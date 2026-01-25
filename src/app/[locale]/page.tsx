@@ -1,0 +1,210 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Link } from "@/core/lib/i18n/navigation";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { Button } from "@/core/components/ui/button";
+import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { serverConfig } from "@/core/config/server";
+import { SkeletonNewsGrid, SkeletonSidebar } from "@/core/components/ui/skeleton";
+import { useTranslations } from "next-intl";
+import { useCurrency } from "@/core/lib/currency/context";
+import { formatRelativeTime } from "@/core/lib/utils";
+import { useModuleEnabled } from "@/core/hooks/useModule";
+import { ThemeSlot } from "@/core/components/theme-slot";
+import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
+import { NewsCard } from "@/core/components/cards/news-card";
+import { DiscordWidget } from "@/core/components/widgets/discord-widget";
+import { FeaturedProductWidget } from "@/core/components/widgets/featured-product-widget";
+import { PaymentGoalWidget } from "@/core/components/widgets/payment-goal-widget";
+import { TopCustomerWidget } from "@/core/components/widgets/top-customer-widget";
+import { TopBuyersWidget } from "@/core/components/widgets/top-buyers-widget";
+import { TopCreditLoadersWidget } from "@/core/components/widgets/top-credit-loaders-widget";
+import { RecentPurchasesWidget } from "@/core/components/widgets/recent-purchases-widget";
+import { NewsGrid } from "@/core/components/blog/news-grid";
+
+// Blog post type from API
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  coverImage: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  category: { name: string; slug: string } | null;
+}
+
+// Payment Goal
+const paymentGoal = { current: 2850, target: 5000 };
+
+// Top Buyers
+const topBuyers = [
+  { name: "xSteve", avatar: "S", amount: 245 },
+  { name: "ProGamer123", avatar: "P", amount: 198 },
+  { name: "MineCraft_King", avatar: "M", amount: 156 },
+];
+
+// Top Credit Loaders
+const topCreditLoaders = [
+  { name: "DiamondHunter", avatar: "D", amount: 500 },
+  { name: "BlockMaster", avatar: "B", amount: 425 },
+  { name: "another site", avatar: "C", amount: 380 },
+];
+
+// Recent Purchases
+const recentPurchases = [
+  { user: "xSteve", product: "VIP Rank", date: "2 min", avatar: "S", price: 19.99 },
+  { user: "GamerPro", product: "100 Credits", date: "5 min", avatar: "G", price: 9.99 },
+  { user: "BlockKing", product: "Premium Key", date: "12 min", avatar: "B", price: 4.99 },
+  { user: "MineMaster", product: "MVP+ Rank", date: "18 min", avatar: "M", price: 29.99 },
+];
+
+// Top Customer
+const topCustomer = { name: "xSteve", avatar: "S", monthlySpend: 2450 };
+
+// Featured Product
+const featuredProduct = {
+  name: "Legend Rank",
+  price: 49.99,
+  image: "👑",
+};
+
+export default function HomePage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const goalPercent = paymentGoal.target > 0 ? Math.round((paymentGoal.current / paymentGoal.target) * 100) : 0;
+
+  const t = useTranslations('news');
+  const sidebarT = useTranslations('sidebar');
+  const storeT = useTranslations('store');
+  const { formatPrice } = useCurrency();
+  const { enabled: blogEnabled } = useModuleEnabled('blog');
+
+  // Fetch blog articles from API (only if blog module enabled)
+  useEffect(() => {
+    if (!blogEnabled) {
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    fetch('/api/v1/blog/articles?limit=8')
+      .then(res => res.json())
+      .then(data => {
+        setBlogPosts(data.articles || []);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, [blogEnabled]);
+
+  // Pagination
+  const newsPerPage = 4;
+  const totalPages = Math.ceil(blogPosts.length / newsPerPage);
+  const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      {/* Shared Hero Banner */}
+      <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
+
+
+      {/* Shared Navbar */}
+      <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6 flex-1">
+        {/* Breadcrumb */}
+        <div className="text-sm text-gray-500 mb-4">
+          <Link href="/" className="hover:text-blue-600">{useTranslations('common')('home')}</Link>
+          <span className="mx-2">/</span>
+          <span className="text-gray-700">{t('title')}</span>
+        </div>
+
+        <ThemeSlot
+          name="SidebarLayout"
+          defaultComponent={<StandardSidebarLayout sidebar={null as any} children={null} />}
+          props={{
+            children: (
+              <div className="lg:col-span-2">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">{t('title')}</h2>
+
+                {/* 2-Column News Grid */}
+                {isLoading ? (
+                  <SkeletonNewsGrid count={4} />
+                ) : blogPosts.length === 0 ? (
+                  <div className="bg-white rounded-xl p-8 text-center">
+                    <p className="text-gray-500">No blog posts yet.</p>
+                  </div>
+                ) : (
+                  <ThemeSlot
+                    name="NewsGrid"
+                    defaultComponent={<NewsGrid posts={paginatedNews} />}
+                    props={{ posts: paginatedNews }}
+                  />
+                )}
+
+                {/* Pagination */}
+                <div className="flex items-center justify-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="border-gray-300 text-gray-700 hover:text-gray-900"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
+                  </Button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className={currentPage === page ? "bg-blue-600" : "border-gray-300"}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="border-gray-300 text-gray-700 hover:text-gray-900"
+                  >
+                    {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            ),
+            sidebar: (
+              <div className="space-y-5">
+                {isLoading ? (
+                  <SkeletonSidebar />
+                ) : (
+                  <>
+                    <ThemeSlot name="DiscordWidget" defaultComponent={<DiscordWidget />} />
+                    <ThemeSlot name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />
+                    <ThemeSlot name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />
+                    <ThemeSlot name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />
+                    <ThemeSlot name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />
+                    <ThemeSlot name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />
+                    <ThemeSlot name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />
+                  </>
+                )}
+              </div>
+            )
+          }}
+        />
+      </main >
+
+      {/* Shared Footer */}
+      < ThemeSlot name="Footer" defaultComponent={< Footer />} />
+    </div >
+  );
+}
