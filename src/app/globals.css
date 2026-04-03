@@ -1,19 +1,25 @@
 @import "tailwindcss";
 
+/* ============================================
+   uxwVend "Neon Forge" Design System
+   Premium dark-first gaming aesthetic
+   ============================================ */
+
 :root {
-  /* Colors - White Theme */
-  --color-primary: #2563eb;
-  --color-secondary: #06b6d4;
-  --color-accent: #22d3ee;
-  --color-background: #f3f4f6;
-  --color-foreground: #111827;
-  --color-muted: #e5e7eb;
-  --color-muted-foreground: #6b7280;
-  --color-card: #ffffff;
-  --color-card-foreground: #111827;
-  --color-destructive: #ef4444;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
+  /* Core Palette — Electric Cyan + Deep Navy */
+  --color-primary: #00d4ff;
+  --color-secondary: #7c3aed;
+  --color-accent: #06ffa5;
+  --color-background: #080c14;
+  --color-foreground: #e2e8f0;
+  --color-muted: #111827;
+  --color-muted-foreground: #64748b;
+  --color-card: #0f1520;
+  --color-card-foreground: #e2e8f0;
+  --color-border: #1e293b;
+  --color-destructive: #ff4757;
+  --color-success: #00ffa5;
+  --color-warning: #ffbe0b;
 
   /* Typography */
   --font-heading: "Outfit", sans-serif;
@@ -22,23 +28,49 @@
 
   /* Spacing */
   --radius: 0.75rem;
+
+  /* Glow colors */
+  --glow-primary: rgba(0, 212, 255, 0.15);
+  --glow-secondary: rgba(124, 58, 237, 0.15);
+  --glow-accent: rgba(6, 255, 165, 0.15);
 }
 
-/* Dark Mode */
-[data-theme="dark"],
-.dark {
-  --color-primary: #6366f1;
-  --color-secondary: #8b5cf6;
-  --color-accent: #a78bfa;
-  --color-background: #0f172a;
-  --color-foreground: #f1f5f9;
-  --color-muted: #1e293b;
-  --color-muted-foreground: #94a3b8;
-  --color-card: #1e293b;
-  --color-card-foreground: #f1f5f9;
-  --color-destructive: #f87171;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
+/* Light mode override */
+[data-theme="flat"],
+[data-theme="light"] {
+  --color-primary: #0ea5e9;
+  --color-secondary: #7c3aed;
+  --color-accent: #10b981;
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-border: #e2e8f0;
+  --color-destructive: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --glow-primary: rgba(14, 165, 233, 0.1);
+  --glow-secondary: rgba(124, 58, 237, 0.1);
+  color-scheme: light;
+}
+
+/* Dark mode explicit */
+[data-theme="dark"] {
+  --color-primary: #00d4ff;
+  --color-secondary: #7c3aed;
+  --color-accent: #06ffa5;
+  --color-background: #080c14;
+  --color-foreground: #e2e8f0;
+  --color-muted: #111827;
+  --color-muted-foreground: #64748b;
+  --color-card: #0f1520;
+  --color-card-foreground: #e2e8f0;
+  --color-border: #1e293b;
+  --color-destructive: #ff4757;
+  --color-success: #00ffa5;
+  --color-warning: #ffbe0b;
   color-scheme: dark;
 }
 
@@ -60,69 +92,106 @@
   --font-mono: var(--font-mono);
 }
 
+/* ============================================
+   Base Styles
+   ============================================ */
+
 body {
   color: var(--color-foreground);
   font-family: var(--font-body);
+  background: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar */
+/* Ambient background noise texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   Scrollbar — Slim & Sleek
+   ============================================ */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-muted);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+  background: var(--color-muted-foreground);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
+  background: var(--color-primary);
 }
 
-/* Selection */
+/* ============================================
+   Selection & Focus
+   ============================================ */
+
 ::selection {
   background: var(--color-primary);
-  color: white;
+  color: #000;
 }
 
-/* Focus styles */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Animated gradient background */
-.gradient-bg {
-  background: linear-gradient(135deg,
-      var(--color-background) 0%,
-      #1a1a2e 50%,
-      var(--color-background) 100%);
+/* ============================================
+   Glass Effects
+   ============================================ */
+
+.glass {
+  background: rgba(15, 21, 32, 0.7);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Glass effect */
-.glass {
-  background: rgba(24, 24, 27, 0.8);
+.glass-light {
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Glow effects */
+/* ============================================
+   Glow Effects
+   ============================================ */
+
 .glow-primary {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 20px var(--glow-primary), 0 0 60px var(--glow-primary);
 }
 
 .glow-secondary {
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  box-shadow: 0 0 20px var(--glow-secondary), 0 0 60px var(--glow-secondary);
 }
 
-/* Text gradient */
+.glow-accent {
+  box-shadow: 0 0 20px var(--glow-accent);
+}
+
+.glow-border {
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.1), 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+/* ============================================
+   Text Effects
+   ============================================ */
+
 .text-gradient {
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
@@ -130,41 +199,50 @@ body {
   background-clip: text;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
+.text-gradient-accent {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 16px var(--glow-primary); }
+  50% { box-shadow: 0 0 32px var(--glow-primary), 0 0 64px var(--glow-primary); }
+}
 
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-  }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-  50% {
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(0, 212, 255, 0.2); }
+  50% { border-color: rgba(0, 212, 255, 0.5); }
 }
 
 .animate-fade-in {
@@ -175,6 +253,84 @@ body {
   animation: slideIn 0.3s ease-out forwards;
 }
 
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
 .animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.05), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* ============================================
+   Gradient Backgrounds
+   ============================================ */
+
+.gradient-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(6, 255, 165, 0.02) 0%, transparent 50%),
+    var(--color-background);
+}
+
+/* ============================================
+   Card Hover Effects
+   ============================================ */
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 212, 255, 0.1);
+}
+
+/* ============================================
+   Admin Sidebar Specific
+   ============================================ */
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #0a0f1a 0%, #080c14 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.admin-sidebar-link {
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.admin-sidebar-link:hover {
+  background: rgba(0, 212, 255, 0.05);
+  border-left-color: rgba(0, 212, 255, 0.3);
+}
+
+.admin-sidebar-link.active {
+  background: rgba(0, 212, 255, 0.08);
+  border-left-color: var(--color-primary);
+  color: var(--color-primary);
 }

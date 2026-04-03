@@ -102,19 +102,22 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
 
     const sidebarContent = (
         <>
-            <Link href="/" className="flex items-center gap-2 mb-8 px-2" onClick={() => setMobileOpen(false)}>
-                <span className="font-bold text-xl">uxwVend</span>
+            <Link href="/" className="flex items-center gap-3 mb-8 px-3" onClick={() => setMobileOpen(false)}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <span className="text-black font-black text-sm">U</span>
+                </div>
+                <span className="font-bold text-lg text-foreground">uxwVend</span>
             </Link>
 
-            <nav className="space-y-1 mb-8">
+            <nav className="space-y-0.5 mb-8 px-1">
                 {allNavItems.map((item) => (
                     <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive(item.href)
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${isActive(item.href)
+                            ? "active"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         {item.icon}
@@ -145,7 +148,7 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
             )}
 
             {/* Mobile sidebar */}
-            <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-card p-4 border-r overflow-y-auto z-50 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <button
                     onClick={() => setMobileOpen(false)}
                     className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"
@@ -156,7 +159,7 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
             </aside>
 
             {/* Desktop sidebar */}
-            <aside className="hidden lg:block fixed top-0 left-0 bottom-0 w-64 bg-card p-4 border-r overflow-y-auto">
+            <aside className="hidden lg:block fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
                 {sidebarContent}
             </aside>
         </>

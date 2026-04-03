@@ -25,7 +25,6 @@ export function Navbar() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
 
-    // Dynamic nav links from DB or defaults
     const defaultLinks = [
         { label: t('home'), href: "/", icon: "Home" },
         { label: t('store'), href: "/store", icon: "ShoppingCart" },
@@ -37,147 +36,96 @@ export function Navbar() {
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setMenuOpen(false);
-            }
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Fetch cart count for logged-in users
     useEffect(() => {
         if (status !== "authenticated") return;
-        fetch("/api/v1/store/cart")
-            .then((r) => r.json())
-            .then((d) => setCartCount(d.itemCount || 0))
-            .catch(() => {});
+        fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
     }, [status]);
 
-    const isActive = (path: string) => {
-        if (path === "/") return pathname === "/";
-        return pathname.startsWith(path);
-    };
-
-    const isAdmin = session?.user?.role === "admin";
+    const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
+    const isAdminUser = session?.user?.role === "admin";
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="glass sticky top-0 z-50 border-b border-white/5">
             <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between py-3">
-                    <nav className="flex items-center gap-1">
+                <div className="flex items-center justify-between h-14">
+                    <nav className="flex items-center gap-0.5">
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
                             return (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(link.href)
-                                        ? "bg-blue-50 text-blue-600"
-                                        : "text-gray-600 hover:bg-gray-100"
-                                        }`}
-                                >
+                                <Link key={link.href} href={link.href}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive(link.href) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
                                     {IconComp && <IconComp className="w-4 h-4" />}
-                                    {link.label}
+                                    <span className="hidden sm:inline">{link.label}</span>
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    <div className="flex items-center gap-3">
-                        {/* Dark Mode Toggle */}
+                    <div className="flex items-center gap-2">
                         {mounted && (
-                            <button
-                                onClick={() => setTheme(theme === "dark" ? "flat" : "dark")}
-                                className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-                                title="Toggle dark mode"
-                            >
-                                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                            <button onClick={() => setTheme(theme === "dark" || theme === "flat" ? "light" : "flat")}
+                                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                                {theme === "dark" || theme === "flat" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
                         )}
 
                         {status === "loading" ? (
-                            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+                            <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
                         ) : session?.user ? (
                             <>
-                            {/* Cart Badge */}
-                            <Link
-                                href="/store/cart"
-                                className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-                            >
-                                <ShoppingCart className="w-5 h-5" />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                                        {cartCount > 9 ? "9+" : cartCount}
-                                    </span>
-                                )}
-                            </Link>
-                            <div className="relative" ref={menuRef}>
-                                <button
-                                    onClick={() => setMenuOpen(!menuOpen)}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                >
-                                    {session.user.image ? (
-                                        <img
-                                            src={session.user.image}
-                                            alt={session.user.name || ""}
-                                            className="w-7 h-7 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                                            {(session.user.name || "U")[0].toUpperCase()}
+                                <Link href="/store/cart" className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                                    <ShoppingCart className="w-4 h-4" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-black text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
+                                    )}
+                                </Link>
+
+                                <div className="relative" ref={menuRef}>
+                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-all">
+                                        {session.user.image ? (
+                                            <img src={session.user.image} alt="" className="w-7 h-7 rounded-full object-cover ring-2 ring-primary/20" />
+                                        ) : (
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-black text-xs font-bold">
+                                                {(session.user.name || "U")[0].toUpperCase()}
+                                            </div>
+                                        )}
+                                        <span className="text-sm font-medium hidden sm:block">{session.user.name}</span>
+                                    </button>
+
+                                    {menuOpen && (
+                                        <div className="absolute right-0 top-full mt-2 w-52 glass rounded-xl shadow-2xl shadow-black/30 py-1 z-50 border border-white/10 animate-fade-in">
+                                            <div className="px-4 py-3 border-b border-white/5">
+                                                <p className="text-sm font-medium truncate">{session.user.name}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+                                            </div>
+                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors" onClick={() => setMenuOpen(false)}>
+                                                <User className="w-4 h-4" /> Profile
+                                            </Link>
+                                            {isAdminUser && (
+                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors" onClick={() => setMenuOpen(false)}>
+                                                    <Shield className="w-4 h-4" /> Admin Panel
+                                                </Link>
+                                            )}
+                                            <div className="border-t border-white/5 mt-1">
+                                                <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full text-left transition-colors">
+                                                    <LogOut className="w-4 h-4" /> {commonT('logout')}
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
-                                    <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                                        {session.user.name}
-                                    </span>
-                                </button>
-
-                                {menuOpen && (
-                                    <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                                        <div className="px-3 py-2 border-b border-gray-100">
-                                            <p className="text-sm font-medium text-gray-900 truncate">{session.user.name}</p>
-                                            <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
-                                        </div>
-                                        <Link
-                                            href="/profile"
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                            onClick={() => setMenuOpen(false)}
-                                        >
-                                            <User className="w-4 h-4" /> Profile
-                                        </Link>
-                                        {isAdmin && (
-                                            <Link
-                                                href="/admin"
-                                                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                                onClick={() => setMenuOpen(false)}
-                                            >
-                                                <Shield className="w-4 h-4" /> Admin Panel
-                                            </Link>
-                                        )}
-                                        <button
-                                            onClick={() => signOut({ callbackUrl: "/" })}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                                        >
-                                            <LogOut className="w-4 h-4" /> {commonT('logout')}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                                </div>
                             </>
                         ) : (
-                            <>
-                                <Link href="/auth/login">
-                                    <Button variant="ghost" className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-5 py-2">
-                                        {commonT('login')}
-                                    </Button>
-                                </Link>
-                                <Link href="/auth/register">
-                                    <Button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-sm">
-                                        {commonT('register')}
-                                    </Button>
-                                </Link>
-                            </>
+                            <div className="flex items-center gap-2">
+                                <Link href="/auth/login"><Button variant="ghost" size="sm">{commonT('login')}</Button></Link>
+                                <Link href="/auth/register"><Button size="sm">{commonT('register')}</Button></Link>
+                            </div>
                         )}
                     </div>
                 </div>
