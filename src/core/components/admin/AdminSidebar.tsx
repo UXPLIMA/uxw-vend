@@ -36,7 +36,8 @@ import {
     MessageSquare,
     LayoutList,
     Layers,
-    Crown
+    Crown,
+    ClipboardCheck
 } from "lucide-react";
 
 interface NavItem {
@@ -59,7 +60,7 @@ const navItems: NavItem[] = [
     { href: "/admin/forms", label: "Custom Forms", icon: <FileEdit size={18} /> },
     { href: "/admin/bulk-discounts", label: "Bulk Discounts", icon: <Percent size={18} /> },
     { href: "/admin/staff-members", label: "Staff Members", icon: <UserCheck size={18} /> },
-    { href: "/admin/staff-applications", label: "Applications", icon: <FileText size={18} /> },
+    { href: "/admin/staff-applications", label: "Applications", icon: <ClipboardCheck size={18} /> },
     { href: "/admin/slider", label: "Slider", icon: <ImageIcon size={18} /> },
     { href: "/admin/seo", label: "SEO", icon: <Search size={18} /> },
     { href: "/admin/webhook-logs", label: "Webhook Logs", icon: <Webhook size={18} /> },
