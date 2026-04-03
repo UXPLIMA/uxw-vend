@@ -35,7 +35,8 @@ import {
     FileEdit,
     MessageSquare,
     LayoutList,
-    Layers
+    Layers,
+    Crown
 } from "lucide-react";
 
 interface NavItem {
@@ -52,7 +53,7 @@ const navItems: NavItem[] = [
     { href: "/admin/popups", label: "Popups", icon: <Bell size={18} /> },
     { href: "/admin/downloads", label: "Downloads", icon: <Download size={18} /> },
     { href: "/admin/gift-codes", label: "Gift Codes", icon: <Gift size={18} /> },
-    { href: "/admin/creator-codes", label: "Creator Codes", icon: <Tag size={18} /> },
+    { href: "/admin/creator-codes", label: "Creator Codes", icon: <Crown size={18} /> },
     { href: "/admin/vote-sites", label: "Vote Sites", icon: <Vote size={18} /> },
     { href: "/admin/wheel-prizes", label: "Wheel Prizes", icon: <Dices size={18} /> },
     { href: "/admin/forms", label: "Custom Forms", icon: <FileEdit size={18} /> },
@@ -84,6 +85,7 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
         MessageSquare,
         LayoutList,
         Layers,
+        Crown,
     };
     const Icon = icons[name] || Package;
     return <Icon size={size} />;
