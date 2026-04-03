@@ -5,6 +5,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useParams } from "next/navigation";
 import { useRouter } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { ThemeSlot } from "@/core/components/theme-slot";
@@ -81,7 +82,10 @@ export default function ProductDetailPage() {
             });
             if (res.ok) {
                 setAddedToCart(true);
+                toast.success(`${product.name} added to cart`);
                 setTimeout(() => setAddedToCart(false), 2000);
+            } else {
+                toast.error("Failed to add to cart");
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);

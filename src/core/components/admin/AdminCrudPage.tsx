@@ -36,6 +36,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<Record<string, string>>({});
+    const [selected, setSelected] = useState<Set<string>>(new Set());
 
     const resetForm = () => {
         const defaults: Record<string, string> = {};
@@ -106,6 +107,22 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         setSaving(false);
     };
 
+    const toggleSelect = (id: string) => {
+        const next = new Set(selected);
+        next.has(id) ? next.delete(id) : next.add(id);
+        setSelected(next);
+    };
+
+    const bulkDelete = async () => {
+        if (!confirm(`Delete ${selected.size} items?`)) return;
+        for (const id of selected) {
+            await fetch(`${apiPath}/${id}`, { method: "DELETE" });
+        }
+        toast.success(`Deleted ${selected.size} items`);
+        setSelected(new Set());
+        fetchItems();
+    };
+
     const deleteItem = async (id: string) => {
         if (!confirm("Delete this item?")) return;
         const res = await fetch(`${apiPath}/${id}`, { method: "DELETE" });
@@ -157,9 +174,16 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                     <h1 className="text-3xl font-bold">{title}</h1>
                     <p className="text-muted-foreground">{subtitle}</p>
                 </div>
-                <Button onClick={() => showForm ? resetForm() : setShowForm(true)}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> Cancel</> : <><Plus className="w-4 h-4 mr-2" /> Add New</>}
-                </Button>
+                <div className="flex gap-2">
+                    {selected.size > 0 && (
+                        <Button variant="destructive" size="sm" onClick={bulkDelete}>
+                            <Trash2 className="w-3 h-3 mr-1" /> Delete {selected.size}
+                        </Button>
+                    )}
+                    <Button onClick={() => showForm ? resetForm() : setShowForm(true)}>
+                        {showForm ? <><X className="w-4 h-4 mr-2" /> Cancel</> : <><Plus className="w-4 h-4 mr-2" /> Add New</>}
+                    </Button>
+                </div>
             </div>
 
             {showForm && (
@@ -192,8 +216,14 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                     ) : (
                         <div className="divide-y">
                             {items.map((item) => (
-                                <div key={item.id as string} className="flex items-center justify-between p-4 hover:bg-muted/50">
-                                    <div>
+                                <div key={item.id as string} className="flex items-center gap-3 p-4 hover:bg-muted/50">
+                                    <input
+                                        type="checkbox"
+                                        checked={selected.has(item.id as string)}
+                                        onChange={() => toggleSelect(item.id as string)}
+                                        className="rounded flex-shrink-0"
+                                    />
+                                    <div className="flex-1 min-w-0">
                                         <p className="font-medium">{String(item[displayField] || "")}</p>
                                         {secondaryField && (
                                             <p className="text-sm text-muted-foreground">{String(item[secondaryField] || "")}</p>

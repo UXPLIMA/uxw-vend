@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
+import { AdminSearch } from "@/core/components/admin/AdminSearch";
 import moduleSystem from "@/core/lib/modules";
 import { prisma } from "@/core/lib/db";
 
@@ -39,6 +40,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             />
             {/* Main Content Wrapper */}
             <main className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8">
+                <div className="mb-6 max-w-md">
+                    <AdminSearch />
+                </div>
                 {children}
             </main>
         </div>
