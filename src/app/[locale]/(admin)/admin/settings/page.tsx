@@ -1,43 +1,71 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Mail, CreditCard, MessageSquare } from "lucide-react";
+import { Palette, Globe, Mail, CreditCard, MessageSquare, Shield, Server, Target, BarChart3, Bot } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
     const settingsItems = [
         {
             title: "Appearance",
-            description: "Manage themes, colors, and layout customization.",
+            description: "Themes, colors, and layout customization.",
             href: "/admin/settings/theme",
             icon: Palette,
             color: "text-purple-500",
         },
         {
             title: "Site Configuration",
-            description: "Server name, description, social links, and general settings.",
+            description: "Server name, description, social links.",
             href: "/admin/settings/site",
             icon: Globe,
             color: "text-blue-500",
         },
         {
-            title: "Email",
-            description: "Email service configuration and templates.",
-            href: "/admin/settings/email",
-            icon: Mail,
-            color: "text-green-500",
-        },
-        {
             title: "Discord",
-            description: "Webhook notifications for orders, tickets, and events.",
+            description: "Webhook notifications for events.",
             href: "/admin/settings/discord",
             icon: MessageSquare,
             color: "text-indigo-500",
         },
         {
             title: "Payments",
-            description: "Stripe and payment gateway configuration.",
+            description: "Stripe keys and payment gateway.",
             href: "/admin/settings/payments",
             icon: CreditCard,
             color: "text-orange-500",
+        },
+        {
+            title: "Email (SMTP)",
+            description: "Resend API key and email settings.",
+            href: "/admin/settings/email",
+            icon: Mail,
+            color: "text-green-500",
+        },
+        {
+            title: "Game Server (RCON)",
+            description: "RCON connection and command delivery.",
+            href: "/admin/settings/rcon",
+            icon: Server,
+            color: "text-red-500",
+        },
+        {
+            title: "Security",
+            description: "CAPTCHA, rate limiting, and protection.",
+            href: "/admin/settings/security",
+            icon: Shield,
+            color: "text-yellow-500",
+        },
+        {
+            title: "Community Goals",
+            description: "Set monthly revenue targets.",
+            href: "/admin/settings/goals",
+            icon: Target,
+            color: "text-pink-500",
+        },
+        {
+            title: "Analytics",
+            description: "Google Analytics tracking configuration.",
+            href: "/admin/settings/analytics",
+            icon: BarChart3,
+            color: "text-cyan-500",
         },
     ];
 
@@ -50,16 +78,16 @@ export default function SettingsPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {settingsItems.map((item) => (
                     <Link href={item.href} key={item.href}>
                         <Card className="hover:bg-accent/50 transition-colors cursor-pointer h-full">
-                            <CardHeader>
-                                <CardTitle className="flex items-center space-x-2 text-base">
-                                    <item.icon className={`w-5 h-5 ${item.color}`} />
+                            <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center space-x-2 text-sm">
+                                    <item.icon className={`w-4 h-4 ${item.color}`} />
                                     <span>{item.title}</span>
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="text-xs">
                                     {item.description}
                                 </CardDescription>
                             </CardHeader>
