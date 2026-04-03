@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, DollarSign, Mail, Facebook, Instagram, Twitter, Youtube, ChevronDown } from "lucide-react";
+import { Globe, DollarSign, Mail, ChevronDown } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
@@ -77,23 +77,23 @@ export function Footer() {
                         </p>
                         <div className="flex gap-3">
                             {serverConfig.social.facebook && (
-                                <a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors">
-                                    <Facebook className="w-4 h-4" />
+                                <a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                    f
                                 </a>
                             )}
                             {serverConfig.social.instagram && (
-                                <a href={serverConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-pink-600 flex items-center justify-center transition-colors">
-                                    <Instagram className="w-4 h-4" />
+                                <a href={serverConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-pink-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                    ig
                                 </a>
                             )}
                             {serverConfig.social.twitter && (
-                                <a href={serverConfig.social.twitter} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-sky-500 flex items-center justify-center transition-colors">
-                                    <Twitter className="w-4 h-4" />
+                                <a href={serverConfig.social.twitter} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-sky-500 flex items-center justify-center transition-colors text-xs font-bold">
+                                    X
                                 </a>
                             )}
                             {serverConfig.social.youtube && (
-                                <a href={serverConfig.social.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 flex items-center justify-center transition-colors">
-                                    <Youtube className="w-4 h-4" />
+                                <a href={serverConfig.social.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                    yt
                                 </a>
                             )}
                             <a href={serverConfig.discordUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-indigo-600 flex items-center justify-center transition-colors">

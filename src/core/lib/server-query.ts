@@ -55,7 +55,7 @@ export async function queryMinecraftServer(
         let data = Buffer.alloc(0);
 
         socket.on("data", (chunk) => {
-            data = Buffer.concat([data, chunk]);
+            data = Buffer.concat([data, chunk as Buffer]);
 
             if (data.length > 3 && data[0] === 0xFF) {
                 responded = true;
