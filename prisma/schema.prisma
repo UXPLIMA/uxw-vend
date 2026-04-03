@@ -70,6 +70,7 @@ model User {
   suggestionVotes  SuggestionVote[]   @relation("SuggestionVotes")
   staffApplications StaffApplication[] @relation("StaffApplications")
   activityLogs     ActivityLog[]      @relation("ActivityLogs")
+  wheelSpins       WheelSpin[]        @relation("WheelSpins")
 
   @@index([email])
   @@index([username])
@@ -557,6 +558,65 @@ model ActivityLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+
+// ==================== DOWNLOAD CENTER ====================
+
+model Download {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  fileName    String
+  fileUrl     String
+  fileSize    Int?
+  downloads   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ==================== PUNISHMENTS ====================
+
+model Punishment {
+  id         String    @id @default(cuid())
+  playerName String
+  playerUuid String?
+  type       String    // ban, mute, kick, warn
+  reason     String?
+  duration   String?   // "permanent", "7d", "30m" etc
+  active     Boolean   @default(true)
+  punishedBy String?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+
+  @@index([playerName])
+  @@index([type])
+  @@index([active])
+}
+
+// ==================== WHEEL OF FORTUNE ====================
+
+model WheelPrize {
+  id          String  @id @default(cuid())
+  name        String
+  type        String  // credits, coupon, nothing
+  value       Int     @default(0)
+  color       String  @default("#3b82f6")
+  probability Int     @default(10) // weight 1-100
+  isActive    Boolean @default(true)
+  order       Int     @default(0)
+}
+
+model WheelSpin {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("WheelSpins", fields: [userId], references: [id])
+  prizeId   String?
+  prizeName String
+  prizeValue Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ==================== FORUM MODULE ====================
