@@ -22,6 +22,7 @@
 }
 
 [data-theme="dark"],
+[data-mode="dark"],
 .dark {
   --color-primary: #3b82f6;
   --color-secondary: #8b5cf6;

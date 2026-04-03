@@ -2,7 +2,6 @@
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText } from "lucide-react";
-import { useTheme } from "next-themes";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -20,10 +19,29 @@ export function Navbar() {
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const { theme, setTheme } = useTheme();
     const { settings } = useSiteSettings();
     const [mounted, setMounted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        const stored = localStorage.getItem("color-mode");
+        const dark = stored === "dark";
+        setIsDark(dark);
+        if (dark) document.documentElement.setAttribute("data-mode", "dark");
+    }, []);
+
+    const toggleDarkMode = () => {
+        const newDark = !isDark;
+        setIsDark(newDark);
+        if (newDark) {
+            document.documentElement.setAttribute("data-mode", "dark");
+            localStorage.setItem("color-mode", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-mode");
+            localStorage.setItem("color-mode", "light");
+        }
+    };
 
     const defaultLinks = [
         { label: t('home'), href: "/", icon: "Home" },
@@ -49,7 +67,7 @@ export function Navbar() {
     const isAdminUser = session?.user?.role === "admin";
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12">
                     <nav className="flex items-center gap-1">
@@ -67,9 +85,9 @@ export function Navbar() {
 
                     <div className="flex items-center gap-2">
                         {mounted && (
-                            <button onClick={() => setTheme(theme === "dark" ? "flat" : "dark")}
+                            <button onClick={toggleDarkMode}
                                 className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
                         )}
 
