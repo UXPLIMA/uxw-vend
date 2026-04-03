@@ -565,6 +565,58 @@ model CustomFormSubmission {
   @@index([formId])
 }
 
+// ==================== SLIDER ====================
+
+model SliderItem {
+  id        String   @id @default(cuid())
+  title     String?
+  subtitle  String?
+  image     String
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ==================== WEBHOOK LOGS ====================
+
+model WebhookLog {
+  id        String   @id @default(cuid())
+  event     String
+  url       String
+  status    Int?
+  response  String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+}
+
+// ==================== PRODUCT VARIABLES ====================
+
+model ProductVariable {
+  id          String  @id @default(cuid())
+  productId   String
+  name        String  // e.g. "minecraft_nick"
+  label       String  // e.g. "Minecraft Username"
+  type        String  @default("text") // text, select, number
+  required    Boolean @default(true)
+  placeholder String?
+  options     String? // comma-separated for select type
+
+  @@index([productId])
+}
+
+model ProductCommand {
+  id        String @id @default(cuid())
+  productId String
+  command   String // e.g. "give {player} diamond 64"
+  order     Int    @default(0)
+
+  @@index([productId])
+}
+
 // ==================== POPUP ====================
 
 model Popup {
