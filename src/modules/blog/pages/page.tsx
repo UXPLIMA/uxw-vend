@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/core/lib/db";
-import { formatDate, formatRelativeTime } from "@/core/lib/utils";
+import { formatDate } from "@/core/lib/utils";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";

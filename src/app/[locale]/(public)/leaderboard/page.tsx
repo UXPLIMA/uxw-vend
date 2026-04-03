@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
 import { getMinecraftAvatar } from "@/core/lib/minecraft";

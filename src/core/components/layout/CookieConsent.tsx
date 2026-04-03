@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/core/components/ui/button";
-import { Cookie, X } from "lucide-react";
+import { Cookie } from "lucide-react";
 
 export function CookieConsent() {
     const [show, setShow] = useState(false);

@@ -1,6 +1,6 @@
 
 import { moduleLoader } from './module-loader';
-import { ModuleDefinition, ModuleState, ModuleManifest } from './module-types';
+import { ModuleState, ModuleManifest } from './module-types';
 
 /**
  * Module System for uxwVend

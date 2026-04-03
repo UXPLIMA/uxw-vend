@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Plus, X, Trash2, Pencil, Check } from "lucide-react";
+import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 
 interface Category {
     id: string;
