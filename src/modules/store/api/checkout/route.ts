@@ -50,17 +50,36 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check for cumulative upgrades (if user owns a cheaper product in same category, pay difference)
+        const ownedProducts = await prisma.ownedProduct.findMany({
+            where: { userId: session.user.id },
+        });
+        const ownedIds = new Set(ownedProducts.map((o) => o.productId));
+
         // Calculate totals
         let subtotal = 0;
         const orderItems = items.map((item) => {
             const product = products.find((p) => p.id === item.productId)!;
-            const itemTotal = Number(product.price) * item.quantity;
+            let price = Number(product.price);
+
+            // Cumulative: if same category and user owns a cheaper product, pay difference
+            if (product.categoryId) {
+                const ownedInCategory = products.filter(
+                    (p) => p.categoryId === product.categoryId && ownedIds.has(p.id) && Number(p.price) < price
+                );
+                if (ownedInCategory.length > 0) {
+                    const highestOwned = Math.max(...ownedInCategory.map((p) => Number(p.price)));
+                    price = Math.max(0, price - highestOwned);
+                }
+            }
+
+            const itemTotal = price * item.quantity;
             subtotal += itemTotal;
 
             return {
                 productId: product.id,
                 name: product.name,
-                price: product.price,
+                price: price,
                 quantity: item.quantity,
                 metadata: { type: product.type },
             };
@@ -121,6 +140,24 @@ export async function POST(request: NextRequest) {
         await prisma.cartItem.deleteMany({
             where: { userId: session.user.id },
         });
+
+        // Add items to chest and owned products
+        for (const item of orderItems) {
+            await prisma.chestItem.create({
+                data: {
+                    userId: session.user.id,
+                    productId: item.productId,
+                    productName: item.name,
+                    quantity: item.quantity,
+                    orderId: order.id,
+                },
+            });
+            await prisma.ownedProduct.upsert({
+                where: { userId_productId: { userId: session.user.id, productId: item.productId } },
+                update: {},
+                create: { userId: session.user.id, productId: item.productId, orderId: order.id },
+            });
+        }
 
         // Audit log
         logActivity({

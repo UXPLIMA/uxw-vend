@@ -49,8 +49,13 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<"profile" | "orders" | "security">("profile");
+    const [activeTab, setActiveTab] = useState<"profile" | "orders" | "security" | "accounts" | "chest">("profile");
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+
+    // Linked accounts & Chest
+    const [linkedAccounts, setLinkedAccounts] = useState<{ id: string; provider: string; username: string | null }[]>([]);
+    const [chestItems, setChestItems] = useState<{ id: string; productName: string; quantity: number; createdAt: string }[]>([]);
+    const [mcUsername, setMcUsername] = useState("");
 
     // 2FA
     const [twoFAStep, setTwoFAStep] = useState<"idle" | "setup" | "verify" | "backup">("idle");
@@ -87,7 +92,9 @@ export default function ProfilePage() {
         Promise.all([
             fetch("/api/v1/auth/profile").then((r) => r.json()),
             fetch("/api/v1/store/orders?limit=10").then((r) => r.json()),
-        ]).then(([profileData, ordersData]) => {
+            fetch("/api/v1/linked-accounts").then((r) => r.json()).catch(() => ({ accounts: [] })),
+            fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })),
+        ]).then(([profileData, ordersData, accountsData, chestData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
                 setUsername(profileData.user.username);
@@ -95,6 +102,8 @@ export default function ProfilePage() {
                 setTwoFAEnabled(profileData.user.twoFactorEnabled || false);
             }
             setOrders(ordersData.orders || []);
+            setLinkedAccounts(accountsData.accounts || []);
+            setChestItems(chestData.items || []);
             setLoading(false);
         }).catch(() => setLoading(false));
     }, [authStatus, router]);
@@ -235,7 +244,7 @@ export default function ProfilePage() {
 
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6">
-                    {(["profile", "orders", "security"] as const).map((tab) => (
+                    {(["profile", "orders", "chest", "accounts", "security"] as const).map((tab) => (
                         <Button
                             key={tab}
                             variant={activeTab === tab ? "default" : "outline"}
@@ -365,6 +374,85 @@ export default function ProfilePage() {
                                     ))}
                                 </div>
                             )}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Chest Tab */}
+                {activeTab === "chest" && (
+                    <Card>
+                        <CardHeader><CardTitle>My Chest</CardTitle></CardHeader>
+                        <CardContent>
+                            {chestItems.length === 0 ? (
+                                <p className="text-muted-foreground text-center py-8">Your chest is empty. Purchase items to store them here.</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {chestItems.map((item) => (
+                                        <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <p className="font-medium">{item.productName}</p>
+                                                <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {new Date(item.createdAt).toLocaleDateString()}</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button size="sm" onClick={async () => {
+                                                    await fetch(`/api/v1/chest/${item.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
+                                                    setChestItems(chestItems.filter((c) => c.id !== item.id));
+                                                }}>Redeem</Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Accounts Tab */}
+                {activeTab === "accounts" && (
+                    <Card>
+                        <CardHeader><CardTitle>Linked Accounts</CardTitle></CardHeader>
+                        <CardContent className="space-y-4">
+                            {/* Current links */}
+                            {linkedAccounts.length > 0 && (
+                                <div className="space-y-2 mb-4">
+                                    {linkedAccounts.map((acc) => (
+                                        <div key={acc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <span className="capitalize font-medium">{acc.provider}</span>
+                                                {acc.username && <span className="text-sm text-muted-foreground">{acc.username}</span>}
+                                            </div>
+                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={async () => {
+                                                await fetch("/api/v1/linked-accounts", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: acc.provider }) });
+                                                setLinkedAccounts(linkedAccounts.filter((a) => a.id !== acc.id));
+                                            }}>Unlink</Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Link Minecraft */}
+                            {!linkedAccounts.find((a) => a.provider === "minecraft") && (
+                                <div className="p-4 border border-dashed border-gray-200 rounded-lg">
+                                    <p className="text-sm font-medium mb-2">Link Minecraft Account</p>
+                                    <div className="flex gap-2">
+                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder="Minecraft username" />
+                                        <Button size="sm" onClick={async () => {
+                                            if (!mcUsername.trim()) return;
+                                            const res = await fetch("/api/v1/linked-accounts", {
+                                                method: "POST", headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ provider: "minecraft", providerId: mcUsername, username: mcUsername }),
+                                            });
+                                            if (res.ok) {
+                                                const data = await res.json();
+                                                setLinkedAccounts([...linkedAccounts, data.account]);
+                                                setMcUsername("");
+                                            }
+                                        }}>Link</Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <p className="text-xs text-muted-foreground">Discord and Google accounts are automatically linked when you log in with them.</p>
                         </CardContent>
                     </Card>
                 )}

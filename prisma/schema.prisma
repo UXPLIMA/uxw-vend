@@ -72,6 +72,8 @@ model User {
   activityLogs     ActivityLog[]      @relation("ActivityLogs")
   wheelSpins       WheelSpin[]        @relation("WheelSpins")
   ownedProducts    OwnedProduct[]     @relation("OwnedProducts")
+  chestItems       ChestItem[]        @relation("ChestItems")
+  linkedAccounts   LinkedAccount[]    @relation("LinkedAccounts")
 
   @@index([email])
   @@index([username])
@@ -156,6 +158,41 @@ model GameServer {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ==================== CHEST (Store & Redeem) ====================
+
+model ChestItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("ChestItems", fields: [userId], references: [id])
+  productId   String
+  productName String
+  quantity    Int      @default(1)
+  isRedeemed  Boolean  @default(false)
+  redeemedAt  DateTime?
+  giftedToId  String?
+  orderId     String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ==================== ACCOUNT LINKING ====================
+
+model LinkedAccount {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation("LinkedAccounts", fields: [userId], references: [id])
+  provider   String   // discord, steam, minecraft
+  providerId String
+  username   String?
+  avatar     String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([provider, providerId])
+  @@index([userId])
 }
 
 model Setting {
