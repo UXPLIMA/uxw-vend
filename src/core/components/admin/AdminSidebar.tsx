@@ -37,30 +37,21 @@ interface NavItem {
 const navItems: NavItem[] = [
     { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/admin/modules", label: "Modules", icon: <Puzzle size={18} /> },
-    { href: "/admin/store/products", label: "Products", icon: <Package size={18} /> },
-    { href: "/admin/store/orders", label: "Orders", icon: <ShoppingCart size={18} /> },
-    { href: "/admin/blog/articles", label: "Blog Articles", icon: <FileText size={18} /> },
-    { href: "/admin/blog/categories", label: "Blog Categories", icon: <FolderOpen size={18} /> },
-    { href: "/admin/tickets", label: "Support Tickets", icon: <Ticket size={18} /> },
-    { href: "/admin/help", label: "Help Center", icon: <HelpCircle size={18} /> },
-    { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
-    { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
-    { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
-];
-
-const manageItems: NavItem[] = [
     { href: "/admin/announcements", label: "Announcements", icon: <Megaphone size={18} /> },
     { href: "/admin/changelog", label: "Changelog", icon: <History size={18} /> },
-    { href: "/admin/staff-members", label: "Staff Members", icon: <UserCheck size={18} /> },
-    { href: "/admin/staff-applications", label: "Applications", icon: <ClipboardList size={18} /> },
+    { href: "/admin/popups", label: "Popups", icon: <Megaphone size={18} /> },
+    { href: "/admin/downloads", label: "Downloads", icon: <Download size={18} /> },
     { href: "/admin/gift-codes", label: "Gift Codes", icon: <Gift size={18} /> },
     { href: "/admin/creator-codes", label: "Creator Codes", icon: <Tag size={18} /> },
-    { href: "/admin/downloads", label: "Downloads", icon: <Download size={18} /> },
-    { href: "/admin/popups", label: "Popups", icon: <Megaphone size={18} /> },
     { href: "/admin/vote-sites", label: "Vote Sites", icon: <CircleDot size={18} /> },
     { href: "/admin/wheel-prizes", label: "Wheel Prizes", icon: <CircleDot size={18} /> },
     { href: "/admin/forms", label: "Custom Forms", icon: <ClipboardList size={18} /> },
     { href: "/admin/bulk-discounts", label: "Bulk Discounts", icon: <Percent size={18} /> },
+    { href: "/admin/staff-members", label: "Staff Members", icon: <UserCheck size={18} /> },
+    { href: "/admin/staff-applications", label: "Applications", icon: <ClipboardList size={18} /> },
+    { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
+    { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
+    { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
 interface AdminSidebarProps {
@@ -87,10 +78,6 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
         return pathname.startsWith(href);
     };
 
-    const coreNavItems = navItems.filter(item =>
-        ["Dashboard", "Modules", "Users", "Roles", "Settings"].includes(item.label)
-    );
-
     const moduleNavItems = modules.flatMap(module => {
         if (!module.menu) return [];
         return module.menu.map((menuItem: any) => ({
@@ -101,10 +88,11 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
         }));
     });
 
+    // Dashboard first, then module menus, then rest of core items
     const allNavItems = [
-        coreNavItems[0],
+        navItems[0], // Dashboard
         ...moduleNavItems,
-        ...coreNavItems.slice(1)
+        ...navItems.slice(1),
     ];
 
     const sidebarContent = (
@@ -120,25 +108,6 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive(item.href)
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                            }`}
-                    >
-                        {item.icon}
-                        {item.label}
-                    </Link>
-                ))}
-            </nav>
-
-            {/* Manage Section */}
-            <p className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Manage</p>
-            <nav className="space-y-1 mb-8">
-                {manageItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-1.5 rounded-lg transition-colors text-sm ${isActive(item.href)
                             ? "bg-primary/10 text-primary font-medium"
                             : "hover:bg-muted text-muted-foreground hover:text-foreground"
                             }`}
