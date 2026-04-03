@@ -53,6 +53,7 @@ const navItems: NavItem[] = [
     { href: "/admin/seo", label: "SEO", icon: <ClipboardList size={18} /> },
     { href: "/admin/webhook-logs", label: "Webhook Logs", icon: <ClipboardList size={18} /> },
     { href: "/admin/activity-log", label: "Activity Log", icon: <ClipboardList size={18} /> },
+    { href: "/admin/servers", label: "Game Servers", icon: <ClipboardList size={18} /> },
     { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
     { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
     { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },

@@ -344,6 +344,28 @@ export default function EditProductPage() {
                             </CardContent>
                         </Card>
 
+                        {/* RCON Commands */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm">Delivery Commands</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-xs text-muted-foreground mb-2">RCON commands executed on purchase. Use {"{player}"} placeholder.</p>
+                                <ProductCommandsEditor productId={productId} />
+                            </CardContent>
+                        </Card>
+
+                        {/* Custom Variables */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm">Custom Variables</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-xs text-muted-foreground mb-2">Extra fields shown to buyer (e.g. Minecraft username)</p>
+                                <ProductVariablesEditor productId={productId} />
+                            </CardContent>
+                        </Card>
+
                         {error && (
                             <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
                                 {error}
@@ -361,5 +383,89 @@ export default function EditProductPage() {
                 </div>
             </form>
         </>
+    );
+}
+
+// Sub-component: RCON commands editor
+function ProductCommandsEditor({ productId }: { productId: string }) {
+    const [commands, setCommands] = useState<{ id: string; command: string }[]>([]);
+    const [newCmd, setNewCmd] = useState("");
+
+    useEffect(() => {
+        fetch(`/api/v1/product-commands?productId=${productId}`)
+            .then((r) => r.json())
+            .then((d) => setCommands(d.commands || []))
+            .catch(() => {});
+    }, [productId]);
+
+    const addCmd = async () => {
+        if (!newCmd.trim()) return;
+        const res = await fetch("/api/v1/product-commands", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, command: newCmd }),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setCommands([...commands, data.command]);
+            setNewCmd("");
+        }
+    };
+
+    return (
+        <div className="space-y-2">
+            {commands.map((cmd) => (
+                <div key={cmd.id} className="flex items-center gap-2">
+                    <code className="flex-1 text-xs bg-muted px-2 py-1 rounded font-mono">{cmd.command}</code>
+                </div>
+            ))}
+            <div className="flex gap-2">
+                <Input value={newCmd} onChange={(e) => setNewCmd(e.target.value)} placeholder='give {player} diamond 64' className="font-mono text-xs" />
+                <Button type="button" variant="outline" size="sm" onClick={addCmd}>Add</Button>
+            </div>
+        </div>
+    );
+}
+
+// Sub-component: Custom variables editor
+function ProductVariablesEditor({ productId }: { productId: string }) {
+    const [vars, setVars] = useState<{ id: string; name: string; label: string; type: string }[]>([]);
+    const [newLabel, setNewLabel] = useState("");
+
+    useEffect(() => {
+        fetch(`/api/v1/product-variables?productId=${productId}`)
+            .then((r) => r.json())
+            .then((d) => setVars(d.variables || []))
+            .catch(() => {});
+    }, [productId]);
+
+    const addVar = async () => {
+        if (!newLabel.trim()) return;
+        const name = newLabel.toLowerCase().replace(/\s+/g, "_");
+        const res = await fetch("/api/v1/product-variables", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, name, label: newLabel, type: "text", required: true }),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            setVars([...vars, data.variable]);
+            setNewLabel("");
+        }
+    };
+
+    return (
+        <div className="space-y-2">
+            {vars.map((v) => (
+                <div key={v.id} className="flex items-center gap-2 text-xs">
+                    <span className="bg-muted px-2 py-1 rounded">{v.label}</span>
+                    <span className="text-muted-foreground">({v.type})</span>
+                </div>
+            ))}
+            <div className="flex gap-2">
+                <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Minecraft Username" className="text-xs" />
+                <Button type="button" variant="outline" size="sm" onClick={addVar}>Add</Button>
+            </div>
+        </div>
     );
 }
