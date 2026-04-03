@@ -93,11 +93,20 @@ export default function CartPage() {
         setCouponDiscount(0);
 
         try {
-            // Validate coupon by attempting a dry-run style check
-            // Since there's no dedicated coupon validation endpoint, we store it for checkout
-            setCouponApplied(couponCode.trim());
+            const res = await fetch("/api/v1/store/coupons/validate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: couponCode.trim(), subtotal: cart?.total || 0 }),
+            });
+            const data = await res.json();
+            if (data.valid) {
+                setCouponApplied(data.coupon.code);
+                setCouponDiscount(data.coupon.discount);
+            } else {
+                setCouponError(data.error || "Invalid coupon");
+            }
         } catch {
-            setCouponError("Failed to apply coupon");
+            setCouponError("Failed to validate coupon");
         }
     };
 

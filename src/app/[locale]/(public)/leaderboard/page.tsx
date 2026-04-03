@@ -6,6 +6,7 @@ import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
+import { getMinecraftAvatar } from "@/core/lib/minecraft";
 import { useCurrency } from "@/core/lib/currency/context";
 
 interface LeaderEntry {
@@ -70,11 +71,12 @@ export default function LeaderboardPage() {
                                             {i < 3 ? ["🥇", "🥈", "🥉"][i] : `#${i + 1}`}
                                         </div>
                                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm overflow-hidden">
-                                            {entry.avatar ? (
-                                                <img src={entry.avatar} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                entry.username[0].toUpperCase()
-                                            )}
+                                            <img
+                                                src={entry.avatar || getMinecraftAvatar(entry.username, 40)}
+                                                alt={entry.username}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                            />
                                         </div>
                                         <div className="flex-1">
                                             <p className="font-medium">{entry.username}</p>

@@ -19,6 +19,7 @@ import { TopBuyersWidget } from "@/core/components/widgets/top-buyers-widget";
 import { TopCreditLoadersWidget } from "@/core/components/widgets/top-credit-loaders-widget";
 import { RecentPurchasesWidget } from "@/core/components/widgets/recent-purchases-widget";
 import { NewsGrid } from "@/core/components/blog/news-grid";
+import { SliderWidget } from "@/core/components/widgets/slider-widget";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 // Blog post type from API
@@ -88,6 +89,9 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 flex-1">
+        {/* Slider */}
+        <SliderWidget />
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-4">
           <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>

@@ -40,6 +40,7 @@ export default function StorePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingProducts, setLoadingProducts] = useState(false);
+    const [sortBy, setSortBy] = useState("newest");
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Product[] | null>(null);
     const [searching, setSearching] = useState(false);
@@ -64,7 +65,7 @@ export default function StorePage() {
         const categorySlug = activeCategory || activeMode;
         if (categorySlug) {
             setLoadingProducts(true);
-            fetch(`/api/v1/store/products?category=${categorySlug}&limit=12`)
+            fetch(`/api/v1/store/products?category=${categorySlug}&limit=12&sort=${sortBy}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setProducts(data.products || []);
@@ -74,7 +75,7 @@ export default function StorePage() {
         } else {
             setProducts([]);
         }
-    }, [activeCategory, activeMode]);
+    }, [activeCategory, activeMode, sortBy]);
 
     // Derived state
     const rootCategories = categories.filter((c) => c.parentId === null);
@@ -287,7 +288,19 @@ export default function StorePage() {
                 {/* Products Grid */}
                 {(showProducts || (activeMode && subCategories.length === 0)) && (
                     <section>
-                        <h2 className="text-xl font-bold text-gray-900 mb-6">{t('products')}</h2>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-gray-900">{t('products')}</h2>
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white"
+                            >
+                                <option value="newest">Newest</option>
+                                <option value="price_asc">Price: Low to High</option>
+                                <option value="price_desc">Price: High to Low</option>
+                                <option value="popular">Most Popular</option>
+                            </select>
+                        </div>
                         {loadingProducts ? (
                             <SkeletonProductGrid count={4} />
                         ) : products.length === 0 ? (

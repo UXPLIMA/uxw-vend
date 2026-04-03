@@ -20,6 +20,8 @@ async function getDashboardStats() {
         totalTopics,
         recentOrders,
         revenueData,
+        recentTickets,
+        recentTopics,
     ] = await Promise.all([
         prisma.user.count(),
         prisma.product.count(),
@@ -38,6 +40,17 @@ async function getDashboardStats() {
             _sum: { total: true },
             where: { status: "COMPLETED" },
         }),
+        prisma.ticket.findMany({
+            take: 5,
+            where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_REPLY"] } },
+            orderBy: { createdAt: "desc" },
+            include: { user: { select: { username: true } }, department: { select: { name: true } } },
+        }),
+        prisma.forumTopic.findMany({
+            take: 5,
+            orderBy: { createdAt: "desc" },
+            include: { author: { select: { username: true } }, category: { select: { name: true } } },
+        }),
     ]);
 
     return {
@@ -48,6 +61,8 @@ async function getDashboardStats() {
         totalArticles,
         totalTopics,
         recentOrders,
+        recentTickets,
+        recentTopics,
         totalRevenue: revenueData._sum.total || 0,
     };
 }
@@ -148,6 +163,60 @@ export default async function AdminDashboard() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Recent Tickets & Topics */}
+            <div className="grid lg:grid-cols-2 gap-6 mt-6">
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-base">Open Tickets</CardTitle>
+                            <Link href="/admin/tickets" className="text-xs text-primary hover:underline">View All</Link>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {stats.recentTickets.length === 0 ? (
+                            <p className="text-muted-foreground text-center py-4 text-sm">No open tickets</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {stats.recentTickets.map((t: any) => (
+                                    <Link key={t.id} href={`/admin/tickets/${t.id}`} className="flex justify-between items-center p-2 rounded hover:bg-muted/50 text-sm">
+                                        <div>
+                                            <p className="font-medium truncate max-w-[200px]">{t.subject}</p>
+                                            <p className="text-xs text-muted-foreground">{t.user.username} · {t.department.name}</p>
+                                        </div>
+                                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{t.status}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-base">Latest Forum Topics</CardTitle>
+                            <Link href="/admin/forum/topics" className="text-xs text-primary hover:underline">View All</Link>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {stats.recentTopics.length === 0 ? (
+                            <p className="text-muted-foreground text-center py-4 text-sm">No topics yet</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {stats.recentTopics.map((t: any) => (
+                                    <div key={t.id} className="flex justify-between items-center p-2 text-sm">
+                                        <div>
+                                            <p className="font-medium truncate max-w-[200px]">{t.title}</p>
+                                            <p className="text-xs text-muted-foreground">{t.author.username} · {t.category.name}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
 
             {/* Charts */}
             <div className="mt-8">

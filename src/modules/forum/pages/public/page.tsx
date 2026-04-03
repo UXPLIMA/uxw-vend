@@ -5,8 +5,9 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
+import { Input } from "@/core/components/ui/input";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, ChevronRight } from "lucide-react";
+import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, ChevronRight, Search } from "lucide-react";
 import { formatRelativeTime } from "@/core/lib/utils";
 
 interface Category {
@@ -39,6 +40,7 @@ export default function ForumPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         fetch("/api/v1/forum/categories")
@@ -51,6 +53,7 @@ export default function ForumPage() {
         setLoading(true);
         const params = new URLSearchParams({ page: String(page), limit: "20" });
         if (selectedCategory) params.set("category", selectedCategory);
+        if (searchQuery) params.set("search", searchQuery);
 
         fetch(`/api/v1/forum/topics?${params}`)
             .then((r) => r.json())
@@ -60,7 +63,7 @@ export default function ForumPage() {
                 setLoading(false);
             })
             .catch(() => setLoading(false));
-    }, [selectedCategory, page]);
+    }, [selectedCategory, page, searchQuery]);
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
@@ -79,6 +82,17 @@ export default function ForumPage() {
                             <Plus className="w-4 h-4 mr-2" /> New Topic
                         </Button>
                     </Link>
+                </div>
+
+                {/* Search */}
+                <div className="relative max-w-md mb-6">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                        value={searchQuery}
+                        onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+                        placeholder="Search topics..."
+                        className="pl-10"
+                    />
                 </div>
 
                 <div className="grid lg:grid-cols-4 gap-6">

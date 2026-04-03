@@ -11,8 +11,11 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const categoryId = searchParams.get("category");
+    const search = searchParams.get("search") || "";
 
-    const where = categoryId ? { categoryId } : {};
+    const where: Record<string, unknown> = {};
+    if (categoryId) where.categoryId = categoryId;
+    if (search) where.title = { contains: search, mode: "insensitive" };
 
     const [topics, total] = await Promise.all([
         prisma.forumTopic.findMany({

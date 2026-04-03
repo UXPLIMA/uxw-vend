@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
         const category = searchParams.get("category");
         const featured = searchParams.get("featured") === "true";
         const search = searchParams.get("search") || "";
+        const sort = searchParams.get("sort") || "newest";
 
         const showAll = searchParams.get("all") === "true";
 
@@ -39,7 +40,10 @@ export async function GET(request: NextRequest) {
                 },
                 skip: (page - 1) * limit,
                 take: limit,
-                orderBy: { createdAt: "desc" },
+                orderBy: sort === "price_asc" ? { price: "asc" }
+                    : sort === "price_desc" ? { price: "desc" }
+                    : sort === "popular" ? { orderItems: { _count: "desc" } }
+                    : { createdAt: "desc" },
             }),
             prisma.product.count({ where }),
         ]);

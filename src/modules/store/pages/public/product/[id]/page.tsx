@@ -42,6 +42,8 @@ export default function ProductDetailPage() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [addingToCart, setAddingToCart] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
+    const [variables, setVariables] = useState<{ name: string; label: string; type: string; required: boolean; placeholder?: string; options?: string }[]>([]);
+    const [variableValues, setVariableValues] = useState<Record<string, string>>({});
 
     useEffect(() => {
         fetch(`/api/v1/store/products/${productId}`)
@@ -58,6 +60,15 @@ export default function ProductDetailPage() {
                 setLoading(false);
             });
     }, [productId]);
+
+    // Fetch product variables
+    useEffect(() => {
+        if (!product) return;
+        fetch(`/api/v1/product-variables?productId=${product.id}`)
+            .then((r) => r.json())
+            .then((d) => setVariables(d.variables || []))
+            .catch(() => {});
+    }, [product?.id]);
 
     const addToCart = async () => {
         if (!product) return;
@@ -290,6 +301,41 @@ export default function ProductDetailPage() {
                                             <Plus className="w-4 h-4" />
                                         </button>
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Product Variables */}
+                            {variables.length > 0 && (
+                                <div className="mb-4 space-y-3">
+                                    {variables.map((v) => (
+                                        <div key={v.name}>
+                                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                                {v.label} {v.required && <span className="text-red-500">*</span>}
+                                            </label>
+                                            {v.type === "select" && v.options ? (
+                                                <select
+                                                    value={variableValues[v.name] || ""}
+                                                    onChange={(e) => setVariableValues({ ...variableValues, [v.name]: e.target.value })}
+                                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                                    required={v.required}
+                                                >
+                                                    <option value="">Select...</option>
+                                                    {v.options.split(",").map((opt) => (
+                                                        <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type={v.type || "text"}
+                                                    value={variableValues[v.name] || ""}
+                                                    onChange={(e) => setVariableValues({ ...variableValues, [v.name]: e.target.value })}
+                                                    placeholder={v.placeholder || v.label}
+                                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                                    required={v.required}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
 
