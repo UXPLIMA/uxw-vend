@@ -51,7 +51,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const validation = forumPostSchema.safeParse({ ...body, topicId: id });
 
     if (!validation.success) {
-        return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
 
     const topic = await prisma.forumTopic.findUnique({ where: { id } });

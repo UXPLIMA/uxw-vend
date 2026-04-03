@@ -43,7 +43,7 @@ export async function PATCH(request: NextRequest) {
     if (body.currentPassword && body.newPassword) {
         const validation = updatePasswordSchema.safeParse(body);
         if (!validation.success) {
-            return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
+            return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({ where: { id: session.user.id } });
@@ -68,7 +68,7 @@ export async function PATCH(request: NextRequest) {
     // Profile update
     const validation = updateUserSchema.safeParse(body);
     if (!validation.success) {
-        return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
 
     const data: Record<string, unknown> = {};
