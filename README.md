@@ -1,173 +1,208 @@
 <div align="center">
-  <br />
-  <h1>🛍️ uxwVend</h1>
-  <p>
-    <strong>Next-Generation Digital Marketplace & Community Platform</strong>
-  </p>
-  <p>An open-source, modular, and modern game server management platform.</p>
+  <h1>uxwVend</h1>
+  <p><strong>Open Source Game Server Management & Marketplace Platform</strong></p>
+  <p>The all-in-one solution for managing your game server website, store, community, and support system.</p>
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react" alt="React" />
-    <img src="https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
-    <img src="https://img.shields.io/badge/Tailwind_4-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/Prisma-6.0-green?style=for-the-badge&logo=prisma" alt="Prisma" />
-    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" />
-  </p>
+  ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)
+  ![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)
+  ![Tailwind](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss)
+  ![License](https://img.shields.io/badge/License-MIT-green)
 </div>
-
-<br />
-
-## 📋 Overview
-
-**uxwVend** is a powerful, full-stack web application designed to be the ultimate all-in-one platform for creators, game server owners, and digital sellers. Built with the absolute latest web technologies, it combines a robust e-commerce store with a fully integrated community forum, blog, and support ticket system.
-
-Unlike fragmented solutions, uxwVend provides a unified experience where your users can buy products, ask for help, read updates, and discuss in forums—all with a single account.
-
-## ✨ Key Features
-
-### 🛒 Advanced Store Module
-- **Digital & Physical Products**: Sell software, game items, keys, or physical merchandise.
-- **Dynamic Pricing**: Support for discounts, coupons, and variable pricing.
-- **Cart & Checkout**: Seamless shopping experience with Stripe & PayPal integration.
-- **Instant Delivery**: Automated delivery for digital assets and license keys.
-- **Multi-Currency Support**: Dynamic currency conversion (USD, EUR, TRY, etc.).
-
-### 👥 Community & Social
-- **Full-Featured Forum**: Categories, topics, sticky posts, and rich text editing.
-- **User Profiles**: Avatars, role-based badges, and activity history.
-- **Engagement**: Like system, post reporting, and moderation tools.
-
-### 📝 CMS & Content
-- **Blog System**: SEO-friendly articles, categories, and tags.
-- **Help Center**: Knowledge base for FAQs and guides to reduce support load.
-- **Rich Text Editor**: Integrated React Quill for beautiful content creation.
-
-### 🎫 Professional Support
-- **Ticket System**: Department-based routing (Sales, Support, Technical).
-- **Priorities & Statuses**: Manage workflow with custom statuses.
-- **File Attachments**: Users can upload proofs or screenshots.
-
-### 🛠️ Technical Highlights
-- **Role-Based Access Control (RBAC)**: Granular permissions for Admins, Mods, and Users.
-- **Internationalization (i18n)**: Native multi-language support (English, Turkish, German, etc.).
-- **Theming System**: Dynamic theme generation and dark mode support.
-- **Modular Architecture**: Features are built as independent modules.
-- **SEO Optimized**: Server-Side Rendering (SSR) and proper metadata management.
-
-## 🚀 Tech Stack
-
-This project is built on the bleeding edge of the JavaScript ecosystem:
-
-- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Auth**: [Auth.js (NextAuth v5)](https://authjs.dev/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Data Fetching**: [TanStack Query](https://tanstack.com/query/latest)
-- **Forms**: [Zod](https://zod.dev/) for validation
-- **Documentation**: [React](https://react.dev/)
-
-## 🗺️ Roadmap & Progress
-
-We are actively developing uxwVend. Here is our current progress:
-
-### ✅ Completed
-- **Core Infrastructure**: Next.js 16 setup, Auth v5, RBAC, Database Schema.
-- **Internationalization**: Full i18n support with `next-intl`.
-- **Store Module**: Product management, Cart, Checkout flow, Orders.
-- **Blog Module**: Article management, Rich text editor, Comments.
-- **User System**: Profile management, Role management.
-
-### 🚧 In Progress
-- **Forum Module**: Topic creation, Category management (Partially implemented).
-- **Ticket System**: Support ticket workflow, Department routing.
-- **Theme System**: Advanced theme uploading (ZIP) and live preview.
-
-### 📅 Planned
-- **Plugin System**: Fully modular plugin loader.
-- **Discord Integration**: Sync roles and notifications.
-- **Marketplace**: Theme and plugin marketplace.
-- **Analytics Dashboard**: Sales and user engagement metrics.
-
-## 🛠️ Getting Started
-
-Follow these steps to set up the project locally.
-
-### Prerequisites
-
-- Node.js 20+ installed
-- PostgreSQL database running
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/siracozmen01/uxwVend.git
-   cd uxwVend
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment**
-   Duplicate the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
-   Open `.env` and fill in your database credentials (`DATABASE_URL`) and authentication secrets.
-
-4. **Database Setup**
-   Push the schema to your database:
-   ```bash
-   npm run db:push
-   ```
-   *(Optional) Seed the database if a seed script exists.*
-
-5. **Run the Development Server**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## 📂 Project Structure
-
-```bash
-uxwVend/
-├── src/
-│   ├── app/              # Next.js App Router pages & API routes
-│   ├── core/
-│   │   ├── components/   # Reusable UI components
-│   │   ├── lib/          # Utilities, exact types, and helpers
-│   │   ├── hooks/        # Custom React hooks
-│   │   └── providers/    # Context providers (Theme, Auth, Query)
-│   ├── modules/          # Feature-specific logic (Store, Blog, etc.)
-├── prisma/               # Database schema
-├── public/               # Static assets
-└── messages/             # i18n translation files
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/siracozmen01">Siraç Özmen</a>
-</p>
+## Features
 
+### Store & Payments
+- Product management with categories, images, and variants
+- Stripe checkout with 120+ payment methods
+- Coupons, bulk discounts, creator codes
+- Gift codes with bulk generation
+- VIP comparison table
+- Community revenue goals
+- Credit system (site balance)
+
+### Community
+- Forum with categories, topics, replies, likes
+- Blog with rich text editor, comments, tags
+- Suggestions with community voting
+- Leaderboard (buyers, voters, contributors)
+- Vote sites with credit rewards
+- Wheel of Fortune game
+- Staff page and applications
+- Changelog
+
+### Support
+- Ticket system with departments and priority
+- Help center / knowledge base
+- Canned responses
+
+### Admin Panel
+- Dashboard with charts (revenue, orders, users)
+- 30+ management pages
+- 14 settings categories
+- Role & permission management
+- User management with ban system
+- Activity log and webhook logs
+- Module enable/disable
+- First-time setup wizard
+
+### Customization
+- Theme system with ZIP upload
+- Dark mode
+- Custom CSS injection
+- Configurable navbar, footer, hero banner
+- Widget visibility and ordering
+- Slider/carousel management
+- Custom pages (HTML editor)
+- Custom forms builder
+- SEO settings per page
+
+### Integrations
+- Discord webhooks (orders, tickets, forum, registrations)
+- Discord & Google OAuth login
+- Stripe payments
+- RCON game server commands
+- Minecraft server query (live status)
+- Google Analytics
+- Cloudflare Turnstile CAPTCHA
+- Resend email service
+- Minecraft skin avatars
+
+### Security
+- Two-factor authentication (TOTP)
+- Email verification
+- Password reset flow
+- Rate limiting
+- GDPR cookie consent
+- DOMPurify sanitization
+
+### i18n
+- 3 languages (English, Turkish, German)
+- Locale-prefixed URLs
+- Multi-currency support
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js 20+
+- PostgreSQL 15+
+
+### Installation
+
+```bash
+# Clone
+git clone https://github.com/siracozmen01/uxwVend.git
+cd uxwVend
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your DATABASE_URL and AUTH_SECRET
+
+# Setup database
+npx prisma db push
+
+# Seed demo data (optional)
+npm run db:seed
+
+# Start development server
+npm run dev
+```
+
+### Docker
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5.7 |
+| Database | PostgreSQL + Prisma 6 |
+| Auth | Auth.js v5 (NextAuth) |
+| Styling | Tailwind CSS 4 |
+| State | Zustand + TanStack Query |
+| Payments | Stripe |
+| Email | Resend |
+| Charts | Chart.js |
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── [locale]/           # i18n locale routing
+│   │   ├── (admin)/        # Admin panel pages
+│   │   ├── (auth)/         # Auth pages
+│   │   └── (public)/       # Public pages
+│   └── api/v1/             # API routes
+├── core/                   # Core framework
+│   ├── components/         # Shared UI components
+│   ├── lib/                # Utilities (auth, db, stripe, email, discord, rcon)
+│   ├── hooks/              # React hooks
+│   └── providers/          # Context providers
+├── modules/                # Feature modules
+│   ├── store/              # E-commerce
+│   ├── blog/               # Blog/news
+│   ├── support/            # Tickets & help center
+│   └── forum/              # Community forum
+├── themes/                 # Theme packages
+└── proxy.ts                # Middleware (i18n + module routing)
+```
+
+---
+
+## Creating Plugins
+
+See [Plugin SDK Documentation](docs/PLUGIN_SDK.md) for creating custom modules.
+
+---
+
+## Commands
+
+```bash
+npm run dev              # Development server
+npm run build            # Production build
+npm run start            # Start production
+npm run lint             # ESLint
+npm run db:push          # Push schema to DB
+npm run db:seed          # Seed demo data
+npm run db:studio        # Prisma Studio GUI
+npm run db:migrate       # Create migration
+npm run generate:themes  # Regenerate themes
+```
+
+---
+
+## API Documentation
+
+OpenAPI spec available at `/api/v1/openapi` when the server is running.
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
