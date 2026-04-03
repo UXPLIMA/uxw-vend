@@ -128,14 +128,16 @@ body {
 
 .admin-sidebar-link {
   transition: all 0.15s ease;
+  color: #6b7280;
 }
 
 .admin-sidebar-link:hover {
-  background: var(--color-muted);
+  color: #111827;
+  background: #f9fafb;
 }
 
 .admin-sidebar-link.active {
-  background: rgba(37, 99, 235, 0.08);
-  color: var(--color-primary);
+  color: #2563eb;
+  background: #eff6ff;
   font-weight: 500;
 }
