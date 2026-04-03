@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTheme as useNextTheme } from "next-themes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Check, Upload, Loader2, Trash2, AlertTriangle } from "lucide-react";
+import { Input } from "@/core/components/ui/input";
+import { Label } from "@/core/components/ui/label";
+import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette } from "lucide-react";
+import { toast } from "sonner";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
 
@@ -194,6 +197,9 @@ export default function ThemeSettingsPage() {
                 })}
             </div>
 
+            {/* Color Customizer */}
+            <ColorCustomizer />
+
             <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
                     <strong>Upload a theme:</strong> ZIP file must contain a <code className="text-xs bg-background px-1 rounded">theme.json</code> with theme configuration (id, name, colors, fonts).
@@ -202,5 +208,116 @@ export default function ThemeSettingsPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+// Color Customizer Component
+function ColorCustomizer() {
+    const colorFields = [
+        { key: "primary", label: "Primary" },
+        { key: "secondary", label: "Secondary" },
+        { key: "accent", label: "Accent" },
+        { key: "background", label: "Background" },
+        { key: "foreground", label: "Text" },
+        { key: "card", label: "Card Background" },
+        { key: "muted", label: "Muted" },
+        { key: "destructive", label: "Destructive" },
+        { key: "success", label: "Success" },
+        { key: "warning", label: "Warning" },
+    ];
+
+    const [colors, setColors] = useState<Record<string, string>>({});
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        fetch("/api/v1/settings")
+            .then((r) => r.json())
+            .then((d) => {
+                const s = d.settings || {};
+                const c: Record<string, string> = {};
+                colorFields.forEach((f) => {
+                    c[f.key] = (s[`theme_color_${f.key}`] as string) || getComputedStyle(document.documentElement).getPropertyValue(`--color-${f.key}`).trim();
+                });
+                setColors(c);
+            })
+            .catch(() => {});
+    }, []);
+
+    const applyColors = () => {
+        Object.entries(colors).forEach(([key, value]) => {
+            if (value) document.documentElement.style.setProperty(`--color-${key}`, value);
+        });
+    };
+
+    const saveColors = async () => {
+        setSaving(true);
+        const payload: Record<string, string> = {};
+        Object.entries(colors).forEach(([key, value]) => {
+            payload[`theme_color_${key}`] = value;
+        });
+        await fetch("/api/v1/settings", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        applyColors();
+        toast.success("Colors saved");
+        setSaving(false);
+    };
+
+    const resetColors = () => {
+        const defaults: Record<string, string> = {
+            primary: "#2563eb", secondary: "#7c3aed", accent: "#06b6d4",
+            background: "#f3f4f6", foreground: "#111827", card: "#ffffff",
+            muted: "#f1f5f9", destructive: "#ef4444", success: "#22c55e", warning: "#f59e0b",
+        };
+        setColors(defaults);
+        Object.entries(defaults).forEach(([key, value]) => {
+            document.documentElement.style.setProperty(`--color-${key}`, value);
+        });
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                    <Palette className="w-4 h-4" /> Color Customization
+                </CardTitle>
+                <CardDescription>Override theme colors. Changes apply instantly and persist in settings.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                    {colorFields.map((field) => (
+                        <div key={field.key}>
+                            <Label className="text-xs mb-1 block">{field.label}</Label>
+                            <div className="flex gap-1">
+                                <input
+                                    type="color"
+                                    value={colors[field.key] || "#000000"}
+                                    onChange={(e) => {
+                                        setColors({ ...colors, [field.key]: e.target.value });
+                                        document.documentElement.style.setProperty(`--color-${field.key}`, e.target.value);
+                                    }}
+                                    className="w-8 h-8 rounded cursor-pointer border-0"
+                                />
+                                <Input
+                                    value={colors[field.key] || ""}
+                                    onChange={(e) => setColors({ ...colors, [field.key]: e.target.value })}
+                                    className="text-xs h-8 font-mono"
+                                    placeholder="#000000"
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="flex gap-2">
+                    <Button size="sm" onClick={saveColors} disabled={saving}>
+                        {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
+                        Save Colors
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={resetColors}>Reset to Default</Button>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
