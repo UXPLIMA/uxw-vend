@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/core/lib/db";
 import { registerSchema } from "@/core/lib/validations";
 import { sendWelcomeEmail } from "@/core/lib/email";
+import { notifyUserRegistered } from "@/core/lib/discord";
 
 export async function POST(request: NextRequest) {
     try {
@@ -66,8 +67,9 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Send welcome email (non-blocking)
+        // Send welcome email and Discord notification (non-blocking)
         sendWelcomeEmail(email, username).catch(console.error);
+        notifyUserRegistered({ username, email }).catch(console.error);
 
         return NextResponse.json(
             { message: "User created successfully", user },

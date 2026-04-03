@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { forumTopicSchema } from "@/core/lib/validations";
 import { generateSlug } from "@/core/lib/utils";
+import { notifyForumTopicCreated } from "@/core/lib/discord";
 
 // GET /api/v1/forum/topics
 export async function GET(request: NextRequest) {
@@ -72,6 +73,13 @@ export async function POST(request: NextRequest) {
             category: { select: { id: true, name: true, slug: true } },
         },
     });
+
+    // Discord notification
+    notifyForumTopicCreated({
+        title: topic.title,
+        username: topic.author.username,
+        category: topic.category?.name || "General",
+    }).catch(console.error);
 
     return NextResponse.json({ topic }, { status: 201 });
 }

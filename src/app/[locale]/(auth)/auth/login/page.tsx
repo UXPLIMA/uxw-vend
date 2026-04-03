@@ -16,6 +16,8 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [needs2FA, setNeeds2FA] = useState(false);
+    const [twoFactorCode, setTwoFactorCode] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,11 +28,21 @@ export default function LoginPage() {
             const result = await signIn("credentials", {
                 email,
                 password,
+                twoFactorCode: needs2FA ? twoFactorCode : "",
                 redirect: false,
             });
 
             if (result?.error) {
-                setError(t('invalidCredentials'));
+                if (result.error.includes("2FA_REQUIRED")) {
+                    setNeeds2FA(true);
+                    setError("");
+                } else if (result.error.includes("INVALID_2FA")) {
+                    setError("Invalid 2FA code");
+                } else if (result.error.includes("BANNED")) {
+                    setError("Your account has been suspended");
+                } else {
+                    setError(t('invalidCredentials'));
+                }
             } else {
                 router.push("/");
                 router.refresh();
@@ -101,6 +113,24 @@ export default function LoginPage() {
                                     className="border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:bg-white"
                                 />
                             </div>
+
+                            {needs2FA && (
+                                <div className="space-y-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <label htmlFor="twoFactorCode" className="text-sm font-medium text-blue-700">
+                                        Two-Factor Authentication Code
+                                    </label>
+                                    <Input
+                                        id="twoFactorCode"
+                                        type="text"
+                                        placeholder="Enter 6-digit code or backup code"
+                                        value={twoFactorCode}
+                                        onChange={(e) => setTwoFactorCode(e.target.value)}
+                                        autoFocus
+                                        className="border-blue-200 bg-white text-center font-mono text-lg tracking-widest"
+                                        maxLength={10}
+                                    />
+                                </div>
+                            )}
 
                             <div className="flex justify-end">
                                 <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">

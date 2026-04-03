@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { stripe, getStripeEnabled } from "@/core/lib/stripe";
 import { generateOrderNumber } from "@/core/lib/utils";
+import { notifyOrderCreated } from "@/core/lib/discord";
 import { z } from "zod";
 
 const checkoutSchema = z.object({
@@ -119,6 +120,13 @@ export async function POST(request: NextRequest) {
         await prisma.cartItem.deleteMany({
             where: { userId: session.user.id },
         });
+
+        // Discord notification
+        notifyOrderCreated({
+            orderNumber: order.orderNumber,
+            total,
+            username: session.user.name || session.user.email || "Unknown",
+        }).catch(console.error);
 
         // If Stripe is not configured, return order directly (free checkout / dev mode)
         if (!getStripeEnabled()) {

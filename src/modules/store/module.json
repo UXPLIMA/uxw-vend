@@ -53,6 +53,10 @@
         {
             "path": "/store/order-success",
             "component": "pages/public/order-success/page.tsx"
+        },
+        {
+            "path": "/store/vip",
+            "component": "pages/public/vip/page.tsx"
         }
     ],
     "adminRoutes": [

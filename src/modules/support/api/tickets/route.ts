@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { ticketSchema } from "@/core/lib/validations";
+import { notifyTicketCreated } from "@/core/lib/discord";
 
 // GET /api/v1/tickets - List tickets
 export async function GET(request: NextRequest) {
@@ -121,6 +122,14 @@ export async function POST(request: NextRequest) {
             },
         },
     });
+
+    // Discord notification
+    notifyTicketCreated({
+        subject,
+        username: ticket.user.username,
+        department: ticket.department.name,
+        priority: ticket.priority,
+    }).catch(console.error);
 
     return NextResponse.json(ticket, { status: 201 });
 }

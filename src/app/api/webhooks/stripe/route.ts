@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/core/lib/stripe";
 import { prisma } from "@/core/lib/db";
 import { sendOrderConfirmationEmail } from "@/core/lib/email";
+import { notifyOrderCompleted } from "@/core/lib/discord";
 import Stripe from "stripe";
 
 // Disable body parsing - Stripe needs raw body for signature verification
@@ -55,6 +56,14 @@ export async function POST(request: NextRequest) {
                         order.orderNumber,
                         Number(order.total)
                     ).catch(console.error);
+
+                    // Discord notification
+                    notifyOrderCompleted({
+                        orderNumber: order.orderNumber,
+                        total: Number(order.total),
+                        username: order.user.email,
+                        itemCount: 0,
+                    }).catch(console.error);
                 }
 
                 // Create Payment record

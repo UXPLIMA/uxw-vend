@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Mail, CreditCard } from "lucide-react";
+import { Palette, Globe, Mail, CreditCard, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
@@ -24,6 +24,13 @@ export default function SettingsPage() {
             href: "/admin/settings/email",
             icon: Mail,
             color: "text-green-500",
+        },
+        {
+            title: "Discord",
+            description: "Webhook notifications for orders, tickets, and events.",
+            href: "/admin/settings/discord",
+            icon: MessageSquare,
+            color: "text-indigo-500",
         },
         {
             title: "Payments",

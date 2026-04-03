@@ -21,10 +21,13 @@ model User {
   locale        String    @default("en")
   currency      String    @default("USD")
   emailVerified DateTime?
-  isBanned      Boolean   @default(false)
-  banReason     String?
-  bannedAt      DateTime?
-  createdAt     DateTime  @default(now())
+  isBanned         Boolean   @default(false)
+  banReason        String?
+  bannedAt         DateTime?
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean   @default(false)
+  backupCodes      String?
+  createdAt        DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   role   Role?   @relation(fields: [roleId], references: [id])
@@ -51,6 +54,9 @@ model User {
   tickets        Ticket[]
   ticketMessages TicketMessage[]
   assignedTickets Ticket[] @relation("AssignedTickets")
+
+  // Gift relations
+  redeemedGifts GiftCode[] @relation("RedeemedGifts")
 
   @@index([email])
   @@index([username])
@@ -329,6 +335,23 @@ model Coupon {
 enum CouponType {
   PERCENTAGE
   FIXED
+}
+
+model GiftCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  value       Decimal   @db.Decimal(10, 2)
+  isRedeemed  Boolean   @default(false)
+  redeemedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  redeemedById String?
+  redeemedBy   User?   @relation("RedeemedGifts", fields: [redeemedById], references: [id])
+  createdById  String?
+
+  @@index([code])
 }
 
 // ==================== FORUM MODULE ====================

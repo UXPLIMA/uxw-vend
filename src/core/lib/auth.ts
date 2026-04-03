@@ -5,6 +5,7 @@ import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { verifyToken, verifyBackupCode } from "./two-factor";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -21,6 +22,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
+                twoFactorCode: { label: "2FA Code", type: "text" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
@@ -47,6 +49,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 if (!isPasswordValid) {
                     return null;
+                }
+
+                // 2FA check
+                if (user.twoFactorEnabled && user.twoFactorSecret) {
+                    const twoFactorCode = credentials.twoFactorCode as string;
+
+                    if (!twoFactorCode) {
+                        throw new Error("2FA_REQUIRED");
+                    }
+
+                    // Try TOTP first, then backup code
+                    const isValidTotp = verifyToken(user.twoFactorSecret, twoFactorCode);
+
+                    if (!isValidTotp) {
+                        // Try backup code
+                        const backupCodes: string[] = user.backupCodes ? JSON.parse(user.backupCodes) : [];
+                        const { valid, remaining } = verifyBackupCode(twoFactorCode, backupCodes);
+
+                        if (!valid) {
+                            throw new Error("INVALID_2FA");
+                        }
+
+                        // Update remaining backup codes
+                        await prisma.user.update({
+                            where: { id: user.id },
+                            data: { backupCodes: JSON.stringify(remaining) },
+                        });
+                    }
                 }
 
                 return {
