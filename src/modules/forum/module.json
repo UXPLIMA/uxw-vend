@@ -24,7 +24,7 @@
         {
             "label": "Forum Categories",
             "path": "/forum/categories",
-            "icon": "MessageSquare"
+            "icon": "LayoutList"
         }
     ],
     "routes": [

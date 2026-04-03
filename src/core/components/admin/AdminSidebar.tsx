@@ -33,7 +33,8 @@ import {
     Server,
     Bell,
     FileEdit,
-    MessageSquare
+    MessageSquare,
+    LayoutList
 } from "lucide-react";
 
 interface NavItem {
@@ -80,6 +81,7 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
         UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
         Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
         MessageSquare,
+        LayoutList,
     };
     const Icon = icons[name] || Package;
     return <Icon size={size} />;
