@@ -35,9 +35,7 @@ export function Navbar() {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
-        }
+        function handleClickOutside(e: MouseEvent) { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false); }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
@@ -51,17 +49,17 @@ export function Navbar() {
     const isAdminUser = session?.user?.role === "admin";
 
     return (
-        <header className="glass sticky top-0 z-50 border-b border-white/5">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
             <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between h-14">
-                    <nav className="flex items-center gap-0.5">
+                <div className="flex items-center justify-between h-12">
+                    <nav className="flex items-center gap-1">
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
                             return (
                                 <Link key={link.href} href={link.href}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive(link.href) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}>
                                     {IconComp && <IconComp className="w-4 h-4" />}
-                                    <span className="hidden sm:inline">{link.label}</span>
+                                    {link.label}
                                 </Link>
                             );
                         })}
@@ -69,51 +67,51 @@ export function Navbar() {
 
                     <div className="flex items-center gap-2">
                         {mounted && (
-                            <button onClick={() => setTheme(theme === "dark" || theme === "flat" ? "light" : "flat")}
-                                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
-                                {theme === "dark" || theme === "flat" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                            <button onClick={() => setTheme(theme === "dark" ? "flat" : "dark")}
+                                className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
                         )}
 
                         {status === "loading" ? (
-                            <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+                            <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
                         ) : session?.user ? (
                             <>
-                                <Link href="/store/cart" className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                                <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
                                     <ShoppingCart className="w-4 h-4" />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-black text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
+                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
                                     )}
                                 </Link>
 
                                 <div className="relative" ref={menuRef}>
-                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-all">
+                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 transition-colors">
                                         {session.user.image ? (
-                                            <img src={session.user.image} alt="" className="w-7 h-7 rounded-full object-cover ring-2 ring-primary/20" />
+                                            <img src={session.user.image} alt="" className="w-7 h-7 rounded-full object-cover" />
                                         ) : (
-                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-black text-xs font-bold">
+                                            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                                                 {(session.user.name || "U")[0].toUpperCase()}
                                             </div>
                                         )}
-                                        <span className="text-sm font-medium hidden sm:block">{session.user.name}</span>
+                                        <span className="text-sm font-medium text-gray-700 hidden sm:block">{session.user.name}</span>
                                     </button>
 
                                     {menuOpen && (
-                                        <div className="absolute right-0 top-full mt-2 w-52 glass rounded-xl shadow-2xl shadow-black/30 py-1 z-50 border border-white/10 animate-fade-in">
-                                            <div className="px-4 py-3 border-b border-white/5">
-                                                <p className="text-sm font-medium truncate">{session.user.name}</p>
-                                                <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+                                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
+                                            <div className="px-3 py-2 border-b border-gray-100">
+                                                <p className="text-sm font-medium text-gray-900 truncate">{session.user.name}</p>
+                                                <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
                                             </div>
-                                            <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors" onClick={() => setMenuOpen(false)}>
+                                            <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900" onClick={() => setMenuOpen(false)}>
                                                 <User className="w-4 h-4" /> Profile
                                             </Link>
                                             {isAdminUser && (
-                                                <Link href="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors" onClick={() => setMenuOpen(false)}>
+                                                <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900" onClick={() => setMenuOpen(false)}>
                                                     <Shield className="w-4 h-4" /> Admin Panel
                                                 </Link>
                                             )}
-                                            <div className="border-t border-white/5 mt-1">
-                                                <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 w-full text-left transition-colors">
+                                            <div className="border-t border-gray-100">
+                                                <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
                                                     <LogOut className="w-4 h-4" /> {commonT('logout')}
                                                 </button>
                                             </div>
@@ -123,7 +121,7 @@ export function Navbar() {
                             </>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <Link href="/auth/login"><Button variant="ghost" size="sm">{commonT('login')}</Button></Link>
+                                <Link href="/auth/login"><Button variant="ghost" size="sm" className="text-gray-600">{commonT('login')}</Button></Link>
                                 <Link href="/auth/register"><Button size="sm">{commonT('register')}</Button></Link>
                             </div>
                         )}

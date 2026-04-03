@@ -31,7 +31,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     const modules = moduleSystem.getDefinitions();
 
     return (
-        <div className="min-h-screen gradient-bg">
+        <div className="min-h-screen bg-gray-50">
             <AdminSidebar
                 userName={session.user.name || ""}
                 userEmail={session.user.email || ""}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Users, Copy } from "lucide-react";
+import { Crown, Users } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
@@ -16,66 +16,50 @@ export function HeroBanner() {
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
     const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
-    const height = parseInt((settings.hero_height as string) || "300");
+    const height = parseInt((settings.hero_height as string) || "260");
 
-    const copyIp = () => {
-        navigator.clipboard.writeText(serverIp);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+    const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
     return (
-        <div className="relative overflow-hidden" style={{ height }}>
-            {/* Background */}
+        <div className="relative overflow-hidden bg-[#1a1f2e]" style={{ height }}>
             <div className="absolute inset-0">
-                <img src={bgImage} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/60 via-[#080c14]/70 to-[#080c14]" />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5" />
+                <img src={bgImage} alt="" className="w-full h-full object-cover opacity-50" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1f2e] via-[#1a1f2e]/60 to-transparent" />
             </div>
-
-            {/* Decorative glow orbs */}
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-secondary/10 rounded-full blur-[80px] pointer-events-none" />
 
             <div className="relative container mx-auto px-4 h-full z-10">
                 <div className="flex items-center justify-between h-full">
-                    {/* Left: Server Status */}
-                    <div className="group hidden md:flex items-center gap-4 glass-light px-5 py-3.5 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/8 hover:-translate-y-0.5" onClick={copyIp}>
-                        <div className="w-11 h-11 rounded-lg bg-accent/10 text-accent flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                            <Users size={22} />
+                    <div className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors" onClick={copyIp}>
+                        <div className="w-10 h-10 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
+                            <Users size={20} />
                         </div>
                         <div>
-                            <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-widest font-semibold">
+                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5">
                                 {serverIp.toUpperCase()}
-                                <Copy className={`w-3 h-3 transition-all ${copied ? "text-accent" : "opacity-0 group-hover:opacity-50"}`} />
+                                {copied && <span className="text-green-400 text-[10px] normal-case">Copied!</span>}
                             </div>
-                            <div className="text-accent font-bold text-base flex items-center gap-2 mt-0.5">
-                                <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(6,255,165,0.5)]" />
-                                {copied ? "IP Copied!" : t('playersOnline', { count: serverConfig.onlineCount })}
+                            <div className="text-green-400 font-bold flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                {t('playersOnline', { count: serverConfig.onlineCount })}
                             </div>
                         </div>
                     </div>
 
-                    {/* Center: Logo */}
                     <div className="animate-float">
-                        <img src={logoImage} alt={serverConfig.name} className="h-36 md:h-44 w-auto object-contain drop-shadow-[0_0_30px_rgba(0,212,255,0.2)]" />
+                        <img src={logoImage} alt={serverConfig.name} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" />
                     </div>
 
-                    {/* Right: Discord */}
-                    <Link href={discordUrl} target="_blank" className="group hidden md:flex items-center gap-4 glass-light px-5 py-3.5 rounded-xl transition-all duration-300 hover:bg-[#5865F2]/15 hover:-translate-y-0.5">
+                    <Link href={discordUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-[#5865F2]/20 transition-colors">
                         <div className="text-right">
-                            <div className="text-muted-foreground text-xs uppercase tracking-widest font-semibold group-hover:text-[#5865F2]/80 transition-colors">{t('joinCommunity')}</div>
-                            <div className="text-[#5865F2] font-bold text-base mt-0.5 group-hover:text-white transition-colors">{t('discordServer')}</div>
+                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{t('joinCommunity')}</div>
+                            <div className="text-[#5865F2] font-bold">{t('discordServer')}</div>
                         </div>
-                        <div className="w-11 h-11 rounded-lg bg-[#5865F2]/15 text-[#5865F2] flex items-center justify-center group-hover:bg-[#5865F2] group-hover:text-white transition-all duration-300">
-                            <Crown size={22} />
+                        <div className="w-10 h-10 rounded-lg bg-[#5865F2]/20 text-[#5865F2] flex items-center justify-center">
+                            <Crown size={20} />
                         </div>
                     </Link>
                 </div>
             </div>
-
-            {/* Bottom edge glow */}
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         </div>
     );
 }
