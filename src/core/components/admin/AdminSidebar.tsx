@@ -32,7 +32,8 @@ import {
     ScrollText,
     Server,
     Bell,
-    FileEdit
+    FileEdit,
+    MessageSquare
 } from "lucide-react";
 
 interface NavItem {
@@ -75,9 +76,12 @@ interface AdminSidebarProps {
 const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
     const icons: Record<string, any> = {
         LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
-        Settings, Puzzle, Ticket, HelpCircle, Tag
+        Settings, Puzzle, Ticket, HelpCircle, Tag, Megaphone, History,
+        UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
+        Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
+        MessageSquare,
     };
-    const Icon = icons[name] || Puzzle;
+    const Icon = icons[name] || Package;
     return <Icon size={size} />;
 };
 
@@ -110,7 +114,7 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
     const sidebarContent = (
         <>
             <Link href="/" className="flex items-center mb-8 px-3" onClick={() => setMobileOpen(false)}>
-                <span className="font-bold text-xl text-white">uxwVend</span>
+                <span className="font-bold text-xl text-gray-900">uxwVend</span>
             </Link>
 
             <nav className="space-y-0.5 mb-8 px-1">
