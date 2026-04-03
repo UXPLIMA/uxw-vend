@@ -6,6 +6,9 @@ import { SessionProvider } from "next-auth/react";
 import { CurrencyProvider } from "@/core/lib/currency/context";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { defaultThemeId } from "@/core/generated/theme-registry";
+import { CookieConsent } from "@/core/components/layout/CookieConsent";
+import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
+import { PopupModal } from "@/core/components/layout/PopupModal";
 import "../globals.css";
 
 const inter = Inter({
@@ -60,7 +63,10 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <CurrencyProvider>
               <AppThemeProvider defaultTheme={defaultThemeId}>
+                <GoogleAnalytics />
+                <PopupModal />
                 {children}
+                <CookieConsent />
               </AppThemeProvider>
             </CurrencyProvider>
           </NextIntlClientProvider>
