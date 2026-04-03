@@ -63,6 +63,29 @@ export async function sendWelcomeEmail(email: string, username: string) {
     });
 }
 
+export async function sendVerificationEmail(email: string, verifyUrl: string) {
+    if (!getEmailEnabled()) {
+        console.log(`[Email Disabled] Verification for ${email}: ${verifyUrl}`);
+        return;
+    }
+
+    await getResend()!.emails.send({
+        from: `${APP_NAME} <${FROM_EMAIL}>`,
+        to: email,
+        subject: `Verify your ${APP_NAME} email`,
+        html: `
+            <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #1f2937;">Verify Your Email</h2>
+                <p style="color: #6b7280;">Click the button below to verify your email address.</p>
+                <a href="${verifyUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 16px 0;">
+                    Verify Email
+                </a>
+                <p style="color: #9ca3af; font-size: 14px;">If you didn't create an account, ignore this email.</p>
+            </div>
+        `,
+    });
+}
+
 export async function sendOrderConfirmationEmail(email: string, orderNumber: string, total: number) {
     if (!getEmailEnabled()) {
         console.log(`[Email Disabled] Order confirmation for ${email}: ${orderNumber}`);

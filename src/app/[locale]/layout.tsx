@@ -9,6 +9,7 @@ import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CookieConsent } from "@/core/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
 import { PopupModal } from "@/core/components/layout/PopupModal";
+import { Toaster } from "sonner";
 import "../globals.css";
 
 const inter = Inter({
@@ -68,6 +69,7 @@ export default async function RootLayout({
                 <PopupModal />
                 {children}
                 <CookieConsent />
+                <Toaster position="bottom-right" richColors closeButton />
               </AppThemeProvider>
             </CurrencyProvider>
           </NextIntlClientProvider>

@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { stripe, getStripeEnabled } from "@/core/lib/stripe";
 import { generateOrderNumber } from "@/core/lib/utils";
 import { notifyOrderCreated } from "@/core/lib/discord";
+import { logActivity } from "@/core/lib/activity-log";
 import { z } from "zod";
 
 const checkoutSchema = z.object({
@@ -120,6 +121,15 @@ export async function POST(request: NextRequest) {
         await prisma.cartItem.deleteMany({
             where: { userId: session.user.id },
         });
+
+        // Audit log
+        logActivity({
+            userId: session.user.id,
+            action: "order.created",
+            entity: "order",
+            entityId: order.id,
+            metadata: { orderNumber: order.orderNumber, total },
+        }).catch(console.error);
 
         // Discord notification
         notifyOrderCreated({

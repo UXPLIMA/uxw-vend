@@ -1,7 +1,8 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -14,6 +15,9 @@ export function Navbar() {
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -86,6 +90,17 @@ export function Navbar() {
                     </nav>
 
                     <div className="flex items-center gap-3">
+                        {/* Dark Mode Toggle */}
+                        {mounted && (
+                            <button
+                                onClick={() => setTheme(theme === "dark" ? "flat" : "dark")}
+                                className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                                title="Toggle dark mode"
+                            >
+                                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                            </button>
+                        )}
+
                         {status === "loading" ? (
                             <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
                         ) : session?.user ? (

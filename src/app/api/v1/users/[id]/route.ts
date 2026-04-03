@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { logActivity } from "@/core/lib/activity-log";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -79,6 +80,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         data,
         include: { role: true },
     });
+
+    // Audit log
+    const actions: string[] = [];
+    if (body.roleId) actions.push("role_change");
+    if (body.isBanned !== undefined) actions.push(body.isBanned ? "user_ban" : "user_unban");
+    for (const action of actions) {
+        logActivity({
+            userId: session.user.id,
+            action: `admin.${action}`,
+            entity: "user",
+            entityId: id,
+            metadata: { targetUsername: user.username, ...data },
+        }).catch(console.error);
+    }
 
     return NextResponse.json({ user });
 }

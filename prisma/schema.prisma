@@ -71,6 +71,7 @@ model User {
   staffApplications StaffApplication[] @relation("StaffApplications")
   activityLogs     ActivityLog[]      @relation("ActivityLogs")
   wheelSpins       WheelSpin[]        @relation("WheelSpins")
+  ownedProducts    OwnedProduct[]     @relation("OwnedProducts")
 
   @@index([email])
   @@index([username])
@@ -351,6 +352,32 @@ enum CouponType {
   FIXED
 }
 
+model OwnedProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("OwnedProducts", fields: [userId], references: [id])
+  productId String
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model BulkDiscount {
+  id           String   @id @default(cuid())
+  name         String
+  minQuantity  Int
+  discountPercent Int
+  productId    String?
+  categoryId   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+  @@index([categoryId])
+}
+
 model GiftCode {
   id          String    @id @default(cuid())
   code        String    @unique
@@ -508,6 +535,34 @@ model SuggestionVote {
   createdAt    DateTime   @default(now())
 
   @@unique([suggestionId, userId])
+}
+
+// ==================== CUSTOM FORMS ====================
+
+model CustomForm {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  fields      Json     // Array of field definitions [{name, type, label, required, options}]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions CustomFormSubmission[]
+  @@index([slug])
+}
+
+model CustomFormSubmission {
+  id        String     @id @default(cuid())
+  formId    String
+  form      CustomForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  userId    String?
+  data      Json       // Submitted field values
+  status    String     @default("new") // new, reviewed, archived
+  createdAt DateTime   @default(now())
+
+  @@index([formId])
 }
 
 // ==================== POPUP ====================
