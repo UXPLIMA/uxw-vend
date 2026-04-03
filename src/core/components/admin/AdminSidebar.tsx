@@ -102,11 +102,8 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
 
     const sidebarContent = (
         <>
-            <Link href="/" className="flex items-center gap-3 mb-8 px-3" onClick={() => setMobileOpen(false)}>
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                    <span className="text-white font-black text-sm">U</span>
-                </div>
-                <span className="font-bold text-lg">uxwVend</span>
+            <Link href="/" className="flex items-center mb-8 px-3" onClick={() => setMobileOpen(false)}>
+                <span className="font-bold text-xl text-white">uxwVend</span>
             </Link>
 
             <nav className="space-y-0.5 mb-8 px-1">
