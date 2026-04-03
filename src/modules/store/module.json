@@ -24,7 +24,7 @@
         {
             "label": "Store Categories",
             "path": "/store/categories",
-            "icon": "Tag"
+            "icon": "Layers"
         },
         {
             "label": "Orders",

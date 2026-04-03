@@ -34,7 +34,8 @@ import {
     Bell,
     FileEdit,
     MessageSquare,
-    LayoutList
+    LayoutList,
+    Layers
 } from "lucide-react";
 
 interface NavItem {
@@ -82,6 +83,7 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
         Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
         MessageSquare,
         LayoutList,
+        Layers,
     };
     const Icon = icons[name] || Package;
     return <Icon size={size} />;
