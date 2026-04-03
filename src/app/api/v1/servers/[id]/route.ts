@@ -12,7 +12,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await request.json();
-    const server = await prisma.gameServer.update({ where: { id }, data: body });
+    const data: Record<string, unknown> = {};
+    if (body.name !== undefined) data.name = body.name;
+    if (body.type !== undefined) data.type = body.type;
+    if (body.host !== undefined) data.host = body.host;
+    if (body.port !== undefined) data.port = body.port;
+    if (body.rconPort !== undefined) data.rconPort = body.rconPort;
+    if (body.rconPassword !== undefined) data.rconPassword = body.rconPassword;
+    if (body.queryPort !== undefined) data.queryPort = body.queryPort;
+    if (body.isDefault !== undefined) data.isDefault = body.isDefault;
+    if (body.isActive !== undefined) data.isActive = body.isActive;
+    if (body.order !== undefined) data.order = body.order;
+    const server = await prisma.gameServer.update({ where: { id }, data });
     return NextResponse.json({ server });
 }
 

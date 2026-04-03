@@ -12,7 +12,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await request.json();
-    const punishment = await prisma.punishment.update({ where: { id }, data: body });
+    const data: Record<string, unknown> = {};
+    if (body.reason !== undefined) data.reason = body.reason;
+    if (body.active !== undefined) data.active = body.active;
+    if (body.duration !== undefined) data.duration = body.duration;
+    if (body.expiresAt !== undefined) data.expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
+    const punishment = await prisma.punishment.update({ where: { id }, data });
     return NextResponse.json({ punishment });
 }
 

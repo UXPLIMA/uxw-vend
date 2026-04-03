@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
 import { randomBytes } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
+import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 
 // POST /api/v1/auth/forgot-password
 export async function POST(request: NextRequest) {
     try {
+        const ip = getClientIP(request.headers);
+        const rl = rateLimit(`forgot:${ip}`, rateLimits.auth);
+        if (!rl.success) return NextResponse.json({ error: "Too many attempts." }, { status: 429 });
         const { email } = await request.json();
 
         if (!email) {

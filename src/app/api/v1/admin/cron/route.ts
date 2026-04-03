@@ -11,6 +11,9 @@ export async function POST(request: NextRequest) {
     if (apiKey) {
         const key = await prisma.apiKey.findUnique({ where: { key: apiKey } });
         if (!key || !key.isActive) return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
+        if (!key.permissions.includes("cron:run") && !key.permissions.includes("*")) {
+            return NextResponse.json({ error: "API key lacks cron:run permission" }, { status: 403 });
+        }
         await prisma.apiKey.update({ where: { id: key.id }, data: { lastUsedAt: new Date() } });
     } else {
         const session = await auth();

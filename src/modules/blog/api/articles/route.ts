@@ -17,10 +17,15 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, unknown> = {};
 
-    // Only show published articles to public
-    if (status === "PUBLISHED") {
+    // Non-admin users can only see published articles
+    const session = await auth();
+    const adminCheck = session?.user?.id ? await isAdmin(session.user.id) : false;
+
+    if (!adminCheck) {
         where.status = "PUBLISHED";
         where.publishedAt = { lte: new Date() };
+    } else if (status && status !== "ALL") {
+        where.status = status;
     }
 
     if (categoryId) {

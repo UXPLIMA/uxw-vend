@@ -131,6 +131,10 @@ export async function POST(request: NextRequest) {
             const ext = path.extname(relativePath).toLowerCase();
             if (![".json", ".ts", ".tsx", ".css", ".png", ".jpg", ".jpeg", ".svg", ".webp"].includes(ext)) continue;
 
+            // Security: verify resolved path stays within theme directory
+            const resolvedTarget = path.resolve(path.join(themeDir, relativePath));
+            if (!resolvedTarget.startsWith(path.resolve(themeDir) + path.sep)) continue;
+
             const targetPath = path.join(themeDir, relativePath);
             const targetDir = path.dirname(targetPath);
 

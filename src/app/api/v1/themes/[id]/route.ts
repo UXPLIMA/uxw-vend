@@ -9,32 +9,33 @@ const PROTECTED_THEMES = ["flat", "retro"];
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-// DELETE /api/v1/themes/[id] - Delete an installed theme
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { id } = await params;
+
+    // Security: validate ID format (only alphanumeric + hyphens)
+    if (!/^[a-z0-9-]+$/.test(id)) {
+        return NextResponse.json({ error: "Invalid theme ID" }, { status: 400 });
+    }
 
     if (PROTECTED_THEMES.includes(id)) {
         return NextResponse.json({ error: "Cannot delete built-in themes" }, { status: 400 });
     }
 
-    const themeDir = path.join(THEMES_DIR, id);
+    const themeDir = path.resolve(THEMES_DIR, id);
+
+    // Security: ensure resolved path is within THEMES_DIR
+    if (!themeDir.startsWith(path.resolve(THEMES_DIR) + path.sep)) {
+        return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
 
     if (!fs.existsSync(themeDir)) {
         return NextResponse.json({ error: "Theme not found" }, { status: 404 });
     }
 
-    // Remove directory recursively
     fs.rmSync(themeDir, { recursive: true, force: true });
-
-    return NextResponse.json({ message: `Theme "${id}" deleted. Run theme generation to update.` });
+    return NextResponse.json({ message: `Theme "${id}" deleted.` });
 }

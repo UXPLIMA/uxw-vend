@@ -7,6 +7,7 @@ export async function GET() {
     const servers = await prisma.gameServer.findMany({
         where: { isActive: true },
         orderBy: { order: "asc" },
+        select: { id: true, name: true, type: true, host: true, port: true, queryPort: true, isDefault: true, isActive: true, order: true, createdAt: true, updatedAt: true },
     });
     return NextResponse.json({ servers });
 }

@@ -24,7 +24,7 @@ export async function PATCH(request: NextRequest) {
     if (markAllRead) {
         await prisma.notification.updateMany({ where: { userId: session.user.id, isRead: false }, data: { isRead: true } });
     } else if (id) {
-        await prisma.notification.update({ where: { id }, data: { isRead: true } });
+        await prisma.notification.updateMany({ where: { id, userId: session.user.id }, data: { isRead: true } });
     }
     return NextResponse.json({ message: "Updated" });
 }

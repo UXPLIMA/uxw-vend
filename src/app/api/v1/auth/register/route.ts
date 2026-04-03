@@ -5,8 +5,13 @@ import { registerSchema } from "@/core/lib/validations";
 import { sendWelcomeEmail } from "@/core/lib/email";
 import { notifyUserRegistered } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
+import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+    // Rate limit: 10 requests per minute per IP
+    const ip = getClientIP(request.headers);
+    const rl = rateLimit(`register:${ip}`, rateLimits.auth);
+    if (!rl.success) return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
     try {
         const body = await request.json();
 

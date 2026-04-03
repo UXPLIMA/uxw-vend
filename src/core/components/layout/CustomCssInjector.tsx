@@ -14,7 +14,14 @@ export function CustomCssInjector() {
                 // Custom CSS
                 const customCss = s.custom_css;
                 if (typeof customCss === "string" && customCss.trim()) {
-                    setCss(customCss);
+                    // Sanitize: remove script injection attempts, @import, expressions
+                    const sanitized = customCss
+                        .replace(/<\/?script[^>]*>/gi, "")
+                        .replace(/javascript\s*:/gi, "")
+                        .replace(/expression\s*\(/gi, "")
+                        .replace(/@import\s/gi, "/* blocked import */")
+                        .replace(/url\s*\(\s*['"]?\s*javascript/gi, "url(blocked");
+                    setCss(sanitized);
                 }
 
                 // Apply saved theme colors

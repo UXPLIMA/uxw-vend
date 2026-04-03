@@ -31,15 +31,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "This code has expired" }, { status: 400 });
     }
 
-    // Mark as redeemed
-    await prisma.giftCode.update({
-        where: { id: giftCode.id },
-        data: {
-            isRedeemed: true,
-            redeemedAt: new Date(),
-            redeemedById: session.user.id,
-        },
+    // Atomic mark as redeemed (prevents race condition / double redemption)
+    const updated = await prisma.giftCode.updateMany({
+        where: { id: giftCode.id, isRedeemed: false },
+        data: { isRedeemed: true, redeemedAt: new Date(), redeemedById: session.user.id },
     });
+    if (updated.count === 0) {
+        return NextResponse.json({ error: "This code has already been redeemed" }, { status: 400 });
+    }
 
     // For now, gift codes give a discount on next order (stored as a one-time coupon)
     // Create a personal coupon for this user
