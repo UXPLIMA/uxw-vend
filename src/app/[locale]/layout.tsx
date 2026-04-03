@@ -11,6 +11,8 @@ import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
 import { PopupModal } from "@/core/components/layout/PopupModal";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { LivePurchaseToast } from "@/core/components/layout/LivePurchaseToast";
+import { ProgressBar } from "@/core/components/layout/ProgressBar";
+import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
 import { Toaster } from "sonner";
 import "../globals.css";
 
@@ -67,11 +69,13 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <CurrencyProvider>
               <AppThemeProvider defaultTheme={defaultThemeId}>
+                <ProgressBar />
                 <GoogleAnalytics />
                 <CustomCssInjector />
                 <LivePurchaseToast />
                 <PopupModal />
                 {children}
+                <MobileBottomNav />
                 <CookieConsent />
                 <Toaster position="bottom-right" richColors closeButton />
               </AppThemeProvider>

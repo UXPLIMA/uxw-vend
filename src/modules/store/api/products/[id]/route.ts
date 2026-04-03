@@ -103,9 +103,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Product not found" }, { status: 404 });
         }
 
-        await prisma.product.delete({ where: { id } });
+        // Soft delete — set inactive instead of hard delete
+        await prisma.product.update({ where: { id }, data: { isActive: false } });
 
-        return NextResponse.json({ message: "Product deleted" });
+        return NextResponse.json({ message: "Product archived" });
     } catch (error) {
         console.error("Delete product error:", error);
         return NextResponse.json(

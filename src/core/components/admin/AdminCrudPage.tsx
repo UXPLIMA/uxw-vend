@@ -165,6 +165,11 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         }
     };
 
+    const [page, setPage] = useState(1);
+    const perPage = 20;
+    const totalPages = Math.ceil(items.length / perPage);
+    const paginatedItems = items.slice((page - 1) * perPage, page * perPage);
+
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
 
     return (
@@ -215,7 +220,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <p className="text-muted-foreground text-center py-8">No items yet</p>
                     ) : (
                         <div className="divide-y">
-                            {items.map((item) => (
+                            {paginatedItems.map((item) => (
                                 <div key={item.id as string} className="flex items-center gap-3 p-4 hover:bg-muted/50">
                                     <input
                                         type="checkbox"
@@ -239,6 +244,15 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between p-3 border-t">
+                            <span className="text-xs text-muted-foreground">{items.length} items · Page {page}/{totalPages}</span>
+                            <div className="flex gap-1">
+                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</Button>
+                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next</Button>
+                            </div>
                         </div>
                     )}
                 </CardContent>

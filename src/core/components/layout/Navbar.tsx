@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -19,6 +19,7 @@ export function Navbar() {
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [unreadNotifs, setUnreadNotifs] = useState(0);
     const { settings } = useSiteSettings();
     const [mounted, setMounted] = useState(false);
     const [isDark, setIsDark] = useState(false);
@@ -61,6 +62,7 @@ export function Navbar() {
     useEffect(() => {
         if (status !== "authenticated") return;
         fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
+        fetch("/api/v1/notifications").then((r) => r.json()).then((d) => setUnreadNotifs(d.unread || 0)).catch(() => {});
     }, [status]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
@@ -95,6 +97,12 @@ export function Navbar() {
                             <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
                         ) : session?.user ? (
                             <>
+                                <Link href="/profile" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                                    <Bell className="w-4 h-4" />
+                                    {unreadNotifs > 0 && (
+                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
+                                    )}
+                                </Link>
                                 <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
                                     <ShoppingCart className="w-4 h-4" />
                                     {cartCount > 0 && (
