@@ -6,6 +6,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
 import { Users, Package, ShoppingCart, DollarSign, Ticket, FileText, MessageSquare } from "lucide-react";
+import { DashboardCharts } from "./components/dashboard-charts";
 
 export const dynamic = "force-dynamic";
 
@@ -147,6 +148,12 @@ export default async function AdminDashboard() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Charts */}
+            <div className="mt-8">
+                <h2 className="text-xl font-bold mb-4">Analytics</h2>
+                <DashboardCharts />
+            </div>
         </>
     );
 }

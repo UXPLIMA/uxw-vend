@@ -36,6 +36,7 @@ export const metadata: Metadata = {
   },
   description: "Open source game server management platform with store, forum, blog, and support system.",
   keywords: ["game server", "minecraft", "fivem", "store", "forum", "open source"],
+  manifest: "/manifest.json",
   authors: [{ name: "uxwVend" }],
   openGraph: {
     title: "uxwVend - Game Server Platform",
