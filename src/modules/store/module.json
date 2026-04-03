@@ -22,9 +22,9 @@
             "icon": "Package"
         },
         {
-            "label": "Categories",
+            "label": "Store Categories",
             "path": "/store/categories",
-            "icon": "FolderOpen"
+            "icon": "Tag"
         },
         {
             "label": "Orders",

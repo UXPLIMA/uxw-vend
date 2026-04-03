@@ -43,7 +43,7 @@
             "icon": "FileText"
         },
         {
-            "label": "Categories",
+            "label": "Blog Categories",
             "path": "/blog/categories",
             "icon": "FolderOpen"
         }
