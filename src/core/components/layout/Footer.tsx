@@ -76,18 +76,29 @@ export function Footer() {
                             {serverConfig.description}
                         </p>
                         <div className="flex gap-3">
-                            <Link href="#" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors">
-                                <Facebook className="w-4 h-4" />
-                            </Link>
-                            <Link href="#" className="w-8 h-8 rounded-full bg-white/10 hover:bg-pink-600 flex items-center justify-center transition-colors">
-                                <Instagram className="w-4 h-4" />
-                            </Link>
-                            <Link href="#" className="w-8 h-8 rounded-full bg-white/10 hover:bg-sky-500 flex items-center justify-center transition-colors">
-                                <Twitter className="w-4 h-4" />
-                            </Link>
-                            <Link href="#" className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 flex items-center justify-center transition-colors">
-                                <Youtube className="w-4 h-4" />
-                            </Link>
+                            {serverConfig.social.facebook && (
+                                <a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors">
+                                    <Facebook className="w-4 h-4" />
+                                </a>
+                            )}
+                            {serverConfig.social.instagram && (
+                                <a href={serverConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-pink-600 flex items-center justify-center transition-colors">
+                                    <Instagram className="w-4 h-4" />
+                                </a>
+                            )}
+                            {serverConfig.social.twitter && (
+                                <a href={serverConfig.social.twitter} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-sky-500 flex items-center justify-center transition-colors">
+                                    <Twitter className="w-4 h-4" />
+                                </a>
+                            )}
+                            {serverConfig.social.youtube && (
+                                <a href={serverConfig.social.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 flex items-center justify-center transition-colors">
+                                    <Youtube className="w-4 h-4" />
+                                </a>
+                            )}
+                            <a href={serverConfig.discordUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-indigo-600 flex items-center justify-center transition-colors">
+                                <Mail className="w-4 h-4" />
+                            </a>
                         </div>
                     </div>
 
@@ -161,7 +172,7 @@ export function Footer() {
                             <span>{t('builtWith')}</span>
                             <span className="text-red-400">♥</span>
                             <span>{t('by')}</span>
-                            <Link href="#" className="text-blue-400 font-medium hover:text-blue-300">uxwVend Team</Link>
+                            <span className="text-blue-400 font-medium">uxwVend Team</span>
                         </div>
                     </div>
                 </div>

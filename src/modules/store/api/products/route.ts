@@ -15,8 +15,10 @@ export async function GET(request: NextRequest) {
         const featured = searchParams.get("featured") === "true";
         const search = searchParams.get("search") || "";
 
+        const showAll = searchParams.get("all") === "true";
+
         const where = {
-            isActive: true,
+            ...(!showAll && { isActive: true }),
             ...(category && { category: { slug: category } }),
             ...(featured && { isFeatured: true }),
             ...(search && {

@@ -50,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     email: user.email,
                     name: user.username,
                     image: user.avatar,
-                    role: user.role.name,
+                    role: user.role?.name || "member",
                 };
             },
         }),
@@ -63,11 +63,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientSecret: process.env.AUTH_GOOGLE_SECRET,
         }),
     ],
+    events: {
+        async createUser({ user }) {
+            // Assign default "member" role to OAuth users on first sign-up
+            const defaultRole = await prisma.role.findFirst({
+                where: { name: "member" },
+            });
+            if (defaultRole && user.id) {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { roleId: defaultRole.id },
+                });
+            }
+        },
+    },
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger }) {
             if (user) {
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
+            }
+            // Refresh role from DB on every token refresh to catch role changes
+            if (trigger === "update" || !token.role) {
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: token.id as string },
+                    include: { role: true },
+                });
+                if (dbUser) {
+                    token.role = dbUser.role?.name || "member";
+                }
             }
             return token;
         },

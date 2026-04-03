@@ -1,18 +1,29 @@
-
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { formatRelativeTime } from "@/core/lib/utils";
 
-// Sample data
-const recentPurchases = [
-    { user: "xSteve", product: "VIP Rank", date: "2 min", avatar: "S", price: 19.99 },
-    { user: "GamerPro", product: "100 Credits", date: "5 min", avatar: "G", price: 9.99 },
-    { user: "BlockKing", product: "Premium Key", date: "12 min", avatar: "B", price: 4.99 },
-    { user: "MineMaster", product: "MVP+ Rank", date: "18 min", avatar: "M", price: 29.99 },
-];
+interface RecentOrder {
+    id: string;
+    orderNumber: string;
+    createdAt: string;
+    user: { username: string };
+    items: { product: { name: string } }[];
+}
 
 export function RecentPurchasesWidget() {
     const sidebarT = useTranslations('sidebar');
+    const [orders, setOrders] = useState<RecentOrder[]>([]);
+
+    useEffect(() => {
+        fetch("/api/v1/store/orders?limit=4")
+            .then((res) => res.json())
+            .then((data) => setOrders(data.orders || []))
+            .catch(() => {});
+    }, []);
+
+    if (orders.length === 0) return null;
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -21,16 +32,21 @@ export function RecentPurchasesWidget() {
                 <span className="text-xs text-green-600 font-medium">● {sidebarT('live')}</span>
             </div>
             <div className="space-y-3">
-                {recentPurchases.map((purchase, i) => (
-                    <div key={i} className="flex items-center gap-3">
+                {orders.map((order) => (
+                    <div key={order.id} className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-medium text-sm">
-                            {purchase.avatar}
+                            {order.user.username[0].toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 text-sm truncate">{purchase.user}</p>
-                            <p className="text-xs text-gray-500 truncate">{purchase.product}</p>
+                            <p className="font-medium text-gray-900 text-sm truncate">{order.user.username}</p>
+                            <p className="text-xs text-gray-500 truncate">
+                                {order.items[0]?.product?.name || "Order"}
+                                {order.items.length > 1 && ` +${order.items.length - 1}`}
+                            </p>
                         </div>
-                        <span className="text-xs text-gray-400 whitespace-nowrap">{purchase.date}</span>
+                        <span className="text-xs text-gray-400 whitespace-nowrap">
+                            {formatRelativeTime(new Date(order.createdAt))}
+                        </span>
                     </div>
                 ))}
             </div>

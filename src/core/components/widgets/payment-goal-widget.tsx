@@ -1,16 +1,34 @@
-
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
-
-// Sample data
-const paymentGoal = { current: 2850, target: 5000 };
 
 export function PaymentGoalWidget() {
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
-    const goalPercent = paymentGoal.target > 0 ? Math.round((paymentGoal.current / paymentGoal.target) * 100) : 0;
+    const [current, setCurrent] = useState(0);
+    const [target] = useState(5000); // TODO: fetch from settings API when available
+
+    useEffect(() => {
+        // Calculate current from completed orders this month
+        fetch("/api/v1/store/orders?limit=100")
+            .then((res) => res.json())
+            .then((data) => {
+                const orders = data.orders || [];
+                const now = new Date();
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthTotal = orders
+                    .filter((o: { status: string; createdAt: string }) =>
+                        o.status === "COMPLETED" && new Date(o.createdAt) >= monthStart
+                    )
+                    .reduce((sum: number, o: { total: number }) => sum + Number(o.total), 0);
+                setCurrent(monthTotal);
+            })
+            .catch(() => {});
+    }, []);
+
+    const goalPercent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -22,7 +40,7 @@ export function PaymentGoalWidget() {
                 />
             </div>
             <p className="text-center text-sm text-gray-600">
-                {formatPrice(paymentGoal.current)} / {formatPrice(paymentGoal.target)} ({goalPercent}%)
+                {formatPrice(current)} / {formatPrice(target)} ({goalPercent}%)
             </p>
         </div>
     );

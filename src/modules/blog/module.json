@@ -18,6 +18,10 @@
             "component": "pages/admin/articles/new/page.tsx"
         },
         {
+            "path": "/blog/articles/[id]/edit",
+            "component": "pages/admin/articles/[id]/edit/page.tsx"
+        },
+        {
             "path": "/blog/categories",
             "component": "pages/admin/categories/page.tsx"
         }
@@ -50,8 +54,24 @@
             "handler": "api/articles/route.ts"
         },
         {
+            "path": "/blog/articles/[id]",
+            "handler": "api/articles/[id]/route.ts"
+        },
+        {
             "path": "/blog/categories",
             "handler": "api/categories/route.ts"
+        },
+        {
+            "path": "/blog/categories/[id]",
+            "handler": "api/categories/[id]/route.ts"
+        },
+        {
+            "path": "/blog/comments",
+            "handler": "api/comments/route.ts"
+        },
+        {
+            "path": "/blog/comments/[id]",
+            "handler": "api/comments/[id]/route.ts"
         }
     ]
 }

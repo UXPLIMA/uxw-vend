@@ -50,3 +50,6 @@ next-env.d.ts
 # documentation
 *.md
 !README.md
+
+# claude code
+.claude/

@@ -5,11 +5,8 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { serverConfig } from "@/core/config/server";
 import { SkeletonNewsGrid, SkeletonSidebar } from "@/core/components/ui/skeleton";
 import { useTranslations } from "next-intl";
-import { useCurrency } from "@/core/lib/currency/context";
-import { formatRelativeTime } from "@/core/lib/utils";
 import { useModuleEnabled } from "@/core/hooks/useModule";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
@@ -35,51 +32,13 @@ interface BlogPost {
   category: { name: string; slug: string } | null;
 }
 
-// Payment Goal
-const paymentGoal = { current: 2850, target: 5000 };
-
-// Top Buyers
-const topBuyers = [
-  { name: "xSteve", avatar: "S", amount: 245 },
-  { name: "ProGamer123", avatar: "P", amount: 198 },
-  { name: "MineCraft_King", avatar: "M", amount: 156 },
-];
-
-// Top Credit Loaders
-const topCreditLoaders = [
-  { name: "DiamondHunter", avatar: "D", amount: 500 },
-  { name: "BlockMaster", avatar: "B", amount: 425 },
-  { name: "another site", avatar: "C", amount: 380 },
-];
-
-// Recent Purchases
-const recentPurchases = [
-  { user: "xSteve", product: "VIP Rank", date: "2 min", avatar: "S", price: 19.99 },
-  { user: "GamerPro", product: "100 Credits", date: "5 min", avatar: "G", price: 9.99 },
-  { user: "BlockKing", product: "Premium Key", date: "12 min", avatar: "B", price: 4.99 },
-  { user: "MineMaster", product: "MVP+ Rank", date: "18 min", avatar: "M", price: 29.99 },
-];
-
-// Top Customer
-const topCustomer = { name: "xSteve", avatar: "S", monthlySpend: 2450 };
-
-// Featured Product
-const featuredProduct = {
-  name: "Legend Rank",
-  price: 49.99,
-  image: "👑",
-};
-
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const goalPercent = paymentGoal.target > 0 ? Math.round((paymentGoal.current / paymentGoal.target) * 100) : 0;
 
   const t = useTranslations('news');
-  const sidebarT = useTranslations('sidebar');
-  const storeT = useTranslations('store');
-  const { formatPrice } = useCurrency();
+  const commonT = useTranslations('common');
   const { enabled: blogEnabled } = useModuleEnabled('blog');
 
   // Fetch blog articles from API (only if blog module enabled)
@@ -118,7 +77,7 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-6 flex-1">
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-4">
-          <Link href="/" className="hover:text-blue-600">{useTranslations('common')('home')}</Link>
+          <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
           <span className="mx-2">/</span>
           <span className="text-gray-700">{t('title')}</span>
         </div>

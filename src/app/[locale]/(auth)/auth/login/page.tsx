@@ -7,9 +7,11 @@ import { signIn } from "next-auth/react";
 import { Home } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
     const router = useRouter();
+    const t = useTranslations('auth');
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -28,13 +30,13 @@ export default function LoginPage() {
             });
 
             if (result?.error) {
-                setError("Invalid email or password");
+                setError(t('invalidCredentials'));
             } else {
                 router.push("/");
                 router.refresh();
             }
         } catch {
-            setError("Something went wrong. Please try again.");
+            setError(t('genericError'));
         } finally {
             setLoading(false);
         }
@@ -42,7 +44,6 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12 relative">
-            {/* Home Button - Top Left Circle */}
             <Link
                 href="/"
                 className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-all"
@@ -50,20 +51,17 @@ export default function LoginPage() {
                 <Home className="w-5 h-5" />
             </Link>
 
-            {/* Main Content */}
             <div className="w-full max-w-md">
-                {/* Logo - Replace with your logo image */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
                         <span className="font-bold text-2xl text-gray-900">uxwVend</span>
                     </Link>
                 </div>
 
-                {/* Login Card */}
                 <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-900 text-center">Welcome Back</h1>
-                        <p className="text-gray-500 text-sm text-center mt-1">Sign in to your account</p>
+                        <h1 className="text-xl font-bold text-gray-900 text-center">{t('loginTitle')}</h1>
+                        <p className="text-gray-500 text-sm text-center mt-1">{t('loginSubtitle')}</p>
                     </div>
 
                     <div className="p-6">
@@ -76,7 +74,7 @@ export default function LoginPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                    Email
+                                    {t('email')}
                                 </label>
                                 <Input
                                     id="email"
@@ -91,7 +89,7 @@ export default function LoginPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                                    Password
+                                    {t('password')}
                                 </label>
                                 <Input
                                     id="password"
@@ -104,12 +102,18 @@ export default function LoginPage() {
                                 />
                             </div>
 
+                            <div className="flex justify-end">
+                                <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">
+                                    {t('forgotPassword')}
+                                </Link>
+                            </div>
+
                             <Button
                                 type="submit"
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-sm"
                                 disabled={loading}
                             >
-                                {loading ? "Signing in..." : "Sign In"}
+                                {loading ? t('signingIn') : t('signIn')}
                             </Button>
 
                             <div className="relative my-6">
@@ -117,7 +121,7 @@ export default function LoginPage() {
                                     <div className="w-full border-t border-gray-100" />
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-white px-2 text-gray-400">Or continue with</span>
+                                    <span className="bg-white px-2 text-gray-400">{t('orContinueWith')}</span>
                                 </div>
                             </div>
 
@@ -151,9 +155,9 @@ export default function LoginPage() {
                         </form>
 
                         <p className="text-center text-sm text-gray-500 mt-6">
-                            Don&apos;t have an account?{" "}
+                            {t('noAccount')}{" "}
                             <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
-                                Sign up
+                                {t('signUp')}
                             </Link>
                         </p>
                     </div>

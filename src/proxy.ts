@@ -72,7 +72,7 @@ async function getModuleEnabled(moduleId: string): Promise<boolean> {
     // We'll use a simple API endpoint to check module status
     // For now, default to enabled if we can't check
     try {
-        const res = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/v1/modules/status`);
+        const res = await fetch(`${process.env.AUTH_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/v1/modules/status`);
         if (res.ok) {
             const data = await res.json();
             moduleCache = new Map(Object.entries(data.modules || {}));

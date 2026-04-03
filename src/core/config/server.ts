@@ -7,4 +7,10 @@ export const serverConfig = {
     discordWidgetId: "1445828806400151696",
     description: "Modern e-commerce platform with powerful features and an amazing user experience.",
     email: "support@uxwvend.com",
+    social: {
+        facebook: "",
+        instagram: "",
+        twitter: "",
+        youtube: "",
+    },
 };

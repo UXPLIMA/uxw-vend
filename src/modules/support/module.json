@@ -61,6 +61,14 @@
         {
             "path": "/tickets",
             "component": "pages/admin/tickets/page.tsx"
+        },
+        {
+            "path": "/tickets/[id]",
+            "component": "pages/admin/tickets/[id]/page.tsx"
+        },
+        {
+            "path": "/help",
+            "component": "pages/admin/help/page.tsx"
         }
     ],
     "api": [

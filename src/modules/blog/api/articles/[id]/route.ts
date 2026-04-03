@@ -35,12 +35,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    // Increment view count
-    await prisma.blogArticle.update({
-        where: { id: article.id },
-        data: { views: { increment: 1 } },
-    });
-
     return NextResponse.json(article);
 }
 

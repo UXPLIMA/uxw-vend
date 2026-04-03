@@ -4,23 +4,28 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { formatCurrency } from "@/core/lib/utils";
-import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
+import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { Users, Package, ShoppingCart, DollarSign, Ticket, FileText, MessageSquare } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-
 
 async function getDashboardStats() {
     const [
         totalUsers,
         totalProducts,
         totalOrders,
+        totalTickets,
+        totalArticles,
+        totalTopics,
         recentOrders,
         revenueData,
     ] = await Promise.all([
         prisma.user.count(),
         prisma.product.count(),
         prisma.order.count(),
+        prisma.ticket.count(),
+        prisma.blogArticle.count(),
+        prisma.forumTopic.count(),
         prisma.order.findMany({
             take: 5,
             orderBy: { createdAt: "desc" },
@@ -38,6 +43,9 @@ async function getDashboardStats() {
         totalUsers,
         totalProducts,
         totalOrders,
+        totalTickets,
+        totalArticles,
+        totalTopics,
         recentOrders,
         totalRevenue: revenueData._sum.total || 0,
     };
@@ -57,60 +65,38 @@ export default async function AdminDashboard() {
 
     const stats = await getDashboardStats();
 
+    const statCards = [
+        { label: "Revenue", value: formatCurrency(Number(stats.totalRevenue)), icon: DollarSign, href: "/admin/store/orders", color: "text-green-600" },
+        { label: "Orders", value: stats.totalOrders, icon: ShoppingCart, href: "/admin/store/orders", color: "text-blue-600" },
+        { label: "Products", value: stats.totalProducts, icon: Package, href: "/admin/store/products", color: "text-purple-600" },
+        { label: "Users", value: stats.totalUsers, icon: Users, href: "/admin/users", color: "text-orange-600" },
+        { label: "Tickets", value: stats.totalTickets, icon: Ticket, href: "/admin/tickets", color: "text-red-600" },
+        { label: "Articles", value: stats.totalArticles, icon: FileText, href: "/admin/blog/articles", color: "text-indigo-600" },
+        { label: "Topics", value: stats.totalTopics, icon: MessageSquare, href: "/admin/forum/categories", color: "text-teal-600" },
+    ];
+
     return (
-        <div className="min-h-screen bg-background">
+        <>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <p className="text-muted-foreground">Welcome back, {session.user.name}</p>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Revenue
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-primary">
-                            {formatCurrency(Number(stats.totalRevenue))}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Orders
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalOrders}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Products
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalProducts}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            Total Users
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                {statCards.map((stat) => (
+                    <Link key={stat.label} href={stat.href}>
+                        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                            <CardContent className="p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+                                    <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                                </div>
+                                <div className="text-2xl font-bold">{stat.value}</div>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                ))}
             </div>
 
             {/* Recent Orders */}
@@ -127,37 +113,40 @@ export default async function AdminDashboard() {
                     {stats.recentOrders.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">No orders yet</p>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {stats.recentOrders.map((order) => (
-                                <div
+                                <Link
                                     key={order.id}
-                                    className="flex justify-between items-center p-4 rounded-lg bg-muted/50"
+                                    href={`/admin/store/orders/${order.id}`}
+                                    className="flex justify-between items-center p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                                 >
                                     <div>
                                         <p className="font-medium">{order.orderNumber}</p>
                                         <p className="text-sm text-muted-foreground">
-                                            {order.user.username} • {order.user.email}
+                                            {order.user.username} · {formatDate(order.createdAt)}
                                         </p>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold">{formatCurrency(Number(order.total))}</p>
                                         <span
                                             className={`text-xs px-2 py-1 rounded ${order.status === "COMPLETED"
-                                                ? "bg-success/20 text-success"
+                                                ? "bg-green-100 text-green-700"
                                                 : order.status === "PENDING"
-                                                    ? "bg-warning/20 text-warning"
-                                                    : "bg-muted text-muted-foreground"
+                                                    ? "bg-yellow-100 text-yellow-700"
+                                                    : order.status === "PROCESSING"
+                                                        ? "bg-blue-100 text-blue-700"
+                                                        : "bg-gray-100 text-gray-500"
                                                 }`}
                                         >
                                             {order.status}
                                         </span>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
                 </CardContent>
             </Card>
-        </div>
+        </>
     );
 }

@@ -30,7 +30,7 @@ export function HeroBanner() {
                             <Users size={24} />
                         </div>
                         <div className="space-y-0.5">
-                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">PLAY.MINETOPYA.COM</div>
+                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{serverConfig.ip.toUpperCase()}</div>
                             <div className="text-green-400 font-bold text-lg flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                                 {t('playersOnline', { count: serverConfig.onlineCount })}

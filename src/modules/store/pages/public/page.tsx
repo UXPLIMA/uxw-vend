@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
-import { Key, Coins, Crown, Box, Sword, ChevronRight } from "lucide-react";
+import { Key, Coins, Crown, Box, Sword, ChevronRight, Search, X } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { SkeletonServerModes, SkeletonProductGrid, SkeletonCategories } from "@/core/components/ui/skeleton";
@@ -40,6 +40,9 @@ export default function StorePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingProducts, setLoadingProducts] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<Product[] | null>(null);
+    const [searching, setSearching] = useState(false);
 
     const t = useTranslations('store');
     const commonT = useTranslations('common');
@@ -86,6 +89,31 @@ export default function StorePage() {
         setActiveMode(null);
         setActiveCategory(null);
         setProducts([]);
+        setSearchResults(null);
+        setSearchQuery("");
+    };
+
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!searchQuery.trim()) {
+            setSearchResults(null);
+            return;
+        }
+        setSearching(true);
+        try {
+            const res = await fetch(`/api/v1/store/products?search=${encodeURIComponent(searchQuery)}&limit=20`);
+            const data = await res.json();
+            setSearchResults(data.products || []);
+        } catch {
+            setSearchResults([]);
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    const clearSearch = () => {
+        setSearchQuery("");
+        setSearchResults(null);
     };
 
     const handleModeSelect = (slug: string) => {
@@ -126,6 +154,64 @@ export default function StorePage() {
                         </>
                     )}
                 </div>
+
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="mb-6">
+                    <div className="relative max-w-lg">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={t('searchProducts') || "Search products..."}
+                            className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                        {searchQuery && (
+                            <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                            </button>
+                        )}
+                    </div>
+                </form>
+
+                {/* Search Results */}
+                {searchResults !== null && (
+                    <section className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold text-gray-900">
+                                {searching ? "Searching..." : `Results for "${searchQuery}" (${searchResults.length})`}
+                            </h2>
+                            <button onClick={clearSearch} className="text-sm text-blue-600 hover:underline">Clear</button>
+                        </div>
+                        {!searching && searchResults.length === 0 ? (
+                            <div className="bg-white rounded-xl p-8 text-center border border-gray-100">
+                                <p className="text-gray-500">No products found matching your search.</p>
+                            </div>
+                        ) : !searching ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {searchResults.map((product) => (
+                                    <Link
+                                        key={product.id}
+                                        href={`/store/product/${product.id}`}
+                                        className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group"
+                                    >
+                                        <div className="h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
+                                            {product.image ? (
+                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                            ) : (
+                                                <Box className="w-16 h-16 text-gray-300" />
+                                            )}
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{product.name}</h3>
+                                            <div className="text-blue-600 font-bold">{formatPrice(product.price)}</div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : null}
+                    </section>
+                )}
 
                 {/* Root Categories (Server Modes) */}
                 {showModes && (

@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Link } from "@/core/lib/i18n/navigation";
+import { usePathname } from "@/core/lib/i18n/navigation";
 import {
     LayoutDashboard,
     Package,
@@ -12,7 +13,11 @@ import {
     Settings,
     Puzzle,
     Ticket,
-    HelpCircle
+    HelpCircle,
+    Shield,
+    Menu,
+    X,
+    Tag
 } from "lucide-react";
 
 interface NavItem {
@@ -31,21 +36,20 @@ const navItems: NavItem[] = [
     { href: "/admin/tickets", label: "Support Tickets", icon: <Ticket size={18} /> },
     { href: "/admin/help", label: "Help Center", icon: <HelpCircle size={18} /> },
     { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
+    { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
     { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
 interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
-    modules?: any[]; // ModuleManifest[]
+    modules?: any[];
 }
 
-// Dynamic Icon Component
 const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
-    // Basic mapping for common icons
     const icons: Record<string, any> = {
         LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
-        Settings, Puzzle, Ticket, HelpCircle
+        Settings, Puzzle, Ticket, HelpCircle, Tag
     };
     const Icon = icons[name] || Puzzle;
     return <Icon size={size} />;
@@ -53,23 +57,15 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
 
 export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
-
-    // Extract the path without locale
-    // /en/admin/store/products -> /admin/store/products
-    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "");
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const isActive = (href: string) => {
-        if (href === "/admin") {
-            return pathWithoutLocale === "/admin";
-        }
-        return pathWithoutLocale.startsWith(href);
+        if (href === "/admin") return pathname === "/admin";
+        return pathname.startsWith(href);
     };
 
-    // Merge core nav with module nav
     const coreNavItems = navItems.filter(item =>
-        // Filter out static items that are now provided by modules if needed
-        // For now, let's keep Dashboard, Modules, Users, Settings as Core
-        ["Dashboard", "Modules", "Users", "Settings"].includes(item.label)
+        ["Dashboard", "Modules", "Users", "Roles", "Settings"].includes(item.label)
     );
 
     const moduleNavItems = modules.flatMap(module => {
@@ -83,14 +79,14 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
     });
 
     const allNavItems = [
-        coreNavItems[0], // Dashboard
+        coreNavItems[0],
         ...moduleNavItems,
-        ...coreNavItems.slice(1) // Others
+        ...coreNavItems.slice(1)
     ];
 
-    return (
-        <aside className="fixed top-0 left-0 bottom-0 w-64 bg-card p-4 border-r overflow-y-auto">
-            <Link href="/" className="flex items-center gap-2 mb-8 px-2">
+    const sidebarContent = (
+        <>
+            <Link href="/" className="flex items-center gap-2 mb-8 px-2" onClick={() => setMobileOpen(false)}>
                 <span className="font-bold text-xl">uxwVend</span>
             </Link>
 
@@ -99,6 +95,7 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
                     <Link
                         key={item.href}
                         href={item.href}
+                        onClick={() => setMobileOpen(false)}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive(item.href)
                             ? "bg-primary/10 text-primary font-medium"
                             : "hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -120,6 +117,42 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
                     </div>
                 </div>
             )}
-        </aside>
+        </>
+    );
+
+    return (
+        <>
+            {/* Mobile hamburger button */}
+            <button
+                onClick={() => setMobileOpen(true)}
+                className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border shadow-sm flex items-center justify-center"
+            >
+                <Menu size={20} />
+            </button>
+
+            {/* Mobile overlay */}
+            {mobileOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/50 z-40"
+                    onClick={() => setMobileOpen(false)}
+                />
+            )}
+
+            {/* Mobile sidebar */}
+            <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 bg-card p-4 border-r overflow-y-auto z-50 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
+                <button
+                    onClick={() => setMobileOpen(false)}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"
+                >
+                    <X size={18} />
+                </button>
+                {sidebarContent}
+            </aside>
+
+            {/* Desktop sidebar */}
+            <aside className="hidden lg:block fixed top-0 left-0 bottom-0 w-64 bg-card p-4 border-r overflow-y-auto">
+                {sidebarContent}
+            </aside>
+        </>
     );
 }

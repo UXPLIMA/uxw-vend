@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/core/lib/db";
 import { registerSchema } from "@/core/lib/validations";
+import { sendWelcomeEmail } from "@/core/lib/email";
 
 export async function POST(request: NextRequest) {
     try {
@@ -64,6 +65,9 @@ export async function POST(request: NextRequest) {
                 createdAt: true,
             },
         });
+
+        // Send welcome email (non-blocking)
+        sendWelcomeEmail(email, username).catch(console.error);
 
         return NextResponse.json(
             { message: "User created successfully", user },

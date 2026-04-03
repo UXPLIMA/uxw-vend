@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "@/core/lib/i18n/navigation";
+import { useRouter } from "@/core/lib/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";

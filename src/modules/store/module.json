@@ -22,9 +22,19 @@
             "icon": "Package"
         },
         {
+            "label": "Categories",
+            "path": "/store/categories",
+            "icon": "FolderOpen"
+        },
+        {
             "label": "Orders",
             "path": "/store/orders",
             "icon": "ShoppingCart"
+        },
+        {
+            "label": "Coupons",
+            "path": "/store/coupons",
+            "icon": "Tag"
         }
     ],
     "routes": [
@@ -33,12 +43,16 @@
             "component": "pages/public/page.tsx"
         },
         {
-            "path": "/cart",
+            "path": "/store/cart",
             "component": "pages/public/cart/page.tsx"
         },
         {
             "path": "/store/product/[id]",
             "component": "pages/public/product/[id]/page.tsx"
+        },
+        {
+            "path": "/store/order-success",
+            "component": "pages/public/order-success/page.tsx"
         }
     ],
     "adminRoutes": [
@@ -47,8 +61,28 @@
             "component": "pages/admin/products/page.tsx"
         },
         {
+            "path": "/store/products/new",
+            "component": "pages/admin/products/new/page.tsx"
+        },
+        {
+            "path": "/store/products/[id]/edit",
+            "component": "pages/admin/products/[id]/edit/page.tsx"
+        },
+        {
+            "path": "/store/categories",
+            "component": "pages/admin/categories/page.tsx"
+        },
+        {
             "path": "/store/orders",
             "component": "pages/admin/orders/page.tsx"
+        },
+        {
+            "path": "/store/orders/[id]",
+            "component": "pages/admin/orders/[id]/page.tsx"
+        },
+        {
+            "path": "/store/coupons",
+            "component": "pages/admin/coupons/page.tsx"
         }
     ],
     "api": [
@@ -57,8 +91,16 @@
             "handler": "api/cart/route.ts"
         },
         {
+            "path": "/store/checkout",
+            "handler": "api/checkout/route.ts"
+        },
+        {
             "path": "/store/categories",
             "handler": "api/categories/route.ts"
+        },
+        {
+            "path": "/store/categories/[id]",
+            "handler": "api/categories/[id]/route.ts"
         },
         {
             "path": "/store/products",
@@ -75,6 +117,14 @@
         {
             "path": "/store/orders/[id]",
             "handler": "api/orders/[id]/route.ts"
+        },
+        {
+            "path": "/store/coupons",
+            "handler": "api/coupons/route.ts"
+        },
+        {
+            "path": "/store/coupons/[id]",
+            "handler": "api/coupons/[id]/route.ts"
         }
     ]
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import DOMPurify from "dompurify";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 
 interface Article {
@@ -98,7 +99,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                             {/* Article Content */}
                             <div
                                 className="prose prose-blue max-w-none mb-8"
-                                dangerouslySetInnerHTML={{ __html: article.content }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
                             />
 
                             {/* Feedback */}

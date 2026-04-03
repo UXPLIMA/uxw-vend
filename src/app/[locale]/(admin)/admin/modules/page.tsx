@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
 import { ShoppingCart, MessageSquare, FileText, Ticket, HelpCircle, Package } from "lucide-react";
 
 interface Module {
@@ -67,15 +66,11 @@ export default function AdminModulesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background">
-            <AdminSidebar />
-
-            {/* Main Content */}
-            <main className="ml-64 p-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold">Module Management</h1>
-                    <p className="text-muted-foreground">Enable or disable platform modules</p>
-                </div>
+        <>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">Module Management</h1>
+                <p className="text-muted-foreground">Enable or disable platform modules</p>
+            </div>
 
                 {loading ? (
                     <div className="text-center py-12">
@@ -131,13 +126,12 @@ export default function AdminModulesPage() {
                     </div>
                 )}
 
-                <div className="mt-8 p-4 bg-muted rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                        <strong>Note:</strong> Disabling a module will hide its pages and API endpoints.
-                        Users trying to access disabled module routes will see a 404 error.
-                    </p>
-                </div>
-            </main>
-        </div>
+            <div className="mt-8 p-4 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                    <strong>Note:</strong> Disabling a module will hide its pages and API endpoints.
+                    Users trying to access disabled module routes will see a 404 error.
+                </p>
+            </div>
+        </>
     );
 }

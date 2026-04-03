@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const cartItemSchema = z.object({
     productId: z.string(),
-    quantity: z.number().int().min(1).max(99),
+    quantity: z.number().int().min(0).max(99),
 });
 
 // GET /api/v1/store/cart - Get user's cart
@@ -74,6 +74,17 @@ export async function POST(request: NextRequest) {
         }
 
         const { productId, quantity } = validation.data;
+
+        // quantity=0 means remove item from cart
+        if (quantity === 0) {
+            await prisma.cartItem.deleteMany({
+                where: {
+                    userId: session.user.id,
+                    productId,
+                },
+            });
+            return NextResponse.json({ message: "Item removed from cart" });
+        }
 
         // Check if product exists and is active
         const product = await prisma.product.findUnique({

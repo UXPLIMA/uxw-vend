@@ -27,7 +27,7 @@ export async function hasPermission(
         },
     });
 
-    if (!user) return false;
+    if (!user || !user.role) return false;
 
     // Admin role has all permissions
     if (user.role.name === "admin") return true;
@@ -42,12 +42,13 @@ export async function hasAnyPermission(
     userId: string,
     permissions: string[]
 ): Promise<boolean> {
-    for (const permission of permissions) {
-        if (await hasPermission(userId, permission)) {
-            return true;
-        }
-    }
-    return false;
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { role: { include: { permissions: true } } },
+    });
+    if (!user || !user.role) return false;
+    if (user.role.name === "admin") return true;
+    return user.role.permissions.some((p: { name: string }) => permissions.includes(p.name));
 }
 
 /**
@@ -57,12 +58,14 @@ export async function hasAllPermissions(
     userId: string,
     permissions: string[]
 ): Promise<boolean> {
-    for (const permission of permissions) {
-        if (!(await hasPermission(userId, permission))) {
-            return false;
-        }
-    }
-    return true;
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { role: { include: { permissions: true } } },
+    });
+    if (!user || !user.role) return false;
+    if (user.role.name === "admin") return true;
+    const userPerms = user.role.permissions.map((p: { name: string }) => p.name);
+    return permissions.every((perm) => userPerms.includes(perm));
 }
 
 /**
@@ -80,7 +83,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
         },
     });
 
-    if (!user) return [];
+    if (!user || !user.role) return [];
 
     // Admin role has all permissions
     if (user.role.name === "admin") {
@@ -115,7 +118,7 @@ export async function isAdmin(userId: string): Promise<boolean> {
         include: { role: true },
     });
 
-    return user?.role.name === "admin";
+    return user?.role?.name === "admin";
 }
 
 /**
@@ -127,5 +130,5 @@ export async function isStaff(userId: string): Promise<boolean> {
         include: { role: true },
     });
 
-    return ["admin", "moderator", "staff"].includes(user?.role.name || "");
+    return ["admin", "moderator", "staff"].includes(user?.role?.name || "");
 }

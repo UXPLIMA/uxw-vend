@@ -1,57 +1,70 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
-
-export const dynamic = "force-dynamic";
-
-
-async function getOrders(page: number = 1, limit: number = 20) {
-    const [orders, total] = await Promise.all([
-        prisma.order.findMany({
-            include: {
-                user: { select: { id: true, username: true, email: true } },
-                items: { select: { id: true } },
-            },
-            skip: (page - 1) * limit,
-            take: limit,
-            orderBy: { createdAt: "desc" },
-        }),
-        prisma.order.count(),
-    ]);
-
-    return { orders, total, pages: Math.ceil(total / limit) };
+interface Order {
+    id: string;
+    orderNumber: string;
+    status: string;
+    total: number;
+    createdAt: string;
+    user: { id: string; username: string; email: string };
+    items: { id: string }[];
 }
 
-export default async function AdminOrdersPage() {
-    const session = await auth();
+const statuses = ["ALL", "PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "REFUNDED"];
 
-    if (!session?.user) {
-        redirect("/auth/login");
-    }
+const statusColors: Record<string, string> = {
+    COMPLETED: "bg-green-100 text-green-700",
+    PENDING: "bg-yellow-100 text-yellow-700",
+    PROCESSING: "bg-blue-100 text-blue-700",
+    CANCELLED: "bg-red-100 text-red-700",
+    REFUNDED: "bg-gray-100 text-gray-600",
+};
 
-    const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) {
-        redirect("/");
-    }
+export default function AdminOrdersPage() {
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeStatus, setActiveStatus] = useState("ALL");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
 
-    const { orders, total } = await getOrders();
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "COMPLETED": return "bg-success/20 text-success";
-            case "PENDING": return "bg-warning/20 text-warning";
-            case "PROCESSING": return "bg-primary/20 text-primary";
-            case "CANCELLED": return "bg-destructive/20 text-destructive";
-            case "REFUNDED": return "bg-muted text-muted-foreground";
-            default: return "bg-muted text-muted-foreground";
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/v1/store/orders?page=${page}&limit=20`);
+            if (res.ok) {
+                const data = await res.json();
+                setOrders(data.orders || []);
+                setTotal(data.pagination?.total || 0);
+                setTotalPages(data.pagination?.pages || 1);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchOrders();
+    }, [page]);
+
+    const filteredOrders = activeStatus === "ALL"
+        ? orders
+        : orders.filter((o) => o.status === activeStatus);
+
+    // Count per status from current page
+    const statusCounts = orders.reduce((acc, o) => {
+        acc[o.status] = (acc[o.status] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
 
     return (
         <>
@@ -62,15 +75,38 @@ export default async function AdminOrdersPage() {
                 </div>
             </div>
 
+            {/* Status Filter Tabs */}
+            <div className="flex gap-2 mb-6 flex-wrap">
+                {statuses.map((status) => (
+                    <Button
+                        key={status}
+                        variant={activeStatus === status ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setActiveStatus(status)}
+                    >
+                        {status === "ALL" ? "All" : status}
+                        {status !== "ALL" && statusCounts[status] ? (
+                            <span className="ml-1 text-xs opacity-70">({statusCounts[status]})</span>
+                        ) : null}
+                    </Button>
+                ))}
+            </div>
+
             <Card>
                 <CardHeader>
-                    <CardTitle>All Orders</CardTitle>
+                    <CardTitle>
+                        {activeStatus === "ALL" ? "All Orders" : `${activeStatus} Orders`}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {orders.length === 0 ? (
+                    {loading ? (
+                        <div className="flex items-center justify-center py-12">
+                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : filteredOrders.length === 0 ? (
                         <div className="text-center py-12">
                             <span className="text-4xl mb-4 block">🛒</span>
-                            <p className="text-muted-foreground">No orders yet</p>
+                            <p className="text-muted-foreground">No orders found</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -87,7 +123,7 @@ export default async function AdminOrdersPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {orders.map((order) => (
+                                    {filteredOrders.map((order) => (
                                         <tr key={order.id} className="hover:bg-muted/50">
                                             <td className="py-3 px-4">
                                                 <p className="font-medium">{order.orderNumber}</p>
@@ -97,7 +133,7 @@ export default async function AdminOrdersPage() {
                                                 <p className="text-xs text-muted-foreground">{order.user.email}</p>
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
-                                                {formatDate(order.createdAt)}
+                                                {formatDate(new Date(order.createdAt))}
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
                                                 {order.items.length} items
@@ -106,17 +142,46 @@ export default async function AdminOrdersPage() {
                                                 {formatCurrency(Number(order.total))}
                                             </td>
                                             <td className="py-3 px-4">
-                                                <span className={`text-xs px-2 py-1 rounded ${getStatusColor(order.status)}`}>
+                                                <span className={`text-xs px-2 py-1 rounded ${statusColors[order.status] || "bg-gray-100 text-gray-500"}`}>
                                                     {order.status}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4 text-right">
-                                                <Button variant="ghost" size="sm">View</Button>
+                                                <Link href={`/admin/store/orders/${order.id}`}>
+                                                    <Button variant="ghost" size="sm">View</Button>
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                            <p className="text-sm text-muted-foreground">
+                                Page {page} of {totalPages}
+                            </p>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={page === 1}
+                                    onClick={() => setPage(page - 1)}
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage(page + 1)}
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </CardContent>

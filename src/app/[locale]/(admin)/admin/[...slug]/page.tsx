@@ -1,7 +1,9 @@
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ModuleRegistry } from "@/core/generated/module-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
+import { auth } from "@/core/lib/auth";
+import { isAdmin } from "@/core/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -14,17 +16,23 @@ interface PageProps {
 }
 
 export default async function DynamicAdminModulePage(props: PageProps) {
+    const session = await auth();
+    if (!session?.user) {
+        redirect("/auth/login");
+    }
+
+    const admin = await isAdmin(session.user.id);
+    if (!admin) {
+        redirect("/");
+    }
+
     const { params } = props;
     const { slug } = await params;
 
-    // Construct the full path including /admin prefix for matching
-    // slug is ["store", "products"] -> pathSegments should be ["admin", "store", "products"]
     const pathSegments = ["admin", ...slug];
-
     const match = matchModuleRoute(pathSegments);
 
     if (!match) {
-        // Fallback or explicit notFound
         notFound();
     }
 

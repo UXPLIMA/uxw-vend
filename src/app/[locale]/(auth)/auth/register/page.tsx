@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
     const router = useRouter();
+    const t = useTranslations('auth');
     const [formData, setFormData] = useState({
         email: "",
         username: "",
@@ -30,7 +32,7 @@ export default function RegisterPage() {
         setError("");
 
         if (formData.password !== formData.confirmPassword) {
-            setError("Passwords don't match");
+            setError(t('passwordsDontMatch'));
             return;
         }
 
@@ -52,7 +54,7 @@ export default function RegisterPage() {
 
             router.push("/auth/login?registered=true");
         } catch {
-            setError("Something went wrong. Please try again.");
+            setError(t('genericError'));
         } finally {
             setLoading(false);
         }
@@ -60,7 +62,6 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12 relative">
-            {/* Home Button - Top Left Circle */}
             <Link
                 href="/"
                 className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-all"
@@ -68,20 +69,17 @@ export default function RegisterPage() {
                 <Home className="w-5 h-5" />
             </Link>
 
-            {/* Main Content */}
             <div className="w-full max-w-md">
-                {/* Logo - Replace with your logo image */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
                         <span className="font-bold text-2xl text-gray-900">uxwVend</span>
                     </Link>
                 </div>
 
-                {/* Register Card */}
                 <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-900 text-center">Create Account</h1>
-                        <p className="text-gray-500 text-sm text-center mt-1">Get started with uxwVend</p>
+                        <h1 className="text-xl font-bold text-gray-900 text-center">{t('registerTitle')}</h1>
+                        <p className="text-gray-500 text-sm text-center mt-1">{t('registerSubtitle')}</p>
                     </div>
 
                     <div className="p-6">
@@ -94,7 +92,7 @@ export default function RegisterPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                    Email
+                                    {t('email')}
                                 </label>
                                 <Input
                                     id="email"
@@ -110,7 +108,7 @@ export default function RegisterPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="username" className="text-sm font-medium text-gray-700">
-                                    Username
+                                    {t('username')}
                                 </label>
                                 <Input
                                     id="username"
@@ -126,7 +124,7 @@ export default function RegisterPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                                    Password
+                                    {t('password')}
                                 </label>
                                 <Input
                                     id="password"
@@ -142,7 +140,7 @@ export default function RegisterPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                                    Confirm Password
+                                    {t('confirmPassword')}
                                 </label>
                                 <Input
                                     id="confirmPassword"
@@ -161,14 +159,14 @@ export default function RegisterPage() {
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-sm"
                                 disabled={loading}
                             >
-                                {loading ? "Creating account..." : "Create Account"}
+                                {loading ? t('creatingAccount') : t('registerTitle')}
                             </Button>
                         </form>
 
                         <p className="text-center text-sm text-gray-500 mt-6">
-                            Already have an account?{" "}
+                            {t('hasAccount')}{" "}
                             <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
-                                Sign in
+                                {t('signIn')}
                             </Link>
                         </p>
                     </div>
