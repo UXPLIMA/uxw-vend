@@ -56,4 +56,4 @@ ROADMAP.md
 !docs/*.md
 
 # claude code
-.claude/
+.claude/proxy.md
