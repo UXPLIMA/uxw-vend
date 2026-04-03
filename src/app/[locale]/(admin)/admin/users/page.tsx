@@ -79,6 +79,7 @@ export default async function AdminUsersPage() {
                                                     </div>
                                                     <Link href={`/admin/users/${user.id}`} className="font-medium hover:text-primary transition-colors">
                                                         {user.username}
+                                                        {user.isBanned && <span className="ml-2 text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Banned</span>}
                                                     </Link>
                                                 </div>
                                             </td>

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText } from "lucide-react";
+import { ArrowLeft, Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, Ban, ShieldCheck } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 
 interface UserDetail {
@@ -18,6 +18,9 @@ interface UserDetail {
     locale: string;
     currency: string;
     createdAt: string;
+    isBanned: boolean;
+    banReason: string | null;
+    bannedAt: string | null;
     role: { id: string; name: string; displayName: string; color: string | null } | null;
     _count: { orders: number; tickets: number; topics: number; posts: number };
 }
@@ -221,6 +224,59 @@ export default function AdminUserDetailPage() {
                                 <span className="text-muted-foreground">Joined</span>
                                 <span>{formatDate(new Date(user.createdAt))}</span>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Ban/Unban */}
+                    <Card className={user.isBanned ? "border-red-200" : ""}>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                {user.isBanned ? <Ban className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-green-500" />}
+                                {user.isBanned ? "Banned" : "Account Active"}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {user.isBanned ? (
+                                <div>
+                                    {user.banReason && (
+                                        <p className="text-sm text-muted-foreground mb-2">Reason: {user.banReason}</p>
+                                    )}
+                                    {user.bannedAt && (
+                                        <p className="text-xs text-muted-foreground mb-3">Since: {formatDate(new Date(user.bannedAt))}</p>
+                                    )}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={async () => {
+                                            await fetch(`/api/v1/users/${userId}`, {
+                                                method: "PATCH",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ isBanned: false }),
+                                            });
+                                            window.location.reload();
+                                        }}
+                                    >
+                                        <ShieldCheck className="w-3 h-3 mr-2" /> Unban User
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={async () => {
+                                        const reason = prompt("Ban reason (optional):");
+                                        if (reason === null) return;
+                                        await fetch(`/api/v1/users/${userId}`, {
+                                            method: "PATCH",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ isBanned: true, banReason: reason || undefined }),
+                                        });
+                                        window.location.reload();
+                                    }}
+                                >
+                                    <Ban className="w-3 h-3 mr-2" /> Ban User
+                                </Button>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

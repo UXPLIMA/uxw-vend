@@ -11,6 +11,7 @@ export const ModuleRegistry: Record<string, any> = {
   'forum:pages/public/page.tsx': dynamic(() => import('@/modules/forum/pages/public/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/topic/[id]/page.tsx': dynamic(() => import('@/modules/forum/pages/public/topic/[id]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/new/page.tsx': dynamic(() => import('@/modules/forum/pages/public/new/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
+  'forum:pages/admin/topics/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/topics/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/categories/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/page.tsx': dynamic(() => import('@/modules/store/pages/public/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/cart/page.tsx': dynamic(() => import('@/modules/store/pages/public/cart/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -83,6 +84,12 @@ export const ModuleRoutes = [
     "path": "/forum/new",
     "key": "forum:pages/public/new/page.tsx",
     "module": "forum"
+  },
+  {
+    "path": "/admin/forum/topics",
+    "key": "forum:pages/admin/topics/page.tsx",
+    "module": "forum",
+    "isAdmin": true
   },
   {
     "path": "/admin/forum/categories",

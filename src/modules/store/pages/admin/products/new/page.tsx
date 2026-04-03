@@ -8,7 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, X } from "lucide-react";
 
 interface Category {
     id: string;
@@ -28,12 +28,14 @@ export default function NewProductPage() {
         price: "",
         comparePrice: "",
         image: "",
+        images: [] as string[],
         stock: "",
         categoryId: "",
         type: "DIGITAL" as string,
         isActive: true,
         isFeatured: false,
     });
+    const [newImageUrl, setNewImageUrl] = useState("");
 
     useEffect(() => {
         fetch("/api/v1/store/categories")
@@ -53,7 +55,8 @@ export default function NewProductPage() {
                 description: form.description || undefined,
                 price: parseFloat(form.price),
                 comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
-                image: form.image || null,
+                image: form.image || (form.images.length > 0 ? form.images[0] : null),
+                images: form.images.length > 0 ? form.images : undefined,
                 stock: form.stock ? parseInt(form.stock) : null,
                 categoryId: form.categoryId || null,
                 type: form.type,
@@ -125,13 +128,52 @@ export default function NewProductPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="image">Image URL</Label>
+                                    <Label htmlFor="image">Main Image URL</Label>
                                     <Input
                                         id="image"
                                         value={form.image}
                                         onChange={(e) => setForm({ ...form, image: e.target.value })}
                                         placeholder="https://..."
                                     />
+                                </div>
+                                <div>
+                                    <Label>Additional Images</Label>
+                                    {form.images.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {form.images.map((url, i) => (
+                                                <div key={i} className="relative group">
+                                                    <img src={url} alt="" className="w-16 h-16 rounded-lg object-cover border" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })}
+                                                        className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <div className="flex gap-2">
+                                        <Input
+                                            value={newImageUrl}
+                                            onChange={(e) => setNewImageUrl(e.target.value)}
+                                            placeholder="https://..."
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => {
+                                                if (newImageUrl.trim()) {
+                                                    setForm({ ...form, images: [...form.images, newImageUrl.trim()] });
+                                                    setNewImageUrl("");
+                                                }
+                                            }}
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

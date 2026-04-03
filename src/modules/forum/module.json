@@ -17,9 +17,14 @@
     },
     "menu": [
         {
-            "label": "Forum",
-            "path": "/forum",
+            "label": "Forum Topics",
+            "path": "/forum/topics",
             "icon": "MessageSquare"
+        },
+        {
+            "label": "Forum Categories",
+            "path": "/forum/categories",
+            "icon": "FolderOpen"
         }
     ],
     "routes": [
@@ -37,6 +42,10 @@
         }
     ],
     "adminRoutes": [
+        {
+            "path": "/forum/topics",
+            "component": "pages/admin/topics/page.tsx"
+        },
         {
             "path": "/forum/categories",
             "component": "pages/admin/categories/page.tsx"

@@ -67,6 +67,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (body.username) data.username = body.username;
     if (body.email) data.email = body.email;
 
+    // Ban/unban
+    if (body.isBanned !== undefined) {
+        data.isBanned = body.isBanned;
+        data.banReason = body.isBanned ? (body.banReason || null) : null;
+        data.bannedAt = body.isBanned ? new Date() : null;
+    }
+
     const user = await prisma.user.update({
         where: { id },
         data,
