@@ -349,6 +349,12 @@ export const ModuleApiRoutes = [
     "method": "ALL"
   },
   {
+    "path": "/store/coupons/validate",
+    "key": "store:api:/store/coupons/validate",
+    "module": "store",
+    "method": "ALL"
+  },
+  {
     "path": "/tickets",
     "key": "support:api:/tickets",
     "module": "support",
@@ -403,6 +409,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'store:api:/store/orders/[id]': () => import('@/modules/store/api/orders/[id]/route'),
   'store:api:/store/coupons': () => import('@/modules/store/api/coupons/route'),
   'store:api:/store/coupons/[id]': () => import('@/modules/store/api/coupons/[id]/route'),
+  'store:api:/store/coupons/validate': () => import('@/modules/store/api/coupons/validate/route'),
   'support:api:/tickets': () => import('@/modules/support/api/tickets/route'),
   'support:api:/tickets/departments': () => import('@/modules/support/api/tickets/departments/route'),
   'support:api:/tickets/[id]': () => import('@/modules/support/api/tickets/[id]/route'),

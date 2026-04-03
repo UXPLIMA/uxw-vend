@@ -4,16 +4,24 @@ import { Crown, Users } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 export function HeroBanner() {
     const t = useTranslations('hero');
+    const { settings } = useSiteSettings();
+
+    const bgImage = (settings.hero_background_image as string) || "/background1.jpg";
+    const logoImage = (settings.hero_logo_image as string) || "/logo.png";
+    const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
+    const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
+    const height = parseInt((settings.hero_height as string) || "280");
 
     return (
-        <div className="relative h-[280px] overflow-hidden bg-[#0F172A] border-b-[6px] border-blue-600">
+        <div className="relative overflow-hidden bg-[#0F172A] border-b-[6px] border-blue-600" style={{ height }}>
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
-                    src="/background1.jpg"
+                    src={bgImage}
                     alt="Background"
                     className="w-full h-full object-cover opacity-60"
                 />
@@ -30,7 +38,7 @@ export function HeroBanner() {
                             <Users size={24} />
                         </div>
                         <div className="space-y-0.5">
-                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{serverConfig.ip.toUpperCase()}</div>
+                            <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{serverIp.toUpperCase()}</div>
                             <div className="text-green-400 font-bold text-lg flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                                 {t('playersOnline', { count: serverConfig.onlineCount })}
@@ -42,7 +50,7 @@ export function HeroBanner() {
                     <div className="relative z-10 transform hover:scale-105 transition-transform duration-500">
                         <div className="flex flex-col items-center">
                             <img
-                                src="/logo.png"
+                                src={logoImage}
                                 alt={serverConfig.name}
                                 className="h-40 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] filter brightness-110"
                             />
@@ -51,7 +59,7 @@ export function HeroBanner() {
 
                     {/* Right: Discord */}
                     <Link
-                        href={serverConfig.discordUrl}
+                        href={discordUrl}
                         target="_blank"
                         className="group hidden md:flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 px-6 py-4 rounded-xl hover:bg-[#5865F2] hover:border-[#5865F2] transition-all duration-300 transform hover:-translate-y-1"
                     >

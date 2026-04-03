@@ -9,6 +9,8 @@ import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CookieConsent } from "@/core/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
 import { PopupModal } from "@/core/components/layout/PopupModal";
+import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
+import { LivePurchaseToast } from "@/core/components/layout/LivePurchaseToast";
 import { Toaster } from "sonner";
 import "../globals.css";
 
@@ -66,6 +68,8 @@ export default async function RootLayout({
             <CurrencyProvider>
               <AppThemeProvider defaultTheme={defaultThemeId}>
                 <GoogleAnalytics />
+                <CustomCssInjector />
+                <LivePurchaseToast />
                 <PopupModal />
                 {children}
                 <CookieConsent />

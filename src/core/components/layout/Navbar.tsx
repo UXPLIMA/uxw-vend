@@ -1,12 +1,17 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
+};
 
 export function Navbar() {
     const pathname = usePathname();
@@ -16,8 +21,18 @@ export function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const { theme, setTheme } = useTheme();
+    const { settings } = useSiteSettings();
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
+
+    // Dynamic nav links from DB or defaults
+    const defaultLinks = [
+        { label: t('home'), href: "/", icon: "Home" },
+        { label: t('store'), href: "/store", icon: "ShoppingCart" },
+        { label: t('forum'), href: "/forum", icon: "MessageSquare" },
+        { label: t('support'), href: "/support", icon: "HelpCircle" },
+    ];
+    const navLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : defaultLinks) as { label: string; href: string; icon?: string }[];
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -51,42 +66,22 @@ export function Navbar() {
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between py-3">
                     <nav className="flex items-center gap-1">
-                        <Link
-                            href="/"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <Home className="w-4 h-4" /> {t('home')}
-                        </Link>
-                        <Link
-                            href="/store"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/store")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <ShoppingCart className="w-4 h-4" /> {t('store')}
-                        </Link>
-                        <Link
-                            href="/forum"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/forum")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <MessageSquare className="w-4 h-4" /> {t('forum')}
-                        </Link>
-                        <Link
-                            href="/support"
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/support")
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-600 hover:bg-gray-100"
-                                }`}
-                        >
-                            <HelpCircle className="w-4 h-4" /> {t('support')}
-                        </Link>
+                        {navLinks.map((link) => {
+                            const IconComp = link.icon ? iconMap[link.icon] : null;
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(link.href)
+                                        ? "bg-blue-50 text-blue-600"
+                                        : "text-gray-600 hover:bg-gray-100"
+                                        }`}
+                                >
+                                    {IconComp && <IconComp className="w-4 h-4" />}
+                                    {link.label}
+                                </Link>
+                            );
+                        })}
                     </nav>
 
                     <div className="flex items-center gap-3">

@@ -19,6 +19,7 @@ import { TopBuyersWidget } from "@/core/components/widgets/top-buyers-widget";
 import { TopCreditLoadersWidget } from "@/core/components/widgets/top-credit-loaders-widget";
 import { RecentPurchasesWidget } from "@/core/components/widgets/recent-purchases-widget";
 import { NewsGrid } from "@/core/components/blog/news-grid";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 // Blog post type from API
 interface BlogPost {
@@ -40,6 +41,15 @@ export default function HomePage() {
   const t = useTranslations('news');
   const commonT = useTranslations('common');
   const { enabled: blogEnabled } = useModuleEnabled('blog');
+  const { settings } = useSiteSettings();
+
+  // Widget visibility from admin settings
+  const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
+  const widgetOrder = (Array.isArray(settings.widget_order) ? settings.widget_order : [
+      "DiscordWidget", "FeaturedProductWidget", "PaymentGoalWidget",
+      "TopCustomerWidget", "TopBuyersWidget", "TopCreditLoadersWidget", "RecentPurchasesWidget"
+  ]) as string[];
+  const isWidgetVisible = (id: string) => widgetVisibility[id] !== false;
 
   // Fetch blog articles from API (only if blog module enabled)
   useEffect(() => {
@@ -150,13 +160,19 @@ export default function HomePage() {
                   <SkeletonSidebar />
                 ) : (
                   <>
-                    <ThemeSlot name="DiscordWidget" defaultComponent={<DiscordWidget />} />
-                    <ThemeSlot name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />
-                    <ThemeSlot name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />
-                    <ThemeSlot name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />
-                    <ThemeSlot name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />
-                    <ThemeSlot name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />
-                    <ThemeSlot name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />
+                    {widgetOrder.map((id) => {
+                      if (!isWidgetVisible(id)) return null;
+                      const widgetMap: Record<string, React.ReactNode> = {
+                        DiscordWidget: <ThemeSlot key={id} name="DiscordWidget" defaultComponent={<DiscordWidget />} />,
+                        FeaturedProductWidget: <ThemeSlot key={id} name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />,
+                        PaymentGoalWidget: <ThemeSlot key={id} name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />,
+                        TopCustomerWidget: <ThemeSlot key={id} name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />,
+                        TopBuyersWidget: <ThemeSlot key={id} name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />,
+                        TopCreditLoadersWidget: <ThemeSlot key={id} name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />,
+                        RecentPurchasesWidget: <ThemeSlot key={id} name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />,
+                      };
+                      return widgetMap[id] || null;
+                    })}
                   </>
                 )}
               </div>

@@ -1,14 +1,31 @@
-import { Link } from '@/core/lib/i18n';
-import { Button } from '@/core/components/ui/button';
+import Link from "next/link";
+import { Button } from "@/core/components/ui/button";
+import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFound() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <h1 className="text-6xl font-black text-gray-900 mb-4">404</h1>
-            <p className="text-xl text-gray-600 mb-8">Page not found</p>
-            <Link href="/">
-                <Button>Go Home</Button>
-            </Link>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+            <div className="text-center max-w-md">
+                <div className="text-[120px] font-black text-gray-200 leading-none select-none mb-4">
+                    404
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Page Not Found</h1>
+                <p className="text-gray-500 mb-8">
+                    The page you're looking for doesn't exist or has been moved.
+                </p>
+                <div className="flex gap-3 justify-center">
+                    <Link href="/">
+                        <Button>
+                            <Home className="w-4 h-4 mr-2" /> Go Home
+                        </Button>
+                    </Link>
+                    <Link href="/store">
+                        <Button variant="outline">
+                            <Search className="w-4 h-4 mr-2" /> Browse Store
+                        </Button>
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 }

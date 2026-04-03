@@ -129,6 +129,10 @@
         {
             "path": "/store/coupons/[id]",
             "handler": "api/coupons/[id]/route.ts"
+        },
+        {
+            "path": "/store/coupons/validate",
+            "handler": "api/coupons/validate/route.ts"
         }
     ]
 }
