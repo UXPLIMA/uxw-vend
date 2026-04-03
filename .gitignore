@@ -47,9 +47,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# documentation
-*.md
+# md files (block analysis/internal, keep README and docs)
+CLAUDE.md
+COMPETITOR_ANALYSIS.md
+QUALITY_ANALYSIS.md
+ROADMAP.md
 !README.md
+!docs/*.md
 
 # claude code
 .claude/
