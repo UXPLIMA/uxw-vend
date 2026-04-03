@@ -63,6 +63,12 @@ model User {
   creditHistory    CreditTransaction[]
   votes            VoteLog[]
 
+  // P2 relations
+  staffProfile     StaffMember[]      @relation("StaffProfile")
+  creatorCodes     CreatorCode[]      @relation("CreatorCodes")
+  suggestions      Suggestion[]       @relation("Suggestions")
+  suggestionVotes  SuggestionVote[]   @relation("SuggestionVotes")
+
   @@index([email])
   @@index([username])
 }
@@ -426,6 +432,79 @@ model VoteLog {
 
   @@index([userId])
   @@index([voteSiteId])
+}
+
+// ==================== CHANGELOG ====================
+
+model ChangelogEntry {
+  id        String   @id @default(cuid())
+  version   String
+  title     String
+  content   String   @db.Text
+  type      String   @default("update") // update, feature, fix, breaking
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ==================== STAFF PAGE ====================
+
+model StaffMember {
+  id        String  @id @default(cuid())
+  userId    String?
+  user      User?   @relation("StaffProfile", fields: [userId], references: [id])
+  name      String
+  role      String
+  avatar    String?
+  order     Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+// ==================== CREATOR CODES ====================
+
+model CreatorCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  creatorId       String
+  creator         User     @relation("CreatorCodes", fields: [creatorId], references: [id])
+  discountPercent Int      @default(5)
+  commissionPercent Int    @default(5)
+  usageCount      Int      @default(0)
+  totalRevenue    Decimal  @default(0) @db.Decimal(10, 2)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([code])
+  @@index([creatorId])
+}
+
+// ==================== SUGGESTIONS ====================
+
+model Suggestion {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  status    String   @default("open") // open, under_review, accepted, rejected, completed
+  upvotes   Int      @default(0)
+  authorId  String
+  author    User     @relation("Suggestions", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  votes SuggestionVote[]
+
+  @@index([status])
+  @@index([authorId])
+}
+
+model SuggestionVote {
+  id           String     @id @default(cuid())
+  suggestionId String
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation("SuggestionVotes", fields: [userId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([suggestionId, userId])
 }
 
 // ==================== FORUM MODULE ====================
