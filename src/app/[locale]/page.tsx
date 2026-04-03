@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { HeroBanner, Navbar, Footer, AnnouncementBanner } from "@/core/components/layout";
 import { SkeletonNewsGrid, SkeletonSidebar } from "@/core/components/ui/skeleton";
 import { useTranslations } from "next-intl";
 import { useModuleEnabled } from "@/core/hooks/useModule";
@@ -66,6 +66,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
+      {/* Announcements */}
+      <AnnouncementBanner />
+
       {/* Shared Hero Banner */}
       <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
 

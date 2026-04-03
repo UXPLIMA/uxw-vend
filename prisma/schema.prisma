@@ -58,6 +58,11 @@ model User {
   // Gift relations
   redeemedGifts GiftCode[] @relation("RedeemedGifts")
 
+  // Credit & Vote relations
+  creditBalance    Decimal            @default(0) @db.Decimal(10, 2)
+  creditHistory    CreditTransaction[]
+  votes            VoteLog[]
+
   @@index([email])
   @@index([username])
 }
@@ -352,6 +357,75 @@ model GiftCode {
   createdById  String?
 
   @@index([code])
+}
+
+// ==================== ANNOUNCEMENTS ====================
+
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  type      String    @default("info") // info, warning, success, error
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ==================== CUSTOM PAGES ====================
+
+model CustomPage {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String   @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// ==================== CREDITS ====================
+
+model CreditTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String   // purchase, spend, gift, refund
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ==================== VOTE ====================
+
+model VoteSite {
+  id        String    @id @default(cuid())
+  name      String
+  url       String
+  reward    Int       @default(0)
+  icon      String?
+  isActive  Boolean   @default(true)
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  votes     VoteLog[]
+}
+
+model VoteLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  voteSiteId String
+  voteSite   VoteSite @relation(fields: [voteSiteId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([voteSiteId])
 }
 
 // ==================== FORUM MODULE ====================
