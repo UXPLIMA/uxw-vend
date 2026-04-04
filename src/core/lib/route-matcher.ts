@@ -24,11 +24,26 @@ export function matchModuleRoute(pathSegments: string[]): RouteMatch | null {
     for (const route of ModuleRoutes) {
         if (!route.path.includes("[")) continue;
 
-        // Convert route pattern to regex
-        // /blog/[slug] -> ^\/blog\/([^/]+)$
+        // Handle catch-all routes [...param]
+        if (route.path.includes("[...")) {
+            const prefix = route.path.replace(/\/\[\.\.\..*?\]$/, "");
+            if (urlPath.startsWith(prefix + "/")) {
+                const rest = urlPath.substring(prefix.length + 1);
+                const paramName = route.path.match(/\[\.\.\.(\w+)\]/)?.[1] || "params";
+                return {
+                    key: route.key,
+                    module: route.module,
+                    params: { [paramName]: rest }
+                };
+            }
+            continue;
+        }
+
+        // Convert route pattern to regex for single dynamic segments
+        // /blog/[slug] -> ^\/blog\/(?<slug>[^/]+)$
         const pattern = route.path
             .replace(/\//g, "\\/")
-            .replace(/\[(.*?)\]/g, "(?<$1>[^/]+)");
+            .replace(/\[(\w+)\]/g, "(?<$1>[^/]+)");
 
         const regex = new RegExp(`^${pattern}$`);
         const match = urlPath.match(regex);
