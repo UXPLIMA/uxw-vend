@@ -58,7 +58,7 @@ ROADMAP.md
 !docs/*.md
 
 # claude code
-.claude/proxy.md
+.claude/
 
 # Test artifacts
 *.png
