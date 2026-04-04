@@ -20,6 +20,7 @@ interface Module {
     icon?: string;
     enabled: boolean;
     dependencies?: string[];
+    conflicts?: string[];
     routes?: { public?: string[]; admin?: string[] };
 }
 
@@ -228,8 +229,40 @@ export default function AdminModulesPage() {
 
                                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
 
-                                    {mod.dependencies && mod.dependencies.length > 0 && (
-                                        <p className="text-xs text-amber-600 mb-3">Requires: {mod.dependencies.join(", ")}</p>
+                                    {((mod.dependencies && mod.dependencies.length > 0) || (mod.conflicts && mod.conflicts.length > 0)) && (
+                                        <div className="mb-3 space-y-1">
+                                            {mod.dependencies && mod.dependencies.length > 0 && (
+                                                <div className="flex items-center gap-1.5 text-xs">
+                                                    <span className="text-amber-600 font-medium">Requires:</span>
+                                                    <div className="flex gap-1 flex-wrap">
+                                                        {mod.dependencies.map(dep => {
+                                                            const depMod = modules.find(m => m.id === dep);
+                                                            const isInstalled = depMod?.enabled;
+                                                            return (
+                                                                <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isInstalled ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                                                                    {depMod?.name || dep} {isInstalled ? "✓" : "missing"}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mod.conflicts && mod.conflicts.length > 0 && (
+                                                <div className="flex items-center gap-1.5 text-xs">
+                                                    <span className="text-red-500 font-medium">Incompatible:</span>
+                                                    <div className="flex gap-1 flex-wrap">
+                                                        {mod.conflicts.map(cId => {
+                                                            const cMod = modules.find(m => m.id === cId);
+                                                            return (
+                                                                <span key={cId} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-200">
+                                                                    {cMod?.name || cId}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
 
                                     <div className="flex gap-2">
@@ -318,7 +351,16 @@ export default function AdminModulesPage() {
                                     </div>
 
                                     {mod.dependencies.length > 0 && (
-                                        <p className="text-xs text-amber-600 mb-3">Requires: {mod.dependencies.join(", ")}</p>
+                                        <div className="flex items-center gap-1.5 text-xs mb-3">
+                                            <span className="text-amber-600 font-medium">Requires:</span>
+                                            <div className="flex gap-1 flex-wrap">
+                                                {mod.dependencies.map((dep: string) => (
+                                                    <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${installedIds.has(dep) ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                                                        {dep}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
                                     )}
 
                                     <Button

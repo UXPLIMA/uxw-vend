@@ -33,6 +33,7 @@ export interface ModuleManifest {
     }[];
 
     dependencies?: string[];
+    conflicts?: string[];       // Modules that can't be active at the same time
 
     hooks?: {
         onEnable?: string;

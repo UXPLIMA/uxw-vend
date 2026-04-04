@@ -79,6 +79,40 @@ export async function PATCH(request: NextRequest) {
                 }, { status: 400 });
             }
         }
+
+        // When enabling: check for conflicts
+        const conflicts = definition.conflicts ?? [];
+        if (conflicts.length > 0) {
+            const configs = await prisma.moduleConfig.findMany();
+            const activeConflicts = conflicts.filter(cId => {
+                const c = configs.find(cfg => cfg.id === cId);
+                return c?.enabled === true;
+            });
+            if (activeConflicts.length > 0) {
+                const conflictNames = activeConflicts.map(cId => moduleSystem.getDefinition(cId)?.name || cId);
+                return NextResponse.json({
+                    error: `Cannot enable '${definition.name}': incompatible with ${conflictNames.join(', ')}`,
+                    conflicts: activeConflicts,
+                }, { status: 400 });
+            }
+        }
+
+        // Also check if any enabled module declares conflict with this one
+        const allDefs = moduleSystem.getDefinitions();
+        const configs2 = await prisma.moduleConfig.findMany();
+        for (const def of allDefs) {
+            if (def.id === moduleId) continue;
+            const theirConflicts = def.conflicts ?? [];
+            if (theirConflicts.includes(moduleId)) {
+                const isEnabled = configs2.find(c => c.id === def.id)?.enabled === true;
+                if (isEnabled) {
+                    return NextResponse.json({
+                        error: `Cannot enable '${definition.name}': incompatible with ${def.name}`,
+                        conflicts: [def.id],
+                    }, { status: 400 });
+                }
+            }
+        }
     } else {
         // When disabling: check if any enabled module depends on this one
         const allDefs = moduleSystem.getDefinitions();
