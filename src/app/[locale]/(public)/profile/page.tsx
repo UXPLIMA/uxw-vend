@@ -12,8 +12,8 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
-import { useModules } from "@/core/hooks/useModule";
-import { ModuleNavLinks } from "@/core/generated/module-registry";
+import { useAllModules } from "@/core/providers/module-provider";
+import { ModuleRoutes } from "@/core/generated/module-registry";
 
 interface UserProfile {
     id: string;
@@ -47,15 +47,15 @@ interface Order {
 export default function ProfilePage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
-    const { modules: moduleStatus } = useModules();
-
-    // Build path→module map from registry — zero hardcoded module names
-    const pathToModule: Record<string, string> = {};
-    for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
-    const isModuleActive = (path: string) => {
-        const mod = pathToModule[path];
-        return mod ? moduleStatus[mod] === true : true;
-    };
+    const modules = useAllModules();
+    // Build installed module set from registry — zero hardcoded module names
+    const installedModulePaths = new Set<string>();
+    for (const r of ModuleRoutes) {
+        if (!r.isAdmin && modules[r.module] === true) {
+            installedModulePaths.add('/' + r.path.split('/')[0]);
+        }
+    }
+    const hasModule = (path: string) => installedModulePaths.has(path);
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
@@ -100,12 +100,11 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
-        const storeEnabled = isModuleActive('/store');
         Promise.all([
             fetch("/api/v1/auth/profile").then((r) => r.json()),
-            storeEnabled ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
+            hasModule('/store') ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
             fetch("/api/v1/linked-accounts").then((r) => r.json()).catch(() => ({ accounts: [] })),
-            storeEnabled ? fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })) : Promise.resolve({ items: [] }),
+            hasModule('/store') ? fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })) : Promise.resolve({ items: [] }),
         ]).then(([profileData, ordersData, accountsData, chestData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
@@ -118,7 +117,7 @@ export default function ProfilePage() {
             setChestItems(chestData.items || []);
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, [authStatus, router, moduleStatus]);
+    }, [authStatus, router, hasModule('/store')]);
 
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -236,28 +235,37 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-4 gap-4 mb-6">
-                    {[
-                        { icon: ShoppingCart, label: "Orders", value: profile?._count.orders || 0 },
-                        { icon: Ticket, label: "Tickets", value: profile?._count.tickets || 0 },
-                        { icon: MessageSquare, label: "Topics", value: profile?._count.topics || 0 },
-                        { icon: FileText, label: "Comments", value: profile?._count.comments || 0 },
-                    ].map((stat) => (
-                        <Card key={stat.label}>
-                            <CardContent className="p-4 text-center">
-                                <stat.icon className="w-5 h-5 mx-auto mb-1 text-gray-400" />
-                                <p className="text-xl font-bold">{stat.value}</p>
-                                <p className="text-xs text-muted-foreground">{stat.label}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                {/* Stats — only show cards for installed modules */}
+                {(() => {
+                    const statItems = [
+                        hasModule('/store') && { icon: ShoppingCart, label: "Orders", value: profile?._count.orders || 0 },
+                        hasModule('/support') && { icon: Ticket, label: "Tickets", value: profile?._count.tickets || 0 },
+                        hasModule('/forum') && { icon: MessageSquare, label: "Topics", value: profile?._count.topics || 0 },
+                        (hasModule('/forum') || hasModule('/blog')) && { icon: FileText, label: "Comments", value: profile?._count.comments || 0 },
+                    ].filter(Boolean) as { icon: React.ElementType; label: string; value: number }[];
+
+                    if (statItems.length === 0) return null;
+
+                    const cols = statItems.length <= 2 ? `grid-cols-${statItems.length}` : statItems.length === 3 ? "grid-cols-3" : "grid-cols-4";
+                    return (
+                        <div className={`grid ${cols} gap-4 mb-6`}>
+                            {statItems.map((stat) => (
+                                <Card key={stat.label}>
+                                    <CardContent className="p-4 text-center">
+                                        <stat.icon className="w-5 h-5 mx-auto mb-1 text-gray-400" />
+                                        <p className="text-xl font-bold">{stat.value}</p>
+                                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    );
+                })()}
 
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6">
                     {(["profile", "orders", "chest", "accounts", "security"] as const).filter(tab => {
-                        if ((tab === "orders" || tab === "chest") && !isModuleActive('/store')) return false;
+                        if ((tab === "orders" || tab === "chest") && !hasModule('/store')) return false;
                         return true;
                     }).map((tab) => (
                         <Button

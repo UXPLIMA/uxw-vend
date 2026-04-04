@@ -9,7 +9,7 @@ import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleFooterLinks, ModuleNavLinks } from "@/core/generated/module-registry";
+import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes } from "@/core/generated/module-registry";
 
 // Custom Dropdown Component for Footer
 function CustomDropdown({
@@ -74,9 +74,36 @@ export function Footer() {
     const pathToModule: Record<string, string> = {};
     for (const fl of ModuleFooterLinks) { pathToModule[fl.href] = fl.module; }
     for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
+    for (const r of ModuleRoutes) {
+        if (!r.isAdmin) {
+            const prefix = '/' + r.path.split('/')[0];
+            if (!pathToModule[prefix]) pathToModule[prefix] = r.module;
+        }
+    }
+
+    // Installed module path prefixes
+    const installedModulePaths = new Set<string>();
+    for (const nl of ModuleNavLinks) {
+        if (moduleStatus[nl.module] === true) installedModulePaths.add(nl.href);
+    }
+    for (const fl of ModuleFooterLinks) {
+        if (moduleStatus[fl.module] === true) installedModulePaths.add(fl.href);
+    }
+    for (const r of ModuleRoutes) {
+        if (!r.isAdmin && moduleStatus[r.module] === true) {
+            installedModulePaths.add('/' + r.path.split('/')[0]);
+        }
+    }
+
+    const corePaths = new Set(['/', '/profile', '/admin', '/auth', '/terms', '/privacy', '/rules', '/refund']);
+
     const isLinkEnabled = (href: string) => {
+        if (href.startsWith('http')) return true;
+        if (corePaths.has(href)) return true;
         const mod = pathToModule[href];
-        return !mod || moduleStatus[mod] === true;
+        if (mod) return moduleStatus[mod] === true;
+        if (installedModulePaths.has(href)) return true;
+        return false;
     };
 
     const handleLocaleChange = (newLocale: string) => {

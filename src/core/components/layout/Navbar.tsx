@@ -8,7 +8,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleNavLinks } from "@/core/generated/module-registry";
+import { ModuleNavLinks, ModuleRoutes } from "@/core/generated/module-registry";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
@@ -50,14 +50,42 @@ export function Navbar() {
     };
 
     // Build nav links: admin-configured links take priority, fallback to module-registered links
-    // pathToModule built dynamically from registry — zero hardcoded module names
+    // pathToModule maps top-level path prefixes to module IDs using both navLinks and routes
     const pathToModule: Record<string, string> = {};
     for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
+    for (const r of ModuleRoutes) {
+        if (!r.isAdmin) {
+            const prefix = '/' + r.path.split('/')[0];
+            if (!pathToModule[prefix]) pathToModule[prefix] = r.module;
+        }
+    }
+
+    // Installed module path prefixes (only from currently installed/enabled modules)
+    const installedModulePaths = new Set<string>();
+    for (const nl of ModuleNavLinks) {
+        if (moduleStatus[nl.module] === true) installedModulePaths.add(nl.href);
+    }
+    for (const r of ModuleRoutes) {
+        if (!r.isAdmin && moduleStatus[r.module] === true) {
+            installedModulePaths.add('/' + r.path.split('/')[0]);
+        }
+    }
+
+    // Core paths that are always valid (not served by modules)
+    const corePaths = new Set(['/', '/profile', '/admin', '/auth', '/terms', '/privacy', '/rules', '/refund']);
 
     const isLinkEnabled = (href: string) => {
+        // External URLs always allowed
+        if (href.startsWith('http')) return true;
+        // Core paths always allowed
+        if (corePaths.has(href)) return true;
+        // Check if this href maps to a known installed module
         const moduleId = pathToModule[href];
-        if (!moduleId) return true;
-        return moduleStatus[moduleId] === true;
+        if (moduleId) return moduleStatus[moduleId] === true;
+        // For DB-saved links: if the path is served by an installed module, allow it
+        if (installedModulePaths.has(href)) return true;
+        // Unknown internal path not served by any installed module — likely a stale module link, hide it
+        return false;
     };
 
     // Default links: Home + enabled module navLinks from registry

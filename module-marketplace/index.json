@@ -3,6 +3,25 @@
   "updated": "2026-04-04",
   "modules": [
     {
+      "id": "analytics",
+      "name": "Google Analytics",
+      "description": "Google Analytics tracking integration",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "BarChart",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "analytics.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "announcements",
       "name": "Announcements",
       "description": "Site-wide announcement banners",
@@ -37,6 +56,25 @@
         "publicRoutes": 2,
         "adminRoutes": 4,
         "apiRoutes": 6,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "cookie-consent",
+      "name": "Cookie Consent",
+      "description": "GDPR cookie consent banner",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "cookie-consent.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
         "widgets": 0
       }
     },

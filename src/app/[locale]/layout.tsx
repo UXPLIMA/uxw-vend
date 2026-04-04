@@ -8,8 +8,6 @@ import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
 import prisma from "@/core/lib/db";
 import { defaultThemeId } from "@/core/generated/theme-registry";
-import { CookieConsent } from "@/core/components/layout/CookieConsent";
-import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
@@ -78,12 +76,10 @@ export default async function RootLayout({
                 <ModuleProvider moduleStates={moduleStates}>
                 <ConfirmProvider>
                   <ProgressBar />
-                  <GoogleAnalytics />
                   <CustomCssInjector />
                   <ModuleLayoutComponents />
                   {children}
                   <MobileBottomNav />
-                  <CookieConsent />
                   <Toaster position="bottom-right" richColors closeButton />
                 </ConfirmProvider>
                 </ModuleProvider>
