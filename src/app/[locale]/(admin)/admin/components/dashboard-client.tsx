@@ -7,7 +7,13 @@ import { Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket, Tro
 import { useAllModules } from "@/core/providers/module-provider";
 import { DashboardCharts } from "./dashboard-charts";
 
-const iconMap: Record<string, any> = {
+interface ModuleManifest {
+    id: string;
+    statsApi?: string;
+    dashboardCards?: DashboardCard[];
+}
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket,
     Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield,
 };
@@ -50,7 +56,7 @@ interface DashboardSection {
 export function DashboardClient() {
     const modules = useAllModules();
     const [cards, setCards] = useState<DashboardCard[]>([]);
-    const [stats, setStats] = useState<Record<string, any>>({});
+    const [stats, setStats] = useState<Record<string, string | number>>({});
     const [sections, setSections] = useState<DashboardSection[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -59,17 +65,17 @@ export function DashboardClient() {
         fetch("/api/v1/modules")
             .then(r => r.json())
             .then(async (data) => {
-                const enabledModules = (data.modules || []).filter((m: any) => modules[m.id] === true);
+                const enabledModules = ((data.modules || []) as ModuleManifest[]).filter((m) => modules[m.id] === true);
 
                 // Collect dashboard cards from enabled modules
                 const allCards: DashboardCard[] = [];
-                const allStats: Record<string, any> = {};
+                const allStats: Record<string, string | number> = {};
                 const allSections: DashboardSection[] = [];
 
                 // Fetch stats from each module's statsApi
                 const fetches = enabledModules
-                    .filter((m: any) => m.statsApi)
-                    .map(async (m: any) => {
+                    .filter((m) => m.statsApi)
+                    .map(async (m) => {
                         try {
                             const res = await fetch(`/api/v1${m.statsApi}`);
                             if (!res.ok) return;
@@ -113,7 +119,7 @@ export function DashboardClient() {
         );
     }
 
-    const formatValue = (key: string, value: any) => {
+    const formatValue = (key: string, value: string | number) => {
         if (key === "revenue") return `$${Number(value || 0).toFixed(2)}`;
         return value || 0;
     };

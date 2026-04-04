@@ -67,10 +67,10 @@ const coreToolItems: NavItem[] = [
 interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
-    modules?: any[];
+    modules?: { menu?: { path: string; label: string; icon?: string }[] }[];
 }
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
     LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
     Settings, Puzzle, Ticket, HelpCircle, Tag, Megaphone, History,
     UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
@@ -83,7 +83,7 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
     return <Icon size={size} />;
 };
 
-export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebarProps) {
+export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -95,7 +95,7 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
     // Build module menu items from enabled module manifests only
     const moduleNavItems: NavItem[] = modules.flatMap(module => {
         if (!module.menu) return [];
-        return module.menu.map((menuItem: any) => ({
+        return module.menu.map((menuItem) => ({
             href: `/admin${menuItem.path.startsWith('/') ? menuItem.path : '/' + menuItem.path}`,
             label: menuItem.label,
             icon: <DynamicIcon name={menuItem.icon || "Puzzle"} />,

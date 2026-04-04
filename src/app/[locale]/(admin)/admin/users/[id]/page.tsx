@@ -124,6 +124,7 @@ export default function AdminUserDetailPage() {
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden">
                         {user.avatar ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
                             user.username[0].toUpperCase()

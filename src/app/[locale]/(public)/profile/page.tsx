@@ -26,7 +26,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-    const { data: session, status: authStatus } = useSession();
+    const { status: authStatus } = useSession();
     const router = useRouter();
     const modules = useAllModules();
 
@@ -127,6 +127,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
                         {profile?.avatar ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
                             (profile?.username || "U")[0].toUpperCase()

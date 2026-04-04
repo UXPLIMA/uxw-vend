@@ -93,17 +93,6 @@ export function Footer() {
         }
     }
 
-    const corePaths = new Set(['/', '/profile', '/admin', '/auth', '/terms', '/privacy', '/rules', '/refund']);
-
-    const isLinkEnabled = (href: string) => {
-        if (href.startsWith('http')) return true;
-        if (corePaths.has(href)) return true;
-        const mod = pathToModule[href];
-        if (mod) return moduleStatus[mod] === true;
-        if (installedModulePaths.has(href)) return true;
-        return false;
-    };
-
     const handleLocaleChange = (newLocale: string) => {
         router.replace(pathname, { locale: newLocale });
     };

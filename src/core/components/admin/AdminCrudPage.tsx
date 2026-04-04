@@ -59,6 +59,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         finally { setLoading(false); }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchItems(); resetForm(); }, []);
 
     const startEdit = (item: Record<string, unknown>) => {
@@ -111,7 +112,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
 
     const toggleSelect = (id: string) => {
         const next = new Set(selected);
-        next.has(id) ? next.delete(id) : next.add(id);
+        if (next.has(id)) { next.delete(id); } else { next.add(id); }
         setSelected(next);
     };
 

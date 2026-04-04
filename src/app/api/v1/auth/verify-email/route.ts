@@ -5,7 +5,8 @@ import { randomBytes } from "crypto";
 import { sendVerificationEmail } from "@/core/lib/email";
 
 // POST /api/v1/auth/verify-email - Send verification email
-export async function POST(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function POST(_request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

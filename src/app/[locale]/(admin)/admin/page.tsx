@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import Link from "next/link";
 import { Users } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { DashboardClient } from "./components/dashboard-client";
@@ -24,7 +25,7 @@ export default async function AdminDashboard() {
 
             {/* Users card — core, always visible */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                <a href="/admin/users">
+                <Link href="/admin/users">
                     <Card className="hover:shadow-md transition-shadow cursor-pointer">
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between mb-2">
@@ -34,7 +35,7 @@ export default async function AdminDashboard() {
                             <div className="text-2xl font-bold">{totalUsers}</div>
                         </CardContent>
                     </Card>
-                </a>
+                </Link>
 
                 {/* Module cards rendered client-side from module stats APIs */}
                 <DashboardClient />
