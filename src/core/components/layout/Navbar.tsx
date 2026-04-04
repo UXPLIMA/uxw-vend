@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell, ChevronDown } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -10,6 +10,7 @@ import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
+    Trophy, Vote, Dices, History, Users, Shield,
 };
 
 export function Navbar() {
@@ -77,31 +78,39 @@ export function Navbar() {
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12">
-                    <nav className="flex items-center gap-1" ref={dropdownRef}>
+                    <nav className="flex items-center gap-1">
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
 
                             // Dropdown menu
                             if (link.children && link.children.length > 0) {
                                 return (
-                                    <div key={link.label} className="relative">
+                                    <div key={link.label} className="relative"
+                                        onMouseEnter={() => setNavDropdown(link.label)}
+                                        onMouseLeave={() => setNavDropdown(null)}
+                                    >
                                         <button
-                                            onClick={() => setNavDropdown(navDropdown === link.label ? null : link.label)}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-gray-50" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
                                         >
                                             {IconComp && <IconComp className="w-4 h-4" />}
                                             {link.label}
                                             <ChevronDown className={`w-3 h-3 transition-transform ${navDropdown === link.label ? "rotate-180" : ""}`} />
                                         </button>
                                         {navDropdown === link.label && (
-                                            <div className="absolute top-full left-0 mt-1 w-48 bg-card border border-[var(--color-border)] rounded-lg shadow-lg py-1 z-50 animate-fade-in">
-                                                {link.children.map((child) => (
-                                                    <Link key={child.href} href={child.href}
-                                                        onClick={() => setNavDropdown(null)}
-                                                        className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                                                        {child.label}
-                                                    </Link>
-                                                ))}
+                                            <div className="absolute top-full left-0 pt-1 z-50">
+                                                <div className="w-52 bg-card border border-[var(--color-border)] rounded-lg shadow-lg py-1 animate-fade-in">
+                                                    {link.children.map((child: { label: string; href: string; icon?: string }) => {
+                                                        const ChildIcon = child.icon ? iconMap[child.icon] : null;
+                                                        return (
+                                                            <Link key={child.href} href={child.href}
+                                                                onClick={() => setNavDropdown(null)}
+                                                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                                                                {ChildIcon && <ChildIcon className="w-4 h-4 text-gray-400" />}
+                                                                {child.label}
+                                                            </Link>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
                                         )}
                                     </div>

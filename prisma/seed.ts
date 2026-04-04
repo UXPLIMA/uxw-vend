@@ -411,14 +411,14 @@ async function main() {
         {
             label: "Other", href: "#", icon: "Star",
             children: [
-                { label: "Leaderboard", href: "/leaderboard" },
-                { label: "Vote for Us", href: "/vote" },
-                { label: "Wheel of Fortune", href: "/wheel" },
-                { label: "Suggestions", href: "/suggestions" },
-                { label: "Changelog", href: "/changelog" },
-                { label: "Staff", href: "/staff" },
-                { label: "Downloads", href: "/downloads" },
-                { label: "Punishments", href: "/punishments" },
+                { label: "Leaderboard", href: "/leaderboard", icon: "Trophy" },
+                { label: "Vote for Us", href: "/vote", icon: "Vote" },
+                { label: "Wheel of Fortune", href: "/wheel", icon: "Dices" },
+                { label: "Suggestions", href: "/suggestions", icon: "MessageSquare" },
+                { label: "Changelog", href: "/changelog", icon: "History" },
+                { label: "Staff", href: "/staff", icon: "Users" },
+                { label: "Downloads", href: "/downloads", icon: "Download" },
+                { label: "Punishments", href: "/punishments", icon: "Shield" },
             ],
         },
     ];
