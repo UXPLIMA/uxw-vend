@@ -341,8 +341,8 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 5,
-        "adminRoutes": 7,
-        "apiRoutes": 11,
+        "adminRoutes": 6,
+        "apiRoutes": 25,
         "widgets": 6
       }
     },
@@ -362,25 +362,6 @@
         "publicRoutes": 1,
         "adminRoutes": 0,
         "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "support",
-      "name": "Support Module",
-      "description": "Comprehensive support system including Tickets and Knowledge Base (Help Center)",
-      "version": "1.0.0",
-      "author": "uxwVend Team",
-      "icon": "LifeBuoy",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "support.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 6,
-        "adminRoutes": 3,
-        "apiRoutes": 5,
         "widgets": 0
       }
     },
@@ -528,6 +509,162 @@
       "verified": true,
       "downloads": 0,
       "zip": "security.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "stripe-gateway",
+      "name": "Stripe Payment Gateway",
+      "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "CreditCard",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "stripe-gateway.zip",
+      "dependencies": [
+        "store"
+      ],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "paypal-gateway",
+      "name": "PayPal Payment Gateway",
+      "description": "Accept payments via PayPal",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "DollarSign",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "paypal-gateway.zip",
+      "dependencies": [
+        "store"
+      ],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "discord-auth",
+      "name": "Discord Login",
+      "description": "Allow users to sign in with their Discord account",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "discord-auth.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "google-auth",
+      "name": "Google Login",
+      "description": "Allow users to sign in with their Google account",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Globe",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "google-auth.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "tickets",
+      "name": "Support Tickets",
+      "description": "Customer support ticket system with departments and priority levels",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "Ticket",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "tickets.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 3,
+        "adminRoutes": 2,
+        "apiRoutes": 4,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "help-center",
+      "name": "Help Center",
+      "description": "Knowledge base with categories and searchable articles",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "HelpCircle",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "help-center.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 3,
+        "adminRoutes": 1,
+        "apiRoutes": 3,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "credits",
+      "name": "Credit System",
+      "description": "Virtual currency wallet for users",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Coins",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "credits.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "resend-provider",
+      "name": "Resend Email Provider",
+      "description": "Send emails via Resend API",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Mail",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "resend-provider.zip",
       "dependencies": [],
       "stats": {
         "publicRoutes": 0,
