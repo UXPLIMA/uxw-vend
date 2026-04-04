@@ -15,18 +15,20 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend);
 
 interface StatsData {
     labels: string[];
-    revenue: number[];
-    orders: number[];
     users: number[];
-    totals: { revenue: number; orders: number; users: number };
+    totals: { users: number };
 }
 
+/**
+ * Dashboard charts — only shows core data (Users).
+ * Module-specific charts (Revenue, Orders) come from module statsApi via DashboardClient.
+ */
 export function DashboardCharts() {
     const [data, setData] = useState<StatsData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -65,30 +67,6 @@ export function DashboardCharts() {
         },
     };
 
-    // Only show charts if there's actual data (e.g. store disabled = all zeros = no chart)
-    const hasRevenue = data.revenue.some(v => v > 0) || data.totals.revenue > 0;
-    const hasOrders = data.orders.some(v => v > 0) || data.totals.orders > 0;
-
-    const charts: { title: string; value: string; color: string; chart: React.ReactNode; span?: boolean }[] = [];
-
-    if (hasRevenue) {
-        charts.push({
-            title: "Revenue", value: `$${data.totals.revenue.toFixed(2)}`, color: "text-green-600",
-            chart: <Line data={{ labels: shortLabels, datasets: [{ label: "Revenue ($)", data: data.revenue, borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] }} options={chartOptions} />,
-        });
-    }
-    if (hasOrders) {
-        charts.push({
-            title: "Orders", value: String(data.totals.orders), color: "text-blue-600",
-            chart: <Bar data={{ labels: shortLabels, datasets: [{ label: "Orders", data: data.orders, backgroundColor: "#3b82f6", borderRadius: 4 }] }} options={chartOptions} />,
-        });
-    }
-
-    charts.push({
-        title: "New Users", value: String(data.totals.users), color: "text-purple-600", span: true,
-        chart: <Line data={{ labels: shortLabels, datasets: [{ label: "New Users", data: data.users, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] }} options={chartOptions} />,
-    });
-
     return (
         <div className="space-y-6">
             <div className="flex gap-2">
@@ -99,19 +77,28 @@ export function DashboardCharts() {
                 ))}
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-6">
-                {charts.map((c) => (
-                    <Card key={c.title} className={c.span ? "lg:col-span-2" : ""}>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">{c.title}</CardTitle>
-                            <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="h-[200px]">{c.chart}</div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">New Users</CardTitle>
+                    <p className="text-2xl font-bold text-purple-600">{data.totals.users}</p>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-[200px]">
+                        <Line data={{
+                            labels: shortLabels,
+                            datasets: [{
+                                label: "New Users",
+                                data: data.users,
+                                borderColor: "#8b5cf6",
+                                backgroundColor: "rgba(139,92,246,0.1)",
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 2,
+                            }],
+                        }} options={chartOptions} />
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
