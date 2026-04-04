@@ -59,6 +59,15 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
+    // OAuth login buttons — rendered on login/register pages
+    oauthButtons?: {
+        id: string;
+        provider: string;        // NextAuth provider ID e.g. "discord"
+        label: string;           // Button text e.g. "Discord"
+        color: string;           // Brand color e.g. "#5865F2"
+        svgIcon: string;         // SVG path data for icon
+    }[];
+
     // Navbar components — rendered in navbar's right side (e.g. cart icon, notification bell)
     navbarComponents?: {
         id: string;

@@ -12,8 +12,6 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
-import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleRoutes } from "@/core/generated/module-registry";
 
 interface UserProfile {
     id: string;
@@ -47,16 +45,6 @@ interface Order {
 export default function ProfilePage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
-    const modules = useAllModules();
-    // Build installed module set from registry — zero hardcoded module names
-    const installedModulePaths = new Set<string>();
-    for (const r of ModuleRoutes) {
-        if (!r.isAdmin && modules[r.module] === true) {
-            installedModulePaths.add('/' + r.path.split('/')[0]);
-        }
-    }
-    const hasModule = (path: string) => installedModulePaths.has(path);
-
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -101,11 +89,12 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
+        // Fetch core profile + try module APIs (fail silently if not installed)
         Promise.all([
-            fetch("/api/v1/auth/profile").then((r) => r.json()),
-            hasModule('/store') ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
-            fetch("/api/v1/linked-accounts").then((r) => r.json()).catch(() => ({ accounts: [] })),
-            hasModule('/store') ? fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })) : Promise.resolve({ items: [] }),
+            fetch("/api/v1/auth/profile").then(r => r.json()),
+            fetch("/api/v1/store/orders?limit=10").then(r => r.ok ? r.json() : { orders: [] }).catch(() => ({ orders: [] })),
+            fetch("/api/v1/linked-accounts").then(r => r.json()).catch(() => ({ accounts: [] })),
+            fetch("/api/v1/chest").then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })),
         ]).then(([profileData, ordersData, accountsData, chestData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
@@ -123,7 +112,7 @@ export default function ProfilePage() {
                 .then(r => { if (r.ok || r.status === 401) setTwoFAAvailable(true); })
                 .catch(() => {});
         }).catch(() => setLoading(false));
-    }, [authStatus, router, hasModule('/store')]);
+    }, [authStatus, router]);
 
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -241,13 +230,14 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Stats — only show cards for installed modules */}
+                {/* Stats — show non-zero counts (data-driven, no module names) */}
                 {(() => {
+                    const counts = profile?._count || {} as any;
                     const statItems = [
-                        hasModule('/store') && { icon: ShoppingCart, label: "Orders", value: profile?._count.orders || 0 },
-                        hasModule('/support') && { icon: Ticket, label: "Tickets", value: profile?._count.tickets || 0 },
-                        hasModule('/forum') && { icon: MessageSquare, label: "Topics", value: profile?._count.topics || 0 },
-                        (hasModule('/forum') || hasModule('/blog')) && { icon: FileText, label: "Comments", value: profile?._count.comments || 0 },
+                        counts.orders > 0 && { icon: ShoppingCart, label: "Orders", value: counts.orders },
+                        counts.tickets > 0 && { icon: Ticket, label: "Tickets", value: counts.tickets },
+                        counts.topics > 0 && { icon: MessageSquare, label: "Topics", value: counts.topics },
+                        counts.comments > 0 && { icon: FileText, label: "Comments", value: counts.comments },
                     ].filter(Boolean) as { icon: React.ElementType; label: string; value: number }[];
 
                     if (statItems.length === 0) return null;
@@ -270,14 +260,14 @@ export default function ProfilePage() {
 
                 {/* Tabs — core tabs always shown, module tabs conditional */}
                 {(() => {
-                    const tabs: { id: string; label: string; requiresPath?: string }[] = [
-                        { id: "profile", label: "Profile" },
-                        { id: "orders", label: "Orders", requiresPath: "/store" },
-                        { id: "chest", label: "Chest", requiresPath: "/store" },
-                        { id: "accounts", label: "Accounts" },
-                        ...(twoFAAvailable ? [{ id: "security", label: "Security" }] : []),
+                    const tabs = [
+                        { id: "profile", label: "Profile", show: true },
+                        { id: "orders", label: "Orders", show: orders.length > 0 },
+                        { id: "chest", label: "Chest", show: chestItems.length > 0 },
+                        { id: "accounts", label: "Accounts", show: true },
+                        { id: "security", label: "Security", show: twoFAAvailable },
                     ];
-                    const visibleTabs = tabs.filter(t => !t.requiresPath || installedModulePaths.has(t.requiresPath));
+                    const visibleTabs = tabs.filter(t => t.show);
                     return (
                         <div className="flex gap-2 mb-6">
                             {visibleTabs.map((tab) => (
@@ -467,8 +457,8 @@ export default function ProfilePage() {
                                 </div>
                             )}
 
-                            {/* Link Game Account — only shown when a game-related module is installed */}
-                            {hasModule('/player') && !linkedAccounts.find((a) => a.provider === "minecraft") && (
+                            {/* Link Game Account — only shown when linked accounts are available */}
+                            {linkedAccounts.length > 0 && !linkedAccounts.find((a) => a.provider === "minecraft") && (
                                 <div className="p-4 border border-dashed border-gray-200 rounded-lg">
                                     <p className="text-sm font-medium mb-2">Link Game Account</p>
                                     <div className="flex gap-2">

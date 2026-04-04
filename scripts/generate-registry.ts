@@ -104,6 +104,7 @@ function generateRegistry() {
     const allLayoutComponents: any[] = [];
     const allNavbarComponents: any[] = [];
     const allSettingsCards: any[] = [];
+    const allOauthButtons: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -139,6 +140,12 @@ function generateRegistry() {
             if (manifest.layoutComponents) {
                 manifest.layoutComponents.forEach((lc: any) => {
                     allLayoutComponents.push({ ...lc, module: moduleName });
+                });
+            }
+
+            if (manifest.oauthButtons) {
+                manifest.oauthButtons.forEach((btn: any) => {
+                    allOauthButtons.push({ ...btn, module: moduleName });
                 });
             }
 
@@ -205,6 +212,7 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n`;
 
     // Generate dynamic imports for layout components

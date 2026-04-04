@@ -2,17 +2,9 @@ import dynamic from 'next/dynamic';
 import { PageLoader } from '@/core/components/ui/page-loader';
 
 export const ModuleRegistry: Record<string, any> = {
-  'security:pages/admin/page.tsx': dynamic(() => import('@/modules/security/pages/admin/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
 };
 
-export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
-  {
-    "path": "/admin/security",
-    "key": "security:pages/admin/page.tsx",
-    "module": "security",
-    "isAdmin": true
-  }
-];
+export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [];
 
 export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
 
@@ -50,5 +42,7 @@ export const ModuleNavLinks: { label: string; href: string; icon?: string; posit
 export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = [];
 
 export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = [];
+
+export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = [];
 
 export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [];
