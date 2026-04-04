@@ -1,0 +1,1 @@
+{"id":"slider","name":"Slider","description":"Homepage image carousel and banners","version":"1.0.0","author":"uxwVend","icon":"Image","permissions":["slider.manage"],"menu":[{"label":"Slider","path":"/slider","icon":"Image"}],"adminRoutes":[{"path":"/slider","component":"pages/admin/page.tsx"}],"api":[{"path":"/slider","handler":"api/route.ts"}]}

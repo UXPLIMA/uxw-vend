@@ -1,0 +1,1 @@
+{"id":"leaderboard","name":"Leaderboard","description":"Player rankings by purchases, votes, and activity","version":"1.0.0","author":"uxwVend","icon":"Trophy","dependencies":["store"],"routes":[{"path":"/leaderboard","component":"pages/public/page.tsx"}],"api":[{"path":"/leaderboard","handler":"api/route.ts"}]}

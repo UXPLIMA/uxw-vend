@@ -1,0 +1,1 @@
+{"id":"player-profiles","name":"Player Profiles","description":"Public player profile pages","version":"1.0.0","author":"uxwVend","icon":"Users","routes":[{"path":"/player/[username]","component":"pages/public/[username]/page.tsx"}],"api":[{"path":"/players/[username]","handler":"api/[username]/route.ts"}]}

@@ -1,0 +1,1 @@
+{"id":"popups","name":"Popups","description":"Modal popup notifications and promotions","version":"1.0.0","author":"uxwVend","icon":"Bell","permissions":["popups.manage"],"menu":[{"label":"Popups","path":"/popups","icon":"Bell"}],"adminRoutes":[{"path":"/popups","component":"pages/admin/page.tsx"}],"api":[{"path":"/popups","handler":"api/route.ts"}]}

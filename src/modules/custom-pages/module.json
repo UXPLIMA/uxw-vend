@@ -1,0 +1,1 @@
+{"id":"custom-pages","name":"Custom Pages","description":"Admin-created HTML content pages","version":"1.0.0","author":"uxwVend","icon":"FileText","routes":[{"path":"/page/[slug]","component":"pages/public/[slug]/page.tsx"}],"api":[{"path":"/custom-pages","handler":"api/route.ts"}]}

@@ -1,0 +1,1 @@
+{"id":"suggestions","name":"Suggestions","description":"Community feature suggestions with voting","version":"1.0.0","author":"uxwVend","icon":"MessageSquare","routes":[{"path":"/suggestions","component":"pages/public/page.tsx"}],"api":[{"path":"/suggestions","handler":"api/route.ts"}]}

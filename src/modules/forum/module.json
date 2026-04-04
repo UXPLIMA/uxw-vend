@@ -1,0 +1,80 @@
+{
+    "id": "forum",
+    "name": "Forum Module",
+    "description": "Community discussion forum with categories, topics, and replies",
+    "version": "1.0.0",
+    "author": "uxwVend Team",
+    "icon": "MessageSquare",
+    "permissions": [
+        "forum.view",
+        "forum.manage",
+        "forum.moderate"
+    ],
+    "defaultConfig": {
+        "allowGuestView": true,
+        "topicsPerPage": 20,
+        "postsPerPage": 15
+    },
+    "menu": [
+        {
+            "label": "Forum Topics",
+            "path": "/forum/topics",
+            "icon": "MessageSquare"
+        },
+        {
+            "label": "Forum Categories",
+            "path": "/forum/categories",
+            "icon": "LayoutList"
+        }
+    ],
+    "routes": [
+        {
+            "path": "/forum",
+            "component": "pages/public/page.tsx"
+        },
+        {
+            "path": "/forum/topic/[...params]",
+            "component": "pages/public/topic/[...params]/page.tsx"
+        },
+        {
+            "path": "/forum/new",
+            "component": "pages/public/new/page.tsx"
+        }
+    ],
+    "adminRoutes": [
+        {
+            "path": "/forum/topics",
+            "component": "pages/admin/topics/page.tsx"
+        },
+        {
+            "path": "/forum/categories",
+            "component": "pages/admin/categories/page.tsx"
+        }
+    ],
+    "api": [
+        {
+            "path": "/forum/categories",
+            "handler": "api/categories/route.ts"
+        },
+        {
+            "path": "/forum/topics",
+            "handler": "api/topics/route.ts"
+        },
+        {
+            "path": "/forum/topics/[id]",
+            "handler": "api/topics/[id]/route.ts"
+        },
+        {
+            "path": "/forum/posts/[id]",
+            "handler": "api/posts/[id]/route.ts"
+        },
+        {
+            "path": "/forum/topics/[id]/like",
+            "handler": "api/topics/[id]/like/route.ts"
+        },
+        {
+            "path": "/forum/posts/[id]/like",
+            "handler": "api/posts/[id]/like/route.ts"
+        }
+    ]
+}
