@@ -339,9 +339,12 @@ async function main() {
     console.log("✅ Suggestions (3)");
 
     // ==================== ANNOUNCEMENTS ====================
-    await prisma.announcement.create({
-        data: { title: "Spring Sale is Live!", content: "Use code SPRING30 for 30% off everything. Limited time only!", type: "success", isActive: true },
-    }).catch(() => {});
+    const existingAnn = await prisma.announcement.findFirst({ where: { title: "Spring Sale is Live!" } });
+    if (!existingAnn) {
+        await prisma.announcement.create({
+            data: { title: "Spring Sale is Live!", content: "Use code SPRING30 for 30% off everything. Limited time only!", type: "success", isActive: true },
+        });
+    }
     console.log("✅ Announcements");
 
     // ==================== STAFF MEMBERS ====================
