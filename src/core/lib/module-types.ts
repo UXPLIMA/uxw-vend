@@ -58,6 +58,23 @@ export interface ModuleManifest {
         href: string;
         section?: "quick" | "legal";
     }[];
+
+    dashboardCards?: {
+        id: string;
+        label: string;
+        icon: string;
+        href: string;
+        color: string;
+        statKey: string;          // Key in the stats API response
+    }[];
+
+    dashboardSections?: {
+        id: string;
+        title: string;
+        component: string;        // Path to component or "@api" for API-driven
+        position: "main" | "sidebar";
+        order: number;
+    }[];
 }
 
 export interface LoadedModule {

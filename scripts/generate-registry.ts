@@ -99,6 +99,7 @@ function generateRegistry() {
     const allWidgets: any[] = [];
     const allNavLinks: any[] = [];
     const allFooterLinks: any[] = [];
+    const allDashboardCards: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -124,6 +125,12 @@ function generateRegistry() {
                     allFooterLinks.push({ ...link, module: moduleName });
                 });
             }
+
+            if (manifest.dashboardCards) {
+                manifest.dashboardCards.forEach((card: any) => {
+                    allDashboardCards.push({ ...card, module: moduleName });
+                });
+            }
         } catch { /* already logged above */ }
     });
 
@@ -133,7 +140,8 @@ function generateRegistry() {
 
     let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n`;
+    widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n`;
 
     const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetRegistry;
 

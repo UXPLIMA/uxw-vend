@@ -17,3 +17,5 @@ export const ModuleWidgets: { id: string; component: string; module: string; def
 export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [];
 
 export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = [];
+
+export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = [];

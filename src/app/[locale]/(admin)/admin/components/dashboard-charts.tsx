@@ -57,42 +57,6 @@ export function DashboardCharts() {
         return `${d.getMonth() + 1}/${d.getDate()}`;
     });
 
-    const revenueChartData = {
-        labels: shortLabels,
-        datasets: [{
-            label: "Revenue ($)",
-            data: data.revenue,
-            borderColor: "#22c55e",
-            backgroundColor: "rgba(34, 197, 94, 0.1)",
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-        }],
-    };
-
-    const ordersChartData = {
-        labels: shortLabels,
-        datasets: [{
-            label: "Orders",
-            data: data.orders,
-            backgroundColor: "#3b82f6",
-            borderRadius: 4,
-        }],
-    };
-
-    const usersChartData = {
-        labels: shortLabels,
-        datasets: [{
-            label: "New Users",
-            data: data.users,
-            borderColor: "#8b5cf6",
-            backgroundColor: "rgba(139, 92, 246, 0.1)",
-            fill: true,
-            tension: 0.3,
-            pointRadius: 2,
-        }],
-    };
-
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -103,9 +67,27 @@ export function DashboardCharts() {
         },
     };
 
+    // Only build charts for enabled modules
+    const charts: { title: string; value: string; color: string; chart: React.ReactNode; span?: boolean }[] = [];
+
+    if (storeEnabled) {
+        charts.push({
+            title: "Revenue", value: `$${data.totals.revenue.toFixed(2)}`, color: "text-green-600",
+            chart: <Line data={{ labels: shortLabels, datasets: [{ label: "Revenue ($)", data: data.revenue, borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] }} options={chartOptions} />,
+        });
+        charts.push({
+            title: "Orders", value: String(data.totals.orders), color: "text-blue-600",
+            chart: <Bar data={{ labels: shortLabels, datasets: [{ label: "Orders", data: data.orders, backgroundColor: "#3b82f6", borderRadius: 4 }] }} options={chartOptions} />,
+        });
+    }
+
+    charts.push({
+        title: "New Users", value: String(data.totals.users), color: "text-purple-600", span: true,
+        chart: <Line data={{ labels: shortLabels, datasets: [{ label: "New Users", data: data.users, borderColor: "#8b5cf6", backgroundColor: "rgba(139,92,246,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] }} options={chartOptions} />,
+    });
+
     return (
         <div className="space-y-6">
-            {/* Period Selector */}
             <div className="flex gap-2">
                 {[{ label: "7 Days", value: "7" }, { label: "30 Days", value: "30" }, { label: "90 Days", value: "90" }].map((p) => (
                     <Button key={p.value} variant={period === p.value ? "default" : "outline"} size="sm" onClick={() => setPeriod(p.value)}>
@@ -114,47 +96,18 @@ export function DashboardCharts() {
                 ))}
             </div>
 
-            {/* Charts Grid */}
             <div className="grid lg:grid-cols-2 gap-6">
-                {storeEnabled && (
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
-                        <p className="text-2xl font-bold text-green-600">${data.totals.revenue.toFixed(2)}</p>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[200px]">
-                            <Line data={revenueChartData} options={chartOptions} />
-                        </div>
-                    </CardContent>
-                </Card>
-                )}
-
-                {storeEnabled && (
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Orders</CardTitle>
-                        <p className="text-2xl font-bold text-blue-600">{data.totals.orders}</p>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[200px]">
-                            <Bar data={ordersChartData} options={chartOptions} />
-                        </div>
-                    </CardContent>
-                </Card>
-                )}
-
-                <Card className={storeEnabled ? "lg:col-span-2" : "lg:col-span-2"}>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">New Users</CardTitle>
-                        <p className="text-2xl font-bold text-purple-600">{data.totals.users}</p>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[200px]">
-                            <Line data={usersChartData} options={chartOptions} />
-                        </div>
-                    </CardContent>
-                </Card>
+                {charts.map((c) => (
+                    <Card key={c.title} className={c.span ? "lg:col-span-2" : ""}>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{c.title}</CardTitle>
+                            <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[200px]">{c.chart}</div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
     );
