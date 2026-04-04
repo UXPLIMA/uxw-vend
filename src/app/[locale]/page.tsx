@@ -7,11 +7,10 @@ import { Button } from "@/core/components/ui/button";
 import { HeroBanner, Navbar, Footer, AnnouncementBanner } from "@/core/components/layout";
 import { SkeletonNewsGrid, SkeletonSidebar } from "@/core/components/ui/skeleton";
 import { useTranslations } from "next-intl";
-import { useModuleEnabled } from "@/core/hooks/useModule";
+import { useAllModules } from "@/core/providers/module-provider";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTheme } from "@/core/providers/theme-provider";
-import { NewsCard } from "@/core/components/cards/news-card";
 import { DiscordWidget } from "@/core/components/widgets/discord-widget";
 import { FeaturedProductWidget } from "@/core/components/widgets/featured-product-widget";
 import { PaymentGoalWidget } from "@/core/components/widgets/payment-goal-widget";
@@ -43,8 +42,8 @@ export default function HomePage() {
 
   const t = useTranslations('news');
   const commonT = useTranslations('common');
-  const { enabled: blogEnabled } = useModuleEnabled('blog');
-  const { enabled: storeEnabled } = useModuleEnabled('store');
+  const modules = useAllModules();
+  const blogEnabled = modules['blog'] === true;
   const { settings } = useSiteSettings();
   const { activeTheme } = useTheme();
 
@@ -170,8 +169,6 @@ export default function HomePage() {
                 <>
                   {widgetOrder.map((id) => {
                     if (!isWidgetVisible(id)) return null;
-                    const storeWidgets = ["FeaturedProductWidget", "PaymentGoalWidget", "TopCustomerWidget", "TopBuyersWidget", "TopCreditLoadersWidget", "RecentPurchasesWidget"];
-                    if (!storeEnabled && storeWidgets.includes(id)) return null;
                     const widgetMap: Record<string, React.ReactNode> = {
                       DiscordWidget: <ThemeSlot key={id} name="DiscordWidget" defaultComponent={<DiscordWidget />} />,
                       FeaturedProductWidget: <ThemeSlot key={id} name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />,

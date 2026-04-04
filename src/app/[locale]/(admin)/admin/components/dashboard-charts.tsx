@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useModuleStatus } from "@/core/providers/module-provider";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -29,7 +28,6 @@ interface StatsData {
 }
 
 export function DashboardCharts() {
-    const storeEnabled = useModuleStatus('store');
     const [data, setData] = useState<StatsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("30");
@@ -67,14 +65,19 @@ export function DashboardCharts() {
         },
     };
 
-    // Only build charts for enabled modules
+    // Only show charts if there's actual data (e.g. store disabled = all zeros = no chart)
+    const hasRevenue = data.revenue.some(v => v > 0) || data.totals.revenue > 0;
+    const hasOrders = data.orders.some(v => v > 0) || data.totals.orders > 0;
+
     const charts: { title: string; value: string; color: string; chart: React.ReactNode; span?: boolean }[] = [];
 
-    if (storeEnabled) {
+    if (hasRevenue) {
         charts.push({
             title: "Revenue", value: `$${data.totals.revenue.toFixed(2)}`, color: "text-green-600",
             chart: <Line data={{ labels: shortLabels, datasets: [{ label: "Revenue ($)", data: data.revenue, borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] }} options={chartOptions} />,
         });
+    }
+    if (hasOrders) {
         charts.push({
             title: "Orders", value: String(data.totals.orders), color: "text-blue-600",
             chart: <Bar data={{ labels: shortLabels, datasets: [{ label: "Orders", data: data.orders, backgroundColor: "#3b82f6", borderRadius: 4 }] }} options={chartOptions} />,
