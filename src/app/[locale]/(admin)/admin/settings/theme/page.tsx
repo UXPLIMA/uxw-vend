@@ -8,6 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette, Download, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
 
@@ -17,6 +18,7 @@ export default function ThemeSettingsPage() {
     const [uploading, setUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -54,19 +56,20 @@ export default function ThemeSettingsPage() {
     };
 
     const handleDelete = async (themeId: string) => {
-        if (!confirm(`Delete theme "${themeId}"? This cannot be undone.`)) return;
+        const ok = await confirm({ title: "Delete Theme", message: `Delete theme "${themeId}"? This cannot be undone.`, variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
 
         setDeleting(themeId);
         try {
             const res = await fetch(`/api/v1/themes/${themeId}`, { method: "DELETE" });
             const data = await res.json();
             if (!res.ok) {
-                alert(data.error || "Failed to delete theme");
+                toast.error(data.error || "Failed to delete theme");
             } else {
                 setUploadMessage({ type: "success", text: data.message });
             }
         } catch {
-            alert("Failed to delete theme");
+            toast.error("Failed to delete theme");
         } finally {
             setDeleting(null);
         }

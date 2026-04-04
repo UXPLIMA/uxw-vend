@@ -7,6 +7,8 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Plus, X, Trash2 } from "lucide-react";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface Category {
     id: string;
@@ -27,6 +29,7 @@ export default function AdminStoreCategoriesPage() {
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     const [form, setForm] = useState({
         name: "",
@@ -87,16 +90,17 @@ export default function AdminStoreCategoriesPage() {
     };
 
     const deleteCategory = async (id: string) => {
-        if (!confirm("Delete this category? Products will be unlinked.")) return;
+        const ok = await confirm({ title: "Delete Category", message: "Delete this category? Products will be unlinked.", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         try {
             const res = await fetch(`/api/v1/store/categories/${id}`, { method: "DELETE" });
             if (res.ok) fetchCategories();
             else {
                 const data = await res.json();
-                alert(data.error || "Failed to delete");
+                toast.error(data.error || "Failed to delete");
             }
         } catch {
-            alert("Failed to delete category");
+            toast.error("Failed to delete category");
         }
     };
 

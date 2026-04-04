@@ -10,6 +10,7 @@ import {
     Megaphone, Search as SearchIcon
 } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Module {
     id: string;
@@ -79,6 +80,7 @@ export default function AdminModulesPage() {
     const [deleting, setDeleting] = useState<string | null>(null);
     const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { confirm } = useConfirm();
 
     const fetchModules = () => {
         fetch("/api/v1/modules")
@@ -133,7 +135,8 @@ export default function AdminModulesPage() {
     };
 
     const handleDelete = async (moduleId: string, moduleName: string) => {
-        if (!confirm(`Delete "${moduleName}"? This removes all module files.`)) return;
+        const ok = await confirm({ title: "Delete Module", message: `Delete "${moduleName}"? This removes all module files.`, variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         setDeleting(moduleId);
         try {
             const res = await fetch(`/api/v1/modules/${moduleId}`, { method: "DELETE" });

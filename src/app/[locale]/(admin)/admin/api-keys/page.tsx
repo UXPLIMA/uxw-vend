@@ -7,6 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Copy, Check, Key } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface ApiKeyItem {
     id: string;
@@ -25,6 +26,7 @@ export default function ApiKeysPage() {
     const [saving, setSaving] = useState(false);
     const [newKey, setNewKey] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const { confirm } = useConfirm();
 
     const fetchKeys = async () => {
         const res = await fetch("/api/v1/api-keys");
@@ -54,7 +56,8 @@ export default function ApiKeysPage() {
     };
 
     const deleteKey = async (id: string) => {
-        if (!confirm("Delete this API key?")) return;
+        const ok = await confirm({ title: "Delete API Key", message: "Delete this API key?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         await fetch(`/api/v1/api-keys/${id}`, { method: "DELETE" });
         fetchKeys();
     };

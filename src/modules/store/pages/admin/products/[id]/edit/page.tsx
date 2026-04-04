@@ -9,6 +9,7 @@ import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { ArrowLeft, Loader2, Trash2, Plus, X } from "lucide-react";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Category {
     id: string;
@@ -21,6 +22,7 @@ export default function EditProductPage() {
     const router = useRouter();
     const productId = params.id as string;
 
+    const { confirm } = useConfirm();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -109,7 +111,8 @@ export default function EditProductPage() {
     };
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this product?")) return;
+        const ok = await confirm({ title: "Delete Product", message: "Are you sure you want to delete this product?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
 
         setDeleting(true);
         try {

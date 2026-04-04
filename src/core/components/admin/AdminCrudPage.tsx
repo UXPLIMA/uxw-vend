@@ -8,6 +8,7 @@ import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 export interface CrudField {
     key: string;
@@ -37,6 +38,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<Record<string, string>>({});
     const [selected, setSelected] = useState<Set<string>>(new Set());
+    const { confirm } = useConfirm();
 
     const resetForm = () => {
         const defaults: Record<string, string> = {};
@@ -114,7 +116,8 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     };
 
     const bulkDelete = async () => {
-        if (!confirm(`Delete ${selected.size} items?`)) return;
+        const ok = await confirm({ title: "Delete Items", message: `Delete ${selected.size} items?`, variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         for (const id of selected) {
             await fetch(`${apiPath}/${id}`, { method: "DELETE" });
         }
@@ -124,7 +127,8 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     };
 
     const deleteItem = async (id: string) => {
-        if (!confirm("Delete this item?")) return;
+        const ok = await confirm({ title: "Delete Item", message: "Delete this item?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         const res = await fetch(`${apiPath}/${id}`, { method: "DELETE" });
         if (res.ok) { toast.success("Deleted"); fetchItems(); }
         else toast.error("Failed to delete");

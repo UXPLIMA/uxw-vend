@@ -7,6 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
 import { formatCurrency } from "@/core/lib/utils";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Coupon {
     id: string;
@@ -30,6 +31,7 @@ export default function AdminCouponsPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { confirm } = useConfirm();
 
     const [form, setForm] = useState({
         code: "",
@@ -136,7 +138,8 @@ export default function AdminCouponsPage() {
     };
 
     const deleteCoupon = async (id: string) => {
-        if (!confirm("Delete this coupon?")) return;
+        const ok = await confirm({ title: "Delete Coupon", message: "Delete this coupon?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
         try {
             await fetch(`/api/v1/store/coupons/${id}`, { method: "DELETE" });
             fetchCoupons();

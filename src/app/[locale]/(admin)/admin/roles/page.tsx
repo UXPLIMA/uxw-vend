@@ -6,6 +6,8 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Shield, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Permission {
     id: string;
@@ -36,6 +38,7 @@ const availablePermissions = [
 export default function AdminRolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const { confirm } = useConfirm();
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -126,18 +129,19 @@ export default function AdminRolesPage() {
     };
 
     const deleteRole = async (roleId: string) => {
-        if (!confirm("Are you sure you want to delete this role?")) return;
+        const ok = await confirm({ title: "Delete Role", message: "Are you sure you want to delete this role?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/v1/roles/${roleId}`, { method: "DELETE" });
             if (!res.ok) {
                 const data = await res.json();
-                alert(data.error || "Failed to delete role");
+                toast.error(data.error || "Failed to delete role");
                 return;
             }
             fetchRoles();
         } catch {
-            alert("Failed to delete role");
+            toast.error("Failed to delete role");
         }
     };
 

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
 import { formatRelativeTime } from "@/core/lib/utils";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface Comment {
     id: string;
@@ -28,6 +30,7 @@ export function CommentSection({ articleId, initialComments = [] }: CommentSecti
     const blogEnabled = useModuleStatus('blog');
     const { data: session } = useSession();
 
+    const { confirm } = useConfirm();
     if (!blogEnabled) return null;
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const [newComment, setNewComment] = useState("");
@@ -85,7 +88,8 @@ export function CommentSection({ articleId, initialComments = [] }: CommentSecti
     };
 
     const handleDelete = async (commentId: string) => {
-        if (!confirm("Are you sure you want to delete this comment?")) return;
+        const ok = await confirm({ title: "Delete Comment", message: "Are you sure you want to delete this comment?", variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
 
         try {
             const res = await fetch(`/api/v1/blog/comments/${commentId}`, {
@@ -98,7 +102,7 @@ export function CommentSection({ articleId, initialComments = [] }: CommentSecti
 
             setComments(comments.filter((c) => c.id !== commentId));
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete comment");
+            toast.error(err instanceof Error ? err.message : "Failed to delete comment");
         }
     };
 
