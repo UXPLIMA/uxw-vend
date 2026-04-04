@@ -1,23 +1,14 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package } from "lucide-react";
+import { Palette, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell } from "lucide-react";
 import Link from "next/link";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleSettingsCards } from "@/core/generated/module-registry";
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
-    Shield: require("lucide-react").Shield,
-    Mail: require("lucide-react").Mail,
-    MessageSquare: require("lucide-react").MessageSquare,
-    BarChart: require("lucide-react").BarChart,
-    DollarSign: require("lucide-react").DollarSign,
-    Server: require("lucide-react").Server,
-    Download: require("lucide-react").Download,
-    Target: require("lucide-react").Target,
-    Webhook: require("lucide-react").Webhook,
-    Bell: require("lucide-react").Bell,
+    Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell,
 };
 
 // Core settings — always visible
