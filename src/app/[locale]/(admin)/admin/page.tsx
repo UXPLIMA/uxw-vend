@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { moduleSystem } from "@/core/lib/modules";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
 import { Users, Package, ShoppingCart, DollarSign, Ticket, FileText, MessageSquare } from "lucide-react";
@@ -11,6 +12,11 @@ import { DashboardCharts } from "./components/dashboard-charts";
 export const dynamic = "force-dynamic";
 
 async function getDashboardStats() {
+    const storeEnabled = moduleSystem.isEnabled('store');
+    const blogEnabled = moduleSystem.isEnabled('blog');
+    const forumEnabled = moduleSystem.isEnabled('forum');
+    const supportEnabled = moduleSystem.isEnabled('support');
+
     const [
         totalUsers,
         totalProducts,
@@ -24,33 +30,33 @@ async function getDashboardStats() {
         recentTopics,
     ] = await Promise.all([
         prisma.user.count(),
-        prisma.product.count(),
-        prisma.order.count(),
-        prisma.ticket.count(),
-        prisma.blogArticle.count(),
-        prisma.forumTopic.count(),
-        prisma.order.findMany({
+        storeEnabled ? prisma.product.count() : 0,
+        storeEnabled ? prisma.order.count() : 0,
+        supportEnabled ? prisma.ticket.count() : 0,
+        blogEnabled ? prisma.blogArticle.count() : 0,
+        forumEnabled ? prisma.forumTopic.count() : 0,
+        storeEnabled ? prisma.order.findMany({
             take: 5,
             orderBy: { createdAt: "desc" },
             include: {
                 user: { select: { username: true, email: true } },
             },
-        }),
-        prisma.order.aggregate({
+        }) : [],
+        storeEnabled ? prisma.order.aggregate({
             _sum: { total: true },
             where: { status: "COMPLETED" },
-        }),
-        prisma.ticket.findMany({
+        }) : { _sum: { total: null } },
+        supportEnabled ? prisma.ticket.findMany({
             take: 5,
             where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_REPLY"] } },
             orderBy: { createdAt: "desc" },
             include: { user: { select: { username: true } }, department: { select: { name: true } } },
-        }),
-        prisma.forumTopic.findMany({
+        }) : [],
+        forumEnabled ? prisma.forumTopic.findMany({
             take: 5,
             orderBy: { createdAt: "desc" },
             include: { author: { select: { username: true } }, category: { select: { name: true } } },
-        }),
+        }) : [],
     ]);
 
     return {
@@ -64,6 +70,10 @@ async function getDashboardStats() {
         recentTickets,
         recentTopics,
         totalRevenue: revenueData._sum.total || 0,
+        storeEnabled,
+        blogEnabled,
+        forumEnabled,
+        supportEnabled,
     };
 }
 
@@ -82,13 +92,21 @@ export default async function AdminDashboard() {
     const stats = await getDashboardStats();
 
     const statCards = [
-        { label: "Revenue", value: formatCurrency(Number(stats.totalRevenue)), icon: DollarSign, href: "/admin/store/orders", color: "text-green-600" },
-        { label: "Orders", value: stats.totalOrders, icon: ShoppingCart, href: "/admin/store/orders", color: "text-blue-600" },
-        { label: "Products", value: stats.totalProducts, icon: Package, href: "/admin/store/products", color: "text-purple-600" },
+        ...(stats.storeEnabled ? [
+            { label: "Revenue", value: formatCurrency(Number(stats.totalRevenue)), icon: DollarSign, href: "/admin/store/orders", color: "text-green-600" },
+            { label: "Orders", value: stats.totalOrders, icon: ShoppingCart, href: "/admin/store/orders", color: "text-blue-600" },
+            { label: "Products", value: stats.totalProducts, icon: Package, href: "/admin/store/products", color: "text-purple-600" },
+        ] : []),
         { label: "Users", value: stats.totalUsers, icon: Users, href: "/admin/users", color: "text-orange-600" },
-        { label: "Tickets", value: stats.totalTickets, icon: Ticket, href: "/admin/tickets", color: "text-red-600" },
-        { label: "Articles", value: stats.totalArticles, icon: FileText, href: "/admin/blog/articles", color: "text-indigo-600" },
-        { label: "Topics", value: stats.totalTopics, icon: MessageSquare, href: "/admin/forum/categories", color: "text-teal-600" },
+        ...(stats.supportEnabled ? [
+            { label: "Tickets", value: stats.totalTickets, icon: Ticket, href: "/admin/tickets", color: "text-red-600" },
+        ] : []),
+        ...(stats.blogEnabled ? [
+            { label: "Articles", value: stats.totalArticles, icon: FileText, href: "/admin/blog/articles", color: "text-indigo-600" },
+        ] : []),
+        ...(stats.forumEnabled ? [
+            { label: "Topics", value: stats.totalTopics, icon: MessageSquare, href: "/admin/forum/categories", color: "text-teal-600" },
+        ] : []),
     ];
 
     return (
@@ -116,6 +134,7 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Recent Orders */}
+            {stats.storeEnabled && (
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
@@ -163,9 +182,12 @@ export default async function AdminDashboard() {
                     )}
                 </CardContent>
             </Card>
+            )}
 
             {/* Recent Tickets & Topics */}
+            {(stats.supportEnabled || stats.forumEnabled) && (
             <div className="grid lg:grid-cols-2 gap-6 mt-6">
+                {stats.supportEnabled && (
                 <Card>
                     <CardHeader>
                         <div className="flex justify-between items-center">
@@ -191,7 +213,9 @@ export default async function AdminDashboard() {
                         )}
                     </CardContent>
                 </Card>
+                )}
 
+                {stats.forumEnabled && (
                 <Card>
                     <CardHeader>
                         <div className="flex justify-between items-center">
@@ -216,7 +240,9 @@ export default async function AdminDashboard() {
                         )}
                     </CardContent>
                 </Card>
+                )}
             </div>
+            )}
 
             {/* Charts */}
             <div className="mt-8">

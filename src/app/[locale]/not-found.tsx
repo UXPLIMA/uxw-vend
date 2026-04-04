@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/core/components/ui/button";
 import { Home, Search } from "lucide-react";
+import { useModuleStatus } from "@/core/providers/module-provider";
 
 export default function NotFound() {
+    const storeEnabled = useModuleStatus("store");
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
             <div className="text-center max-w-md">
@@ -19,11 +24,13 @@ export default function NotFound() {
                             <Home className="w-4 h-4 mr-2" /> Go Home
                         </Button>
                     </Link>
-                    <Link href="/store">
-                        <Button variant="outline">
-                            <Search className="w-4 h-4 mr-2" /> Browse Store
-                        </Button>
-                    </Link>
+                    {storeEnabled && (
+                        <Link href="/store">
+                            <Button variant="outline">
+                                <Search className="w-4 h-4 mr-2" /> Browse Store
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

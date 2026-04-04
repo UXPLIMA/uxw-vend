@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/admin/search?q=...
 export async function GET(request: NextRequest) {
@@ -12,6 +13,12 @@ export async function GET(request: NextRequest) {
     const q = request.nextUrl.searchParams.get("q") || "";
     if (q.length < 2) return NextResponse.json({ results: [] });
 
+    // Load module states
+    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
+    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
+    const storeEnabled = moduleSystem.isEnabled("store");
+    const supportEnabled = moduleSystem.isEnabled("support");
+
     const [users, products, orders, tickets] = await Promise.all([
         prisma.user.findMany({
             where: { OR: [
@@ -21,21 +28,21 @@ export async function GET(request: NextRequest) {
             select: { id: true, username: true, email: true },
             take: 5,
         }),
-        prisma.product.findMany({
+        storeEnabled ? prisma.product.findMany({
             where: { name: { contains: q, mode: "insensitive" } },
             select: { id: true, name: true, slug: true },
             take: 5,
-        }),
-        prisma.order.findMany({
+        }) : Promise.resolve([]),
+        storeEnabled ? prisma.order.findMany({
             where: { orderNumber: { contains: q, mode: "insensitive" } },
             select: { id: true, orderNumber: true, status: true },
             take: 5,
-        }),
-        prisma.ticket.findMany({
+        }) : Promise.resolve([]),
+        supportEnabled ? prisma.ticket.findMany({
             where: { subject: { contains: q, mode: "insensitive" } },
             select: { id: true, subject: true, status: true },
             take: 5,
-        }),
+        }) : Promise.resolve([]),
     ]);
 
     const results = [

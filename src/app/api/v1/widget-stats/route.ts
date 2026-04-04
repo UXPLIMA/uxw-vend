@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
+import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/store/widget-stats - Public stats for homepage widgets
 export async function GET() {
     try {
+        // Check if store module is enabled
+        const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
+        await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
+        if (!moduleSystem.isEnabled("store")) {
+            return NextResponse.json({
+                recentPurchases: [],
+                topCustomer: null,
+                topBuyers: [],
+                topCreditLoaders: [],
+            });
+        }
+
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
