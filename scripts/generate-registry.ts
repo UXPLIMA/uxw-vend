@@ -105,6 +105,7 @@ function generateRegistry() {
     const allNavbarComponents: any[] = [];
     const allSettingsCards: any[] = [];
     const allOauthButtons: any[] = [];
+    const allProfileTabs: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -140,6 +141,12 @@ function generateRegistry() {
             if (manifest.layoutComponents) {
                 manifest.layoutComponents.forEach((lc: any) => {
                     allLayoutComponents.push({ ...lc, module: moduleName });
+                });
+            }
+
+            if (manifest.profileTabs) {
+                manifest.profileTabs.forEach((pt: any) => {
+                    allProfileTabs.push({ ...pt, module: moduleName });
                 });
             }
 
@@ -212,6 +219,20 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    // Generate dynamic imports for profile tab components
+    allProfileTabs.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    let profileTabImports = '// Profile tab component registry\nexport const ProfileTabRegistry: Record<string, any> = {\n';
+    for (const pt of allProfileTabs) {
+        let importPath = pt.component.startsWith('@core/')
+            ? `@/core/components/${pt.component.replace('@core/', '')}`
+            : `@/modules/${pt.module}/${pt.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then(mod => mod.${pt.id} || mod.default || mod), { ssr: false }),\n`;
+    }
+    profileTabImports += '};\n\n';
+    profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
+
+    widgetRegistry += profileTabImports;
     widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n`;
 

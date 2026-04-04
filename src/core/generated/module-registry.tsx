@@ -43,6 +43,12 @@ export const ModuleFooterLinks: { label: string; href: string; section?: string;
 
 export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = [];
 
+// Profile tab component registry
+export const ProfileTabRegistry: Record<string, any> = {
+};
+
+export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = [];
+
 export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = [];
 
 export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [];

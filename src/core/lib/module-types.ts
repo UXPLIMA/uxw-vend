@@ -59,6 +59,14 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
+    // Profile tabs — modules add their own tabs to user profile
+    profileTabs?: {
+        id: string;
+        label: string;
+        component: string;       // path to tab component
+        order: number;           // render order
+    }[];
+
     // OAuth login buttons — rendered on login/register pages
     oauthButtons?: {
         id: string;
