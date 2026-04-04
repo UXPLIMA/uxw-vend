@@ -95,17 +95,22 @@ function generateRegistry() {
     mapping += `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     mapping += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
-    // Collect widgets, navLinks, footerLinks, homepageSections from all modules
-    const allWidgets: Record<string, unknown>[] = [];
-    const allNavLinks: Record<string, unknown>[] = [];
-    const allFooterLinks: Record<string, unknown>[] = [];
-    const allDashboardCards: Record<string, unknown>[] = [];
-    const allHomepageSections: Record<string, unknown>[] = [];
-    const allLayoutComponents: Record<string, unknown>[] = [];
-    const allNavbarComponents: Record<string, unknown>[] = [];
-    const allSettingsCards: Record<string, unknown>[] = [];
-    const allOauthButtons: Record<string, unknown>[] = [];
-    const allProfileTabs: Record<string, unknown>[] = [];
+    // Typed interfaces for manifest collections
+    interface ManifestItem { module: string; [key: string]: string | number | boolean | undefined }
+    interface WidgetItem extends ManifestItem { id: string; component: string; defaultOrder: number; defaultVisible: boolean }
+    interface NavLinkItem extends ManifestItem { label: string; href: string; icon?: string; position?: number }
+    interface SectionItem extends ManifestItem { id: string; component: string; order?: number }
+
+    const allWidgets: WidgetItem[] = [];
+    const allNavLinks: NavLinkItem[] = [];
+    const allFooterLinks: ManifestItem[] = [];
+    const allDashboardCards: ManifestItem[] = [];
+    const allHomepageSections: SectionItem[] = [];
+    const allLayoutComponents: SectionItem[] = [];
+    const allNavbarComponents: SectionItem[] = [];
+    const allSettingsCards: ManifestItem[] = [];
+    const allOauthButtons: ManifestItem[] = [];
+    const allProfileTabs: SectionItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -115,61 +120,61 @@ function generateRegistry() {
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
             if (manifest.widgets) {
-                manifest.widgets.forEach((w: Record<string, unknown>) => {
+                manifest.widgets.forEach((w: { id: string; component: string; defaultOrder: number; defaultVisible: boolean }) => {
                     allWidgets.push({ ...w, module: moduleName });
                 });
             }
 
             if (manifest.navLinks) {
-                manifest.navLinks.forEach((link: Record<string, unknown>) => {
+                manifest.navLinks.forEach((link: { label: string; href: string; icon?: string; position?: number; section?: string }) => {
                     allNavLinks.push({ ...link, module: moduleName });
                 });
             }
 
             if (manifest.footerLinks) {
-                manifest.footerLinks.forEach((link: Record<string, unknown>) => {
+                manifest.footerLinks.forEach((link: { label: string; href: string; icon?: string; position?: number; section?: string }) => {
                     allFooterLinks.push({ ...link, module: moduleName });
                 });
             }
 
             if (manifest.dashboardCards) {
-                manifest.dashboardCards.forEach((card: Record<string, unknown>) => {
+                manifest.dashboardCards.forEach((card: { id: string; label: string; icon: string; href: string; color: string; statKey: string }) => {
                     allDashboardCards.push({ ...card, module: moduleName });
                 });
             }
 
             if (manifest.layoutComponents) {
-                manifest.layoutComponents.forEach((lc: Record<string, unknown>) => {
+                manifest.layoutComponents.forEach((lc: { id: string; component: string }) => {
                     allLayoutComponents.push({ ...lc, module: moduleName });
                 });
             }
 
             if (manifest.profileTabs) {
-                manifest.profileTabs.forEach((pt: Record<string, unknown>) => {
+                manifest.profileTabs.forEach((pt: { id: string; label: string; component: string; order: number }) => {
                     allProfileTabs.push({ ...pt, module: moduleName });
                 });
             }
 
             if (manifest.oauthButtons) {
-                manifest.oauthButtons.forEach((btn: Record<string, unknown>) => {
+                manifest.oauthButtons.forEach((btn: { id: string; provider: string; label: string; color: string; svgIcon: string }) => {
                     allOauthButtons.push({ ...btn, module: moduleName });
                 });
             }
 
             if (manifest.settingsCards) {
-                manifest.settingsCards.forEach((sc: Record<string, unknown>) => {
+                manifest.settingsCards.forEach((sc: { title: string; description: string; href: string; icon: string; color: string }) => {
                     allSettingsCards.push({ ...sc, module: moduleName });
                 });
             }
 
             if (manifest.navbarComponents) {
-                manifest.navbarComponents.forEach((nc: Record<string, unknown>) => {
+                manifest.navbarComponents.forEach((nc: { id: string; component: string; order: number }) => {
                     allNavbarComponents.push({ ...nc, module: moduleName });
                 });
             }
 
             if (manifest.homepageSections) {
-                manifest.homepageSections.forEach((section: Record<string, unknown>) => {
+                manifest.homepageSections.forEach((section: { id: string; component: string; order: number }) => {
                     allHomepageSections.push({ ...section, module: moduleName });
                 });
             }
