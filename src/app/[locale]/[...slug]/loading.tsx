@@ -1,4 +1,4 @@
-import { SkeletonHeroBanner, SkeletonNavbar, SkeletonNewsGrid, SkeletonSidebar } from "@/core/components/ui/skeleton";
+import { SkeletonHeroBanner, SkeletonNavbar, SkeletonCard, SkeletonSidebar } from "@/core/components/ui/skeleton";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { Footer } from "@/core/components/layout";
@@ -16,7 +16,13 @@ export default function Loading() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 <StandardSidebarLayout
                     sidebar={<SkeletonSidebar />}
-                    children={<SkeletonNewsGrid count={4} />}
+                    children={
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <SkeletonCard key={i} />
+                            ))}
+                        </div>
+                    }
                 />
             </main>
 

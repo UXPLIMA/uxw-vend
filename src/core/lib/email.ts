@@ -55,7 +55,7 @@ export async function sendWelcomeEmail(email: string, username: string) {
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #1f2937;">Welcome, ${username}!</h2>
                 <p style="color: #6b7280;">Your ${APP_NAME} account has been created successfully.</p>
-                <p style="color: #6b7280;">You can now browse the store, join forum discussions, and manage your account.</p>
+                <p style="color: #6b7280;">Explore the platform and discover all available features.</p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
                 <p style="color: #9ca3af; font-size: 12px;">${APP_NAME}</p>
             </div>
