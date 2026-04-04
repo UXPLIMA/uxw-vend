@@ -12,7 +12,7 @@ export default function MinecraftHeroBanner() {
     const { settings } = useSiteSettings();
     const [copied, setCopied] = useState(false);
 
-    const bgImage = (settings.hero_background_image as string) || "/background1.jpg";
+    const bgImage = (settings.hero_background_image as string) || "/background1.png";
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
     const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
