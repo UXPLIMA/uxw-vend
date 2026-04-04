@@ -15,11 +15,11 @@ function generateRegistry() {
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
 
-    let imports = `import dynamic from 'next/dynamic';\nimport { PageLoader } from '@/core/components/ui/page-loader';\n\n`;
+    const imports = `import dynamic from 'next/dynamic';\nimport { PageLoader } from '@/core/components/ui/page-loader';\n\n`;
     let mapping = `export const ModuleRegistry: Record<string, any> = {\n`;
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<any>> = {\n`;
-    const routes: any[] = [];
-    const apiRoutes: any[] = [];
+    const routes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [];
+    const apiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -30,7 +30,7 @@ function generateRegistry() {
 
             // Process Page Routes
             if (manifest.routes) {
-                manifest.routes.forEach((route: any) => {
+                manifest.routes.forEach((route: { path: string; component: string }) => {
                     const componentKey = `${moduleName}:${route.component}`;
                     const importPath = `@/modules/${moduleName}/${route.component.replace(/\.tsx?$/, '')}`;
 
@@ -46,7 +46,7 @@ function generateRegistry() {
 
             // Process Admin Routes
             if (manifest.adminRoutes) {
-                manifest.adminRoutes.forEach((route: any) => {
+                manifest.adminRoutes.forEach((route: { path: string; component: string }) => {
                     const componentKey = `${moduleName}:${route.component}`;
                     const importPath = `@/modules/${moduleName}/${route.component.replace(/\.tsx?$/, '')}`;
                     // Admin routes often start with /admin in the path, but let's ensure consistency
@@ -70,7 +70,7 @@ function generateRegistry() {
 
             // Process API Routes
             if (manifest.api) {
-                manifest.api.forEach((api: any) => {
+                manifest.api.forEach((api: { path: string; handler: string; method?: string }) => {
                     const apiKey = `${moduleName}:api:${api.path}`;
                     const handlerImportPath = `@/modules/${moduleName}/${api.handler.replace(/\.ts?$/, '')}`;
 
@@ -96,16 +96,16 @@ function generateRegistry() {
     mapping += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
     // Collect widgets, navLinks, footerLinks, homepageSections from all modules
-    const allWidgets: any[] = [];
-    const allNavLinks: any[] = [];
-    const allFooterLinks: any[] = [];
-    const allDashboardCards: any[] = [];
-    const allHomepageSections: any[] = [];
-    const allLayoutComponents: any[] = [];
-    const allNavbarComponents: any[] = [];
-    const allSettingsCards: any[] = [];
-    const allOauthButtons: any[] = [];
-    const allProfileTabs: any[] = [];
+    const allWidgets: Record<string, unknown>[] = [];
+    const allNavLinks: Record<string, unknown>[] = [];
+    const allFooterLinks: Record<string, unknown>[] = [];
+    const allDashboardCards: Record<string, unknown>[] = [];
+    const allHomepageSections: Record<string, unknown>[] = [];
+    const allLayoutComponents: Record<string, unknown>[] = [];
+    const allNavbarComponents: Record<string, unknown>[] = [];
+    const allSettingsCards: Record<string, unknown>[] = [];
+    const allOauthButtons: Record<string, unknown>[] = [];
+    const allProfileTabs: Record<string, unknown>[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -115,61 +115,61 @@ function generateRegistry() {
             const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
             if (manifest.widgets) {
-                manifest.widgets.forEach((w: any) => {
+                manifest.widgets.forEach((w: Record<string, unknown>) => {
                     allWidgets.push({ ...w, module: moduleName });
                 });
             }
 
             if (manifest.navLinks) {
-                manifest.navLinks.forEach((link: any) => {
+                manifest.navLinks.forEach((link: Record<string, unknown>) => {
                     allNavLinks.push({ ...link, module: moduleName });
                 });
             }
 
             if (manifest.footerLinks) {
-                manifest.footerLinks.forEach((link: any) => {
+                manifest.footerLinks.forEach((link: Record<string, unknown>) => {
                     allFooterLinks.push({ ...link, module: moduleName });
                 });
             }
 
             if (manifest.dashboardCards) {
-                manifest.dashboardCards.forEach((card: any) => {
+                manifest.dashboardCards.forEach((card: Record<string, unknown>) => {
                     allDashboardCards.push({ ...card, module: moduleName });
                 });
             }
 
             if (manifest.layoutComponents) {
-                manifest.layoutComponents.forEach((lc: any) => {
+                manifest.layoutComponents.forEach((lc: Record<string, unknown>) => {
                     allLayoutComponents.push({ ...lc, module: moduleName });
                 });
             }
 
             if (manifest.profileTabs) {
-                manifest.profileTabs.forEach((pt: any) => {
+                manifest.profileTabs.forEach((pt: Record<string, unknown>) => {
                     allProfileTabs.push({ ...pt, module: moduleName });
                 });
             }
 
             if (manifest.oauthButtons) {
-                manifest.oauthButtons.forEach((btn: any) => {
+                manifest.oauthButtons.forEach((btn: Record<string, unknown>) => {
                     allOauthButtons.push({ ...btn, module: moduleName });
                 });
             }
 
             if (manifest.settingsCards) {
-                manifest.settingsCards.forEach((sc: any) => {
+                manifest.settingsCards.forEach((sc: Record<string, unknown>) => {
                     allSettingsCards.push({ ...sc, module: moduleName });
                 });
             }
 
             if (manifest.navbarComponents) {
-                manifest.navbarComponents.forEach((nc: any) => {
+                manifest.navbarComponents.forEach((nc: Record<string, unknown>) => {
                     allNavbarComponents.push({ ...nc, module: moduleName });
                 });
             }
 
             if (manifest.homepageSections) {
-                manifest.homepageSections.forEach((section: any) => {
+                manifest.homepageSections.forEach((section: Record<string, unknown>) => {
                     allHomepageSections.push({ ...section, module: moduleName });
                 });
             }

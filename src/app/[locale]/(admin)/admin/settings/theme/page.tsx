@@ -321,6 +321,7 @@ function ColorCustomizer() {
                 setColors(c);
             })
             .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const applyColors = () => {
