@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
         for (const product of products) {
             entries.push({
-                url: `${baseUrl}/en/store/product/${product.number}-${product.slug}`,
+                url: `${baseUrl}/en/store/product/${product.number}/${product.slug}`,
                 lastModified: product.updatedAt as Date,
                 changeFrequency: "weekly",
                 priority: 0.7,

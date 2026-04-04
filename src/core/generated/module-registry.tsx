@@ -15,7 +15,7 @@ export const ModuleRegistry: Record<string, any> = {
   'forum:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/categories/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/page.tsx': dynamic(() => import('@/modules/store/pages/public/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/cart/page.tsx': dynamic(() => import('@/modules/store/pages/public/cart/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
-  'store:pages/public/product/[id]/page.tsx': dynamic(() => import('@/modules/store/pages/public/product/[id]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
+  'store:pages/public/product/[...params]/page.tsx': dynamic(() => import('@/modules/store/pages/public/product/[...params]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/order-success/page.tsx': dynamic(() => import('@/modules/store/pages/public/order-success/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/public/vip/page.tsx': dynamic(() => import('@/modules/store/pages/public/vip/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'store:pages/admin/products/page.tsx': dynamic(() => import('@/modules/store/pages/admin/products/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -109,8 +109,8 @@ export const ModuleRoutes = [
     "module": "store"
   },
   {
-    "path": "/store/product/[id]",
-    "key": "store:pages/public/product/[id]/page.tsx",
+    "path": "/store/product/[...params]",
+    "key": "store:pages/public/product/[...params]/page.tsx",
     "module": "store"
   },
   {

@@ -47,8 +47,8 @@
             "component": "pages/public/cart/page.tsx"
         },
         {
-            "path": "/store/product/[id]",
-            "component": "pages/public/product/[id]/page.tsx"
+            "path": "/store/product/[...params]",
+            "component": "pages/public/product/[...params]/page.tsx"
         },
         {
             "path": "/store/order-success",

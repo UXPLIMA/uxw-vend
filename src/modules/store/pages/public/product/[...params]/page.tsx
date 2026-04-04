@@ -33,8 +33,11 @@ interface Product {
 export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const productId = params.id as string;
     const { formatPrice } = useCurrency();
+
+    // URL format: /store/product/5/legendary-key → params = ["5", "legendary-key"]
+    const segments = Array.isArray(params.params) ? params.params : [params.params];
+    const lookupId = segments[0] as string; // number or id
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
@@ -45,9 +48,6 @@ export default function ProductDetailPage() {
     const [addedToCart, setAddedToCart] = useState(false);
     const [variables, setVariables] = useState<{ name: string; label: string; type: string; required: boolean; placeholder?: string; options?: string }[]>([]);
     const [variableValues, setVariableValues] = useState<Record<string, string>>({});
-
-    // Parse number from URL format "3-legendary-key" → "3"
-    const lookupId = productId.includes("-") ? productId.split("-")[0] : productId;
 
     useEffect(() => {
         fetch(`/api/v1/store/products/${lookupId}`)
@@ -63,7 +63,7 @@ export default function ProductDetailPage() {
                 setError(true);
                 setLoading(false);
             });
-    }, [productId]);
+    }, [lookupId]);
 
     // Fetch product variables
     useEffect(() => {

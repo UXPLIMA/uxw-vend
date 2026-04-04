@@ -195,7 +195,7 @@ export default function StorePage() {
                                 {searchResults.map((product) => (
                                     <Link
                                         key={product.id}
-                                        href={`/store/product/${product.number}-${product.slug}`}
+                                        href={`/store/product/${product.number}/${product.slug}`}
                                         className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group"
                                     >
                                         <div className="h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -314,7 +314,7 @@ export default function StorePage() {
                                 {products.map((product) => (
                                     <Link
                                         key={product.id}
-                                        href={`/store/product/${product.number}-${product.slug}`}
+                                        href={`/store/product/${product.number}/${product.slug}`}
                                         className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group"
                                     >
                                         <div className={`h-44 bg-gray-100 flex items-center justify-center overflow-hidden relative`}>

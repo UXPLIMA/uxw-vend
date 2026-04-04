@@ -46,7 +46,7 @@ export function FeaturedProductWidget() {
                 </div>
                 <h4 className="font-semibold text-gray-900 mb-1">{product.name}</h4>
                 <p className="text-blue-600 font-bold text-lg mb-3">{formatPrice(product.price)}</p>
-                <Link href={`/store/product/${product.number}-${product.slug}`}>
+                <Link href={`/store/product/${product.number}/${product.slug}`}>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-none">
                         {storeT('viewDetails')}
                     </Button>
