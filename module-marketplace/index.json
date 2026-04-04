@@ -440,6 +440,101 @@
         "apiRoutes": 1,
         "widgets": 0
       }
+    },
+    {
+      "id": "data-tools",
+      "name": "Data Tools",
+      "description": "CSV export and import utilities",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Download",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "data-tools.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "webhook-logs",
+      "name": "Webhook Logs",
+      "description": "View and manage webhook delivery logs",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Webhook",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "webhook-logs.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "discord-integration",
+      "name": "Discord Integration",
+      "description": "Discord webhook notifications and settings",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "discord-integration.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "email-system",
+      "name": "Email System",
+      "description": "Email service configuration and templates",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Mail",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "email-system.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "description": "CAPTCHA, login protection, and security settings",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "security.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
     }
   ]
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "generate:themes": "npx tsx scripts/generate-themes.ts",
     "predev": "npm run generate:themes && npx tsx scripts/generate-registry.ts",
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --port 3001 --hostname 0.0.0.0",
     "prebuild": "npm run generate:themes && npx tsx scripts/generate-registry.ts",
     "build": "next build",
     "start": "next start",
