@@ -34,9 +34,9 @@ export function HeroBanner() {
             </div>
 
             <div className="relative container mx-auto px-4 h-full z-10">
-                <div className={`flex items-center ${showServerIp || showDiscord ? 'justify-between' : 'justify-center'} h-full`}>
+                <div className="flex items-center justify-center h-full relative">
                     {showServerIp && (
-                        <div className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors" onClick={copyIp}>
+                        <div className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg cursor-pointer hover:bg-white/10 transition-colors absolute left-0" onClick={copyIp}>
                             <div className="w-10 h-10 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
                                 <Users size={20} />
                             </div>
@@ -61,7 +61,7 @@ export function HeroBanner() {
                     </div>
 
                     {showDiscord && (
-                        <Link href={discordUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-[#5865F2]/20 transition-colors">
+                        <Link href={discordUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-[#5865F2]/20 transition-colors absolute right-0">
                             <div className="text-right">
                                 <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{t('joinCommunity')}</div>
                                 <div className="text-[#5865F2] font-bold">{t('discordServer')}</div>

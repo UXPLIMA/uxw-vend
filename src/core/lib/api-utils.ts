@@ -5,10 +5,10 @@ import { rateLimit, getClientIP, rateLimits } from "./rate-limit";
  * Apply rate limiting to an API handler
  */
 export function withRateLimit(
-    handler: (request: NextRequest, ...args: any[]) => Promise<NextResponse>,
+    handler: (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>,
     config = rateLimits.api
 ) {
-    return async (request: NextRequest, ...args: any[]) => {
+    return async (request: NextRequest, ...args: unknown[]) => {
         const ip = getClientIP(request.headers);
         const { success, remaining, resetAt } = rateLimit(ip, config);
 

@@ -8,7 +8,7 @@ import { ModuleNavLinks } from "@/core/generated/module-registry";
 
 // Icon map for dynamic rendering from registry
 import { ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download, Gift, Crown, Trophy, Vote, Dices, History, Users, Shield } from "lucide-react";
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download,
     Gift, Crown, Trophy, Vote, Dices, History, Users, Shield, Package, User,
 };
