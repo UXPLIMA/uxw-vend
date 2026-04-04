@@ -672,6 +672,25 @@
         "apiRoutes": 0,
         "widgets": 0
       }
+    },
+    {
+      "id": "two-factor-auth",
+      "name": "Two-Factor Authentication",
+      "description": "TOTP-based 2FA with backup codes for enhanced account security",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "two-factor-auth.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 3,
+        "widgets": 0
+      }
     }
   ]
 }

@@ -68,7 +68,8 @@ export default function ProfilePage() {
     const [chestItems, setChestItems] = useState<{ id: string; productName: string; quantity: number; createdAt: string }[]>([]);
     const [mcUsername, setMcUsername] = useState("");
 
-    // 2FA
+    // 2FA (only available if two-factor-auth module is installed)
+    const [twoFAAvailable, setTwoFAAvailable] = useState(false);
     const [twoFAStep, setTwoFAStep] = useState<"idle" | "setup" | "verify" | "backup">("idle");
     const [qrCode, setQrCode] = useState("");
     const [twoFASecret, setTwoFASecret] = useState("");
@@ -116,6 +117,11 @@ export default function ProfilePage() {
             setLinkedAccounts(accountsData.accounts || []);
             setChestItems(chestData.items || []);
             setLoading(false);
+
+            // Check if 2FA module is available
+            fetch("/api/v1/auth/two-factor/setup", { method: "HEAD" })
+                .then(r => { if (r.ok || r.status === 401) setTwoFAAvailable(true); })
+                .catch(() => {});
         }).catch(() => setLoading(false));
     }, [authStatus, router, hasModule('/store')]);
 
@@ -269,7 +275,7 @@ export default function ProfilePage() {
                         { id: "orders", label: "Orders", requiresPath: "/store" },
                         { id: "chest", label: "Chest", requiresPath: "/store" },
                         { id: "accounts", label: "Accounts" },
-                        { id: "security", label: "Security" },
+                        ...(twoFAAvailable ? [{ id: "security", label: "Security" }] : []),
                     ];
                     const visibleTabs = tabs.filter(t => !t.requiresPath || installedModulePaths.has(t.requiresPath));
                     return (
