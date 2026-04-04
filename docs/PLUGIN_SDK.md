@@ -118,8 +118,8 @@ import { isAdmin, hasPermission } from "@/core/lib/permissions";
 // Email
 import { sendOrderConfirmationEmail } from "@/core/lib/email";
 
-// Discord
-import { notifyOrderCompleted } from "@/core/lib/discord";
+// Discord (generic webhook — pass event type and embed payload)
+import { sendDiscordWebhook } from "@/core/lib/discord";
 
 // RCON
 import { sendRconCommand } from "@/core/lib/rcon";

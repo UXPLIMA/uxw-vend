@@ -16,6 +16,7 @@ export function HeroBanner() {
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
     const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
+    const siteName = (settings.site_name as string) || serverConfig.name;
     const height = parseInt((settings.hero_height as string) || "260");
 
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
@@ -46,7 +47,7 @@ export function HeroBanner() {
                     </div>
 
                     <div className="animate-float">
-                        <img src={logoImage} alt={serverConfig.name} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" />
+                        <img src={logoImage} alt={siteName} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" />
                     </div>
 
                     <Link href={discordUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-[#5865F2]/20 transition-colors">

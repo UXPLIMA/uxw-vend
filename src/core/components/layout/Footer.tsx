@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Globe, DollarSign, Mail, ChevronDown, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleFooterLinks, ModuleNavLinks } from "@/core/generated/module-registry";
@@ -61,6 +62,13 @@ export function Footer() {
     const pathname = usePathname();
     const { currency, setCurrency } = useCurrency();
     const moduleStatus = useAllModules();
+    const { settings } = useSiteSettings();
+
+    // Prefer DB settings, fall back to serverConfig defaults
+    const siteName = (settings.site_name as string) || serverConfig.name;
+    const siteDescription = (settings.site_description as string) || serverConfig.description;
+    const siteEmail = (settings.site_email as string) || serverConfig.email;
+    const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
 
     // Build path→module map from registry — zero hardcoded module names
     const pathToModule: Record<string, string> = {};
@@ -82,10 +90,10 @@ export function Footer() {
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="text-white font-bold text-lg">{serverConfig.name}</span>
+                            <span className="text-white font-bold text-lg">{siteName}</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                            {serverConfig.description}
+                            {siteDescription}
                         </p>
                         <div className="flex gap-3">
                             {serverConfig.social.facebook && (
@@ -108,9 +116,11 @@ export function Footer() {
                                     yt
                                 </a>
                             )}
-                            <a href={serverConfig.discordUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-indigo-600 flex items-center justify-center transition-colors">
-                                <Mail className="w-4 h-4" />
-                            </a>
+                            {discordUrl && (
+                                <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-indigo-600 flex items-center justify-center transition-colors">
+                                    <Mail className="w-4 h-4" />
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -168,7 +178,7 @@ export function Footer() {
                         <div className="mt-6">
                             <p className="text-gray-400 text-sm flex items-center gap-2">
                                 <Mail className="w-4 h-4" />
-                                {serverConfig.email}
+                                {siteEmail}
                             </p>
                         </div>
                     </div>
@@ -180,7 +190,7 @@ export function Footer() {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-gray-500 text-sm">
-                            © 2026 {serverConfig.name}. {t('allRightsReserved')}
+                            © 2026 {siteName}. {t('allRightsReserved')}
                         </p>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <span>{t('builtWith')}</span>

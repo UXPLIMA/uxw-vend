@@ -17,19 +17,24 @@ interface WebhookPayload {
     avatar_url?: string;
 }
 
-// Event types that can trigger webhooks
-export type WebhookEvent =
-    | "order.completed"
-    | "order.created"
-    | "ticket.created"
-    | "ticket.replied"
-    | "user.registered"
-    | "forum.topic.created";
-
-// Get webhook URL for an event from settings
-async function getWebhookUrl(event: WebhookEvent): Promise<string | null> {
-    // Check event-specific webhook first, then fallback to general
-    const specificKey = `discord_webhook_${event.replace(/\./g, "_")}`;
+/**
+ * Generic Discord webhook sender.
+ *
+ * Modules call this with their own event type key.
+ * The webhook URL is resolved from settings:
+ *   1. `discord_webhook_{eventType}` (dots replaced with underscores)
+ *   2. `discord_webhook_general` fallback
+ *   3. DISCORD_WEBHOOK_URL env var fallback
+ *
+ * Example usage from a module:
+ *   sendDiscordWebhook("order_completed", { embeds: [...] })
+ *   sendDiscordWebhook("ticket_created", { embeds: [...] })
+ */
+export async function sendDiscordWebhook(
+    eventType: string,
+    payload: WebhookPayload
+): Promise<void> {
+    const specificKey = `discord_webhook_${eventType.replace(/\./g, "_")}`;
     const generalKey = "discord_webhook_general";
 
     const settings = await prisma.setting.findMany({
@@ -37,21 +42,21 @@ async function getWebhookUrl(event: WebhookEvent): Promise<string | null> {
     });
 
     const specific = settings.find((s) => s.key === specificKey);
+    let url: string | null = null;
+
     if (specific && typeof specific.value === "string" && specific.value.startsWith("http")) {
-        return specific.value;
+        url = specific.value;
+    } else {
+        const general = settings.find((s) => s.key === generalKey);
+        if (general && typeof general.value === "string" && general.value.startsWith("http")) {
+            url = general.value;
+        } else {
+            url = process.env.DISCORD_WEBHOOK_URL || null;
+        }
     }
 
-    const general = settings.find((s) => s.key === generalKey);
-    if (general && typeof general.value === "string" && general.value.startsWith("http")) {
-        return general.value;
-    }
+    if (!url) return;
 
-    // Fallback to env
-    return process.env.DISCORD_WEBHOOK_URL || null;
-}
-
-// Send a webhook to Discord
-async function sendWebhook(url: string, payload: WebhookPayload): Promise<void> {
     try {
         await fetch(url, {
             method: "POST",
@@ -66,121 +71,19 @@ async function sendWebhook(url: string, payload: WebhookPayload): Promise<void> 
     }
 }
 
-// ---- Event handlers ----
-
-export async function notifyOrderCompleted(order: {
-    orderNumber: string;
-    total: number;
-    username: string;
-    itemCount: number;
-}) {
-    const url = await getWebhookUrl("order.completed");
-    if (!url) return;
-
-    await sendWebhook(url, {
-        embeds: [{
-            title: "New Purchase!",
-            description: `**${order.username}** completed an order`,
-            color: 0x22c55e, // green
-            fields: [
-                { name: "Order", value: order.orderNumber, inline: true },
-                { name: "Total", value: `$${order.total.toFixed(2)}`, inline: true },
-                { name: "Items", value: String(order.itemCount), inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    });
-}
-
-export async function notifyOrderCreated(order: {
-    orderNumber: string;
-    total: number;
-    username: string;
-}) {
-    const url = await getWebhookUrl("order.created");
-    if (!url) return;
-
-    await sendWebhook(url, {
-        embeds: [{
-            title: "New Order",
-            description: `**${order.username}** placed an order`,
-            color: 0x3b82f6, // blue
-            fields: [
-                { name: "Order", value: order.orderNumber, inline: true },
-                { name: "Total", value: `$${order.total.toFixed(2)}`, inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    });
-}
-
-export async function notifyTicketCreated(ticket: {
-    subject: string;
-    username: string;
-    department: string;
-    priority: string;
-}) {
-    const url = await getWebhookUrl("ticket.created");
-    if (!url) return;
-
-    const priorityColors: Record<string, number> = {
-        LOW: 0x6b7280,
-        MEDIUM: 0x3b82f6,
-        HIGH: 0xf97316,
-        URGENT: 0xef4444,
-    };
-
-    await sendWebhook(url, {
-        embeds: [{
-            title: "New Support Ticket",
-            description: ticket.subject,
-            color: priorityColors[ticket.priority] || 0x6b7280,
-            fields: [
-                { name: "From", value: ticket.username, inline: true },
-                { name: "Department", value: ticket.department, inline: true },
-                { name: "Priority", value: ticket.priority, inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    });
-}
+// ---- Core event: user registration (auth system, not module-specific) ----
 
 export async function notifyUserRegistered(user: {
     username: string;
     email: string;
 }) {
-    const url = await getWebhookUrl("user.registered");
-    if (!url) return;
-
-    await sendWebhook(url, {
+    await sendDiscordWebhook("user_registered", {
         embeds: [{
             title: "New User Registered",
             description: `**${user.username}** joined the platform`,
             color: 0x8b5cf6, // purple
             fields: [
                 { name: "Email", value: user.email, inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    });
-}
-
-export async function notifyForumTopicCreated(topic: {
-    title: string;
-    username: string;
-    category: string;
-}) {
-    const url = await getWebhookUrl("forum.topic.created");
-    if (!url) return;
-
-    await sendWebhook(url, {
-        embeds: [{
-            title: "New Forum Topic",
-            description: `**${topic.username}** started a discussion`,
-            color: 0x06b6d4, // cyan
-            fields: [
-                { name: "Topic", value: topic.title, inline: false },
-                { name: "Category", value: topic.category, inline: true },
             ],
             timestamp: new Date().toISOString(),
         }],

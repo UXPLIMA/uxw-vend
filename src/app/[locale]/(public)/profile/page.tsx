@@ -13,6 +13,7 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
 import { useModules } from "@/core/hooks/useModule";
+import { ModuleNavLinks } from "@/core/generated/module-registry";
 
 interface UserProfile {
     id: string;
@@ -47,6 +48,14 @@ export default function ProfilePage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
     const { modules: moduleStatus } = useModules();
+
+    // Build path→module map from registry — zero hardcoded module names
+    const pathToModule: Record<string, string> = {};
+    for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
+    const isModuleActive = (path: string) => {
+        const mod = pathToModule[path];
+        return mod ? moduleStatus[mod] === true : true;
+    };
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
@@ -91,7 +100,7 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
-        const storeEnabled = moduleStatus['store'] === true;
+        const storeEnabled = isModuleActive('/store');
         Promise.all([
             fetch("/api/v1/auth/profile").then((r) => r.json()),
             storeEnabled ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
@@ -248,7 +257,7 @@ export default function ProfilePage() {
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6">
                     {(["profile", "orders", "chest", "accounts", "security"] as const).filter(tab => {
-                        if ((tab === "orders" || tab === "chest") && moduleStatus['store'] !== true) return false;
+                        if ((tab === "orders" || tab === "chest") && !isModuleActive('/store')) return false;
                         return true;
                     }).map((tab) => (
                         <Button

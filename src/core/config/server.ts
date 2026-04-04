@@ -1,16 +1,18 @@
-// Server configuration - shared across all pages
+// Server configuration defaults — fallbacks when DB settings are not yet loaded.
+// Components should prefer useSiteSettings() values over these.
+// For initial setup, configure via Admin > Settings or environment variables.
 export const serverConfig = {
-    name: "uxwVend",
-    ip: "play.uxwvend.com",
-    onlineCount: 1247,
-    discordUrl: "https://discord.gg/uxwvend",
-    discordWidgetId: "1445828806400151696",
-    description: "Modern e-commerce platform with powerful features and an amazing user experience.",
-    email: "support@uxwvend.com",
+    name: process.env.SITE_NAME || "uxwVend",
+    ip: process.env.SERVER_IP || "play.example.com",
+    onlineCount: 0,
+    discordUrl: process.env.DISCORD_URL || "",
+    discordWidgetId: process.env.DISCORD_WIDGET_ID || "",
+    description: process.env.SITE_DESCRIPTION || "",
+    email: process.env.SITE_EMAIL || "",
     social: {
-        facebook: "",
-        instagram: "",
-        twitter: "",
-        youtube: "",
+        facebook: process.env.SOCIAL_FACEBOOK || "",
+        instagram: process.env.SOCIAL_INSTAGRAM || "",
+        twitter: process.env.SOCIAL_TWITTER || "",
+        youtube: process.env.SOCIAL_YOUTUBE || "",
     },
 };

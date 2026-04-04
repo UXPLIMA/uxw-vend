@@ -3,9 +3,11 @@
 import { serverConfig } from "@/core/config/server";
 import { useState, useEffect } from "react";
 import { useModuleEnabled } from "@/core/hooks/useModule";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 export function DiscordWidget() {
     const { enabled: discordEnabled } = useModuleEnabled('discord-widget');
+    const { settings } = useSiteSettings();
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
@@ -17,12 +19,13 @@ export function DiscordWidget() {
         return () => observer.disconnect();
     }, []);
 
-    if (!discordEnabled || !serverConfig.discordWidgetId) return null;
+    const widgetId = (settings.widget_discord_server_id as string) || serverConfig.discordWidgetId;
+    if (!discordEnabled || !widgetId) return null;
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <iframe
-                src={`https://discord.com/widget?id=${serverConfig.discordWidgetId}&theme=${isDark ? "dark" : "light"}`}
+                src={`https://discord.com/widget?id=${widgetId}&theme=${isDark ? "dark" : "light"}`}
                 width="100%"
                 height="300"
                 frameBorder="0"

@@ -16,6 +16,7 @@ const PUBLIC_KEYS = [
     "custom_css",
     "site_name",
     "site_description",
+    "site_email",
     "footer_text",
     "widget_discord_enabled",
     "widget_discord_server_id",
