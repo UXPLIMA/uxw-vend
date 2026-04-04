@@ -17,6 +17,12 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
 export const WidgetComponentRegistry: Record<string, any> = {
 };
 
+// Homepage section component registry
+export const HomepageSectionRegistry: Record<string, any> = {
+};
+
+export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = [];
+
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [];
 
 export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [];

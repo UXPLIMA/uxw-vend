@@ -62,6 +62,14 @@ export interface ModuleManifest {
     // Dashboard integration — module provides its own stats
     statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
 
+    // Homepage sections — modules register their own content areas
+    homepageSections?: {
+        id: string;
+        type: "content" | "widget";   // content = main area, widget = sidebar
+        component: string;             // path to component (e.g. "@core/widgets/xxx" or "components/xxx")
+        order: number;                  // render order
+    }[];
+
     dashboardCards?: {
         id: string;
         label: string;

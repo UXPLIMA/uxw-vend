@@ -95,11 +95,12 @@ function generateRegistry() {
     mapping += `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     mapping += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
-    // Collect widgets, navLinks, footerLinks from all modules
+    // Collect widgets, navLinks, footerLinks, homepageSections from all modules
     const allWidgets: any[] = [];
     const allNavLinks: any[] = [];
     const allFooterLinks: any[] = [];
     const allDashboardCards: any[] = [];
+    const allHomepageSections: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -131,12 +132,19 @@ function generateRegistry() {
                     allDashboardCards.push({ ...card, module: moduleName });
                 });
             }
+
+            if (manifest.homepageSections) {
+                manifest.homepageSections.forEach((section: any) => {
+                    allHomepageSections.push({ ...section, module: moduleName });
+                });
+            }
         } catch { /* already logged above */ }
     });
 
-    // Sort navLinks by position, widgets by defaultOrder
+    // Sort navLinks by position, widgets by defaultOrder, homepageSections by order
     allNavLinks.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
     allWidgets.sort((a, b) => a.defaultOrder - b.defaultOrder);
+    allHomepageSections.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
     // Generate dynamic imports for widget components
     let widgetImports = '\n// Widget component registry\nexport const WidgetComponentRegistry: Record<string, any> = {\n';
@@ -154,12 +162,29 @@ function generateRegistry() {
     }
     widgetImports += '};\n\n';
 
+    // Generate dynamic imports for homepage section components
+    let homepageSectionImports = '// Homepage section component registry\nexport const HomepageSectionRegistry: Record<string, any> = {\n';
+    for (const s of allHomepageSections) {
+        const comp = s.component;
+        let importPath = '';
+        if (comp.startsWith('@core/')) {
+            importPath = `@/core/components/${comp.replace('@core/', '')}`;
+        } else {
+            importPath = `@/modules/${s.module}/${comp}`;
+        }
+        importPath = importPath.replace(/\.tsx$/, '');
+        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then(mod => mod.${s.id} || mod.default || mod), { ssr: false }),\n`;
+    }
+    homepageSectionImports += '};\n\n';
+
+    homepageSectionImports += `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
+
     let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + widgetRegistry;
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);
