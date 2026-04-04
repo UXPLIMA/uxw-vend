@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText } from "lucide-react";
+import { Loader2, Check, Hash } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -23,7 +23,7 @@ interface UserProfile {
     currency: string;
     createdAt: string;
     role: { name: string; displayName: string; color: string | null } | null;
-    _count: { orders: number; tickets: number; topics: number; comments: number };
+    _count: Record<string, number>;
 }
 
 export default function ProfilePage() {
@@ -150,25 +150,24 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Stats — show non-zero counts (data-driven) */}
+                {/* Stats — fully data-driven from API _count, no hardcoded field names */}
                 {(() => {
-                    const counts = profile?._count || {} as any;
-                    const statItems = [
-                        counts.orders > 0 && { icon: ShoppingCart, label: "Orders", value: counts.orders },
-                        counts.tickets > 0 && { icon: Ticket, label: "Tickets", value: counts.tickets },
-                        counts.topics > 0 && { icon: MessageSquare, label: "Topics", value: counts.topics },
-                        counts.comments > 0 && { icon: FileText, label: "Comments", value: counts.comments },
-                    ].filter(Boolean) as { icon: React.ElementType; label: string; value: number }[];
+                    const counts = profile?._count || {};
+                    const statItems = Object.entries(counts)
+                        .filter(([, v]) => v > 0)
+                        .map(([key, value]) => ({
+                            label: key.charAt(0).toUpperCase() + key.slice(1),
+                            value,
+                        }));
 
                     if (statItems.length === 0) return null;
 
-                    const cols = statItems.length <= 2 ? `grid-cols-${statItems.length}` : statItems.length === 3 ? "grid-cols-3" : "grid-cols-4";
                     return (
-                        <div className={`grid ${cols} gap-4 mb-6`}>
+                        <div className={`grid grid-cols-${Math.min(statItems.length, 4)} gap-4 mb-6`}>
                             {statItems.map((stat) => (
                                 <Card key={stat.label}>
                                     <CardContent className="p-4 text-center">
-                                        <stat.icon className="w-5 h-5 mx-auto mb-1 text-gray-400" />
+                                        <Hash className="w-5 h-5 mx-auto mb-1 text-gray-400" />
                                         <p className="text-xl font-bold">{stat.value}</p>
                                         <p className="text-xs text-muted-foreground">{stat.label}</p>
                                     </CardContent>
