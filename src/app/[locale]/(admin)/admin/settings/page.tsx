@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Mail, CreditCard, MessageSquare, Shield, Server, Target, BarChart3, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings } from "lucide-react";
+import { Palette, Globe, Mail, MessageSquare, Shield, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
@@ -13,12 +13,8 @@ export default function SettingsPage() {
         { title: "Custom CSS", description: "Inject custom styles.", href: "/admin/settings/css", icon: Code, color: "text-yellow-500" },
         { title: "Site Config", description: "Name, description, social links.", href: "/admin/settings/site", icon: Globe, color: "text-blue-400" },
         { title: "Discord", description: "Webhook notifications.", href: "/admin/settings/discord", icon: MessageSquare, color: "text-indigo-500" },
-        { title: "Payments", description: "Stripe keys and gateway.", href: "/admin/settings/payments", icon: CreditCard, color: "text-orange-500" },
         { title: "Email", description: "SMTP and templates.", href: "/admin/settings/email", icon: Mail, color: "text-green-500" },
-        { title: "Game Server", description: "RCON connection.", href: "/admin/settings/rcon", icon: Server, color: "text-red-500" },
         { title: "Security", description: "CAPTCHA, rate limits.", href: "/admin/settings/security", icon: Shield, color: "text-yellow-600" },
-        { title: "Community Goals", description: "Revenue targets.", href: "/admin/settings/goals", icon: Target, color: "text-pink-500" },
-        { title: "Analytics", description: "Google Analytics.", href: "/admin/settings/analytics", icon: BarChart3, color: "text-cyan-500" },
     ];
 
     return (
