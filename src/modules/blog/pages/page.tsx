@@ -95,7 +95,7 @@ export default async function BlogPage() {
                                         {articles.slice(0, 5).map((article) => (
                                             <Link
                                                 key={article.id}
-                                                href={`/blog/${article.slug}`}
+                                                href={`/blog/${article.number}/${article.slug}`}
                                                 className="block group"
                                             >
                                                 <h4 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">

@@ -25,6 +25,7 @@ import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 // Blog post type from API
 interface BlogPost {
   id: string;
+  number: number;
   title: string;
   slug: string;
   excerpt: string | null;

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
 
     const topic = await prisma.forumTopic.findFirst({
-        where: { OR: [{ id }, { slug: id }] },
+        where: { OR: [{ id }, { slug: id }, ...(isNaN(Number(id)) ? [] : [{ number: Number(id) }])] },
         include: {
             author: { select: { id: true, username: true, avatar: true } },
             category: { select: { id: true, name: true, slug: true, color: true } },

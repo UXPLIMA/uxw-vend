@@ -116,7 +116,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                                     <CardContent>
                                         <div className="space-y-2">
                                             {player.recentTopics.map((topic) => (
-                                                <Link key={topic.id} href={`/forum/topic/${topic.slug}`} className="block text-sm text-gray-700 hover:text-primary transition-colors truncate">
+                                                <Link key={topic.id} href={`/forum/topic/${topic.id}/${topic.slug}`} className="block text-sm text-gray-700 hover:text-primary transition-colors truncate">
                                                     {topic.title}
                                                 </Link>
                                             ))}

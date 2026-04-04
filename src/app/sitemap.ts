@@ -32,11 +32,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         const articles = await prisma.blogArticle.findMany({
             where: { status: "PUBLISHED" },
-            select: { slug: true, updatedAt: true },
+            select: { number: true, slug: true, updatedAt: true },
         });
         for (const article of articles) {
             entries.push({
-                url: `${baseUrl}/en/blog/${article.slug}`,
+                url: `${baseUrl}/en/blog/${article.number}/${article.slug}`,
                 lastModified: article.updatedAt,
                 changeFrequency: "weekly",
                 priority: 0.7,
@@ -63,13 +63,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Forum topics
     try {
         const topics = await prisma.forumTopic.findMany({
-            select: { slug: true, updatedAt: true },
+            select: { number: true, slug: true, updatedAt: true },
             take: 100,
             orderBy: { createdAt: "desc" },
         });
         for (const topic of topics) {
             entries.push({
-                url: `${baseUrl}/en/forum/topic/${topic.slug}`,
+                url: `${baseUrl}/en/forum/topic/${topic.number}/${topic.slug}`,
                 lastModified: topic.updatedAt,
                 changeFrequency: "daily",
                 priority: 0.6,

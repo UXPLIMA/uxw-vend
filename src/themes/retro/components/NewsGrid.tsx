@@ -6,6 +6,7 @@ import { NewsCard } from "@/core/components/cards/news-card";
 
 interface BlogPost {
     id: string;
+    number: number;
     title: string;
     slug: string;
     excerpt: string | null;

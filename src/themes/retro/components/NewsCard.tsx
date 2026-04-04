@@ -7,6 +7,7 @@ import { formatRelativeTime } from "@/core/lib/utils";
 // Duplicate interface or import - keeping it simple for now by redefining based on usage
 interface BlogPost {
     id: string;
+    number: number;
     title: string;
     slug: string;
     excerpt: string | null;
@@ -22,7 +23,7 @@ interface NewsCardProps {
 
 export default function RetroNewsCard({ post }: NewsCardProps) {
     return (
-        <Link href={`/blog/${post.slug}`} className="block h-full">
+        <Link href={`/blog/${post.number}/${post.slug}`} className="block h-full">
             <div className="group h-full bg-gray-200 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex flex-col">
                 {/* Retro Image Frame */}
                 <div className="relative h-48 border-b-4 border-black overflow-hidden bg-black">

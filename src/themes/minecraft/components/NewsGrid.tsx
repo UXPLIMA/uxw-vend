@@ -4,6 +4,7 @@ import MinecraftNewsCard from "./NewsCard";
 
 interface Post {
     id: string;
+    number: number;
     title: string;
     slug: string;
     excerpt: string | null;

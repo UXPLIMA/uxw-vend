@@ -159,7 +159,7 @@ export default async function AdminBlogArticlesPage() {
                                                     Edit
                                                 </Link>
                                                 <Link
-                                                    href={`/blog/${article.slug}`}
+                                                    href={`/blog/${article.number}/${article.slug}`}
                                                     target="_blank"
                                                     className="text-muted-foreground hover:underline text-sm"
                                                 >

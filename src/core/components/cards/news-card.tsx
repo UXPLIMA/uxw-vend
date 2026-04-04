@@ -7,6 +7,7 @@ import { formatRelativeTime } from "@/core/lib/utils";
 // Define the interface here or import it if shared
 interface BlogPost {
     id: string;
+    number: number;
     title: string;
     slug: string;
     excerpt: string | null;
@@ -22,7 +23,7 @@ interface NewsCardProps {
 
 export function NewsCard({ post }: NewsCardProps) {
     return (
-        <Link href={`/blog/${post.slug}`}>
+        <Link href={`/blog/${post.number}/${post.slug}`}>
             <div className="group bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">

@@ -6,6 +6,7 @@ import { formatRelativeTime } from "@/core/lib/utils";
 interface NewsCardProps {
     post: {
         id: string;
+        number: number;
         title: string;
         slug: string;
         excerpt: string | null;
@@ -20,7 +21,7 @@ export default function MinecraftNewsCard({ post }: NewsCardProps) {
     const date = post.publishedAt || post.createdAt;
 
     return (
-        <Link href={`/blog/${post.slug}`}>
+        <Link href={`/blog/${post.number}/${post.slug}`}>
             <div className="group overflow-hidden transition-all hover:-translate-y-1" style={{ background: "#242424", border: "1px solid #3a3a3a", borderRadius: "2px" }}>
                 {/* Image */}
                 <div className="relative h-44 overflow-hidden" style={{ background: "#1a1a1a" }}>

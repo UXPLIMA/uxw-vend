@@ -22,6 +22,7 @@ interface Category {
 
 interface Topic {
     id: string;
+    number: number;
     title: string;
     slug: string;
     isPinned: boolean;
@@ -145,7 +146,7 @@ export default function ForumPage() {
                         ) : (
                             <>
                                 {topics.map((topic) => (
-                                    <Link key={topic.id} href={`/forum/topic/${topic.slug}`}>
+                                    <Link key={topic.id} href={`/forum/topic/${topic.number}/${topic.slug}`}>
                                         <Card className="hover:shadow-md transition-shadow cursor-pointer">
                                             <CardContent className="p-4">
                                                 <div className="flex items-start gap-4">

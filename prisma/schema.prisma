@@ -838,6 +838,7 @@ model ForumCategory {
 
 model ForumTopic {
   id          String   @id @default(cuid())
+  number      Int      @unique @default(autoincrement())
   title       String
   slug        String   @unique
   content     String   @db.Text
@@ -918,6 +919,7 @@ model BlogCategory {
 
 model BlogArticle {
   id          String        @id @default(cuid())
+  number      Int           @unique @default(autoincrement())
   title       String
   slug        String        @unique
   excerpt     String?

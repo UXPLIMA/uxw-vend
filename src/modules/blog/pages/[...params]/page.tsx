@@ -8,13 +8,14 @@ import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { CommentSection } from "@/core/components/blog/CommentSection";
 
 interface PageProps {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ params: string[] }>;
 }
 
-async function getArticle(slug: string) {
+async function getArticle(lookup: string) {
+    const num = Number(lookup);
     const article = await prisma.blogArticle.findFirst({
         where: {
-            slug,
+            ...(isNaN(num) ? { slug: lookup } : { number: num }),
             status: "PUBLISHED",
             publishedAt: { lte: new Date() },
         },
@@ -48,6 +49,7 @@ async function getRelatedArticles(articleId: string, categoryId: string | null) 
         orderBy: { publishedAt: "desc" },
         select: {
             id: true,
+            number: true,
             title: true,
             slug: true,
             coverImage: true,
@@ -57,8 +59,9 @@ async function getRelatedArticles(articleId: string, categoryId: string | null) 
 }
 
 export default async function BlogArticlePage({ params }: PageProps) {
-    const { slug } = await params;
-    const article = await getArticle(slug);
+    const { params: segments } = await params;
+    const lookup = segments[0]; // number or slug
+    const article = await getArticle(lookup);
 
     if (!article) {
         notFound();
@@ -185,7 +188,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             {relatedArticles.map((related) => (
                                                 <Link
                                                     key={related.id}
-                                                    href={`/blog/${related.slug}`}
+                                                    href={`/blog/${related.number}/${related.slug}`}
                                                     className="block group"
                                                 >
                                                     {related.coverImage && (

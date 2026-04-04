@@ -32,8 +32,8 @@
             "component": "pages/page.tsx"
         },
         {
-            "path": "/blog/[slug]",
-            "component": "pages/[slug]/page.tsx"
+            "path": "/blog/[...params]",
+            "component": "pages/[...params]/page.tsx"
         }
     ],
     "menu": [

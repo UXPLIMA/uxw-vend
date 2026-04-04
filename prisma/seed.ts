@@ -116,6 +116,22 @@ async function main() {
         update: {},
         create: { name: "Events", slug: "events", description: "Community events" },
     });
+    // Blog articles
+    const newsCategory = await prisma.blogCategory.findUnique({ where: { slug: "news" } });
+    const blogArticles = [
+        { title: "Server Launch Announcement", slug: "server-launch", excerpt: "We are excited to announce the official launch of our server! Join us and start your adventure today.", content: "We are thrilled to announce that our server is now officially live! After months of development and testing, we're ready to welcome players from around the world.\n\nWhat to expect:\n- Survival mode with custom features\n- Active staff team\n- Regular events and updates\n- Fair play environment\n\nJoin us today and be part of our growing community!", status: "PUBLISHED" as const, publishedAt: new Date(), categoryId: newsCategory?.id },
+        { title: "Spring Sale - 30% Off Everything", slug: "spring-sale", excerpt: "Don't miss our biggest sale of the season! Get 30% off all ranks and items for a limited time.", content: "Spring is here and so is our biggest sale yet! For a limited time, enjoy 30% off everything in the store.\n\nUse code SPRING30 at checkout.\n\nSale ends April 15th. Don't miss out!", status: "PUBLISHED" as const, publishedAt: new Date(Date.now() - 86400000), categoryId: newsCategory?.id },
+        { title: "New Gamemode: SkyBlock", slug: "new-skyblock", excerpt: "Introducing our brand new SkyBlock gamemode with custom islands, challenges, and rewards.", content: "We're excited to introduce SkyBlock to our server! Start on your own floating island and build your way to the top.\n\nFeatures:\n- Custom island templates\n- 50+ challenges\n- Island leveling system\n- Weekly top island rewards", status: "PUBLISHED" as const, publishedAt: new Date(Date.now() - 172800000), categoryId: newsCategory?.id },
+        { title: "Community Event: Build Competition", slug: "build-competition", excerpt: "Show off your building skills in our monthly build competition! Amazing prizes await the winners.", content: "It's time for our monthly build competition! This month's theme is Medieval Castle.\n\nPrizes:\n- 1st Place: Legend Rank + 500 Credits\n- 2nd Place: MVP Rank + 250 Credits\n- 3rd Place: VIP Rank + 100 Credits\n\nSubmissions due by April 20th.", status: "PUBLISHED" as const, publishedAt: new Date(Date.now() - 259200000), categoryId: newsCategory?.id },
+    ];
+    for (const article of blogArticles) {
+        await prisma.blogArticle.upsert({
+            where: { slug: article.slug },
+            update: {},
+            create: { ...article, authorId: admin.id },
+        });
+    }
+    console.log("✅ Blog articles created");
     console.log("✅ Blog categories created");
 
     // Forum categories

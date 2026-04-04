@@ -56,7 +56,7 @@ export default function NewTopicPage() {
             }
 
             const data = await res.json();
-            router.push(`/forum/topic/${data.topic.slug}`);
+            router.push(`/forum/topic/${data.topic.number}/${data.topic.slug}`);
         } catch {
             setError("Something went wrong");
         } finally {

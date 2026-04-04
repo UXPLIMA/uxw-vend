@@ -36,7 +36,8 @@ interface Topic {
 
 export default function TopicDetailPage() {
     const params = useParams();
-    const topicId = params.id as string;
+    const segments = Array.isArray(params.params) ? params.params : [params.params];
+    const topicId = segments[0] as string;
 
     const [topic, setTopic] = useState<Topic | null>(null);
     const [loading, setLoading] = useState(true);

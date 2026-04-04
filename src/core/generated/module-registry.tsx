@@ -3,13 +3,13 @@ import { PageLoader } from '@/core/components/ui/page-loader';
 
 export const ModuleRegistry: Record<string, any> = {
   'blog:pages/page.tsx': dynamic(() => import('@/modules/blog/pages/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
-  'blog:pages/[slug]/page.tsx': dynamic(() => import('@/modules/blog/pages/[slug]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
+  'blog:pages/[...params]/page.tsx': dynamic(() => import('@/modules/blog/pages/[...params]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/admin/articles/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/articles/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/admin/articles/new/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/articles/new/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/admin/articles/[id]/edit/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/articles/[id]/edit/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/categories/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/page.tsx': dynamic(() => import('@/modules/forum/pages/public/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
-  'forum:pages/public/topic/[id]/page.tsx': dynamic(() => import('@/modules/forum/pages/public/topic/[id]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
+  'forum:pages/public/topic/[...params]/page.tsx': dynamic(() => import('@/modules/forum/pages/public/topic/[...params]/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/new/page.tsx': dynamic(() => import('@/modules/forum/pages/public/new/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/admin/topics/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/topics/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/categories/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -43,8 +43,8 @@ export const ModuleRoutes = [
     "module": "blog"
   },
   {
-    "path": "/blog/[slug]",
-    "key": "blog:pages/[slug]/page.tsx",
+    "path": "/blog/[...params]",
+    "key": "blog:pages/[...params]/page.tsx",
     "module": "blog"
   },
   {
@@ -77,8 +77,8 @@ export const ModuleRoutes = [
     "module": "forum"
   },
   {
-    "path": "/forum/topic/[id]",
-    "key": "forum:pages/public/topic/[id]/page.tsx",
+    "path": "/forum/topic/[...params]",
+    "key": "forum:pages/public/topic/[...params]/page.tsx",
     "module": "forum"
   },
   {
