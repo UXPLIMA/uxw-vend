@@ -11,6 +11,7 @@ import { useCurrency } from "@/core/lib/currency/context";
 interface Product {
     id: string;
     name: string;
+    slug: string;
     price: number;
     comparePrice: number | null;
     description: string | null;
@@ -133,7 +134,7 @@ export default function VipTablePage() {
                                     <td className="py-4 px-6"></td>
                                     {productFeatures.map(({ product }) => (
                                         <td key={product.id} className="text-center py-4 px-4">
-                                            <Link href={`/store/product/${product.id}`}>
+                                            <Link href={`/store/product/${product.slug}`}>
                                                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                                                     Buy Now
                                                 </Button>
@@ -172,7 +173,7 @@ export default function VipTablePage() {
                                 {product.description && (
                                     <p className="text-sm text-gray-500 mb-4">{product.description}</p>
                                 )}
-                                <Link href={`/store/product/${product.id}`}>
+                                <Link href={`/store/product/${product.slug}`}>
                                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                                         Buy Now
                                     </Button>

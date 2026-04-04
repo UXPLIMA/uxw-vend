@@ -31,15 +31,15 @@ async function main() {
     const adminPassword = await bcrypt.hash("admin123", 12);
     const admin = await prisma.user.upsert({
         where: { email: "admin@example.com" },
-        update: {},
+        update: { password: adminPassword, roleId: adminRole.id },
         create: {
             email: "admin@example.com",
-            username: "admin",
+            username: "uxwadmin",
             password: adminPassword,
             roleId: adminRole.id,
         },
     });
-    console.log("✅ Admin user: admin@example.com / admin123");
+    console.log("✅ Admin user: admin@example.com / admin123 (username: uxwadmin)");
 
     // Permissions
     const permissions = [
