@@ -79,9 +79,9 @@ class ModuleSystem {
             "admin.roles",
         ];
 
-        for (const module of this.getEnabledModules()) {
-            if (module.permissions) {
-                permissions.push(...module.permissions);
+        for (const mod of this.getEnabledModules()) {
+            if (mod.permissions) {
+                permissions.push(...mod.permissions);
             }
         }
 
@@ -105,10 +105,10 @@ class ModuleSystem {
             return true;
         }
 
-        for (const module of this.getDefinitions()) {
+        for (const mod of this.getDefinitions()) {
             // Combine public routes and admin routes
-            const publicRoutes = module.routes?.map(r => r.path) || [];
-            const adminRoutes = module.adminRoutes?.map(r => r.path) || [];
+            const publicRoutes = mod.routes?.map(r => r.path) || [];
+            const adminRoutes = mod.adminRoutes?.map(r => r.path) || [];
 
             // For admin paths, we need to check if regex matching should include /admin prefix logic
             // Manifest admin routes are like "/store/products". 

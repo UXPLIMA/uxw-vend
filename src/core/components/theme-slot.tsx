@@ -23,6 +23,7 @@ export function ThemeSlot({ name, defaultComponent, props = {} }: ThemeSlotProps
         const element = defaultComponent as React.ReactElement<any>;
         const mergedProps = { ...(element.props || {}), ...props };
         if (props.children !== undefined) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { children: _, ...restProps } = mergedProps;
             return React.cloneElement(element, restProps, props.children);
         }

@@ -42,7 +42,7 @@ export interface ThemeConfig {
 
 export interface ThemeComponents {
     // Map component names to React Components
-    [key: string]: React.ComponentType<any> | undefined;
+    [key: string]: React.ComponentType<Record<string, unknown>> | undefined;
 }
 
 export interface Theme {

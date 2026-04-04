@@ -15,7 +15,7 @@ export async function logActivity(params: {
                 action: params.action,
                 entity: params.entity || null,
                 entityId: params.entityId || null,
-                metadata: (params.metadata as any) || undefined,
+                metadata: (params.metadata as unknown as string) || undefined,
                 ipAddress: params.ipAddress || null,
             },
         });

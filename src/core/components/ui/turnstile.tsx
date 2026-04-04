@@ -15,7 +15,8 @@ export function Turnstile({ onVerify }: TurnstileProps) {
     useEffect(() => {
         if (!loaded || !containerRef.current || !siteKey) return;
 
-        const win = window as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const win = window as any; //?: { render: (id: string, opts: Record<string, unknown>) => void } };
         if (win.turnstile) {
             win.turnstile.render(containerRef.current, {
                 sitekey: siteKey,

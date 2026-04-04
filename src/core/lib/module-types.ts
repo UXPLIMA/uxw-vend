@@ -122,17 +122,14 @@ export interface ModuleManifest {
 
 export interface LoadedModule {
     manifest: ModuleManifest;
-    path: string; // Absolute path to module directory
+    path: string;
     enabled: boolean;
 }
 
-// Retaining legacy types if needed or for database mapping
 export interface ModuleState {
     id: string;
     enabled: boolean;
     config: Record<string, unknown>;
 }
 
-export interface ModuleDefinition extends ModuleManifest {
-    // Alias to keep compatibility if needed
-}
+export type ModuleDefinition = ModuleManifest;
