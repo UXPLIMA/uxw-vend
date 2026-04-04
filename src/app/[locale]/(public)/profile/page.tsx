@@ -60,7 +60,7 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<"profile" | "orders" | "security" | "accounts" | "chest">("profile");
+    const [activeTab, setActiveTab] = useState<string>("profile");
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
     // Linked accounts & Chest
@@ -262,23 +262,31 @@ export default function ProfilePage() {
                     );
                 })()}
 
-                {/* Tabs */}
-                <div className="flex gap-2 mb-6">
-                    {(["profile", "orders", "chest", "accounts", "security"] as const).filter(tab => {
-                        if ((tab === "orders" || tab === "chest") && !hasModule('/store')) return false;
-                        return true;
-                    }).map((tab) => (
-                        <Button
-                            key={tab}
-                            variant={activeTab === tab ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setActiveTab(tab)}
-                            className="capitalize"
-                        >
-                            {tab}
-                        </Button>
-                    ))}
-                </div>
+                {/* Tabs — core tabs always shown, module tabs conditional */}
+                {(() => {
+                    const tabs: { id: string; label: string; requiresPath?: string }[] = [
+                        { id: "profile", label: "Profile" },
+                        { id: "orders", label: "Orders", requiresPath: "/store" },
+                        { id: "chest", label: "Chest", requiresPath: "/store" },
+                        { id: "accounts", label: "Accounts" },
+                        { id: "security", label: "Security" },
+                    ];
+                    const visibleTabs = tabs.filter(t => !t.requiresPath || installedModulePaths.has(t.requiresPath));
+                    return (
+                        <div className="flex gap-2 mb-6">
+                            {visibleTabs.map((tab) => (
+                                <Button
+                                    key={tab.id}
+                                    variant={activeTab === tab.id ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setActiveTab(tab.id)}
+                                >
+                                    {tab.label}
+                                </Button>
+                            ))}
+                        </div>
+                    );
+                })()}
 
                 {/* Profile Tab */}
                 {activeTab === "profile" && (

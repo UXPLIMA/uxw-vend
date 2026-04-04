@@ -1,23 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Check, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-
-const availableWidgets = [
-    { id: "DiscordWidget", name: "Discord Widget", description: "Shows Discord server info and join button" },
-    { id: "FeaturedProductWidget", name: "Featured Product", description: "Highlights a featured store product" },
-    { id: "PaymentGoalWidget", name: "Community Goal", description: "Monthly revenue progress bar" },
-    { id: "TopCustomerWidget", name: "Top Customer", description: "This month's top spender" },
-    { id: "TopBuyersWidget", name: "Top Buyers", description: "Top buyers leaderboard" },
-    { id: "TopCreditLoadersWidget", name: "Top Credit Loaders", description: "Users who loaded most credits" },
-    { id: "RecentPurchasesWidget", name: "Recent Purchases", description: "Live recent order feed" },
-];
+import { ModuleWidgets } from "@/core/generated/module-registry";
+import { useAllModules } from "@/core/providers/module-provider";
 
 export default function WidgetSettingsPage() {
+    const modules = useAllModules();
+
+    // Build available widgets from registry, filtered to enabled modules
+    const availableWidgets = useMemo(() =>
+        ModuleWidgets
+            .filter((w) => modules[w.module] === true)
+            .map((w) => ({
+                id: w.id,
+                name: w.id.replace(/([A-Z])/g, " $1").trim(),
+                description: `Widget from ${w.module} module`,
+                module: w.module,
+            })),
+        [modules]
+    );
+
     const [widgetConfig, setWidgetConfig] = useState<Record<string, boolean>>({});
     const [widgetOrder, setWidgetOrder] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,16 +36,23 @@ export default function WidgetSettingsPage() {
             .then((data) => {
                 const s = data.settings || {};
                 const config = s.widget_visibility || {};
-                const order = s.widget_order || availableWidgets.map((w) => w.id);
+                const widgetIds = availableWidgets.map((w) => w.id);
+                const order = s.widget_order || widgetIds;
 
                 const vis: Record<string, boolean> = {};
                 availableWidgets.forEach((w) => { vis[w.id] = config[w.id] !== false; });
                 setWidgetConfig(vis);
-                setWidgetOrder(Array.isArray(order) ? order : availableWidgets.map((w) => w.id));
+                setWidgetOrder(Array.isArray(order) ? order.filter((id: string) => widgetIds.includes(id)) : widgetIds);
+                // Add any new widgets not in saved order
+                const savedSet = new Set(Array.isArray(order) ? order : []);
+                const missing = widgetIds.filter((id) => !savedSet.has(id));
+                if (missing.length > 0) {
+                    setWidgetOrder((prev) => [...prev, ...missing]);
+                }
                 setLoading(false);
             })
             .catch(() => setLoading(false));
-    }, []);
+    }, [availableWidgets]);
 
     const toggle = (id: string) => {
         setWidgetConfig({ ...widgetConfig, [id]: !widgetConfig[id] });
