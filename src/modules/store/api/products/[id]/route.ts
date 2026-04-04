@@ -13,7 +13,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         const product = await prisma.product.findFirst({
             where: {
-                OR: [{ id }, { slug: id }],
+                OR: [
+                    { id },
+                    { slug: id },
+                    ...(isNaN(Number(id)) ? [] : [{ number: Number(id) }]),
+                ],
             },
             include: {
                 category: {

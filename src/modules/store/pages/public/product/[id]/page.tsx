@@ -46,8 +46,11 @@ export default function ProductDetailPage() {
     const [variables, setVariables] = useState<{ name: string; label: string; type: string; required: boolean; placeholder?: string; options?: string }[]>([]);
     const [variableValues, setVariableValues] = useState<Record<string, string>>({});
 
+    // Parse number from URL format "3-legendary-key" → "3"
+    const lookupId = productId.includes("-") ? productId.split("-")[0] : productId;
+
     useEffect(() => {
-        fetch(`/api/v1/store/products/${productId}`)
+        fetch(`/api/v1/store/products/${lookupId}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Not found");
                 return res.json();

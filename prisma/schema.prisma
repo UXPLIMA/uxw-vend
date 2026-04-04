@@ -292,6 +292,7 @@ model Category {
 
 model Product {
   id            String   @id @default(cuid())
+  number        Int      @unique @default(autoincrement())
   name          String
   slug          String   @unique
   translations  Json?    // Stores multi-language data: { en: { name: "...", description: "..." } }
