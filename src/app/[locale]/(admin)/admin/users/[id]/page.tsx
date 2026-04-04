@@ -186,26 +186,32 @@ export default function AdminUserDetailPage() {
 
                 {/* Info Sidebar */}
                 <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Activity</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            {[
-                                { icon: ShoppingCart, label: "Orders", value: user._count.orders },
-                                { icon: Ticket, label: "Tickets", value: user._count.tickets },
-                                { icon: MessageSquare, label: "Topics", value: user._count.topics },
-                                { icon: FileText, label: "Posts", value: user._count.posts },
-                            ].map((stat) => (
-                                <div key={stat.label} className="flex items-center justify-between">
-                                    <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <stat.icon className="w-4 h-4" /> {stat.label}
-                                    </span>
-                                    <span className="font-medium">{stat.value}</span>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
+                    {(() => {
+                        const statItems = [
+                            user._count.orders > 0 && { icon: ShoppingCart, label: "Orders", value: user._count.orders },
+                            user._count.tickets > 0 && { icon: Ticket, label: "Tickets", value: user._count.tickets },
+                            user._count.topics > 0 && { icon: MessageSquare, label: "Topics", value: user._count.topics },
+                            user._count.posts > 0 && { icon: FileText, label: "Posts", value: user._count.posts },
+                        ].filter(Boolean) as { icon: typeof ShoppingCart; label: string; value: number }[];
+                        if (statItems.length === 0) return null;
+                        return (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Activity</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    {statItems.map((stat) => (
+                                        <div key={stat.label} className="flex items-center justify-between">
+                                            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <stat.icon className="w-4 h-4" /> {stat.label}
+                                            </span>
+                                            <span className="font-medium">{stat.value}</span>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        );
+                    })()}
 
                     <Card>
                         <CardHeader>

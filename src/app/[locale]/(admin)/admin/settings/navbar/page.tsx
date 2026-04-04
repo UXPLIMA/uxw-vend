@@ -35,9 +35,6 @@ export default function NavbarSettingsPage() {
                 if (Array.isArray(navLinks)) setLinks(navLinks);
                 else setLinks([
                     { label: "Home", href: "/", icon: "Home" },
-                    { label: "Store", href: "/store", icon: "ShoppingCart" },
-                    { label: "Forum", href: "/forum", icon: "MessageSquare" },
-                    { label: "Support", href: "/support", icon: "HelpCircle" },
                 ]);
                 setLoading(false);
             })
