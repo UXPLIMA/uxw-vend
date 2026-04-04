@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, DollarSign, Mail, ChevronDown, Heart } from "lucide-react";
+import { Globe, Mail, ChevronDown, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
-import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes } from "@/core/generated/module-registry";
 
@@ -60,7 +59,6 @@ export function Footer() {
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
-    const { currency, setCurrency } = useCurrency();
     const moduleStatus = useAllModules();
     const { settings } = useSiteSettings();
 
@@ -186,18 +184,6 @@ export function Footer() {
                                     value={locale}
                                     onChange={handleLocaleChange}
                                     formatLabel={(l) => localeNames[l as Locale]}
-                                />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-gray-400" />
-                                <CustomDropdown
-                                    options={currencies.map(c => c.code)}
-                                    value={currency}
-                                    onChange={(val) => setCurrency(val as CurrencyCode)}
-                                    formatLabel={(code) => {
-                                        const c = currencies.find(cur => cur.code === code);
-                                        return c ? `${c.code} (${c.symbol})` : code;
-                                    }}
                                 />
                             </div>
                         </div>

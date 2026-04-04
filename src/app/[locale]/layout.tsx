@@ -3,7 +3,6 @@ import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { SessionProvider } from "next-auth/react";
-import { CurrencyProvider } from "@/core/lib/currency/context";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
 import prisma from "@/core/lib/db";
@@ -71,7 +70,6 @@ export default async function RootLayout({
       >
         <SessionProvider>
           <NextIntlClientProvider messages={messages}>
-            <CurrencyProvider>
               <AppThemeProvider defaultTheme={defaultThemeId}>
                 <ModuleProvider moduleStates={moduleStates}>
                 <ConfirmProvider>
@@ -84,7 +82,6 @@ export default async function RootLayout({
                 </ConfirmProvider>
                 </ModuleProvider>
               </AppThemeProvider>
-            </CurrencyProvider>
           </NextIntlClientProvider>
         </SessionProvider>
       </body>

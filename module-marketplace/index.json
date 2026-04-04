@@ -691,6 +691,25 @@
         "apiRoutes": 3,
         "widgets": 0
       }
+    },
+    {
+      "id": "currency",
+      "name": "Multi-Currency",
+      "description": "Multi-currency support with automatic conversion",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "DollarSign",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "currency.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
     }
   ]
 }
