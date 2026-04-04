@@ -10,9 +10,8 @@ import prisma from "@/core/lib/db";
 import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CookieConsent } from "@/core/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
-import { PopupModal } from "@/core/components/layout/PopupModal";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
-import { LivePurchaseToast } from "@/core/components/layout/LivePurchaseToast";
+import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -81,8 +80,7 @@ export default async function RootLayout({
                   <ProgressBar />
                   <GoogleAnalytics />
                   <CustomCssInjector />
-                  <LivePurchaseToast />
-                  <PopupModal />
+                  <ModuleLayoutComponents />
                   {children}
                   <MobileBottomNav />
                   <CookieConsent />

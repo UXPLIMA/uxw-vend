@@ -59,6 +59,12 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
+    // Layout components — rendered on every page when module is enabled
+    layoutComponents?: {
+        id: string;
+        component: string;   // e.g. "@core/layout/LivePurchaseToast"
+    }[];
+
     // Dashboard integration — module provides its own stats
     statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
 

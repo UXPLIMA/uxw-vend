@@ -23,6 +23,12 @@ export const HomepageSectionRegistry: Record<string, any> = {
 
 export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = [];
 
+// Layout component registry (rendered on every page)
+export const LayoutComponentRegistry: Record<string, any> = {
+};
+
+export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = [];
+
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [];
 
 export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [];

@@ -101,6 +101,7 @@ function generateRegistry() {
     const allFooterLinks: any[] = [];
     const allDashboardCards: any[] = [];
     const allHomepageSections: any[] = [];
+    const allLayoutComponents: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -130,6 +131,12 @@ function generateRegistry() {
             if (manifest.dashboardCards) {
                 manifest.dashboardCards.forEach((card: any) => {
                     allDashboardCards.push({ ...card, module: moduleName });
+                });
+            }
+
+            if (manifest.layoutComponents) {
+                manifest.layoutComponents.forEach((lc: any) => {
+                    allLayoutComponents.push({ ...lc, module: moduleName });
                 });
             }
 
@@ -184,7 +191,19 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + widgetRegistry;
+    // Generate dynamic imports for layout components
+    let layoutImports = '// Layout component registry (rendered on every page)\nexport const LayoutComponentRegistry: Record<string, any> = {\n';
+    for (const lc of allLayoutComponents) {
+        let importPath = lc.component.startsWith('@core/')
+            ? `@/core/components/${lc.component.replace('@core/', '')}`
+            : `@/modules/${lc.module}/${lc.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then(mod => mod.${lc.id} || mod.default || mod), { ssr: false }),\n`;
+    }
+    layoutImports += '};\n\n';
+    layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
+
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);

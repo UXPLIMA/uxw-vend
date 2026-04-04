@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/core/lib/i18n/navigation";
-import { HeroBanner, Navbar, Footer, AnnouncementBanner } from "@/core/components/layout";
+import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ThemeSlot } from "@/core/components/theme-slot";
@@ -30,7 +30,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      <AnnouncementBanner />
       <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
       <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
