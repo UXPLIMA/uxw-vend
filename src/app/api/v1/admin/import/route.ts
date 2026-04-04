@@ -3,7 +3,6 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { generateSlug } from "@/core/lib/utils";
-import moduleSystem from "@/core/lib/modules";
 
 // POST /api/v1/admin/import?type=products
 export async function POST(request: NextRequest) {
@@ -20,38 +19,38 @@ export async function POST(request: NextRequest) {
     const headers = lines[0].split(",").map((h) => h.replace(/"/g, "").trim());
     let imported = 0;
 
-    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-
     switch (type) {
         case "products": {
-            if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 400 });
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
-                const row: Record<string, string> = {};
-                headers.forEach((h, idx) => { row[h] = values[idx] || ""; });
+            try {
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]);
+                    const row: Record<string, string> = {};
+                    headers.forEach((h, idx) => { row[h] = values[idx] || ""; });
 
-                const name = row.name;
-                if (!name) continue;
+                    const name = row.name;
+                    if (!name) continue;
 
-                const slug = row.slug || generateSlug(name);
-                const existing = await prisma.product.findUnique({ where: { slug } });
-                if (existing) continue;
+                    const slug = row.slug || generateSlug(name);
+                    const existing = await prisma.product.findUnique({ where: { slug } });
+                    if (existing) continue;
 
-                await prisma.product.create({
-                    data: {
-                        name,
-                        slug,
-                        price: parseFloat(row.price) || 0,
-                        comparePrice: row.comparePrice ? parseFloat(row.comparePrice) : null,
-                        stock: row.stock ? parseInt(row.stock) : null,
-                        isActive: row.isActive !== "false",
-                        isFeatured: row.isFeatured === "true",
-                        type: (row.type as any) || "DIGITAL",
-                        description: row.description || null,
-                    },
-                });
-                imported++;
+                    await prisma.product.create({
+                        data: {
+                            name,
+                            slug,
+                            price: parseFloat(row.price) || 0,
+                            comparePrice: row.comparePrice ? parseFloat(row.comparePrice) : null,
+                            stock: row.stock ? parseInt(row.stock) : null,
+                            isActive: row.isActive !== "false",
+                            isFeatured: row.isFeatured === "true",
+                            type: (row.type as any) || "DIGITAL",
+                            description: row.description || null,
+                        },
+                    });
+                    imported++;
+                }
+            } catch {
+                return NextResponse.json({ error: "No data available" }, { status: 400 });
             }
             break;
         }

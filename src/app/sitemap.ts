@@ -1,29 +1,10 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/core/lib/db";
-import moduleSystem from "@/core/lib/modules";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
-    // Load module states from DB
-    try {
-        const dbModuleConfigs = await prisma.moduleConfig.findMany();
-        await moduleSystem.initialize(dbModuleConfigs.map(mc => ({ id: mc.id, enabled: mc.enabled, config: mc.config as Record<string, unknown> })));
-    } catch { /* DB might not be ready */ }
-
-    const storeEnabled = moduleSystem.isEnabled("store");
-    const blogEnabled = moduleSystem.isEnabled("blog");
-    const forumEnabled = moduleSystem.isEnabled("forum");
-    const supportEnabled = moduleSystem.isEnabled("support");
-
-    // Static pages — filter module-specific paths
-    const modulePages: Record<string, string[]> = {
-        store: ["/store", "/store/vip"],
-        blog: ["/blog"],
-        forum: ["/forum"],
-        support: ["/support", "/help"],
-    };
-
+    // Static core pages
     const staticPages = [
         "",
         "/changelog",
@@ -32,11 +13,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         "/downloads",
         "/punishments",
         "/wheel",
-        ...(storeEnabled ? modulePages.store : []),
-        ...(blogEnabled ? modulePages.blog : []),
-        ...(forumEnabled ? modulePages.forum : []),
-        ...(supportEnabled ? modulePages.support : []),
     ];
+
+    // Dynamically discover module pages by querying their data
+    // If a module's tables exist and have data, include its pages
+    try {
+        const products = await prisma.product.findFirst({ where: { isActive: true } });
+        if (products) staticPages.push("/store", "/store/vip");
+    } catch { /* model unavailable */ }
+
+    try {
+        const article = await prisma.blogArticle.findFirst({ where: { status: "PUBLISHED" } });
+        if (article) staticPages.push("/blog");
+    } catch { /* model unavailable */ }
+
+    try {
+        const topic = await prisma.forumTopic.findFirst();
+        if (topic) staticPages.push("/forum");
+    } catch { /* model unavailable */ }
+
+    try {
+        const ticket = await prisma.ticket.findFirst();
+        if (ticket) staticPages.push("/support", "/help");
+    } catch { /* model unavailable */ }
 
     const entries: MetadataRoute.Sitemap = staticPages.map((path) => ({
         url: `${baseUrl}/en${path}`,
@@ -46,59 +45,53 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Blog articles
-    if (blogEnabled) {
-        try {
-            const articles = await prisma.blogArticle.findMany({
-                where: { status: "PUBLISHED" },
-                select: { number: true, slug: true, updatedAt: true },
+    try {
+        const articles = await prisma.blogArticle.findMany({
+            where: { status: "PUBLISHED" },
+            select: { number: true, slug: true, updatedAt: true },
+        });
+        for (const article of articles) {
+            entries.push({
+                url: `${baseUrl}/en/blog/${article.number}/${article.slug}`,
+                lastModified: article.updatedAt,
+                changeFrequency: "weekly",
+                priority: 0.7,
             });
-            for (const article of articles) {
-                entries.push({
-                    url: `${baseUrl}/en/blog/${article.number}/${article.slug}`,
-                    lastModified: article.updatedAt,
-                    changeFrequency: "weekly",
-                    priority: 0.7,
-                });
-            }
-        } catch { /* DB might not be ready */ }
-    }
+        }
+    } catch { /* model unavailable */ }
 
     // Products
-    if (storeEnabled) {
-        try {
-            const products = await prisma.product.findMany({
-                where: { isActive: true },
-                select: { number: true, slug: true, updatedAt: true },
+    try {
+        const products = await prisma.product.findMany({
+            where: { isActive: true },
+            select: { number: true, slug: true, updatedAt: true },
+        });
+        for (const product of products) {
+            entries.push({
+                url: `${baseUrl}/en/store/product/${product.number}/${product.slug}`,
+                lastModified: product.updatedAt as Date,
+                changeFrequency: "weekly",
+                priority: 0.7,
             });
-            for (const product of products) {
-                entries.push({
-                    url: `${baseUrl}/en/store/product/${product.number}/${product.slug}`,
-                    lastModified: product.updatedAt as Date,
-                    changeFrequency: "weekly",
-                    priority: 0.7,
-                });
-            }
-        } catch { /* DB might not be ready */ }
-    }
+        }
+    } catch { /* model unavailable */ }
 
     // Forum topics
-    if (forumEnabled) {
-        try {
-            const topics = await prisma.forumTopic.findMany({
-                select: { number: true, slug: true, updatedAt: true },
-                take: 100,
-                orderBy: { createdAt: "desc" },
+    try {
+        const topics = await prisma.forumTopic.findMany({
+            select: { number: true, slug: true, updatedAt: true },
+            take: 100,
+            orderBy: { createdAt: "desc" },
+        });
+        for (const topic of topics) {
+            entries.push({
+                url: `${baseUrl}/en/forum/topic/${topic.number}/${topic.slug}`,
+                lastModified: topic.updatedAt,
+                changeFrequency: "daily",
+                priority: 0.6,
             });
-            for (const topic of topics) {
-                entries.push({
-                    url: `${baseUrl}/en/forum/topic/${topic.number}/${topic.slug}`,
-                    lastModified: topic.updatedAt,
-                    changeFrequency: "daily",
-                    priority: 0.6,
-                });
-            }
-        } catch { /* DB might not be ready */ }
-    }
+        }
+    } catch { /* model unavailable */ }
 
     // Custom pages
     try {

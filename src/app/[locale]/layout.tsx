@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     template: "%s | uxwVend",
   },
   description: "Open source game server management platform with store, forum, blog, and support system.",
-  keywords: ["game server", "minecraft", "fivem", "store", "forum", "open source"],
+  keywords: ["game server", "minecraft", "fivem", "open source"],
   manifest: "/manifest.json",
   authors: [{ name: "uxwVend" }],
   openGraph: {

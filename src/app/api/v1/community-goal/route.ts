@@ -2,18 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/community-goal - Public endpoint
 export async function GET() {
     try {
-        // Check if store module is enabled (community goal depends on order data)
-        const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-        await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-        if (!moduleSystem.isEnabled("store")) {
-            return NextResponse.json({ target: 0, current: 0, title: "Monthly Goal", endDate: null });
-        }
-
         const settings = await prisma.setting.findMany({
             where: { key: { startsWith: "community_goal_" } },
         });

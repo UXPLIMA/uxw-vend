@@ -9,38 +9,41 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 
-const pages = [
+// Core pages always shown; module pages added dynamically
+const corePages = [
     { key: "home", label: "Homepage" },
-    { key: "store", label: "Store" },
-    { key: "forum", label: "Forum" },
-    { key: "blog", label: "Blog" },
-    { key: "support", label: "Support" },
-    { key: "changelog", label: "Changelog" },
-    { key: "staff", label: "Staff" },
-    { key: "suggestions", label: "Suggestions" },
 ];
 
 export default function SeoPage() {
+    const [pages, setPages] = useState(corePages);
     const [seo, setSeo] = useState<Record<string, { title: string; description: string }>>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                const s = data.settings || {};
-                const seoData: Record<string, { title: string; description: string }> = {};
-                pages.forEach((p) => {
-                    seoData[p.key] = {
-                        title: (s[`seo_${p.key}_title`] as string) || "",
-                        description: (s[`seo_${p.key}_description`] as string) || "",
-                    };
-                });
-                setSeo(seoData);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
+        Promise.all([
+            fetch("/api/v1/settings").then((r) => r.json()),
+            fetch("/api/v1/modules").then((r) => r.json()).catch(() => ({ modules: [] })),
+        ]).then(([settingsData, modulesData]) => {
+            const enabledModules = (modulesData.modules || []).filter((m: any) => m.enabled);
+            const modulePages = enabledModules.map((m: any) => ({
+                key: m.id,
+                label: m.name,
+            }));
+            const allPages = [...corePages, ...modulePages];
+            setPages(allPages);
+
+            const s = settingsData.settings || {};
+            const seoData: Record<string, { title: string; description: string }> = {};
+            allPages.forEach((p) => {
+                seoData[p.key] = {
+                    title: (s[`seo_${p.key}_title`] as string) || "",
+                    description: (s[`seo_${p.key}_description`] as string) || "",
+                };
+            });
+            setSeo(seoData);
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }, []);
 
     const save = async () => {

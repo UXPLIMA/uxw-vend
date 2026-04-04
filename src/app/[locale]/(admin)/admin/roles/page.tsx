@@ -26,18 +26,15 @@ interface Role {
     _count: { users: number };
 }
 
-// All available permissions organized by module
-const availablePermissions = [
+// Core permissions always shown; module permissions added dynamically
+const corePermissions = [
     { module: "admin", perms: ["admin.access", "admin.settings", "admin.users", "admin.roles"] },
-    { module: "store", perms: ["store.view", "store.manage"] },
-    { module: "blog", perms: ["blog.view", "blog.manage"] },
-    { module: "support", perms: ["support.view", "support.manage", "tickets.create", "tickets.reply"] },
-    { module: "forum", perms: ["forum.view", "forum.manage", "forum.moderate"] },
 ];
 
 export default function AdminRolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const [availablePermissions, setAvailablePermissions] = useState(corePermissions);
     const { confirm } = useConfirm();
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -68,6 +65,17 @@ export default function AdminRolesPage() {
 
     useEffect(() => {
         fetchRoles();
+        // Build permission groups dynamically from module manifests
+        fetch("/api/v1/modules")
+            .then((r) => r.json())
+            .then((data) => {
+                const modules = (data.modules || []).filter((m: any) => m.enabled);
+                const modulePerms = modules
+                    .filter((m: any) => m.permissions && m.permissions.length > 0)
+                    .map((m: any) => ({ module: m.id, perms: m.permissions as string[] }));
+                setAvailablePermissions([...corePermissions, ...modulePerms]);
+            })
+            .catch(() => { /* keep core permissions only */ });
     }, []);
 
     const resetForm = () => {

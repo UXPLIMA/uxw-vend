@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/admin/export?type=products|orders|users
 export async function GET(request: NextRequest) {
@@ -10,36 +9,39 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-
     const type = request.nextUrl.searchParams.get("type") || "products";
 
     let csv = "";
 
     switch (type) {
         case "products": {
-            if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 400 });
-            const products = await prisma.product.findMany({
-                include: { category: { select: { name: true } } },
-            });
-            csv = "id,name,slug,price,comparePrice,stock,category,isActive,isFeatured,type,createdAt\n";
-            csv += products.map((p) =>
-                `"${p.id}","${p.name}","${p.slug}",${p.price},${p.comparePrice || ""},${p.stock ?? ""},` +
-                `"${p.category?.name || ""}",${p.isActive},${p.isFeatured},"${p.type}","${p.createdAt.toISOString()}"`
-            ).join("\n");
+            try {
+                const products = await prisma.product.findMany({
+                    include: { category: { select: { name: true } } },
+                });
+                csv = "id,name,slug,price,comparePrice,stock,category,isActive,isFeatured,type,createdAt\n";
+                csv += products.map((p) =>
+                    `"${p.id}","${p.name}","${p.slug}",${p.price},${p.comparePrice || ""},${p.stock ?? ""},` +
+                    `"${p.category?.name || ""}",${p.isActive},${p.isFeatured},"${p.type}","${p.createdAt.toISOString()}"`
+                ).join("\n");
+            } catch {
+                return NextResponse.json({ error: "No data available" }, { status: 400 });
+            }
             break;
         }
         case "orders": {
-            if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 400 });
-            const orders = await prisma.order.findMany({
-                include: { user: { select: { username: true, email: true } } },
-            });
-            csv = "id,orderNumber,username,email,subtotal,discount,total,status,paymentMethod,createdAt\n";
-            csv += orders.map((o) =>
-                `"${o.id}","${o.orderNumber}","${o.user.username}","${o.user.email}",` +
-                `${o.subtotal},${o.discount},${o.total},"${o.status}","${o.paymentMethod || ""}","${o.createdAt.toISOString()}"`
-            ).join("\n");
+            try {
+                const orders = await prisma.order.findMany({
+                    include: { user: { select: { username: true, email: true } } },
+                });
+                csv = "id,orderNumber,username,email,subtotal,discount,total,status,paymentMethod,createdAt\n";
+                csv += orders.map((o) =>
+                    `"${o.id}","${o.orderNumber}","${o.user.username}","${o.user.email}",` +
+                    `${o.subtotal},${o.discount},${o.total},"${o.status}","${o.paymentMethod || ""}","${o.createdAt.toISOString()}"`
+                ).join("\n");
+            } catch {
+                return NextResponse.json({ error: "No data available" }, { status: 400 });
+            }
             break;
         }
         case "users": {

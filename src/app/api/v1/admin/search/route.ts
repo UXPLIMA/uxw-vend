@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/admin/search?q=...
 export async function GET(request: NextRequest) {
@@ -13,37 +12,41 @@ export async function GET(request: NextRequest) {
     const q = request.nextUrl.searchParams.get("q") || "";
     if (q.length < 2) return NextResponse.json({ results: [] });
 
-    // Load module states
-    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-    const storeEnabled = moduleSystem.isEnabled("store");
-    const supportEnabled = moduleSystem.isEnabled("support");
+    const users = await prisma.user.findMany({
+        where: { OR: [
+            { username: { contains: q, mode: "insensitive" } },
+            { email: { contains: q, mode: "insensitive" } },
+        ]},
+        select: { id: true, username: true, email: true },
+        take: 5,
+    });
 
-    const [users, products, orders, tickets] = await Promise.all([
-        prisma.user.findMany({
-            where: { OR: [
-                { username: { contains: q, mode: "insensitive" } },
-                { email: { contains: q, mode: "insensitive" } },
-            ]},
-            select: { id: true, username: true, email: true },
-            take: 5,
-        }),
-        storeEnabled ? prisma.product.findMany({
+    let products: { id: string; name: string; slug: string }[] = [];
+    try {
+        products = await prisma.product.findMany({
             where: { name: { contains: q, mode: "insensitive" } },
             select: { id: true, name: true, slug: true },
             take: 5,
-        }) : Promise.resolve([]),
-        storeEnabled ? prisma.order.findMany({
+        });
+    } catch { /* model unavailable */ }
+
+    let orders: { id: string; orderNumber: string; status: string }[] = [];
+    try {
+        orders = await prisma.order.findMany({
             where: { orderNumber: { contains: q, mode: "insensitive" } },
             select: { id: true, orderNumber: true, status: true },
             take: 5,
-        }) : Promise.resolve([]),
-        supportEnabled ? prisma.ticket.findMany({
+        });
+    } catch { /* model unavailable */ }
+
+    let tickets: { id: string; subject: string; status: string }[] = [];
+    try {
+        tickets = await prisma.ticket.findMany({
             where: { subject: { contains: q, mode: "insensitive" } },
             select: { id: true, subject: true, status: true },
             take: 5,
-        }) : Promise.resolve([]),
-    ]);
+        });
+    } catch { /* model unavailable */ }
 
     const results = [
         ...users.map((u) => ({ type: "user", id: u.id, title: u.username, subtitle: u.email, href: `/admin/users/${u.id}` })),
