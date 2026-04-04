@@ -146,7 +146,9 @@
       "verified": true,
       "downloads": 0,
       "zip": "discord-widget.zip",
-      "dependencies": [],
+      "dependencies": [
+        "discord-integration"
+      ],
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 0,
@@ -338,7 +340,9 @@
       "verified": true,
       "downloads": 0,
       "zip": "store.zip",
-      "dependencies": [],
+      "dependencies": [
+        "currency"
+      ],
       "stats": {
         "publicRoutes": 5,
         "adminRoutes": 6,
@@ -376,7 +380,9 @@
       "verified": true,
       "downloads": 0,
       "zip": "vote.zip",
-      "dependencies": [],
+      "dependencies": [
+        "credits"
+      ],
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -395,7 +401,9 @@
       "verified": true,
       "downloads": 0,
       "zip": "wheel.zip",
-      "dependencies": [],
+      "dependencies": [
+        "credits"
+      ],
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -665,7 +673,9 @@
       "verified": true,
       "downloads": 0,
       "zip": "resend-provider.zip",
-      "dependencies": [],
+      "dependencies": [
+        "email-system"
+      ],
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,

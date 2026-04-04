@@ -354,11 +354,14 @@ export default function AdminModulesPage() {
                                         <div className="flex items-center gap-1.5 text-xs mb-3">
                                             <span className="text-amber-600 font-medium">Requires:</span>
                                             <div className="flex gap-1 flex-wrap">
-                                                {mod.dependencies.map((dep: string) => (
-                                                    <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${installedIds.has(dep) ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
-                                                        {dep}
-                                                    </span>
-                                                ))}
+                                                {mod.dependencies.map((dep: string) => {
+                                                    const depName = marketplace.find(m => m.id === dep)?.name || modules.find(m => m.id === dep)?.name || dep;
+                                                    return (
+                                                        <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${installedIds.has(dep) ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                                                            {depName}
+                                                        </span>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     )}
