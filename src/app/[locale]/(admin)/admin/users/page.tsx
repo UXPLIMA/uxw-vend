@@ -14,7 +14,7 @@ async function getUsers(page: number = 1, limit: number = 50) {
         prisma.user.findMany({
             include: {
                 role: true,
-                _count: { select: { orders: true } },
+                _count: true,
             },
             skip: (page - 1) * limit,
             take: limit,
@@ -61,7 +61,6 @@ export default async function AdminUsersPage() {
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">User</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Email</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Role</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Orders</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Joined</th>
                                     </tr>
                                 </thead>
@@ -90,9 +89,6 @@ export default async function AdminUsersPage() {
                                                     currentRoleId={user.roleId || ""}
                                                     roles={roles.map((r) => ({ id: r.id, name: r.name, displayName: r.displayName }))}
                                                 />
-                                            </td>
-                                            <td className="py-3 px-4 text-muted-foreground">
-                                                {user._count.orders}
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
                                                 {formatDate(user.createdAt)}

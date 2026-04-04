@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         where: { id },
         include: {
             role: true,
-            _count: { select: { orders: true, tickets: true, topics: true, posts: true } },
+            _count: true,
         },
     });
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, Ban, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Check, Ban, ShieldCheck } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 
 interface UserDetail {
@@ -22,7 +22,7 @@ interface UserDetail {
     banReason: string | null;
     bannedAt: string | null;
     role: { id: string; name: string; displayName: string; color: string | null } | null;
-    _count: { orders: number; tickets: number; topics: number; posts: number };
+    _count: Record<string, number>;
 }
 
 interface Role {
@@ -187,12 +187,13 @@ export default function AdminUserDetailPage() {
                 {/* Info Sidebar */}
                 <div className="space-y-6">
                     {(() => {
-                        const statItems = [
-                            user._count.orders > 0 && { icon: ShoppingCart, label: "Orders", value: user._count.orders },
-                            user._count.tickets > 0 && { icon: Ticket, label: "Tickets", value: user._count.tickets },
-                            user._count.topics > 0 && { icon: MessageSquare, label: "Topics", value: user._count.topics },
-                            user._count.posts > 0 && { icon: FileText, label: "Posts", value: user._count.posts },
-                        ].filter(Boolean) as { icon: typeof ShoppingCart; label: string; value: number }[];
+                        const counts = user._count || {};
+                        const statItems = Object.entries(counts)
+                            .filter(([, v]) => (v as number) > 0)
+                            .map(([key, value]) => ({
+                                label: key.charAt(0).toUpperCase() + key.slice(1),
+                                value,
+                            }));
                         if (statItems.length === 0) return null;
                         return (
                             <Card>
@@ -202,8 +203,8 @@ export default function AdminUserDetailPage() {
                                 <CardContent className="space-y-3">
                                     {statItems.map((stat) => (
                                         <div key={stat.label} className="flex items-center justify-between">
-                                            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <stat.icon className="w-4 h-4" /> {stat.label}
+                                            <span className="text-sm text-muted-foreground">
+                                                {stat.label}
                                             </span>
                                             <span className="font-medium">{stat.value}</span>
                                         </div>

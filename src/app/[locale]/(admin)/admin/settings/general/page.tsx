@@ -29,7 +29,6 @@ const sections: SectionDef[] = [
             { key: "password_min_length", label: "Minimum password length", type: "number", defaultValue: 6 },
             { key: "email_verify_expiry_hours", label: "Email verification link expiry (hours)", type: "number", defaultValue: 24 },
             { key: "password_reset_expiry_minutes", label: "Password reset link expiry (minutes)", type: "number", defaultValue: 60 },
-            { key: "backup_codes_count", label: "2FA backup codes count", type: "number", defaultValue: 8 },
         ],
     },
     {

@@ -24,7 +24,7 @@ export async function GET() {
             createdAt: true,
             twoFactorEnabled: true,
             role: { select: { name: true, displayName: true, color: true } },
-            _count: { select: { orders: true, tickets: true, topics: true, comments: true } },
+            _count: true,
         },
     });
 
