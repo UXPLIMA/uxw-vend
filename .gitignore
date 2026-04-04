@@ -23,6 +23,7 @@
 *.pem
 *.zip
 !module-marketplace/*.zip
+!theme-marketplace/*.zip
 *.tar.gz
 *.rar
 backup*

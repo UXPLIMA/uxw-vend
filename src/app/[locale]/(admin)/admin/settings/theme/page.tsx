@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/cor
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette } from "lucide-react";
+import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette, Download, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
@@ -101,7 +101,39 @@ export default function ThemeSettingsPage() {
         );
     };
 
-    const builtInThemes = ["flat", "pixelcraft"];
+    const builtInThemes = ["flat"];
+
+    // Marketplace
+    const [marketplaceThemes, setMarketplaceThemes] = useState<any[]>([]);
+    const [loadingMarketplace, setLoadingMarketplace] = useState(true);
+    const [installing, setInstalling] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetch("/api/v1/themes/marketplace")
+            .then(r => r.json())
+            .then(d => { setMarketplaceThemes(d.themes || []); setLoadingMarketplace(false); })
+            .catch(() => setLoadingMarketplace(false));
+    }, []);
+
+    const installedThemeIds = new Set(Object.keys(themeRegistry));
+
+    const handleMarketplaceInstall = async (theme: any) => {
+        setInstalling(theme.id);
+        try {
+            const res = await fetch("/api/v1/themes/marketplace/install", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ themeId: theme.id, zipFile: theme.zip }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(`"${theme.name}" installed. Restart server to activate.`);
+            } else {
+                toast.error(data.error || "Install failed");
+            }
+        } catch { toast.error("Install failed"); }
+        finally { setInstalling(null); }
+    };
 
     return (
         <div className="space-y-6">
@@ -196,6 +228,51 @@ export default function ThemeSettingsPage() {
                     );
                 })}
             </div>
+
+            {/* Theme Marketplace */}
+            {(() => {
+                const available = marketplaceThemes.filter(t => !installedThemeIds.has(t.id));
+                if (loadingMarketplace || available.length === 0) return null;
+                return (
+                    <div>
+                        <h3 className="text-lg font-medium flex items-center gap-2 mb-4">
+                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                            Verified Themes
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {available.map((theme: any) => (
+                                <Card key={theme.id} className="hover:shadow-md transition-shadow">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: theme.colors?.primary || "#333" }}>
+                                                <Palette className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                                                    {theme.name}
+                                                    {theme.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
+                                                </h4>
+                                                <p className="text-xs text-muted-foreground">v{theme.version} — {theme.type}</p>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mb-3">{theme.description}</p>
+                                        {theme.colors && (
+                                            <div className="flex gap-1 mb-3">
+                                                {Object.values(theme.colors).map((c: any, i: number) => (
+                                                    <div key={i} className="w-6 h-6 rounded" style={{ background: c }} />
+                                                ))}
+                                            </div>
+                                        )}
+                                        <Button size="sm" className="w-full" disabled={installing === theme.id} onClick={() => handleMarketplaceInstall(theme)}>
+                                            {installing === theme.id ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</> : <><Download className="w-3 h-3 mr-1.5" /> Install</>}
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Color Customizer */}
             <ColorCustomizer />
