@@ -36,8 +36,11 @@ interface Topic {
 
 export default function TopicDetailPage() {
     const params = useParams();
-    const segments = Array.isArray(params.params) ? params.params : [params.params];
-    const topicId = segments[0] as string;
+    // Can be { slug: ["forum","topic","3","general"], params: "3/general" } etc
+    const raw = params.params || params.slug;
+    const segments = typeof raw === "string" ? raw.split("/") : Array.isArray(raw) ? raw : [String(raw)];
+    const topicIdx = segments.indexOf("topic");
+    const topicId = topicIdx >= 0 && segments[topicIdx + 1] ? segments[topicIdx + 1] : segments[0];
 
     const [topic, setTopic] = useState<Topic | null>(null);
     const [loading, setLoading] = useState(true);

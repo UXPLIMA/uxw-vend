@@ -35,9 +35,15 @@ export default function ProductDetailPage() {
     const router = useRouter();
     const { formatPrice } = useCurrency();
 
-    // URL format: /store/product/5/legendary-key → params = ["5", "legendary-key"]
-    const segments = Array.isArray(params.params) ? params.params : [params.params];
-    const lookupId = segments[0] as string; // number or id
+    // URL: /store/product/5/legendary-key
+    // useParams returns { slug: ["store", "product", "5", "legendary-key"], locale: "tr" } or { params: ["5", "legendary-key"] }
+    const rawParams = params.params || params.slug;
+    const segments = Array.isArray(rawParams) ? rawParams : [rawParams];
+    // If coming through [...slug] catch-all, segments = ["store", "product", "5", "legendary-key"]
+    // Find the number segment (first numeric after "product")
+    const productIdx = segments.indexOf("product");
+    const lookupId = productIdx >= 0 && segments[productIdx + 1] ? segments[productIdx + 1] : segments[0];
+
 
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);

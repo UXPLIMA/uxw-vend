@@ -8,7 +8,7 @@ import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { CommentSection } from "@/core/components/blog/CommentSection";
 
 interface PageProps {
-    params: Promise<{ params: string[] }>;
+    params: Promise<Record<string, unknown>>;
 }
 
 async function getArticle(lookup: string) {
@@ -59,8 +59,14 @@ async function getRelatedArticles(articleId: string, categoryId: string | null) 
 }
 
 export default async function BlogArticlePage({ params }: PageProps) {
-    const { params: segments } = await params;
-    const lookup = segments[0]; // number or slug
+    const resolvedParams = await params;
+    // Route matcher passes { params: "1/server-launch" } as string
+    // or slug might be ["blog", "1", "server-launch"]
+    const raw = resolvedParams.params as string | string[] || resolvedParams.slug as string[];
+    const segments = typeof raw === "string" ? raw.split("/") : Array.isArray(raw) ? raw : [String(raw)];
+    // If segments came from [...slug] catch-all: ["blog", "1", "server-launch"]
+    const blogIdx = segments.indexOf("blog");
+    const lookup = blogIdx >= 0 && segments[blogIdx + 1] ? segments[blogIdx + 1] : segments[0];
     const article = await getArticle(lookup);
 
     if (!article) {
