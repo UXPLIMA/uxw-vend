@@ -25,8 +25,8 @@ export default function SeoPage() {
             fetch("/api/v1/settings").then((r) => r.json()),
             fetch("/api/v1/modules").then((r) => r.json()).catch(() => ({ modules: [] })),
         ]).then(([settingsData, modulesData]) => {
-            const enabledModules = (modulesData.modules || []).filter((m: any) => m.enabled);
-            const modulePages = enabledModules.map((m: any) => ({
+            const enabledModules = (modulesData.modules || []).filter((m: { enabled: boolean }) => m.enabled);
+            const modulePages = enabledModules.map((m: { id: string; name: string }) => ({
                 key: m.id,
                 label: m.name,
             }));

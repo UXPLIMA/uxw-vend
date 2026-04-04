@@ -13,7 +13,6 @@ export function ProgressBar() {
 
     useEffect(() => {
         const handleStart = () => NProgress.start();
-        const handleDone = () => NProgress.done();
 
         // Intercept link clicks for page transitions
         const handleClick = (e: MouseEvent) => {

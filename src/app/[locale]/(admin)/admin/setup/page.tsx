@@ -62,7 +62,7 @@ export default function SetupWizardPage() {
                 <Card>
                     <CardContent className="p-8 text-center">
                         <h1 className="text-3xl font-bold mb-4">Welcome to uxwVend!</h1>
-                        <p className="text-gray-500 mb-8">Let's set up your game server platform in a few quick steps.</p>
+                        <p className="text-gray-500 mb-8">Let&apos;s set up your game server platform in a few quick steps.</p>
                         <Button size="lg" onClick={() => setStep(1)}>
                             Get Started <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
@@ -151,7 +151,7 @@ export default function SetupWizardPage() {
                         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                             <Check className="w-8 h-8 text-green-600" />
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">You're all set!</h2>
+                        <h2 className="text-2xl font-bold mb-2">You&apos;re all set!</h2>
                         <p className="text-gray-500 mb-6">Your platform is ready. You can configure more in Settings.</p>
                         <Button onClick={() => router.push("/admin")}>Go to Dashboard</Button>
                     </CardContent>

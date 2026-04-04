@@ -1,6 +1,4 @@
 
-import { type ReactNode } from "react";
-
 export interface ThemeColors {
     primary: string;
     secondary: string;

@@ -70,7 +70,7 @@ export default function NavbarSettingsPage() {
 
     const updateChild = (parentIdx: number, childIdx: number, field: string, value: string) => {
         const newLinks = [...links];
-        (newLinks[parentIdx].children![childIdx] as any)[field] = value;
+        (newLinks[parentIdx].children![childIdx] as unknown as Record<string, string>)[field] = value;
         setLinks(newLinks);
     };
 
@@ -184,7 +184,7 @@ export default function NavbarSettingsPage() {
 
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground">
                 <strong>Icons:</strong> Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Crown, Download, Gift, Star. Leave empty for no icon.
-                <br /><strong>Dropdown:</strong> Click the "Dropdown" button to add a menu with sub-items. Set href to "#" for dropdown-only items.
+                <br /><strong>Dropdown:</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
             </div>
         </>
     );

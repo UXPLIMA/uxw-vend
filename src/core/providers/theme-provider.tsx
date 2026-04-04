@@ -5,7 +5,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
-import { ThemeLoader } from "@/core/components/ui/theme-loader";
 
 import { Theme } from "@/core/types/theme";
 
@@ -30,7 +29,7 @@ function ThemeContent({
     children,
     defaultTheme
 }: AppThemeProviderProps) {
-    const { theme: currentThemeId, resolvedTheme } = useNextTheme();
+    const { theme: currentThemeId } = useNextTheme();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {

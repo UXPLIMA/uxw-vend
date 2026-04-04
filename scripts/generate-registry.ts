@@ -15,7 +15,7 @@ function generateRegistry() {
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
 
-    const imports = `import dynamic from 'next/dynamic';\nimport { PageLoader } from '@/core/components/ui/page-loader';\n\n`;
+    const imports = `/* eslint-disable */\nimport dynamic from 'next/dynamic';\nimport { PageLoader } from '@/core/components/ui/page-loader';\n\n`;
     let mapping = `export const ModuleRegistry: Record<string, any> = {\n`;
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<any>> = {\n`;
     const routes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [];

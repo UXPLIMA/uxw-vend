@@ -1,3 +1,4 @@
+/* eslint-disable */
 import dynamic from 'next/dynamic';
 import { PageLoader } from '@/core/components/ui/page-loader';
 

@@ -69,10 +69,10 @@ export default function AdminRolesPage() {
         fetch("/api/v1/modules")
             .then((r) => r.json())
             .then((data) => {
-                const modules = (data.modules || []).filter((m: any) => m.enabled);
+                const modules = (data.modules || []).filter((m: { enabled: boolean }) => m.enabled);
                 const modulePerms = modules
-                    .filter((m: any) => m.permissions && m.permissions.length > 0)
-                    .map((m: any) => ({ module: m.id, perms: m.permissions as string[] }));
+                    .filter((m: { permissions?: string[] }) => m.permissions && m.permissions.length > 0)
+                    .map((m: { id: string; permissions: string[] }) => ({ module: m.id, perms: m.permissions as string[] }));
                 setAvailablePermissions([...corePermissions, ...modulePerms]);
             })
             .catch(() => { /* keep core permissions only */ });

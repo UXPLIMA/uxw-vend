@@ -28,6 +28,7 @@ export function HeroBanner() {
     return (
         <div className="relative overflow-hidden bg-[#1a1f2e]" style={{ height }}>
             <div className="absolute inset-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={bgImage} alt="" className="w-full h-full object-cover opacity-50" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1a1f2e] via-[#1a1f2e]/60 to-transparent" />
             </div>
@@ -55,6 +56,7 @@ export function HeroBanner() {
                     )}
 
                     <div className="animate-float">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={logoImage} alt={siteName} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" />
                     </div>
 
