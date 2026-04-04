@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
                                 <h2 className="font-semibold text-gray-900 mb-1">Check your email</h2>
                                 <p className="text-gray-500 text-sm mb-4">
-                                    If an account exists for {email}, we've sent a password reset link.
+                                    If an account exists for {email}, we&apos;ve sent a password reset link.
                                 </p>
                                 <Link href="/auth/login">
                                     <Button variant="outline">

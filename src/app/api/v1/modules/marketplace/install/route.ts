@@ -63,10 +63,10 @@ export async function POST(request: NextRequest) {
                 timeout: 30000,
                 stdio: "pipe",
             });
-        } catch (err: any) {
+        } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.rm(zipPath, { force: true });
-            return NextResponse.json({ error: "Registry generation failed: " + (err.stderr?.toString()?.slice(0, 200) || err.message) }, { status: 400 });
+            return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
         }
 
         // Create DB record (enabled by default for marketplace installs)
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
             message: "Module installed and enabled",
             module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true },
         });
-    } catch (err: any) {
-        return NextResponse.json({ error: "Install failed: " + (err.message || "Unknown error") }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: "Install failed: " + ((err instanceof Error ? err.message : "Unknown error")) }, { status: 500 });
     }
 }

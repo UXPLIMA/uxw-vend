@@ -19,6 +19,8 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [needs2FA, setNeeds2FA] = useState(false);
+    const allModules = useAllModules();
+    const oauthButtons = ModuleOauthButtons.filter(b => allModules[b.module] === true);
     const [twoFactorCode, setTwoFactorCode] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -158,13 +160,9 @@ export default function LoginPage() {
                             </div>
 
                             {/* OAuth buttons — from installed modules */}
-                            {(() => {
-                                const modules = useAllModules();
-                                const buttons = ModuleOauthButtons.filter(b => modules[b.module] === true);
-                                if (buttons.length === 0) return null;
-                                return (
-                                    <div className={`grid ${buttons.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-3`}>
-                                        {buttons.map(btn => (
+                            {oauthButtons.length > 0 && (
+                                    <div className={`grid ${oauthButtons.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-3`}>
+                                        {oauthButtons.map(btn => (
                                             <Button key={btn.id} type="button" variant="outline"
                                                 onClick={() => signIn(btn.provider, { callbackUrl: "/" })}
                                                 className="border-gray-200 text-gray-700 hover:bg-gray-50">
@@ -178,8 +176,7 @@ export default function LoginPage() {
                                             </Button>
                                         ))}
                                     </div>
-                                );
-                            })()}
+                            )}
                         </form>
 
                         <p className="text-center text-sm text-gray-500 mt-6">

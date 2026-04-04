@@ -120,7 +120,7 @@ export default function ThemeSettingsPage() {
 
     const installedThemeIds = new Set(Object.keys(themeRegistry));
 
-    const handleMarketplaceInstall = async (theme: any) => {
+    const handleMarketplaceInstall = async (theme: { id: string; name: string; zip: string }) => {
         setInstalling(theme.id);
         try {
             const res = await fetch("/api/v1/themes/marketplace/install", {
@@ -243,7 +243,7 @@ export default function ThemeSettingsPage() {
                             Verified Themes
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {available.map((theme: any) => (
+                            {available.map((theme: { id: string; name: string; version: string; type: string; description: string; verified: boolean; zip: string; colors?: Record<string, string> }) => (
                                 <Card key={theme.id} className="hover:shadow-md transition-shadow">
                                     <CardContent className="p-4">
                                         <div className="flex items-center gap-3 mb-3">
@@ -261,7 +261,7 @@ export default function ThemeSettingsPage() {
                                         <p className="text-xs text-muted-foreground mb-3">{theme.description}</p>
                                         {theme.colors && (
                                             <div className="flex gap-1 mb-3">
-                                                {Object.values(theme.colors).map((c: any, i: number) => (
+                                                {Object.values(theme.colors).map((c: string, i: number) => (
                                                     <div key={i} className="w-6 h-6 rounded" style={{ background: c }} />
                                                 ))}
                                             </div>
