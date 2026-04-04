@@ -23,6 +23,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "~6.19",
+    "@swc/helpers": "^0.5.21",
     "adm-zip": "^0.5.17",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
