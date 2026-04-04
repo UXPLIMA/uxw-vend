@@ -47,16 +47,16 @@ export async function POST(request: NextRequest) {
         // Regenerate theme registry
         try {
             execSync("npx tsx scripts/generate-themes.ts", { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
-        } catch (err: any) {
+        } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.rm(zipPath, { force: true });
-            return NextResponse.json({ error: "Theme registry failed: " + (err.stderr?.toString()?.slice(0, 200) || err.message) }, { status: 400 });
+            return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
         }
 
         await fs.rm(zipPath, { force: true });
 
         return NextResponse.json({ message: "Theme installed", theme: { id: themeId } });
-    } catch (err: any) {
-        return NextResponse.json({ error: "Install failed: " + (err.message || "Unknown") }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json({ error: "Install failed: " + (err instanceof Error ? err.message : "Unknown") }, { status: 500 });
     }
 }

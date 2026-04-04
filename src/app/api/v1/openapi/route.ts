@@ -4,7 +4,7 @@ import { ModuleApiRoutes } from "@/core/generated/module-registry";
 // GET /api/v1/openapi - OpenAPI spec (auto-generated from module registry)
 export async function GET() {
     // Core API paths (always available)
-    const corePaths: Record<string, any> = {
+    const corePaths: Record<string, Record<string, unknown>> = {
         "/auth/profile": {
             get: { summary: "Get profile", tags: ["Auth"], security: [{ session: [] }] },
             patch: { summary: "Update profile", tags: ["Auth"], security: [{ session: [] }] },
@@ -20,7 +20,7 @@ export async function GET() {
     };
 
     // Auto-generate paths from module API registry
-    const modulePaths: Record<string, any> = {};
+    const modulePaths: Record<string, Record<string, unknown>> = {};
     for (const route of ModuleApiRoutes) {
         const path = `/${route.path}`;
         if (!modulePaths[path]) modulePaths[path] = {};

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 
 // Cache marketplace index for 5 minutes
-let cachedIndex: any = null;
+let cachedIndex: Record<string, unknown> | null = null;
 let cacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000;
 

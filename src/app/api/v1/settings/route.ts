@@ -44,8 +44,8 @@ export async function PATCH(request: NextRequest) {
     for (const [key, value] of Object.entries(body)) {
         await prisma.setting.upsert({
             where: { key },
-            update: { value: value as any },
-            create: { key, value: value as any },
+            update: { value: value as string },
+            create: { key, value: value as string },
         });
     }
 

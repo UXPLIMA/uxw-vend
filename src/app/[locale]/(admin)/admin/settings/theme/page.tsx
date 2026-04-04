@@ -107,7 +107,7 @@ export default function ThemeSettingsPage() {
     const builtInThemes = ["flat"];
 
     // Marketplace
-    const [marketplaceThemes, setMarketplaceThemes] = useState<any[]>([]);
+    const [marketplaceThemes, setMarketplaceThemes] = useState<{ id: string; name: string; version: string; type: string; description: string; verified: boolean; zip: string; colors?: Record<string, string> }[]>([]);
     const [loadingMarketplace, setLoadingMarketplace] = useState(true);
     const [installing, setInstalling] = useState<string | null>(null);
 

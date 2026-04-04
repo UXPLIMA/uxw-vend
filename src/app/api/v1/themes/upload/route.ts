@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         if (!validation.success) {
             return NextResponse.json({
                 error: "Invalid theme.json schema",
-                details: validation.error.issues.map((e: any) => `${String(e.path?.join?.(".") || "")}: ${e.message}`),
+                details: validation.error.issues.map((e) => `${e.path?.join(".") || ""}: ${e.message}`),
             }, { status: 400 });
         }
 

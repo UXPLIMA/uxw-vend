@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/theme-marketplace/index.json";
 
-let cached: any = null;
+let cached: Record<string, unknown> | null = null;
 let cacheTime = 0;
 
 export async function GET() {
