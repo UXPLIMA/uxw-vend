@@ -453,12 +453,12 @@ export default function ProfilePage() {
                                 </div>
                             )}
 
-                            {/* Link Minecraft */}
-                            {!linkedAccounts.find((a) => a.provider === "minecraft") && (
+                            {/* Link Game Account — only shown when a game-related module is installed */}
+                            {hasModule('/player') && !linkedAccounts.find((a) => a.provider === "minecraft") && (
                                 <div className="p-4 border border-dashed border-gray-200 rounded-lg">
-                                    <p className="text-sm font-medium mb-2">Link Minecraft Account</p>
+                                    <p className="text-sm font-medium mb-2">Link Game Account</p>
                                     <div className="flex gap-2">
-                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder="Minecraft username" />
+                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder="Game username" />
                                         <Button size="sm" onClick={async () => {
                                             if (!mcUsername.trim()) return;
                                             const res = await fetch("/api/v1/linked-accounts", {

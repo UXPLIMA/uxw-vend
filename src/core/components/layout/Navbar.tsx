@@ -24,6 +24,7 @@ export function Navbar() {
     const [navDropdown, setNavDropdown] = useState<string | null>(null);
     const [cartCount, setCartCount] = useState(0);
     const [unreadNotifs, setUnreadNotifs] = useState(0);
+    const [notificationsAvailable, setNotificationsAvailable] = useState(false);
     const { settings } = useSiteSettings();
     const moduleStatus = useAllModules();
     const [mounted, setMounted] = useState(false);
@@ -128,7 +129,11 @@ export function Navbar() {
         if (isLinkEnabled("/store")) {
             fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
         }
-        fetch("/api/v1/notifications").then((r) => r.json()).then((d) => setUnreadNotifs(d.unread || 0)).catch(() => {});
+        fetch("/api/v1/notifications").then((r) => {
+            if (!r.ok) return;
+            setNotificationsAvailable(true);
+            r.json().then((d) => setUnreadNotifs(d.unread || 0));
+        }).catch(() => {});
     }, [status, moduleStatus]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
@@ -200,12 +205,14 @@ export function Navbar() {
                             <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
                         ) : session?.user ? (
                             <>
-                                <Link href="/profile" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                                    <Bell className="w-4 h-4" />
-                                    {unreadNotifs > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
-                                    )}
-                                </Link>
+                                {notificationsAvailable && (
+                                    <Link href="/profile" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                                        <Bell className="w-4 h-4" />
+                                        {unreadNotifs > 0 && (
+                                            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
+                                        )}
+                                    </Link>
+                                )}
                                 {isLinkEnabled("/store") && (
                                     <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
                                         <ShoppingCart className="w-4 h-4" />
