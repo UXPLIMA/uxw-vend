@@ -1,1 +1,0 @@
-{"id":"discord-widget","name":"Discord Widget","description":"Discord server widget on homepage sidebar","version":"1.0.0","author":"uxwVend","icon":"MessageSquare","widgets":[{"id":"DiscordWidget","component":"@core/widgets/discord-widget","defaultOrder":0,"defaultVisible":true}]}

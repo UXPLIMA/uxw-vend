@@ -1,1 +1,0 @@
-{"id":"punishments","name":"Punishments","description":"Player punishment history and ban management","version":"1.0.0","author":"uxwVend","icon":"Shield","routes":[{"path":"/punishments","component":"pages/public/page.tsx"}],"api":[{"path":"/punishments","handler":"api/route.ts"}]}
