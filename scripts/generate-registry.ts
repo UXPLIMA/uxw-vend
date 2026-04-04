@@ -103,6 +103,7 @@ function generateRegistry() {
     const allHomepageSections: any[] = [];
     const allLayoutComponents: any[] = [];
     const allNavbarComponents: any[] = [];
+    const allSettingsCards: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -138,6 +139,12 @@ function generateRegistry() {
             if (manifest.layoutComponents) {
                 manifest.layoutComponents.forEach((lc: any) => {
                     allLayoutComponents.push({ ...lc, module: moduleName });
+                });
+            }
+
+            if (manifest.settingsCards) {
+                manifest.settingsCards.forEach((sc: any) => {
+                    allSettingsCards.push({ ...sc, module: moduleName });
                 });
             }
 
@@ -197,7 +204,8 @@ function generateRegistry() {
     let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n`;
+    widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n`;
 
     // Generate dynamic imports for layout components
     let layoutImports = '// Layout component registry (rendered on every page)\nexport const LayoutComponentRegistry: Record<string, any> = {\n';

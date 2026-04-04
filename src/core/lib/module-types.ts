@@ -72,6 +72,15 @@ export interface ModuleManifest {
         component: string;   // e.g. "@core/layout/LivePurchaseToast"
     }[];
 
+    // Settings page cards — modules add their own settings buttons
+    settingsCards?: {
+        title: string;
+        description: string;
+        href: string;         // admin route path e.g. "/security"
+        icon: string;         // Lucide icon name
+        color: string;        // Tailwind color class e.g. "text-red-500"
+    }[];
+
     // Dashboard integration — module provides its own stats
     statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
 
