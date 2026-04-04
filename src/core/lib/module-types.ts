@@ -59,21 +59,16 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
+    // Dashboard integration — module provides its own stats
+    statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
+
     dashboardCards?: {
         id: string;
         label: string;
         icon: string;
         href: string;
         color: string;
-        statKey: string;          // Key in the stats API response
-    }[];
-
-    dashboardSections?: {
-        id: string;
-        title: string;
-        component: string;        // Path to component or "@api" for API-driven
-        position: "main" | "sidebar";
-        order: number;
+        statKey: string;
     }[];
 }
 
