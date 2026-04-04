@@ -109,7 +109,8 @@
         "live": "Live",
         "thisWeek": "Diese Woche",
         "allTime": "Alle Zeiten",
-        "paidThisMonth": "Hat diesen Monat {amount} bezahlt"
+        "paidThisMonth": "Hat diesen Monat {amount} bezahlt",
+        "viewDetails": "Details ansehen"
     },
     "admin": {
         "title": "Admin Panel",

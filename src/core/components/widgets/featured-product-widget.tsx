@@ -6,7 +6,6 @@ import { Button } from "@/core/components/ui/button";
 import { Crown } from "lucide-react";
 import { useCurrency } from "@/core/lib/currency/context";
 import { Link } from "@/core/lib/i18n/navigation";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface Product {
     id: string;
@@ -18,9 +17,7 @@ interface Product {
 }
 
 export function FeaturedProductWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
-    const storeT = useTranslations('store');
     const { formatPrice } = useCurrency();
     const [product, setProduct] = useState<Product | null>(null);
 
@@ -34,7 +31,6 @@ export function FeaturedProductWidget() {
             .catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (!product) return null;
 
     return (
@@ -52,7 +48,7 @@ export function FeaturedProductWidget() {
                 <p className="text-blue-600 font-bold text-lg mb-3">{formatPrice(product.price)}</p>
                 <Link href={`/store/product/${product.number}/${product.slug}`}>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-none">
-                        {storeT('viewDetails')}
+                        {sidebarT('viewDetails')}
                     </Button>
                 </Link>
             </div>

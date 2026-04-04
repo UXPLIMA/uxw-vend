@@ -3,10 +3,8 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 export function TopCustomerWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [topCustomer, setTopCustomer] = useState<{ username: string; avatar: string | null; total: number } | null>(null);
@@ -20,7 +18,6 @@ export function TopCustomerWidget() {
             .catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (!topCustomer) return null;
 
     return (

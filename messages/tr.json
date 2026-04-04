@@ -109,7 +109,8 @@
         "live": "Canlı",
         "thisWeek": "Bu Hafta",
         "allTime": "Tüm Zamanlar",
-        "paidThisMonth": "Bu ay {amount} ödedi"
+        "paidThisMonth": "Bu ay {amount} ödedi",
+        "viewDetails": "Detayları Gör"
     },
     "admin": {
         "title": "Yönetim Paneli",

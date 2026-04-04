@@ -2,11 +2,9 @@
 
 import { serverConfig } from "@/core/config/server";
 import { useState, useEffect } from "react";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 export function DiscordWidget() {
-    const { enabled: discordEnabled } = useModuleEnabled('discord-widget');
     const { settings } = useSiteSettings();
     const [isDark, setIsDark] = useState(false);
 
@@ -20,7 +18,7 @@ export function DiscordWidget() {
     }, []);
 
     const widgetId = (settings.widget_discord_server_id as string) || serverConfig.discordWidgetId;
-    if (!discordEnabled || !widgetId) return null;
+    if (!widgetId) return null;
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
 import { Target } from "lucide-react";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface GoalData {
     target: number;
@@ -14,7 +13,6 @@ interface GoalData {
 }
 
 export function PaymentGoalWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [goal, setGoal] = useState<GoalData | null>(null);
@@ -28,7 +26,6 @@ export function PaymentGoalWidget() {
         }).catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (!goal || goal.target <= 0) return null;
 
     const percent = Math.min(100, Math.round((goal.current / goal.target) * 100));

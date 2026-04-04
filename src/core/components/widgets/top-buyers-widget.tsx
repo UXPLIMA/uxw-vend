@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface TopBuyer {
     username: string;
@@ -12,7 +11,6 @@ interface TopBuyer {
 }
 
 export function TopBuyersWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [buyers, setBuyers] = useState<TopBuyer[]>([]);
@@ -24,7 +22,6 @@ export function TopBuyersWidget() {
             .catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (buyers.length === 0) return null;
 
     return (

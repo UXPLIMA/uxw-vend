@@ -109,7 +109,8 @@
         "live": "Live",
         "thisWeek": "This Week",
         "allTime": "All Time",
-        "paidThisMonth": "Paid {amount} this month"
+        "paidThisMonth": "Paid {amount} this month",
+        "viewDetails": "View Details"
     },
     "admin": {
         "title": "Admin Panel",

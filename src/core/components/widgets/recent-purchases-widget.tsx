@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { formatRelativeTime } from "@/core/lib/utils";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface RecentPurchase {
     username: string;
@@ -13,7 +12,6 @@ interface RecentPurchase {
 }
 
 export function RecentPurchasesWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const [purchases, setPurchases] = useState<RecentPurchase[]>([]);
 
@@ -24,7 +22,6 @@ export function RecentPurchasesWidget() {
             .catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (purchases.length === 0) return null;
 
     return (

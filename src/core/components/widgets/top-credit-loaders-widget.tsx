@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
-import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface TopLoader {
     username: string;
@@ -12,7 +11,6 @@ interface TopLoader {
 }
 
 export function TopCreditLoadersWidget() {
-    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [loaders, setLoaders] = useState<TopLoader[]>([]);
@@ -24,7 +22,6 @@ export function TopCreditLoadersWidget() {
             .catch(() => {});
     }, []);
 
-    if (!storeEnabled) return null;
     if (loaders.length === 0) return null;
 
     return (
