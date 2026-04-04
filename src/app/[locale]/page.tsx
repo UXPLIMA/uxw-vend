@@ -11,18 +11,9 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTheme } from "@/core/providers/theme-provider";
-import { DiscordWidget } from "@/core/components/widgets/discord-widget";
-import { FeaturedProductWidget } from "@/core/components/widgets/featured-product-widget";
-import { PaymentGoalWidget } from "@/core/components/widgets/payment-goal-widget";
-import { TopCustomerWidget } from "@/core/components/widgets/top-customer-widget";
-import { TopBuyersWidget } from "@/core/components/widgets/top-buyers-widget";
-import { TopCreditLoadersWidget } from "@/core/components/widgets/top-credit-loaders-widget";
-import { RecentPurchasesWidget } from "@/core/components/widgets/recent-purchases-widget";
-import { NewsGrid } from "@/core/components/blog/news-grid";
-import { SliderWidget } from "@/core/components/widgets/slider-widget";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
+import { ModuleWidgets, WidgetComponentRegistry } from "@/core/generated/module-registry";
 
-// Blog post type from API
 interface BlogPost {
   id: string;
   number: number;
@@ -43,34 +34,20 @@ export default function HomePage() {
   const t = useTranslations('news');
   const commonT = useTranslations('common');
   const modules = useAllModules();
-  const blogEnabled = modules['blog'] === true;
   const { settings } = useSiteSettings();
   const { activeTheme } = useTheme();
 
-  // Widget visibility from admin settings
-  const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
-  const widgetOrder = (Array.isArray(settings.widget_order) ? settings.widget_order : [
-      "DiscordWidget", "FeaturedProductWidget", "PaymentGoalWidget",
-      "TopCustomerWidget", "TopBuyersWidget", "TopCreditLoadersWidget", "RecentPurchasesWidget"
-  ]) as string[];
-  const isWidgetVisible = (id: string) => widgetVisibility[id] !== false;
+  // Check if any module provides a blog/news API
+  const blogEnabled = modules['blog'] === true;
 
-  // Fetch blog articles from API (only if blog module enabled)
+  // Fetch blog articles (only if blog module installed)
   useEffect(() => {
-    if (!blogEnabled) {
-      setIsLoading(false);
-      return;
-    }
+    if (!blogEnabled) { setIsLoading(false); return; }
     setIsLoading(true);
     fetch('/api/v1/blog/articles?limit=8')
       .then(res => res.json())
-      .then(data => {
-        setBlogPosts(data.articles || []);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
+      .then(data => { setBlogPosts(data.articles || []); setIsLoading(false); })
+      .catch(() => setIsLoading(false));
   }, [blogEnabled]);
 
   // Pagination
@@ -78,119 +55,118 @@ export default function HomePage() {
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
+  // Get enabled widgets from registry — no hardcoded widget names
+  const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
+  const enabledWidgets = ModuleWidgets
+    .filter(w => modules[w.module] === true)         // module must be installed & enabled
+    .filter(w => widgetVisibility[w.id] !== false)    // not hidden by admin
+    .filter(w => WidgetComponentRegistry[w.id]);      // component exists in registry
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Announcements */}
       <AnnouncementBanner />
-
-      {/* Shared Hero Banner */}
       <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-
-
-      {/* Shared Navbar */}
       <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-6 flex-1">
-        {/* Slider */}
-        <SliderWidget />
-
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-4">
           <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-700">{t('title')}</span>
+          {blogEnabled && (
+            <>
+              <span className="mx-2">/</span>
+              <span className="text-gray-700">{t('title')}</span>
+            </>
+          )}
         </div>
 
         {(() => {
           const SidebarLayout = activeTheme?.components?.SidebarLayout || StandardSidebarLayout;
 
+          // News content — only if blog module provides it
           const newsContent = blogEnabled ? (
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-6">{t('title')}</h2>
-
-              {/* 2-Column News Grid */}
               {isLoading ? (
                 <SkeletonNewsGrid count={4} />
               ) : blogPosts.length === 0 ? (
                 <div className="bg-white rounded-xl p-8 text-center">
-                  <p className="text-gray-500">No blog posts yet.</p>
+                  <p className="text-gray-500">{t('noPosts') || 'No posts yet.'}</p>
                 </div>
               ) : (
-                <ThemeSlot
-                  name="NewsGrid"
-                  defaultComponent={<NewsGrid posts={paginatedNews} />}
-                  props={{ posts: paginatedNews }}
-                />
-              )}
-
-              {/* Pagination */}
-              <div className="flex items-center justify-center gap-2 mt-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="border-gray-300 text-gray-700 hover:text-gray-900"
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
-                </Button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={currentPage === page ? "bg-blue-600" : "border-gray-300"}
-                  >
-                    {page}
-                  </Button>
-                ))}
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="border-gray-300 text-gray-700 hover:text-gray-900"
-                >
-                  {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
-            </div>
-          ) : null;
-
-          const sidebarContent = (
-            <div className="space-y-5">
-              {isLoading ? (
-                <SkeletonSidebar />
-              ) : (
                 <>
-                  {widgetOrder.map((id) => {
-                    if (!isWidgetVisible(id)) return null;
-                    const widgetMap: Record<string, React.ReactNode> = {
-                      DiscordWidget: <ThemeSlot key={id} name="DiscordWidget" defaultComponent={<DiscordWidget />} />,
-                      FeaturedProductWidget: <ThemeSlot key={id} name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />,
-                      PaymentGoalWidget: <ThemeSlot key={id} name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />,
-                      TopCustomerWidget: <ThemeSlot key={id} name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />,
-                      TopBuyersWidget: <ThemeSlot key={id} name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />,
-                      TopCreditLoadersWidget: <ThemeSlot key={id} name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />,
-                      RecentPurchasesWidget: <ThemeSlot key={id} name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />,
-                    };
-                    return widgetMap[id] || null;
-                  })}
+                  {/* Render posts — use ThemeSlot for override, fallback to generic grid */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {paginatedNews.map((post) => (
+                      <Link key={post.id} href={`/blog/${post.number}/${post.slug}`}
+                        className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
+                        <div className="h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
+                          {post.coverImage ? (
+                            <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          ) : (
+                            <div className="text-gray-300 text-sm">No image</div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <p className="text-xs text-gray-400 mb-1">
+                            {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                          </p>
+                          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{post.title}</h3>
+                          {post.excerpt && <p className="text-sm text-gray-500 line-clamp-2">{post.excerpt}</p>}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-6">
+                      <Button variant="outline" size="sm"
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}>
+                        <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
+                      </Button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm"
+                          onClick={() => setCurrentPage(page)}>
+                          {page}
+                        </Button>
+                      ))}
+                      <Button variant="outline" size="sm"
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}>
+                        {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
             </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-400">{commonT('home')}</p>
+            </div>
           );
 
-          return <SidebarLayout sidebar={sidebarContent}>{newsContent}</SidebarLayout>;
-        })()}
-      </main >
+          // Sidebar — render widgets dynamically from registry
+          const sidebarContent = enabledWidgets.length > 0 ? (
+            <div className="space-y-5">
+              {enabledWidgets.map((w) => {
+                const WidgetComponent = WidgetComponentRegistry[w.id];
+                return <WidgetComponent key={w.id} />;
+              })}
+            </div>
+          ) : null;
 
-      {/* Shared Footer */}
-      < ThemeSlot name="Footer" defaultComponent={< Footer />} />
-    </div >
+          return sidebarContent ? (
+            <SidebarLayout sidebar={sidebarContent}>{newsContent}</SidebarLayout>
+          ) : (
+            newsContent
+          );
+        })()}
+      </main>
+
+      <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+    </div>
   );
 }
