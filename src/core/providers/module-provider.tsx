@@ -24,7 +24,8 @@ export function ModuleProvider({
 
 export function useModuleStatus(moduleId: string): boolean {
     const { modules } = useContext(ModuleContext);
-    return modules[moduleId] !== false;
+    // Module must be explicitly enabled (true). Missing = not installed = disabled.
+    return modules[moduleId] === true;
 }
 
 export function useAllModules(): Record<string, boolean> {

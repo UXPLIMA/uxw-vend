@@ -91,7 +91,7 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
-        const storeEnabled = moduleStatus['store'] !== false;
+        const storeEnabled = moduleStatus['store'] === true;
         Promise.all([
             fetch("/api/v1/auth/profile").then((r) => r.json()),
             storeEnabled ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
@@ -248,7 +248,7 @@ export default function ProfilePage() {
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6">
                     {(["profile", "orders", "chest", "accounts", "security"] as const).filter(tab => {
-                        if ((tab === "orders" || tab === "chest") && moduleStatus['store'] === false) return false;
+                        if ((tab === "orders" || tab === "chest") && moduleStatus['store'] !== true) return false;
                         return true;
                     }).map((tab) => (
                         <Button

@@ -41,9 +41,10 @@ class ModuleSystem {
      * Check if a module is enabled
      */
     isEnabled(id: string): boolean {
+        if (!this.initialized) return false;
         const state = this.moduleStates.get(id);
-        // Default to enabled if not in database
-        return state?.enabled ?? true;
+        // Module must exist in DB AND be enabled
+        return state?.enabled === true;
     }
 
     /**

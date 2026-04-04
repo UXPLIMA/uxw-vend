@@ -66,7 +66,7 @@ export function Navbar() {
     const isLinkEnabled = (href: string) => {
         const moduleId = pathToModule[href];
         if (!moduleId) return true; // not a module link, always show
-        return moduleStatus[moduleId] !== false;
+        return moduleStatus[moduleId] === true;
     };
 
     // Filter out disabled module links (including from dropdown children)
@@ -96,7 +96,7 @@ export function Navbar() {
 
     useEffect(() => {
         if (status !== "authenticated") return;
-        if (moduleStatus['store'] !== false) {
+        if (moduleStatus['store'] === true) {
             fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
         }
         fetch("/api/v1/notifications").then((r) => r.json()).then((d) => setUnreadNotifs(d.unread || 0)).catch(() => {});
@@ -177,7 +177,7 @@ export function Navbar() {
                                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
                                     )}
                                 </Link>
-                                {moduleStatus['store'] !== false && (
+                                {moduleStatus['store'] === true && (
                                     <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
                                         <ShoppingCart className="w-4 h-4" />
                                         {cartCount > 0 && (

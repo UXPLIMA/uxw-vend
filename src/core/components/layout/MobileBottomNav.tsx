@@ -29,7 +29,7 @@ export function MobileBottomNav() {
     };
     const isLinkEnabled = (href: string) => {
         const mod = pathToModule[href];
-        return !mod || moduleStatus[mod] !== false;
+        return !mod || moduleStatus[mod] === true;
     };
 
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);

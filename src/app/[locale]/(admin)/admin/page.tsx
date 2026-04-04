@@ -12,6 +12,16 @@ import { DashboardCharts } from "./components/dashboard-charts";
 export const dynamic = "force-dynamic";
 
 async function getDashboardStats() {
+    // Ensure module system is initialized
+    const dbModuleConfigs = await prisma.moduleConfig.findMany();
+    await moduleSystem.initialize(
+        dbModuleConfigs.map((mc) => ({
+            id: mc.id,
+            enabled: mc.enabled,
+            config: mc.config as Record<string, unknown>,
+        }))
+    );
+
     const storeEnabled = moduleSystem.isEnabled('store');
     const blogEnabled = moduleSystem.isEnabled('blog');
     const forumEnabled = moduleSystem.isEnabled('forum');

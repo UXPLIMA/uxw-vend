@@ -69,7 +69,7 @@ export function Footer() {
     };
     const isLinkEnabled = (href: string) => {
         const mod = pathToModule[href];
-        return !mod || moduleStatus[mod] !== false;
+        return !mod || moduleStatus[mod] === true;
     };
 
     const handleLocaleChange = (newLocale: string) => {
