@@ -10,11 +10,11 @@ interface Announcement {
     type: string;
 }
 
-const typeStyles: Record<string, { bg: string; border: string; icon: typeof Info }> = {
-    info: { bg: "bg-blue-50", border: "border-blue-200", icon: Info },
-    warning: { bg: "bg-yellow-50", border: "border-yellow-200", icon: AlertTriangle },
-    success: { bg: "bg-green-50", border: "border-green-200", icon: CheckCircle },
-    error: { bg: "bg-red-50", border: "border-red-200", icon: AlertCircle },
+const typeConfig: Record<string, { icon: typeof Info; color: string }> = {
+    info: { icon: Info, color: "var(--color-primary)" },
+    warning: { icon: AlertTriangle, color: "var(--color-warning)" },
+    success: { icon: CheckCircle, color: "var(--color-success)" },
+    error: { icon: AlertCircle, color: "var(--color-destructive)" },
 };
 
 export function AnnouncementBanner() {
@@ -22,7 +22,6 @@ export function AnnouncementBanner() {
     const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
     useEffect(() => {
-        // Load dismissed from sessionStorage
         const stored = sessionStorage.getItem("dismissed_announcements");
         if (stored) setDismissed(new Set(JSON.parse(stored)));
 
@@ -43,29 +42,30 @@ export function AnnouncementBanner() {
     if (visible.length === 0) return null;
 
     return (
-        <div className="space-y-0">
+        <div>
             {visible.map((announcement) => {
-                const style = typeStyles[announcement.type] || typeStyles.info;
-                const Icon = style.icon;
+                const config = typeConfig[announcement.type] || typeConfig.info;
+                const Icon = config.icon;
 
                 return (
                     <div
                         key={announcement.id}
-                        className={`${style.bg} border-b ${style.border} px-4 py-2.5`}
+                        className="px-4 py-2.5"
+                        style={{ backgroundColor: "var(--color-card)", borderBottom: `2px solid ${config.color}` }}
                     >
                         <div className="container mx-auto flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3 min-w-0">
-                                <Icon className="w-4 h-4 flex-shrink-0" />
+                                <Icon className="w-4 h-4 flex-shrink-0" style={{ color: config.color }} />
                                 <div className="min-w-0">
-                                    <span className="text-sm font-medium">{announcement.title}</span>
+                                    <span className="text-sm font-medium" style={{ color: "var(--color-foreground)" }}>{announcement.title}</span>
                                     {announcement.content !== announcement.title && (
-                                        <span className="text-sm text-gray-600 ml-2">{announcement.content}</span>
+                                        <span className="text-sm ml-2" style={{ color: "var(--color-muted-foreground)" }}>{announcement.content}</span>
                                     )}
                                 </div>
                             </div>
                             <button
                                 onClick={() => dismiss(announcement.id)}
-                                className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors"
+                                className="flex-shrink-0 p-1 rounded transition-opacity opacity-50 hover:opacity-100"
                             >
                                 <X className="w-3.5 h-3.5" />
                             </button>
