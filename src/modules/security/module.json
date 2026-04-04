@@ -1,0 +1,10 @@
+{
+    "id": "security",
+    "name": "Security",
+    "description": "CAPTCHA, login protection, and security settings",
+    "version": "1.0.0",
+    "author": "uxwVend",
+    "icon": "Shield",
+    "menu": [{ "label": "Security", "path": "/security", "icon": "Shield" }],
+    "adminRoutes": [{ "path": "/security", "component": "pages/admin/page.tsx" }]
+}
