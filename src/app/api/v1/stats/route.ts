@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import moduleSystem from "@/core/lib/modules";
 
 // GET /api/v1/stats?period=30d
 export async function GET(request: NextRequest) {
@@ -16,12 +17,16 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
-    // Fetch orders in period
-    const orders = await prisma.order.findMany({
+    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
+    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
+    const storeEnabled = moduleSystem.isEnabled("store");
+
+    // Fetch orders in period (only if store enabled)
+    const orders = storeEnabled ? await prisma.order.findMany({
         where: { createdAt: { gte: startDate } },
         select: { total: true, status: true, createdAt: true },
         orderBy: { createdAt: "asc" },
-    });
+    }) : [];
 
     // Fetch users in period
     const users = await prisma.user.findMany({

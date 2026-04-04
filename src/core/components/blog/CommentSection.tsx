@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useModuleStatus } from "@/core/providers/module-provider";
 import Link from "next/link";
 import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
@@ -24,7 +25,10 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ articleId, initialComments = [] }: CommentSectionProps) {
+    const blogEnabled = useModuleStatus('blog');
     const { data: session } = useSession();
+
+    if (!blogEnabled) return null;
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(false);

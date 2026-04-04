@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import moduleSystem from "@/core/lib/modules";
 
 // GET ?productId=xxx (public for checkout, admin for all)
 export async function GET(request: NextRequest) {
+    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
+    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
+    if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 404 });
+
     const productId = request.nextUrl.searchParams.get("productId");
     if (!productId) return NextResponse.json({ error: "productId required" }, { status: 400 });
 

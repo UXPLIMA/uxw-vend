@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { generateSlug } from "@/core/lib/utils";
+import moduleSystem from "@/core/lib/modules";
 
 // POST /api/v1/admin/import?type=products
 export async function POST(request: NextRequest) {
@@ -19,8 +20,12 @@ export async function POST(request: NextRequest) {
     const headers = lines[0].split(",").map((h) => h.replace(/"/g, "").trim());
     let imported = 0;
 
+    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
+    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
+
     switch (type) {
         case "products": {
+            if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 400 });
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
                 const row: Record<string, string> = {};
