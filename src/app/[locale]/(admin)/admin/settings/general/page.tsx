@@ -6,14 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, ToggleLeft, ToggleRight } from "lucide-react";
+import { ArrowLeft, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface FieldDef {
     key: string;
     label: string;
-    type: "number" | "toggle";
-    defaultValue: number | boolean;
+    type: "number";
+    defaultValue: number;
     description?: string;
 }
 
@@ -23,48 +23,6 @@ interface SectionDef {
 }
 
 const sections: SectionDef[] = [
-    {
-        title: "Pagination & Display",
-        fields: [
-            { key: "per_page_products", label: "Products per page", type: "number", defaultValue: 12 },
-            { key: "per_page_blog", label: "Blog articles per page", type: "number", defaultValue: 10 },
-            { key: "per_page_forum", label: "Forum topics per page", type: "number", defaultValue: 20 },
-            { key: "per_page_leaderboard", label: "Leaderboard entries", type: "number", defaultValue: 20 },
-            { key: "per_page_home_news", label: "Homepage news items", type: "number", defaultValue: 4 },
-            { key: "slider_interval", label: "Slider auto-advance (ms)", type: "number", defaultValue: 5000 },
-        ],
-    },
-    {
-        title: "Wheel of Fortune",
-        fields: [
-            { key: "wheel_enabled", label: "Enable Wheel of Fortune", type: "toggle", defaultValue: true },
-            { key: "wheel_spin_cooldown_hours", label: "Spin cooldown (hours)", type: "number", defaultValue: 24 },
-            { key: "wheel_spin_cost_credits", label: "Spin cost (credits, 0=free)", type: "number", defaultValue: 0 },
-            { key: "wheel_max_daily_spins", label: "Max spins per day", type: "number", defaultValue: 1 },
-        ],
-    },
-    {
-        title: "Voting System",
-        fields: [
-            { key: "vote_enabled", label: "Enable Vote Rewards", type: "toggle", defaultValue: true },
-            { key: "vote_cooldown_hours", label: "Vote cooldown (hours)", type: "number", defaultValue: 24 },
-            { key: "vote_reward_multiplier", label: "Reward multiplier", type: "number", defaultValue: 1 },
-        ],
-    },
-    {
-        title: "Order & Ticket Automation",
-        fields: [
-            { key: "order_auto_cancel_hours", label: "Auto-cancel pending orders after (hours)", type: "number", defaultValue: 24 },
-            { key: "ticket_auto_close_days", label: "Auto-close resolved tickets after (days)", type: "number", defaultValue: 7 },
-        ],
-    },
-    {
-        title: "Creator Codes",
-        fields: [
-            { key: "creator_default_discount", label: "Default creator discount (%)", type: "number", defaultValue: 5 },
-            { key: "creator_default_commission", label: "Default creator commission (%)", type: "number", defaultValue: 5 },
-        ],
-    },
     {
         title: "Authentication & Security",
         fields: [
@@ -78,7 +36,6 @@ const sections: SectionDef[] = [
         title: "Cache & Performance",
         fields: [
             { key: "settings_cache_seconds", label: "Settings cache TTL (seconds)", type: "number", defaultValue: 60 },
-            { key: "server_query_cache_seconds", label: "Server query cache (seconds)", type: "number", defaultValue: 60 },
             { key: "widget_refresh_seconds", label: "Widget data refresh (seconds)", type: "number", defaultValue: 30 },
         ],
     },
@@ -86,33 +43,21 @@ const sections: SectionDef[] = [
 
 const allFields = sections.flatMap((s) => s.fields);
 
-function getDefault(field: FieldDef): string | boolean {
-    if (field.type === "toggle") return field.defaultValue as boolean;
-    return String(field.defaultValue);
-}
-
 export default function GeneralSettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [values, setValues] = useState<Record<string, string | boolean>>({});
+    const [values, setValues] = useState<Record<string, string>>({});
 
     useEffect(() => {
         fetch("/api/v1/settings")
             .then((r) => r.json())
             .then((data) => {
                 const s = data.settings || {};
-                const v: Record<string, string | boolean> = {};
+                const v: Record<string, string> = {};
                 for (const field of allFields) {
-                    if (field.type === "toggle") {
-                        const stored = s[field.key];
-                        v[field.key] = stored === undefined || stored === null
-                            ? (field.defaultValue as boolean)
-                            : stored === true || stored === "true";
-                    } else {
-                        v[field.key] = s[field.key] !== undefined && s[field.key] !== null
-                            ? String(s[field.key])
-                            : String(field.defaultValue);
-                    }
+                    v[field.key] = s[field.key] !== undefined && s[field.key] !== null
+                        ? String(s[field.key])
+                        : String(field.defaultValue);
                 }
                 setValues(v);
                 setLoading(false);
@@ -120,7 +65,7 @@ export default function GeneralSettingsPage() {
             .catch(() => setLoading(false));
     }, []);
 
-    const setValue = (key: string, val: string | boolean) => {
+    const setValue = (key: string, val: string) => {
         setValues((prev) => ({ ...prev, [key]: val }));
     };
 
@@ -166,7 +111,7 @@ export default function GeneralSettingsPage() {
                 </Link>
                 <div>
                     <h1 className="text-3xl font-bold">General Settings</h1>
-                    <p className="text-muted-foreground">Pagination, limits, business rules, and automation settings</p>
+                    <p className="text-muted-foreground">Authentication, security, cache, and performance settings</p>
                 </div>
             </div>
 
@@ -180,41 +125,16 @@ export default function GeneralSettingsPage() {
                             <CardContent className="space-y-4">
                                 {section.fields.map((field) => (
                                     <div key={field.key}>
-                                        {field.type === "toggle" ? (
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <Label>{field.label}</Label>
-                                                    {field.description && (
-                                                        <p className="text-xs text-muted-foreground mt-0.5">{field.description}</p>
-                                                    )}
-                                                </div>
-                                                <Button
-                                                    type="button"
-                                                    variant={values[field.key] ? "default" : "outline"}
-                                                    size="sm"
-                                                    onClick={() => setValue(field.key, !values[field.key])}
-                                                >
-                                                    {values[field.key] ? (
-                                                        <><ToggleRight className="w-4 h-4 mr-1" /> Enabled</>
-                                                    ) : (
-                                                        <><ToggleLeft className="w-4 h-4 mr-1" /> Disabled</>
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <Label>{field.label}</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={values[field.key] as string}
-                                                    onChange={(e) => setValue(field.key, e.target.value)}
-                                                    placeholder={String(field.defaultValue)}
-                                                    min={0}
-                                                />
-                                                {field.description && (
-                                                    <p className="text-xs text-muted-foreground mt-1">{field.description}</p>
-                                                )}
-                                            </div>
+                                        <Label>{field.label}</Label>
+                                        <Input
+                                            type="number"
+                                            value={values[field.key] as string}
+                                            onChange={(e) => setValue(field.key, e.target.value)}
+                                            placeholder={String(field.defaultValue)}
+                                            min={0}
+                                        />
+                                        {field.description && (
+                                            <p className="text-xs text-muted-foreground mt-1">{field.description}</p>
                                         )}
                                     </div>
                                 ))}

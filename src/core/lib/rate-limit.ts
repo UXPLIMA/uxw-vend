@@ -3,8 +3,6 @@ import {
     RATE_LIMIT_API,
     RATE_LIMIT_CHECKOUT,
     RATE_LIMIT_UPLOAD,
-    RATE_LIMIT_VOTE,
-    RATE_LIMIT_SPIN,
 } from "./constants";
 
 /**
@@ -70,6 +68,4 @@ export const rateLimits = {
     api: RATE_LIMIT_API,
     checkout: RATE_LIMIT_CHECKOUT,
     upload: RATE_LIMIT_UPLOAD,
-    vote: RATE_LIMIT_VOTE,
-    spin: RATE_LIMIT_SPIN,
 };
