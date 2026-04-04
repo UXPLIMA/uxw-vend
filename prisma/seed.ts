@@ -9,7 +9,7 @@ function generateOrderNumber() {
 }
 
 async function main() {
-    console.log("🌱 Seeding database...\n");
+    console.log("[seed]Seeding database...\n");
 
     // ==================== ROLES ====================
     const adminRole = await prisma.role.upsert({
@@ -27,7 +27,7 @@ async function main() {
         update: {},
         create: { name: "member", displayName: "Member", color: "#6b7280", priority: 0, isDefault: true },
     });
-    console.log("✅ Roles");
+    console.log("[ok]Roles");
 
     // ==================== PERMISSIONS ====================
     for (const perm of [
@@ -41,7 +41,7 @@ async function main() {
             create: { name: perm, module: perm.split(".")[0], description: perm },
         });
     }
-    console.log("✅ Permissions");
+    console.log("[ok]Permissions");
 
     // ==================== USERS ====================
     const pw = await bcrypt.hash("password123", 12);
@@ -75,7 +75,7 @@ async function main() {
         });
         users.push(user);
     }
-    console.log("✅ Users (admin + mod + 5 members)");
+    console.log("[ok]Users (admin + mod + 5 members)");
 
     // ==================== STORE CATEGORIES ====================
     const catSurvival = await prisma.category.upsert({
@@ -93,7 +93,7 @@ async function main() {
         update: { image: "/background5.png" },
         create: { name: "Keys", slug: "keys", description: "Crate keys", image: "/background5.png", parentId: catSurvival.id, order: 1 },
     });
-    console.log("✅ Store categories");
+    console.log("[ok]Store categories");
 
     // ==================== PRODUCTS ====================
     const productData = [
@@ -113,7 +113,7 @@ async function main() {
         });
         products.push(prod);
     }
-    console.log("✅ Products");
+    console.log("[ok]Products");
 
     // ==================== ORDERS ====================
     const orderStatuses: ("COMPLETED" | "PENDING" | "PROCESSING")[] = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING"];
@@ -139,7 +139,7 @@ async function main() {
             },
         });
     }
-    console.log("✅ Orders (8)");
+    console.log("[ok]Orders (8)");
 
     // ==================== BLOG ====================
     const newsCategory = await prisma.blogCategory.upsert({
@@ -190,23 +190,23 @@ async function main() {
             },
         });
     }
-    console.log("✅ Blog articles (6) + comments (6)");
+    console.log("[ok]Blog articles (6) + comments (6)");
 
     // ==================== FORUM ====================
     const forumGeneral = await prisma.forumCategory.upsert({
         where: { slug: "general" },
         update: {},
-        create: { name: "General", slug: "general", description: "General discussions", icon: "💬", color: "#3b82f6", order: 0 },
+        create: { name: "General", slug: "general", description: "General discussions", icon: "MessageSquare", color: "#3b82f6", order: 0 },
     });
     const forumSuggestions = await prisma.forumCategory.upsert({
         where: { slug: "suggestions" },
         update: {},
-        create: { name: "Suggestions", slug: "suggestions", description: "Share your ideas", icon: "💡", color: "#22c55e", order: 1 },
+        create: { name: "Suggestions", slug: "suggestions", description: "Share your ideas", icon: "Lightbulb", color: "#22c55e", order: 1 },
     });
     const forumSupport = await prisma.forumCategory.upsert({
         where: { slug: "support" },
         update: {},
-        create: { name: "Support", slug: "support", description: "Get help from the community", icon: "🆘", color: "#ef4444", order: 2 },
+        create: { name: "Support", slug: "support", description: "Get help from the community", icon: "HelpCircle", color: "#ef4444", order: 2 },
     });
 
     const forumTopics = [
@@ -243,7 +243,7 @@ async function main() {
             });
         }
     }
-    console.log("✅ Forum topics (7) + replies");
+    console.log("[ok]Forum topics (7) + replies");
 
     // ==================== TICKETS ====================
     for (const dept of [
@@ -279,17 +279,17 @@ async function main() {
             },
         });
     }
-    console.log("✅ Tickets (4)");
+    console.log("[ok]Tickets (4)");
 
     // ==================== MODULES ====================
-    for (const mod of ["store", "blog", "support", "forum"]) {
+    for (const mod of ["store", "blog", "support", "forum", "wheel", "vote", "leaderboard", "suggestions", "changelog", "staff", "downloads", "punishments", "announcements", "popups", "slider", "custom-pages", "custom-forms", "servers", "player-profiles", "discord-widget"]) {
         await prisma.moduleConfig.upsert({
             where: { id: mod },
             update: {},
             create: { id: mod, name: `${mod.charAt(0).toUpperCase()}${mod.slice(1)} Module`, enabled: true },
         });
     }
-    console.log("✅ Modules");
+    console.log("[ok]Modules");
 
     // ==================== WHEEL PRIZES ====================
     // Delete existing first to avoid duplicates
@@ -303,7 +303,7 @@ async function main() {
     ].entries()) {
         await prisma.wheelPrize.create({ data: { ...prize, order: i } });
     }
-    console.log("✅ Wheel prizes");
+    console.log("[ok]Wheel prizes");
 
     // ==================== COUPONS ====================
     await prisma.coupon.upsert({
@@ -321,7 +321,7 @@ async function main() {
         update: {},
         create: { code: "VIP5OFF", type: "FIXED", value: 5, description: "$5 off any purchase", minPurchase: 15, usageLimit: 200, isActive: true },
     });
-    console.log("✅ Coupons (3)");
+    console.log("[ok]Coupons (3)");
 
     // ==================== SUGGESTIONS ====================
     const suggestions = [
@@ -336,7 +336,7 @@ async function main() {
             create: s,
         }).catch(() => prisma.suggestion.create({ data: s }));
     }
-    console.log("✅ Suggestions (3)");
+    console.log("[ok]Suggestions (3)");
 
     // ==================== ANNOUNCEMENTS ====================
     const existingAnn = await prisma.announcement.findFirst({ where: { title: "Spring Sale is Live!" } });
@@ -345,7 +345,7 @@ async function main() {
             data: { title: "Spring Sale is Live!", content: "Use code SPRING30 for 30% off everything. Limited time only!", type: "success", isActive: true },
         });
     }
-    console.log("✅ Announcements");
+    console.log("[ok]Announcements");
 
     // ==================== STAFF MEMBERS ====================
     await prisma.staffMember.create({
@@ -354,16 +354,16 @@ async function main() {
     await prisma.staffMember.create({
         data: { name: "ModSteve", role: "Head Moderator", userId: mod.id, order: 1 },
     }).catch(() => {});
-    console.log("✅ Staff members");
+    console.log("[ok]Staff members");
 
     // ==================== VOTE SITES ====================
     await prisma.voteSite.create({
-        data: { name: "MinecraftServers.org", url: "https://minecraftservers.org", reward: 10, icon: "🗳️", order: 0 },
+        data: { name: "MinecraftServers.org", url: "https://minecraftservers.org", reward: 10, icon: "Vote", order: 0 },
     }).catch(() => {});
     await prisma.voteSite.create({
-        data: { name: "TopG.org", url: "https://topg.org", reward: 15, icon: "⭐", order: 1 },
+        data: { name: "TopG.org", url: "https://topg.org", reward: 15, icon: "Star", order: 1 },
     }).catch(() => {});
-    console.log("✅ Vote sites (2)");
+    console.log("[ok]Vote sites (2)");
 
     // ==================== CREDIT TRANSACTIONS ====================
     for (const user of users) {
@@ -373,7 +373,7 @@ async function main() {
             });
         }
     }
-    console.log("✅ Credit transactions");
+    console.log("[ok]Credit transactions");
 
     // ==================== CHANGELOG ====================
     const changelogs = [
@@ -385,11 +385,11 @@ async function main() {
     for (const cl of changelogs) {
         await prisma.changelogEntry.create({ data: cl }).catch(() => {});
     }
-    console.log("✅ Changelog (4)");
+    console.log("[ok]Changelog (4)");
 
     // ==================== HELP CENTER ====================
     const helpCat = await prisma.helpCategory.create({
-        data: { name: "Getting Started", slug: "getting-started", description: "New player guides", icon: "📚", order: 0 },
+        data: { name: "Getting Started", slug: "getting-started", description: "New player guides", icon: "BookOpen", order: 0 },
     }).catch(() => null);
 
     if (helpCat) {
@@ -400,7 +400,7 @@ async function main() {
             data: { title: "Server Rules", slug: "server-rules-help", content: "Please read our rules carefully:\n\n1. No hacking\n2. Be respectful\n3. No spam\n4. No advertising\n5. Have fun!", categoryId: helpCat.id },
         }).catch(() => {});
     }
-    console.log("✅ Help center articles");
+    console.log("[ok]Help center articles");
 
     // ==================== NAVBAR SETTINGS ====================
     const navbarLinks = [
@@ -427,9 +427,9 @@ async function main() {
         update: { value: navbarLinks },
         create: { key: "navbar_links", value: navbarLinks },
     });
-    console.log("✅ Navbar with dropdown menu");
+    console.log("[ok]Navbar with dropdown menu");
 
-    console.log("\n🎉 Seeding complete!");
+    console.log("\n[done]Seeding complete!");
     console.log("   Accounts (all password: password123):");
     console.log("   - admin@example.com (Admin)");
     console.log("   - mod@example.com (Moderator)");

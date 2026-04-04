@@ -3,38 +3,28 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
+import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface TopBuyer {
     username: string;
+    avatar: string | null;
     total: number;
 }
 
 export function TopBuyersWidget() {
+    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [buyers, setBuyers] = useState<TopBuyer[]>([]);
 
     useEffect(() => {
-        // Fetch top buyers by completed order totals
-        fetch("/api/v1/store/orders?limit=50")
+        fetch("/api/v1/widget-stats")
             .then((res) => res.json())
-            .then((data) => {
-                const orders = data.orders || [];
-                // Aggregate by user
-                const userTotals: Record<string, { username: string; total: number }> = {};
-                for (const order of orders) {
-                    if (order.status === "COMPLETED") {
-                        const uid = order.user?.username || "Unknown";
-                        if (!userTotals[uid]) userTotals[uid] = { username: uid, total: 0 };
-                        userTotals[uid].total += Number(order.total);
-                    }
-                }
-                const sorted = Object.values(userTotals).sort((a, b) => b.total - a.total).slice(0, 3);
-                setBuyers(sorted);
-            })
+            .then((data) => setBuyers(data.topBuyers || []))
             .catch(() => {});
     }, []);
 
+    if (!storeEnabled) return null;
     if (buyers.length === 0) return null;
 
     return (
@@ -46,8 +36,12 @@ export function TopBuyersWidget() {
             <div className="space-y-3">
                 {buyers.map((buyer, i) => (
                     <div key={i} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm">
-                            {buyer.username[0].toUpperCase()}
+                        <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm overflow-hidden">
+                            {buyer.avatar ? (
+                                <img src={buyer.avatar} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                buyer.username[0].toUpperCase()
+                            )}
                         </div>
                         <div className="flex-1">
                             <p className="font-medium text-gray-900 text-sm">{buyer.username}</p>

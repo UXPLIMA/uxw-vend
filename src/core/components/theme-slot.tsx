@@ -19,9 +19,16 @@ export function ThemeSlot({ name, defaultComponent, props = {} }: ThemeSlotProps
         return <OverrideComponent {...props} />;
     }
 
-    // Otherwise render default with props injected
-    if (React.isValidElement(defaultComponent)) {
-        return React.cloneElement(defaultComponent as React.ReactElement, props);
+    // If props have content, use the default component's type to render with new props
+    if (Object.keys(props).length > 0 && React.isValidElement(defaultComponent)) {
+        const element = defaultComponent as React.ReactElement<any>;
+        const elementProps = (element.props || {}) as Record<string, any>;
+        const mergedProps = { ...elementProps, ...props };
+        if (props.children !== undefined) {
+            const { children: _, ...restProps } = mergedProps;
+            return React.cloneElement(element, restProps, props.children);
+        }
+        return React.cloneElement(element, mergedProps);
     }
 
     return <>{defaultComponent}</>;

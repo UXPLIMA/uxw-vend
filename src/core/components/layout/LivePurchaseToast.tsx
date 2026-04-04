@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useModuleEnabled } from "@/core/hooks/useModule";
 
 export function LivePurchaseToast() {
+    const { enabled: storeEnabled } = useModuleEnabled('store');
     const [enabled, setEnabled] = useState(false);
 
     useEffect(() => {
         // Check if live purchase notifications are enabled
-        fetch("/api/v1/settings")
+        fetch("/api/v1/public-settings")
             .then((r) => r.json())
             .then((d) => {
                 if (d.settings?.live_purchase_toast === "true" || d.settings?.live_purchase_toast === true) {
@@ -19,7 +21,7 @@ export function LivePurchaseToast() {
     }, []);
 
     useEffect(() => {
-        if (!enabled) return;
+        if (!enabled || !storeEnabled) return;
 
         // Poll for recent orders every 30 seconds
         let lastOrderId = "";
@@ -45,7 +47,7 @@ export function LivePurchaseToast() {
         poll();
         const interval = setInterval(poll, 30000);
         return () => clearInterval(interval);
-    }, [enabled]);
+    }, [enabled, storeEnabled]);
 
     return null;
 }

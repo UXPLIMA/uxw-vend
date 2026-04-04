@@ -101,7 +101,7 @@ export default function ThemeSettingsPage() {
         );
     };
 
-    const builtInThemes = ["flat", "retro"];
+    const builtInThemes = ["flat", "pixelcraft"];
 
     return (
         <div className="space-y-6">

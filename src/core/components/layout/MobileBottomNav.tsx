@@ -3,6 +3,7 @@
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { Home, ShoppingCart, MessageSquare, HelpCircle, User } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useModules } from "@/core/hooks/useModule";
 
 const navItems = [
     { href: "/", icon: Home, label: "Home" },
@@ -15,16 +16,28 @@ const navItems = [
 export function MobileBottomNav() {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const { modules: moduleStatus } = useModules();
 
     // Don't show on admin pages
     if (pathname.startsWith("/admin")) return null;
+
+    const pathToModule: Record<string, string> = {
+        "/store": "store", "/forum": "forum", "/support": "support", "/blog": "blog",
+        "/wheel": "wheel", "/vote": "vote", "/leaderboard": "leaderboard",
+        "/suggestions": "suggestions", "/changelog": "changelog", "/staff": "staff",
+        "/downloads": "downloads", "/punishments": "punishments",
+    };
+    const isLinkEnabled = (href: string) => {
+        const mod = pathToModule[href];
+        return !mod || moduleStatus[mod] !== false;
+    };
 
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
     return (
         <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-area-bottom">
             <div className="flex items-center justify-around h-14">
-                {navItems.map((item) => {
+                {navItems.filter(item => isLinkEnabled(item.href)).map((item) => {
                     if (item.href === "/profile" && !session?.user) return null;
                     return (
                         <Link

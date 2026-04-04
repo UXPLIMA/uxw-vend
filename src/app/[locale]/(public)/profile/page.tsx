@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Check, ShoppingCart, Ticket, MessageSquare, FileText, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { useModules } from "@/core/hooks/useModule";
 
 interface UserProfile {
     id: string;
@@ -45,6 +46,7 @@ interface Order {
 export default function ProfilePage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
+    const { modules: moduleStatus } = useModules();
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
@@ -89,11 +91,12 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
+        const storeEnabled = moduleStatus['store'] !== false;
         Promise.all([
             fetch("/api/v1/auth/profile").then((r) => r.json()),
-            fetch("/api/v1/store/orders?limit=10").then((r) => r.json()),
+            storeEnabled ? fetch("/api/v1/store/orders?limit=10").then((r) => r.json()) : Promise.resolve({ orders: [] }),
             fetch("/api/v1/linked-accounts").then((r) => r.json()).catch(() => ({ accounts: [] })),
-            fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })),
+            storeEnabled ? fetch("/api/v1/chest").then((r) => r.json()).catch(() => ({ items: [] })) : Promise.resolve({ items: [] }),
         ]).then(([profileData, ordersData, accountsData, chestData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
@@ -106,7 +109,7 @@ export default function ProfilePage() {
             setChestItems(chestData.items || []);
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, [authStatus, router]);
+    }, [authStatus, router, moduleStatus]);
 
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -244,7 +247,10 @@ export default function ProfilePage() {
 
                 {/* Tabs */}
                 <div className="flex gap-2 mb-6">
-                    {(["profile", "orders", "chest", "accounts", "security"] as const).map((tab) => (
+                    {(["profile", "orders", "chest", "accounts", "security"] as const).filter(tab => {
+                        if ((tab === "orders" || tab === "chest") && moduleStatus['store'] === false) return false;
+                        return true;
+                    }).map((tab) => (
                         <Button
                             key={tab}
                             variant={activeTab === tab ? "default" : "outline"}
@@ -343,7 +349,7 @@ export default function ProfilePage() {
                                                                     {item.product?.image ? (
                                                                         <img src={item.product.image} alt="" className="w-full h-full object-cover" />
                                                                     ) : (
-                                                                        <span className="text-sm">📦</span>
+                                                                        <Package className="w-4 h-4 text-muted-foreground" />
                                                                     )}
                                                                 </div>
                                                                 <div className="flex-1">

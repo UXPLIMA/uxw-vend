@@ -48,16 +48,92 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Module not found" }, { status: 404 });
     }
 
+    const wantEnabled = enabled ?? true;
+
+    // --- Dependency resolution ---
+    if (wantEnabled) {
+        // When enabling: check that all dependencies are enabled
+        const deps = definition.dependencies ?? [];
+        if (deps.length > 0) {
+            const configs = await prisma.moduleConfig.findMany();
+            const configMap = new Map(configs.map(c => [c.id, c]));
+            const missingDeps: string[] = [];
+
+            for (const dep of deps) {
+                const depDef = moduleSystem.getDefinition(dep);
+                if (!depDef) {
+                    missingDeps.push(dep);
+                    continue;
+                }
+                const depConfig = configMap.get(dep);
+                // Default is enabled if no DB record exists
+                if (depConfig && !depConfig.enabled) {
+                    missingDeps.push(dep);
+                }
+            }
+
+            if (missingDeps.length > 0) {
+                return NextResponse.json({
+                    error: `Cannot enable '${moduleId}': requires module '${missingDeps[0]}' to be enabled first`,
+                    missingDeps,
+                }, { status: 400 });
+            }
+        }
+    } else {
+        // When disabling: check if any enabled module depends on this one
+        const allDefs = moduleSystem.getDefinitions();
+        const configs = await prisma.moduleConfig.findMany();
+        const configMap = new Map(configs.map(c => [c.id, c]));
+        const dependents: string[] = [];
+
+        for (const def of allDefs) {
+            if (def.id === moduleId) continue;
+            const deps = def.dependencies ?? [];
+            if (!deps.includes(moduleId)) continue;
+            // Check if this dependent module is enabled
+            const depConfig = configMap.get(def.id);
+            const isEnabled = depConfig ? depConfig.enabled : true;
+            if (isEnabled) {
+                dependents.push(def.id);
+            }
+        }
+
+        if (dependents.length > 0) {
+            const force = body.force === true;
+            if (!force) {
+                return NextResponse.json({
+                    error: `Cannot disable '${moduleId}': module '${dependents[0]}' depends on it`,
+                    dependents,
+                }, { status: 400 });
+            }
+
+            // Force mode: cascade-disable all dependents
+            for (const depId of dependents) {
+                const depDef = moduleSystem.getDefinition(depId);
+                await prisma.moduleConfig.upsert({
+                    where: { id: depId },
+                    create: {
+                        id: depId,
+                        name: depDef?.name ?? depId,
+                        enabled: false,
+                        config: {},
+                    },
+                    update: { enabled: false },
+                });
+            }
+        }
+    }
+
     const updated = await prisma.moduleConfig.upsert({
         where: { id: moduleId },
         create: {
             id: moduleId,
             name: definition.name,
-            enabled: enabled ?? true,
+            enabled: wantEnabled,
             config: config || {},
         },
         update: {
-            enabled: enabled ?? true,
+            enabled: wantEnabled,
             ...(config ? { config } : {}),
         },
     });

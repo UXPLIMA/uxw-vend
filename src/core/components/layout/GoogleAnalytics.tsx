@@ -19,7 +19,7 @@ export function GoogleAnalytics() {
         }
 
         // Try fetching from settings API
-        fetch("/api/v1/settings")
+        fetch("/api/v1/public-settings")
             .then((r) => r.json())
             .then((d) => {
                 const id = d.settings?.google_analytics_id;

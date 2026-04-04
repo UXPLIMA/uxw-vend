@@ -1,0 +1,388 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-04-04",
+  "modules": [
+    {
+      "id": "announcements",
+      "name": "Announcements",
+      "description": "Site-wide announcement banners",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Megaphone",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "announcements.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "blog",
+      "name": "Blog Module",
+      "description": "News and announcements system",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Package",
+      "category": "community",
+      "verified": true,
+      "downloads": 0,
+      "zip": "blog.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 2,
+        "adminRoutes": 4,
+        "apiRoutes": 6,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "changelog",
+      "name": "Changelog",
+      "description": "Release notes and update history",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "History",
+      "category": "community",
+      "verified": true,
+      "downloads": 0,
+      "zip": "changelog.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "custom-forms",
+      "name": "Custom Forms",
+      "description": "Dynamic form builder with submissions",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "FileEdit",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "custom-forms.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "custom-pages",
+      "name": "Custom Pages",
+      "description": "Admin-created HTML content pages",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "FileText",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "custom-pages.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "discord-widget",
+      "name": "Discord Widget",
+      "description": "Discord server widget on homepage sidebar",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "discord-widget.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
+        "widgets": 1
+      }
+    },
+    {
+      "id": "downloads",
+      "name": "Downloads",
+      "description": "File download center for resources and mods",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Download",
+      "category": "gaming",
+      "verified": true,
+      "downloads": 0,
+      "zip": "downloads.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "forum",
+      "name": "Forum Module",
+      "description": "Community discussion forum with categories, topics, and replies",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "MessageSquare",
+      "category": "community",
+      "verified": true,
+      "downloads": 0,
+      "zip": "forum.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 3,
+        "adminRoutes": 2,
+        "apiRoutes": 6,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "leaderboard",
+      "name": "Leaderboard",
+      "description": "Player rankings by purchases, votes, and activity",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Trophy",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "leaderboard.zip",
+      "dependencies": [
+        "store"
+      ],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "player-profiles",
+      "name": "Player Profiles",
+      "description": "Public player profile pages",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Users",
+      "category": "gaming",
+      "verified": true,
+      "downloads": 0,
+      "zip": "player-profiles.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "popups",
+      "name": "Popups",
+      "description": "Modal popup notifications and promotions",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Bell",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "popups.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "punishments",
+      "name": "Punishments",
+      "description": "Player punishment history and ban management",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "gaming",
+      "verified": true,
+      "downloads": 0,
+      "zip": "punishments.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "servers",
+      "name": "Game Servers",
+      "description": "Game server management, RCON, and status monitoring",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Server",
+      "category": "gaming",
+      "verified": true,
+      "downloads": 0,
+      "zip": "servers.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 3,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "description": "Homepage image carousel and banners",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Image",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "slider.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "staff",
+      "name": "Staff",
+      "description": "Staff member listing and applications",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Users",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "staff.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "store",
+      "name": "Store Module",
+      "description": "Complete e-commerce functionality with products, categories, cart and orders",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "ShoppingBag",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "store.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 5,
+        "adminRoutes": 7,
+        "apiRoutes": 11,
+        "widgets": 6
+      }
+    },
+    {
+      "id": "suggestions",
+      "name": "Suggestions",
+      "description": "Community feature suggestions with voting",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "community",
+      "verified": true,
+      "downloads": 0,
+      "zip": "suggestions.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "support",
+      "name": "Support Module",
+      "description": "Comprehensive support system including Tickets and Knowledge Base (Help Center)",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "LifeBuoy",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "support.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 6,
+        "adminRoutes": 3,
+        "apiRoutes": 5,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "vote",
+      "name": "Vote System",
+      "description": "Vote-for-rewards system with configurable sites and cooldowns",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Vote",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "vote.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "wheel",
+      "name": "Wheel of Fortune",
+      "description": "Spin-to-win game with configurable prizes and cooldowns",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Dices",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "wheel.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    }
+  ]
+}

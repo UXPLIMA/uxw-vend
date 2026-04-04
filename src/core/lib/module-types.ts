@@ -31,6 +31,33 @@ export interface ModuleManifest {
         handler: string; // Relative path to handler file
         method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "ALL";
     }[];
+
+    dependencies?: string[];
+
+    hooks?: {
+        onEnable?: string;
+        onDisable?: string;
+    };
+
+    widgets?: {
+        id: string;
+        component: string;
+        defaultOrder: number;
+        defaultVisible: boolean;
+    }[];
+
+    navLinks?: {
+        label: string;
+        href: string;
+        icon?: string;
+        position?: number;
+    }[];
+
+    footerLinks?: {
+        label: string;
+        href: string;
+        section?: "quick" | "legal";
+    }[];
 }
 
 export interface LoadedModule {

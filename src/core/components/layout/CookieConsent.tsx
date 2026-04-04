@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/core/components/ui/button";
 import { Cookie } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function CookieConsent() {
+    const t = useTranslations('cookie');
     const [show, setShow] = useState(false);
 
     useEffect(() => {
@@ -31,15 +33,15 @@ export function CookieConsent() {
                     <Cookie className="w-8 h-8 text-amber-500 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-700">
-                            We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies.
+                            {t('message')}
                         </p>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
                         <Button variant="outline" size="sm" onClick={reject}>
-                            Reject
+                            {t('reject')}
                         </Button>
                         <Button size="sm" onClick={accept}>
-                            Accept
+                            {t('accept')}
                         </Button>
                     </div>
                 </div>

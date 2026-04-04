@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface SlideItem {
     id: string;
@@ -12,6 +13,7 @@ interface SlideItem {
 }
 
 export function SliderWidget() {
+    const { enabled: sliderEnabled } = useModuleEnabled('slider');
     const [slides, setSlides] = useState<SlideItem[]>([]);
     const [current, setCurrent] = useState(0);
 
@@ -37,6 +39,7 @@ export function SliderWidget() {
         return () => clearInterval(timer);
     }, [slides.length, next]);
 
+    if (!sliderEnabled) return null;
     if (slides.length === 0) return null;
 
     const slide = slides[current];

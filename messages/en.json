@@ -177,7 +177,9 @@
         "selectCategory": "Select a category",
         "topicTitle": "What's your topic about?",
         "topicContent": "Write your message...",
-        "creating": "Creating..."
+        "creating": "Creating...",
+        "searchTopics": "Search topics...",
+        "communityDiscussions": "Community discussions"
     },
     "auth": {
         "loginTitle": "Welcome Back",
@@ -200,5 +202,57 @@
         "invalidCredentials": "Invalid email or password",
         "passwordsDontMatch": "Passwords don't match",
         "genericError": "Something went wrong. Please try again."
+    },
+    "wheel": {
+        "title": "Wheel of Fortune",
+        "subtitle": "Spin the wheel and win amazing prizes",
+        "freeSpinInfo": "One free spin per day",
+        "spinButton": "Spin the Wheel",
+        "loginToSpin": "Login to Spin",
+        "spinning": "Spinning...",
+        "availablePrizes": "Available Prizes",
+        "youWon": "You won!",
+        "betterLuck": "Better luck next time!",
+        "creditsAdded": "{value} credits added to your account",
+        "couponCreated": "${value} coupon has been created"
+    },
+    "cart": {
+        "title": "Shopping Cart",
+        "empty": "Your cart is empty",
+        "emptyDesc": "Add some items to get started",
+        "addToCart": "Add to Cart",
+        "buyNow": "Buy Now",
+        "quantity": "Quantity",
+        "total": "Total",
+        "inStock": "In Stock",
+        "outOfStock": "Out of Stock",
+        "viewDetails": "View Details"
+    },
+    "helpCenter": {
+        "title": "Help Center",
+        "heading": "How can we help you?",
+        "subtitle": "Search our knowledge base or browse categories below",
+        "searchPlaceholder": "Search for articles...",
+        "search": "Search",
+        "searchResults": "Search Results",
+        "browseCategories": "Browse by Category",
+        "popularArticles": "Popular Articles",
+        "needHelp": "Need more help?",
+        "cantFind": "Can't find what you're looking for?",
+        "createTicket": "Create a support ticket",
+        "wasHelpful": "Was this article helpful?",
+        "yesHelpful": "Yes, helpful",
+        "noNotHelpful": "No, not helpful",
+        "thanksFeedback": "Thank you for your feedback!"
+    },
+    "cookie": {
+        "message": "We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies.",
+        "accept": "Accept",
+        "reject": "Reject"
+    },
+    "product": {
+        "notFound": "Product Not Found",
+        "backToStore": "Back to Store",
+        "featured": "Featured"
     }
 }

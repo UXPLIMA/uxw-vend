@@ -1,3 +1,12 @@
+import {
+    RATE_LIMIT_AUTH,
+    RATE_LIMIT_API,
+    RATE_LIMIT_CHECKOUT,
+    RATE_LIMIT_UPLOAD,
+    RATE_LIMIT_VOTE,
+    RATE_LIMIT_SPIN,
+} from "./constants";
+
 /**
  * In-memory rate limiter
  * For production, replace with Redis-based limiter
@@ -57,10 +66,10 @@ export function getClientIP(headers: Headers): string {
  * Preset rate limit configs
  */
 export const rateLimits = {
-    auth: { maxRequests: 10, windowMs: 60000 },       // 10 per minute
-    api: { maxRequests: 120, windowMs: 60000 },        // 120 per minute
-    checkout: { maxRequests: 5, windowMs: 60000 },     // 5 per minute
-    upload: { maxRequests: 3, windowMs: 60000 },       // 3 per minute
-    vote: { maxRequests: 10, windowMs: 60000 },        // 10 per minute
-    spin: { maxRequests: 2, windowMs: 60000 },         // 2 per minute
+    auth: RATE_LIMIT_AUTH,
+    api: RATE_LIMIT_API,
+    checkout: RATE_LIMIT_CHECKOUT,
+    upload: RATE_LIMIT_UPLOAD,
+    vote: RATE_LIMIT_VOTE,
+    spin: RATE_LIMIT_SPIN,
 };

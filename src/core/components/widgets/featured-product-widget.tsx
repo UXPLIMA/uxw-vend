@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
+import { Crown } from "lucide-react";
 import { useCurrency } from "@/core/lib/currency/context";
 import { Link } from "@/core/lib/i18n/navigation";
+import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface Product {
     id: string;
@@ -16,6 +18,7 @@ interface Product {
 }
 
 export function FeaturedProductWidget() {
+    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const storeT = useTranslations('store');
     const { formatPrice } = useCurrency();
@@ -31,6 +34,7 @@ export function FeaturedProductWidget() {
             .catch(() => {});
     }, []);
 
+    if (!storeEnabled) return null;
     if (!product) return null;
 
     return (
@@ -41,7 +45,7 @@ export function FeaturedProductWidget() {
                     {product.image ? (
                         <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                     ) : (
-                        <span className="text-4xl">👑</span>
+                        <Crown className="w-10 h-10 text-amber-500" />
                     )}
                 </div>
                 <h4 className="font-semibold text-gray-900 mb-1">{product.name}</h4>

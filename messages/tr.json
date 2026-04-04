@@ -177,7 +177,9 @@
         "selectCategory": "Kategori seçin",
         "topicTitle": "Konunuz ne hakkında?",
         "topicContent": "Mesajınızı yazın...",
-        "creating": "Oluşturuluyor..."
+        "creating": "Oluşturuluyor...",
+        "searchTopics": "Konu ara...",
+        "communityDiscussions": "Topluluk tartışmaları"
     },
     "auth": {
         "loginTitle": "Tekrar Hoş Geldin",
@@ -200,5 +202,57 @@
         "invalidCredentials": "Geçersiz e-posta veya şifre",
         "passwordsDontMatch": "Şifreler eşleşmiyor",
         "genericError": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
+    },
+    "wheel": {
+        "title": "Sans Carki",
+        "subtitle": "Carki cevir ve harika oduller kazan",
+        "freeSpinInfo": "Günde bir ücretsiz çevirme",
+        "spinButton": "Çarkı Çevir",
+        "loginToSpin": "Çevirmek için Giriş Yap",
+        "spinning": "Çevriliyor...",
+        "availablePrizes": "Mevcut Ödüller",
+        "youWon": "Kazandın!",
+        "betterLuck": "Bir dahaki sefere!",
+        "creditsAdded": "Hesabınıza {value} kredi eklendi",
+        "couponCreated": "${value} kupon oluşturuldu"
+    },
+    "cart": {
+        "title": "Alışveriş Sepeti",
+        "empty": "Sepetiniz boş",
+        "emptyDesc": "Başlamak için ürün ekleyin",
+        "addToCart": "Sepete Ekle",
+        "buyNow": "Hemen Al",
+        "quantity": "Adet",
+        "total": "Toplam",
+        "inStock": "Stokta",
+        "outOfStock": "Tükendi",
+        "viewDetails": "Detayları Gör"
+    },
+    "helpCenter": {
+        "title": "Yardım Merkezi",
+        "heading": "Size nasıl yardımcı olabiliriz?",
+        "subtitle": "Bilgi tabanımızda arayın veya aşağıdaki kategorilere göz atın",
+        "searchPlaceholder": "Makale ara...",
+        "search": "Ara",
+        "searchResults": "Arama Sonuçları",
+        "browseCategories": "Kategoriye Göre",
+        "popularArticles": "Popüler Makaleler",
+        "needHelp": "Daha fazla yardım?",
+        "cantFind": "Aradığınızı bulamadınız?",
+        "createTicket": "Destek talebi oluştur",
+        "wasHelpful": "Bu makale yararlı oldu mu?",
+        "yesHelpful": "Evet, yararlı",
+        "noNotHelpful": "Hayır, yararlı değil",
+        "thanksFeedback": "Geri bildiriminiz için teşekkürler!"
+    },
+    "cookie": {
+        "message": "Deneyiminizi geliştirmek için çerezler kullanıyoruz. Bu siteyi kullanmaya devam ederek çerez kullanımımızı kabul edersiniz.",
+        "accept": "Kabul Et",
+        "reject": "Reddet"
+    },
+    "product": {
+        "notFound": "Ürün Bulunamadı",
+        "backToStore": "Mağazaya Dön",
+        "featured": "Öne Çıkan"
     }
 }

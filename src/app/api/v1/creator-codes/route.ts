@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import {
+    CREATOR_DEFAULT_DISCOUNT,
+    CREATOR_DEFAULT_COMMISSION,
+} from "@/core/lib/constants";
+
+async function getSetting(key: string, defaultValue: string): Promise<string> {
+    const s = await prisma.setting.findUnique({ where: { key } });
+    return (s?.value as string) ?? defaultValue;
+}
 
 // GET /api/v1/creator-codes - List (admin: all, user: own)
 export async function GET() {
@@ -31,12 +40,15 @@ export async function POST(request: NextRequest) {
     const existing = await prisma.creatorCode.findUnique({ where: { code: code.toUpperCase() } });
     if (existing) return NextResponse.json({ error: "Code already exists" }, { status: 400 });
 
+    const defaultDiscount = Number(await getSetting("creator_default_discount", String(CREATOR_DEFAULT_DISCOUNT)));
+    const defaultCommission = Number(await getSetting("creator_default_commission", String(CREATOR_DEFAULT_COMMISSION)));
+
     const creatorCode = await prisma.creatorCode.create({
         data: {
             code: code.toUpperCase(),
             creatorId,
-            discountPercent: discountPercent || 5,
-            commissionPercent: commissionPercent || 5,
+            discountPercent: discountPercent || defaultDiscount,
+            commissionPercent: commissionPercent || defaultCommission,
         },
     });
     return NextResponse.json({ creatorCode }, { status: 201 });

@@ -112,6 +112,7 @@ export function AppThemeProvider({ children, defaultTheme }: AppThemeProviderPro
             defaultTheme={defaultTheme}
             themes={Object.keys(themeRegistry)}
             enableSystem={false}
+            disableTransitionOnChange
         >
             <ThemeContent defaultTheme={defaultTheme}>
                 {children}

@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
 import bcrypt from "bcryptjs";
+import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 
 // GET /api/v1/auth/profile
 export async function GET() {
@@ -56,7 +57,7 @@ export async function PATCH(request: NextRequest) {
             return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(validation.data.newPassword, 10);
+        const hashedPassword = await bcrypt.hash(validation.data.newPassword, BCRYPT_ROUNDS);
         await prisma.user.update({
             where: { id: session.user.id },
             data: { password: hashedPassword },

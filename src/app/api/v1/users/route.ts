@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { PER_PAGE_USERS } from "@/core/lib/constants";
 
 // GET /api/v1/users - List users (admin only)
 export async function GET(request: NextRequest) {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
 
         const searchParams = request.nextUrl.searchParams;
         const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "20");
+        const limit = parseInt(searchParams.get("limit") || String(PER_PAGE_USERS));
         const search = searchParams.get("search") || "";
 
         const where = search

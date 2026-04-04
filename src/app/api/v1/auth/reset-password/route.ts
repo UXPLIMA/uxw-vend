@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
 import bcrypt from "bcryptjs";
+import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Hash new password and update
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
         await prisma.user.update({
             where: { id: user.id },

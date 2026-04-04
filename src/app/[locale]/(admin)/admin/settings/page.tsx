@@ -1,9 +1,10 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Mail, CreditCard, MessageSquare, Shield, Server, Target, BarChart3, Navigation, PanelBottom, Image, LayoutGrid, Code } from "lucide-react";
+import { Palette, Globe, Mail, CreditCard, MessageSquare, Shield, Server, Target, BarChart3, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
     const settingsItems = [
+        { title: "General", description: "Pagination, limits, business rules, and automation settings.", href: "/admin/settings/general", icon: Settings, color: "text-slate-500" },
         { title: "Appearance", description: "Themes and layout.", href: "/admin/settings/theme", icon: Palette, color: "text-purple-500" },
         { title: "Navbar", description: "Navigation menu links and order.", href: "/admin/settings/navbar", icon: Navigation, color: "text-blue-500" },
         { title: "Footer", description: "Footer content and links.", href: "/admin/settings/footer", icon: PanelBottom, color: "text-gray-500" },

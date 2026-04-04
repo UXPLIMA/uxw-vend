@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, DollarSign, Mail, ChevronDown } from "lucide-react";
+import { Globe, DollarSign, Mail, ChevronDown, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
+import { useModules } from "@/core/hooks/useModule";
 
 // Custom Dropdown Component for Footer
 function CustomDropdown({
@@ -58,6 +59,18 @@ export function Footer() {
     const router = useRouter();
     const pathname = usePathname();
     const { currency, setCurrency } = useCurrency();
+    const { modules: moduleStatus } = useModules();
+
+    const pathToModule: Record<string, string> = {
+        "/store": "store", "/forum": "forum", "/support": "support", "/blog": "blog",
+        "/wheel": "wheel", "/vote": "vote", "/leaderboard": "leaderboard",
+        "/suggestions": "suggestions", "/changelog": "changelog", "/staff": "staff",
+        "/downloads": "downloads", "/punishments": "punishments",
+    };
+    const isLinkEnabled = (href: string) => {
+        const mod = pathToModule[href];
+        return !mod || moduleStatus[mod] !== false;
+    };
 
     const handleLocaleChange = (newLocale: string) => {
         router.replace(pathname, { locale: newLocale });
@@ -106,10 +119,14 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold text-white mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">{commonT('home')}</Link></li>
-                            <li><Link href="/store" className="text-gray-400 hover:text-white transition-colors">{commonT('store')}</Link></li>
-                            <li><Link href="/support" className="text-gray-400 hover:text-white transition-colors">{commonT('support')}</Link></li>
-                            <li><Link href="/faq" className="text-gray-400 hover:text-white transition-colors">{t('faq')}</Link></li>
+                            {[
+                                { href: "/", label: commonT('home') },
+                                { href: "/store", label: commonT('store') },
+                                { href: "/support", label: commonT('support') },
+                                { href: "/faq", label: t('faq') },
+                            ].filter(link => isLinkEnabled(link.href)).map(link => (
+                                <li key={link.href}><Link href={link.href} className="text-gray-400 hover:text-white transition-colors">{link.label}</Link></li>
+                            ))}
                         </ul>
                     </div>
 
@@ -170,7 +187,7 @@ export function Footer() {
                         </p>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <span>{t('builtWith')}</span>
-                            <span className="text-red-400">♥</span>
+                            <Heart className="w-4 h-4 text-red-400 fill-red-400" />
                             <span>{t('by')}</span>
                             <span className="text-blue-400 font-medium">uxwVend Team</span>
                         </div>

@@ -3,34 +3,28 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "@/core/lib/currency/context";
+import { useModuleEnabled } from "@/core/hooks/useModule";
 
 interface TopLoader {
     username: string;
+    avatar: string | null;
     total: number;
 }
 
 export function TopCreditLoadersWidget() {
+    const { enabled: storeEnabled } = useModuleEnabled('store');
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [loaders, setLoaders] = useState<TopLoader[]>([]);
 
     useEffect(() => {
-        fetch("/api/v1/store/orders?limit=100")
+        fetch("/api/v1/widget-stats")
             .then((res) => res.json())
-            .then((data) => {
-                const orders = data.orders || [];
-                const userTotals: Record<string, { username: string; total: number }> = {};
-                for (const order of orders) {
-                    const uid = order.user?.username || "Unknown";
-                    if (!userTotals[uid]) userTotals[uid] = { username: uid, total: 0 };
-                    userTotals[uid].total += Number(order.total);
-                }
-                const sorted = Object.values(userTotals).sort((a, b) => b.total - a.total).slice(0, 3);
-                setLoaders(sorted);
-            })
+            .then((data) => setLoaders(data.topCreditLoaders || []))
             .catch(() => {});
     }, []);
 
+    if (!storeEnabled) return null;
     if (loaders.length === 0) return null;
 
     return (
@@ -42,8 +36,12 @@ export function TopCreditLoadersWidget() {
             <div className="space-y-3">
                 {loaders.map((loader, i) => (
                     <div key={i} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm">
-                            {loader.username[0].toUpperCase()}
+                        <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm overflow-hidden">
+                            {loader.avatar ? (
+                                <img src={loader.avatar} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                loader.username[0].toUpperCase()
+                            )}
                         </div>
                         <div className="flex-1">
                             <p className="font-medium text-gray-900 text-sm">{loader.username}</p>

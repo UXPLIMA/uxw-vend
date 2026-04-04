@@ -2,6 +2,7 @@
 "use client";
 
 import { Link } from "@/core/lib/i18n/navigation";
+import { Newspaper } from "lucide-react";
 import { formatRelativeTime } from "@/core/lib/utils";
 
 // Define the interface here or import it if shared
@@ -35,7 +36,7 @@ export function NewsCard({ post }: NewsCardProps) {
                         />
                     ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-4xl">📰</span>
+                            <Newspaper className="w-10 h-10 text-gray-400" />
                         </div>
                     )}
                     {post.category && (

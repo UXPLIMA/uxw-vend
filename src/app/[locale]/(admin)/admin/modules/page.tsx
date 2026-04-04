@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ShoppingCart, MessageSquare, FileText, Ticket, HelpCircle, Package } from "lucide-react";
+import {
+    Package, Upload, Loader2, Trash2, Download, CheckCircle, ShoppingCart,
+    MessageSquare, FileText, Ticket, HelpCircle, Shield, History, Users,
+    Vote, Dices, Trophy, Star, Bell, Server, FileEdit, ImageIcon, Crown,
+    Megaphone, Search as SearchIcon
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Module {
     id: string;
@@ -12,29 +18,85 @@ interface Module {
     version: string;
     icon?: string;
     enabled: boolean;
-    routes: {
-        public: string[];
-        admin: string[];
-    };
+    dependencies?: string[];
+    routes?: { public?: string[]; admin?: string[] };
 }
+
+interface MarketplaceModule {
+    id: string;
+    name: string;
+    description: string;
+    version: string;
+    author: string;
+    icon: string;
+    category: string;
+    verified: boolean;
+    zip: string;
+    dependencies: string[];
+    stats: { publicRoutes: number; adminRoutes: number; apiRoutes: number; widgets: number };
+}
+
+const iconMap: Record<string, React.ReactNode> = {
+    ShoppingCart: <ShoppingCart size={22} />,
+    MessageSquare: <MessageSquare size={22} />,
+    FileText: <FileText size={22} />,
+    Ticket: <Ticket size={22} />,
+    HelpCircle: <HelpCircle size={22} />,
+    Shield: <Shield size={22} />,
+    History: <History size={22} />,
+    Users: <Users size={22} />,
+    Vote: <Vote size={22} />,
+    Dices: <Dices size={22} />,
+    Trophy: <Trophy size={22} />,
+    Star: <Star size={22} />,
+    Bell: <Bell size={22} />,
+    Server: <Server size={22} />,
+    FileEdit: <FileEdit size={22} />,
+    Image: <ImageIcon size={22} />,
+    Crown: <Crown size={22} />,
+    Megaphone: <Megaphone size={22} />,
+    Download: <Download size={22} />,
+    Package: <Package size={22} />,
+    Search: <SearchIcon size={22} />,
+};
+
+const categoryColors: Record<string, string> = {
+    commerce: "bg-blue-100 text-blue-700",
+    community: "bg-green-100 text-green-700",
+    management: "bg-purple-100 text-purple-700",
+    gaming: "bg-orange-100 text-orange-700",
+    content: "bg-gray-100 text-gray-700",
+};
 
 export default function AdminModulesPage() {
     const [modules, setModules] = useState<Module[]>([]);
+    const [marketplace, setMarketplace] = useState<MarketplaceModule[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMarketplace, setLoadingMarketplace] = useState(true);
     const [updating, setUpdating] = useState<string | null>(null);
+    const [installing, setInstalling] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [deleting, setDeleting] = useState<string | null>(null);
+    const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
+    const fetchModules = () => {
         fetch("/api/v1/modules")
             .then(res => res.json())
-            .then(data => {
-                setModules(data.modules || []);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
-    }, []);
+            .then(data => { setModules(data.modules || []); setLoading(false); })
+            .catch(() => setLoading(false));
+    };
+
+    const fetchMarketplace = () => {
+        fetch("/api/v1/modules/marketplace")
+            .then(res => res.json())
+            .then(data => { setMarketplace(data.modules || []); setLoadingMarketplace(false); })
+            .catch(() => setLoadingMarketplace(false));
+    };
+
+    useEffect(() => { fetchModules(); fetchMarketplace(); }, []);
+
+    const installedIds = new Set(modules.map(m => m.id));
 
     const toggleModule = async (moduleId: string, enabled: boolean) => {
         setUpdating(moduleId);
@@ -44,93 +106,235 @@ export default function AdminModulesPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ moduleId, enabled }),
             });
-
+            const data = await res.json();
             if (res.ok) {
-                setModules(modules.map(m =>
-                    m.id === moduleId ? { ...m, enabled } : m
-                ));
+                setModules(modules.map(m => m.id === moduleId ? { ...m, enabled } : m));
+                toast.success(`${moduleId} ${enabled ? "enabled" : "disabled"}`);
+            } else {
+                toast.error(data.error || "Failed");
             }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setUpdating(null);
-        }
+        } catch { toast.error("Network error"); }
+        finally { setUpdating(null); }
     };
 
-    const iconMap: Record<string, React.ReactNode> = {
-        ShoppingCart: <ShoppingCart size={24} />,
-        MessageSquare: <MessageSquare size={24} />,
-        FileText: <FileText size={24} />,
-        Ticket: <Ticket size={24} />,
-        HelpCircle: <HelpCircle size={24} />,
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/v1/modules/upload", { method: "POST", body: formData });
+            const data = await res.json();
+            if (res.ok) { toast.success(`"${data.module?.name}" installed`); fetchModules(); }
+            else toast.error(data.error || "Upload failed");
+        } catch { toast.error("Upload failed"); }
+        finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
     };
+
+    const handleDelete = async (moduleId: string, moduleName: string) => {
+        if (!confirm(`Delete "${moduleName}"? This removes all module files.`)) return;
+        setDeleting(moduleId);
+        try {
+            const res = await fetch(`/api/v1/modules/${moduleId}`, { method: "DELETE" });
+            const data = await res.json();
+            if (res.ok) { toast.success(`"${moduleName}" deleted`); fetchModules(); }
+            else toast.error(data.error || "Delete failed");
+        } catch { toast.error("Delete failed"); }
+        finally { setDeleting(null); }
+    };
+
+    const handleMarketplaceInstall = async (mod: MarketplaceModule) => {
+        setInstalling(mod.id);
+        try {
+            const res = await fetch("/api/v1/modules/marketplace/install", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ moduleId: mod.id, zipFile: mod.zip }),
+            });
+            const data = await res.json();
+            if (res.ok) { toast.success(`"${mod.name}" installed and enabled`); fetchModules(); }
+            else toast.error(data.error || "Install failed");
+        } catch { toast.error("Install failed"); }
+        finally { setInstalling(null); }
+    };
+
+    const filteredMarketplace = marketplace.filter(m => {
+        if (marketplaceFilter !== "all" && m.category !== marketplaceFilter) return false;
+        return !installedIds.has(m.id);
+    });
+
+    const categories = [...new Set(marketplace.map(m => m.category))];
 
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Module Management</h1>
-                <p className="text-muted-foreground">Enable or disable platform modules</p>
+                <h1 className="text-3xl font-bold">Modules</h1>
+                <p className="text-muted-foreground">Install, enable, and manage platform modules</p>
             </div>
 
-                {loading ? (
-                    <div className="text-center py-12">
-                        <p className="text-muted-foreground">Loading modules...</p>
+            {/* Upload Module */}
+            <Card className="mb-6">
+                <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="font-semibold">Custom Module</h3>
+                            <p className="text-sm text-muted-foreground">Upload a .zip file with module.json</p>
+                        </div>
+                        <div>
+                            <input type="file" accept=".zip" ref={fileInputRef} className="hidden" onChange={handleUpload} />
+                            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                                {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Installing...</> : <><Upload className="w-4 h-4 mr-2" /> Upload ZIP</>}
+                            </Button>
+                        </div>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Installed Modules */}
+            <div className="mb-10">
+                <h2 className="text-xl font-bold mb-4">Installed Modules ({modules.length})</h2>
+
+                {loading ? (
+                    <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                ) : modules.length === 0 ? (
+                    <Card>
+                        <CardContent className="py-12 text-center">
+                            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                            <p className="text-muted-foreground mb-1">No modules installed</p>
+                            <p className="text-sm text-muted-foreground">Browse the marketplace below to get started</p>
+                        </CardContent>
+                    </Card>
                 ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {modules.map((module) => (
-                            <Card key={module.id} className={`transition-all ${!module.enabled ? 'opacity-60' : ''}`}>
-                                <CardHeader>
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-primary">{iconMap[module.icon || ''] || <Package size={24} />}</span>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {modules.map((mod) => (
+                            <Card key={mod.id} className={`transition-all ${!mod.enabled ? "opacity-60" : ""}`}>
+                                <CardContent className="p-4">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="text-primary">{iconMap[mod.icon || ""] || <Package size={22} />}</span>
                                             <div>
-                                                <CardTitle>{module.name}</CardTitle>
-                                                <p className="text-xs text-muted-foreground">v{module.version}</p>
+                                                <h3 className="font-semibold text-sm">{mod.name}</h3>
+                                                <p className="text-xs text-muted-foreground">v{mod.version}</p>
                                             </div>
                                         </div>
-                                        <div className={`px-2 py-1 rounded text-xs font-medium ${module.enabled
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-gray-100 text-gray-500'
-                                            }`}>
-                                            {module.enabled ? 'Enabled' : 'Disabled'}
-                                        </div>
+                                        <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                            {mod.enabled ? "ON" : "OFF"}
+                                        </span>
                                     </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <CardDescription className="mb-4">
-                                        {module.description}
-                                    </CardDescription>
 
-                                    <div className="text-xs text-muted-foreground mb-4">
-                                        <p><strong>Routes:</strong> {module.routes.public.length} public, {module.routes.admin.length} admin</p>
+                                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
+
+                                    {mod.dependencies && mod.dependencies.length > 0 && (
+                                        <p className="text-xs text-amber-600 mb-3">Requires: {mod.dependencies.join(", ")}</p>
+                                    )}
+
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant={mod.enabled ? "outline" : "default"}
+                                            size="sm"
+                                            className="flex-1 text-xs"
+                                            disabled={updating === mod.id}
+                                            onClick={() => toggleModule(mod.id, !mod.enabled)}
+                                        >
+                                            {updating === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : mod.enabled ? "Disable" : "Enable"}
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            disabled={deleting === mod.id}
+                                            onClick={() => handleDelete(mod.id, mod.name)}
+                                            className="text-destructive hover:text-destructive"
+                                        >
+                                            {deleting === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                                        </Button>
                                     </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Marketplace */}
+            <div>
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 className="text-xl font-bold flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                            Verified Modules
+                        </h2>
+                        <p className="text-sm text-muted-foreground">Official modules from the uxwVend marketplace</p>
+                    </div>
+                    <div className="flex gap-1.5">
+                        <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>All</Button>
+                        {categories.map(cat => (
+                            <Button key={cat} size="sm" variant={marketplaceFilter === cat ? "default" : "outline"} onClick={() => setMarketplaceFilter(cat)} className="capitalize">
+                                {cat}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+
+                {loadingMarketplace ? (
+                    <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                ) : filteredMarketplace.length === 0 ? (
+                    <Card>
+                        <CardContent className="py-8 text-center text-muted-foreground">
+                            {marketplace.length === 0 ? "Could not load marketplace" : "All modules in this category are already installed"}
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredMarketplace.map((mod) => (
+                            <Card key={mod.id} className="hover:shadow-md transition-shadow">
+                                <CardContent className="p-4">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="text-blue-500">{iconMap[mod.icon] || <Package size={22} />}</span>
+                                            <div>
+                                                <h3 className="font-semibold text-sm flex items-center gap-1.5">
+                                                    {mod.name}
+                                                    {mod.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
+                                                </h3>
+                                                <p className="text-xs text-muted-foreground">v{mod.version} by {mod.author}</p>
+                                            </div>
+                                        </div>
+                                        <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${categoryColors[mod.category] || "bg-gray-100 text-gray-700"}`}>
+                                            {mod.category}
+                                        </span>
+                                    </div>
+
+                                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
+
+                                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                                        {mod.stats.publicRoutes > 0 && <span>{mod.stats.publicRoutes} pages</span>}
+                                        {mod.stats.adminRoutes > 0 && <span>{mod.stats.adminRoutes} admin</span>}
+                                        {mod.stats.apiRoutes > 0 && <span>{mod.stats.apiRoutes} APIs</span>}
+                                        {mod.stats.widgets > 0 && <span>{mod.stats.widgets} widgets</span>}
+                                    </div>
+
+                                    {mod.dependencies.length > 0 && (
+                                        <p className="text-xs text-amber-600 mb-3">Requires: {mod.dependencies.join(", ")}</p>
+                                    )}
 
                                     <Button
-                                        variant={module.enabled ? "outline" : "default"}
                                         size="sm"
                                         className="w-full"
-                                        disabled={updating === module.id}
-                                        onClick={() => toggleModule(module.id, !module.enabled)}
+                                        disabled={installing === mod.id}
+                                        onClick={() => handleMarketplaceInstall(mod)}
                                     >
-                                        {updating === module.id
-                                            ? "Updating..."
-                                            : module.enabled
-                                                ? "Disable Module"
-                                                : "Enable Module"
-                                        }
+                                        {installing === mod.id ? (
+                                            <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</>
+                                        ) : (
+                                            <><Download className="w-3 h-3 mr-1.5" /> Install</>
+                                        )}
                                     </Button>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 )}
-
-            <div className="mt-8 p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                    <strong>Note:</strong> Disabling a module will hide its pages and API endpoints.
-                    Users trying to access disabled module routes will see a 404 error.
-                </p>
             </div>
         </>
     );

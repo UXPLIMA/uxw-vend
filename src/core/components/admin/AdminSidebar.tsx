@@ -38,7 +38,8 @@ import {
     Layers,
     Crown,
     ClipboardCheck,
-    KeyRound
+    KeyRound,
+    Trophy,
 } from "lucide-react";
 
 interface NavItem {
@@ -47,31 +48,22 @@ interface NavItem {
     icon: React.ReactNode;
 }
 
-const navItems: NavItem[] = [
+// Core items that are NOT tied to any module - always visible
+const coreNavItems: NavItem[] = [
     { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/admin/modules", label: "Modules", icon: <Puzzle size={18} /> },
-    { href: "/admin/announcements", label: "Announcements", icon: <Megaphone size={18} /> },
-    { href: "/admin/changelog", label: "Changelog", icon: <History size={18} /> },
-    { href: "/admin/popups", label: "Popups", icon: <Bell size={18} /> },
-    { href: "/admin/downloads", label: "Downloads", icon: <Download size={18} /> },
-    { href: "/admin/gift-codes", label: "Gift Codes", icon: <Gift size={18} /> },
-    { href: "/admin/creator-codes", label: "Creator Codes", icon: <Crown size={18} /> },
-    { href: "/admin/vote-sites", label: "Vote Sites", icon: <Vote size={18} /> },
-    { href: "/admin/wheel-prizes", label: "Wheel Prizes", icon: <Dices size={18} /> },
-    { href: "/admin/forms", label: "Custom Forms", icon: <FileEdit size={18} /> },
-    { href: "/admin/bulk-discounts", label: "Bulk Discounts", icon: <Percent size={18} /> },
-    { href: "/admin/staff-members", label: "Staff Members", icon: <UserCheck size={18} /> },
-    { href: "/admin/staff-applications", label: "Applications", icon: <ClipboardCheck size={18} /> },
-    { href: "/admin/slider", label: "Slider", icon: <ImageIcon size={18} /> },
+];
+
+// Core admin features that are always available (not module-dependent)
+const coreToolItems: NavItem[] = [
     { href: "/admin/seo", label: "SEO", icon: <Search size={18} /> },
-    { href: "/admin/webhook-logs", label: "Webhook Logs", icon: <Webhook size={18} /> },
-    { href: "/admin/activity-log", label: "Activity Log", icon: <ScrollText size={18} /> },
-    { href: "/admin/servers", label: "Game Servers", icon: <Server size={18} /> },
-    { href: "/admin/export", label: "Export/Import", icon: <Download size={18} /> },
-    { href: "/admin/api-keys", label: "API Keys", icon: <KeyRound size={18} /> },
     { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
     { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
     { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
+    { href: "/admin/webhook-logs", label: "Webhook Logs", icon: <Webhook size={18} /> },
+    { href: "/admin/activity-log", label: "Activity Log", icon: <ScrollText size={18} /> },
+    { href: "/admin/export", label: "Export/Import", icon: <Download size={18} /> },
+    { href: "/admin/api-keys", label: "API Keys", icon: <KeyRound size={18} /> },
 ];
 
 interface AdminSidebarProps {
@@ -80,18 +72,16 @@ interface AdminSidebarProps {
     modules?: any[];
 }
 
+const iconMap: Record<string, any> = {
+    LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
+    Settings, Puzzle, Ticket, HelpCircle, Tag, Megaphone, History,
+    UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
+    Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
+    MessageSquare, LayoutList, Layers, Crown, ClipboardCheck, KeyRound, Trophy,
+};
+
 const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
-    const icons: Record<string, any> = {
-        LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
-        Settings, Puzzle, Ticket, HelpCircle, Tag, Megaphone, History,
-        UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
-        Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
-        MessageSquare,
-        LayoutList,
-        Layers,
-        Crown,
-    };
-    const Icon = icons[name] || Package;
+    const Icon = iconMap[name] || Package;
     return <Icon size={size} />;
 };
 
@@ -104,21 +94,21 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
         return pathname.startsWith(href);
     };
 
-    const moduleNavItems = modules.flatMap(module => {
+    // Build module menu items from enabled module manifests only
+    const moduleNavItems: NavItem[] = modules.flatMap(module => {
         if (!module.menu) return [];
         return module.menu.map((menuItem: any) => ({
             href: `/admin${menuItem.path.startsWith('/') ? menuItem.path : '/' + menuItem.path}`,
             label: menuItem.label,
             icon: <DynamicIcon name={menuItem.icon || "Puzzle"} />,
-            moduleId: module.id
         }));
     });
 
-    // Dashboard first, then module menus, then rest of core items
-    const allNavItems = [
-        navItems[0], // Dashboard
+    // Combine: core nav + module menus + core tools
+    const allNavItems: NavItem[] = [
+        ...coreNavItems,
         ...moduleNavItems,
-        ...navItems.slice(1),
+        ...coreToolItems,
     ];
 
     const sidebarContent = (
@@ -133,17 +123,13 @@ export function AdminSidebar({ userName, userEmail, modules = [] }: AdminSidebar
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileOpen(false)}
-                        className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${isActive(item.href)
-                            ? "active"
-                            : "text-muted-foreground hover:text-foreground"
-                            }`}
+                        className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${isActive(item.href) ? "active" : "text-muted-foreground hover:text-foreground"}`}
                     >
                         {item.icon}
                         {item.label}
                     </Link>
                 ))}
             </nav>
-
         </>
     );
 

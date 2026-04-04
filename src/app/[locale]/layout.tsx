@@ -5,6 +5,8 @@ import { getMessages } from "next-intl/server";
 import { SessionProvider } from "next-auth/react";
 import { CurrencyProvider } from "@/core/lib/currency/context";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
+import { ModuleProvider } from "@/core/providers/module-provider";
+import prisma from "@/core/lib/db";
 import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CookieConsent } from "@/core/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/core/components/layout/GoogleAnalytics";
@@ -60,6 +62,10 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
+  const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
+  const moduleStates: Record<string, boolean> = {};
+  for (const mc of moduleConfigs) { moduleStates[mc.id] = mc.enabled; }
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
@@ -69,15 +75,17 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <CurrencyProvider>
               <AppThemeProvider defaultTheme={defaultThemeId}>
-                <ProgressBar />
-                <GoogleAnalytics />
-                <CustomCssInjector />
-                <LivePurchaseToast />
-                <PopupModal />
-                {children}
-                <MobileBottomNav />
-                <CookieConsent />
-                <Toaster position="bottom-right" richColors closeButton />
+                <ModuleProvider moduleStates={moduleStates}>
+                  <ProgressBar />
+                  <GoogleAnalytics />
+                  <CustomCssInjector />
+                  <LivePurchaseToast />
+                  <PopupModal />
+                  {children}
+                  <MobileBottomNav />
+                  <CookieConsent />
+                  <Toaster position="bottom-right" richColors closeButton />
+                </ModuleProvider>
               </AppThemeProvider>
             </CurrencyProvider>
           </NextIntlClientProvider>

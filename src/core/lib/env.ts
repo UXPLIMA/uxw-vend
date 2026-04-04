@@ -60,7 +60,7 @@ export function validateEnv() {
             (i) => `  ${i.path.join(".")}: ${i.message}`
         );
         console.warn(
-            `⚠️  Environment validation warnings:\n${errors.join("\n")}\n`
+            `[warn] Environment validation warnings:\n${errors.join("\n")}\n`
         );
     }
 

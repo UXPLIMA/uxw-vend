@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
+import { useModules } from "@/core/hooks/useModule";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
@@ -23,6 +24,7 @@ export function Navbar() {
     const [cartCount, setCartCount] = useState(0);
     const [unreadNotifs, setUnreadNotifs] = useState(0);
     const { settings } = useSiteSettings();
+    const { modules: moduleStatus } = useModules();
     const [mounted, setMounted] = useState(false);
     const [isDark, setIsDark] = useState(false);
 
@@ -52,7 +54,34 @@ export function Navbar() {
         { label: t('forum'), href: "/forum", icon: "MessageSquare" },
         { label: t('support'), href: "/support", icon: "HelpCircle" },
     ];
-    const navLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : defaultLinks) as { label: string; href: string; icon?: string; children?: { label: string; href: string }[] }[];
+    const rawNavLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : defaultLinks) as { label: string; href: string; icon?: string; children?: { label: string; href: string }[] }[];
+
+    // Map href paths to module IDs for filtering disabled modules
+    const pathToModule: Record<string, string> = {
+        "/store": "store", "/forum": "forum", "/support": "support", "/blog": "blog",
+        "/wheel": "wheel", "/vote": "vote", "/leaderboard": "leaderboard",
+        "/suggestions": "suggestions", "/changelog": "changelog", "/staff": "staff",
+        "/downloads": "downloads", "/punishments": "punishments",
+    };
+    const isLinkEnabled = (href: string) => {
+        const moduleId = pathToModule[href];
+        if (!moduleId) return true; // not a module link, always show
+        return moduleStatus[moduleId] !== false;
+    };
+
+    // Filter out disabled module links (including from dropdown children)
+    const navLinks = rawNavLinks
+        .filter((link) => isLinkEnabled(link.href))
+        .map((link) => {
+            if (link.children) {
+                const filtered = link.children.filter((child) => isLinkEnabled(child.href));
+                if (filtered.length === 0) return null;
+                return { ...link, children: filtered };
+            }
+            return link;
+        })
+        .filter(Boolean) as typeof rawNavLinks;
+
     const menuRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -67,9 +96,11 @@ export function Navbar() {
 
     useEffect(() => {
         if (status !== "authenticated") return;
-        fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
+        if (moduleStatus['store'] !== false) {
+            fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
+        }
         fetch("/api/v1/notifications").then((r) => r.json()).then((d) => setUnreadNotifs(d.unread || 0)).catch(() => {});
-    }, [status]);
+    }, [status, moduleStatus]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
     const isAdminUser = session?.user?.role === "admin";
@@ -146,12 +177,14 @@ export function Navbar() {
                                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
                                     )}
                                 </Link>
-                                <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                                    <ShoppingCart className="w-4 h-4" />
-                                    {cartCount > 0 && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
-                                    )}
-                                </Link>
+                                {moduleStatus['store'] !== false && (
+                                    <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                                        <ShoppingCart className="w-4 h-4" />
+                                        {cartCount > 0 && (
+                                            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
+                                        )}
+                                    </Link>
+                                )}
 
                                 <div className="relative" ref={menuRef}>
                                     <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 transition-colors">

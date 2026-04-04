@@ -6,6 +6,7 @@ import { sendWelcomeEmail } from "@/core/lib/email";
 import { notifyUserRegistered } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
+import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 
 export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute per IP
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Hash password and create user
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
         const user = await prisma.user.create({
             data: {

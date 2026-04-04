@@ -6,7 +6,7 @@ export function CustomCssInjector() {
     const [css, setCss] = useState("");
 
     useEffect(() => {
-        fetch("/api/v1/settings")
+        fetch("/api/v1/public-settings")
             .then((r) => r.json())
             .then((data) => {
                 const s = data.settings || {};

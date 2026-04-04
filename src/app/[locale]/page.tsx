@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { useModuleEnabled } from "@/core/hooks/useModule";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
+import { useTheme } from "@/core/providers/theme-provider";
 import { NewsCard } from "@/core/components/cards/news-card";
 import { DiscordWidget } from "@/core/components/widgets/discord-widget";
 import { FeaturedProductWidget } from "@/core/components/widgets/featured-product-widget";
@@ -43,7 +44,9 @@ export default function HomePage() {
   const t = useTranslations('news');
   const commonT = useTranslations('common');
   const { enabled: blogEnabled } = useModuleEnabled('blog');
+  const { enabled: storeEnabled } = useModuleEnabled('store');
   const { settings } = useSiteSettings();
+  const { activeTheme } = useTheme();
 
   // Widget visibility from admin settings
   const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
@@ -72,7 +75,7 @@ export default function HomePage() {
   }, [blogEnabled]);
 
   // Pagination
-  const newsPerPage = 4;
+  const newsPerPage = Number(settings.per_page_home_news) || 4;
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
@@ -100,90 +103,93 @@ export default function HomePage() {
           <span className="text-gray-700">{t('title')}</span>
         </div>
 
-        <ThemeSlot
-          name="SidebarLayout"
-          defaultComponent={<StandardSidebarLayout sidebar={null as any} children={null} />}
-          props={{
-            children: (
-              <div className="lg:col-span-2">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">{t('title')}</h2>
+        {(() => {
+          const SidebarLayout = activeTheme?.components?.SidebarLayout || StandardSidebarLayout;
 
-                {/* 2-Column News Grid */}
-                {isLoading ? (
-                  <SkeletonNewsGrid count={4} />
-                ) : blogPosts.length === 0 ? (
-                  <div className="bg-white rounded-xl p-8 text-center">
-                    <p className="text-gray-500">No blog posts yet.</p>
-                  </div>
-                ) : (
-                  <ThemeSlot
-                    name="NewsGrid"
-                    defaultComponent={<NewsGrid posts={paginatedNews} />}
-                    props={{ posts: paginatedNews }}
-                  />
-                )}
+          const newsContent = blogEnabled ? (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">{t('title')}</h2>
 
-                {/* Pagination */}
-                <div className="flex items-center justify-center gap-2 mt-6">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="border-gray-300 text-gray-700 hover:text-gray-900"
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
-                  </Button>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                      className={currentPage === page ? "bg-blue-600" : "border-gray-300"}
-                    >
-                      {page}
-                    </Button>
-                  ))}
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="border-gray-300 text-gray-700 hover:text-gray-900"
-                  >
-                    {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
+              {/* 2-Column News Grid */}
+              {isLoading ? (
+                <SkeletonNewsGrid count={4} />
+              ) : blogPosts.length === 0 ? (
+                <div className="bg-white rounded-xl p-8 text-center">
+                  <p className="text-gray-500">No blog posts yet.</p>
                 </div>
+              ) : (
+                <ThemeSlot
+                  name="NewsGrid"
+                  defaultComponent={<NewsGrid posts={paginatedNews} />}
+                  props={{ posts: paginatedNews }}
+                />
+              )}
+
+              {/* Pagination */}
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="border-gray-300 text-gray-700 hover:text-gray-900"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={currentPage === page ? "bg-blue-600" : "border-gray-300"}
+                  >
+                    {page}
+                  </Button>
+                ))}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="border-gray-300 text-gray-700 hover:text-gray-900"
+                >
+                  {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
-            ),
-            sidebar: (
-              <div className="space-y-5">
-                {isLoading ? (
-                  <SkeletonSidebar />
-                ) : (
-                  <>
-                    {widgetOrder.map((id) => {
-                      if (!isWidgetVisible(id)) return null;
-                      const widgetMap: Record<string, React.ReactNode> = {
-                        DiscordWidget: <ThemeSlot key={id} name="DiscordWidget" defaultComponent={<DiscordWidget />} />,
-                        FeaturedProductWidget: <ThemeSlot key={id} name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />,
-                        PaymentGoalWidget: <ThemeSlot key={id} name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />,
-                        TopCustomerWidget: <ThemeSlot key={id} name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />,
-                        TopBuyersWidget: <ThemeSlot key={id} name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />,
-                        TopCreditLoadersWidget: <ThemeSlot key={id} name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />,
-                        RecentPurchasesWidget: <ThemeSlot key={id} name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />,
-                      };
-                      return widgetMap[id] || null;
-                    })}
-                  </>
-                )}
-              </div>
-            )
-          }}
-        />
+            </div>
+          ) : null;
+
+          const sidebarContent = (
+            <div className="space-y-5">
+              {isLoading ? (
+                <SkeletonSidebar />
+              ) : (
+                <>
+                  {widgetOrder.map((id) => {
+                    if (!isWidgetVisible(id)) return null;
+                    const storeWidgets = ["FeaturedProductWidget", "PaymentGoalWidget", "TopCustomerWidget", "TopBuyersWidget", "TopCreditLoadersWidget", "RecentPurchasesWidget"];
+                    if (!storeEnabled && storeWidgets.includes(id)) return null;
+                    const widgetMap: Record<string, React.ReactNode> = {
+                      DiscordWidget: <ThemeSlot key={id} name="DiscordWidget" defaultComponent={<DiscordWidget />} />,
+                      FeaturedProductWidget: <ThemeSlot key={id} name="FeaturedProductWidget" defaultComponent={<FeaturedProductWidget />} />,
+                      PaymentGoalWidget: <ThemeSlot key={id} name="PaymentGoalWidget" defaultComponent={<PaymentGoalWidget />} />,
+                      TopCustomerWidget: <ThemeSlot key={id} name="TopCustomerWidget" defaultComponent={<TopCustomerWidget />} />,
+                      TopBuyersWidget: <ThemeSlot key={id} name="TopBuyersWidget" defaultComponent={<TopBuyersWidget />} />,
+                      TopCreditLoadersWidget: <ThemeSlot key={id} name="TopCreditLoadersWidget" defaultComponent={<TopCreditLoadersWidget />} />,
+                      RecentPurchasesWidget: <ThemeSlot key={id} name="RecentPurchasesWidget" defaultComponent={<RecentPurchasesWidget />} />,
+                    };
+                    return widgetMap[id] || null;
+                  })}
+                </>
+              )}
+            </div>
+          );
+
+          return <SidebarLayout sidebar={sidebarContent}>{newsContent}</SidebarLayout>;
+        })()}
       </main >
 
       {/* Shared Footer */}

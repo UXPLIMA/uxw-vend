@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         }))
     );
 
-    const modules = moduleSystem.getDefinitions();
+    const modules = moduleSystem.getEnabledModules();
 
     return (
         <div className="min-h-screen bg-gray-50">

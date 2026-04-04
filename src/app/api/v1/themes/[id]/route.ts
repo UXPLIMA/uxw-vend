@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
-const PROTECTED_THEMES = ["flat", "retro"];
+const PROTECTED_THEMES = ["flat", "pixelcraft"];
 
 type RouteParams = { params: Promise<{ id: string }> };
 

@@ -4,22 +4,14 @@
 
 import { Theme } from "@/core/types/theme";
 import { flatTheme as flatConfig } from "@/themes/flat/theme.config";
-import { minecraftTheme as minecraftConfig } from "@/themes/minecraft/theme.config";
-import minecraft_DiscordWidget from "@/themes/minecraft/components/DiscordWidget";
-import minecraft_Footer from "@/themes/minecraft/components/Footer";
-import minecraft_HeroBanner from "@/themes/minecraft/components/HeroBanner";
-import minecraft_Navbar from "@/themes/minecraft/components/Navbar";
-import minecraft_NewsCard from "@/themes/minecraft/components/NewsCard";
-import minecraft_NewsGrid from "@/themes/minecraft/components/NewsGrid";
-import minecraft_SidebarLayout from "@/themes/minecraft/components/SidebarLayout";
-import { retroTheme as retroConfig } from "@/themes/retro/theme.config";
-import retro_DiscordWidget from "@/themes/retro/components/DiscordWidget";
-import retro_Footer from "@/themes/retro/components/Footer";
-import retro_HeroBanner from "@/themes/retro/components/HeroBanner";
-import retro_Navbar from "@/themes/retro/components/Navbar";
-import retro_NewsCard from "@/themes/retro/components/NewsCard";
-import retro_NewsGrid from "@/themes/retro/components/NewsGrid";
-import retro_SidebarLayout from "@/themes/retro/components/SidebarLayout";
+import { pixelcraftTheme as pixelcraftConfig } from "@/themes/pixelcraft/theme.config";
+import pixelcraft_DiscordWidget from "@/themes/pixelcraft/components/DiscordWidget";
+import pixelcraft_Footer from "@/themes/pixelcraft/components/Footer";
+import pixelcraft_HeroBanner from "@/themes/pixelcraft/components/HeroBanner";
+import pixelcraft_Navbar from "@/themes/pixelcraft/components/Navbar";
+import pixelcraft_NewsCard from "@/themes/pixelcraft/components/NewsCard";
+import pixelcraft_NewsGrid from "@/themes/pixelcraft/components/NewsGrid";
+import pixelcraft_SidebarLayout from "@/themes/pixelcraft/components/SidebarLayout";
 
 export const themeRegistry: Record<string, Theme> = {
 
@@ -28,14 +20,9 @@ export const themeRegistry: Record<string, Theme> = {
     components: {}
   },
 
-  "minecraft": {
-    config: minecraftConfig,
-    components: { DiscordWidget: minecraft_DiscordWidget, Footer: minecraft_Footer, HeroBanner: minecraft_HeroBanner, Navbar: minecraft_Navbar, NewsCard: minecraft_NewsCard, NewsGrid: minecraft_NewsGrid, SidebarLayout: minecraft_SidebarLayout }
-  },
-
-  "retro": {
-    config: retroConfig,
-    components: { DiscordWidget: retro_DiscordWidget, Footer: retro_Footer, HeroBanner: retro_HeroBanner, Navbar: retro_Navbar, NewsCard: retro_NewsCard, NewsGrid: retro_NewsGrid, SidebarLayout: retro_SidebarLayout }
+  "pixelcraft": {
+    config: pixelcraftConfig,
+    components: { DiscordWidget: pixelcraft_DiscordWidget, Footer: pixelcraft_Footer, HeroBanner: pixelcraft_HeroBanner, Navbar: pixelcraft_Navbar, NewsCard: pixelcraft_NewsCard, NewsGrid: pixelcraft_NewsGrid, SidebarLayout: pixelcraft_SidebarLayout }
   }
 };
 

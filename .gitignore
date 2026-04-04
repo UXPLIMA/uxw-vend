@@ -57,3 +57,11 @@ ROADMAP.md
 
 # claude code
 .claude/proxy.md
+
+# Test artifacts
+*.png
+!public/**/*.png
+.playwright-mcp/
+nabvar-dropdown.png
+wheel-new.png
+widgets-working.png
