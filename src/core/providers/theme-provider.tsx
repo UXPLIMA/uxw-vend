@@ -89,9 +89,17 @@ function ThemeContent({
 
     }, [activeTheme]);
 
+    // Pre-mount: use theme config colors directly for loader
+    const loaderBg = activeTheme?.config.colors.background || "#f3f4f6";
+    const loaderColor = activeTheme?.config.colors.primary || "#2563eb";
+
     return (
         <ThemeContext.Provider value={{ activeTheme, currentThemeId: activeThemeId }}>
-            {!mounted && <ThemeLoader />}
+            {!mounted && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backgroundColor: loaderBg }}>
+                    <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: `${loaderColor}20`, borderTopColor: loaderColor }} />
+                </div>
+            )}
             {children}
         </ThemeContext.Provider>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -18,6 +18,7 @@ export function Navbar() {
     const commonT = useTranslations('common');
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [navDropdown, setNavDropdown] = useState<string | null>(null);
     const [cartCount, setCartCount] = useState(0);
     const [unreadNotifs, setUnreadNotifs] = useState(0);
     const { settings } = useSiteSettings();
@@ -50,11 +51,15 @@ export function Navbar() {
         { label: t('forum'), href: "/forum", icon: "MessageSquare" },
         { label: t('support'), href: "/support", icon: "HelpCircle" },
     ];
-    const navLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : defaultLinks) as { label: string; href: string; icon?: string }[];
+    const navLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : defaultLinks) as { label: string; href: string; icon?: string; children?: { label: string; href: string }[] }[];
     const menuRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        function handleClickOutside(e: MouseEvent) { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false); }
+        function handleClickOutside(e: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setNavDropdown(null);
+        }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
@@ -72,9 +77,38 @@ export function Navbar() {
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12">
-                    <nav className="flex items-center gap-1">
+                    <nav className="flex items-center gap-1" ref={dropdownRef}>
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
+
+                            // Dropdown menu
+                            if (link.children && link.children.length > 0) {
+                                return (
+                                    <div key={link.label} className="relative">
+                                        <button
+                                            onClick={() => setNavDropdown(navDropdown === link.label ? null : link.label)}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
+                                        >
+                                            {IconComp && <IconComp className="w-4 h-4" />}
+                                            {link.label}
+                                            <ChevronDown className={`w-3 h-3 transition-transform ${navDropdown === link.label ? "rotate-180" : ""}`} />
+                                        </button>
+                                        {navDropdown === link.label && (
+                                            <div className="absolute top-full left-0 mt-1 w-48 bg-card border border-[var(--color-border)] rounded-lg shadow-lg py-1 z-50 animate-fade-in">
+                                                {link.children.map((child) => (
+                                                    <Link key={child.href} href={child.href}
+                                                        onClick={() => setNavDropdown(null)}
+                                                        className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                                                        {child.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+
+                            // Normal link
                             return (
                                 <Link key={link.href} href={link.href}
                                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}>

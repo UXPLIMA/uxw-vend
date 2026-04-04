@@ -116,7 +116,7 @@ async function main() {
     console.log("✅ Products");
 
     // ==================== ORDERS ====================
-    const orderStatuses = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING"];
+    const orderStatuses: ("COMPLETED" | "PENDING" | "PROCESSING")[] = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING"];
     for (let i = 0; i < 8; i++) {
         const user = users[i % users.length];
         const product = products[i % products.length];
@@ -259,10 +259,10 @@ async function main() {
     }
 
     const tickets = [
-        { subject: "I didn't receive my VIP rank", departmentId: "billing-dept", userId: users[0].id, priority: "HIGH" as const, status: "OPEN" },
-        { subject: "Player griefing my base", departmentId: "report-dept", userId: users[1].id, priority: "MEDIUM" as const, status: "IN_PROGRESS" },
-        { subject: "How do I claim my daily reward?", departmentId: "general-dept", userId: users[2].id, priority: "LOW" as const, status: "RESOLVED" },
-        { subject: "Refund request for duplicate purchase", departmentId: "billing-dept", userId: users[3].id, priority: "HIGH" as const, status: "OPEN" },
+        { subject: "I didn't receive my VIP rank", departmentId: "billing-dept", userId: users[0].id, priority: "HIGH" as const, status: "OPEN" as const },
+        { subject: "Player griefing my base", departmentId: "report-dept", userId: users[1].id, priority: "MEDIUM" as const, status: "IN_PROGRESS" as const },
+        { subject: "How do I claim my daily reward?", departmentId: "general-dept", userId: users[2].id, priority: "LOW" as const, status: "RESOLVED" as const },
+        { subject: "Refund request for duplicate purchase", departmentId: "billing-dept", userId: users[3].id, priority: "HIGH" as const, status: "OPEN" as const },
     ];
 
     for (const ticket of tickets) {
@@ -398,6 +398,33 @@ async function main() {
         }).catch(() => {});
     }
     console.log("✅ Help center articles");
+
+    // ==================== NAVBAR SETTINGS ====================
+    const navbarLinks = [
+        { label: "Home", href: "/", icon: "Home" },
+        { label: "Store", href: "/store", icon: "ShoppingCart" },
+        { label: "Forum", href: "/forum", icon: "MessageSquare" },
+        { label: "Support", href: "/support", icon: "HelpCircle" },
+        {
+            label: "Other", href: "#", icon: "Star",
+            children: [
+                { label: "Leaderboard", href: "/leaderboard" },
+                { label: "Vote for Us", href: "/vote" },
+                { label: "Wheel of Fortune", href: "/wheel" },
+                { label: "Suggestions", href: "/suggestions" },
+                { label: "Changelog", href: "/changelog" },
+                { label: "Staff", href: "/staff" },
+                { label: "Downloads", href: "/downloads" },
+                { label: "Punishments", href: "/punishments" },
+            ],
+        },
+    ];
+    await prisma.setting.upsert({
+        where: { key: "navbar_links" },
+        update: { value: navbarLinks },
+        create: { key: "navbar_links", value: navbarLinks },
+    });
+    console.log("✅ Navbar with dropdown menu");
 
     console.log("\n🎉 Seeding complete!");
     console.log("   Accounts (all password: password123):");
