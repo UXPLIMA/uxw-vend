@@ -71,35 +71,35 @@ async function main() {
     const catSurvival = await prisma.category.upsert({
         where: { slug: "survival" },
         update: {},
-        create: { name: "Survival", slug: "survival", description: "Survival gamemode items", order: 0 },
+        create: { name: "Survival", slug: "survival", description: "Survival gamemode items", image: "https://mc-heads.net/head/MHF_Villager/128", order: 0 },
     });
 
     const catRanks = await prisma.category.upsert({
         where: { slug: "ranks" },
         update: {},
-        create: { name: "Ranks", slug: "ranks", description: "VIP and donor ranks", parentId: catSurvival.id, order: 0 },
+        create: { name: "Ranks", slug: "ranks", description: "VIP and donor ranks", image: "https://mc-heads.net/head/MHF_Steve/128", parentId: catSurvival.id, order: 0 },
     });
 
     const catKeys = await prisma.category.upsert({
         where: { slug: "keys" },
         update: {},
-        create: { name: "Keys", slug: "keys", description: "Crate keys", parentId: catSurvival.id, order: 1 },
+        create: { name: "Keys", slug: "keys", description: "Crate keys", image: "https://mc-heads.net/head/MHF_Chest/128", parentId: catSurvival.id, order: 1 },
     });
     console.log("✅ Store categories created");
 
     // Products
     const products = [
-        { name: "VIP Rank", slug: "vip-rank", price: 9.99, description: "Access VIP features|Priority queue|Custom chat color|VIP kit", categoryId: catRanks.id, isFeatured: true },
-        { name: "MVP Rank", slug: "mvp-rank", price: 19.99, comparePrice: 24.99, description: "All VIP features|Fly in lobby|Special effects|Monthly crate", categoryId: catRanks.id, isFeatured: true },
-        { name: "Legend Rank", slug: "legend-rank", price: 49.99, comparePrice: 59.99, description: "All MVP features|Custom join message|Pet companion|Exclusive cosmetics|Priority support", categoryId: catRanks.id, isFeatured: true },
-        { name: "Vote Key", slug: "vote-key", price: 1.99, description: "Open the Vote Crate", categoryId: catKeys.id, stock: 999 },
-        { name: "Legendary Key", slug: "legendary-key", price: 4.99, description: "Open the Legendary Crate", categoryId: catKeys.id, stock: 500 },
+        { name: "VIP Rank", slug: "vip-rank", price: 9.99, image: "https://mc-heads.net/head/MHF_Steve/128", description: "Access VIP features|Priority queue|Custom chat color|VIP kit", categoryId: catRanks.id, isFeatured: true },
+        { name: "MVP Rank", slug: "mvp-rank", price: 19.99, comparePrice: 24.99, image: "https://mc-heads.net/head/MHF_Alex/128", description: "All VIP features|Fly in lobby|Special effects|Monthly crate", categoryId: catRanks.id, isFeatured: true },
+        { name: "Legend Rank", slug: "legend-rank", price: 49.99, comparePrice: 59.99, image: "https://mc-heads.net/head/Notch/128", description: "All MVP features|Custom join message|Pet companion|Exclusive cosmetics|Priority support", categoryId: catRanks.id, isFeatured: true },
+        { name: "Vote Key", slug: "vote-key", price: 1.99, image: "https://mc-heads.net/head/MHF_Chest/128", description: "Open the Vote Crate", categoryId: catKeys.id, stock: 999 },
+        { name: "Legendary Key", slug: "legendary-key", price: 4.99, image: "https://mc-heads.net/head/MHF_Present2/128", description: "Open the Legendary Crate", categoryId: catKeys.id, stock: 500 },
     ];
 
     for (const p of products) {
         await prisma.product.upsert({
             where: { slug: p.slug },
-            update: {},
+            update: { image: p.image },
             create: { ...p, isActive: true },
         });
     }
