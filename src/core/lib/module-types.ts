@@ -59,6 +59,13 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
+    // Navbar components — rendered in navbar's right side (e.g. cart icon, notification bell)
+    navbarComponents?: {
+        id: string;
+        component: string;   // path to component
+        order: number;        // render order (lower = left)
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

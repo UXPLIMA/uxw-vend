@@ -1,14 +1,14 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, Bell, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleNavLinks, ModuleRoutes } from "@/core/generated/module-registry";
+import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
@@ -22,9 +22,6 @@ export function Navbar() {
     const { data: session, status } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [navDropdown, setNavDropdown] = useState<string | null>(null);
-    const [cartCount, setCartCount] = useState(0);
-    const [unreadNotifs, setUnreadNotifs] = useState(0);
-    const [notificationsAvailable, setNotificationsAvailable] = useState(false);
     const { settings } = useSiteSettings();
     const moduleStatus = useAllModules();
     const [mounted, setMounted] = useState(false);
@@ -124,17 +121,10 @@ export function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        if (status !== "authenticated") return;
-        if (isLinkEnabled("/store")) {
-            fetch("/api/v1/store/cart").then((r) => r.json()).then((d) => setCartCount(d.itemCount || 0)).catch(() => {});
-        }
-        fetch("/api/v1/notifications").then((r) => {
-            if (!r.ok) return;
-            setNotificationsAvailable(true);
-            r.json().then((d) => setUnreadNotifs(d.unread || 0));
-        }).catch(() => {});
-    }, [status, moduleStatus]);
+    // Navbar components from modules (bell, cart, etc.)
+    const enabledNavbarComponents = ModuleNavbarComponents
+        .filter(nc => moduleStatus[nc.module] === true)
+        .filter(nc => NavbarComponentRegistry[nc.id]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
     const isAdminUser = session?.user?.role === "admin";
@@ -205,22 +195,11 @@ export function Navbar() {
                             <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
                         ) : session?.user ? (
                             <>
-                                {notificationsAvailable && (
-                                    <Link href="/profile" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                                        <Bell className="w-4 h-4" />
-                                        {unreadNotifs > 0 && (
-                                            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">{unreadNotifs > 9 ? "9+" : unreadNotifs}</span>
-                                        )}
-                                    </Link>
-                                )}
-                                {isLinkEnabled("/store") && (
-                                    <Link href="/store/cart" className="relative p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                                        <ShoppingCart className="w-4 h-4" />
-                                        {cartCount > 0 && (
-                                            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">{cartCount > 9 ? "9+" : cartCount}</span>
-                                        )}
-                                    </Link>
-                                )}
+                                {/* Module navbar components (bell, cart, etc.) — from registry */}
+                                {enabledNavbarComponents.map(nc => {
+                                    const NavComp = NavbarComponentRegistry[nc.id];
+                                    return <NavComp key={nc.id} />;
+                                })}
 
                                 <div className="relative" ref={menuRef}>
                                     <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 transition-colors">

@@ -29,6 +29,12 @@ export const LayoutComponentRegistry: Record<string, any> = {
 
 export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = [];
 
+// Navbar component registry (rendered in navbar right side)
+export const NavbarComponentRegistry: Record<string, any> = {
+};
+
+export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = [];
+
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [];
 
 export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [];

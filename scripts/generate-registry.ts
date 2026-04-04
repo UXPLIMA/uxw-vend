@@ -102,6 +102,7 @@ function generateRegistry() {
     const allDashboardCards: any[] = [];
     const allHomepageSections: any[] = [];
     const allLayoutComponents: any[] = [];
+    const allNavbarComponents: any[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -140,6 +141,12 @@ function generateRegistry() {
                 });
             }
 
+            if (manifest.navbarComponents) {
+                manifest.navbarComponents.forEach((nc: any) => {
+                    allNavbarComponents.push({ ...nc, module: moduleName });
+                });
+            }
+
             if (manifest.homepageSections) {
                 manifest.homepageSections.forEach((section: any) => {
                     allHomepageSections.push({ ...section, module: moduleName });
@@ -152,6 +159,7 @@ function generateRegistry() {
     allNavLinks.sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
     allWidgets.sort((a, b) => a.defaultOrder - b.defaultOrder);
     allHomepageSections.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    allNavbarComponents.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
     // Generate dynamic imports for widget components
     let widgetImports = '\n// Widget component registry\nexport const WidgetComponentRegistry: Record<string, any> = {\n';
@@ -203,7 +211,19 @@ function generateRegistry() {
     layoutImports += '};\n\n';
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + widgetRegistry;
+    // Generate dynamic imports for navbar components
+    let navbarImports = '// Navbar component registry (rendered in navbar right side)\nexport const NavbarComponentRegistry: Record<string, any> = {\n';
+    for (const nc of allNavbarComponents) {
+        let importPath = nc.component.startsWith('@core/')
+            ? `@/core/components/${nc.component.replace('@core/', '')}`
+            : `@/modules/${nc.module}/${nc.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then(mod => mod.${nc.id} || mod.default || mod), { ssr: false }),\n`;
+    }
+    navbarImports += '};\n\n';
+    navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
+
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);
