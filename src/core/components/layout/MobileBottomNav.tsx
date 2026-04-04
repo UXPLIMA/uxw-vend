@@ -1,55 +1,56 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, MessageSquare, HelpCircle, User } from "lucide-react";
+import { Home, User, Package } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useModules } from "@/core/hooks/useModule";
+import { useAllModules } from "@/core/providers/module-provider";
+import { ModuleNavLinks } from "@/core/generated/module-registry";
 
-const navItems = [
-    { href: "/", icon: Home, label: "Home" },
-    { href: "/store", icon: ShoppingCart, label: "Store" },
-    { href: "/forum", icon: MessageSquare, label: "Forum" },
-    { href: "/support", icon: HelpCircle, label: "Support" },
-    { href: "/profile", icon: User, label: "Profile" },
-];
+// Icon map for dynamic rendering from registry
+import { ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download, Gift, Crown, Trophy, Vote, Dices, History, Users, Shield } from "lucide-react";
+const iconMap: Record<string, any> = {
+    Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download,
+    Gift, Crown, Trophy, Vote, Dices, History, Users, Shield, Package, User,
+};
 
 export function MobileBottomNav() {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const { modules: moduleStatus } = useModules();
+    const moduleStatus = useAllModules();
 
-    // Don't show on admin pages
     if (pathname.startsWith("/admin")) return null;
 
-    const pathToModule: Record<string, string> = {
-        "/store": "store", "/forum": "forum", "/support": "support", "/blog": "blog",
-        "/wheel": "wheel", "/vote": "vote", "/leaderboard": "leaderboard",
-        "/suggestions": "suggestions", "/changelog": "changelog", "/staff": "staff",
-        "/downloads": "downloads", "/punishments": "punishments",
-    };
-    const isLinkEnabled = (href: string) => {
-        const mod = pathToModule[href];
-        return !mod || moduleStatus[mod] === true;
-    };
+    // Build nav items from registry — Home + first 3 enabled module links + Profile
+    const moduleLinks = ModuleNavLinks
+        .filter(nl => moduleStatus[nl.module] === true)
+        .slice(0, 3)
+        .map(nl => ({
+            href: nl.href,
+            icon: iconMap[nl.icon || "Package"] || Package,
+            label: nl.label,
+        }));
+
+    const items = [
+        { href: "/", icon: Home, label: "Home" },
+        ...moduleLinks,
+        ...(session?.user ? [{ href: "/profile", icon: User, label: "Profile" }] : []),
+    ];
 
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
     return (
         <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-area-bottom">
             <div className="flex items-center justify-around h-14">
-                {navItems.filter(item => isLinkEnabled(item.href)).map((item) => {
-                    if (item.href === "/profile" && !session?.user) return null;
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex flex-col items-center gap-0.5 px-3 py-1 ${isActive(item.href) ? "text-primary" : "text-gray-400"}`}
-                        >
-                            <item.icon className="w-5 h-5" />
-                            <span className="text-[10px] font-medium">{item.label}</span>
-                        </Link>
-                    );
-                })}
+                {items.map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex flex-col items-center gap-0.5 px-3 py-1 ${isActive(item.href) ? "text-primary" : "text-gray-400"}`}
+                    >
+                        <item.icon className="w-5 h-5" />
+                        <span className="text-[10px] font-medium">{item.label}</span>
+                    </Link>
+                ))}
             </div>
         </nav>
     );

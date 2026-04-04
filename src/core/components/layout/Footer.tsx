@@ -7,7 +7,8 @@ import { Globe, DollarSign, Mail, ChevronDown, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useCurrency, currencies, type CurrencyCode } from "@/core/lib/currency/context";
-import { useModules } from "@/core/hooks/useModule";
+import { useAllModules } from "@/core/providers/module-provider";
+import { ModuleFooterLinks, ModuleNavLinks } from "@/core/generated/module-registry";
 
 // Custom Dropdown Component for Footer
 function CustomDropdown({
@@ -59,14 +60,12 @@ export function Footer() {
     const router = useRouter();
     const pathname = usePathname();
     const { currency, setCurrency } = useCurrency();
-    const { modules: moduleStatus } = useModules();
+    const moduleStatus = useAllModules();
 
-    const pathToModule: Record<string, string> = {
-        "/store": "store", "/forum": "forum", "/support": "support", "/blog": "blog",
-        "/wheel": "wheel", "/vote": "vote", "/leaderboard": "leaderboard",
-        "/suggestions": "suggestions", "/changelog": "changelog", "/staff": "staff",
-        "/downloads": "downloads", "/punishments": "punishments",
-    };
+    // Build path→module map from registry — zero hardcoded module names
+    const pathToModule: Record<string, string> = {};
+    for (const fl of ModuleFooterLinks) { pathToModule[fl.href] = fl.module; }
+    for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
     const isLinkEnabled = (href: string) => {
         const mod = pathToModule[href];
         return !mod || moduleStatus[mod] === true;
@@ -119,14 +118,12 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold text-white mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
-                            {[
-                                { href: "/", label: commonT('home') },
-                                { href: "/store", label: commonT('store') },
-                                { href: "/support", label: commonT('support') },
-                                { href: "/faq", label: t('faq') },
-                            ].filter(link => isLinkEnabled(link.href)).map(link => (
-                                <li key={link.href}><Link href={link.href} className="text-gray-400 hover:text-white transition-colors">{link.label}</Link></li>
-                            ))}
+                            <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">{commonT('home')}</Link></li>
+                            {ModuleFooterLinks
+                                .filter(fl => fl.section === "quick" && moduleStatus[fl.module] === true)
+                                .map(fl => (
+                                    <li key={fl.href}><Link href={fl.href} className="text-gray-400 hover:text-white transition-colors">{fl.label}</Link></li>
+                                ))}
                         </ul>
                     </div>
 
