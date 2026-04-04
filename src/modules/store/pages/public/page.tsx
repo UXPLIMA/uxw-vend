@@ -232,17 +232,19 @@ export default function StorePage() {
                                     <button
                                         key={mode.id}
                                         onClick={() => handleModeSelect(mode.slug)}
-                                        className="bg-white rounded-lg border border-gray-100 p-6 text-center hover:shadow-md transition-all group"
+                                        className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group text-left"
                                     >
-                                        <div className="w-20 h-20 mx-auto mb-3 flex items-center justify-center bg-blue-50 rounded-lg overflow-hidden">
+                                        <div className="h-32 bg-gray-100 flex items-center justify-center overflow-hidden">
                                             {mode.image ? (
-                                                <img src={mode.image} alt={mode.name} className="w-full h-full object-cover" />
+                                                <img src={mode.image} alt={mode.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                             ) : (
-                                                <Box className="w-12 h-12 text-blue-500 group-hover:scale-110 transition-transform" />
+                                                <Box className="w-12 h-12 text-gray-300" />
                                             )}
                                         </div>
-                                        <h3 className="font-semibold text-gray-900">{mode.name}</h3>
-                                        {mode.description && <p className="text-sm text-gray-500 mt-1">{mode.description}</p>}
+                                        <div className="p-4">
+                                            <h3 className="font-semibold text-gray-900">{mode.name}</h3>
+                                            {mode.description && <p className="text-sm text-gray-500 mt-1">{mode.description}</p>}
+                                        </div>
                                     </button>
                                 ))}
                             </div>
@@ -263,16 +265,18 @@ export default function StorePage() {
                                     <button
                                         key={cat.id}
                                         onClick={() => setActiveCategory(cat.slug)}
-                                        className="bg-white rounded-lg border border-gray-100 p-6 text-center hover:shadow-md transition-all group"
+                                        className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-all group text-left"
                                     >
-                                        <div className="w-20 h-20 mx-auto mb-3 flex items-center justify-center bg-amber-50 rounded-lg overflow-hidden">
+                                        <div className="h-32 bg-gray-100 flex items-center justify-center overflow-hidden">
                                             {cat.image ? (
-                                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                                             ) : (
-                                                <Coins className="w-12 h-12 text-amber-500 group-hover:scale-110 transition-transform" />
+                                                <Coins className="w-12 h-12 text-gray-300" />
                                             )}
                                         </div>
-                                        <h3 className="font-medium text-gray-900">{cat.name}</h3>
+                                        <div className="p-4">
+                                            <h3 className="font-medium text-gray-900">{cat.name}</h3>
+                                        </div>
                                     </button>
                                 ))}
                             </div>
