@@ -4,6 +4,14 @@
 
 import { Theme } from "@/core/types/theme";
 import { flatTheme as flatConfig } from "@/themes/flat/theme.config";
+import { minecraftTheme as minecraftConfig } from "@/themes/minecraft/theme.config";
+import minecraft_DiscordWidget from "@/themes/minecraft/components/DiscordWidget";
+import minecraft_Footer from "@/themes/minecraft/components/Footer";
+import minecraft_HeroBanner from "@/themes/minecraft/components/HeroBanner";
+import minecraft_Navbar from "@/themes/minecraft/components/Navbar";
+import minecraft_NewsCard from "@/themes/minecraft/components/NewsCard";
+import minecraft_NewsGrid from "@/themes/minecraft/components/NewsGrid";
+import minecraft_SidebarLayout from "@/themes/minecraft/components/SidebarLayout";
 import { retroTheme as retroConfig } from "@/themes/retro/theme.config";
 import retro_DiscordWidget from "@/themes/retro/components/DiscordWidget";
 import retro_Footer from "@/themes/retro/components/Footer";
@@ -18,6 +26,11 @@ export const themeRegistry: Record<string, Theme> = {
   "flat": {
     config: flatConfig,
     components: {}
+  },
+
+  "minecraft": {
+    config: minecraftConfig,
+    components: { DiscordWidget: minecraft_DiscordWidget, Footer: minecraft_Footer, HeroBanner: minecraft_HeroBanner, Navbar: minecraft_Navbar, NewsCard: minecraft_NewsCard, NewsGrid: minecraft_NewsGrid, SidebarLayout: minecraft_SidebarLayout }
   },
 
   "retro": {
