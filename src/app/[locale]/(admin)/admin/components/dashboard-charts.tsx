@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useModuleStatus } from "@/core/providers/module-provider";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -28,6 +29,7 @@ interface StatsData {
 }
 
 export function DashboardCharts() {
+    const storeEnabled = useModuleStatus('store');
     const [data, setData] = useState<StatsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("30");
@@ -114,6 +116,7 @@ export function DashboardCharts() {
 
             {/* Charts Grid */}
             <div className="grid lg:grid-cols-2 gap-6">
+                {storeEnabled && (
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
@@ -125,7 +128,9 @@ export function DashboardCharts() {
                         </div>
                     </CardContent>
                 </Card>
+                )}
 
+                {storeEnabled && (
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Orders</CardTitle>
@@ -137,8 +142,9 @@ export function DashboardCharts() {
                         </div>
                     </CardContent>
                 </Card>
+                )}
 
-                <Card className="lg:col-span-2">
+                <Card className={storeEnabled ? "lg:col-span-2" : "lg:col-span-2"}>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">New Users</CardTitle>
                         <p className="text-2xl font-bold text-purple-600">{data.totals.users}</p>
