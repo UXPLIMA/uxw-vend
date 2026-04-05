@@ -67,3 +67,6 @@ ROADMAP.md
 nabvar-dropdown.png
 wheel-new.png
 widgets-working.png
+
+# Module sources (dev only, ZIPs are built from these)
+module-sources/

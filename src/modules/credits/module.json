@@ -1,0 +1,22 @@
+{
+    "id": "credits",
+    "name": "Credit System",
+    "description": "Virtual currency wallet for users",
+    "version": "1.0.0",
+    "author": "uxwVend",
+    "icon": "Coins",
+    "permissions": [
+        "credits.view",
+        "credits.manage"
+    ],
+    "api": [
+        {
+            "path": "/credits",
+            "handler": "api/credits/route.ts"
+        },
+        {
+            "path": "/credits/purchase",
+            "handler": "api/credits/purchase/route.ts"
+        }
+    ]
+}

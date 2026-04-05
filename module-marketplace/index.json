@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated": "2026-04-04",
+  "updated": "2026-04-05",
   "modules": [
     {
       "id": "analytics",
@@ -16,7 +16,7 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 0,
-        "adminRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 0,
         "widgets": 0
       }
@@ -55,26 +55,7 @@
       "stats": {
         "publicRoutes": 2,
         "adminRoutes": 4,
-        "apiRoutes": 6,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "cookie-consent",
-      "name": "Cookie Consent",
-      "description": "GDPR cookie consent banner",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Shield",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "cookie-consent.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 0,
+        "apiRoutes": 7,
         "widgets": 0
       }
     },
@@ -98,6 +79,63 @@
       }
     },
     {
+      "id": "cookie-consent",
+      "name": "Cookie Consent",
+      "description": "GDPR cookie consent banner",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "cookie-consent.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "credits",
+      "name": "Credit System",
+      "description": "Virtual currency wallet for users",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Coins",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "credits.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "currency",
+      "name": "Multi-Currency",
+      "description": "Multi-currency support with automatic conversion",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "DollarSign",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "currency.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "custom-forms",
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
@@ -112,7 +150,7 @@
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
-        "apiRoutes": 1,
+        "apiRoutes": 2,
         "widgets": 0
       }
     },
@@ -131,7 +169,64 @@
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "data-tools",
+      "name": "Data Tools",
+      "description": "CSV export and import utilities",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Download",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "data-tools.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "discord-auth",
+      "name": "Discord Login",
+      "description": "Allow users to sign in with their Discord account",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "discord-auth.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "discord-integration",
+      "name": "Discord Integration",
+      "description": "Discord webhook notifications and settings",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageSquare",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "discord-integration.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
         "widgets": 0
       }
     },
@@ -176,6 +271,25 @@
       }
     },
     {
+      "id": "email-system",
+      "name": "Email System",
+      "description": "Email service configuration and templates",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Mail",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "email-system.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "forum",
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
@@ -190,7 +304,45 @@
       "stats": {
         "publicRoutes": 3,
         "adminRoutes": 2,
-        "apiRoutes": 6,
+        "apiRoutes": 7,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "google-auth",
+      "name": "Google Login",
+      "description": "Allow users to sign in with their Google account",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Globe",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "google-auth.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "help-center",
+      "name": "Help Center",
+      "description": "Knowledge base with categories and searchable articles",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "HelpCircle",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "help-center.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 3,
+        "adminRoutes": 1,
+        "apiRoutes": 3,
         "widgets": 0
       }
     },
@@ -216,6 +368,46 @@
       }
     },
     {
+      "id": "notifications",
+      "name": "Notifications",
+      "description": "In-app notification system with bell icon",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Bell",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "notifications.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "paypal-gateway",
+      "name": "PayPal Payment Gateway",
+      "description": "Accept payments via PayPal",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "DollarSign",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "paypal-gateway.zip",
+      "dependencies": [
+        "store"
+      ],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "player-profiles",
       "name": "Player Profiles",
       "description": "Public player profile pages",
@@ -230,7 +422,7 @@
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
-        "apiRoutes": 1,
+        "apiRoutes": 2,
         "widgets": 0
       }
     },
@@ -268,237 +460,24 @@
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
-        "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "servers",
-      "name": "Game Servers",
-      "description": "Game server management, RCON, and status monitoring",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Server",
-      "category": "gaming",
-      "verified": true,
-      "downloads": 0,
-      "zip": "servers.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 3,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "slider",
-      "name": "Slider",
-      "description": "Homepage image carousel and banners",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Image",
-      "category": "content",
-      "verified": true,
-      "downloads": 0,
-      "zip": "slider.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "staff",
-      "name": "Staff",
-      "description": "Staff member listing and applications",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Users",
-      "category": "content",
-      "verified": true,
-      "downloads": 0,
-      "zip": "staff.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 1,
-        "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
       }
     },
     {
-      "id": "store",
-      "name": "Store Module",
-      "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "1.0.0",
-      "author": "uxwVend Team",
-      "icon": "ShoppingBag",
-      "category": "commerce",
-      "verified": true,
-      "downloads": 0,
-      "zip": "store.zip",
-      "dependencies": [
-        "currency"
-      ],
-      "stats": {
-        "publicRoutes": 5,
-        "adminRoutes": 6,
-        "apiRoutes": 25,
-        "widgets": 6
-      }
-    },
-    {
-      "id": "suggestions",
-      "name": "Suggestions",
-      "description": "Community feature suggestions with voting",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "MessageSquare",
-      "category": "community",
-      "verified": true,
-      "downloads": 0,
-      "zip": "suggestions.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 1,
-        "adminRoutes": 0,
-        "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "vote",
-      "name": "Vote System",
-      "description": "Vote-for-rewards system with configurable sites and cooldowns",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Vote",
-      "category": "commerce",
-      "verified": true,
-      "downloads": 0,
-      "zip": "vote.zip",
-      "dependencies": [
-        "credits"
-      ],
-      "stats": {
-        "publicRoutes": 1,
-        "adminRoutes": 1,
-        "apiRoutes": 2,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "wheel",
-      "name": "Wheel of Fortune",
-      "description": "Spin-to-win game with configurable prizes and cooldowns",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Dices",
-      "category": "commerce",
-      "verified": true,
-      "downloads": 0,
-      "zip": "wheel.zip",
-      "dependencies": [
-        "credits"
-      ],
-      "stats": {
-        "publicRoutes": 1,
-        "adminRoutes": 1,
-        "apiRoutes": 2,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "notifications",
-      "name": "Notifications",
-      "description": "In-app notification system with bell icon",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Bell",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "notifications.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "data-tools",
-      "name": "Data Tools",
-      "description": "CSV export and import utilities",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Download",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "data-tools.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 2,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "webhook-logs",
-      "name": "Webhook Logs",
-      "description": "View and manage webhook delivery logs",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Webhook",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "webhook-logs.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 1,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "discord-integration",
-      "name": "Discord Integration",
-      "description": "Discord webhook notifications and settings",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "MessageSquare",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "discord-integration.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "email-system",
-      "name": "Email System",
-      "description": "Email service configuration and templates",
+      "id": "resend-provider",
+      "name": "Resend Email Provider",
+      "description": "Send emails via Resend API",
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "management",
       "verified": true,
       "downloads": 0,
-      "zip": "email-system.zip",
-      "dependencies": [],
+      "zip": "resend-provider.zip",
+      "dependencies": [
+        "email-system"
+      ],
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -526,6 +505,84 @@
       }
     },
     {
+      "id": "servers",
+      "name": "Game Servers",
+      "description": "Game server management, RCON, and status monitoring",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Server",
+      "category": "gaming",
+      "verified": true,
+      "downloads": 0,
+      "zip": "servers.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 2,
+        "apiRoutes": 4,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "description": "Homepage image carousel and banners",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Image",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "slider.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 1
+      }
+    },
+    {
+      "id": "staff",
+      "name": "Staff",
+      "description": "Staff member listing and applications",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Users",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "staff.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 2,
+        "apiRoutes": 4,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "store",
+      "name": "Store Module",
+      "description": "Complete e-commerce functionality with products, categories, cart and orders",
+      "version": "1.0.0",
+      "author": "uxwVend Team",
+      "icon": "ShoppingBag",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "store.zip",
+      "dependencies": [
+        "currency"
+      ],
+      "stats": {
+        "publicRoutes": 5,
+        "adminRoutes": 12,
+        "apiRoutes": 25,
+        "widgets": 0
+      }
+    },
+    {
       "id": "stripe-gateway",
       "name": "Stripe Payment Gateway",
       "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
@@ -547,61 +604,21 @@
       }
     },
     {
-      "id": "paypal-gateway",
-      "name": "PayPal Payment Gateway",
-      "description": "Accept payments via PayPal",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "DollarSign",
-      "category": "commerce",
-      "verified": true,
-      "downloads": 0,
-      "zip": "paypal-gateway.zip",
-      "dependencies": [
-        "store"
-      ],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "discord-auth",
-      "name": "Discord Login",
-      "description": "Allow users to sign in with their Discord account",
+      "id": "suggestions",
+      "name": "Suggestions",
+      "description": "Community feature suggestions with voting",
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
-      "category": "management",
+      "category": "community",
       "verified": true,
       "downloads": 0,
-      "zip": "discord-auth.zip",
+      "zip": "suggestions.zip",
       "dependencies": [],
       "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "google-auth",
-      "name": "Google Login",
-      "description": "Allow users to sign in with their Google account",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Globe",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "google-auth.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
+        "publicRoutes": 1,
+        "adminRoutes": 0,
+        "apiRoutes": 2,
         "widgets": 0
       }
     },
@@ -625,65 +642,6 @@
       }
     },
     {
-      "id": "help-center",
-      "name": "Help Center",
-      "description": "Knowledge base with categories and searchable articles",
-      "version": "1.0.0",
-      "author": "uxwVend Team",
-      "icon": "HelpCircle",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "help-center.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 3,
-        "adminRoutes": 1,
-        "apiRoutes": 3,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "credits",
-      "name": "Credit System",
-      "description": "Virtual currency wallet for users",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Coins",
-      "category": "commerce",
-      "verified": true,
-      "downloads": 0,
-      "zip": "credits.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 2,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "resend-provider",
-      "name": "Resend Email Provider",
-      "description": "Send emails via Resend API",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Mail",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "resend-provider.zip",
-      "dependencies": [
-        "email-system"
-      ],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
-    {
       "id": "two-factor-auth",
       "name": "Two-Factor Authentication",
       "description": "TOTP-based 2FA with backup codes for enhanced account security",
@@ -703,21 +661,63 @@
       }
     },
     {
-      "id": "currency",
-      "name": "Multi-Currency",
-      "description": "Multi-currency support with automatic conversion",
+      "id": "vote",
+      "name": "Vote System",
+      "description": "Vote-for-rewards system with configurable sites and cooldowns",
       "version": "1.0.0",
       "author": "uxwVend",
-      "icon": "DollarSign",
+      "icon": "Vote",
       "category": "commerce",
       "verified": true,
       "downloads": 0,
-      "zip": "currency.zip",
+      "zip": "vote.zip",
+      "dependencies": [
+        "credits"
+      ],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "webhook-logs",
+      "name": "Webhook Logs",
+      "description": "View and manage webhook delivery logs",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Webhook",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "webhook-logs.zip",
       "dependencies": [],
       "stats": {
         "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "wheel",
+      "name": "Wheel of Fortune",
+      "description": "Spin-to-win game with configurable prizes and cooldowns",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Dices",
+      "category": "commerce",
+      "verified": true,
+      "downloads": 0,
+      "zip": "wheel.zip",
+      "dependencies": [
+        "credits"
+      ],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
         "widgets": 0
       }
     }
