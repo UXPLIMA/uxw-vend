@@ -29,7 +29,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             emailVerified: true, twoFactorEnabled: true,
             role: { select: { id: true, name: true, displayName: true, color: true, priority: true } },
             _count: true,
-            creditBalance: true,
         },
     });
 
@@ -89,7 +88,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             isBanned: true, banReason: true, bannedAt: true,
             emailVerified: true, twoFactorEnabled: true,
             role: { select: { id: true, name: true, displayName: true, color: true, priority: true } },
-            creditBalance: true,
         },
     });
 
