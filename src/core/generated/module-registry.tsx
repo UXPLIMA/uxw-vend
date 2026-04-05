@@ -15,7 +15,7 @@ export const ModuleRegistry: Record<string, any> = {
 
 export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
   {
-    "path": "/admin/settings/analytics",
+    "path": "/admin/analytics",
     "key": "analytics:pages/admin/settings/analytics/page.tsx",
     "module": "analytics",
     "isAdmin": true
