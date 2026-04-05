@@ -7,7 +7,7 @@ import {
     Package, Upload, Loader2, Trash2, Download, CheckCircle, ShoppingCart,
     MessageSquare, FileText, Ticket, HelpCircle, Shield, History, Users,
     Vote, Dices, Trophy, Star, Bell, Server, FileEdit, ImageIcon, Crown,
-    Megaphone, Search as SearchIcon
+    Megaphone, Search as SearchIcon, ArrowUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
@@ -22,6 +22,8 @@ interface Module {
     dependencies?: string[];
     conflicts?: string[];
     routes?: { public?: string[]; admin?: string[] };
+    updateAvailable?: boolean;
+    latestVersion?: string | null;
 }
 
 interface MarketplaceModule {
@@ -79,6 +81,7 @@ export default function AdminModulesPage() {
     const [installing, setInstalling] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [updatingModule, setUpdatingModule] = useState<string | null>(null);
     const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { confirm } = useConfirm();
@@ -146,6 +149,27 @@ export default function AdminModulesPage() {
             else toast.error(data.error || "Delete failed");
         } catch { toast.error("Delete failed"); }
         finally { setDeleting(null); }
+    };
+
+    const handleUpdate = async (mod: Module) => {
+        const mpMod = marketplace.find(m => m.id === mod.id);
+        if (!mpMod) { toast.error("Module not found in marketplace"); return; }
+        setUpdatingModule(mod.id);
+        try {
+            const res = await fetch("/api/v1/modules/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ moduleId: mod.id, zipFile: mpMod.zip }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(`"${mod.name}" updated to v${data.module?.version ?? mpMod.version}`);
+                fetchModules();
+            } else {
+                toast.error(data.error || "Update failed");
+            }
+        } catch { toast.error("Update failed"); }
+        finally { setUpdatingModule(null); }
     };
 
     const handleMarketplaceInstall = async (mod: MarketplaceModule) => {
@@ -219,7 +243,14 @@ export default function AdminModulesPage() {
                                             <span className="text-primary">{iconMap[mod.icon || ""] || <Package size={22} />}</span>
                                             <div>
                                                 <h3 className="font-semibold text-sm">{mod.name}</h3>
-                                                <p className="text-xs text-muted-foreground">v{mod.version}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    v{mod.version}
+                                                    {mod.updateAvailable && mod.latestVersion && (
+                                                        <span className="ml-1 text-amber-600 font-medium">
+                                                            → v{mod.latestVersion}
+                                                        </span>
+                                                    )}
+                                                </p>
                                             </div>
                                         </div>
                                         <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
@@ -275,6 +306,18 @@ export default function AdminModulesPage() {
                                         >
                                             {updating === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : mod.enabled ? "Disable" : "Enable"}
                                         </Button>
+                                        {mod.updateAvailable && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={updatingModule === mod.id}
+                                                onClick={() => handleUpdate(mod)}
+                                                className="text-amber-600 hover:text-amber-700 border-amber-300"
+                                                title={`Update to v${mod.latestVersion}`}
+                                            >
+                                                {updatingModule === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowUp className="w-3 h-3" />}
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="sm"

@@ -1,5 +1,5 @@
 "use client";
-import { SettingsForm } from "./settings-form";
+import { SettingsForm } from "@/core/components/admin/SettingsForm";
 
 export default function StripeSettingsPage() {
     return (

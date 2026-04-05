@@ -78,12 +78,63 @@ export async function POST(request: NextRequest) {
             create: { id: moduleId, name: manifest.name, enabled: true },
         });
 
+        // Run seed if manifest says to
+        let seeded = false;
+        if (manifest.seedOnInstall) {
+            const seedPath = path.join(targetDir, "seed.ts");
+            const hasSeed = await fs.access(seedPath).then(() => true).catch(() => false);
+            if (hasSeed) {
+                try {
+                    execSync(`npx tsx "${seedPath}"`, {
+                        cwd: process.cwd(),
+                        timeout: 60000,
+                        stdio: "pipe",
+                    });
+                    seeded = true;
+                } catch (seedErr: unknown) {
+                    // Seed failure is non-fatal — module is still installed
+                    console.error(`[module-install] Seed failed for ${moduleId}:`, (seedErr as Error)?.message || seedErr);
+                }
+            }
+        }
+
+        // Merge module translations into core messages
+        if (manifest.translations) {
+            const messagesDir = path.join(process.cwd(), "messages");
+            for (const [locale, translations] of Object.entries(manifest.translations)) {
+                const msgPath = path.join(messagesDir, `${locale}.json`);
+                try {
+                    const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
+                    const merged = { ...existing, ...(translations as Record<string, unknown>) };
+                    await fs.writeFile(msgPath, JSON.stringify(merged, null, 2));
+                } catch { /* locale file doesn't exist, skip */ }
+            }
+        }
+
+        // Also check for messages/ directory in module (alternative to manifest translations)
+        const moduleMessagesDir = path.join(targetDir, "messages");
+        const hasModuleMessages = await fs.access(moduleMessagesDir).then(() => true).catch(() => false);
+        if (hasModuleMessages) {
+            const localeFiles = await fs.readdir(moduleMessagesDir);
+            const coreMessagesDir = path.join(process.cwd(), "messages");
+            for (const file of localeFiles) {
+                if (!file.endsWith(".json")) continue;
+                try {
+                    const moduleTranslations = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
+                    const corePath = path.join(coreMessagesDir, file);
+                    const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
+                    const merged = { ...existing, ...moduleTranslations };
+                    await fs.writeFile(corePath, JSON.stringify(merged, null, 2));
+                } catch { /* skip */ }
+            }
+        }
+
         // Cleanup
         await fs.rm(zipPath, { force: true });
 
         return NextResponse.json({
-            message: "Module installed and enabled",
-            module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true },
+            message: seeded ? "Module installed, enabled, and seeded" : "Module installed and enabled",
+            module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true, seeded },
         });
     } catch (err: unknown) {
         return NextResponse.json({ error: "Install failed: " + ((err instanceof Error ? err.message : "Unknown error")) }, { status: 500 });

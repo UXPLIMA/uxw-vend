@@ -35,6 +35,13 @@ export interface ModuleManifest {
     dependencies?: string[];
     conflicts?: string[];       // Modules that can't be active at the same time
 
+    seedOnInstall?: boolean;
+
+    // Module translations — merged into core messages at runtime
+    translations?: {
+        [locale: string]: Record<string, string | Record<string, string>>;
+    };
+
     hooks?: {
         onEnable?: string;
         onDisable?: string;

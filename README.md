@@ -1,5 +1,8 @@
 <div align="center">
   <h1>uxwVend</h1>
+
+  ![CI](https://github.com/siracozmen01/uxwVend/actions/workflows/ci.yml/badge.svg)
+
   <p><strong>Open-source modular platform with a plugin marketplace</strong></p>
   <p>Zero modules by default. Install what you need. 37 verified modules available, plus custom ZIP uploads.</p>
 

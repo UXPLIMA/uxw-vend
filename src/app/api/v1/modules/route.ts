@@ -4,21 +4,69 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import moduleSystem from "@/core/lib/modules";
 
+const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
+
+// Cache marketplace index for update checks
+let marketplaceCache: { modules: Array<{ id: string; version: string }> } | null = null;
+let marketplaceCacheTime = 0;
+const MARKETPLACE_CACHE_TTL = 5 * 60 * 1000;
+
+async function fetchMarketplaceIndex(): Promise<Map<string, string>> {
+    const now = Date.now();
+    if (marketplaceCache && now - marketplaceCacheTime < MARKETPLACE_CACHE_TTL) {
+        return new Map(marketplaceCache.modules.map(m => [m.id, m.version]));
+    }
+    try {
+        const res = await fetch(MARKETPLACE_URL, { next: { revalidate: 300 } });
+        if (!res.ok) return new Map();
+        const data = await res.json();
+        marketplaceCache = data;
+        marketplaceCacheTime = now;
+        return new Map((data.modules as Array<{ id: string; version: string }>).map(m => [m.id, m.version]));
+    } catch {
+        if (marketplaceCache) {
+            return new Map(marketplaceCache.modules.map(m => [m.id, m.version]));
+        }
+        return new Map();
+    }
+}
+
+function isNewerVersion(current: string, latest: string): boolean {
+    const parse = (v: string) => v.replace(/^v/, "").split(".").map(Number);
+    const c = parse(current);
+    const l = parse(latest);
+    for (let i = 0; i < Math.max(c.length, l.length); i++) {
+        const cv = c[i] ?? 0;
+        const lv = l[i] ?? 0;
+        if (lv > cv) return true;
+        if (lv < cv) return false;
+    }
+    return false;
+}
+
 // GET /api/v1/modules - Get all modules with their status
 export async function GET() {
     const definitions = moduleSystem.getDefinitions();
     const configs = await prisma.moduleConfig.findMany();
-
     const configMap = new Map(configs.map(c => [c.id, c]));
 
-    const modules = definitions.map(def => ({
-        ...def,
-        enabled: configMap.get(def.id)?.enabled ?? true,
-        config: {
-            ...def.defaultConfig,
-            ...(configMap.get(def.id)?.config as object || {}),
-        },
-    }));
+    // Fetch marketplace versions for update checks
+    const marketplaceVersions = await fetchMarketplaceIndex();
+
+    const modules = definitions.map(def => {
+        const latestVersion = marketplaceVersions.get(def.id);
+        const updateAvailable = latestVersion ? isNewerVersion(def.version, latestVersion) : false;
+        return {
+            ...def,
+            enabled: configMap.get(def.id)?.enabled ?? true,
+            config: {
+                ...def.defaultConfig,
+                ...(configMap.get(def.id)?.config as object || {}),
+            },
+            updateAvailable,
+            latestVersion: latestVersion ?? null,
+        };
+    });
 
     return NextResponse.json({ modules });
 }
