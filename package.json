@@ -22,7 +22,9 @@
     "db:restore": "bash scripts/restore.sh",
     "clean": "rm -rf .next node_modules/.cache",
     "test:e2e": "npx playwright test",
-    "test:e2e:ui": "npx playwright test --ui"
+    "test:e2e:ui": "npx playwright test --ui",
+    "create:module": "npx tsx scripts/create-module.ts",
+    "validate:module": "npx tsx scripts/validate-module.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -51,6 +53,14 @@
     "stripe": "^22.0.0",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "redis": "^4.0.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "redis": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

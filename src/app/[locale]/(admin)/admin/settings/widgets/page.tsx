@@ -29,6 +29,8 @@ export default function WidgetSettingsPage() {
     const [widgetOrder, setWidgetOrder] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+    const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
     useEffect(() => {
         fetch("/api/v1/settings")
@@ -67,6 +69,38 @@ export default function WidgetSettingsPage() {
         setWidgetOrder(newOrder);
     };
 
+    const handleDragStart = (idx: number) => {
+        setDraggedIdx(idx);
+    };
+
+    const handleDragOver = (e: React.DragEvent, idx: number) => {
+        e.preventDefault();
+        setDragOverIdx(idx);
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIdx(null);
+    };
+
+    const handleDrop = (idx: number) => {
+        if (draggedIdx === null || draggedIdx === idx) {
+            setDraggedIdx(null);
+            setDragOverIdx(null);
+            return;
+        }
+        const newOrder = [...widgetOrder];
+        const [moved] = newOrder.splice(draggedIdx, 1);
+        newOrder.splice(idx, 0, moved);
+        setWidgetOrder(newOrder);
+        setDraggedIdx(null);
+        setDragOverIdx(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedIdx(null);
+        setDragOverIdx(null);
+    };
+
     const save = async () => {
         setSaving(true);
         await fetch("/api/v1/settings", {
@@ -97,13 +131,22 @@ export default function WidgetSettingsPage() {
             <Card className="mb-6">
                 <CardContent className="p-0">
                     <div className="divide-y">
-                        {sortedWidgets.map((widget) => (
-                            <div key={widget.id} className="flex items-center gap-4 p-4">
-                                <div className="flex flex-col gap-0.5">
+                        {sortedWidgets.map((widget, idx) => (
+                            <div
+                                key={widget.id}
+                                draggable
+                                onDragStart={() => handleDragStart(idx)}
+                                onDragOver={(e) => handleDragOver(e, idx)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={() => handleDrop(idx)}
+                                onDragEnd={handleDragEnd}
+                                className={`flex items-center gap-4 p-4 transition-all ${draggedIdx === idx ? "opacity-40" : ""} ${dragOverIdx === idx && draggedIdx !== idx ? "bg-primary/10 border-l-2 border-l-primary" : ""}`}
+                            >
+                                <div className="flex flex-col gap-0.5 cursor-grab active:cursor-grabbing">
                                     <button onClick={() => move(widget.id, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
                                     <button onClick={() => move(widget.id, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
                                 </div>
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0">
                                     <p className="font-medium">{widget.name}</p>
                                     <p className="text-xs text-muted-foreground">{widget.description}</p>
                                 </div>

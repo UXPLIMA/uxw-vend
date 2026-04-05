@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { usePathname } from "@/core/lib/i18n/navigation";
 import {
@@ -40,6 +40,8 @@ import {
     ClipboardCheck,
     KeyRound,
     Trophy,
+    Sun,
+    Moon,
 } from "lucide-react";
 
 interface NavItem {
@@ -86,6 +88,23 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
 export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        setIsDark(document.documentElement.getAttribute("data-mode") === "dark");
+    }, []);
+
+    const toggleDarkMode = () => {
+        const newDark = !isDark;
+        setIsDark(newDark);
+        if (newDark) {
+            document.documentElement.setAttribute("data-mode", "dark");
+            localStorage.setItem("color-mode", "dark");
+        } else {
+            document.documentElement.removeAttribute("data-mode");
+            localStorage.setItem("color-mode", "light");
+        }
+    };
 
     const isActive = (href: string) => {
         if (href === "/admin") return pathname === "/admin";
@@ -112,10 +131,10 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const sidebarContent = (
         <>
             <Link href="/" className="flex items-center mb-8 px-3" onClick={() => setMobileOpen(false)}>
-                <span className="font-bold text-xl text-gray-900">uxwVend</span>
+                <span className="font-bold text-xl text-foreground">uxwVend</span>
             </Link>
 
-            <nav className="space-y-0.5 mb-8 px-1">
+            <nav className="space-y-0.5 mb-8 px-1 flex-1">
                 {allNavItems.map((item) => (
                     <Link
                         key={item.href}
@@ -128,6 +147,17 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                     </Link>
                 ))}
             </nav>
+
+            {/* Dark mode toggle */}
+            <div className="px-1 mt-auto pt-4 border-t border-border">
+                <button
+                    onClick={toggleDarkMode}
+                    className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
+                >
+                    {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                    {isDark ? "Light Mode" : "Dark Mode"}
+                </button>
+            </div>
         </>
     );
 
@@ -150,7 +180,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             )}
 
             {/* Mobile sidebar */}
-            <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 flex flex-col ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <button
                     onClick={() => setMobileOpen(false)}
                     className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"
@@ -161,7 +191,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             </aside>
 
             {/* Desktop sidebar */}
-            <aside className="hidden lg:block fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
+            <aside className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
                 {sidebarContent}
             </aside>
         </>

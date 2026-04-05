@@ -32,7 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     const modules = moduleSystem.getEnabledModules();
 
     return (
-        <div className="min-h-screen bg-gray-50" suppressHydrationWarning>
+        <div className="min-h-screen bg-background" suppressHydrationWarning>
             <AdminSidebar
                 userName={session.user.name || ""}
                 userEmail={session.user.email || ""}

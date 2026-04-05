@@ -1,0 +1,13 @@
+{
+    "myModule": {
+        "title": "Modulom",
+        "description": "uxwVend icin ornek modul",
+        "items": "Ogeler",
+        "noItems": "Oge bulunamadi.",
+        "createItem": "Oge Olustur",
+        "editItem": "Oge Duzenle",
+        "deleteItem": "Oge Sil",
+        "itemTitle": "Baslik",
+        "itemDescription": "Aciklama"
+    }
+}

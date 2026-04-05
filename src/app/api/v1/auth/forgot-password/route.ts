@@ -8,7 +8,7 @@ import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 export async function POST(request: NextRequest) {
     try {
         const ip = getClientIP(request.headers);
-        const rl = rateLimit(`reset:${ip}`, { maxRequests: 5, windowMs: 3600000 }); // 5 per hour
+        const rl = await rateLimit(`reset:${ip}`, { maxRequests: 5, windowMs: 3600000 }); // 5 per hour
         if (!rl.success) {
             return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
         }

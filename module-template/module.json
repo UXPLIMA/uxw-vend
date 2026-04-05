@@ -1,0 +1,160 @@
+{
+    "_comment": "This is a complete module.json template. Remove fields you don't need.",
+
+    "id": "my-module",
+    "name": "My Module",
+    "description": "A template module for uxwVend",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "icon": "Star",
+
+    "dependencies": [],
+    "conflicts": [],
+
+    "permissions": [
+        "mymodule.view",
+        "mymodule.manage"
+    ],
+
+    "defaultConfig": {
+        "exampleSetting": true
+    },
+
+    "seedOnInstall": false,
+
+    "menu": [
+        {
+            "label": "My Module",
+            "path": "/my-module",
+            "icon": "Star"
+        }
+    ],
+
+    "routes": [
+        {
+            "path": "/my-module",
+            "component": "pages/public/page.tsx"
+        }
+    ],
+
+    "adminRoutes": [
+        {
+            "path": "/my-module",
+            "component": "pages/admin/page.tsx"
+        }
+    ],
+
+    "api": [
+        {
+            "path": "/my-module/items",
+            "handler": "api/route.ts"
+        }
+    ],
+
+    "widgets": [
+        {
+            "id": "ExampleWidget",
+            "component": "widgets/ExampleWidget",
+            "defaultOrder": 50,
+            "defaultVisible": true
+        }
+    ],
+
+    "navLinks": [
+        {
+            "label": "My Module",
+            "href": "/my-module",
+            "icon": "Star",
+            "position": 50
+        }
+    ],
+
+    "footerLinks": [
+        {
+            "label": "My Module",
+            "href": "/my-module",
+            "section": "quick"
+        }
+    ],
+
+    "navbarComponents": [
+        {
+            "id": "MyModuleIcon",
+            "component": "components/ExampleWidget",
+            "order": 50
+        }
+    ],
+
+    "layoutComponents": [
+        {
+            "id": "MyModuleOverlay",
+            "component": "components/ExampleWidget",
+            "include": ["/*"],
+            "exclude": ["/admin/*"]
+        }
+    ],
+
+    "homepageSections": [
+        {
+            "id": "MyModuleSection",
+            "type": "content",
+            "component": "components/ExampleWidget",
+            "order": 50
+        }
+    ],
+
+    "profileTabs": [
+        {
+            "id": "MyModuleTab",
+            "label": "My Module",
+            "component": "components/ExampleWidget",
+            "order": 50
+        }
+    ],
+
+    "dashboardCards": [
+        {
+            "id": "my-module-items",
+            "label": "Items",
+            "icon": "Star",
+            "href": "/admin/my-module",
+            "color": "text-blue-600",
+            "statKey": "items"
+        }
+    ],
+
+    "statsApi": "/my-module/stats",
+
+    "settingsCards": [
+        {
+            "title": "My Module",
+            "description": "Configure my module settings.",
+            "href": "/my-module",
+            "icon": "Star",
+            "color": "text-blue-500"
+        }
+    ],
+
+    "oauthButtons": [],
+
+    "translations": {
+        "en": {
+            "myModule": {
+                "title": "My Module",
+                "description": "Example module for uxwVend"
+            }
+        },
+        "tr": {
+            "myModule": {
+                "title": "Modulom",
+                "description": "uxwVend icin ornek modul"
+            }
+        },
+        "de": {
+            "myModule": {
+                "title": "Mein Modul",
+                "description": "Beispielmodul fuer uxwVend"
+            }
+        }
+    }
+}

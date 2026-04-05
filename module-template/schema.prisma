@@ -1,0 +1,29 @@
+// My Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+//
+// IMPORTANT:
+// - Model names should be prefixed with your module name to avoid collisions
+// - Use @id @default(cuid()) for primary keys
+// - Add @@index for frequently queried fields
+// - Relations to User model must be declared via the special comment below
+
+// @@user-relations-start
+//   myModuleItems MyModuleItem[]
+// @@user-relations-end
+
+// ==================== MY MODULE ====================
+
+model MyModuleItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}

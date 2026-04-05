@@ -1,0 +1,13 @@
+{
+    "myModule": {
+        "title": "My Module",
+        "description": "Example module for uxwVend",
+        "items": "Items",
+        "noItems": "No items found.",
+        "createItem": "Create Item",
+        "editItem": "Edit Item",
+        "deleteItem": "Delete Item",
+        "itemTitle": "Title",
+        "itemDescription": "Description"
+    }
+}

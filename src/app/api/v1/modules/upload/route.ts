@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     // Rate limit: 3 uploads per hour
-    const rl = rateLimit(`upload:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
+    const rl = await rateLimit(`upload:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
     if (!rl.success) {
         return NextResponse.json({ error: "Too many uploads. Try again later." }, { status: 429 });
     }

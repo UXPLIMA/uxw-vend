@@ -11,7 +11,7 @@ import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute per IP
     const ip = getClientIP(request.headers);
-    const rl = rateLimit(`register:${ip}`, rateLimits.auth);
+    const rl = await rateLimit(`register:${ip}`, rateLimits.auth);
     if (!rl.success) return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
     try {
         const body = await request.json();

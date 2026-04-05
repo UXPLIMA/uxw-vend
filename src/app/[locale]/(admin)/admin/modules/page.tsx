@@ -292,7 +292,7 @@ export default function AdminModulesPage() {
             {/* Upload Module */}
             <Card className="mb-6">
                 <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h3 className="font-semibold">Custom Module</h3>
                             <p className="text-sm text-muted-foreground">Upload a .zip file with module.json</p>
@@ -322,7 +322,7 @@ export default function AdminModulesPage() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {modules.map((mod) => (
                             <Card key={mod.id} className={`transition-all ${!mod.enabled ? "opacity-60" : ""}`}>
                                 <CardContent className="p-4">
@@ -425,7 +425,7 @@ export default function AdminModulesPage() {
 
             {/* Marketplace */}
             <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                     <div>
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-blue-500" />
@@ -433,7 +433,7 @@ export default function AdminModulesPage() {
                         </h2>
                         <p className="text-sm text-muted-foreground">Official modules from the uxwVend marketplace</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         {selectedModules.size > 0 && (
                             <Button size="sm" onClick={handleBulkInstall} disabled={isBusy || bulkInstalling}>
                                 {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</> : <><Download className="w-3 h-3 mr-1.5" /> Install {selectedModules.size} selected</>}
@@ -447,7 +447,7 @@ export default function AdminModulesPage() {
                                 {selectedModules.size === filteredMarketplace.length ? "Deselect All" : "Select All"}
                             </Button>
                         )}
-                        <div className="flex gap-1.5">
+                        <div className="flex flex-wrap gap-1.5">
                             <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>All</Button>
                             {categories.map(cat => (
                                 <Button key={cat} size="sm" variant={marketplaceFilter === cat ? "default" : "outline"} onClick={() => setMarketplaceFilter(cat)} className="capitalize">
@@ -467,7 +467,7 @@ export default function AdminModulesPage() {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredMarketplace.map((mod) => (
                             <Card key={mod.id} className={`hover:shadow-md transition-shadow ${selectedModules.has(mod.id) ? "ring-2 ring-primary" : ""}`}>
                                 <CardContent className="p-4">

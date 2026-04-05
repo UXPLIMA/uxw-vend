@@ -10,7 +10,7 @@ export function withRateLimit(
 ) {
     return async (request: NextRequest, ...args: unknown[]) => {
         const ip = getClientIP(request.headers);
-        const { success, remaining, resetAt } = rateLimit(ip, config);
+        const { success, remaining, resetAt } = await rateLimit(ip, config);
 
         if (!success) {
             return NextResponse.json(
