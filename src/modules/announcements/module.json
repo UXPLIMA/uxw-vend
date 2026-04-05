@@ -25,6 +25,10 @@
         {
             "path": "/announcements",
             "handler": "api/route.ts"
+        },
+        {
+            "path": "/announcements/[id]",
+            "handler": "api/[id]/route.ts"
         }
     ],
     "layoutComponents": [
