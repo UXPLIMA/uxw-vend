@@ -97,14 +97,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
         }
 
-        // Rebuild production if not in dev mode
+        // Rebuild + restart in production
         if (process.env.NODE_ENV === "production") {
             try {
-                execFileSync("npm", ["run", "build"], {
-                    cwd: process.cwd(),
-                    timeout: 120000,
-                    stdio: "pipe",
-                });
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
+                // Graceful restart via PM2 (if available) or process signal
+                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
+                catch { process.kill(process.pid, "SIGUSR2"); } // Fallback: signal self-restart
             } catch {
                 // Build failed but module is installed — will work after manual restart
             }

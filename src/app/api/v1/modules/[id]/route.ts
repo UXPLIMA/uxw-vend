@@ -34,7 +34,9 @@ export async function DELETE(
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
             if (process.env.NODE_ENV === "production") {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
+                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
+                catch { process.kill(process.pid, "SIGUSR2"); }
             }
         } catch {
             // Registry/build failed but module is already removed

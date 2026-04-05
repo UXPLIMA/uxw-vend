@@ -99,11 +99,13 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        // Rebuild production
+        // Rebuild + restart production
         if (process.env.NODE_ENV === "production") {
             try {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
-            } catch { /* module installed, will work after manual restart */ }
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
+                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
+                catch { process.kill(process.pid, "SIGUSR2"); }
+            } catch { /* will work after manual restart */ }
         }
 
         // Update DB record
