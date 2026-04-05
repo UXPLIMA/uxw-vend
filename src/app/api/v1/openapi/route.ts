@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ModuleApiRoutes } from "@/core/generated/module-registry";
+import { ModuleApiRoutes } from "@/core/generated/module-data";
 
 // GET /api/v1/openapi - OpenAPI spec (auto-generated from module registry)
 export async function GET() {

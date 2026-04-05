@@ -199,7 +199,7 @@ function generateRegistry() {
         }
         // Remove .tsx extension for import
         importPath = importPath.replace(/\.tsx$/, '');
-        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${w.id} || mod.default || mod), { ssr: false }),\n`;
+        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${w.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     widgetImports += '};\n\n';
 
@@ -214,7 +214,7 @@ function generateRegistry() {
             importPath = `@/modules/${s.module}/${comp}`;
         }
         importPath = importPath.replace(/\.tsx$/, '');
-        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${s.id} || mod.default || mod), { ssr: false }),\n`;
+        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${s.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     homepageSectionImports += '};\n\n';
 
@@ -232,7 +232,7 @@ function generateRegistry() {
             ? `@/core/components/${pt.component.replace('@core/', '')}`
             : `@/modules/${pt.module}/${pt.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${pt.id} || mod.default || mod), { ssr: false }),\n`;
+        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${pt.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     profileTabImports += '};\n\n';
     profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
@@ -248,7 +248,7 @@ function generateRegistry() {
             ? `@/core/components/${lc.component.replace('@core/', '')}`
             : `@/modules/${lc.module}/${lc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${lc.id} || mod.default || mod), { ssr: false }),\n`;
+        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${lc.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     layoutImports += '};\n\n';
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
@@ -260,7 +260,7 @@ function generateRegistry() {
             ? `@/core/components/${nc.component.replace('@core/', '')}`
             : `@/modules/${nc.module}/${nc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${nc.id} || mod.default || mod), { ssr: false }),\n`;
+        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${nc.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     navbarImports += '};\n\n';
     navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
@@ -275,6 +275,13 @@ function generateRegistry() {
 
     fs.writeFileSync(OUTPUT_FILE, content);
     console.log(`Generated module registry at ${OUTPUT_FILE}`);
+
+    // Generate server-safe data file (no dynamic imports, safe for API routes)
+    const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
+    let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
+    dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
+    dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n`;
+    fs.writeFileSync(DATA_FILE, dataContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');
