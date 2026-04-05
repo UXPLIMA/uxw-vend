@@ -110,7 +110,8 @@ export async function POST(request: NextRequest) {
                         stdio: "pipe",
                     });
                 } catch { /* best effort */ }
-                return NextResponse.json({ error: "Schema migration failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
+                const detail = process.env.NEXT_DEV ? ": " + String((err as Error)?.message || err).slice(0, 200) : "";
+                return NextResponse.json({ error: "Schema migration failed" + detail }, { status: 400 });
             }
         }
 
@@ -123,7 +124,8 @@ export async function POST(request: NextRequest) {
             });
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
+            const detail = process.env.NEXT_DEV ? ": " + String((err as Error)?.message || err).slice(0, 200) : "";
+            return NextResponse.json({ error: "Registry generation failed" + detail }, { status: 400 });
         }
 
         // Rebuild + restart (skip in dev mode — Turbopack handles hot-reload)

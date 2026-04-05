@@ -144,8 +144,8 @@ export async function POST(request: NextRequest) {
             // Rollback: remove the module directory
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.rm(extractDir, { recursive: true, force: true });
-            const message = err instanceof Error ? err.message : "Unknown error";
-            return NextResponse.json({ error: "Module has errors — registry generation failed: " + message }, { status: 400 });
+            const detail = process.env.NEXT_DEV ? ": " + (err instanceof Error ? err.message : "Unknown error") : "";
+            return NextResponse.json({ error: "Module has errors — registry generation failed" + detail }, { status: 400 });
         }
 
         // 10. Create DB record (disabled by default)

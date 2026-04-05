@@ -152,7 +152,8 @@ model ExchangeRate {
 model ApiKey {
   id          String   @id @default(cuid())
   name        String
-  key         String   @unique
+  keyHash     String
+  keyPrefix   String
   userId      String
   user        User     @relation("ApiKeys", fields: [userId], references: [id])
   permissions String[] @default([])
@@ -161,7 +162,7 @@ model ApiKey {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
-  @@index([key])
+  @@index([keyPrefix])
 }
 
 model ActivityLog {

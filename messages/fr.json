@@ -1,0 +1,81 @@
+{
+    "common": {
+        "home": "Accueil",
+        "store": "Boutique",
+        "blog": "Blog",
+        "support": "Support",
+        "login": "Connexion",
+        "register": "S'inscrire",
+        "logout": "Déconnexion",
+        "settings": "Paramètres",
+        "language": "Langue",
+        "currency": "Devise",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "view": "Voir",
+        "create": "Créer",
+        "back": "Retour",
+        "loading": "Chargement...",
+        "noResults": "Aucun résultat trouvé"
+    },
+    "nav": {
+        "home": "Accueil"
+    },
+    "hero": {
+        "playersOnline": "{count} Joueurs en ligne",
+        "joinCommunity": "Rejoindre notre communauté",
+        "discordServer": "Serveur Discord"
+    },
+    "admin": {
+        "title": "Panneau d'administration",
+        "dashboard": "Tableau de bord",
+        "users": "Utilisateurs",
+        "settings": "Paramètres",
+        "modules": "Modules",
+        "moduleManagement": "Gestion des modules",
+        "enableDisableModules": "Activer ou désactiver les modules de la plateforme",
+        "enableModule": "Activer le module",
+        "disableModule": "Désactiver le module",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "routes": "Routes",
+        "publicRoutes": "publiques",
+        "adminRoutes": "administration"
+    },
+    "footer": {
+        "quickLinks": "Liens rapides",
+        "legal": "Mentions légales",
+        "termsOfService": "Conditions d'utilisation",
+        "privacyPolicy": "Politique de confidentialité",
+        "refundPolicy": "Politique de remboursement",
+        "serverRules": "Règles du serveur",
+        "faq": "FAQ",
+        "allRightsReserved": "Tous droits réservés.",
+        "builtWith": "Créé avec",
+        "by": "par"
+    },
+    "auth": {
+        "loginTitle": "Bon retour",
+        "loginSubtitle": "Connectez-vous à votre compte",
+        "registerTitle": "Créer un compte",
+        "registerSubtitle": "Commencez avec uxwVend",
+        "email": "E-mail",
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "forgotPassword": "Mot de passe oublié ?",
+        "noAccount": "Vous n'avez pas de compte ?",
+        "hasAccount": "Vous avez déjà un compte ?",
+        "signIn": "Se connecter",
+        "signUp": "S'inscrire",
+        "signingIn": "Connexion...",
+        "creatingAccount": "Création du compte...",
+        "signInWith": "Se connecter avec {provider}",
+        "orContinueWith": "Ou continuer avec",
+        "invalidCredentials": "E-mail ou mot de passe invalide",
+        "passwordsDontMatch": "Les mots de passe ne correspondent pas",
+        "genericError": "Une erreur est survenue. Veuillez réessayer."
+    }
+}

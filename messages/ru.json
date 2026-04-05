@@ -1,0 +1,81 @@
+{
+    "common": {
+        "home": "Главная",
+        "store": "Магазин",
+        "blog": "Блог",
+        "support": "Поддержка",
+        "login": "Войти",
+        "register": "Регистрация",
+        "logout": "Выйти",
+        "settings": "Настройки",
+        "language": "Язык",
+        "currency": "Валюта",
+        "save": "Сохранить",
+        "cancel": "Отмена",
+        "delete": "Удалить",
+        "edit": "Редактировать",
+        "view": "Просмотр",
+        "create": "Создать",
+        "back": "Назад",
+        "loading": "Загр��зка...",
+        "noResults": "Результатов не найдено"
+    },
+    "nav": {
+        "home": "Главная"
+    },
+    "hero": {
+        "playersOnline": "{count} Игроков онлайн",
+        "joinCommunity": "Присоединяйтесь к нашему сообществу",
+        "discordServer": "Сервер Discord"
+    },
+    "admin": {
+        "title": "Панель администратора",
+        "dashboard": "Панель управления",
+        "users": "Пользователи",
+        "settings": "Настройки",
+        "modules": "Модули",
+        "moduleManagement": "Управление модулями",
+        "enableDisableModules": "Включить или отключить модули платформы",
+        "enableModule": "Включить модуль",
+        "disableModule": "Отключить модуль",
+        "enabled": "Включён",
+        "disabled": "Отключён",
+        "routes": "Маршруты",
+        "publicRoutes": "публичные",
+        "adminRoutes": "администрирование"
+    },
+    "footer": {
+        "quickLinks": "Быстрые ссылки",
+        "legal": "Правовая информация",
+        "termsOfService": "Условия использования",
+        "privacyPolicy": "Политика конфиденциальности",
+        "refundPolicy": "Политика возврата",
+        "serverRules": "Правила сервера",
+        "faq": "Частые вопросы",
+        "allRightsReserved": "Все права защищены.",
+        "builtWith": "Создано с помощью",
+        "by": "от"
+    },
+    "auth": {
+        "loginTitle": "С возвращением",
+        "loginSubtitle": "Войдите в свой аккаунт",
+        "registerTitle": "Создать аккаунт",
+        "registerSubtitle": "Начните работу с uxwVend",
+        "email": "Электронная почта",
+        "username": "Имя пользователя",
+        "password": "Пароль",
+        "confirmPassword": "Подтвердите пароль",
+        "forgotPassword": "Забыли пароль?",
+        "noAccount": "Нет аккаунта?",
+        "hasAccount": "Уже есть аккаунт?",
+        "signIn": "Войти",
+        "signUp": "Зарегистрироваться",
+        "signingIn": "Вход...",
+        "creatingAccount": "Создание аккаунта...",
+        "signInWith": "Войти через {provider}",
+        "orContinueWith": "Или продолжить с",
+        "invalidCredentials": "Неверная почта или пароль",
+        "passwordsDontMatch": "Пароли не совпадают",
+        "genericError": "Произошла ошибка. Пожалуйста, попробуйте ещё раз."
+    }
+}
