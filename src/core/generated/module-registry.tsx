@@ -151,7 +151,7 @@ export const LayoutComponentRegistry: Record<string, any> = {
   'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
 };
 
-export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = [
+export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = [
   {
     "id": "GoogleAnalytics",
     "component": "components/GoogleAnalytics",
@@ -160,6 +160,9 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
   {
     "id": "AnnouncementBanner",
     "component": "components/AnnouncementBanner",
+    "exclude": [
+      "/admin/*"
+    ],
     "module": "announcements"
   }
 ];

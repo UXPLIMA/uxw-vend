@@ -30,7 +30,10 @@
     "layoutComponents": [
         {
             "id": "AnnouncementBanner",
-            "component": "components/AnnouncementBanner"
+            "component": "components/AnnouncementBanner",
+            "exclude": [
+                "/admin/*"
+            ]
         }
     ]
 }

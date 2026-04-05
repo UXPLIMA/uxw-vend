@@ -94,7 +94,9 @@ export interface ModuleManifest {
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;
-        component: string;   // e.g. "@core/layout/LivePurchaseToast"
+        component: string;
+        include?: string[];   // URL patterns to show on (e.g. ["/*"] for all, ["/store/*"])
+        exclude?: string[];   // URL patterns to hide on (e.g. ["/admin/*"])
     }[];
 
     // Settings page cards — modules add their own settings buttons

@@ -251,7 +251,7 @@ function generateRegistry() {
         layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${lc.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     layoutImports += '};\n\n';
-    layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
+    layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
 
     // Generate dynamic imports for navbar components
     let navbarImports = '// Navbar component registry (rendered in navbar right side)\nexport const NavbarComponentRegistry: Record<string, any> = {\n';
