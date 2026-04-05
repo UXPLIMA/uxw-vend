@@ -65,6 +65,11 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          try { if (localStorage.getItem('color-mode') === 'dark') document.documentElement.setAttribute('data-mode', 'dark'); } catch {}
+        ` }} />
+      </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
       >
