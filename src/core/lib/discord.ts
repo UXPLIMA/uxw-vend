@@ -57,6 +57,15 @@ export async function sendDiscordWebhook(
 
     if (!url) return;
 
+    // Validate webhook domain
+    try {
+        const urlObj = new URL(url);
+        if (!urlObj.hostname.endsWith('discord.com') && !urlObj.hostname.endsWith('discordapp.com')) {
+            console.warn('[Discord] Invalid webhook domain:', urlObj.hostname);
+            return;
+        }
+    } catch { return; }
+
     try {
         await fetch(url, {
             method: "POST",

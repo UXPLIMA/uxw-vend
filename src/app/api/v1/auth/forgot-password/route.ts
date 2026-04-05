@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
-import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
+import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 
 // POST /api/v1/auth/forgot-password
 export async function POST(request: NextRequest) {
     try {
         const ip = getClientIP(request.headers);
-        const rl = rateLimit(`forgot:${ip}`, rateLimits.auth);
-        if (!rl.success) return NextResponse.json({ error: "Too many attempts." }, { status: 429 });
+        const rl = rateLimit(`reset:${ip}`, { maxRequests: 5, windowMs: 3600000 }); // 5 per hour
+        if (!rl.success) {
+            return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+        }
         const { email } = await request.json();
 
         if (!email) {
@@ -18,33 +20,35 @@ export async function POST(request: NextRequest) {
 
         const user = await prisma.user.findUnique({ where: { email } });
 
-        // Always return success to prevent email enumeration
-        if (!user) {
-            return NextResponse.json({ message: "If an account exists, a reset link has been sent." });
+        // Always do some work to prevent timing attack
+        const token = randomBytes(32).toString("hex");
+        const hashedToken = createHash("sha256").update(token).digest("hex");
+        void hashedToken; // used to ensure constant-time work
+
+        if (user) {
+            // Delete any existing tokens for this user
+            await prisma.verificationToken.deleteMany({
+                where: { identifier: email },
+            });
+
+            // Create reset token (expires in 1 hour)
+            const expires = new Date(Date.now() + 60 * 60 * 1000);
+
+            await prisma.verificationToken.create({
+                data: {
+                    identifier: email,
+                    token,
+                    expires,
+                },
+            });
+
+            const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+            const resetUrl = `${baseUrl}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+            await sendPasswordResetEmail(email, resetUrl);
         }
 
-        // Delete any existing tokens for this user
-        await prisma.verificationToken.deleteMany({
-            where: { identifier: email },
-        });
-
-        // Create reset token (expires in 1 hour)
-        const token = randomBytes(32).toString("hex");
-        const expires = new Date(Date.now() + 60 * 60 * 1000);
-
-        await prisma.verificationToken.create({
-            data: {
-                identifier: email,
-                token,
-                expires,
-            },
-        });
-
-        const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-        const resetUrl = `${baseUrl}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-
-        await sendPasswordResetEmail(email, resetUrl);
-
+        // Always return same response
         return NextResponse.json({ message: "If an account exists, a reset link has been sent." });
     } catch (error) {
         console.error("Forgot password error:", error);

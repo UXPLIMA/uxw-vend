@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
             return NextResponse.json(
-                { error: existingUser.email === email ? "Email already in use" : "Username already taken" },
+                { error: "Email or username already registered" },
                 { status: 400 }
             );
         }

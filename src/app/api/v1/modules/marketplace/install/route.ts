@@ -4,7 +4,8 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
+import AdmZip from "adm-zip";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -21,6 +22,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }
 
+        // Validate zipFile to prevent SSRF / path traversal
+        if (!/^[a-z0-9-]+\.zip$/.test(zipFile)) {
+            return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
+        }
+
         // Check if already installed
         const targetDir = path.join(MODULES_DIR, moduleId);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
@@ -28,44 +34,60 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Module already installed" }, { status: 409 });
         }
 
-        // Download ZIP from GitHub
+        // Download ZIP from GitHub with size limit
         const zipUrl = `${MARKETPLACE_BASE}/${zipFile}`;
         const res = await fetch(zipUrl);
         if (!res.ok) {
             return NextResponse.json({ error: `Failed to download module: HTTP ${res.status}` }, { status: 502 });
         }
 
+        const contentLength = res.headers.get("content-length");
+        const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
+        if (contentLength && parseInt(contentLength, 10) > MAX_MODULE_SIZE) {
+            return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 413 });
+        }
+
         const buffer = Buffer.from(await res.arrayBuffer());
+        if (buffer.length > MAX_MODULE_SIZE) {
+            return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 413 });
+        }
 
-        // Write to temp
-        const tmpDir = path.join(process.cwd(), "tmp");
-        await fs.mkdir(tmpDir, { recursive: true });
-        const zipPath = path.join(tmpDir, `marketplace-${moduleId}-${Date.now()}.zip`);
-        await fs.writeFile(zipPath, buffer);
+        // Validate ZIP magic number
+        if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4B || buffer[2] !== 0x03 || buffer[3] !== 0x04) {
+            return NextResponse.json({ error: "Invalid ZIP file" }, { status: 400 });
+        }
 
-        // Extract directly to module directory
+        // Extract directly to module directory using adm-zip (no shell, path traversal protected)
         await fs.mkdir(targetDir, { recursive: true });
-        execSync(`unzip -o "${zipPath}" -d "${targetDir}"`, { timeout: 30000 });
+        const zip = new AdmZip(buffer);
+        const entries = zip.getEntries();
+        for (const entry of entries) {
+            if (entry.isDirectory) continue;
+            if (entry.entryName.includes("..")) continue;
+            const resolvedPath = path.resolve(targetDir, entry.entryName);
+            if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
+            const dir = path.dirname(resolvedPath);
+            await fs.mkdir(dir, { recursive: true });
+            await fs.writeFile(resolvedPath, entry.getData());
+        }
 
         // Verify module.json exists
         const manifestPath = path.join(targetDir, "module.json");
         const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
         if (!hasManifest) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
         }
 
         // Regenerate registry
         try {
-            execSync("npx tsx scripts/generate-registry.ts", {
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
                 cwd: process.cwd(),
                 timeout: 30000,
                 stdio: "pipe",
             });
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
         }
 
@@ -78,25 +100,8 @@ export async function POST(request: NextRequest) {
             create: { id: moduleId, name: manifest.name, enabled: true },
         });
 
-        // Run seed if manifest says to
-        let seeded = false;
-        if (manifest.seedOnInstall) {
-            const seedPath = path.join(targetDir, "seed.ts");
-            const hasSeed = await fs.access(seedPath).then(() => true).catch(() => false);
-            if (hasSeed) {
-                try {
-                    execSync(`npx tsx "${seedPath}"`, {
-                        cwd: process.cwd(),
-                        timeout: 60000,
-                        stdio: "pipe",
-                    });
-                    seeded = true;
-                } catch (seedErr: unknown) {
-                    // Seed failure is non-fatal — module is still installed
-                    console.error(`[module-install] Seed failed for ${moduleId}:`, (seedErr as Error)?.message || seedErr);
-                }
-            }
-        }
+        // Seed scripts must be run manually by admin for security
+        // manifest.seedOnInstall is preserved in module.json but not auto-executed
 
         // Merge module translations into core messages
         if (manifest.translations) {
@@ -129,14 +134,14 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Cleanup
-        await fs.rm(zipPath, { force: true });
-
         return NextResponse.json({
-            message: seeded ? "Module installed, enabled, and seeded" : "Module installed and enabled",
-            module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true, seeded },
+            message: "Module installed and enabled",
+            module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true },
         });
     } catch (err: unknown) {
-        return NextResponse.json({ error: "Install failed: " + ((err instanceof Error ? err.message : "Unknown error")) }, { status: 500 });
+        const msg = process.env.NODE_ENV === 'production'
+            ? 'Operation failed'
+            : (err instanceof Error ? err.message : 'Unknown error');
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
 }

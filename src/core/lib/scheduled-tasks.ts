@@ -1,3 +1,5 @@
+import { prisma } from "./db";
+
 /**
  * Scheduled tasks - call from a cron job or admin API
  * Example: curl -X POST http://localhost:3000/api/v1/admin/cron -H "x-api-key: YOUR_KEY"
@@ -10,8 +12,13 @@
 export async function runScheduledTasks() {
     const results: string[] = [];
 
-    // No core-level scheduled tasks at this time.
-    // Module-specific tasks should be registered via module manifests or module APIs.
+    // Cleanup expired verification tokens
+    try {
+        const deleted = await prisma.verificationToken.deleteMany({ where: { expires: { lt: new Date() } } });
+        if (deleted.count > 0) {
+            results.push(`Cleaned up ${deleted.count} expired verification token(s)`);
+        }
+    } catch { /* table might not exist */ }
 
     return results;
 }

@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { rateLimit } from "@/core/lib/rate-limit";
 import fs from "fs/promises";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
+import AdmZip from "adm-zip";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -14,6 +16,12 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+    // Rate limit: 3 uploads per hour
+    const rl = rateLimit(`upload:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
+    if (!rl.success) {
+        return NextResponse.json({ error: "Too many uploads. Try again later." }, { status: 429 });
+    }
+
     try {
         // 2. Get form data with ZIP file
         const formData = await request.formData();
@@ -22,17 +30,37 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Please upload a .zip file" }, { status: 400 });
         }
 
-        // 3. Write ZIP to temp
+        // 3. Check file size (max 50MB)
+        const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
+        if (file.size > MAX_MODULE_SIZE) {
+            return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 413 });
+        }
+
+        // 4. Read ZIP buffer
         const buffer = Buffer.from(await file.arrayBuffer());
+
+        // Validate ZIP magic number
+        if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4B || buffer[2] !== 0x03 || buffer[3] !== 0x04) {
+            return NextResponse.json({ error: "Invalid ZIP file" }, { status: 400 });
+        }
+
         const tmpDir = path.join(process.cwd(), "tmp");
         await fs.mkdir(tmpDir, { recursive: true });
-        const zipPath = path.join(tmpDir, `module-${Date.now()}.zip`);
-        await fs.writeFile(zipPath, buffer);
 
-        // 4. Extract to temp directory
+        // 4. Extract to temp directory using adm-zip (no shell, path traversal protected)
         const extractDir = path.join(tmpDir, `module-extract-${Date.now()}`);
         await fs.mkdir(extractDir, { recursive: true });
-        execSync(`unzip -o "${zipPath}" -d "${extractDir}"`, { timeout: 30000 });
+        const zip = new AdmZip(buffer);
+        const entries = zip.getEntries();
+        for (const entry of entries) {
+            if (entry.isDirectory) continue;
+            if (entry.entryName.includes("..")) continue;
+            const resolvedPath = path.resolve(extractDir, entry.entryName);
+            if (!resolvedPath.startsWith(path.resolve(extractDir) + path.sep)) continue;
+            const dir = path.dirname(resolvedPath);
+            await fs.mkdir(dir, { recursive: true });
+            await fs.writeFile(resolvedPath, entry.getData());
+        }
 
         // 5. Find module.json (might be in root or in a subdirectory)
         let manifestDir = extractDir;
@@ -61,7 +89,6 @@ export async function POST(request: NextRequest) {
         } catch {
             // Cleanup
             await fs.rm(extractDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "No module.json found in ZIP" }, { status: 400 });
         }
 
@@ -72,20 +99,17 @@ export async function POST(request: NextRequest) {
             manifest = JSON.parse(manifestRaw);
         } catch {
             await fs.rm(extractDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "Invalid module.json — not valid JSON" }, { status: 400 });
         }
 
         if (!manifest.id || !manifest.name || !manifest.version) {
             await fs.rm(extractDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "module.json must have id, name, and version fields" }, { status: 400 });
         }
 
         // Validate id format (alphanumeric + hyphens only)
         if (!/^[a-z0-9-]+$/.test(manifest.id)) {
             await fs.rm(extractDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             return NextResponse.json({ error: "Module ID must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
         }
 
@@ -99,12 +123,12 @@ export async function POST(request: NextRequest) {
             await fs.rm(targetDir, { recursive: true, force: true });
         }
 
-        // Copy from manifestDir to target
-        execSync(`cp -r "${manifestDir}" "${targetDir}"`, { timeout: 10000 });
+        // Copy from manifestDir to target (safe fs.cp, no shell)
+        await fs.cp(manifestDir, targetDir, { recursive: true });
 
         // 9. Regenerate registry
         try {
-            execSync("npx tsx scripts/generate-registry.ts", {
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
                 cwd: process.cwd(),
                 timeout: 30000,
                 stdio: "pipe",
@@ -113,7 +137,6 @@ export async function POST(request: NextRequest) {
             // Rollback: remove the module directory
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.rm(extractDir, { recursive: true, force: true });
-            await fs.rm(zipPath, { force: true });
             const message = err instanceof Error ? err.message : "Unknown error";
             return NextResponse.json({ error: "Module has errors — registry generation failed: " + message }, { status: 400 });
         }
@@ -127,14 +150,15 @@ export async function POST(request: NextRequest) {
 
         // 11. Cleanup temp files
         await fs.rm(extractDir, { recursive: true, force: true });
-        await fs.rm(zipPath, { force: true });
 
         return NextResponse.json({
             message: "Module installed successfully",
             module: { id: manifest.id, name: manifest.name, version: manifest.version, enabled: false },
         });
     } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        return NextResponse.json({ error: "Upload failed: " + message }, { status: 500 });
+        const msg = process.env.NODE_ENV === 'production'
+            ? 'Operation failed'
+            : (err instanceof Error ? err.message : 'Unknown error');
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
 }

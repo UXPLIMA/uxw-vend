@@ -14,13 +14,16 @@ export function CustomCssInjector() {
                 // Custom CSS
                 const customCss = s.custom_css;
                 if (typeof customCss === "string" && customCss.trim()) {
-                    // Sanitize: remove script injection attempts, @import, expressions
+                    // Sanitize: remove script injection attempts, @import, expressions, and other XSS vectors
                     const sanitized = customCss
                         .replace(/<\/?script[^>]*>/gi, "")
                         .replace(/javascript\s*:/gi, "")
                         .replace(/expression\s*\(/gi, "")
                         .replace(/@import\s/gi, "/* blocked import */")
-                        .replace(/url\s*\(\s*['"]?\s*javascript/gi, "url(blocked");
+                        .replace(/url\s*\(\s*['"]?\s*javascript/gi, "url(blocked")
+                        .replace(/behavior\s*:/gi, "/* blocked behavior */")
+                        .replace(/-moz-binding\s*:/gi, "/* blocked moz-binding */")
+                        .replace(/@charset\s/gi, "/* blocked charset */");
                     setCss(sanitized);
                 }
 

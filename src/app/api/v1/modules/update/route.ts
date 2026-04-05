@@ -4,7 +4,8 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
+import AdmZip from "adm-zip";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -37,24 +38,29 @@ export async function POST(request: NextRequest) {
 
         const buffer = Buffer.from(await res.arrayBuffer());
 
-        // Write to temp
+        // Create backup of current module
         const tmpDir = path.join(process.cwd(), "tmp");
         await fs.mkdir(tmpDir, { recursive: true });
-        const zipPath = path.join(tmpDir, `update-${moduleId}-${Date.now()}.zip`);
-        await fs.writeFile(zipPath, buffer);
-
-        // Create backup of current module
         const backupDir = path.join(tmpDir, `backup-${moduleId}-${Date.now()}`);
         await fs.cp(targetDir, backupDir, { recursive: true });
 
-        // Extract over existing directory (overwrite)
+        // Extract over existing directory using adm-zip (no shell, path traversal protected)
         try {
-            execSync(`unzip -o "${zipPath}" -d "${targetDir}"`, { timeout: 30000 });
+            const zip = new AdmZip(buffer);
+            const entries = zip.getEntries();
+            for (const entry of entries) {
+                if (entry.isDirectory) continue;
+                if (entry.entryName.includes("..")) continue;
+                const resolvedPath = path.resolve(targetDir, entry.entryName);
+                if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
+                const dir = path.dirname(resolvedPath);
+                await fs.mkdir(dir, { recursive: true });
+                await fs.writeFile(resolvedPath, entry.getData());
+            }
         } catch (extractErr: unknown) {
             // Restore backup on failure
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.cp(backupDir, targetDir, { recursive: true });
-            await fs.rm(zipPath, { force: true });
             await fs.rm(backupDir, { recursive: true, force: true });
             return NextResponse.json({
                 error: "Extraction failed: " + String((extractErr as Error)?.message || extractErr).slice(0, 200),
@@ -68,14 +74,13 @@ export async function POST(request: NextRequest) {
             // Restore backup
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.cp(backupDir, targetDir, { recursive: true });
-            await fs.rm(zipPath, { force: true });
             await fs.rm(backupDir, { recursive: true, force: true });
             return NextResponse.json({ error: "Invalid module update — no module.json found" }, { status: 400 });
         }
 
         // Regenerate registry
         try {
-            execSync("npx tsx scripts/generate-registry.ts", {
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
                 cwd: process.cwd(),
                 timeout: 30000,
                 stdio: "pipe",
@@ -84,11 +89,10 @@ export async function POST(request: NextRequest) {
             // Restore backup on registry failure
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.cp(backupDir, targetDir, { recursive: true });
-            await fs.rm(zipPath, { force: true });
             await fs.rm(backupDir, { recursive: true, force: true });
             // Re-generate registry with old module
             try {
-                execSync("npx tsx scripts/generate-registry.ts", { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+                execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
             } catch { /* best effort */ }
             return NextResponse.json({
                 error: "Registry generation failed: " + String((regErr as Error)?.message || regErr).slice(0, 200),
@@ -105,7 +109,6 @@ export async function POST(request: NextRequest) {
         });
 
         // Cleanup
-        await fs.rm(zipPath, { force: true });
         await fs.rm(backupDir, { recursive: true, force: true });
 
         return NextResponse.json({
@@ -113,8 +116,9 @@ export async function POST(request: NextRequest) {
             module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true },
         });
     } catch (err: unknown) {
-        return NextResponse.json({
-            error: "Update failed: " + (err instanceof Error ? err.message : "Unknown error"),
-        }, { status: 500 });
+        const msg = process.env.NODE_ENV === 'production'
+            ? 'Operation failed'
+            : (err instanceof Error ? err.message : 'Unknown error');
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
