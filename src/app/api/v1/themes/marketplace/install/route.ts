@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         const entries = zip.getEntries();
         for (const entry of entries) {
             if (entry.isDirectory) continue;
-            if (entry.entryName.includes("..")) continue;
+            if (entry.entryName.includes("../")) continue;
             const resolvedPath = path.resolve(targetDir, entry.entryName);
             if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
             const dir = path.dirname(resolvedPath);
