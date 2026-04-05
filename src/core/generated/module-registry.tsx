@@ -3,13 +3,29 @@ import dynamic from 'next/dynamic';
 import { PageLoader } from '@/core/components/ui/page-loader';
 
 export const ModuleRegistry: Record<string, any> = {
+  'stripe-gateway:pages/admin/page.tsx': dynamic(() => import('@/modules/stripe-gateway/pages/admin/page').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),
 };
 
-export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [];
+export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
+  {
+    "path": "/admin/settings/stripe",
+    "key": "stripe-gateway:pages/admin/page.tsx",
+    "module": "stripe-gateway",
+    "isAdmin": true
+  }
+];
 
-export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
+export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = [
+  {
+    "path": "/webhooks/stripe",
+    "key": "stripe-gateway:api:/webhooks/stripe",
+    "module": "stripe-gateway",
+    "method": "ALL"
+  }
+];
 
 export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
+  'stripe-gateway:api:/webhooks/stripe': () => import('@/modules/stripe-gateway/api/webhooks/stripe/route'),
 };
 
 
@@ -52,4 +68,13 @@ export const ModuleProfileTabs: { id: string; label: string; component: string; 
 
 export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = [];
 
-export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [];
+export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [
+  {
+    "title": "Stripe",
+    "description": "Stripe API keys and webhook configuration.",
+    "href": "/settings/stripe",
+    "icon": "CreditCard",
+    "color": "text-purple-500",
+    "module": "stripe-gateway"
+  }
+];

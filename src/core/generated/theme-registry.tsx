@@ -4,12 +4,25 @@
 
 import { Theme } from "@/core/types/theme";
 import { flatTheme as flatConfig } from "@/themes/flat/theme.config";
+import { pixelcraftTheme as pixelcraftConfig } from "@/themes/pixelcraft/theme.config";
+import pixelcraft_DiscordWidget from "@/themes/pixelcraft/components/DiscordWidget";
+import pixelcraft_Footer from "@/themes/pixelcraft/components/Footer";
+import pixelcraft_HeroBanner from "@/themes/pixelcraft/components/HeroBanner";
+import pixelcraft_Navbar from "@/themes/pixelcraft/components/Navbar";
+import pixelcraft_NewsCard from "@/themes/pixelcraft/components/NewsCard";
+import pixelcraft_NewsGrid from "@/themes/pixelcraft/components/NewsGrid";
+import pixelcraft_SidebarLayout from "@/themes/pixelcraft/components/SidebarLayout";
 
 export const themeRegistry: Record<string, Theme> = {
 
   "flat": {
     config: flatConfig,
     components: {}
+  },
+
+  "pixelcraft": {
+    config: pixelcraftConfig,
+    components: { DiscordWidget: pixelcraft_DiscordWidget, Footer: pixelcraft_Footer, HeroBanner: pixelcraft_HeroBanner, Navbar: pixelcraft_Navbar, NewsCard: pixelcraft_NewsCard, NewsGrid: pixelcraft_NewsGrid, SidebarLayout: pixelcraft_SidebarLayout }
   }
 };
 
