@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || String(PER_PAGE_ACTIVITY));
+    const page = Math.max(1, parseInt(request.nextUrl.searchParams.get("page") || "1") || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(request.nextUrl.searchParams.get("limit") || String(PER_PAGE_ACTIVITY)) || 20));
     const action = request.nextUrl.searchParams.get("action");
 
     const where = action ? { action } : {};

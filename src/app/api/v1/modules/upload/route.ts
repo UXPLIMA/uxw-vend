@@ -113,6 +113,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Module ID must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
         }
 
+        // Block reserved module IDs
+        const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
+        if (RESERVED_IDS.includes(manifest.id)) {
+            await fs.rm(extractDir, { recursive: true, force: true });
+            return NextResponse.json({ error: "Module ID is reserved" }, { status: 400 });
+        }
+
         // 7. Check if module already exists
         const targetDir = path.join(MODULES_DIR, manifest.id);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);

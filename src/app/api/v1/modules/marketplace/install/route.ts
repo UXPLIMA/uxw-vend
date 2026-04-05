@@ -27,6 +27,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
         }
 
+        // Block reserved module IDs
+        const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
+        if (RESERVED_IDS.includes(moduleId)) {
+            return NextResponse.json({ error: "Module ID is reserved" }, { status: 400 });
+        }
+
         // Check if already installed
         const targetDir = path.join(MODULES_DIR, moduleId);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
@@ -104,13 +110,37 @@ export async function POST(request: NextRequest) {
         // manifest.seedOnInstall is preserved in module.json but not auto-executed
 
         // Merge module translations into core messages
+        const PROTECTED_KEYS = ["common", "nav", "auth", "hero", "footer", "errors", "metadata", "admin"];
+
+        function sanitizeTranslations(obj: Record<string, unknown>): Record<string, unknown> {
+            const result: Record<string, unknown> = {};
+            for (const [key, value] of Object.entries(obj)) {
+                if (typeof value === 'string') {
+                    result[key] = value.replace(/<[^>]*>/g, '');
+                } else if (typeof value === 'object' && value !== null) {
+                    result[key] = sanitizeTranslations(value as Record<string, unknown>);
+                } else {
+                    result[key] = value;
+                }
+            }
+            return result;
+        }
+
+        function safeMergeTranslations(existing: Record<string, unknown>, incoming: Record<string, unknown>): Record<string, unknown> {
+            const sanitized = sanitizeTranslations(incoming);
+            for (const key of PROTECTED_KEYS) {
+                delete sanitized[key];
+            }
+            return { ...existing, ...sanitized };
+        }
+
         if (manifest.translations) {
             const messagesDir = path.join(process.cwd(), "messages");
             for (const [locale, translations] of Object.entries(manifest.translations)) {
                 const msgPath = path.join(messagesDir, `${locale}.json`);
                 try {
                     const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
-                    const merged = { ...existing, ...(translations as Record<string, unknown>) };
+                    const merged = safeMergeTranslations(existing, translations as Record<string, unknown>);
                     await fs.writeFile(msgPath, JSON.stringify(merged, null, 2));
                 } catch { /* locale file doesn't exist, skip */ }
             }
@@ -128,7 +158,7 @@ export async function POST(request: NextRequest) {
                     const moduleTranslations = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
                     const corePath = path.join(coreMessagesDir, file);
                     const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
-                    const merged = { ...existing, ...moduleTranslations };
+                    const merged = safeMergeTranslations(existing, moduleTranslations);
                     await fs.writeFile(corePath, JSON.stringify(merged, null, 2));
                 } catch { /* skip */ }
             }

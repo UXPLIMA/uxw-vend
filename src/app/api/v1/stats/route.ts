@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const period = request.nextUrl.searchParams.get("period") || "30d";
-    const days = parseInt(period) || 30;
+    const days = Math.min(365, Math.max(1, parseInt(period) || 30));
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);

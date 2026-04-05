@@ -126,7 +126,7 @@ class ModuleSystem {
                 const pattern = route.replace(/\[.*?\]/g, "[^/]+");
                 const regex = new RegExp(`^${pattern}$`);
                 if (regex.test(path)) {
-                    return this.isEnabled(module.id);
+                    return this.isEnabled(mod.id);
                 }
             }
         }

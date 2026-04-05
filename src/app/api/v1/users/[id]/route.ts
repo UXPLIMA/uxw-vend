@@ -22,9 +22,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const user = await prisma.user.findUnique({
         where: { id },
-        include: {
-            role: true,
+        select: {
+            id: true, email: true, username: true, avatar: true,
+            locale: true, currency: true, createdAt: true, updatedAt: true,
+            isBanned: true, banReason: true, bannedAt: true,
+            emailVerified: true, twoFactorEnabled: true,
+            role: { select: { id: true, name: true, displayName: true, color: true, priority: true } },
             _count: true,
+            creditBalance: true,
         },
     });
 
@@ -78,7 +83,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const user = await prisma.user.update({
         where: { id },
         data,
-        include: { role: true },
+        select: {
+            id: true, email: true, username: true, avatar: true,
+            locale: true, currency: true, createdAt: true, updatedAt: true,
+            isBanned: true, banReason: true, bannedAt: true,
+            emailVerified: true, twoFactorEnabled: true,
+            role: { select: { id: true, name: true, displayName: true, color: true, priority: true } },
+            creditBalance: true,
+        },
     });
 
     // Audit log

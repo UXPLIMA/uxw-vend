@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
         }
 
         const searchParams = request.nextUrl.searchParams;
-        const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || String(PER_PAGE_USERS));
+        const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || String(PER_PAGE_USERS)) || 20));
         const search = searchParams.get("search") || "";
 
         const where = search
