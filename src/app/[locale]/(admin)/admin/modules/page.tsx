@@ -87,6 +87,9 @@ export default function AdminModulesPage() {
     // Global lock — only one operation at a time
     const isBusy = installing !== null || uploading || deleting !== null || updatingModule !== null;
     const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
+    const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
+    const [bulkInstalling, setBulkInstalling] = useState(false);
+    const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; name: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { confirm } = useConfirm();
 
@@ -207,6 +210,44 @@ export default function AdminModulesPage() {
         }
     };
 
+    const toggleSelect = (id: string) => {
+        const next = new Set(selectedModules);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        setSelectedModules(next);
+    };
+
+    const handleBulkInstall = async () => {
+        const toInstall = marketplace.filter(m => selectedModules.has(m.id) && !installedIds.has(m.id));
+        if (toInstall.length === 0) return;
+
+        setBulkInstalling(true);
+        let installed = 0;
+
+        for (const mod of toInstall) {
+            setBulkProgress({ current: installed + 1, total: toInstall.length, name: mod.name });
+            try {
+                const res = await fetch("/api/v1/modules/marketplace/install", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ moduleId: mod.id, zipFile: mod.zip }),
+                });
+                if (res.ok) installed++;
+                else {
+                    const data = await res.json();
+                    toast.error(`${mod.name}: ${data.error || "Failed"}`);
+                }
+            } catch {
+                toast.error(`${mod.name}: Install failed`);
+            }
+        }
+
+        toast.success(`${installed}/${toInstall.length} modules installed`);
+        setSelectedModules(new Set());
+        setBulkInstalling(false);
+        setBulkProgress(null);
+        fetchModules();
+    };
+
     const filteredMarketplace = marketplace.filter(m => {
         if (marketplaceFilter !== "all" && m.category !== marketplaceFilter) return false;
         return !installedIds.has(m.id);
@@ -217,16 +258,28 @@ export default function AdminModulesPage() {
     return (
         <>
             {/* Install/Operation Progress Overlay */}
-            {installProgress && (
+            {(installProgress || bulkProgress) && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center">
                     <div className="fixed inset-0 bg-black/50" />
                     <div className="relative bg-card border rounded-xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center">
                         <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
-                        <h3 className="font-semibold text-lg mb-1">{installProgress.name}</h3>
-                        <p className="text-sm text-muted-foreground">{installProgress.step}</p>
-                        <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
-                            <div className="bg-primary h-full rounded-full animate-pulse" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
-                        </div>
+                        {bulkProgress ? (
+                            <>
+                                <h3 className="font-semibold text-lg mb-1">Installing modules ({bulkProgress.current}/{bulkProgress.total})</h3>
+                                <p className="text-sm text-muted-foreground">{bulkProgress.name}</p>
+                                <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
+                                    <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }} />
+                                </div>
+                            </>
+                        ) : installProgress ? (
+                            <>
+                                <h3 className="font-semibold text-lg mb-1">{installProgress.name}</h3>
+                                <p className="text-sm text-muted-foreground">{installProgress.step}</p>
+                                <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
+                                    <div className="bg-primary h-full rounded-full animate-pulse" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
+                                </div>
+                            </>
+                        ) : null}
                     </div>
                 </div>
             )}
@@ -380,13 +433,28 @@ export default function AdminModulesPage() {
                         </h2>
                         <p className="text-sm text-muted-foreground">Official modules from the uxwVend marketplace</p>
                     </div>
-                    <div className="flex gap-1.5">
-                        <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>All</Button>
-                        {categories.map(cat => (
-                            <Button key={cat} size="sm" variant={marketplaceFilter === cat ? "default" : "outline"} onClick={() => setMarketplaceFilter(cat)} className="capitalize">
-                                {cat}
+                    <div className="flex items-center gap-3">
+                        {selectedModules.size > 0 && (
+                            <Button size="sm" onClick={handleBulkInstall} disabled={isBusy || bulkInstalling}>
+                                {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</> : <><Download className="w-3 h-3 mr-1.5" /> Install {selectedModules.size} selected</>}
                             </Button>
-                        ))}
+                        )}
+                        {filteredMarketplace.length > 0 && (
+                            <Button size="sm" variant="outline" onClick={() => {
+                                if (selectedModules.size === filteredMarketplace.length) setSelectedModules(new Set());
+                                else setSelectedModules(new Set(filteredMarketplace.map(m => m.id)));
+                            }}>
+                                {selectedModules.size === filteredMarketplace.length ? "Deselect All" : "Select All"}
+                            </Button>
+                        )}
+                        <div className="flex gap-1.5">
+                            <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>All</Button>
+                            {categories.map(cat => (
+                                <Button key={cat} size="sm" variant={marketplaceFilter === cat ? "default" : "outline"} onClick={() => setMarketplaceFilter(cat)} className="capitalize">
+                                    {cat}
+                                </Button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -401,10 +469,16 @@ export default function AdminModulesPage() {
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredMarketplace.map((mod) => (
-                            <Card key={mod.id} className="hover:shadow-md transition-shadow">
+                            <Card key={mod.id} className={`hover:shadow-md transition-shadow ${selectedModules.has(mod.id) ? "ring-2 ring-primary" : ""}`}>
                                 <CardContent className="p-4">
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2.5">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedModules.has(mod.id)}
+                                                onChange={() => toggleSelect(mod.id)}
+                                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                            />
                                             <span className="text-blue-500">{iconMap[mod.icon] || <Package size={22} />}</span>
                                             <div>
                                                 <h3 className="font-semibold text-sm flex items-center gap-1.5">
