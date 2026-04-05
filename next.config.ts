@@ -4,7 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/core/lib/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
   allowedDevOrigins: ["*"],
   images: {
     remotePatterns: [
