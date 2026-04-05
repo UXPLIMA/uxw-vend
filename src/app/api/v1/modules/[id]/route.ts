@@ -33,7 +33,7 @@ export async function DELETE(
         // 5. Regenerate registry + rebuild
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
-            if (process.env.NODE_ENV === "production") {
+            if (!process.env.NEXT_DEV) {
                 execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
                 catch { process.kill(process.pid, "SIGUSR2"); }

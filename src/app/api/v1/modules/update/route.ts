@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Rebuild + restart production
-        if (process.env.NODE_ENV === "production") {
+        if (!process.env.NEXT_DEV) {
             try {
                 execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }

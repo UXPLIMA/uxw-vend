@@ -97,13 +97,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
         }
 
-        // Rebuild + restart in production
-        if (process.env.NODE_ENV === "production") {
+        // Rebuild + restart (skip in dev mode — Turbopack handles hot-reload)
+        if (!process.env.NEXT_DEV) {
             try {
                 execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
-                // Graceful restart via PM2 (if available) or process signal
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
-                catch { process.kill(process.pid, "SIGUSR2"); } // Fallback: signal self-restart
+                catch { /* no PM2, user restarts manually */ }
             } catch {
                 // Build failed but module is installed — will work after manual restart
             }
