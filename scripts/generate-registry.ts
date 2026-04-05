@@ -34,7 +34,7 @@ function generateRegistry() {
                     const componentKey = `${moduleName}:${route.component}`;
                     const importPath = `@/modules/${moduleName}/${route.component.replace(/\.tsx?$/, '')}`;
 
-                    mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),\n`;
+                    mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),\n`;
 
                     routes.push({
                         path: route.path,
@@ -52,12 +52,12 @@ function generateRegistry() {
                     // Admin routes often start with /admin in the path, but let's ensure consistency
                     // If manifest says "/store/products", the full URL is "/admin/store/products"
                     // We will store the relative path (without /admin prefix) in the registry for the admin specific matcher to use?
-                    // OR we store the full path to be safe. 
+                    // OR we store the full path to be safe.
                     // Let's assume manifest path is relative to /admin.
 
                     const fullPath = `/admin${route.path.startsWith('/') ? route.path : '/' + route.path}`;
 
-                    mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then(mod => mod.default || mod), { loading: () => <PageLoader /> }),\n`;
+                    mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),\n`;
 
                     routes.push({
                         path: fullPath,
@@ -199,7 +199,7 @@ function generateRegistry() {
         }
         // Remove .tsx extension for import
         importPath = importPath.replace(/\.tsx$/, '');
-        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then(mod => mod.${w.id} || mod.default || mod), { ssr: false }),\n`;
+        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${w.id} || mod.default || mod), { ssr: false }),\n`;
     }
     widgetImports += '};\n\n';
 
@@ -214,7 +214,7 @@ function generateRegistry() {
             importPath = `@/modules/${s.module}/${comp}`;
         }
         importPath = importPath.replace(/\.tsx$/, '');
-        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then(mod => mod.${s.id} || mod.default || mod), { ssr: false }),\n`;
+        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${s.id} || mod.default || mod), { ssr: false }),\n`;
     }
     homepageSectionImports += '};\n\n';
 
@@ -232,7 +232,7 @@ function generateRegistry() {
             ? `@/core/components/${pt.component.replace('@core/', '')}`
             : `@/modules/${pt.module}/${pt.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then(mod => mod.${pt.id} || mod.default || mod), { ssr: false }),\n`;
+        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${pt.id} || mod.default || mod), { ssr: false }),\n`;
     }
     profileTabImports += '};\n\n';
     profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
@@ -248,7 +248,7 @@ function generateRegistry() {
             ? `@/core/components/${lc.component.replace('@core/', '')}`
             : `@/modules/${lc.module}/${lc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then(mod => mod.${lc.id} || mod.default || mod), { ssr: false }),\n`;
+        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${lc.id} || mod.default || mod), { ssr: false }),\n`;
     }
     layoutImports += '};\n\n';
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
@@ -260,7 +260,7 @@ function generateRegistry() {
             ? `@/core/components/${nc.component.replace('@core/', '')}`
             : `@/modules/${nc.module}/${nc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then(mod => mod.${nc.id} || mod.default || mod), { ssr: false }),\n`;
+        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${nc.id} || mod.default || mod), { ssr: false }),\n`;
     }
     navbarImports += '};\n\n';
     navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
