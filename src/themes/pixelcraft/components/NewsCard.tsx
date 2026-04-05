@@ -26,6 +26,7 @@ export default function PixelCraftNewsCard({ post }: NewsCardProps) {
                 {/* Image */}
                 <div className="relative h-44 overflow-hidden" style={{ background: "#1a1a1a" }}>
                     {post.coverImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #2a2a2a, #1a1a1a)" }}>

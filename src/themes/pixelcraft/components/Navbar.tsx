@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Star, Download, Gift, Crown, FileText, Bell, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Star, Download, Gift, Crown, FileText, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";

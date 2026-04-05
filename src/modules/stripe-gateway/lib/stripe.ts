@@ -13,6 +13,7 @@ export function getStripe(): Stripe {
 
 export const stripe = new Proxy({} as Stripe, {
     get(_, prop) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (getStripe() as any)[prop];
     },
 });

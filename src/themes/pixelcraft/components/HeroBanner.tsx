@@ -23,6 +23,7 @@ export default function PixelCraftHeroBanner() {
         <div className="relative overflow-hidden" style={{ height: 340, background: "#111" }}>
             {/* Background */}
             <div className="absolute inset-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={bgImage} alt="" className="w-full h-full object-cover opacity-40" />
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(17,17,17,0.3) 0%, rgba(17,17,17,0.8) 70%, #1a1a1a 100%)" }} />
             </div>
@@ -43,6 +44,7 @@ export default function PixelCraftHeroBanner() {
 
             <div className="relative container mx-auto px-4 h-full z-10 flex flex-col items-center justify-center text-center">
                 {/* Logo */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
 
                 {/* CTA Buttons */}

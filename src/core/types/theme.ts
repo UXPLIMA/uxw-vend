@@ -42,6 +42,7 @@ export interface ThemeConfig {
 
 export interface ThemeComponents {
     // Map component names to React Components
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: React.ComponentType<any> | undefined;
 }
 

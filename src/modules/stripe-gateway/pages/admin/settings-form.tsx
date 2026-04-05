@@ -44,6 +44,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                 setLoading(false);
             })
             .catch(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSave = async (e: React.FormEvent) => {
