@@ -23,7 +23,7 @@ export function Skeleton({ className, style }: SkeletonProps) {
 
 export function SkeletonCard() {
     return (
-        <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
             <Skeleton className="h-44 w-full rounded-none" />
             <div className="p-4 space-y-3">
                 <Skeleton className="h-4 w-3/4" />
@@ -41,7 +41,7 @@ export function SkeletonSidebar() {
             <Skeleton className="h-[300px] w-full rounded-xl" />
 
             {/* Featured Product Skeleton */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-card rounded-xl border border-border p-5">
                 <Skeleton className="h-5 w-32 mb-4" />
                 <div className="flex flex-col items-center">
                     <Skeleton className="w-20 h-20 rounded-lg mb-3" />
@@ -52,14 +52,14 @@ export function SkeletonSidebar() {
             </div>
 
             {/* Payment Goal Skeleton */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-card rounded-xl border border-border p-5">
                 <Skeleton className="h-5 w-28 mb-4" />
                 <Skeleton className="h-3 w-full rounded-full mb-2" />
                 <Skeleton className="h-4 w-32 mx-auto" />
             </div>
 
             {/* Top Buyers Skeleton */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-card rounded-xl border border-border p-5">
                 <div className="flex justify-between mb-4">
                     <Skeleton className="h-5 w-24" />
                     <Skeleton className="h-3 w-16" />
@@ -109,7 +109,7 @@ export function SkeletonHeroBanner() {
 
 export function SkeletonNavbar() {
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-card border-b border-border sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-2">

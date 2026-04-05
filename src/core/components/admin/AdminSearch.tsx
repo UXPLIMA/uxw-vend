@@ -63,7 +63,7 @@ export function AdminSearch() {
             </div>
 
             {open && results.length > 0 && (
-                <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full mt-1 left-0 right-0 bg-card border border-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                     {results.map((r) => {
                         const Icon = typeIcons[r.type] || Package;
                         return (
