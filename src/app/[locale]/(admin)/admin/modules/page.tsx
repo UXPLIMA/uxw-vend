@@ -79,9 +79,13 @@ export default function AdminModulesPage() {
     const [loadingMarketplace, setLoadingMarketplace] = useState(true);
     const [updating, setUpdating] = useState<string | null>(null);
     const [installing, setInstalling] = useState<string | null>(null);
+    const [installProgress, setInstallProgress] = useState<{ name: string; step: string } | null>(null);
     const [uploading, setUploading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [updatingModule, setUpdatingModule] = useState<string | null>(null);
+
+    // Global lock — only one operation at a time
+    const isBusy = installing !== null || uploading || deleting !== null || updatingModule !== null;
     const [marketplaceFilter, setMarketplaceFilter] = useState<string>("all");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { confirm } = useConfirm();
@@ -126,6 +130,7 @@ export default function AdminModulesPage() {
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
         setUploading(true);
         try {
             const formData = new FormData();
@@ -139,6 +144,7 @@ export default function AdminModulesPage() {
     };
 
     const handleDelete = async (moduleId: string, moduleName: string) => {
+        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
         const ok = await confirm({ title: "Delete Module", message: `Delete "${moduleName}"? This removes all module files.`, variant: "danger", confirmText: "Delete" });
         if (!ok) return;
         setDeleting(moduleId);
@@ -152,6 +158,7 @@ export default function AdminModulesPage() {
     };
 
     const handleUpdate = async (mod: Module) => {
+        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
         const mpMod = marketplace.find(m => m.id === mod.id);
         if (!mpMod) { toast.error("Module not found in marketplace"); return; }
         setUpdatingModule(mod.id);
@@ -173,18 +180,31 @@ export default function AdminModulesPage() {
     };
 
     const handleMarketplaceInstall = async (mod: MarketplaceModule) => {
+        if (isBusy) {
+            toast.error("Please wait — another operation is in progress");
+            return;
+        }
         setInstalling(mod.id);
+        setInstallProgress({ name: mod.name, step: "Downloading..." });
         try {
+            setInstallProgress({ name: mod.name, step: "Installing..." });
             const res = await fetch("/api/v1/modules/marketplace/install", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ moduleId: mod.id, zipFile: mod.zip }),
             });
             const data = await res.json();
-            if (res.ok) { toast.success(`"${mod.name}" installed and enabled`); fetchModules(); }
-            else toast.error(data.error || "Install failed");
+            if (res.ok) {
+                setInstallProgress({ name: mod.name, step: "Done!" });
+                toast.success(`"${mod.name}" installed and enabled`);
+                fetchModules();
+            } else {
+                toast.error(data.error || "Install failed");
+            }
         } catch { toast.error("Install failed"); }
-        finally { setInstalling(null); }
+        finally {
+            setTimeout(() => { setInstalling(null); setInstallProgress(null); }, 500);
+        }
     };
 
     const filteredMarketplace = marketplace.filter(m => {
@@ -196,6 +216,21 @@ export default function AdminModulesPage() {
 
     return (
         <>
+            {/* Install/Operation Progress Overlay */}
+            {installProgress && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center">
+                    <div className="fixed inset-0 bg-black/50" />
+                    <div className="relative bg-card border rounded-xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
+                        <h3 className="font-semibold text-lg mb-1">{installProgress.name}</h3>
+                        <p className="text-sm text-muted-foreground">{installProgress.step}</p>
+                        <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
+                            <div className="bg-primary h-full rounded-full animate-pulse" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-8">
                 <h1 className="text-3xl font-bold">Modules</h1>
                 <p className="text-muted-foreground">Install, enable, and manage platform modules</p>
@@ -412,7 +447,7 @@ export default function AdminModulesPage() {
                                     <Button
                                         size="sm"
                                         className="w-full"
-                                        disabled={installing === mod.id}
+                                        disabled={isBusy}
                                         onClick={() => handleMarketplaceInstall(mod)}
                                     >
                                         {installing === mod.id ? (
