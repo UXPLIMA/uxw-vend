@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "../../../lib/stripe";
 import { prisma } from "@/core/lib/db";
 import { sendOrderConfirmationEmail } from "@/core/lib/email";
-import { notifyOrderCompleted } from "@/core/lib/discord";
-import { deliverProduct } from "@/core/lib/rcon";
+import { sendDiscordWebhook } from "@/core/lib/discord";
 import Stripe from "stripe";
 
 // Disable body parsing - Stripe needs raw body for signature verification
@@ -59,43 +58,19 @@ export async function POST(request: NextRequest) {
                     ).catch(console.error);
 
                     // Discord notification
-                    notifyOrderCompleted({
-                        orderNumber: order.orderNumber,
-                        total: Number(order.total),
-                        username: order.user.email,
-                        itemCount: 0,
+                    sendDiscordWebhook("order_completed", {
+                        embeds: [{
+                            title: "Order Completed",
+                            description: `Order **${order.orderNumber}** has been completed.`,
+                            color: 0x22c55e,
+                            fields: [
+                                { name: "Total", value: `$${Number(order.total).toFixed(2)}`, inline: true },
+                            ],
+                        }],
                     }).catch(console.error);
                 }
 
-                // RCON: Deliver products to game server
-                try {
-                    const orderItems = await prisma.orderItem.findMany({
-                        where: { orderId },
-                        select: { productId: true, name: true, quantity: true },
-                    });
-
-                    for (const item of orderItems) {
-                        if (!item.productId) continue;
-                        const commands = await prisma.productCommand.findMany({
-                            where: { productId: item.productId },
-                            orderBy: { order: "asc" },
-                        });
-
-                        if (commands.length > 0) {
-                            // Try to get player name from order metadata or username
-                            const playerName = session.metadata?.playerName || session.customer_details?.name || "Player";
-
-                            deliverProduct({
-                                playerName,
-                                productName: item.name,
-                                commands: commands.map((c) => c.command),
-                                quantity: item.quantity,
-                            }).catch(console.error);
-                        }
-                    }
-                } catch (e) {
-                    console.error("[RCON Delivery]", e);
-                }
+                // RCON delivery handled by servers module if installed
 
                 // Create Payment record
                 await prisma.payment.create({
