@@ -85,6 +85,35 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
         }
 
+        // If module has schema.prisma, merge schemas and push to DB
+        const schemaPath = path.join(targetDir, "schema.prisma");
+        const hasSchema = await fs.access(schemaPath).then(() => true).catch(() => false);
+        if (hasSchema) {
+            try {
+                execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], {
+                    cwd: process.cwd(),
+                    timeout: 30000,
+                    stdio: "pipe",
+                });
+                execFileSync("npx", ["prisma", "db", "push"], {
+                    cwd: process.cwd(),
+                    timeout: 60000,
+                    stdio: "pipe",
+                });
+            } catch (err: unknown) {
+                await fs.rm(targetDir, { recursive: true, force: true });
+                // Re-merge schemas without the failed module
+                try {
+                    execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], {
+                        cwd: process.cwd(),
+                        timeout: 30000,
+                        stdio: "pipe",
+                    });
+                } catch { /* best effort */ }
+                return NextResponse.json({ error: "Schema migration failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
+            }
+        }
+
         // Regenerate registry
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
