@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 modules={modules}
             />
             {/* Main Content Wrapper */}
-            <main className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 bg-background min-h-screen">
+            <main className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 min-h-screen bg-background">
                 <div className="mb-6 max-w-md">
                     <AdminSearch />
                 </div>
