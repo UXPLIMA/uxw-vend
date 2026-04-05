@@ -1,0 +1,36 @@
+{
+    "id": "analytics",
+    "name": "Google Analytics",
+    "description": "Google Analytics tracking integration",
+    "version": "1.0.0",
+    "author": "uxwVend",
+    "icon": "BarChart",
+    "layoutComponents": [
+        {
+            "id": "GoogleAnalytics",
+            "component": "components/GoogleAnalytics"
+        }
+    ],
+    "adminRoutes": [
+        {
+            "path": "/analytics",
+            "component": "pages/admin/settings/analytics/page.tsx"
+        }
+    ],
+    "settingsCards": [
+        {
+            "title": "Analytics",
+            "description": "Google Analytics tracking.",
+            "href": "/analytics",
+            "icon": "BarChart",
+            "color": "text-green-500"
+        }
+    ],
+    "menu": [
+        {
+            "label": "Analytics",
+            "path": "/analytics",
+            "icon": "BarChart"
+        }
+    ]
+}

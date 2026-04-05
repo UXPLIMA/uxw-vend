@@ -20,6 +20,9 @@ export default function Page() {
                     { value: "error", label: "Error (Red)" },
                 ], defaultValue: "info" },
                 { key: "isActive", label: "Active", type: "toggle", defaultValue: "true" },
+                { key: "dismissible", label: "Dismissible", type: "toggle", defaultValue: "true" },
+                { key: "includePages", label: "Show on pages", placeholder: "Leave empty for all pages. Examples: /store/*, /blog/*" },
+                { key: "excludePages", label: "Hide on pages", placeholder: "Examples: /admin/*, /auth/*" },
                 { key: "startsAt", label: "Start Date", type: "datetime" },
                 { key: "endsAt", label: "End Date", type: "datetime" },
             ]}

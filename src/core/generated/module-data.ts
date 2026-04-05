@@ -16,6 +16,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
 
 export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
   {
+    "path": "/admin/analytics",
+    "key": "analytics:pages/admin/settings/analytics/page.tsx",
+    "module": "analytics",
+    "isAdmin": true
+  },
+  {
     "path": "/admin/announcements",
     "key": "announcements:pages/admin/page.tsx",
     "module": "announcements",

@@ -3,10 +3,17 @@ import dynamic from 'next/dynamic';
 import { PageLoader } from '@/core/components/ui/page-loader';
 
 export const ModuleRegistry: Record<string, any> = {
+  'analytics:pages/admin/settings/analytics/page.tsx': dynamic(() => import('@/modules/analytics/pages/admin/settings/analytics/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'announcements:pages/admin/page.tsx': dynamic(() => import('@/modules/announcements/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
 };
 
 export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
+  {
+    "path": "/admin/analytics",
+    "key": "analytics:pages/admin/settings/analytics/page.tsx",
+    "module": "analytics",
+    "isAdmin": true
+  },
   {
     "path": "/admin/announcements",
     "key": "announcements:pages/admin/page.tsx",
@@ -49,10 +56,16 @@ export const ModuleHomepageSections: { id: string; type: string; component: stri
 
 // Layout component registry (rendered on every page)
 export const LayoutComponentRegistry: Record<string, any> = {
+  'GoogleAnalytics': dynamic(() => import('@/modules/analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
   'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = [
+  {
+    "id": "GoogleAnalytics",
+    "component": "components/GoogleAnalytics",
+    "module": "analytics"
+  },
   {
     "id": "AnnouncementBanner",
     "component": "components/AnnouncementBanner",
@@ -85,4 +98,13 @@ export const ModuleProfileTabs: { id: string; label: string; component: string; 
 
 export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = [];
 
-export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [];
+export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [
+  {
+    "title": "Analytics",
+    "description": "Google Analytics tracking.",
+    "href": "/analytics",
+    "icon": "BarChart",
+    "color": "text-green-500",
+    "module": "analytics"
+  }
+];
