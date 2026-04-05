@@ -70,3 +70,7 @@ widgets-working.png
 
 # Module sources (dev only, ZIPs are built from these)
 module-sources/
+
+# Installed modules (runtime, not committed)
+src/modules/*
+!src/modules/.gitkeep
