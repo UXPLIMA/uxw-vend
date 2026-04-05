@@ -99,6 +99,13 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
+        // Rebuild production
+        if (process.env.NODE_ENV === "production") {
+            try {
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
+            } catch { /* module installed, will work after manual restart */ }
+        }
+
         // Update DB record
         const manifestRaw = await fs.readFile(manifestPath, "utf-8");
         const manifest = JSON.parse(manifestRaw);

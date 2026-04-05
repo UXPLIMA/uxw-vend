@@ -4,7 +4,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -30,15 +30,14 @@ export async function DELETE(
         // 4. Remove module directory
         await fs.rm(moduleDir, { recursive: true, force: true });
 
-        // 5. Regenerate registry
+        // 5. Regenerate registry + rebuild
         try {
-            execSync("npx tsx scripts/generate-registry.ts", {
-                cwd: process.cwd(),
-                timeout: 30000,
-                stdio: "pipe",
-            });
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+            if (process.env.NODE_ENV === "production") {
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
+            }
         } catch {
-            // Registry generation failed but module is already removed
+            // Registry/build failed but module is already removed
         }
 
         // 6. Remove DB record

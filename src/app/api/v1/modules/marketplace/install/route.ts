@@ -97,6 +97,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Registry generation failed: " + String((err as Error)?.message || err).slice(0, 200) }, { status: 400 });
         }
 
+        // Rebuild production if not in dev mode
+        if (process.env.NODE_ENV === "production") {
+            try {
+                execFileSync("npm", ["run", "build"], {
+                    cwd: process.cwd(),
+                    timeout: 120000,
+                    stdio: "pipe",
+                });
+            } catch {
+                // Build failed but module is installed — will work after manual restart
+            }
+        }
+
         // Create DB record (enabled by default for marketplace installs)
         const manifestRaw = await fs.readFile(manifestPath, "utf-8");
         const manifest = JSON.parse(manifestRaw);

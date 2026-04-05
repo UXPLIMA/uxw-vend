@@ -77,6 +77,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
         }
 
+        // Rebuild production
+        if (process.env.NODE_ENV === "production") {
+            try {
+                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
+            } catch { /* theme installed, will work after manual restart */ }
+        }
+
         return NextResponse.json({ message: "Theme installed", theme: { id: themeId } });
     } catch (err: unknown) {
         const msg = process.env.NODE_ENV === 'production'
