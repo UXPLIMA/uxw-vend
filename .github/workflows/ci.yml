@@ -8,6 +8,8 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
+  AUTH_SECRET: "ci-test-secret-key-32-characters!!"
 
 jobs:
   check:
@@ -44,6 +46,3 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
-          AUTH_SECRET: "ci-test-secret-key-32-characters!!"
