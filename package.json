@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "description": "Open source game server management platform",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "generate:themes": "npx tsx scripts/generate-themes.ts",
     "build:marketplace": "bash scripts/build-marketplace.sh",
     "db:merge": "npx tsx scripts/merge-schemas.ts",
-    "predev": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts",
+    "predev": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/clean-translations.ts",
     "dev": "NEXT_DEV=1 next dev --turbopack --port 3001 --hostname 0.0.0.0",
-    "prebuild": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts",
+    "prebuild": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/clean-translations.ts",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
