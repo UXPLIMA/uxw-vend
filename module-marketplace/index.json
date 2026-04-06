@@ -465,6 +465,27 @@
       }
     },
     {
+      "id": "referral",
+      "name": "Referral System",
+      "description": "Earn credits by referring new users",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "UserPlus",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "referral.zip",
+      "dependencies": [
+        "store"
+      ],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
       "id": "resend-provider",
       "name": "Resend Email Provider",
       "description": "Send emails via Resend API",
@@ -501,6 +522,25 @@
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "seo",
+      "name": "SEO Manager",
+      "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Search",
+      "category": "content",
+      "verified": true,
+      "downloads": 0,
+      "zip": "seo.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 2,
+        "apiRoutes": 3,
         "widgets": 0
       }
     },
@@ -578,7 +618,7 @@
       "stats": {
         "publicRoutes": 5,
         "adminRoutes": 12,
-        "apiRoutes": 39,
+        "apiRoutes": 42,
         "widgets": 0
       }
     },
