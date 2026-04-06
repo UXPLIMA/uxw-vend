@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { locales, defaultLocale } from './core/lib/i18n/config';
 import { moduleRouteMap } from '@/core/generated/module-routes';
+import { randomUUID } from 'crypto';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -54,6 +55,11 @@ async function getModuleEnabled(moduleId: string, request: NextRequest): Promise
 }
 
 export async function proxy(request: NextRequest) {
+    // Inject correlation ID for request tracking
+    const correlationId = request.headers.get('x-correlation-id') || randomUUID();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-correlation-id', correlationId);
+
     const { pathname } = request.nextUrl;
 
     // Check if path belongs to a module
@@ -80,10 +86,14 @@ export async function proxy(request: NextRequest) {
 
     // Continue with i18n middleware for non-API routes
     if (!pathname.startsWith('/api/')) {
-        return intlMiddleware(request);
+        const response = intlMiddleware(request);
+        response.headers.set('x-correlation-id', correlationId);
+        return response;
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    response.headers.set('x-correlation-id', correlationId);
+    return response;
 }
 
 export const config = {

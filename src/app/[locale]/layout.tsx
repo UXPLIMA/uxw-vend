@@ -13,6 +13,7 @@ import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
 import { Toaster } from "sonner";
+import { ErrorBoundary } from "@/core/components/ErrorBoundary";
 import "../globals.css";
 
 const inter = Inter({
@@ -78,11 +79,13 @@ export default async function RootLayout({
               <AppThemeProvider defaultTheme={defaultThemeId}>
                 <ModuleProvider moduleStates={moduleStates}>
                 <ConfirmProvider>
+                  <ErrorBoundary>
                   <ProgressBar />
                   <CustomCssInjector />
                   <ModuleLayoutComponents />
                   {children}
                   <MobileBottomNav />
+                  </ErrorBoundary>
                   <Toaster position="bottom-right" richColors closeButton />
                 </ConfirmProvider>
                 </ModuleProvider>

@@ -1,20 +1,26 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { ModuleApiRegistry } from "@/core/generated/module-registry";
 import { matchApiRoute } from "@/core/lib/api-matcher";
+import { logRequest } from "@/core/lib/logger";
+import { recordMetric } from "@/core/lib/metrics";
 
 async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: string[] }>, method: string) {
     const { path } = await paramsPromise;
+    const fullPath = `/api/v1/${path.join("/")}`;
+    const requestStart = Date.now();
+    const { correlationId, finish } = logRequest(method, fullPath);
     const match = matchApiRoute(path);
 
     if (!match) {
-        // If not matched, it might be handled by another specialized route or it's a 404
+        finish(404);
+        recordMetric(method, fullPath, 404, Date.now() - requestStart);
         return NextResponse.json({ error: "API route not found" }, { status: 404 });
     }
 
     const loadHandler = ModuleApiRegistry[match.key];
     if (!loadHandler) {
-        console.error(`API handler not found in registry: ${match.key}`);
+        finish(500, { error: "handler_missing", handler: match.key });
+        recordMetric(method, fullPath, 500, Date.now() - requestStart);
         return NextResponse.json({ error: "API handler missing" }, { status: 500 });
     }
 
@@ -23,14 +29,21 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
         const handler = handlerModule[method];
 
         if (!handler) {
+            finish(405);
+            recordMetric(method, fullPath, 405, Date.now() - requestStart);
             return NextResponse.json({ error: `Method ${method} not allowed` }, { status: 405 });
         }
 
-        // Call the handler
-        // We pass the request and context merging the original params with dynamic route params
-        return handler(req, { params: { ...match.params } });
+        const response: NextResponse = await handler(req, { params: { ...match.params } });
+        const status = response.status || 200;
+        finish(status, { handler: match.key });
+        recordMetric(method, fullPath, status, Date.now() - requestStart);
+        response.headers.set("x-correlation-id", correlationId);
+        return response;
     } catch (error) {
-        console.error(`Error executing API handler for ${match.key}:`, error);
+        const errMsg = error instanceof Error ? error.message : "Unknown error";
+        finish(500, { error: errMsg, handler: match.key });
+        recordMetric(method, fullPath, 500, Date.now() - requestStart);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
