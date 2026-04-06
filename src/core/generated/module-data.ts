@@ -631,6 +631,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/tickets/departments/[id]",
+    "key": "tickets:api:/tickets/departments/[id]",
+    "module": "tickets",
+    "method": "ALL"
+  },
+  {
     "path": "/tickets/[id]",
     "key": "tickets:api:/tickets/[id]",
     "module": "tickets",
@@ -705,6 +711,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
   {
     "path": "/wheel/prizes",
     "key": "wheel:api:/wheel/prizes",
+    "module": "wheel",
+    "method": "ALL"
+  },
+  {
+    "path": "/wheel/prizes/[id]",
+    "key": "wheel:api:/wheel/prizes/[id]",
     "module": "wheel",
     "method": "ALL"
   },
@@ -1108,6 +1120,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
   {
     "path": "/admin/tickets/[id]",
     "key": "tickets:pages/admin/tickets/[id]/page.tsx",
+    "module": "tickets",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/tickets/departments",
+    "key": "tickets:pages/admin/tickets/departments/page.tsx",
     "module": "tickets",
     "isAdmin": true
   },

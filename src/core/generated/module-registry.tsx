@@ -73,6 +73,7 @@ export const ModuleRegistry: Record<string, any> = {
   'tickets:pages/public/tickets/[id]/page.tsx': dynamic(() => import('@/modules/tickets/pages/public/tickets/[id]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'tickets:pages/admin/tickets/page.tsx': dynamic(() => import('@/modules/tickets/pages/admin/tickets/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'tickets:pages/admin/tickets/[id]/page.tsx': dynamic(() => import('@/modules/tickets/pages/admin/tickets/[id]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'tickets:pages/admin/tickets/departments/page.tsx': dynamic(() => import('@/modules/tickets/pages/admin/tickets/departments/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'vote:pages/public/page.tsx': dynamic(() => import('@/modules/vote/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'vote:pages/admin/sites/page.tsx': dynamic(() => import('@/modules/vote/pages/admin/sites/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'webhook-logs:pages/admin/page.tsx': dynamic(() => import('@/modules/webhook-logs/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -472,6 +473,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
   {
     "path": "/admin/tickets/[id]",
     "key": "tickets:pages/admin/tickets/[id]/page.tsx",
+    "module": "tickets",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/tickets/departments",
+    "key": "tickets:pages/admin/tickets/departments/page.tsx",
     "module": "tickets",
     "isAdmin": true
   },
@@ -1137,6 +1144,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/tickets/departments/[id]",
+    "key": "tickets:api:/tickets/departments/[id]",
+    "module": "tickets",
+    "method": "ALL"
+  },
+  {
     "path": "/tickets/[id]",
     "key": "tickets:api:/tickets/[id]",
     "module": "tickets",
@@ -1211,6 +1224,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
   {
     "path": "/wheel/prizes",
     "key": "wheel:api:/wheel/prizes",
+    "module": "wheel",
+    "method": "ALL"
+  },
+  {
+    "path": "/wheel/prizes/[id]",
+    "key": "wheel:api:/wheel/prizes/[id]",
     "module": "wheel",
     "method": "ALL"
   },
@@ -1328,6 +1347,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'suggestions:api:/suggestions/[id]': () => import('@/modules/suggestions/api/[id]/route'),
   'tickets:api:/tickets': () => import('@/modules/tickets/api/tickets/route'),
   'tickets:api:/tickets/departments': () => import('@/modules/tickets/api/tickets/departments/route'),
+  'tickets:api:/tickets/departments/[id]': () => import('@/modules/tickets/api/tickets/departments/[id]/route'),
   'tickets:api:/tickets/[id]': () => import('@/modules/tickets/api/tickets/[id]/route'),
   'tickets:api:/support/stats': () => import('@/modules/tickets/api/stats/route'),
   'tickets:api:/tickets/stats': () => import('@/modules/tickets/api/stats/route'),
@@ -1341,6 +1361,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'vote:api:/vote/claim': () => import('@/modules/vote/api/claim/route'),
   'webhook-logs:api:/webhook-logs': () => import('@/modules/webhook-logs/api/route'),
   'wheel:api:/wheel/prizes': () => import('@/modules/wheel/api/prizes/route'),
+  'wheel:api:/wheel/prizes/[id]': () => import('@/modules/wheel/api/prizes/[id]/route'),
   'wheel:api:/wheel/spin': () => import('@/modules/wheel/api/spin/route'),
 };
 

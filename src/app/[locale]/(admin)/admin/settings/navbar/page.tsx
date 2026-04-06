@@ -8,6 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { ArrowLeft, Loader2, Check, Plus, X, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import { invalidateSettingsCache } from "@/core/hooks/useSiteSettings";
 
 interface NavChild {
     label: string;
@@ -88,8 +89,12 @@ export default function NavbarSettingsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ navbar_links: links }),
         });
-        if (res.ok) toast.success("Navbar saved");
-        else toast.error("Failed to save");
+        if (res.ok) {
+            invalidateSettingsCache();
+            toast.success("Navbar saved");
+        } else {
+            toast.error("Failed to save");
+        }
         setSaving(false);
     };
 

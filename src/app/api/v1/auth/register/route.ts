@@ -83,8 +83,37 @@ export async function POST(request: NextRequest) {
             { message: "User created successfully", user },
             { status: 201 }
         );
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Registration error:", error);
+
+        // Handle Prisma unique constraint violations (P2002)
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            (error as { code: string }).code === "P2002"
+        ) {
+            return NextResponse.json(
+                { error: "Email or username already registered" },
+                { status: 400 }
+            );
+        }
+
+        // Handle Prisma connection / adapter errors
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            typeof (error as { code: string }).code === "string" &&
+            (error as { code: string }).code.startsWith("P")
+        ) {
+            console.error("Prisma error code:", (error as { code: string }).code);
+            return NextResponse.json(
+                { error: "Database error. Please try again later." },
+                { status: 500 }
+            );
+        }
+
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

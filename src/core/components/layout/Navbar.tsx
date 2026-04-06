@@ -112,7 +112,7 @@ export function Navbar() {
         .filter(nc => NavbarComponentRegistry[nc.id]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
-    const isAdminUser = session?.user?.role === "admin";
+    const isStaffUser = ["admin", "moderator", "staff"].includes(session?.user?.role || "");
 
     return (
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
@@ -207,7 +207,7 @@ export function Navbar() {
                                             <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
                                                 <User className="w-4 h-4" /> Profile
                                             </Link>
-                                            {isAdminUser && (
+                                            {isStaffUser && (
                                                 <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
                                                     <Shield className="w-4 h-4" /> Admin Panel
                                                 </Link>

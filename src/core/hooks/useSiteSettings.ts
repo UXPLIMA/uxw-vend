@@ -28,6 +28,12 @@ async function fetchSettings(): Promise<Record<string, unknown>> {
     return fetchPromise;
 }
 
+/** Invalidate the settings cache so the next useSiteSettings call fetches fresh data */
+export function invalidateSettingsCache() {
+    cachedSettings = null;
+    fetchPromise = null;
+}
+
 export function useSiteSettings() {
     const [settings, setSettings] = useState<Record<string, unknown>>(cachedSettings || {});
     const [loaded, setLoaded] = useState(!!cachedSettings);

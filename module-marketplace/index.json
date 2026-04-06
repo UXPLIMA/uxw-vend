@@ -676,8 +676,8 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 3,
-        "adminRoutes": 2,
-        "apiRoutes": 5,
+        "adminRoutes": 3,
+        "apiRoutes": 6,
         "widgets": 0
       }
     },
@@ -757,7 +757,7 @@
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
-        "apiRoutes": 2,
+        "apiRoutes": 3,
         "widgets": 0
       }
     }
