@@ -578,7 +578,7 @@
       "stats": {
         "publicRoutes": 5,
         "adminRoutes": 12,
-        "apiRoutes": 38,
+        "apiRoutes": 39,
         "widgets": 0
       }
     },
@@ -599,7 +599,7 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
-        "apiRoutes": 1,
+        "apiRoutes": 0,
         "widgets": 0
       }
     },
