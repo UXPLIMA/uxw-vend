@@ -157,7 +157,7 @@ body {
 [data-mode="dark"] .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.3) !important; }
 [data-mode="dark"] .shadow-lg { box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
 [data-mode="dark"] input, [data-mode="dark"] textarea, [data-mode="dark"] select {
-  background-color: #0f172a !important;
+  background-color: #111827 !important;
   border-color: #374151 !important;
   color: #f1f5f9 !important;
 }
