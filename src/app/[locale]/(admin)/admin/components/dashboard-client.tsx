@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket, Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
-import { DashboardCharts } from "./dashboard-charts";
+import dynamic from "next/dynamic";
+
+const DashboardCharts = dynamic(() => import("./dashboard-charts").then(m => ({ default: m.DashboardCharts })), {
+    loading: () => <div className="h-[300px] bg-muted animate-pulse rounded-lg" />,
+});
 
 interface ModuleManifest {
     id: string;

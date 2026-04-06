@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
+import { useDarkMode } from "@/core/hooks/useDarkMode";
 import Image from "next/image";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -26,29 +27,10 @@ export function Navbar() {
     const { settings } = useSiteSettings();
     const moduleStatus = useAllModules();
     const [mounted, setMounted] = useState(false);
-    const [isDark, setIsDark] = useState(false);
+    const { isDark, toggle: toggleDarkMode } = useDarkMode();
 
-    useEffect(() => {
-        /* eslint-disable react-hooks/set-state-in-effect -- client-only mount + localStorage read */
-        setMounted(true);
-        const stored = localStorage.getItem("color-mode");
-        const dark = stored === "dark";
-        setIsDark(dark);
-        /* eslint-enable react-hooks/set-state-in-effect */
-        if (dark) document.documentElement.setAttribute("data-mode", "dark");
-    }, []);
-
-    const toggleDarkMode = () => {
-        const newDark = !isDark;
-        setIsDark(newDark);
-        if (newDark) {
-            document.documentElement.setAttribute("data-mode", "dark");
-            localStorage.setItem("color-mode", "dark");
-        } else {
-            document.documentElement.removeAttribute("data-mode");
-            localStorage.setItem("color-mode", "light");
-        }
-    };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { setMounted(true); }, []);
 
     // Build nav links: admin-configured links take priority, fallback to module-registered links
     // pathToModule maps top-level path prefixes to module IDs using both navLinks and routes
@@ -188,7 +170,7 @@ export function Navbar() {
 
                     <div className="flex items-center gap-2">
                         {mounted && (
-                            <button onClick={toggleDarkMode}
+                            <button onClick={toggleDarkMode} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                                 className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
                                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>

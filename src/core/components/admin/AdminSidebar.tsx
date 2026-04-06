@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { usePathname } from "@/core/lib/i18n/navigation";
+import { useDarkMode } from "@/core/hooks/useDarkMode";
 import {
     LayoutDashboard,
     Package,
@@ -89,24 +90,7 @@ const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
 export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [isDark, setIsDark] = useState(false);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- reading DOM attribute on mount
-        setIsDark(document.documentElement.getAttribute("data-mode") === "dark");
-    }, []);
-
-    const toggleDarkMode = () => {
-        const newDark = !isDark;
-        setIsDark(newDark);
-        if (newDark) {
-            document.documentElement.setAttribute("data-mode", "dark");
-            localStorage.setItem("color-mode", "dark");
-        } else {
-            document.documentElement.removeAttribute("data-mode");
-            localStorage.setItem("color-mode", "light");
-        }
-    };
+    const { isDark, toggle: toggleDarkMode } = useDarkMode();
 
     const isActive = (href: string) => {
         if (href === "/admin") return pathname === "/admin";
@@ -168,6 +152,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             {/* Mobile hamburger button */}
             <button
                 onClick={() => setMobileOpen(true)}
+                aria-label="Open menu"
                 className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border shadow-sm flex items-center justify-center"
             >
                 <Menu size={20} />
@@ -185,6 +170,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             <aside className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 flex flex-col ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <button
                     onClick={() => setMobileOpen(false)}
+                    aria-label="Close menu"
                     className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"
                 >
                     <X size={18} />

@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
   poweredByHeader: false,
   ...(process.env.NODE_ENV === 'development' ? { allowedDevOrigins: ['*'] } : {}),
-  serverExternalPackages: ["redis", "net"],
+  serverExternalPackages: ["redis", "net", "fs"],
   images: {
     remotePatterns: [
       // Default safe domains

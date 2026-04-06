@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/core/lib/utils";
 
 interface SkeletonProps {
