@@ -222,28 +222,40 @@ export default function AdminModulesPage() {
         const toInstall = marketplace.filter(m => selectedModules.has(m.id) && !installedIds.has(m.id));
         if (toInstall.length === 0) return;
 
-        setBulkInstalling(true);
-        let installed = 0;
+        const ok = await confirm({
+            title: "Bulk Install",
+            message: `Install ${toInstall.length} modules? This may take a few minutes as the system will rebuild after all modules are installed.`,
+            confirmText: `Install ${toInstall.length} modules`,
+        });
+        if (!ok) return;
 
-        for (const mod of toInstall) {
-            setBulkProgress({ current: installed + 1, total: toInstall.length, name: mod.name });
-            try {
-                const res = await fetch("/api/v1/modules/marketplace/install", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ moduleId: mod.id, zipFile: mod.zip }),
-                });
-                if (res.ok) installed++;
-                else {
-                    const data = await res.json();
-                    toast.error(`${mod.name}: ${data.error || "Failed"}`);
+        setBulkInstalling(true);
+        setBulkProgress({ current: 0, total: toInstall.length, name: "Preparing..." });
+
+        try {
+            // Single API call — server handles all installs + single build
+            const res = await fetch("/api/v1/modules/marketplace/bulk-install", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    modules: toInstall.map(m => ({ id: m.id, zip: m.zip, name: m.name })),
+                }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                toast.success(`${data.installed}/${data.total} modules installed`);
+                if (data.failed > 0) {
+                    const failedNames = data.results.filter((r: { status: string }) => r.status === "failed").map((r: { name: string; error?: string }) => r.name).join(", ");
+                    toast.error(`Failed: ${failedNames}`);
                 }
-            } catch {
-                toast.error(`${mod.name}: Install failed`);
+            } else {
+                toast.error(data.error || "Bulk install failed");
             }
+        } catch {
+            toast.error("Bulk install failed");
         }
 
-        toast.success(`${installed}/${toInstall.length} modules installed`);
         setSelectedModules(new Set());
         setBulkInstalling(false);
         setBulkProgress(null);

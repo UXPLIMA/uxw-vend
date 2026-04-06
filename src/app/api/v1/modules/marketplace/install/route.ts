@@ -7,9 +7,12 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
+import { scheduleBuild } from "@/core/lib/install-lock";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
+const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
+const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
 // POST /api/v1/modules/marketplace/install — Install a module from marketplace
 export async function POST(request: NextRequest) {
@@ -28,8 +31,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
         }
 
-        // Block reserved module IDs
-        const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
         if (RESERVED_IDS.includes(moduleId)) {
             return NextResponse.json({ error: "Module ID is reserved" }, { status: 400 });
         }
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Module already installed" }, { status: 409 });
         }
 
+        // Check available disk space (need at least 100MB free)
+        try {
+            const stats = await fs.statfs(MODULES_DIR);
+            const freeBytes = stats.bsize * stats.bfree;
+            if (freeBytes < 100 * 1024 * 1024) {
+                return NextResponse.json({ error: "Insufficient disk space" }, { status: 507 });
+            }
+        } catch { /* statfs not available on all platforms */ }
+
         // Download ZIP from GitHub with size limit
         const zipUrl = `${MARKETPLACE_BASE}/${zipFile}`;
         const res = await fetch(zipUrl);
@@ -49,7 +59,6 @@ export async function POST(request: NextRequest) {
         }
 
         const contentLength = res.headers.get("content-length");
-        const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
         if (contentLength && parseInt(contentLength, 10) > MAX_MODULE_SIZE) {
             return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 413 });
         }
@@ -64,17 +73,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid ZIP file" }, { status: 400 });
         }
 
-        // Extract directly to module directory using adm-zip (no shell, path traversal protected)
+        // Extract to module directory
         await fs.mkdir(targetDir, { recursive: true });
         const zip = new AdmZip(buffer);
-        const entries = zip.getEntries();
-        for (const entry of entries) {
+        for (const entry of zip.getEntries()) {
             if (entry.isDirectory) continue;
             if (entry.entryName.includes("../")) continue;
             const resolvedPath = path.resolve(targetDir, entry.entryName);
             if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
-            const dir = path.dirname(resolvedPath);
-            await fs.mkdir(dir, { recursive: true });
+            await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
             await fs.writeFile(resolvedPath, entry.getData());
         }
 
@@ -86,61 +93,25 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
         }
 
-        // If module has schema.prisma, merge schemas and push to DB
+        // Schema merge (sync, lightweight — just merges files)
         const schemaPath = path.join(targetDir, "schema.prisma");
         const hasSchema = await fs.access(schemaPath).then(() => true).catch(() => false);
         if (hasSchema) {
             try {
-                execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], {
-                    cwd: process.cwd(),
-                    timeout: 30000,
-                    stdio: "pipe",
-                });
-                execFileSync("npx", ["prisma", "db", "push"], {
-                    cwd: process.cwd(),
-                    timeout: 60000,
-                    stdio: "pipe",
-                });
-            } catch (err: unknown) {
-                await fs.rm(targetDir, { recursive: true, force: true });
-                // Re-merge schemas without the failed module
-                try {
-                    execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], {
-                        cwd: process.cwd(),
-                        timeout: 30000,
-                        stdio: "pipe",
-                    });
-                } catch { /* best effort */ }
-                const detail = process.env.NEXT_DEV ? ": " + String((err as Error)?.message || err).slice(0, 200) : "";
-                return NextResponse.json({ error: "Schema migration failed" + detail }, { status: 400 });
-            }
-        }
-
-        // Regenerate registry
-        try {
-            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
-                cwd: process.cwd(),
-                timeout: 30000,
-                stdio: "pipe",
-            });
-        } catch (err: unknown) {
-            await fs.rm(targetDir, { recursive: true, force: true });
-            const detail = process.env.NEXT_DEV ? ": " + String((err as Error)?.message || err).slice(0, 200) : "";
-            return NextResponse.json({ error: "Registry generation failed" + detail }, { status: 400 });
-        }
-
-        // Rebuild + restart (skip in dev mode — Turbopack handles hot-reload)
-        if (!process.env.NEXT_DEV) {
-            try {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
-                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
-                catch { /* no PM2, user restarts manually */ }
+                execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
             } catch {
-                // Build failed but module is installed — will work after manual restart
+                // Non-fatal: schema will be merged during deferred build
             }
         }
 
-        // Create DB record (enabled by default for marketplace installs)
+        // Registry generation (sync, lightweight)
+        try {
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+        } catch {
+            // Non-fatal: registry will be regenerated during deferred build
+        }
+
+        // Create DB record
         const manifestRaw = await fs.readFile(manifestPath, "utf-8");
         const manifest = JSON.parse(manifestRaw);
         await prisma.moduleConfig.upsert({
@@ -150,72 +121,77 @@ export async function POST(request: NextRequest) {
         });
         await invalidateModuleCache();
 
-        // Seed scripts must be run manually by admin for security
-        // manifest.seedOnInstall is preserved in module.json but not auto-executed
+        // Merge translations
+        await mergeModuleTranslations(manifest, targetDir);
 
-        // Merge module translations into core messages
-        const PROTECTED_KEYS = ["common", "nav", "auth", "hero", "footer", "errors", "metadata", "admin"];
-
-        function sanitizeTranslations(obj: Record<string, unknown>): Record<string, unknown> {
-            const result: Record<string, unknown> = {};
-            for (const [key, value] of Object.entries(obj)) {
-                if (typeof value === 'string') {
-                    result[key] = value.replace(/<[^>]*>/g, '');
-                } else if (typeof value === 'object' && value !== null) {
-                    result[key] = sanitizeTranslations(value as Record<string, unknown>);
-                } else {
-                    result[key] = value;
-                }
-            }
-            return result;
-        }
-
-        function safeMergeTranslations(existing: Record<string, unknown>, incoming: Record<string, unknown>): Record<string, unknown> {
-            const sanitized = sanitizeTranslations(incoming);
-            for (const key of PROTECTED_KEYS) {
-                delete sanitized[key];
-            }
-            return { ...existing, ...sanitized };
-        }
-
-        if (manifest.translations) {
-            const messagesDir = path.join(process.cwd(), "messages");
-            for (const [locale, translations] of Object.entries(manifest.translations)) {
-                const msgPath = path.join(messagesDir, `${locale}.json`);
-                try {
-                    const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
-                    const merged = safeMergeTranslations(existing, translations as Record<string, unknown>);
-                    await fs.writeFile(msgPath, JSON.stringify(merged, null, 2));
-                } catch { /* locale file doesn't exist, skip */ }
-            }
-        }
-
-        // Also check for messages/ directory in module (alternative to manifest translations)
-        const moduleMessagesDir = path.join(targetDir, "messages");
-        const hasModuleMessages = await fs.access(moduleMessagesDir).then(() => true).catch(() => false);
-        if (hasModuleMessages) {
-            const localeFiles = await fs.readdir(moduleMessagesDir);
-            const coreMessagesDir = path.join(process.cwd(), "messages");
-            for (const file of localeFiles) {
-                if (!file.endsWith(".json")) continue;
-                try {
-                    const moduleTranslations = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
-                    const corePath = path.join(coreMessagesDir, file);
-                    const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
-                    const merged = safeMergeTranslations(existing, moduleTranslations);
-                    await fs.writeFile(corePath, JSON.stringify(merged, null, 2));
-                } catch { /* skip */ }
-            }
-        }
+        // Schedule deferred build + restart (debounced — waits for more installs)
+        // Bulk install: 37 modules call this, but only ONE build runs after all finish
+        scheduleBuild();
 
         return NextResponse.json({
             message: "Module installed and enabled",
             module: { id: moduleId, name: manifest.name, version: manifest.version, enabled: true },
+            buildScheduled: true,
         });
     } catch (err: unknown) {
         const msg = process.env.NODE_ENV === 'production'
             ? 'Operation failed'
             : (err instanceof Error ? err.message : 'Unknown error');
         return NextResponse.json({ error: msg }, { status: 500 });
+    }
+}
+
+// --- Translation merge helpers ---
+
+const PROTECTED_KEYS = ["common", "nav", "auth", "hero", "footer", "errors", "metadata", "admin"];
+
+function sanitizeTranslations(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+        if (typeof value === 'string') {
+            result[key] = value.replace(/<[^>]*>/g, '');
+        } else if (typeof value === 'object' && value !== null) {
+            result[key] = sanitizeTranslations(value as Record<string, unknown>);
+        } else {
+            result[key] = value;
+        }
+    }
+    return result;
+}
+
+function safeMerge(existing: Record<string, unknown>, incoming: Record<string, unknown>): Record<string, unknown> {
+    const sanitized = sanitizeTranslations(incoming);
+    for (const key of PROTECTED_KEYS) delete sanitized[key];
+    return { ...existing, ...sanitized };
+}
+
+async function mergeModuleTranslations(manifest: Record<string, unknown>, targetDir: string) {
+    const messagesDir = path.join(process.cwd(), "messages");
+
+    // From manifest translations field
+    if (manifest.translations && typeof manifest.translations === 'object') {
+        for (const [locale, translations] of Object.entries(manifest.translations as Record<string, unknown>)) {
+            const msgPath = path.join(messagesDir, `${locale}.json`);
+            try {
+                const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
+                await fs.writeFile(msgPath, JSON.stringify(safeMerge(existing, translations as Record<string, unknown>), null, 2));
+            } catch { /* skip */ }
+        }
+    }
+
+    // From messages/ directory
+    const moduleMessagesDir = path.join(targetDir, "messages");
+    const hasDir = await fs.access(moduleMessagesDir).then(() => true).catch(() => false);
+    if (hasDir) {
+        const files = await fs.readdir(moduleMessagesDir);
+        for (const file of files) {
+            if (!file.endsWith(".json")) continue;
+            try {
+                const moduleTranslations = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
+                const corePath = path.join(messagesDir, file);
+                const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
+                await fs.writeFile(corePath, JSON.stringify(safeMerge(existing, moduleTranslations), null, 2));
+            } catch { /* skip */ }
+        }
     }
 }
