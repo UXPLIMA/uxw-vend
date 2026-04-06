@@ -1,87 +1,73 @@
-
-import fs from "fs";
-import path from "path";
 import { ModuleManifest, LoadedModule } from "./module-types";
 
-// This will run on the server side only
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
+const MODULES_DIR = typeof process !== "undefined" ? (process.cwd?.() || "") + "/src/modules" : "";
 
 class ModuleLoader {
     private modules: Map<string, LoadedModule> = new Map();
     private initialized = false;
 
-    /**
-     * Scan for modules in the modules directory
-     */
     public scanModules(): Map<string, LoadedModule> {
-        if (!fs.existsSync(MODULES_DIR)) {
-            console.warn(`Modules directory not found at ${MODULES_DIR}`);
-            return this.modules;
-        }
+        // Only run on server (fs not available in browser/SSR client)
+        if (typeof window !== "undefined") return this.modules;
 
-        const entries = fs.readdirSync(MODULES_DIR, { withFileTypes: true });
+        try {
+            // Dynamic require to prevent bundler from pulling fs into client
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const fs = require("fs");
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const path = require("path");
+            const modulesDir = path.join(process.cwd(), "src/modules");
 
-        for (const entry of entries) {
-            if (entry.isDirectory()) {
-                this.loadModule(entry.name);
+            if (!fs.existsSync(modulesDir)) {
+                return this.modules;
             }
+
+            const entries = fs.readdirSync(modulesDir, { withFileTypes: true });
+
+            for (const entry of entries) {
+                if (entry.isDirectory()) {
+                    this.loadModule(entry.name, modulesDir, fs, path);
+                }
+            }
+
+            this.initialized = true;
+            console.log(`Loaded ${this.modules.size} modules`);
+        } catch {
+            // fs not available (client-side) — return empty
         }
 
-        this.initialized = true;
-        console.log(`Loaded ${this.modules.size} modules`);
         return this.modules;
     }
 
-    /**
-     * Load a single module by directory name
-     */
-    private loadModule(dirName: string) {
+    private loadModule(dirName: string, modulesDir: string, fs: typeof import("fs"), path: typeof import("path")) {
         try {
-            const modulePath = path.join(MODULES_DIR, dirName);
+            const modulePath = path.join(modulesDir, dirName);
             const manifestPath = path.join(modulePath, "module.json");
 
-            if (!fs.existsSync(manifestPath)) {
-                // Not a valid module, skip
-                return;
-            }
+            if (!fs.existsSync(manifestPath)) return;
 
             const manifestContent = fs.readFileSync(manifestPath, "utf-8");
             const manifest = JSON.parse(manifestContent) as ModuleManifest;
 
-            // TODO: Validate manifest against schema
-
-            const loadedModule: LoadedModule = {
+            this.modules.set(manifest.id, {
                 manifest,
                 path: modulePath,
-                enabled: true, // Default to enabled, later check DB
-            };
-
-            this.modules.set(manifest.id, loadedModule);
+                enabled: true,
+            });
         } catch (error) {
             console.error(`Failed to load module ${dirName}:`, error);
         }
     }
 
-    /**
-     * Get all loaded modules
-     */
     public getModules(): LoadedModule[] {
-        if (!this.initialized) {
-            this.scanModules();
-        }
+        if (!this.initialized) this.scanModules();
         return Array.from(this.modules.values());
     }
 
-    /**
-     * Get a specific module
-     */
     public getModule(id: string): LoadedModule | undefined {
-        if (!this.initialized) {
-            this.scanModules();
-        }
+        if (!this.initialized) this.scanModules();
         return this.modules.get(id);
     }
 }
 
-// Singleton instance
 export const moduleLoader = new ModuleLoader();
