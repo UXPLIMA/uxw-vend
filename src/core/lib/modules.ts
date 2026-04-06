@@ -88,52 +88,6 @@ class ModuleSystem {
         return permissions;
     }
 
-    /**
-     * Check if route belongs to an enabled module
-     */
-    isRouteEnabled(path: string): boolean {
-        // Core routes are always enabled
-        if (
-            path.startsWith("/auth") ||
-            path.startsWith("/admin/settings") ||
-            path.startsWith("/admin/users") ||
-            path.startsWith("/api/v1/auth") ||
-            path.startsWith("/api/v1/users") ||
-            path === "/" ||
-            path === "/admin"
-        ) {
-            return true;
-        }
-
-        for (const mod of this.getDefinitions()) {
-            // Combine public routes and admin routes
-            const publicRoutes = mod.routes?.map(r => r.path) || [];
-            const adminRoutes = mod.adminRoutes?.map(r => r.path) || [];
-
-            // For admin paths, we need to check if regex matching should include /admin prefix logic
-            // Manifest admin routes are like "/store/products". 
-            // The URL path will be "/admin/store/products".
-            // So we should prefix admin routes with "/admin" for matching.
-
-            const allRoutes = [
-                ...publicRoutes,
-                ...adminRoutes.map(r => `/admin${r.startsWith('/') ? r : '/' + r}`)
-            ];
-
-            for (const route of allRoutes) {
-                // Convert route pattern to regex
-                // Replace [xxx] with [^/]+
-                const pattern = route.replace(/\[.*?\]/g, "[^/]+");
-                const regex = new RegExp(`^${pattern}$`);
-                if (regex.test(path)) {
-                    return this.isEnabled(mod.id);
-                }
-            }
-        }
-
-        // Unknown routes are allowed (e.g. static assets or core routes not listed)
-        return true;
-    }
 }
 
 export const moduleSystem = new ModuleSystem();

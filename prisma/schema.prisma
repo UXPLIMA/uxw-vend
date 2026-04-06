@@ -118,6 +118,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -164,7 +166,6 @@ model Setting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([key])
   @@index([module])
 }
 
@@ -200,7 +201,7 @@ model ApiKey {
   keyHash     String
   keyPrefix   String
   userId      String
-  user        User     @relation("ApiKeys", fields: [userId], references: [id])
+  user        User     @relation("ApiKeys", fields: [userId], references: [id], onDelete: Cascade)
   permissions String[] @default([])
   lastUsedAt  DateTime?
   expiresAt   DateTime?
@@ -208,6 +209,7 @@ model ApiKey {
   createdAt   DateTime @default(now())
 
   @@index([keyPrefix])
+  @@index([userId])
 }
 
 model ActivityLog {
@@ -221,7 +223,7 @@ model ActivityLog {
   ipAddress String?
   createdAt DateTime @default(now())
 
-  @@index([userId])
+  @@index([userId, createdAt])
   @@index([action])
   @@index([createdAt])
 }

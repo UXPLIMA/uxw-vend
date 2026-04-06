@@ -45,8 +45,12 @@ function isNewerVersion(current: string, latest: string): boolean {
     return false;
 }
 
-// GET /api/v1/modules - Get all modules with their status
+// GET /api/v1/modules - Get all modules with their status (admin only)
 export async function GET() {
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     const definitions = moduleSystem.getDefinitions();
     const configs = await prisma.moduleConfig.findMany();
     const configMap = new Map(configs.map(c => [c.id, c]));

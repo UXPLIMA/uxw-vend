@@ -13,7 +13,8 @@ const imageHosts = (process.env.NEXT_PUBLIC_IMAGE_DOMAINS || "")
 
 const nextConfig: NextConfig = {
   // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
-  allowedDevOrigins: ["*"],
+  poweredByHeader: false,
+  ...(process.env.NODE_ENV === 'development' ? { allowedDevOrigins: ['*'] } : {}),
   serverExternalPackages: ["redis", "net"],
   images: {
     remotePatterns: [

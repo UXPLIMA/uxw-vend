@@ -22,6 +22,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }
 
+        // Validate moduleId format (prevent path traversal)
+        if (!/^[a-z0-9-]+$/.test(moduleId)) {
+            return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+        }
+
         // Verify module is already installed
         const targetDir = path.join(MODULES_DIR, moduleId);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);

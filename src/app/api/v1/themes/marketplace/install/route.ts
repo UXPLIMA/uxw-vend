@@ -18,9 +18,12 @@ export async function POST(request: NextRequest) {
         const { themeId, zipFile } = await request.json();
         if (!themeId || !zipFile) return NextResponse.json({ error: "themeId and zipFile required" }, { status: 400 });
 
-        // Validate zipFile to prevent SSRF / path traversal
+        // Validate inputs to prevent SSRF / path traversal
         if (!/^[a-z0-9-]+\.zip$/.test(zipFile)) {
             return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
+        }
+        if (!/^[a-z0-9-]+$/.test(themeId)) {
+            return NextResponse.json({ error: "Invalid theme ID" }, { status: 400 });
         }
 
         const targetDir = path.join(THEMES_DIR, themeId);

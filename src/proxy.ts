@@ -37,10 +37,13 @@ async function getModuleEnabled(moduleId: string, request: NextRequest): Promise
         return moduleCache.get(moduleId) ?? true;
     }
 
-    // Use the current request's origin to build the internal API URL
-    const origin = request.nextUrl.origin;
+    // Use hardcoded internal URL to prevent SSRF via Origin header spoofing
+    const port = process.env.PORT || '3001';
+    const internalUrl = `http://127.0.0.1:${port}/api/v1/modules/status`;
     try {
-        const res = await fetch(`${origin}/api/v1/modules/status`);
+        const res = await fetch(internalUrl, {
+            headers: { 'x-internal-request': '1' },
+        });
         if (res.ok) {
             const data = await res.json();
             moduleCache = new Map(Object.entries(data.modules || {}));
@@ -51,6 +54,7 @@ async function getModuleEnabled(moduleId: string, request: NextRequest): Promise
         // If API fails, default to enabled
     }
 
+    void request; // consumed for type safety
     return true;
 }
 

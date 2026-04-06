@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         const { id, zip, name } = mod;
         if (!id || !zip) { results.push({ id: id || "unknown", name: name || id, status: "failed", error: "Missing id or zip" }); continue; }
         if (!/^[a-z0-9-]+\.zip$/.test(zip)) { results.push({ id, name: name || id, status: "failed", error: "Invalid zip name" }); continue; }
+        if (!/^[a-z0-9-]+$/.test(id)) { results.push({ id, name: name || id, status: "failed", error: "Invalid module ID" }); continue; }
 
         const targetDir = path.join(MODULES_DIR, id);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);

@@ -117,13 +117,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
             }
-            // Refresh role from DB on every token refresh to catch role changes
+            // Refresh role + ban status from DB on every token refresh
             if (trigger === "update" || !token.role) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     include: { role: true },
                 });
                 if (dbUser) {
+                    // Invalidate session if user is banned
+                    if (dbUser.isBanned) {
+                        return null as unknown as typeof token;
+                    }
                     token.role = dbUser.role?.name || "member";
                 }
             }

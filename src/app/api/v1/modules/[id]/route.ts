@@ -19,7 +19,12 @@ export async function DELETE(
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // 2. Check if module directory exists
+    // 2. Validate moduleId format (prevent path traversal)
+    if (!/^[a-z0-9-]+$/.test(moduleId)) {
+        return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+    }
+
+    // 3. Check if module directory exists
     const moduleDir = path.join(MODULES_DIR, moduleId);
     const exists = await fs.access(moduleDir).then(() => true).catch(() => false);
     if (!exists) {

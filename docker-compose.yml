@@ -1,26 +1,32 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: uxwvend
       POSTGRES_USER: uxwvend
-      POSTGRES_PASSWORD: uxwvend_secret
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uxwvend"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
+    restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://uxwvend:uxwvend_secret@db:5432/uxwvend
-      AUTH_SECRET: change-this-to-a-random-secret
+      DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
       AUTH_URL: http://localhost:3001
       NEXTAUTH_URL: http://localhost:3001
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:

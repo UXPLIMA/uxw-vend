@@ -68,6 +68,14 @@ nabvar-dropdown.png
 wheel-new.png
 widgets-working.png
 
+backups/
+*.sql
+*.sql.gz
+.env.production
+.env.staging
+logs/
+uploads/
+
 # Module sources (dev only, ZIPs are built from these)
 module-sources/
 

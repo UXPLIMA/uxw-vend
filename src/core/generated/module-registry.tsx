@@ -7,24 +7,9 @@ export const ModuleRegistry: Record<string, any> = {
 
 export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [];
 
-export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = [
-  {
-    "path": "/credits",
-    "key": "credits:api:/credits",
-    "module": "credits",
-    "method": "ALL"
-  },
-  {
-    "path": "/credits/purchase",
-    "key": "credits:api:/credits/purchase",
-    "module": "credits",
-    "method": "ALL"
-  }
-];
+export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
 
 export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
-  'credits:api:/credits': () => import('@/modules/credits/api/credits/route'),
-  'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
 };
 
 

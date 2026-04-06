@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
                 try {
                     await execFileAsync("psql", [dbUrl, "-f", tmpSql], { timeout: 120000 });
                     restored.push("database");
-                } catch (err) {
-                    restored.push(`database (failed: ${(err as Error).message.slice(0, 100)})`);
+                } catch {
+                    restored.push("database (failed — check server logs)");
                 }
                 try { await fsAsync.unlink(tmpSql); } catch { /* ignore */ }
             }
