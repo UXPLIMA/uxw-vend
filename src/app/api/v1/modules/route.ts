@@ -99,13 +99,16 @@ export async function PATCH(request: NextRequest) {
 
     const wantEnabled = enabled ?? true;
 
+    // Single DB query for all module configs — used for dependency/conflict resolution
+    const allConfigs = await prisma.moduleConfig.findMany();
+    const configMap = new Map(allConfigs.map(c => [c.id, c]));
+    const allDefs = moduleSystem.getDefinitions();
+
     // --- Dependency resolution ---
     if (wantEnabled) {
         // When enabling: check that all dependencies are enabled
         const deps = definition.dependencies ?? [];
         if (deps.length > 0) {
-            const configs = await prisma.moduleConfig.findMany();
-            const configMap = new Map(configs.map(c => [c.id, c]));
             const missingDeps: string[] = [];
 
             for (const dep of deps) {
@@ -115,7 +118,6 @@ export async function PATCH(request: NextRequest) {
                     continue;
                 }
                 const depConfig = configMap.get(dep);
-                // Default is enabled if no DB record exists
                 if (depConfig && !depConfig.enabled) {
                     missingDeps.push(dep);
                 }
@@ -132,11 +134,7 @@ export async function PATCH(request: NextRequest) {
         // When enabling: check for conflicts
         const conflicts = definition.conflicts ?? [];
         if (conflicts.length > 0) {
-            const configs = await prisma.moduleConfig.findMany();
-            const activeConflicts = conflicts.filter(cId => {
-                const c = configs.find(cfg => cfg.id === cId);
-                return c?.enabled === true;
-            });
+            const activeConflicts = conflicts.filter(cId => configMap.get(cId)?.enabled === true);
             if (activeConflicts.length > 0) {
                 const conflictNames = activeConflicts.map(cId => moduleSystem.getDefinition(cId)?.name || cId);
                 return NextResponse.json({
@@ -147,14 +145,11 @@ export async function PATCH(request: NextRequest) {
         }
 
         // Also check if any enabled module declares conflict with this one
-        const allDefs = moduleSystem.getDefinitions();
-        const configs2 = await prisma.moduleConfig.findMany();
         for (const def of allDefs) {
             if (def.id === moduleId) continue;
             const theirConflicts = def.conflicts ?? [];
             if (theirConflicts.includes(moduleId)) {
-                const isEnabled = configs2.find(c => c.id === def.id)?.enabled === true;
-                if (isEnabled) {
+                if (configMap.get(def.id)?.enabled === true) {
                     return NextResponse.json({
                         error: `Cannot enable '${definition.name}': incompatible with ${def.name}`,
                         conflicts: [def.id],
@@ -164,9 +159,6 @@ export async function PATCH(request: NextRequest) {
         }
     } else {
         // When disabling: check if any enabled module depends on this one
-        const allDefs = moduleSystem.getDefinitions();
-        const configs = await prisma.moduleConfig.findMany();
-        const configMap = new Map(configs.map(c => [c.id, c]));
         const dependents: string[] = [];
 
         for (const def of allDefs) {

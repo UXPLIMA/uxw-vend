@@ -11,12 +11,13 @@
     "dev": "NEXT_DEV=1 next dev --turbopack --port 3001 --hostname 0.0.0.0",
     "prebuild": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts",
     "build": "next build",
+    "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "npx playwright test",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -25,7 +26,6 @@
     "db:backup": "bash scripts/backup.sh",
     "db:restore": "bash scripts/restore.sh",
     "clean": "rm -rf .next node_modules/.cache",
-    "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
     "create:module": "npx tsx scripts/create-module.ts",
     "validate:module": "npx tsx scripts/validate-module.ts"
@@ -67,6 +67,7 @@
     }
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.2",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/adm-zip": "^0.5.8",

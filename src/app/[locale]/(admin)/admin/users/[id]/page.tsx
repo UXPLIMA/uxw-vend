@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -124,8 +125,7 @@ export default function AdminUserDetailPage() {
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden">
                         {user.avatar ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                            <Image src={user.avatar} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
                         ) : (
                             user.username[0].toUpperCase()
                         )}

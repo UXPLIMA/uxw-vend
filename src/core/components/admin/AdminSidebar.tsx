@@ -62,6 +62,7 @@ const coreToolItems: NavItem[] = [
     { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
     { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
     { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
+    { href: "/admin/system", label: "System Health", icon: <Server size={18} /> },
     { href: "/admin/activity-log", label: "Activity Log", icon: <ScrollText size={18} /> },
     { href: "/admin/api-keys", label: "API Keys", icon: <KeyRound size={18} /> },
 ];

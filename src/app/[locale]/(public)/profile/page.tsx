@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -127,8 +128,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
                         {profile?.avatar ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
+                            <Image src={profile.avatar} alt="" width={64} height={64} className="w-full h-full object-cover" unoptimized />
                         ) : (
                             (profile?.username || "U")[0].toUpperCase()
                         )}

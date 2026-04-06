@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
@@ -71,8 +72,7 @@ export default async function AdminUsersPage() {
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
                                                         {user.avatar ? (
-                                                            /* eslint-disable-next-line @next/next/no-img-element */
-                                                            <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
+                                                            <Image src={user.avatar} alt={user.username} width={32} height={32} className="w-full h-full rounded-full object-cover" unoptimized />
                                                         ) : (
                                                             user.username[0].toUpperCase()
                                                         )}

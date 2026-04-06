@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin('./src/core/lib/i18n/request.ts');
+const analyzeBundles = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
 
 // Parse NEXT_PUBLIC_IMAGE_DOMAINS env var for additional allowed image hostnames
 const imageHosts = (process.env.NEXT_PUBLIC_IMAGE_DOMAINS || "")
@@ -49,4 +51,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default analyzeBundles(withNextIntl(nextConfig));
