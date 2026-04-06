@@ -50,6 +50,7 @@
   --color-muted-foreground: var(--ux-muted-foreground);
   --color-card: var(--ux-card);
   --color-card-foreground: var(--ux-card-foreground);
+  --color-border: var(--ux-border);
   --color-destructive: var(--ux-destructive);
   --color-success: var(--ux-success);
   --color-warning: var(--ux-warning);
