@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #2563eb;
-  --color-secondary: #7c3aed;
-  --color-accent: #06b6d4;
-  --color-background: #f3f4f6;
-  --color-foreground: #111827;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-card: #ffffff;
-  --color-card-foreground: #111827;
-  --color-border: #e5e7eb;
-  --color-destructive: #ef4444;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
+  --ux-primary: #2563eb;
+  --ux-secondary: #7c3aed;
+  --ux-accent: #06b6d4;
+  --ux-background: #f3f4f6;
+  --ux-foreground: #111827;
+  --ux-muted: #f1f5f9;
+  --ux-muted-foreground: #64748b;
+  --ux-card: #ffffff;
+  --ux-card-foreground: #111827;
+  --ux-border: #e5e7eb;
+  --ux-destructive: #ef4444;
+  --ux-success: #22c55e;
+  --ux-warning: #f59e0b;
 
   --font-heading: "Outfit", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -24,43 +24,43 @@
 [data-theme="dark"],
 [data-mode="dark"],
 .dark {
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-accent: #22d3ee;
-  --color-background: #111827;
-  --color-foreground: #f1f5f9;
-  --color-muted: #1e293b;
-  --color-muted-foreground: #94a3b8;
-  --color-card: #1e293b;
-  --color-card-foreground: #f1f5f9;
-  --color-border: #374151;
-  --color-destructive: #f87171;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
+  --ux-primary: #3b82f6;
+  --ux-secondary: #8b5cf6;
+  --ux-accent: #22d3ee;
+  --ux-background: #111827;
+  --ux-foreground: #f1f5f9;
+  --ux-muted: #1e293b;
+  --ux-muted-foreground: #94a3b8;
+  --ux-card: #1e293b;
+  --ux-card-foreground: #f1f5f9;
+  --ux-border: #374151;
+  --ux-destructive: #f87171;
+  --ux-success: #4ade80;
+  --ux-warning: #fbbf24;
   color-scheme: dark;
 }
 
 @theme inline {
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
-  --color-accent: var(--color-accent);
-  --color-background: var(--color-background);
-  --color-foreground: var(--color-foreground);
-  --color-muted: var(--color-muted);
-  --color-muted-foreground: var(--color-muted-foreground);
-  --color-card: var(--color-card);
-  --color-card-foreground: var(--color-card-foreground);
-  --color-destructive: var(--color-destructive);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
+  --color-primary: var(--ux-primary);
+  --color-secondary: var(--ux-secondary);
+  --color-accent: var(--ux-accent);
+  --color-background: var(--ux-background);
+  --color-foreground: var(--ux-foreground);
+  --color-muted: var(--ux-muted);
+  --color-muted-foreground: var(--ux-muted-foreground);
+  --color-card: var(--ux-card);
+  --color-card-foreground: var(--ux-card-foreground);
+  --color-destructive: var(--ux-destructive);
+  --color-success: var(--ux-success);
+  --color-warning: var(--ux-warning);
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
 }
 
 body {
-  color: var(--color-foreground);
+  color: var(--ux-foreground);
   font-family: var(--font-body);
-  background: var(--color-background);
+  background: var(--ux-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -123,9 +123,10 @@ body {
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
 /* Dark mode overrides for hardcoded Tailwind classes */
+/* Force dark mode colors on html element */
 [data-mode="dark"] {
-  background-color: #111827;
-  color: #f1f5f9;
+  background-color: var(--ux-background) !important;
+  color: var(--ux-foreground) !important;
 }
 
 [data-mode="dark"] .bg-background { background-color: #111827 !important; }
