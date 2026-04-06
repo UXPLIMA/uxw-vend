@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -28,13 +28,14 @@ export default function ApiKeysPage() {
     const [copied, setCopied] = useState(false);
     const { confirm } = useConfirm();
 
-    const fetchKeys = async () => {
+    const fetchKeys = useCallback(async () => {
         const res = await fetch("/api/v1/api-keys");
         if (res.ok) { const data = await res.json(); setKeys(data.keys || []); }
         setLoading(false);
-    };
+    }, []);
 
-    useEffect(() => { fetchKeys(); }, []);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+    useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
     const createKey = async (e: React.FormEvent) => {
         e.preventDefault();

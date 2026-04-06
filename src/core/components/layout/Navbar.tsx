@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
@@ -28,10 +29,12 @@ export function Navbar() {
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
+        /* eslint-disable react-hooks/set-state-in-effect -- client-only mount + localStorage read */
         setMounted(true);
         const stored = localStorage.getItem("color-mode");
         const dark = stored === "dark";
         setIsDark(dark);
+        /* eslint-enable react-hooks/set-state-in-effect */
         if (dark) document.documentElement.setAttribute("data-mode", "dark");
     }, []);
 
@@ -204,7 +207,7 @@ export function Navbar() {
                                 <div className="relative" ref={menuRef}>
                                     <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 transition-colors">
                                         {session.user.image ? (
-                                            <img src={session.user.image} alt="" className="w-7 h-7 rounded-full object-cover" />
+                                            <Image src={session.user.image} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                                         ) : (
                                             <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">
                                                 {(session.user.name || "U")[0].toUpperCase()}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,13 +21,16 @@ export default function ActivityLogPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    useEffect(() => {
+    const fetchLogs = useCallback(() => {
         setLoading(true);
         fetch(`/api/v1/activity-log?page=${page}`)
             .then((r) => r.json())
             .then((d) => { setLogs(d.logs || []); setTotalPages(d.pages || 1); setLoading(false); })
             .catch(() => setLoading(false));
     }, [page]);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount/page change
+    useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
     return (
         <>

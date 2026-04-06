@@ -91,6 +91,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- reading DOM attribute on mount
         setIsDark(document.documentElement.getAttribute("data-mode") === "dark");
     }, []);
 

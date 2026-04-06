@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -34,13 +34,16 @@ export function DashboardCharts() {
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("30");
 
-    useEffect(() => {
+    const fetchStats = useCallback(() => {
         setLoading(true);
         fetch(`/api/v1/stats?period=${period}d`)
             .then((r) => r.json())
             .then((d) => { setData(d); setLoading(false); })
             .catch(() => setLoading(false));
     }, [period]);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on period change
+    useEffect(() => { fetchStats(); }, [fetchStats]);
 
     if (loading) {
         return (
