@@ -130,6 +130,14 @@ body {
 
 [data-mode="dark"] .bg-background { background-color: #111827 !important; }
 [data-mode="dark"] .bg-white, [data-mode="dark"] .bg-card { background-color: #1e293b !important; }
+[data-mode="dark"] .text-foreground { color: #f1f5f9 !important; }
+[data-mode="dark"] .text-card-foreground { color: #f1f5f9 !important; }
+[data-mode="dark"] .text-muted-foreground { color: #94a3b8 !important; }
+[data-mode="dark"] .bg-muted { background-color: #1e293b !important; }
+[data-mode="dark"] .bg-muted\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+[data-mode="dark"] .border-border { border-color: #374151 !important; }
+[data-mode="dark"] .hover\:bg-muted\/50:hover { background-color: rgba(30, 41, 59, 0.5) !important; }
+[data-mode="dark"] .hover\:text-foreground:hover { color: #f1f5f9 !important; }
 [data-mode="dark"] header { background-color: #1e293b !important; border-color: #374151 !important; }
 [data-mode="dark"] .bg-gray-50 { background-color: #111827 !important; }
 [data-mode="dark"] .bg-gray-100 { background-color: #1e293b !important; }
