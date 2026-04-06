@@ -8,6 +8,7 @@ import {
     Download, Loader2, Trash2, RefreshCw, Activity,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SystemMetrics } from "../components/system-metrics";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface SystemData {
@@ -188,6 +189,11 @@ export default function SystemPage() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Request Metrics */}
+            <div className="mt-8">
+                <SystemMetrics />
+            </div>
         </>
     );
 }

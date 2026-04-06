@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket, Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
 import { DashboardCharts } from "./dashboard-charts";
-import { SystemMetrics } from "./system-metrics";
 
 interface ModuleManifest {
     id: string;
@@ -203,10 +202,6 @@ export function DashboardClient() {
                 <DashboardCharts />
             </div>
 
-            {/* System Metrics */}
-            <div className="col-span-full mt-4">
-                <SystemMetrics />
-            </div>
         </>
     );
 }
