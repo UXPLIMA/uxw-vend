@@ -6,10 +6,10 @@ const THEMES_DIR = path.join(process.cwd(), 'src/themes');
 const OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/theme-registry.tsx');
 
 async function generate() {
-    console.log('🎨 Generating theme registry...');
+    console.log('Generating theme registry...');
 
     if (!fs.existsSync(THEMES_DIR)) {
-        console.warn('⚠️ No themes directory found at src/themes');
+        console.warn('No themes directory found at src/themes');
         return;
     }
 
@@ -77,7 +77,7 @@ export const defaultThemeId = "flat";
     }
 
     fs.writeFileSync(OUTPUT_FILE, content);
-    console.log(`✅ Generated registry for ${themes.length} themes.`);
+    console.log(`Generated registry for ${themes.length} themes.`);
 }
 
 generate().catch(console.error);
