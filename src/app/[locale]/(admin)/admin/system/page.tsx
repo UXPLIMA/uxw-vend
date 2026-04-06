@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import {
     Database, HardDrive, Cpu, Users, Puzzle, Clock,
-    Download, Loader2, Trash2, RefreshCw, Activity,
+    Download, Loader2, Trash2, RefreshCw, Activity, RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SystemMetrics } from "../components/system-metrics";
@@ -34,6 +34,7 @@ export default function SystemPage() {
     const [backups, setBackups] = useState<BackupItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [backing, setBacking] = useState(false);
+    const [restoring, setRestoring] = useState<string | null>(null);
     const { confirm } = useConfirm();
 
     const fetchData = useCallback(async () => {
@@ -62,6 +63,43 @@ export default function SystemPage() {
             toast.error(data.error || "Backup failed");
         }
         setBacking(false);
+    };
+
+    const downloadBackup = (filename: string) => {
+        window.open(`/api/v1/admin/backup/${encodeURIComponent(filename)}`, "_blank");
+    };
+
+    const deleteBackup = async (filename: string) => {
+        const ok = await confirm({ title: "Delete Backup", message: `Delete ${filename}?`, variant: "danger", confirmText: "Delete" });
+        if (!ok) return;
+        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(filename)}`, { method: "DELETE" });
+        if (res.ok) { toast.success("Backup deleted"); fetchData(); }
+        else { toast.error("Failed to delete"); }
+    };
+
+    const restoreBackup = async (filename: string) => {
+        if (!filename.endsWith(".zip")) { toast.error("Only ZIP backups can be restored"); return; }
+        const ok = await confirm({
+            title: "Restore Backup",
+            message: `Restore from ${filename}? This will overwrite current database, modules, and translations. This action cannot be undone.`,
+            variant: "danger",
+            confirmText: "Restore",
+        });
+        if (!ok) return;
+        setRestoring(filename);
+        const res = await fetch("/api/v1/admin/backup/restore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filename }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            toast.success(`Restored: ${(data.restored || []).join(", ")}`);
+            fetchData();
+        } else {
+            toast.error(data.error || "Restore failed");
+        }
+        setRestoring(null);
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
@@ -182,7 +220,19 @@ export default function SystemPage() {
                                         <p className="font-medium text-sm">{b.filename}</p>
                                         <p className="text-xs text-muted-foreground">{new Date(b.createdAt).toLocaleString()} - {b.sizeHuman}</p>
                                     </div>
-                                    <Trash2 className="w-4 h-4 text-muted-foreground cursor-not-allowed opacity-30" />
+                                    <div className="flex items-center gap-1">
+                                        <Button variant="ghost" size="sm" onClick={() => downloadBackup(b.filename)} title="Download">
+                                            <Download className="w-4 h-4" />
+                                        </Button>
+                                        {b.filename.endsWith(".zip") && (
+                                            <Button variant="ghost" size="sm" onClick={() => restoreBackup(b.filename)} disabled={restoring === b.filename} title="Restore">
+                                                {restoring === b.filename ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                                            </Button>
+                                        )}
+                                        <Button variant="ghost" size="sm" onClick={() => deleteBackup(b.filename)} className="text-destructive" title="Delete">
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
