@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import moduleSystem from "@/core/lib/modules";
+import { invalidateModuleCache } from "@/core/lib/module-cache";
 
 const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 
@@ -219,6 +220,9 @@ export async function PATCH(request: NextRequest) {
             ...(config ? { config } : {}),
         },
     });
+
+    // Invalidate module states cache (Redis + in-memory)
+    await invalidateModuleCache();
 
     return NextResponse.json(updated);
 }

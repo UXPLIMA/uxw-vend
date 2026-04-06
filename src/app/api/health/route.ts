@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
+import { getRedisClient, isRedisConfigured } from "@/core/lib/redis";
 import fs from "fs/promises";
 import os from "os";
 
@@ -17,17 +18,17 @@ export async function GET() {
         checks.database = { status: "error", latencyMs: Date.now() - dbStart, detail: (err as Error).message };
     }
 
-    // Redis check (optional)
-    if (process.env.REDIS_URL) {
+    // Redis check (uses shared client)
+    if (isRedisConfigured()) {
         const redisStart = Date.now();
         try {
-            // @ts-expect-error -- redis is optional peer dependency
-            const { createClient } = await import("redis");
-            const client = createClient({ url: process.env.REDIS_URL });
-            await client.connect();
-            await client.ping();
-            await client.disconnect();
-            checks.redis = { status: "ok", latencyMs: Date.now() - redisStart };
+            const client = await getRedisClient();
+            if (client) {
+                await client.ping();
+                checks.redis = { status: "ok", latencyMs: Date.now() - redisStart };
+            } else {
+                checks.redis = { status: "error", latencyMs: Date.now() - redisStart, detail: "Connection failed" };
+            }
         } catch (err) {
             checks.redis = { status: "error", latencyMs: Date.now() - redisStart, detail: (err as Error).message };
         }

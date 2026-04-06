@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
+import { invalidateModuleCache } from "@/core/lib/module-cache";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -147,6 +148,7 @@ export async function POST(request: NextRequest) {
             update: { name: manifest.name, enabled: true },
             create: { id: moduleId, name: manifest.name, enabled: true },
         });
+        await invalidateModuleCache();
 
         // Seed scripts must be run manually by admin for security
         // manifest.seedOnInstall is preserved in module.json but not auto-executed
