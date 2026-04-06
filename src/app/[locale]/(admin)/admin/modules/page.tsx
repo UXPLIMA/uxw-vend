@@ -187,6 +187,8 @@ export default function AdminModulesPage() {
             toast.error("Please wait — another operation is in progress");
             return;
         }
+        const ok = await confirm({ title: "Install Module", message: `Install "${mod.name}" (v${mod.version})?`, confirmText: "Install" });
+        if (!ok) return;
         setInstalling(mod.id);
         setInstallProgress({ name: mod.name, step: "Downloading..." });
         try {
@@ -469,8 +471,8 @@ export default function AdminModulesPage() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredMarketplace.map((mod) => (
-                            <Card key={mod.id} className={`hover:shadow-md transition-shadow ${selectedModules.has(mod.id) ? "ring-2 ring-primary" : ""}`}>
-                                <CardContent className="p-4">
+                            <Card key={mod.id} className={`hover:shadow-md transition-shadow flex flex-col ${selectedModules.has(mod.id) ? "ring-2 ring-primary" : ""}`}>
+                                <CardContent className="p-4 flex flex-col flex-1">
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2.5">
                                             <input
@@ -520,7 +522,7 @@ export default function AdminModulesPage() {
 
                                     <Button
                                         size="sm"
-                                        className="w-full"
+                                        className="w-full mt-auto"
                                         disabled={isBusy}
                                         onClick={() => handleMarketplaceInstall(mod)}
                                     >

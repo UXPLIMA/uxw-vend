@@ -156,7 +156,7 @@ export default function NavbarSettingsPage() {
 
                                     {/* Dropdown children */}
                                     {isDropdown && isExpanded && (
-                                        <div className="border-t border-gray-200 p-3 bg-white space-y-2">
+                                        <div className="border-t border-border p-3 bg-card space-y-2">
                                             <Label className="text-xs text-muted-foreground">Dropdown Items</Label>
                                             {link.children!.map((child, j) => (
                                                 <div key={j} className="flex items-center gap-2 pl-6">

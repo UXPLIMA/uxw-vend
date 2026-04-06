@@ -152,6 +152,41 @@ body {
   border-color: #374151 !important;
   color: #f1f5f9 !important;
 }
+[data-mode="dark"] input::placeholder, [data-mode="dark"] textarea::placeholder {
+  color: #64748b !important;
+}
+/* Tables */
+[data-mode="dark"] table { color: #f1f5f9; }
+[data-mode="dark"] th { color: #94a3b8 !important; border-color: #374151 !important; }
+[data-mode="dark"] td { border-color: #374151 !important; }
+[data-mode="dark"] tr:hover { background-color: #374151 !important; }
+[data-mode="dark"] .divide-y > * + * { border-color: #374151 !important; }
+[data-mode="dark"] .border-b { border-color: #374151 !important; }
+[data-mode="dark"] .border-t { border-color: #374151 !important; }
+/* Cards and containers */
+[data-mode="dark"] .bg-green-50 { background-color: rgba(34, 197, 94, 0.1) !important; }
+[data-mode="dark"] .border-green-200 { border-color: rgba(34, 197, 94, 0.3) !important; }
+[data-mode="dark"] .text-green-800 { color: #4ade80 !important; }
+[data-mode="dark"] .bg-red-50 { background-color: rgba(239, 68, 68, 0.1) !important; }
+[data-mode="dark"] .border-red-200 { border-color: rgba(239, 68, 68, 0.3) !important; }
+[data-mode="dark"] .bg-blue-50 { background-color: rgba(59, 130, 246, 0.1) !important; }
+[data-mode="dark"] .border-blue-200 { border-color: rgba(59, 130, 246, 0.3) !important; }
+[data-mode="dark"] .bg-yellow-50 { background-color: rgba(245, 158, 11, 0.1) !important; }
+[data-mode="dark"] .border-yellow-200 { border-color: rgba(245, 158, 11, 0.3) !important; }
+/* Code blocks and pre */
+[data-mode="dark"] code { background-color: #374151 !important; color: #e2e8f0 !important; }
+[data-mode="dark"] pre { background-color: #0f172a !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+/* Dropdown and popover */
+[data-mode="dark"] .bg-card { background-color: #1e293b !important; }
+[data-mode="dark"] [role="menu"], [data-mode="dark"] [role="listbox"] {
+  background-color: #1e293b !important;
+  border-color: #374151 !important;
+}
+/* Specific admin pages — hardcoded colors */
+[data-mode="dark"] .bg-gray-300 { background-color: #4b5563 !important; }
+[data-mode="dark"] .ring-gray-300 { --tw-ring-color: #4b5563 !important; }
+/* Color picker input */
+[data-mode="dark"] input[type="color"] { background-color: transparent !important; border-color: #374151 !important; }
 
 .admin-sidebar {
   background: #ffffff;
