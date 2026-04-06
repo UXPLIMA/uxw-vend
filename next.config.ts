@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
   poweredByHeader: false,
   ...(process.env.NODE_ENV === 'development' ? { allowedDevOrigins: ['*'] } : {}),
-  serverExternalPackages: ["redis", "net", "fs"],
+  serverExternalPackages: ["redis", "net", "fs", "dns", "tls", "pg", "@prisma/adapter-pg", "rcon-client"],
   images: {
     remotePatterns: [
       // Default safe domains
