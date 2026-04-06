@@ -49,6 +49,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Prisma generated client
+src/generated/
+
 # md files (block analysis/internal, keep README and docs)
 CLAUDE.md
 COMPETITOR_ANALYSIS.md
