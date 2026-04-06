@@ -10,7 +10,6 @@ function createClient(): PrismaClient {
     // into the client SSR bundle — these are Node.js-only modules.
     const _require = typeof __webpack_require__ === "function"
         ? __non_webpack_require__
-        // eslint-disable-next-line no-eval
         : eval("require");
 
     const { PrismaPg } = _require("@prisma/adapter-pg");

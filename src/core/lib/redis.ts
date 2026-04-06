@@ -29,7 +29,6 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
 
     connecting = true;
     try {
-        // eslint-disable-next-line no-eval
         const { createClient } = eval('require')("redis");
         const c = createClient({ url: REDIS_URL }) as RedisClientType;
         c.on("error", () => {
