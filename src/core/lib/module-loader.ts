@@ -1,7 +1,5 @@
 import { ModuleManifest, LoadedModule } from "./module-types";
 
-const MODULES_DIR = typeof process !== "undefined" ? (process.cwd?.() || "") + "/src/modules" : "";
-
 class ModuleLoader {
     private modules: Map<string, LoadedModule> = new Map();
     private initialized = false;
