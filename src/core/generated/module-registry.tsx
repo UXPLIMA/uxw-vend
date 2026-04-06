@@ -1457,15 +1457,7 @@ export const ModuleWidgets: { id: string; component: string; module: string; def
   }
 ];
 
-export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [
-  {
-    "label": "Referral",
-    "href": "/referral",
-    "icon": "UserPlus",
-    "position": 80,
-    "module": "referral"
-  }
-];
+export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = [];
 
 export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = [];
 
