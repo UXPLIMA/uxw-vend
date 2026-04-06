@@ -122,9 +122,9 @@ export default function NavbarSettingsPage() {
                             const isExpanded = expandedDropdown === i;
 
                             return (
-                                <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
+                                <div key={i} className="border border-border rounded-lg overflow-hidden">
                                     {/* Main row */}
-                                    <div className="flex items-center gap-2 p-3 bg-gray-50">
+                                    <div className="flex items-center gap-2 p-3 bg-muted">
                                         <div className="flex flex-col gap-0.5">
                                             <button onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
                                             <button onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
@@ -160,7 +160,7 @@ export default function NavbarSettingsPage() {
                                             <Label className="text-xs text-muted-foreground">Dropdown Items</Label>
                                             {link.children!.map((child, j) => (
                                                 <div key={j} className="flex items-center gap-2 pl-6">
-                                                    <span className="text-gray-300">└</span>
+                                                    <span className="text-muted-foreground">└</span>
                                                     <Input value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder="Sub-item label" className="flex-1" />
                                                     <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" className="flex-1" />
                                                     <Button variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>

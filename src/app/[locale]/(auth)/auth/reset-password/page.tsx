@@ -60,10 +60,10 @@ export default function ResetPasswordPage() {
 
     if (!token || !email) {
         return (
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+            <div className="min-h-screen bg-background flex items-center justify-center px-4">
                 <div className="text-center">
-                    <h1 className="text-xl font-bold text-gray-900 mb-2">Invalid Reset Link</h1>
-                    <p className="text-gray-500 mb-4">This password reset link is invalid or has expired.</p>
+                    <h1 className="text-xl font-bold text-foreground mb-2">Invalid Reset Link</h1>
+                    <p className="text-muted-foreground mb-4">This password reset link is invalid or has expired.</p>
                     <Link href="/auth/forgot-password">
                         <Button>Request New Link</Button>
                     </Link>
@@ -73,10 +73,10 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12 relative">
+        <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
             <Link
                 href="/"
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
             >
                 <Home className="w-5 h-5" />
             </Link>
@@ -84,22 +84,22 @@ export default function ResetPasswordPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <span className="font-bold text-2xl text-gray-900">uxwVend</span>
+                        <span className="font-bold text-2xl text-foreground">uxwVend</span>
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-900 text-center">Reset Password</h1>
-                        <p className="text-gray-500 text-sm text-center mt-1">Enter your new password</p>
+                <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-border">
+                        <h1 className="text-xl font-bold text-foreground text-center">Reset Password</h1>
+                        <p className="text-muted-foreground text-sm text-center mt-1">Enter your new password</p>
                     </div>
 
                     <div className="p-6">
                         {success ? (
                             <div className="text-center py-4">
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <h2 className="font-semibold text-gray-900 mb-1">Password Reset!</h2>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <h2 className="font-semibold text-foreground mb-1">Password Reset!</h2>
+                                <p className="text-muted-foreground text-sm mb-4">
                                     Your password has been updated successfully.
                                 </p>
                                 <Link href="/auth/login">
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
                                 )}
 
                                 <div className="space-y-2">
-                                    <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                                    <label htmlFor="password" className="text-sm font-medium text-foreground">
                                         {t('password')}
                                     </label>
                                     <Input
@@ -128,12 +128,12 @@ export default function ResetPasswordPage() {
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         minLength={6}
-                                        className="border-gray-200 bg-gray-50"
+                                        className="border-border bg-muted"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                                    <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                                         {t('confirmPassword')}
                                     </label>
                                     <Input
@@ -144,7 +144,7 @@ export default function ResetPasswordPage() {
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
                                         minLength={6}
-                                        className="border-gray-200 bg-gray-50"
+                                        className="border-border bg-muted"
                                     />
                                 </div>
 

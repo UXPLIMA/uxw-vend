@@ -130,7 +130,7 @@ export function Navbar() {
                                         onMouseLeave={() => setNavDropdown(null)}
                                     >
                                         <button
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-gray-50" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                                         >
                                             {IconComp && <IconComp className="w-4 h-4" />}
                                             {link.label}
@@ -144,8 +144,8 @@ export function Navbar() {
                                                         return (
                                                             <Link key={child.href} href={child.href}
                                                                 onClick={() => setNavDropdown(null)}
-                                                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                                                                {ChildIcon && <ChildIcon className="w-4 h-4 text-gray-400" />}
+                                                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                                                                {ChildIcon && <ChildIcon className="w-4 h-4 text-muted-foreground" />}
                                                                 {child.label}
                                                             </Link>
                                                         );
@@ -160,7 +160,7 @@ export function Navbar() {
                             // Normal link
                             return (
                                 <Link key={link.href} href={link.href}
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"}`}>
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
                                     {IconComp && <IconComp className="w-4 h-4" />}
                                     {link.label}
                                 </Link>
@@ -171,13 +171,13 @@ export function Navbar() {
                     <div className="flex items-center gap-2">
                         {mounted && (
                             <button onClick={toggleDarkMode} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-                                className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                                className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
                         )}
 
                         {status === "loading" ? (
-                            <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
+                            <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
                         ) : session?.user ? (
                             <>
                                 {/* Module navbar components (bell, cart, etc.) — from registry */}
@@ -187,7 +187,7 @@ export function Navbar() {
                                 })}
 
                                 <div className="relative" ref={menuRef}>
-                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 transition-colors">
+                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors">
                                         {session.user.image ? (
                                             <Image src={session.user.image} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                                         ) : (
@@ -195,24 +195,24 @@ export function Navbar() {
                                                 {(session.user.name || "U")[0].toUpperCase()}
                                             </div>
                                         )}
-                                        <span className="text-sm font-medium text-gray-700 hidden sm:block">{session.user.name}</span>
+                                        <span className="text-sm font-medium text-foreground hidden sm:block">{session.user.name}</span>
                                     </button>
 
                                     {menuOpen && (
-                                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50 animate-fade-in">
-                                            <div className="px-3 py-2 border-b border-gray-100">
-                                                <p className="text-sm font-medium text-gray-900 truncate">{session.user.name}</p>
-                                                <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+                                        <div className="absolute right-0 top-full mt-1 w-48 bg-card rounded-lg shadow-lg border border-border py-1 z-50 animate-fade-in">
+                                            <div className="px-3 py-2 border-b border-border">
+                                                <p className="text-sm font-medium text-foreground truncate">{session.user.name}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                                             </div>
-                                            <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900" onClick={() => setMenuOpen(false)}>
+                                            <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
                                                 <User className="w-4 h-4" /> Profile
                                             </Link>
                                             {isAdminUser && (
-                                                <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900" onClick={() => setMenuOpen(false)}>
+                                                <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
                                                     <Shield className="w-4 h-4" /> Admin Panel
                                                 </Link>
                                             )}
-                                            <div className="border-t border-gray-100">
+                                            <div className="border-t border-border">
                                                 <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
                                                     <LogOut className="w-4 h-4" /> {commonT('logout')}
                                                 </button>
@@ -223,7 +223,7 @@ export function Navbar() {
                             </>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <Link href="/auth/login"><Button variant="ghost" size="sm" className="text-gray-600">{commonT('login')}</Button></Link>
+                                <Link href="/auth/login"><Button variant="ghost" size="sm" className="text-muted-foreground">{commonT('login')}</Button></Link>
                                 <Link href="/auth/register"><Button size="sm">{commonT('register')}</Button></Link>
                             </div>
                         )}

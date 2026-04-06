@@ -100,11 +100,11 @@ export default function ProfilePage() {
 
     if (authStatus === "loading" || loading) {
         return (
-            <div className="min-h-screen flex flex-col bg-gray-100">
+            <div className="min-h-screen flex flex-col bg-background">
                 <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
                 <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </main>
                 <ThemeSlot name="Footer" defaultComponent={<Footer />} />
             </div>
@@ -119,7 +119,7 @@ export default function ProfilePage() {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
+        <div className="min-h-screen flex flex-col bg-background">
             <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
             <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
@@ -134,8 +134,8 @@ export default function ProfilePage() {
                         )}
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{profile?.username}</h1>
-                        <p className="text-gray-500 text-sm">{profile?.email}</p>
+                        <h1 className="text-2xl font-bold text-foreground">{profile?.username}</h1>
+                        <p className="text-muted-foreground text-sm">{profile?.email}</p>
                         {profile?.role && (
                             <span
                                 className="text-xs px-2 py-0.5 rounded mt-1 inline-block"
@@ -185,12 +185,12 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <Label>Email</Label>
-                                    <Input value={profile?.email || ""} disabled className="bg-gray-50" />
+                                    <Input value={profile?.email || ""} disabled className="bg-muted" />
                                     <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
                                 </div>
                                 <div>
                                     <Label>Member since</Label>
-                                    <Input value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-gray-50" />
+                                    <Input value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-muted" />
                                 </div>
                                 <Button type="submit" disabled={savingProfile}>
                                     {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
@@ -217,7 +217,7 @@ export default function ProfilePage() {
                             {linkedAccounts.length > 0 && (
                                 <div className="space-y-2 mb-4">
                                     {linkedAccounts.map((acc) => (
-                                        <div key={acc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div key={acc.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                                             <div className="flex items-center gap-3">
                                                 <span className="capitalize font-medium">{acc.provider}</span>
                                                 {acc.username && <span className="text-sm text-muted-foreground">{acc.username}</span>}
@@ -233,7 +233,7 @@ export default function ProfilePage() {
 
                             {/* Link Game Account */}
                             {linkedAccounts.length > 0 && !linkedAccounts.find((a) => a.provider === "minecraft") && (
-                                <div className="p-4 border border-dashed border-gray-200 rounded-lg">
+                                <div className="p-4 border border-dashed border-border rounded-lg">
                                     <p className="text-sm font-medium mb-2">Link Game Account</p>
                                     <div className="flex gap-2">
                                         <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder="Game username" />

@@ -24,13 +24,13 @@ export default function AuthErrorPage() {
     const message = errorMessages[errorType] || errorMessages.Default;
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-muted px-4">
             <div className="max-w-md w-full text-center">
                 <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
                     <AlertTriangle className="w-8 h-8 text-red-600" />
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Authentication Error</h1>
-                <p className="text-gray-600 mb-8">{message}</p>
+                <h1 className="text-2xl font-bold text-foreground mb-2">Authentication Error</h1>
+                <p className="text-muted-foreground mb-8">{message}</p>
                 <div className="flex gap-3 justify-center">
                     <Link href="/auth/login">
                         <Button>Try Again</Button>

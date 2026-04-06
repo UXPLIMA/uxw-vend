@@ -59,10 +59,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12 relative">
+        <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
             <Link
                 href="/"
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
             >
                 <Home className="w-5 h-5" />
             </Link>
@@ -70,14 +70,14 @@ export default function LoginPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <span className="font-bold text-2xl text-gray-900">uxwVend</span>
+                        <span className="font-bold text-2xl text-foreground">uxwVend</span>
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-900 text-center">{t('loginTitle')}</h1>
-                        <p className="text-gray-500 text-sm text-center mt-1">{t('loginSubtitle')}</p>
+                <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-border">
+                        <h1 className="text-xl font-bold text-foreground text-center">{t('loginTitle')}</h1>
+                        <p className="text-muted-foreground text-sm text-center mt-1">{t('loginSubtitle')}</p>
                     </div>
 
                     <div className="p-6">
@@ -89,7 +89,7 @@ export default function LoginPage() {
                             )}
 
                             <div className="space-y-2">
-                                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                                <label htmlFor="email" className="text-sm font-medium text-foreground">
                                     {t('email')}
                                 </label>
                                 <Input
@@ -99,12 +99,12 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:bg-white"
+                                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary focus:bg-card"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                                <label htmlFor="password" className="text-sm font-medium text-foreground">
                                     {t('password')}
                                 </label>
                                 <Input
@@ -114,7 +114,7 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:bg-white"
+                                    className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary focus:bg-card"
                                 />
                             </div>
 
@@ -130,7 +130,7 @@ export default function LoginPage() {
                                         value={twoFactorCode}
                                         onChange={(e) => setTwoFactorCode(e.target.value)}
                                         autoFocus
-                                        className="border-blue-200 bg-white text-center font-mono text-lg tracking-widest"
+                                        className="border-blue-200 bg-card text-center font-mono text-lg tracking-widest"
                                         maxLength={10}
                                     />
                                 </div>
@@ -152,10 +152,10 @@ export default function LoginPage() {
 
                             <div className="relative my-6">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-100" />
+                                    <div className="w-full border-t border-border" />
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-white px-2 text-gray-400">{t('orContinueWith')}</span>
+                                    <span className="bg-card px-2 text-muted-foreground">{t('orContinueWith')}</span>
                                 </div>
                             </div>
 
@@ -165,7 +165,7 @@ export default function LoginPage() {
                                         {oauthButtons.map(btn => (
                                             <Button key={btn.id} type="button" variant="outline"
                                                 onClick={() => signIn(btn.provider, { callbackUrl: "/" })}
-                                                className="border-gray-200 text-gray-700 hover:bg-gray-50">
+                                                className="border-border text-foreground hover:bg-muted">
                                                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill={btn.color}>
                                                     {btn.svgIcon.includes("|")
                                                         ? btn.svgIcon.split("|").map((d: string, i: number) => <path key={i} d={d} />)
@@ -179,7 +179,7 @@ export default function LoginPage() {
                             )}
                         </form>
 
-                        <p className="text-center text-sm text-gray-500 mt-6">
+                        <p className="text-center text-sm text-muted-foreground mt-6">
                             {t('noAccount')}{" "}
                             <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
                                 {t('signUp')}

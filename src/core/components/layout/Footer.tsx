@@ -28,7 +28,7 @@ function CustomDropdown({
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 text-gray-400 hover:text-white text-sm min-w-[100px]"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm min-w-[100px]"
             >
                 <span className="flex-1 text-left">{formatLabel ? formatLabel(value) : value}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -36,12 +36,12 @@ function CustomDropdown({
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-gray-800 border border-white/10 rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                    <div className="absolute bottom-full left-0 mb-1 w-full bg-card border border-white/10 rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {options.map((option) => (
                             <button
                                 key={option}
                                 onClick={() => { onChange(option); setIsOpen(false); }}
-                                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/10 transition-colors ${value === option ? 'bg-blue-600 text-white' : 'text-gray-300'}`}
+                                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/10 transition-colors ${value === option ? 'bg-blue-600 text-white' : 'text-muted-foreground'}`}
                             >
                                 {formatLabel ? formatLabel(option) : option}
                             </button>
@@ -98,7 +98,7 @@ export function Footer() {
     };
 
     return (
-        <footer className="bg-gray-900 text-white mt-12">
+        <footer className="bg-[#111827] text-white mt-12">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
                     {/* Brand */}
@@ -106,7 +106,7 @@ export function Footer() {
                         <div className="flex items-center gap-3 mb-4">
                             <span className="text-white font-bold text-lg">{siteName}</span>
                         </div>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                        <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                             {siteDescription}
                         </p>
                         <div className="flex gap-3">
@@ -142,11 +142,11 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold text-white mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><Link href="/" className="text-gray-400 hover:text-white transition-colors">{commonT('home')}</Link></li>
+                            <li><Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">{commonT('home')}</Link></li>
                             {ModuleFooterLinks
                                 .filter(fl => fl.section === "quick" && moduleStatus[fl.module] === true)
                                 .map(fl => (
-                                    <li key={fl.href}><Link href={fl.href} className="text-gray-400 hover:text-white transition-colors">{fl.label}</Link></li>
+                                    <li key={fl.href}><Link href={fl.href} className="text-muted-foreground hover:text-foreground transition-colors">{fl.label}</Link></li>
                                 ))}
                         </ul>
                     </div>
@@ -155,10 +155,10 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold text-white mb-4">{t('legal')}</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><Link href="/terms" className="text-gray-400 hover:text-white transition-colors">{t('termsOfService')}</Link></li>
-                            <li><Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">{t('privacyPolicy')}</Link></li>
-                            <li><Link href="/refund" className="text-gray-400 hover:text-white transition-colors">{t('refundPolicy')}</Link></li>
-                            <li><Link href="/rules" className="text-gray-400 hover:text-white transition-colors">{t('serverRules')}</Link></li>
+                            <li><Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t('termsOfService')}</Link></li>
+                            <li><Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t('privacyPolicy')}</Link></li>
+                            <li><Link href="/refund" className="text-muted-foreground hover:text-foreground transition-colors">{t('refundPolicy')}</Link></li>
+                            <li><Link href="/rules" className="text-muted-foreground hover:text-foreground transition-colors">{t('serverRules')}</Link></li>
                         </ul>
                     </div>
 
@@ -167,7 +167,7 @@ export function Footer() {
                         <h4 className="font-semibold text-white mb-4">{commonT('settings')}</h4>
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                                <Globe className="w-4 h-4 text-gray-400" />
+                                <Globe className="w-4 h-4 text-muted-foreground" />
                                 <CustomDropdown
                                     options={locales}
                                     value={locale}
@@ -178,7 +178,7 @@ export function Footer() {
                         </div>
 
                         <div className="mt-6">
-                            <p className="text-gray-400 text-sm flex items-center gap-2">
+                            <p className="text-muted-foreground text-sm flex items-center gap-2">
                                 <Mail className="w-4 h-4" />
                                 {siteEmail}
                             </p>
@@ -191,10 +191,10 @@ export function Footer() {
             <div className="border-t border-white/10">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-muted-foreground text-sm">
                             © 2026 {siteName}. {t('allRightsReserved')}
                         </p>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span>{t('builtWith')}</span>
                             <Heart className="w-4 h-4 text-red-400 fill-red-400" />
                             <span>{t('by')}</span>

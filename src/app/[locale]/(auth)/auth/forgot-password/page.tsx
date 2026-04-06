@@ -40,10 +40,10 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12 relative">
+        <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
             <Link
                 href="/"
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
             >
                 <Home className="w-5 h-5" />
             </Link>
@@ -51,14 +51,14 @@ export default function ForgotPasswordPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <span className="font-bold text-2xl text-gray-900">uxwVend</span>
+                        <span className="font-bold text-2xl text-foreground">uxwVend</span>
                     </Link>
                 </div>
 
-                <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-900 text-center">{t('forgotPassword')}</h1>
-                        <p className="text-gray-500 text-sm text-center mt-1">
+                <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-border">
+                        <h1 className="text-xl font-bold text-foreground text-center">{t('forgotPassword')}</h1>
+                        <p className="text-muted-foreground text-sm text-center mt-1">
                             Enter your email to receive a reset link
                         </p>
                     </div>
@@ -67,8 +67,8 @@ export default function ForgotPasswordPage() {
                         {sent ? (
                             <div className="text-center py-4">
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <h2 className="font-semibold text-gray-900 mb-1">Check your email</h2>
-                                <p className="text-gray-500 text-sm mb-4">
+                                <h2 className="font-semibold text-foreground mb-1">Check your email</h2>
+                                <p className="text-muted-foreground text-sm mb-4">
                                     If an account exists for {email}, we&apos;ve sent a password reset link.
                                 </p>
                                 <Link href="/auth/login">
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                                 )}
 
                                 <div className="space-y-2">
-                                    <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                                    <label htmlFor="email" className="text-sm font-medium text-foreground">
                                         {t('email')}
                                     </label>
                                     <Input
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="border-gray-200 bg-gray-50"
+                                        className="border-border bg-muted"
                                     />
                                 </div>
 
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
                                     {loading ? "Sending..." : "Send Reset Link"}
                                 </Button>
 
-                                <p className="text-center text-sm text-gray-500">
+                                <p className="text-center text-sm text-muted-foreground">
                                     <Link href="/auth/login" className="text-blue-600 hover:underline">
                                         <ArrowLeft className="w-3 h-3 inline mr-1" />
                                         Back to login

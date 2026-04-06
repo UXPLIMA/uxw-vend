@@ -210,11 +210,11 @@ export default function SetupWizardPage() {
                 {steps.map((s, i) => (
                     <div key={s} className="flex items-center gap-2">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                            i < step ? "bg-green-500 text-white" : i === step ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"
+                            i < step ? "bg-green-500 text-white" : i === step ? "bg-blue-600 text-white" : "bg-muted text-muted-foreground"
                         }`}>
                             {i < step ? <Check className="w-4 h-4" /> : i + 1}
                         </div>
-                        {i < steps.length - 1 && <div className={`w-8 h-0.5 ${i < step ? "bg-green-500" : "bg-gray-200"}`} />}
+                        {i < steps.length - 1 && <div className={`w-8 h-0.5 ${i < step ? "bg-green-500" : "bg-muted"}`} />}
                     </div>
                 ))}
             </div>
@@ -224,7 +224,7 @@ export default function SetupWizardPage() {
                 <Card>
                     <CardContent className="p-8 text-center">
                         <h1 className="text-3xl font-bold mb-4">Welcome to uxwVend!</h1>
-                        <p className="text-gray-500 mb-8">Let&apos;s set up your game server platform in a few quick steps.</p>
+                        <p className="text-muted-foreground mb-8">Let&apos;s set up your game server platform in a few quick steps.</p>
                         <Button size="lg" onClick={() => setStep(1)}>
                             Get Started <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
@@ -256,7 +256,7 @@ export default function SetupWizardPage() {
                                 {logoPreview ? (
                                     <Image src={logoPreview} alt="Logo preview" width={64} height={64} className="w-16 h-16 rounded-lg object-contain border" />
                                 ) : (
-                                    <div className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                                    <div className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center text-muted-foreground">
                                         <ImageIcon className="w-6 h-6" />
                                     </div>
                                 )}
@@ -382,11 +382,11 @@ export default function SetupWizardPage() {
                                         className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
                                             selectedTheme === theme.id
                                                 ? "border-blue-500 bg-blue-50/50"
-                                                : "border-gray-200 hover:border-gray-300"
+                                                : "border-border hover:border-border"
                                         }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <Palette className={`w-5 h-5 ${selectedTheme === theme.id ? "text-blue-500" : "text-gray-400"}`} />
+                                            <Palette className={`w-5 h-5 ${selectedTheme === theme.id ? "text-blue-500" : "text-muted-foreground"}`} />
                                             <div>
                                                 <h4 className="font-medium text-sm">{theme.name}</h4>
                                                 {theme.description && (
@@ -428,7 +428,7 @@ export default function SetupWizardPage() {
                             <Check className="w-8 h-8 text-green-600" />
                         </div>
                         <h2 className="text-2xl font-bold mb-2">You&apos;re all set!</h2>
-                        <p className="text-gray-500 mb-6">Your platform is ready. You can configure payments, Discord, and more in Settings.</p>
+                        <p className="text-muted-foreground mb-6">Your platform is ready. You can configure payments, Discord, and more in Settings.</p>
                         <Button onClick={() => router.push("/admin")}>Go to Dashboard</Button>
                     </CardContent>
                 </Card>

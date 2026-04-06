@@ -3,8 +3,6 @@ import { prisma } from "@/core/lib/db";
 import { getRedisClient, isRedisConfigured } from "@/core/lib/redis";
 import fs from "fs/promises";
 
-const startTime = Date.now();
-
 export async function GET() {
     const checks: Record<string, { status: "ok" | "error"; latencyMs?: number; detail?: string }> = {};
 

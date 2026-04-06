@@ -15,7 +15,7 @@ interface RichTextEditorProps {
 const ReactQuill = dynamic(() => import("react-quill-new"), {
     ssr: false,
     loading: () => (
-        <div className="min-h-[300px] bg-gray-50 rounded-md border border-input flex items-center justify-center">
+        <div className="min-h-[300px] bg-muted rounded-md border border-input flex items-center justify-center">
             <span className="text-muted-foreground">Loading editor...</span>
         </div>
     ),

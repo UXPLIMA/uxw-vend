@@ -69,7 +69,7 @@ const categoryColors: Record<string, string> = {
     community: "bg-green-100 text-green-700",
     management: "bg-purple-100 text-purple-700",
     gaming: "bg-orange-100 text-orange-700",
-    content: "bg-gray-100 text-gray-700",
+    content: "bg-muted text-foreground",
 };
 
 export default function AdminModulesPage() {
@@ -355,7 +355,7 @@ export default function AdminModulesPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                        <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
                                             {mod.enabled ? "ON" : "OFF"}
                                         </span>
                                     </div>
@@ -491,7 +491,7 @@ export default function AdminModulesPage() {
                                                 type="checkbox"
                                                 checked={selectedModules.has(mod.id)}
                                                 onChange={() => toggleSelect(mod.id)}
-                                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                                             />
                                             <span className="text-blue-500">{iconMap[mod.icon] || <Package size={22} />}</span>
                                             <div>
@@ -502,7 +502,7 @@ export default function AdminModulesPage() {
                                                 <p className="text-xs text-muted-foreground">v{mod.version} by {mod.author}</p>
                                             </div>
                                         </div>
-                                        <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${categoryColors[mod.category] || "bg-gray-100 text-gray-700"}`}>
+                                        <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${categoryColors[mod.category] || "bg-muted text-foreground"}`}>
                                             {mod.category}
                                         </span>
                                     </div>

@@ -49,7 +49,7 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
         ? "border-red-200 bg-red-50"
         : currentRole?.name === "moderator"
             ? "border-purple-200 bg-purple-50"
-            : "border-gray-200 bg-white";
+            : "border-border bg-card";
 
     return (
         <div className="flex items-center gap-2">

@@ -29,13 +29,13 @@ export default function HomePage() {
     .filter(s => HomepageSectionRegistry[s.id]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-background">
       <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
       <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
       <main className="container mx-auto px-4 py-6 flex-1">
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-4">
+        <div className="text-sm text-muted-foreground mb-4">
           <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
         </div>
 
@@ -52,7 +52,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-400">{commonT('home')}</p>
+              <p className="text-muted-foreground">{commonT('home')}</p>
             </div>
           );
 

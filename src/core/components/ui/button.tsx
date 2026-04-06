@@ -18,11 +18,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                             variant === "default",
                         "bg-destructive text-white hover:bg-destructive/90":
                             variant === "destructive",
-                        "border border-gray-200 bg-card hover:bg-muted text-gray-700":
+                        "border border-border bg-card hover:bg-muted text-foreground":
                             variant === "outline",
                         "bg-secondary text-white hover:bg-secondary/80":
                             variant === "secondary",
-                        "hover:bg-gray-100 text-gray-600": variant === "ghost",
+                        "hover:bg-muted text-muted-foreground": variant === "ghost",
                         "text-primary underline-offset-4 hover:underline": variant === "link",
                         "h-10 px-4 py-2": size === "default",
                         "h-8 rounded-md px-3 text-xs": size === "sm",
