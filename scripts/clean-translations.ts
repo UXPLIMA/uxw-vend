@@ -1,7 +1,9 @@
 /**
- * Ensures core message files contain ONLY core namespaces + installed module translations.
+ * Ensures core message files contain core namespaces + installed module translations.
  * 1. Strips everything to core-only
- * 2. Re-merges translations from installed modules' module.json manifests
+ * 2. Re-merges translations from installed modules' manifests
+ *    - Module namespaces (store, forum, etc.) are added directly
+ *    - Protected namespaces (admin, common, etc.) are DEEP MERGED, not overwritten
  *
  * Runs on predev/prebuild to keep translations in sync with installed modules.
  */
@@ -48,11 +50,18 @@ for (const mod of modules) {
         if (!fs.existsSync(msgPath)) continue;
 
         const existing = JSON.parse(fs.readFileSync(msgPath, "utf-8"));
-        // Remove protected core keys from module translations
-        const sanitized = { ...translations };
-        for (const key of CORE_NAMESPACES) delete sanitized[key];
 
-        fs.writeFileSync(msgPath, JSON.stringify({ ...existing, ...sanitized }, null, 2));
+        for (const [key, value] of Object.entries(translations)) {
+            if (CORE_NAMESPACES.includes(key)) {
+                // Deep merge into protected namespace (e.g. admin.menu_store)
+                existing[key] = { ...(existing[key] as Record<string, unknown> || {}), ...(value as Record<string, unknown>) };
+            } else {
+                // Module namespace — add directly
+                existing[key] = value;
+            }
+        }
+
+        fs.writeFileSync(msgPath, JSON.stringify(existing, null, 2));
     }
     merged++;
 }
