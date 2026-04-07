@@ -1163,7 +1163,9 @@
     "adm_previous": "Anterior",
     "adm_stats": "Estatísticas",
     "adm_status": "Status",
-    "adm_topic": "Tópico"
+    "adm_topic": "Tópico",
+    "adm_pageOf": "Página {page} de {totalPages}",
+    "adm_topicsTotal": "{count} tópicos no total"
   },
   "googleAuth": {
     "title": "Login com Google",
@@ -1732,7 +1734,8 @@
     "adm_noApplications": "Ainda não há candidaturas",
     "adm_accept": "Aceitar",
     "adm_reject": "Rejeitar",
-    "adm_adminNote": "Nota do Administrador"
+    "adm_adminNote": "Nota do Administrador",
+    "adm_pendingReview": "{count} pendentes de revisão"
   },
   "store": {
     "title": "Loja",
@@ -1894,7 +1897,14 @@
     "adm_usageLimit": "Limite de Uso",
     "adm_value": "Valor",
     "adm_valueDollar": "Valor ($)",
-    "adm_view": "Ver"
+    "adm_view": "Ver",
+    "adm_pageOf": "Página {page} de {totalPages}",
+    "adm_orderNumber": "Pedido #{number}",
+    "adm_ordersTotal": "{count} pedidos no total",
+    "adm_productsTotal": "{count} produtos no total",
+    "adm_statusOrders": "Pedidos {status}",
+    "adm_itemsCount": "{count} itens",
+    "adm_codesTotal": "{count} códigos no total"
   },
   "cart": {
     "title": "Carrinho de compras",

@@ -1163,7 +1163,9 @@
     "adm_previous": "Önceki",
     "adm_stats": "İstatistikler",
     "adm_status": "Durum",
-    "adm_topic": "Konu"
+    "adm_topic": "Konu",
+    "adm_pageOf": "Sayfa {page} / {totalPages}",
+    "adm_topicsTotal": "Toplam {count} konu"
   },
   "googleAuth": {
     "title": "Google ile Giris",
@@ -1732,7 +1734,8 @@
     "adm_noApplications": "Henüz başvuru yok",
     "adm_accept": "Kabul Et",
     "adm_reject": "Reddet",
-    "adm_adminNote": "Yönetici Notu"
+    "adm_adminNote": "Yönetici Notu",
+    "adm_pendingReview": "{count} inceleme bekliyor"
   },
   "store": {
     "title": "Mağaza",
@@ -1894,7 +1897,14 @@
     "adm_usageLimit": "Kullanım Limiti",
     "adm_value": "Değer",
     "adm_valueDollar": "Değer (₺)",
-    "adm_view": "Görüntüle"
+    "adm_view": "Görüntüle",
+    "adm_pageOf": "Sayfa {page} / {totalPages}",
+    "adm_orderNumber": "Sipariş #{number}",
+    "adm_ordersTotal": "Toplam {count} sipariş",
+    "adm_productsTotal": "Toplam {count} ürün",
+    "adm_statusOrders": "{status} Siparişler",
+    "adm_itemsCount": "{count} ürün",
+    "adm_codesTotal": "Toplam {count} kod"
   },
   "cart": {
     "title": "Alışveriş Sepeti",

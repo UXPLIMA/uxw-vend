@@ -1163,7 +1163,9 @@
     "adm_previous": "Previous",
     "adm_stats": "Stats",
     "adm_status": "Status",
-    "adm_topic": "Topic"
+    "adm_topic": "Topic",
+    "adm_pageOf": "Page {page} of {totalPages}",
+    "adm_topicsTotal": "{count} topics total"
   },
   "googleAuth": {
     "title": "Google Login",
@@ -1732,7 +1734,8 @@
     "adm_noApplications": "No applications yet",
     "adm_accept": "Accept",
     "adm_reject": "Reject",
-    "adm_adminNote": "Admin Note"
+    "adm_adminNote": "Admin Note",
+    "adm_pendingReview": "{count} pending review"
   },
   "store": {
     "title": "Store",
@@ -1894,7 +1897,14 @@
     "adm_usageLimit": "Usage Limit",
     "adm_value": "Value",
     "adm_valueDollar": "Value ($)",
-    "adm_view": "View"
+    "adm_view": "View",
+    "adm_pageOf": "Page {page} of {totalPages}",
+    "adm_orderNumber": "Order #{number}",
+    "adm_ordersTotal": "{count} orders total",
+    "adm_productsTotal": "{count} products total",
+    "adm_statusOrders": "{status} Orders",
+    "adm_itemsCount": "{count} items",
+    "adm_codesTotal": "{count} codes total"
   },
   "cart": {
     "title": "Shopping Cart",

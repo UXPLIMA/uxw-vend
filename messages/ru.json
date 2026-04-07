@@ -1163,7 +1163,9 @@
     "adm_previous": "Назад",
     "adm_stats": "Статистика",
     "adm_status": "Статус",
-    "adm_topic": "Тема"
+    "adm_topic": "Тема",
+    "adm_pageOf": "Страница {page} из {totalPages}",
+    "adm_topicsTotal": "Всего {count} тем"
   },
   "googleAuth": {
     "title": "Вход через Google",
@@ -1732,7 +1734,8 @@
     "adm_noApplications": "Заявок пока нет",
     "adm_accept": "Принять",
     "adm_reject": "Отклонить",
-    "adm_adminNote": "Заметка администратора"
+    "adm_adminNote": "Заметка администратора",
+    "adm_pendingReview": "{count} ожидают рассмотрения"
   },
   "store": {
     "title": "Магазин",
@@ -1894,7 +1897,14 @@
     "adm_usageLimit": "Лимит использования",
     "adm_value": "Значение",
     "adm_valueDollar": "Значение ($)",
-    "adm_view": "Просмотр"
+    "adm_view": "Просмотр",
+    "adm_pageOf": "Страница {page} из {totalPages}",
+    "adm_orderNumber": "Заказ #{number}",
+    "adm_ordersTotal": "Всего {count} заказов",
+    "adm_productsTotal": "Всего {count} товаров",
+    "adm_statusOrders": "Заказы {status}",
+    "adm_itemsCount": "{count} товаров",
+    "adm_codesTotal": "Всего {count} кодов"
   },
   "cart": {
     "title": "Корзина",
