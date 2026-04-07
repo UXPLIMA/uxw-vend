@@ -228,7 +228,10 @@ export async function PATCH(request: NextRequest) {
         try {
             const modulesDir = path.join(process.cwd(), "src/modules", moduleId);
             const hookPath = path.join(modulesDir, hookRelPath);
-            const hookModule = await import(hookPath);
+            const _require = typeof __webpack_require__ === "function"
+                ? __non_webpack_require__
+                : eval("require");
+            const hookModule = _require(hookPath);
             if (typeof hookModule.default === "function") {
                 await hookModule.default();
             }
@@ -239,3 +242,6 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(updated);
 }
+
+declare const __webpack_require__: unknown;
+declare const __non_webpack_require__: (id: string) => Record<string, unknown>;

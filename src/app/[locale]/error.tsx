@@ -7,7 +7,6 @@ import { AlertTriangle, RotateCcw, Home } from "lucide-react";
 
 function useErrorTranslations() {
     try {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
         const t = useTranslations("common");
         return {
             title: t("error_title") || "Something went wrong",

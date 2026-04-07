@@ -44,6 +44,7 @@ export default function SeoPage() {
             setSeo(seoData);
             setLoading(false);
         }).catch(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const save = async () => {
