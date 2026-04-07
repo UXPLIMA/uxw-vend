@@ -7,6 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Copy, Check, Key } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface ApiKeyItem {
@@ -19,6 +20,7 @@ interface ApiKeyItem {
 }
 
 export default function ApiKeysPage() {
+    const t = useTranslations("admin");
     const [keys, setKeys] = useState<ApiKeyItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -57,7 +59,7 @@ export default function ApiKeysPage() {
     };
 
     const deleteKey = async (id: string) => {
-        const ok = await confirm({ title: "Delete API Key", message: "Delete this API key?", variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("apiKeys_deleteTitle"), message: t("apiKeys_deleteMessage"), variant: "danger", confirmText: "Delete" });
         if (!ok) return;
         await fetch(`/api/v1/api-keys/${id}`, { method: "DELETE" });
         fetchKeys();
@@ -73,17 +75,17 @@ export default function ApiKeysPage() {
         <>
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold">API Keys</h1>
-                    <p className="text-muted-foreground">Manage API keys for external integrations</p>
+                    <h1 className="text-3xl font-bold">{t("apiKeys_title")}</h1>
+                    <p className="text-muted-foreground">{t("apiKeys_subtitle")}</p>
                 </div>
                 <Button onClick={() => setShowForm(!showForm)}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> Cancel</> : <><Plus className="w-4 h-4 mr-2" /> New Key</>}
+                    {showForm ? <><X className="w-4 h-4 mr-2" /> {t("apiKeys_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("apiKeys_newKey")}</>}
                 </Button>
             </div>
 
             {newKey && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm font-medium text-green-800 mb-2">API key created! Copy it now — it won&apos;t be shown again.</p>
+                    <p className="text-sm font-medium text-green-800 mb-2">{t("apiKeys_keyCreated")}</p>
                     <div className="flex items-center gap-2">
                         <code className="flex-1 text-sm bg-muted px-3 py-2 rounded border border-border font-mono select-all">{newKey}</code>
                         <Button size="sm" variant="outline" onClick={copyKey}>
@@ -98,11 +100,11 @@ export default function ApiKeysPage() {
                     <CardContent className="p-4">
                         <form onSubmit={createKey} className="flex items-end gap-3">
                             <div className="flex-1">
-                                <Label>Key Name</Label>
+                                <Label>{t("apiKeys_keyName")}</Label>
                                 <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Integration" required />
                             </div>
                             <Button type="submit" disabled={saving}>
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
+                                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t("apiKeys_create")}
                             </Button>
                         </form>
                     </CardContent>
@@ -112,7 +114,7 @@ export default function ApiKeysPage() {
             <Card>
                 <CardContent className="p-0">
                     {keys.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No API keys</p>
+                        <p className="text-muted-foreground text-center py-8">{t("apiKeys_noKeys")}</p>
                     ) : (
                         <div className="divide-y">
                             {keys.map((k) => (

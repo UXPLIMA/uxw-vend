@@ -7,6 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Permission {
@@ -32,6 +33,7 @@ const corePermissions = [
 ];
 
 export default function AdminRolesPage() {
+    const t = useTranslations("admin");
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [availablePermissions, setAvailablePermissions] = useState(corePermissions);
@@ -137,7 +139,7 @@ export default function AdminRolesPage() {
     };
 
     const deleteRole = async (roleId: string) => {
-        const ok = await confirm({ title: "Delete Role", message: "Are you sure you want to delete this role?", variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("roles_deleteTitle"), message: t("roles_deleteMessage"), variant: "danger", confirmText: "Delete" });
         if (!ok) return;
 
         try {
@@ -165,11 +167,11 @@ export default function AdminRolesPage() {
         <>
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold">Roles & Permissions</h1>
-                    <p className="text-muted-foreground">Manage user roles and their permissions</p>
+                    <h1 className="text-3xl font-bold">{t("roles_title")}</h1>
+                    <p className="text-muted-foreground">{t("roles_subtitle")}</p>
                 </div>
                 <Button onClick={() => { resetForm(); setShowCreateForm(true); }}>
-                    <Plus className="w-4 h-4 mr-2" /> New Role
+                    <Plus className="w-4 h-4 mr-2" /> {t("roles_newRole")}
                 </Button>
             </div>
 
@@ -182,7 +184,7 @@ export default function AdminRolesPage() {
                 <Card className="mb-8">
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between">
-                            <span>{editingRole ? `Edit: ${editingRole.displayName}` : "New Role"}</span>
+                            <span>{editingRole ? t("roles_editRole", { name: editingRole.displayName }) : t("roles_newRole")}</span>
                             <Button variant="ghost" size="icon" onClick={resetForm}>
                                 <X className="w-4 h-4" />
                             </Button>
@@ -192,7 +194,7 @@ export default function AdminRolesPage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label>Internal Name *</Label>
+                                    <Label>{t("roles_internalName")} *</Label>
                                     <Input
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value.toLowerCase().replace(/[^a-z_]/g, "") })}
@@ -200,10 +202,10 @@ export default function AdminRolesPage() {
                                         required
                                         disabled={editingRole?.name === "admin"}
                                     />
-                                    <p className="text-xs text-muted-foreground mt-1">Lowercase, underscores only</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("roles_lowercaseHint")}</p>
                                 </div>
                                 <div>
-                                    <Label>Display Name *</Label>
+                                    <Label>{t("roles_displayName")} *</Label>
                                     <Input
                                         value={form.displayName}
                                         onChange={(e) => setForm({ ...form, displayName: e.target.value })}
@@ -212,7 +214,7 @@ export default function AdminRolesPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>Color</Label>
+                                    <Label>{t("roles_color")}</Label>
                                     <div className="flex gap-2">
                                         <input
                                             type="color"
@@ -228,22 +230,22 @@ export default function AdminRolesPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <Label>Priority</Label>
+                                    <Label>{t("roles_priority")}</Label>
                                     <Input
                                         type="number"
                                         value={form.priority}
                                         onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}
                                         placeholder="0"
                                     />
-                                    <p className="text-xs text-muted-foreground mt-1">Higher = more authority</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("roles_priorityHint")}</p>
                                 </div>
                             </div>
 
                             {/* Permissions */}
                             <div>
-                                <Label className="mb-3 block">Permissions</Label>
+                                <Label className="mb-3 block">{t("roles_permissions")}</Label>
                                 {editingRole?.name === "admin" ? (
-                                    <p className="text-sm text-muted-foreground">Admin role has all permissions automatically.</p>
+                                    <p className="text-sm text-muted-foreground">{t("roles_adminAllPerms")}</p>
                                 ) : (
                                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {availablePermissions.map((group) => (
@@ -270,11 +272,11 @@ export default function AdminRolesPage() {
 
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
-                                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</>
+                                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("roles_saving")}</>
                                 ) : editingRole ? (
-                                    "Save Changes"
+                                    t("roles_saveChanges")
                                 ) : (
-                                    "Create Role"
+                                    t("roles_createRole")
                                 )}
                             </Button>
                         </form>
@@ -315,23 +317,23 @@ export default function AdminRolesPage() {
                         <CardContent>
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Internal name</span>
+                                    <span className="text-muted-foreground">{t("roles_internalName")}</span>
                                     <code className="bg-muted px-2 py-0.5 rounded text-xs">{role.name}</code>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Users</span>
+                                    <span className="text-muted-foreground">{t("roles_users")}</span>
                                     <span>{role._count.users}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Priority</span>
+                                    <span className="text-muted-foreground">{t("roles_priority")}</span>
                                     <span>{role.priority}</span>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-muted-foreground mb-1">Permissions</p>
+                                    <p className="text-sm text-muted-foreground mb-1">{t("roles_permissions")}</p>
                                     {role.name === "admin" ? (
-                                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">All permissions</span>
+                                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">{t("roles_allPermissions")}</span>
                                     ) : role.permissions.length === 0 ? (
-                                        <span className="text-xs text-muted-foreground">No permissions</span>
+                                        <span className="text-xs text-muted-foreground">{t("roles_noPermissions")}</span>
                                     ) : (
                                         <div className="flex flex-wrap gap-1">
                                             {role.permissions.map((p) => (

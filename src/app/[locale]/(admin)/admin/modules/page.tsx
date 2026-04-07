@@ -10,6 +10,7 @@ import {
     Megaphone, Search as SearchIcon, ArrowUp
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Module {
@@ -73,6 +74,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function AdminModulesPage() {
+    const t = useTranslations("admin");
     const [modules, setModules] = useState<Module[]>([]);
     const [marketplace, setMarketplace] = useState<MarketplaceModule[]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,7 +124,7 @@ export default function AdminModulesPage() {
             const data = await res.json();
             if (res.ok) {
                 setModules(modules.map(m => m.id === moduleId ? { ...m, enabled } : m));
-                toast.success(`${moduleId} ${enabled ? "enabled" : "disabled"}`);
+                toast.success(`${moduleId} ${enabled ? t("modules_enable") : t("modules_disable")}`);
             } else {
                 toast.error(data.error || "Failed");
             }
@@ -133,7 +135,7 @@ export default function AdminModulesPage() {
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
+        if (isBusy) { toast.error(t("modules_pleaseWait")); return; }
         setUploading(true);
         try {
             const formData = new FormData();
@@ -147,7 +149,7 @@ export default function AdminModulesPage() {
     };
 
     const handleDelete = async (moduleId: string, moduleName: string) => {
-        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
+        if (isBusy) { toast.error(t("modules_pleaseWait")); return; }
         const ok = await confirm({ title: "Delete Module", message: `Delete "${moduleName}"? This removes all module files.`, variant: "danger", confirmText: "Delete" });
         if (!ok) return;
         setDeleting(moduleId);
@@ -161,7 +163,7 @@ export default function AdminModulesPage() {
     };
 
     const handleUpdate = async (mod: Module) => {
-        if (isBusy) { toast.error("Please wait — another operation is in progress"); return; }
+        if (isBusy) { toast.error(t("modules_pleaseWait")); return; }
         const mpMod = marketplace.find(m => m.id === mod.id);
         if (!mpMod) { toast.error("Module not found in marketplace"); return; }
         setUpdatingModule(mod.id);
@@ -184,7 +186,7 @@ export default function AdminModulesPage() {
 
     const handleMarketplaceInstall = async (mod: MarketplaceModule) => {
         if (isBusy) {
-            toast.error("Please wait — another operation is in progress");
+            toast.error(t("modules_pleaseWait"));
             return;
         }
         const ok = await confirm({ title: "Install Module", message: `Install "${mod.name}" (v${mod.version})?`, confirmText: "Install" });
@@ -279,7 +281,7 @@ export default function AdminModulesPage() {
                         <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
                         {bulkProgress ? (
                             <>
-                                <h3 className="font-semibold text-lg mb-1">Installing modules ({bulkProgress.current}/{bulkProgress.total})</h3>
+                                <h3 className="font-semibold text-lg mb-1">{t("modules_installingModules", { current: bulkProgress.current, total: bulkProgress.total })}</h3>
                                 <p className="text-sm text-muted-foreground">{bulkProgress.name}</p>
                                 <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
                                     <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }} />
@@ -299,8 +301,8 @@ export default function AdminModulesPage() {
             )}
 
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Modules</h1>
-                <p className="text-muted-foreground">Install, enable, and manage platform modules</p>
+                <h1 className="text-3xl font-bold">{t("modules_title")}</h1>
+                <p className="text-muted-foreground">{t("modules_subtitle")}</p>
             </div>
 
             {/* Upload Module */}
@@ -308,13 +310,13 @@ export default function AdminModulesPage() {
                 <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 className="font-semibold">Custom Module</h3>
-                            <p className="text-sm text-muted-foreground">Upload a .zip file with module.json</p>
+                            <h3 className="font-semibold">{t("modules_customModule")}</h3>
+                            <p className="text-sm text-muted-foreground">{t("modules_uploadDesc")}</p>
                         </div>
                         <div>
                             <input type="file" accept=".zip" ref={fileInputRef} className="hidden" onChange={handleUpload} />
                             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                                {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Installing...</> : <><Upload className="w-4 h-4 mr-2" /> Upload ZIP</>}
+                                {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("modules_installing")}</> : <><Upload className="w-4 h-4 mr-2" /> {t("modules_uploadZip")}</>}
                             </Button>
                         </div>
                     </div>
@@ -323,7 +325,7 @@ export default function AdminModulesPage() {
 
             {/* Installed Modules */}
             <div className="mb-10">
-                <h2 className="text-xl font-bold mb-4">Installed Modules ({modules.length})</h2>
+                <h2 className="text-xl font-bold mb-4">{t("modules_installedModules")} ({modules.length})</h2>
 
                 {loading ? (
                     <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
@@ -331,8 +333,8 @@ export default function AdminModulesPage() {
                     <Card>
                         <CardContent className="py-12 text-center">
                             <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                            <p className="text-muted-foreground mb-1">No modules installed</p>
-                            <p className="text-sm text-muted-foreground">Browse the marketplace below to get started</p>
+                            <p className="text-muted-foreground mb-1">{t("modules_noModules")}</p>
+                            <p className="text-sm text-muted-foreground">{t("modules_browseMarketplace")}</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -356,7 +358,7 @@ export default function AdminModulesPage() {
                                             </div>
                                         </div>
                                         <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
-                                            {mod.enabled ? "ON" : "OFF"}
+                                            {mod.enabled ? t("modules_on") : t("modules_off")}
                                         </span>
                                     </div>
 
@@ -366,14 +368,14 @@ export default function AdminModulesPage() {
                                         <div className="mb-3 space-y-1">
                                             {mod.dependencies && mod.dependencies.length > 0 && (
                                                 <div className="flex items-center gap-1.5 text-xs">
-                                                    <span className="text-amber-600 font-medium">Requires:</span>
+                                                    <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
                                                     <div className="flex gap-1 flex-wrap">
                                                         {mod.dependencies.map(dep => {
                                                             const depMod = modules.find(m => m.id === dep);
                                                             const isInstalled = depMod?.enabled;
                                                             return (
                                                                 <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isInstalled ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-                                                                    {depMod?.name || dep} {isInstalled ? "✓" : "missing"}
+                                                                    {depMod?.name || dep} {isInstalled ? "✓" : t("modules_missing")}
                                                                 </span>
                                                             );
                                                         })}
@@ -382,7 +384,7 @@ export default function AdminModulesPage() {
                                             )}
                                             {mod.conflicts && mod.conflicts.length > 0 && (
                                                 <div className="flex items-center gap-1.5 text-xs">
-                                                    <span className="text-red-500 font-medium">Incompatible:</span>
+                                                    <span className="text-red-500 font-medium">{t("modules_incompatible")}</span>
                                                     <div className="flex gap-1 flex-wrap">
                                                         {mod.conflicts.map(cId => {
                                                             const cMod = modules.find(m => m.id === cId);
@@ -406,7 +408,7 @@ export default function AdminModulesPage() {
                                             disabled={updating === mod.id}
                                             onClick={() => toggleModule(mod.id, !mod.enabled)}
                                         >
-                                            {updating === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : mod.enabled ? "Disable" : "Enable"}
+                                            {updating === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : mod.enabled ? t("modules_disable") : t("modules_enable")}
                                         </Button>
                                         {mod.updateAvailable && (
                                             <Button
@@ -443,14 +445,14 @@ export default function AdminModulesPage() {
                     <div>
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-blue-500" />
-                            Verified Modules
+                            {t("modules_verifiedModules")}
                         </h2>
-                        <p className="text-sm text-muted-foreground">Official modules from the uxwVend marketplace</p>
+                        <p className="text-sm text-muted-foreground">{t("modules_officialModules")}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         {selectedModules.size > 0 && (
                             <Button size="sm" onClick={handleBulkInstall} disabled={isBusy || bulkInstalling}>
-                                {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</> : <><Download className="w-3 h-3 mr-1.5" /> Install {selectedModules.size} selected</>}
+                                {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 mr-1.5" /> {t("modules_installSelected", { count: selectedModules.size })}</>}
                             </Button>
                         )}
                         {filteredMarketplace.length > 0 && (
@@ -458,11 +460,11 @@ export default function AdminModulesPage() {
                                 if (selectedModules.size === filteredMarketplace.length) setSelectedModules(new Set());
                                 else setSelectedModules(new Set(filteredMarketplace.map(m => m.id)));
                             }}>
-                                {selectedModules.size === filteredMarketplace.length ? "Deselect All" : "Select All"}
+                                {selectedModules.size === filteredMarketplace.length ? t("modules_deselectAll") : t("modules_selectAll")}
                             </Button>
                         )}
                         <div className="flex flex-wrap gap-1.5">
-                            <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>All</Button>
+                            <Button size="sm" variant={marketplaceFilter === "all" ? "default" : "outline"} onClick={() => setMarketplaceFilter("all")}>{t("modules_all")}</Button>
                             {categories.map(cat => (
                                 <Button key={cat} size="sm" variant={marketplaceFilter === cat ? "default" : "outline"} onClick={() => setMarketplaceFilter(cat)} className="capitalize">
                                     {cat}
@@ -477,7 +479,7 @@ export default function AdminModulesPage() {
                 ) : filteredMarketplace.length === 0 ? (
                     <Card>
                         <CardContent className="py-8 text-center text-muted-foreground">
-                            {marketplace.length === 0 ? "Could not load marketplace" : "All modules in this category are already installed"}
+                            {marketplace.length === 0 ? t("modules_couldNotLoad") : t("modules_allInstalled")}
                         </CardContent>
                     </Card>
                 ) : (
@@ -510,15 +512,15 @@ export default function AdminModulesPage() {
                                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
 
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                                        {mod.stats.publicRoutes > 0 && <span>{mod.stats.publicRoutes} pages</span>}
-                                        {mod.stats.adminRoutes > 0 && <span>{mod.stats.adminRoutes} admin</span>}
-                                        {mod.stats.apiRoutes > 0 && <span>{mod.stats.apiRoutes} APIs</span>}
-                                        {mod.stats.widgets > 0 && <span>{mod.stats.widgets} widgets</span>}
+                                        {mod.stats.publicRoutes > 0 && <span>{t("modules_pages", { count: mod.stats.publicRoutes })}</span>}
+                                        {mod.stats.adminRoutes > 0 && <span>{t("modules_admin", { count: mod.stats.adminRoutes })}</span>}
+                                        {mod.stats.apiRoutes > 0 && <span>{t("modules_apis", { count: mod.stats.apiRoutes })}</span>}
+                                        {mod.stats.widgets > 0 && <span>{t("modules_widgets", { count: mod.stats.widgets })}</span>}
                                     </div>
 
                                     {mod.dependencies.length > 0 && (
                                         <div className="flex items-center gap-1.5 text-xs mb-3">
-                                            <span className="text-amber-600 font-medium">Requires:</span>
+                                            <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
                                             <div className="flex gap-1 flex-wrap">
                                                 {mod.dependencies.map((dep: string) => {
                                                     const depName = marketplace.find(m => m.id === dep)?.name || modules.find(m => m.id === dep)?.name || dep;
@@ -539,9 +541,9 @@ export default function AdminModulesPage() {
                                         onClick={() => handleMarketplaceInstall(mod)}
                                     >
                                         {installing === mod.id ? (
-                                            <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</>
+                                            <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</>
                                         ) : (
-                                            <><Download className="w-3 h-3 mr-1.5" /> Install</>
+                                            <><Download className="w-3 h-3 mr-1.5" /> {t("modules_install")}</>
                                         )}
                                     </Button>
                                 </CardContent>

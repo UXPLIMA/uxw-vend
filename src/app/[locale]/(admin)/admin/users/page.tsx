@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatDate } from "@/core/lib/utils";
 import { UserRoleSelect } from "./role-select";
@@ -39,30 +40,31 @@ export default async function AdminUsersPage() {
     if (!adminCheck) redirect("/");
 
     const [{ users, total }, roles] = await Promise.all([getUsers(), getRoles()]);
+    const t = await getTranslations("admin");
 
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Users</h1>
-                <p className="text-muted-foreground">{total} users total</p>
+                <h1 className="text-3xl font-bold">{t("users_title")}</h1>
+                <p className="text-muted-foreground">{t("users_total", { count: total })}</p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>All Users</CardTitle>
+                    <CardTitle>{t("users_allUsers")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {users.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No users found</p>
+                        <p className="text-muted-foreground text-center py-8">{t("users_noUsers")}</p>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
                                     <tr>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">User</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Email</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Role</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Joined</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("users_user")}</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("users_email")}</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("users_role")}</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("users_joined")}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,7 +81,7 @@ export default async function AdminUsersPage() {
                                                     </div>
                                                     <Link href={`/admin/users/${user.id}`} className="font-medium hover:text-primary transition-colors">
                                                         {user.username}
-                                                        {user.isBanned && <span className="ml-2 text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Banned</span>}
+                                                        {user.isBanned && <span className="ml-2 text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">{t("users_banned")}</span>}
                                                     </Link>
                                                 </div>
                                             </td>

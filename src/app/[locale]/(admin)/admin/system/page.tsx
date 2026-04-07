@@ -8,6 +8,7 @@ import {
     Download, Loader2, Trash2, RefreshCw, Activity, RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { SystemMetrics } from "../components/system-metrics";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
@@ -30,6 +31,7 @@ interface BackupItem {
 }
 
 export default function SystemPage() {
+    const t = useTranslations("admin");
     const [system, setSystem] = useState<SystemData | null>(null);
     const [backups, setBackups] = useState<BackupItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function SystemPage() {
     useEffect(() => { fetchData(); }, [fetchData]);
 
     const createBackup = async () => {
-        const ok = await confirm({ title: "Create Backup", message: "Create a full backup of the database, modules, and translations?", confirmText: "Backup" });
+        const ok = await confirm({ title: t("system_createBackupTitle"), message: t("system_createBackupMessage"), confirmText: t("system_createBackup") });
         if (!ok) return;
         setBacking(true);
         const res = await fetch("/api/v1/admin/backup", { method: "POST" });
@@ -70,7 +72,7 @@ export default function SystemPage() {
     };
 
     const deleteBackup = async (filename: string) => {
-        const ok = await confirm({ title: "Delete Backup", message: `Delete ${filename}?`, variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("system_deleteBackupTitle"), message: t("system_deleteBackupMessage", { filename }), variant: "danger", confirmText: "Delete" });
         if (!ok) return;
         const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(filename)}`, { method: "DELETE" });
         if (res.ok) { toast.success("Backup deleted"); fetchData(); }
@@ -80,8 +82,8 @@ export default function SystemPage() {
     const restoreBackup = async (filename: string) => {
         if (!filename.endsWith(".zip")) { toast.error("Only ZIP backups can be restored"); return; }
         const ok = await confirm({
-            title: "Restore Backup",
-            message: `Restore from ${filename}? This will overwrite current database, modules, and translations. This action cannot be undone.`,
+            title: t("system_restoreBackupTitle"),
+            message: t("system_restoreBackupMessage", { filename }),
             variant: "danger",
             confirmText: "Restore",
         });
@@ -103,28 +105,28 @@ export default function SystemPage() {
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
-    if (!system) return <p className="text-muted-foreground text-center py-8">Failed to load system data</p>;
+    if (!system) return <p className="text-muted-foreground text-center py-8">{t("system_failedToLoad")}</p>;
 
     const stats = [
-        { label: "Database Size", value: system.database.size, icon: Database, color: "text-blue-500" },
-        { label: "Total Users", value: system.database.totalUsers, icon: Users, color: "text-green-500" },
-        { label: "New (7d)", value: system.database.newUsersWeek, icon: Activity, color: "text-purple-500" },
-        { label: "Modules", value: `${system.database.enabledModules}/${system.database.totalModules}`, icon: Puzzle, color: "text-orange-500" },
-        { label: "Disk Used", value: system.disk.used, icon: HardDrive, color: "text-red-500" },
-        { label: "Disk Free", value: system.disk.free, icon: HardDrive, color: "text-emerald-500" },
-        { label: "CPU Cores", value: system.system.cpuCount, icon: Cpu, color: "text-indigo-500" },
-        { label: "Uptime", value: `${system.system.uptimeHours}h`, icon: Clock, color: "text-amber-500" },
+        { label: t("system_databaseSize"), value: system.database.size, icon: Database, color: "text-blue-500" },
+        { label: t("system_totalUsers"), value: system.database.totalUsers, icon: Users, color: "text-green-500" },
+        { label: t("system_newUsers7d"), value: system.database.newUsersWeek, icon: Activity, color: "text-purple-500" },
+        { label: t("system_modules"), value: `${system.database.enabledModules}/${system.database.totalModules}`, icon: Puzzle, color: "text-orange-500" },
+        { label: t("system_diskUsed"), value: system.disk.used, icon: HardDrive, color: "text-red-500" },
+        { label: t("system_diskFree"), value: system.disk.free, icon: HardDrive, color: "text-emerald-500" },
+        { label: t("system_cpuCores"), value: system.system.cpuCount, icon: Cpu, color: "text-indigo-500" },
+        { label: t("system_uptime"), value: `${system.system.uptimeHours}h`, icon: Clock, color: "text-amber-500" },
     ];
 
     return (
         <>
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold">System Health</h1>
+                    <h1 className="text-3xl font-bold">{t("system_title")}</h1>
                     <p className="text-muted-foreground">{system.system.hostname} - {system.system.platform}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={fetchData}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+                    <RefreshCw className="w-4 h-4 mr-2" /> {t("system_refresh")}
                 </Button>
             </div>
 
@@ -147,7 +149,7 @@ export default function SystemPage() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Process Memory</CardTitle>
+                        <CardTitle className="text-base">{t("system_processMemory")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div className="flex justify-between text-sm">
@@ -175,7 +177,7 @@ export default function SystemPage() {
 
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-base">System Info</CardTitle>
+                        <CardTitle className="text-base">{t("system_systemInfo")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div className="flex justify-between text-sm">
@@ -202,16 +204,16 @@ export default function SystemPage() {
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
-                        <CardTitle className="text-base">Backups</CardTitle>
+                        <CardTitle className="text-base">{t("system_backups")}</CardTitle>
                         <Button size="sm" onClick={createBackup} disabled={backing}>
                             {backing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Download className="w-4 h-4 mr-2" />}
-                            {backing ? "Creating..." : "Create Backup"}
+                            {backing ? t("system_creating") : t("system_createBackup")}
                         </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
                     {backups.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4 text-sm">No backups yet</p>
+                        <p className="text-muted-foreground text-center py-4 text-sm">{t("system_noBackups")}</p>
                     ) : (
                         <div className="divide-y">
                             {backups.map((b) => (

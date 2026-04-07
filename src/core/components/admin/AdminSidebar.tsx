@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { usePathname } from "@/core/lib/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
 import {
     LayoutDashboard,
@@ -51,22 +52,21 @@ interface NavItem {
     icon: React.ReactNode;
 }
 
-// Core items that are NOT tied to any module - always visible
-const coreNavItems: NavItem[] = [
-    { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/admin/modules", label: "Modules", icon: <Puzzle size={18} /> },
-];
+// Core nav item definitions (labels resolved at render time via i18n)
+const coreNavDefs = [
+    { href: "/admin", labelKey: "sidebar_dashboard", icon: <LayoutDashboard size={18} /> },
+    { href: "/admin/modules", labelKey: "sidebar_modules", icon: <Puzzle size={18} /> },
+] as const;
 
-// Core admin features that are always available (not module-dependent)
-const coreToolItems: NavItem[] = [
-    { href: "/admin/seo", label: "SEO", icon: <Search size={18} /> },
-    { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
-    { href: "/admin/roles", label: "Roles", icon: <Shield size={18} /> },
-    { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
-    { href: "/admin/system", label: "System Health", icon: <Server size={18} /> },
-    { href: "/admin/activity-log", label: "Activity Log", icon: <ScrollText size={18} /> },
-    { href: "/admin/api-keys", label: "API Keys", icon: <KeyRound size={18} /> },
-];
+const coreToolDefs = [
+    { href: "/admin/seo", labelKey: "sidebar_seo", icon: <Search size={18} /> },
+    { href: "/admin/users", labelKey: "sidebar_users", icon: <Users size={18} /> },
+    { href: "/admin/roles", labelKey: "sidebar_roles", icon: <Shield size={18} /> },
+    { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },
+    { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
+    { href: "/admin/activity-log", labelKey: "sidebar_activityLog", icon: <ScrollText size={18} /> },
+    { href: "/admin/api-keys", labelKey: "sidebar_apiKeys", icon: <KeyRound size={18} /> },
+] as const;
 
 interface AdminSidebarProps {
     userName?: string;
@@ -91,11 +91,21 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
+    const t = useTranslations("admin");
 
     const isActive = (href: string) => {
         if (href === "/admin") return pathname === "/admin";
         return pathname.startsWith(href);
     };
+
+    // Resolve core nav items with translated labels
+    const coreNavItems: NavItem[] = coreNavDefs.map(d => ({
+        href: d.href, label: t(d.labelKey), icon: d.icon,
+    }));
+
+    const coreToolItems: NavItem[] = coreToolDefs.map(d => ({
+        href: d.href, label: t(d.labelKey), icon: d.icon,
+    }));
 
     // Build module menu items from enabled module manifests only
     const moduleNavItems: NavItem[] = modules.flatMap(module => {
@@ -141,7 +151,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                     className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
                 >
                     {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                    {isDark ? "Light Mode" : "Dark Mode"}
+                    {isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
                 </button>
             </div>
         </>

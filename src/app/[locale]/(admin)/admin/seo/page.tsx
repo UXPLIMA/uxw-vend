@@ -8,13 +8,13 @@ import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
-
-// Core pages always shown; module pages added dynamically
-const corePages = [
-    { key: "home", label: "Homepage" },
-];
+import { useTranslations } from "next-intl";
 
 export default function SeoPage() {
+    const t = useTranslations("admin");
+    const corePages = [
+        { key: "home", label: t("seo_homepage") },
+    ];
     const [pages, setPages] = useState(corePages);
     const [seo, setSeo] = useState<Record<string, { title: string; description: string }>>({});
     const [loading, setLoading] = useState(true);
@@ -67,8 +67,8 @@ export default function SeoPage() {
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">SEO Settings</h1>
-                <p className="text-muted-foreground">Customize meta titles and descriptions per page</p>
+                <h1 className="text-3xl font-bold">{t("seo_title")}</h1>
+                <p className="text-muted-foreground">{t("seo_subtitle")}</p>
             </div>
 
             <div className="space-y-4">
@@ -79,7 +79,7 @@ export default function SeoPage() {
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <div>
-                                <Label className="text-xs">Meta Title</Label>
+                                <Label className="text-xs">{t("seo_metaTitle")}</Label>
                                 <Input
                                     value={seo[page.key]?.title || ""}
                                     onChange={(e) => setSeo({ ...seo, [page.key]: { ...seo[page.key], title: e.target.value } })}
@@ -87,11 +87,11 @@ export default function SeoPage() {
                                 />
                             </div>
                             <div>
-                                <Label className="text-xs">Meta Description</Label>
+                                <Label className="text-xs">{t("seo_metaDescription")}</Label>
                                 <Textarea
                                     value={seo[page.key]?.description || ""}
                                     onChange={(e) => setSeo({ ...seo, [page.key]: { ...seo[page.key], description: e.target.value } })}
-                                    placeholder="Page description for search engines..."
+                                    placeholder={t("seo_placeholder")}
                                     rows={2}
                                 />
                             </div>
@@ -102,7 +102,7 @@ export default function SeoPage() {
 
             <div className="mt-6">
                 <Button onClick={save} disabled={saving}>
-                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Check className="w-4 h-4 mr-2" /> Save SEO</>}
+                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("seo_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("seo_saveSeo")}</>}
                 </Button>
             </div>
         </>
