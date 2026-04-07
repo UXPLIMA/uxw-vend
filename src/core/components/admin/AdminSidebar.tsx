@@ -107,13 +107,22 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
         href: d.href, label: t(d.labelKey), icon: d.icon,
     }));
 
-    // Build module menu items — try translated label, fall back to manifest label
+    // Build module menu items — try translated label per item, fall back to manifest label
     const moduleNavItems: NavItem[] = modules.flatMap(module => {
         if (!module.menu) return [];
-        return module.menu.map((menuItem) => {
-            // Try to get translated menu label from module's translation namespace
+        return module.menu.map((menuItem, idx) => {
             let label = menuItem.label;
-            try { const translated = t(`menu_${module.id}`); if (translated && !translated.startsWith("admin.menu_")) label = translated; } catch { /* fallback */ }
+            // Try item-specific key first (menu_store_0, menu_store_1), then module key (menu_store)
+            const itemKey = `menu_${module.id}_${idx}`;
+            const moduleKey = `menu_${module.id}`;
+            try {
+                const itemTranslated = t(itemKey);
+                if (itemTranslated && !itemTranslated.startsWith("admin.")) { label = itemTranslated; }
+                else if (idx === 0) {
+                    const modTranslated = t(moduleKey);
+                    if (modTranslated && !modTranslated.startsWith("admin.")) label = modTranslated;
+                }
+            } catch { /* fallback to original */ }
             return {
                 href: `/admin${menuItem.path.startsWith('/') ? menuItem.path : '/' + menuItem.path}`,
                 label,
