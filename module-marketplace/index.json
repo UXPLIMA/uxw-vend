@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated": "2026-04-06",
+  "updated": "2026-04-07",
   "modules": [
     {
       "id": "analytics",
@@ -149,8 +149,8 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 1,
-        "apiRoutes": 2,
+        "adminRoutes": 2,
+        "apiRoutes": 3,
         "widgets": 0
       }
     },
@@ -168,7 +168,7 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
       }
@@ -540,7 +540,7 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 2,
-        "apiRoutes": 3,
+        "apiRoutes": 4,
         "widgets": 0
       }
     },

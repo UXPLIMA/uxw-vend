@@ -91,6 +91,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/forms/submissions",
+    "key": "custom-forms:api:/forms/submissions",
+    "module": "custom-forms",
+    "method": "ALL"
+  },
+  {
     "path": "/custom-pages",
     "key": "custom-pages:api:/custom-pages",
     "module": "custom-pages",
@@ -267,6 +273,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
   {
     "path": "/seo/settings",
     "key": "seo:api:/seo/settings",
+    "module": "seo",
+    "method": "ALL"
+  },
+  {
+    "path": "/seo/lookup",
+    "key": "seo:api:/seo/lookup",
     "module": "seo",
     "method": "ALL"
   },
@@ -798,9 +810,21 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "isAdmin": true
   },
   {
+    "path": "/admin/form-submissions",
+    "key": "custom-forms:pages/admin/submissions/page.tsx",
+    "module": "custom-forms",
+    "isAdmin": true
+  },
+  {
     "path": "/page/[slug]",
     "key": "custom-pages:pages/public/[slug]/page.tsx",
     "module": "custom-pages"
+  },
+  {
+    "path": "/admin/custom-pages",
+    "key": "custom-pages:pages/admin/page.tsx",
+    "module": "custom-pages",
+    "isAdmin": true
   },
   {
     "path": "/admin/export",

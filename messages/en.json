@@ -133,7 +133,8 @@
     "loginToComment": "Please login to leave a comment",
     "views": "{count} views",
     "share": "Share",
-    "tags": "Tags"
+    "tags": "Tags",
+    "noArticles": "No articles published yet."
   },
   "news": {
     "title": "News",
@@ -497,7 +498,11 @@
     "topicContent": "Write your message...",
     "creating": "Creating...",
     "searchTopics": "Search topics...",
-    "communityDiscussions": "Community discussions"
+    "communityDiscussions": "Community discussions",
+    "loadingTopics": "Loading topics...",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}"
   },
   "googleAuth": {
     "title": "Google Login",
@@ -537,7 +542,13 @@
     "wasHelpful": "Was this article helpful?",
     "yesHelpful": "Yes, helpful",
     "noNotHelpful": "No, not helpful",
-    "thanksFeedback": "Thank you for your feedback!"
+    "thanksFeedback": "Thank you for your feedback!",
+    "articles": "{count} articles",
+    "views": "{count} views",
+    "noArticlesYet": "No articles yet",
+    "noCategories": "No help categories available yet",
+    "loading": "Loading...",
+    "inCategory": "in {category}"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -942,6 +953,31 @@
     "payWithPaypalDesc": "Pay with your PayPal account",
     "payWithCredits": "Store Credits",
     "payWithCreditsDesc": "Pay with your credit balance",
+    "noSubCategories": "No sub-categories. Viewing products directly...",
+    "noCategories": "No store categories found.",
+    "noProducts": "No products found in this category.",
+    "noProductsSearch": "No products found matching your search.",
+    "searchResultsFor": "Results for \"{query}\" ({count})",
+    "searching": "Searching...",
+    "clear": "Clear",
+    "newest": "Newest",
+    "priceLowHigh": "Price: Low to High",
+    "priceHighLow": "Price: High to Low",
+    "mostPopular": "Most Popular",
+    "featured": "Featured",
+    "category": "Category",
+    "creatorCode": "Creator Code",
+    "playerName": "Player Name",
+    "playerNameRequired": "Player name is required",
+    "playerNamePlaceholder": "Your in-game username",
+    "playerNameHelp": "Items will be delivered to this player",
+    "couponDiscount": "Coupon Discount",
+    "creatorDiscount": "Creator Discount ({percent}%)",
+    "secureCheckout": "Secure checkout powered by uxwVend",
+    "items": "Items ({count})",
+    "balance": "Balance: {amount}",
+    "insufficient": "insufficient",
+    "enterCode": "Enter code",
     "features": {
       "fly": "Fly",
       "repair": "Repair",
@@ -1088,7 +1124,19 @@
     "assignTicket": "Assign Ticket",
     "allTickets": "All Tickets",
     "openTickets": "Open Tickets",
-    "closedTickets": "Closed Tickets"
+    "closedTickets": "Closed Tickets",
+    "loginRequired": "Please login to view and create support tickets",
+    "login": "Login",
+    "loadingTickets": "Loading tickets...",
+    "noTicketsYet": "You don't have any support tickets yet",
+    "createFirst": "Create Your First Ticket",
+    "messages": "Messages",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "loginToCreate": "Please login to create a support ticket",
+    "briefDescription": "Brief description of your issue",
+    "describeIssue": "Describe your issue in detail...",
+    "createNewTicket": "Create New Ticket"
   },
   "twoFactorAuth": {
     "title": "Two-Factor Authentication",

@@ -997,8 +997,9 @@ model Suggestion {
   id        String   @id @default(cuid())
   title     String
   content   String   @db.Text
-  status    String   @default("open")
-  upvotes   Int      @default(0)
+  status      String   @default("open")
+  visibility  String   @default("public")
+  upvotes     Int      @default(0)
   authorId  String
   author    User     @relation("Suggestions", fields: [authorId], references: [id])
   createdAt DateTime @default(now())

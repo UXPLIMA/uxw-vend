@@ -23,10 +23,12 @@ export const moduleRouteMap: Record<string, RegExp[]> = {
   "custom-forms": [
     /^\/[a-z]{2}\/form/,
     /^\/[a-z]{2}\/admin\/forms/,
+    /^\/[a-z]{2}\/admin\/form-submissions/,
     /^\/api\/v1\/forms/,
   ],
   "custom-pages": [
     /^\/[a-z]{2}\/page/,
+    /^\/[a-z]{2}\/admin\/custom-pages/,
     /^\/api\/v1\/custom-pages/,
   ],
   "data-tools": [

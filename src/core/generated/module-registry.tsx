@@ -15,7 +15,9 @@ export const ModuleRegistry: Record<string, any> = {
   'changelog:pages/admin/page.tsx': dynamic(() => import('@/modules/changelog/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'custom-forms:pages/admin/submissions/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/submissions/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-pages:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-pages/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'custom-pages:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-pages/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'data-tools:pages/admin/page.tsx': dynamic(() => import('@/modules/data-tools/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'discord-auth:pages/admin/settings/discord-auth/page.tsx': dynamic(() => import('@/modules/discord-auth/pages/admin/settings/discord-auth/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'discord-integration:pages/admin/page.tsx': dynamic(() => import('@/modules/discord-integration/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -151,9 +153,21 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "isAdmin": true
   },
   {
+    "path": "/admin/form-submissions",
+    "key": "custom-forms:pages/admin/submissions/page.tsx",
+    "module": "custom-forms",
+    "isAdmin": true
+  },
+  {
     "path": "/page/[slug]",
     "key": "custom-pages:pages/public/[slug]/page.tsx",
     "module": "custom-pages"
+  },
+  {
+    "path": "/admin/custom-pages",
+    "key": "custom-pages:pages/admin/page.tsx",
+    "module": "custom-pages",
+    "isAdmin": true
   },
   {
     "path": "/admin/export",
@@ -604,6 +618,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/forms/submissions",
+    "key": "custom-forms:api:/forms/submissions",
+    "module": "custom-forms",
+    "method": "ALL"
+  },
+  {
     "path": "/custom-pages",
     "key": "custom-pages:api:/custom-pages",
     "module": "custom-pages",
@@ -780,6 +800,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
   {
     "path": "/seo/settings",
     "key": "seo:api:/seo/settings",
+    "module": "seo",
+    "method": "ALL"
+  },
+  {
+    "path": "/seo/lookup",
+    "key": "seo:api:/seo/lookup",
     "module": "seo",
     "method": "ALL"
   },
@@ -1257,6 +1283,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
   'custom-forms:api:/forms': () => import('@/modules/custom-forms/api/route'),
   'custom-forms:api:/forms/[slug]': () => import('@/modules/custom-forms/api/[slug]/route'),
+  'custom-forms:api:/forms/submissions': () => import('@/modules/custom-forms/api/submissions/route'),
   'custom-pages:api:/custom-pages': () => import('@/modules/custom-pages/api/route'),
   'custom-pages:api:/custom-pages/[slug]': () => import('@/modules/custom-pages/api/[slug]/route'),
   'data-tools:api:/admin/export': () => import('@/modules/data-tools/api/export/route'),
@@ -1287,6 +1314,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'seo:api:/seo/pages': () => import('@/modules/seo/api/pages/route'),
   'seo:api:/seo/pages/[id]': () => import('@/modules/seo/api/pages/[id]/route'),
   'seo:api:/seo/settings': () => import('@/modules/seo/api/settings/route'),
+  'seo:api:/seo/lookup': () => import('@/modules/seo/api/lookup/route'),
   'servers:api:/servers': () => import('@/modules/servers/api/route'),
   'servers:api:/server-status': () => import('@/modules/servers/api/status/route'),
   'servers:api:/rcon': () => import('@/modules/servers/api/rcon/route'),
@@ -1395,6 +1423,7 @@ export const LayoutComponentRegistry: Record<string, any> = {
   'CookieConsent': dynamic(() => import('@/modules/cookie-consent/components/CookieConsent').then((mod: any) => mod.CookieConsent || mod.default || mod), { loading: () => null }),
   'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.CurrencyProvider || mod.default || mod), { loading: () => null }),
   'PopupModal': dynamic(() => import('@/modules/popups/components/PopupModal').then((mod: any) => mod.PopupModal || mod.default || mod), { loading: () => null }),
+  'SeoHead': dynamic(() => import('@/modules/seo/components/SeoHead').then((mod: any) => mod.SeoHead || mod.default || mod), { loading: () => null }),
   'LivePurchaseToast': dynamic(() => import('@/modules/store/components/LivePurchaseToast').then((mod: any) => mod.LivePurchaseToast || mod.default || mod), { loading: () => null }),
 };
 
@@ -1432,6 +1461,11 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
       "/admin/*"
     ],
     "module": "popups"
+  },
+  {
+    "id": "SeoHead",
+    "component": "components/SeoHead.tsx",
+    "module": "seo"
   },
   {
     "id": "LivePurchaseToast",
