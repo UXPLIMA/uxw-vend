@@ -1,8 +1,29 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { AlertTriangle, RotateCcw, Home } from "lucide-react";
+
+function useErrorTranslations() {
+    try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const t = useTranslations("common");
+        return {
+            title: t("error_title") || "Something went wrong",
+            description: t("error_description") || "An unexpected error occurred. Please try again.",
+            retry: t("retry") || "Try Again",
+            goHome: t("go_home") || "Go Home",
+        };
+    } catch {
+        return {
+            title: "Something went wrong",
+            description: "An unexpected error occurred. Please try again.",
+            retry: "Try Again",
+            goHome: "Go Home",
+        };
+    }
+}
 
 export default function Error({
     error,
@@ -11,6 +32,8 @@ export default function Error({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const labels = useErrorTranslations();
+
     useEffect(() => {
         console.error(error);
     }, [error]);
@@ -21,17 +44,17 @@ export default function Error({
                 <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
             <div className="text-center max-w-md">
-                <h2 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-2">{labels.title}</h2>
                 <p className="text-muted-foreground text-sm mb-6">
-                    An unexpected error occurred. Please try again.
+                    {labels.description}
                 </p>
             </div>
             <div className="flex gap-3">
                 <Button onClick={() => reset()}>
-                    <RotateCcw className="w-4 h-4 mr-2" /> Try Again
+                    <RotateCcw className="w-4 h-4 mr-2" /> {labels.retry}
                 </Button>
                 <Button variant="outline" onClick={() => window.location.href = "/"}>
-                    <Home className="w-4 h-4 mr-2" /> Go Home
+                    <Home className="w-4 h-4 mr-2" /> {labels.goHome}
                 </Button>
             </div>
             {process.env.NODE_ENV === "development" && (

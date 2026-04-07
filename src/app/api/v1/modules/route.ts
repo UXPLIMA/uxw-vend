@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
+import path from "path";
 
 const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 
@@ -219,6 +220,22 @@ export async function PATCH(request: NextRequest) {
 
     // Invalidate module states cache (Redis + in-memory)
     await invalidateModuleCache();
+
+    // Execute onEnable/onDisable hooks if defined in manifest
+    const hookKey = wantEnabled ? "onEnable" as const : "onDisable" as const;
+    const hookRelPath = definition.hooks?.[hookKey];
+    if (hookRelPath) {
+        try {
+            const modulesDir = path.join(process.cwd(), "src/modules", moduleId);
+            const hookPath = path.join(modulesDir, hookRelPath);
+            const hookModule = await import(hookPath);
+            if (typeof hookModule.default === "function") {
+                await hookModule.default();
+            }
+        } catch {
+            // Hook execution failed — non-fatal, state change already persisted
+        }
+    }
 
     return NextResponse.json(updated);
 }

@@ -7,6 +7,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
+import { acquireInstallLock } from "@/core/lib/install-lock";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -29,6 +30,12 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+    const releaseLock = await acquireInstallLock();
+    if (!releaseLock) {
+        return NextResponse.json({ error: "Another install is in progress. Please try again." }, { status: 429 });
+    }
+
+    try {
     const { modules } = await request.json();
     if (!Array.isArray(modules) || modules.length === 0) {
         return NextResponse.json({ error: "modules array required" }, { status: 400 });
@@ -109,7 +116,7 @@ export async function POST(request: NextRequest) {
         if (hasSchemaChanges) {
             try {
                 execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], { cwd: process.cwd(), timeout: 60000, stdio: "pipe" });
-                execFileSync("npx", ["prisma", "db", "push", "--accept-data-loss"], { cwd: process.cwd(), timeout: 60000, stdio: "pipe" });
+                execFileSync("npx", ["prisma", "db", "push"], { cwd: process.cwd(), timeout: 60000, stdio: "pipe" });
             } catch { /* will need manual: npm run db:merge && npm run db:push */ }
         }
 
@@ -135,6 +142,9 @@ export async function POST(request: NextRequest) {
         skipped: results.filter(r => r.status === "skipped").length,
         results,
     });
+    } finally {
+        releaseLock();
+    }
 }
 
 // --- Translation helpers (same as single install) ---

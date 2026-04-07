@@ -6,6 +6,7 @@ import {
     ModuleLayoutComponents as LayoutComponentList,
     LayoutComponentRegistry,
 } from "@/core/generated/module-registry";
+import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 function matchPattern(path: string, pattern: string): boolean {
     if (pattern === "/*" || pattern === "*") return true;
@@ -40,7 +41,11 @@ export function ModuleLayoutComponents() {
         <>
             {enabled.map(lc => {
                 const Component = LayoutComponentRegistry[lc.id];
-                return <Component key={lc.id} />;
+                return (
+                    <ModuleErrorBoundary key={lc.id} fallbackLabel={`Failed to load ${lc.id}`}>
+                        <Component />
+                    </ModuleErrorBoundary>
+                );
             })}
         </>
     );

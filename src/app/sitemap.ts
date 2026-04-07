@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 
+// Revalidate sitemap every hour instead of regenerating on every request
+export const revalidate = 3600;
+
 // Core sitemap — only core pages. Module-specific URLs are served by module APIs.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";

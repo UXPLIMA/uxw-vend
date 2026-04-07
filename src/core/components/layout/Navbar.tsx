@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
+import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
@@ -183,7 +184,11 @@ export function Navbar() {
                                 {/* Module navbar components (bell, cart, etc.) — from registry */}
                                 {enabledNavbarComponents.map(nc => {
                                     const NavComp = NavbarComponentRegistry[nc.id];
-                                    return <NavComp key={nc.id} />;
+                                    return (
+                                        <ModuleErrorBoundary key={nc.id} fallbackLabel={`Failed to load ${nc.id}`}>
+                                            <NavComp />
+                                        </ModuleErrorBoundary>
+                                    );
                                 })}
 
                                 <div className="relative" ref={menuRef}>

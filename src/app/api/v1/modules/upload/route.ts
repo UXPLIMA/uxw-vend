@@ -7,6 +7,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
+import { acquireInstallLock } from "@/core/lib/install-lock";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -20,6 +21,11 @@ export async function POST(request: NextRequest) {
     const rl = await rateLimit(`upload:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
     if (!rl.success) {
         return NextResponse.json({ error: "Too many uploads. Try again later." }, { status: 429 });
+    }
+
+    const releaseLock = await acquireInstallLock();
+    if (!releaseLock) {
+        return NextResponse.json({ error: "Another install is in progress. Please try again." }, { status: 429 });
     }
 
     try {
@@ -167,5 +173,7 @@ export async function POST(request: NextRequest) {
             ? 'Operation failed'
             : (err instanceof Error ? err.message : 'Unknown error');
         return NextResponse.json({ error: msg }, { status: 500 });
+    } finally {
+        releaseLock();
     }
 }

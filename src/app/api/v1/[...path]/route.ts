@@ -17,6 +17,13 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
         return NextResponse.json({ error: "API route not found" }, { status: 404 });
     }
 
+    // Enforce method restriction from module manifest
+    if (match.method && match.method !== "ALL" && match.method !== method) {
+        finish(405);
+        recordMetric(method, fullPath, 405, Date.now() - requestStart);
+        return NextResponse.json({ error: `Method ${method} not allowed` }, { status: 405 });
+    }
+
     const loadHandler = ModuleApiRegistry[match.key];
     if (!loadHandler) {
         finish(500, { error: "handler_missing", handler: match.key });

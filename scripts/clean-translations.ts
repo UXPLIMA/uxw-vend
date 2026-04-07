@@ -5,11 +5,36 @@
  *    - Module namespaces (store, forum, etc.) are added directly
  *    - Protected namespaces (admin, common, etc.) are DEEP MERGED, not overwritten
  *
+ * Uses the same deep merge strategy as the install route's safeMerge to ensure
+ * consistent results regardless of which code path runs.
+ *
  * Runs on predev/prebuild to keep translations in sync with installed modules.
  */
 
 import fs from "fs";
 import path from "path";
+
+/** Deep merge two objects recursively — same logic as install route safeMerge */
+function deepMerge(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>
+): Record<string, unknown> {
+    const result = { ...target };
+    for (const [key, value] of Object.entries(source)) {
+        if (
+            typeof value === "object" && value !== null && !Array.isArray(value) &&
+            typeof result[key] === "object" && result[key] !== null && !Array.isArray(result[key])
+        ) {
+            result[key] = deepMerge(
+                result[key] as Record<string, unknown>,
+                value as Record<string, unknown>
+            );
+        } else {
+            result[key] = value;
+        }
+    }
+    return result;
+}
 
 const MESSAGES_DIR = path.join(process.cwd(), "messages");
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
@@ -54,7 +79,10 @@ for (const mod of modules) {
         for (const [key, value] of Object.entries(translations)) {
             if (CORE_NAMESPACES.includes(key)) {
                 // Deep merge into protected namespace (e.g. admin.menu_store)
-                existing[key] = { ...(existing[key] as Record<string, unknown> || {}), ...(value as Record<string, unknown>) };
+                existing[key] = deepMerge(
+                    (existing[key] as Record<string, unknown>) || {},
+                    value as Record<string, unknown>
+                );
             } else {
                 // Module namespace — add directly
                 existing[key] = value;

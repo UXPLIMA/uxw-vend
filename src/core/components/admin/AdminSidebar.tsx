@@ -59,7 +59,6 @@ const coreNavDefs = [
 ] as const;
 
 const coreToolDefs = [
-    { href: "/admin/seo", labelKey: "sidebar_seo", icon: <Search size={18} /> },
     { href: "/admin/users", labelKey: "sidebar_users", icon: <Users size={18} /> },
     { href: "/admin/roles", labelKey: "sidebar_roles", icon: <Shield size={18} /> },
     { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },

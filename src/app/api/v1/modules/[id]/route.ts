@@ -5,6 +5,7 @@ import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
+import { logActivity } from "@/core/lib/activity-log";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -34,6 +35,12 @@ export async function DELETE(
     try {
         // 4. Remove module directory
         await fs.rm(moduleDir, { recursive: true, force: true });
+
+        // Note: Module DB tables are intentionally left intact for data preservation.
+        // If the module is reinstalled later, its data will still be available.
+
+        // Log the uninstall action
+        await logActivity({ action: "module_uninstall", entity: "module", entityId: moduleId, userId: session.user.id });
 
         // 5. Regenerate registry + rebuild
         try {

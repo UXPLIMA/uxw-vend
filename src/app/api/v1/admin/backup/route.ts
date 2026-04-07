@@ -63,7 +63,16 @@ export async function POST(request: NextRequest) {
 
         // 1. Database dump
         try {
-            await execFileAsync("pg_dump", [databaseUrl, "-f", dbDumpPath], { timeout: 120000 });
+            const dbUrl = new URL(databaseUrl);
+            const pgEnv = {
+                ...process.env,
+                PGHOST: dbUrl.hostname,
+                PGPORT: dbUrl.port || "5432",
+                PGUSER: decodeURIComponent(dbUrl.username),
+                PGPASSWORD: decodeURIComponent(dbUrl.password),
+                PGDATABASE: dbUrl.pathname.slice(1),
+            };
+            await execFileAsync("pg_dump", ["-f", dbDumpPath], { timeout: 120000, env: pgEnv });
         } catch {
             await fs.writeFile(dbDumpPath, "-- pg_dump not available. Use: prisma db pull\n");
         }

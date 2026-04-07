@@ -5,6 +5,7 @@ export interface ApiRouteMatch {
     key: string;
     module: string;
     params: Record<string, string>;
+    method?: string;
 }
 
 export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
@@ -18,7 +19,8 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
         return {
             key: exactMatch.key,
             module: exactMatch.module,
-            params: {}
+            params: {},
+            method: exactMatch.method
         };
     }
 
@@ -37,7 +39,8 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
             return {
                 key: route.key,
                 module: route.module,
-                params: match.groups || {}
+                params: match.groups || {},
+                method: route.method
             };
         }
     }

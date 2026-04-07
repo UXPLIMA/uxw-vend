@@ -7,7 +7,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
-import { scheduleBuild } from "@/core/lib/install-lock";
+import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const releaseLock = await acquireInstallLock();
+    if (!releaseLock) {
+        return NextResponse.json({ error: "Another install is in progress. Please try again." }, { status: 429 });
+    }
 
     try {
         const { moduleId, zipFile } = await request.json();
@@ -93,6 +98,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
         }
 
+        // Verify manifest.id matches requested moduleId
+        const manifestData = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+        if (manifestData.id !== moduleId) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json({ error: `Manifest ID '${manifestData.id}' does not match requested module '${moduleId}'` }, { status: 400 });
+        }
+
         // Schema merge (sync, lightweight — just merges files)
         const schemaPath = path.join(targetDir, "schema.prisma");
         const hasSchema = await fs.access(schemaPath).then(() => true).catch(() => false);
@@ -138,6 +150,8 @@ export async function POST(request: NextRequest) {
             ? 'Operation failed'
             : (err instanceof Error ? err.message : 'Unknown error');
         return NextResponse.json({ error: msg }, { status: 500 });
+    } finally {
+        releaseLock();
     }
 }
 

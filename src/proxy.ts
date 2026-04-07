@@ -27,7 +27,9 @@ function getModuleForPath(pathname: string): string | null {
 // Cache for module states (avoid DB calls on every request)
 let moduleCache: Map<string, boolean> = new Map();
 let cacheUpdatedAt = 0;
-const CACHE_TTL = 10 * 1000; // 10 seconds
+// Cache TTL for module status. HTTP fetch is used because middleware runs in
+// edge runtime which cannot import Prisma directly.
+const CACHE_TTL = 30 * 1000; // 30 seconds
 
 async function getModuleEnabled(moduleId: string, request: NextRequest): Promise<boolean> {
     const now = Date.now();
@@ -42,7 +44,7 @@ async function getModuleEnabled(moduleId: string, request: NextRequest): Promise
     const internalUrl = `http://127.0.0.1:${port}/api/v1/modules/status`;
     try {
         const res = await fetch(internalUrl, {
-            headers: { 'x-internal-request': '1' },
+            headers: { 'x-internal-request': process.env.INTERNAL_API_SECRET || '1' },
         });
         if (res.ok) {
             const data = await res.json();

@@ -51,7 +51,7 @@ export function generateBackupCodes(count: number = 8): { codes: string[]; hashe
 }
 
 export function hashBackupCode(code: string): string {
-    return createHash("sha256").update(code.replace("-", "").toUpperCase()).digest("hex");
+    return createHash("sha256").update(code.replaceAll("-", "").toUpperCase()).digest("hex");
 }
 
 export function verifyBackupCode(code: string, hashedCodes: string[]): { valid: boolean; remaining: string[] } {

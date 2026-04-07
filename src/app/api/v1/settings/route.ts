@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { z } from "zod";
+
+const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
+const settingValueSchema = z.string().max(10000, "Setting value too long");
+const settingsBodySchema = z.record(settingKeySchema, settingValueSchema);
 
 // GET /api/v1/settings
 export async function GET() {
@@ -40,12 +45,21 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
 
+    // Validate settings keys and values
+    const parsed = settingsBodySchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json(
+            { error: "Invalid settings data", issues: parsed.error.issues },
+            { status: 400 }
+        );
+    }
+
     // Upsert each setting
-    for (const [key, value] of Object.entries(body)) {
+    for (const [key, value] of Object.entries(parsed.data)) {
         await prisma.setting.upsert({
             where: { key },
-            update: { value: value as string },
-            create: { key, value: value as string },
+            update: { value },
+            create: { key, value },
         });
     }
 

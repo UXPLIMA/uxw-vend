@@ -9,6 +9,7 @@ import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTheme } from "@/core/providers/theme-provider";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { ModuleWidgets, WidgetComponentRegistry, ModuleHomepageSections, HomepageSectionRegistry } from "@/core/generated/module-registry";
+import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 export default function HomePage() {
   const commonT = useTranslations('common');
@@ -47,7 +48,11 @@ export default function HomePage() {
             <div className="space-y-8">
               {enabledSections.map((section) => {
                 const SectionComponent = HomepageSectionRegistry[section.id];
-                return <SectionComponent key={section.id} />;
+                return (
+                    <ModuleErrorBoundary key={section.id} fallbackLabel={`Failed to load ${section.id}`}>
+                        <SectionComponent />
+                    </ModuleErrorBoundary>
+                );
               })}
             </div>
           ) : (
@@ -61,7 +66,11 @@ export default function HomePage() {
             <div className="space-y-5">
               {enabledWidgets.map((w) => {
                 const WidgetComponent = WidgetComponentRegistry[w.id];
-                return <WidgetComponent key={w.id} />;
+                return (
+                    <ModuleErrorBoundary key={w.id} fallbackLabel={`Failed to load ${w.id}`}>
+                        <WidgetComponent />
+                    </ModuleErrorBoundary>
+                );
               })}
             </div>
           ) : null;

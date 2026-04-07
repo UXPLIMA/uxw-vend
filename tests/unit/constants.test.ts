@@ -10,7 +10,6 @@ import {
     BACKUP_CODES_COUNT,
     RATE_LIMIT_AUTH,
     RATE_LIMIT_API,
-    RATE_LIMIT_CHECKOUT,
     RATE_LIMIT_UPLOAD,
     PER_PAGE_USERS,
     PER_PAGE_ACTIVITY,
@@ -54,12 +53,8 @@ describe('Rate limit constants', () => {
         expect(RATE_LIMIT_UPLOAD.maxRequests).toBeLessThanOrEqual(RATE_LIMIT_AUTH.maxRequests);
     });
 
-    it('checkout is strict', () => {
-        expect(RATE_LIMIT_CHECKOUT.maxRequests).toBeLessThanOrEqual(10);
-    });
-
     it('all have positive window', () => {
-        for (const config of [RATE_LIMIT_AUTH, RATE_LIMIT_API, RATE_LIMIT_CHECKOUT, RATE_LIMIT_UPLOAD]) {
+        for (const config of [RATE_LIMIT_AUTH, RATE_LIMIT_API, RATE_LIMIT_UPLOAD]) {
             expect(config.windowMs).toBeGreaterThan(0);
         }
     });

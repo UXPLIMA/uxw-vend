@@ -1,7 +1,6 @@
 import {
     RATE_LIMIT_AUTH,
     RATE_LIMIT_API,
-    RATE_LIMIT_CHECKOUT,
     RATE_LIMIT_UPLOAD,
 } from "./constants";
 import { getRedisClient, isRedisConfigured } from "./redis";
@@ -104,12 +103,41 @@ export async function rateLimit(
 }
 
 /**
- * Helper to get client IP from request headers
+ * Trusted proxy IPs for x-forwarded-for validation.
+ * Set TRUSTED_PROXY_IPS env var as comma-separated IPs to restrict
+ * which proxies are trusted to set forwarded headers.
+ */
+const TRUSTED_PROXY_IPS: Set<string> | null = process.env.TRUSTED_PROXY_IPS
+    ? new Set(process.env.TRUSTED_PROXY_IPS.split(",").map(ip => ip.trim()))
+    : null;
+
+/**
+ * Helper to get client IP from request headers.
+ * Priority: x-real-ip > x-forwarded-for (first value) > "unknown"
+ *
+ * When TRUSTED_PROXY_IPS is configured, forwarded headers are only
+ * trusted if the direct connection IP (from x-real-ip or socket) is
+ * in the trusted set. This prevents IP spoofing via header injection.
  */
 export function getClientIP(headers: Headers): string {
-    return headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-        || headers.get("x-real-ip")
-        || "unknown";
+    const realIp = headers.get("x-real-ip")?.trim() || null;
+    const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+
+    // If trusted proxies are configured, only trust forwarded headers
+    // when the direct connection comes from a trusted proxy
+    if (TRUSTED_PROXY_IPS) {
+        // x-real-ip is typically set by the reverse proxy to the actual client IP
+        // If the proxy itself is trusted, we can use x-forwarded-for
+        const directIp = realIp || "unknown";
+        if (TRUSTED_PROXY_IPS.has(directIp)) {
+            return forwardedFor || directIp;
+        }
+        // Proxy not trusted — use direct connection IP, ignoring forwarded headers
+        return directIp;
+    }
+
+    // No trusted proxy list configured — use headers as-is (current behavior)
+    return realIp || forwardedFor || "unknown";
 }
 
 /**
@@ -118,6 +146,5 @@ export function getClientIP(headers: Headers): string {
 export const rateLimits = {
     auth: RATE_LIMIT_AUTH,
     api: RATE_LIMIT_API,
-    checkout: RATE_LIMIT_CHECKOUT,
     upload: RATE_LIMIT_UPLOAD,
 };

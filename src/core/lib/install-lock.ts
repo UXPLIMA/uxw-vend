@@ -63,7 +63,7 @@ export function scheduleBuild(): void {
 
             // 2. DB push
             try {
-                await execFileAsync("npx", ["prisma", "db", "push", "--accept-data-loss"], {
+                await execFileAsync("npx", ["prisma", "db", "push"], {
                     cwd: process.cwd(), timeout: 60000,
                 });
             } catch { /* db push failed — non-fatal */ }

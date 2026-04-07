@@ -31,17 +31,24 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
     try {
         const { createClient } = eval('require')("redis");
         const c = createClient({ url: REDIS_URL }) as RedisClientType;
-        c.on("error", () => {
+        c.on("error", (...args: unknown[]) => {
+            const err = args[0] as Error | undefined;
+            console.error("[Redis] Connection failed, falling back to in-memory:", err?.message ?? "unknown error");
             client = null;
             failed = true;
+            // Retry after 30 seconds
+            setTimeout(() => { failed = false; }, 30_000);
         });
         await c.connect();
         client = c;
         connecting = false;
         return client;
-    } catch {
+    } catch (err) {
+        console.error("[Redis] Connection failed, falling back to in-memory:", (err as Error).message);
         connecting = false;
         failed = true;
+        // Retry after 30 seconds
+        setTimeout(() => { failed = false; }, 30_000);
         return null;
     }
 }

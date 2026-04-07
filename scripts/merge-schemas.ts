@@ -78,58 +78,43 @@ function discoverModuleSchemas(): ModuleSchema[] {
   const schemas: ModuleSchema[] = [];
   const seen = new Set<string>();
 
-  // 1. Scan module-sources/ (reference schemas for built-in modules)
-  if (fs.existsSync(MODULE_SOURCES_DIR)) {
-    const dirs = fs.readdirSync(MODULE_SOURCES_DIR, { withFileTypes: true });
-    for (const dir of dirs) {
-      if (!dir.isDirectory()) continue;
-      const schemaPath = path.join(MODULE_SOURCES_DIR, dir.name, "schema.prisma");
-      if (!fs.existsSync(schemaPath)) continue;
-
-      const content = fs.readFileSync(schemaPath, "utf-8");
-      const { relations, cleanContent } = extractUserRelations(content);
-      schemas.push({
-        name: dir.name,
-        source: "module-sources",
-        content: cleanContent,
-        userRelations: relations,
-      });
-      seen.add(dir.name);
-    }
-  }
-
-  // 2. Scan src/modules/ (installed modules — may override module-sources)
+  // Only include schemas for modules that are actually installed (exist in src/modules/)
+  const installedModules = new Set<string>();
   if (fs.existsSync(INSTALLED_MODULES_DIR)) {
     const dirs = fs.readdirSync(INSTALLED_MODULES_DIR, { withFileTypes: true });
     for (const dir of dirs) {
-      if (!dir.isDirectory()) continue;
-      const schemaPath = path.join(INSTALLED_MODULES_DIR, dir.name, "schema.prisma");
-      if (!fs.existsSync(schemaPath)) continue;
-
-      const content = fs.readFileSync(schemaPath, "utf-8");
-      const { relations, cleanContent } = extractUserRelations(content);
-
-      if (seen.has(dir.name)) {
-        // Override module-sources version with installed version
-        const idx = schemas.findIndex((s) => s.name === dir.name);
-        if (idx !== -1) {
-          schemas[idx] = {
-            name: dir.name,
-            source: "installed",
-            content: cleanContent,
-            userRelations: relations,
-          };
-        }
-      } else {
-        schemas.push({
-          name: dir.name,
-          source: "installed",
-          content: cleanContent,
-          userRelations: relations,
-        });
-      }
-      seen.add(dir.name);
+      if (dir.isDirectory()) installedModules.add(dir.name);
     }
+  }
+
+  // For each installed module, prefer src/modules/[name]/schema.prisma,
+  // fall back to module-sources/[name]/schema.prisma
+  for (const moduleName of installedModules) {
+    const installedSchema = path.join(INSTALLED_MODULES_DIR, moduleName, "schema.prisma");
+    const sourceSchema = path.join(MODULE_SOURCES_DIR, moduleName, "schema.prisma");
+
+    let schemaPath: string | null = null;
+    let source: "installed" | "module-sources" = "installed";
+
+    if (fs.existsSync(installedSchema)) {
+      schemaPath = installedSchema;
+      source = "installed";
+    } else if (fs.existsSync(sourceSchema)) {
+      schemaPath = sourceSchema;
+      source = "module-sources";
+    }
+
+    if (!schemaPath) continue;
+
+    const content = fs.readFileSync(schemaPath, "utf-8");
+    const { relations, cleanContent } = extractUserRelations(content);
+    schemas.push({
+      name: moduleName,
+      source,
+      content: cleanContent,
+      userRelations: relations,
+    });
+    seen.add(moduleName);
   }
 
   return schemas;
@@ -144,6 +129,33 @@ function mergeSchemas(): string {
 
   const core = fs.readFileSync(CORE_SCHEMA, "utf-8");
   const modules = discoverModuleSchemas();
+
+  // Check for duplicate model names across modules
+  const coreModelNames = new Set<string>();
+  const coreModelMatches = core.matchAll(/^model\s+(\w+)\s*\{/gm);
+  for (const match of coreModelMatches) {
+    coreModelNames.add(match[1]);
+  }
+
+  const modelOwners = new Map<string, string>();
+  for (const mod of modules) {
+    const modelMatches = mod.content.matchAll(/^model\s+(\w+)\s*\{/gm);
+    for (const match of modelMatches) {
+      const modelName = match[1];
+      if (coreModelNames.has(modelName)) {
+        // Skip — core models are allowed to exist
+        continue;
+      }
+      const existingOwner = modelOwners.get(modelName);
+      if (existingOwner && existingOwner !== mod.name) {
+        throw new Error(
+          `Model name collision: '${modelName}' is defined in both '${existingOwner}' and '${mod.name}' modules. ` +
+          `Rename one of the models to resolve the conflict.`
+        );
+      }
+      modelOwners.set(modelName, mod.name);
+    }
+  }
 
   // Collect all user relations
   const allUserRelations: string[] = [];

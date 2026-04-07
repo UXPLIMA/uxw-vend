@@ -110,9 +110,12 @@ export function requirePermission(permission: string) {
 }
 
 /**
- * Check if user is admin
+ * Check if user is admin.
+ * Pass sessionRole from JWT to skip the DB query when possible.
  */
-export async function isAdmin(userId: string): Promise<boolean> {
+export async function isAdmin(userId: string, sessionRole?: string): Promise<boolean> {
+    if (sessionRole === "admin") return true;
+
     const user = await prisma.user.findUnique({
         where: { id: userId },
         include: { role: true },
@@ -122,9 +125,12 @@ export async function isAdmin(userId: string): Promise<boolean> {
 }
 
 /**
- * Check if user is staff (admin or moderator)
+ * Check if user is staff (admin or moderator).
+ * Pass sessionRole from JWT to skip the DB query when possible.
  */
-export async function isStaff(userId: string): Promise<boolean> {
+export async function isStaff(userId: string, sessionRole?: string): Promise<boolean> {
+    if (sessionRole === "admin" || sessionRole === "moderator") return true;
+
     const user = await prisma.user.findUnique({
         where: { id: userId },
         include: { role: true },
