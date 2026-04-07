@@ -515,7 +515,21 @@
     "webhookLogs": "Webhook-Protokolle",
     "deliveryHistory": "Discord Webhook-Verlauf",
     "noLogsYet": "Noch keine Webhook-Protokolle",
-    "event": "Ereignis"
+    "event": "Ereignis",
+    "crud_addNew": "Neu hinzufügen",
+    "crud_cancel": "Abbrechen",
+    "crud_edit": "Bearbeiten",
+    "crud_createNew": "Neu erstellen",
+    "crud_create": "Erstellen",
+    "crud_saveChanges": "Änderungen speichern",
+    "crud_saving": "Speichern...",
+    "crud_delete": "Löschen",
+    "crud_deleted": "Gelöscht",
+    "crud_deleteItem": "Element löschen",
+    "crud_deleteItemConfirm": "Dieses Element löschen?",
+    "crud_deleteItems": "Elemente löschen",
+    "crud_deleteItemsConfirm": "{count} Elemente löschen?",
+    "crud_noItems": "Noch keine Einträge"
   },
   "footer": {
     "quickLinks": "Schnelllinks",

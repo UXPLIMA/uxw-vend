@@ -9,6 +9,7 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 export interface CrudField {
     key: string;
@@ -31,6 +32,7 @@ interface AdminCrudPageProps {
 }
 
 export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField }: AdminCrudPageProps) {
+    const ct = useTranslations("admin");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -117,21 +119,21 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     };
 
     const bulkDelete = async () => {
-        const ok = await confirm({ title: "Delete Items", message: `Delete ${selected.size} items?`, variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: ct("crud_deleteItems"), message: ct("crud_deleteItemsConfirm", { count: selected.size }), variant: "danger", confirmText: ct("crud_delete") });
         if (!ok) return;
         for (const id of selected) {
             await fetch(`${apiPath}/${id}`, { method: "DELETE" });
         }
-        toast.success(`Deleted ${selected.size} items`);
+        toast.success(ct("crud_deleted"));
         setSelected(new Set());
         fetchItems();
     };
 
     const deleteItem = async (id: string) => {
-        const ok = await confirm({ title: "Delete Item", message: "Delete this item?", variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: ct("crud_deleteItem"), message: ct("crud_deleteItemConfirm"), variant: "danger", confirmText: ct("crud_delete") });
         if (!ok) return;
         const res = await fetch(`${apiPath}/${id}`, { method: "DELETE" });
-        if (res.ok) { toast.success("Deleted"); fetchItems(); }
+        if (res.ok) { toast.success(ct("crud_deleted")); fetchItems(); }
         else toast.error("Failed to delete");
     };
 
@@ -187,11 +189,11 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 <div className="flex gap-2">
                     {selected.size > 0 && (
                         <Button variant="destructive" size="sm" onClick={bulkDelete}>
-                            <Trash2 className="w-3 h-3 mr-1" /> Delete {selected.size}
+                            <Trash2 className="w-3 h-3 mr-1" /> {ct("crud_delete")} {selected.size}
                         </Button>
                     )}
                     <Button onClick={() => showForm ? resetForm() : setShowForm(true)}>
-                        {showForm ? <><X className="w-4 h-4 mr-2" /> Cancel</> : <><Plus className="w-4 h-4 mr-2" /> Add New</>}
+                        {showForm ? <><X className="w-4 h-4 mr-2" /> {ct("crud_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {ct("crud_addNew")}</>}
                     </Button>
                 </div>
             </div>
@@ -199,7 +201,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             {showForm && (
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>{editingId ? "Edit" : "Create New"}</CardTitle>
+                        <CardTitle>{editingId ? ct("crud_edit") : ct("crud_createNew")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -212,7 +214,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                 ))}
                             </div>
                             <Button type="submit" disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : editingId ? "Save Changes" : "Create"}
+                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}
                             </Button>
                         </form>
                     </CardContent>
@@ -222,7 +224,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             <Card>
                 <CardContent className="p-0">
                     {items.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No items yet</p>
+                        <p className="text-muted-foreground text-center py-8">{ct("crud_noItems")}</p>
                     ) : (
                         <div className="divide-y">
                             {paginatedItems.map((item) => (

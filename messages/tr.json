@@ -515,7 +515,21 @@
     "webhookLogs": "Webhook Logları",
     "deliveryHistory": "Discord webhook gönderim geçmişi",
     "noLogsYet": "Henüz webhook logu yok",
-    "event": "Olay"
+    "event": "Olay",
+    "crud_addNew": "Yeni Ekle",
+    "crud_cancel": "İptal",
+    "crud_edit": "Düzenle",
+    "crud_createNew": "Yeni Oluştur",
+    "crud_create": "Oluştur",
+    "crud_saveChanges": "Değişiklikleri Kaydet",
+    "crud_saving": "Kaydediliyor...",
+    "crud_delete": "Sil",
+    "crud_deleted": "Silindi",
+    "crud_deleteItem": "Öğeyi Sil",
+    "crud_deleteItemConfirm": "Bu öğeyi silmek istediğinizden emin misiniz?",
+    "crud_deleteItems": "Öğeleri Sil",
+    "crud_deleteItemsConfirm": "{count} öğeyi silmek istediğinizden emin misiniz?",
+    "crud_noItems": "Henüz öğe yok"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

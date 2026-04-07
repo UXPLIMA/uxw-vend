@@ -515,7 +515,21 @@
     "webhookLogs": "Webhook Logs",
     "deliveryHistory": "Discord webhook delivery history",
     "noLogsYet": "No webhook logs yet",
-    "event": "Event"
+    "event": "Event",
+    "crud_addNew": "Добавить",
+    "crud_cancel": "Отмена",
+    "crud_edit": "Редактировать",
+    "crud_createNew": "Создать",
+    "crud_create": "Создать",
+    "crud_saveChanges": "Сохранить изменения",
+    "crud_saving": "Сохранение...",
+    "crud_delete": "Удалить",
+    "crud_deleted": "Удалено",
+    "crud_deleteItem": "Удалить элемент",
+    "crud_deleteItemConfirm": "Удалить этот элемент?",
+    "crud_deleteItems": "Удалить элементы",
+    "crud_deleteItemsConfirm": "Удалить {count} элементов?",
+    "crud_noItems": "Пока нет элементов"
   },
   "footer": {
     "quickLinks": "Быстрые ссылки",
