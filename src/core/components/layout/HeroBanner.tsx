@@ -16,13 +16,13 @@ export function HeroBanner() {
     const bgImage = (settings.hero_background_image as string) || "/background1.png";
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip || "";
-    const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl || "";
+    const communityUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl || "";
     const siteName = (settings.site_name as string) || serverConfig.name;
     const playerCount = serverConfig.onlineCount;
     const height = parseInt((settings.hero_height as string) || "260");
 
     const showServerIp = !!serverIp;
-    const showDiscord = !!discordUrl;
+    const showCommunity = !!communityUrl;
 
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
@@ -59,13 +59,13 @@ export function HeroBanner() {
                         <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" unoptimized priority />
                     </div>
 
-                    {showDiscord && (
-                        <Link href={discordUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-[#5865F2]/20 transition-colors absolute right-0">
+                    {showCommunity && (
+                        <Link href={communityUrl} target="_blank" className="hidden md:flex items-center gap-3 glass-light px-4 py-3 rounded-lg hover:bg-primary/20 transition-colors absolute right-0">
                             <div className="text-right">
                                 <div className="text-gray-400 text-xs uppercase tracking-wider font-semibold">{t('joinCommunity')}</div>
-                                <div className="text-[#5865F2] font-bold">{t('discordServer')}</div>
+                                <div className="text-primary font-bold">{t('joinCommunity')}</div>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-[#5865F2]/20 text-[#5865F2] flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
                                 <Crown size={20} />
                             </div>
                         </Link>

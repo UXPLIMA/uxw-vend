@@ -15,7 +15,7 @@ export default function PixelCraftHeroBanner() {
     const bgImage = (settings.hero_background_image as string) || "/background1.png";
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
-    const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
+    const discordUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl;
 
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 

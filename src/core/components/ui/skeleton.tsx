@@ -35,12 +35,15 @@ export function SkeletonCard() {
 export function SkeletonSidebar() {
     return (
         <div className="space-y-5">
-            {/* Discord Widget Skeleton */}
-            <Skeleton className="h-[300px] w-full rounded-xl" />
-
-            {/* Featured Product Skeleton */}
+            {/* Generic widget skeleton */}
             <div className="bg-card rounded-xl border border-border p-5">
                 <Skeleton className="h-5 w-32 mb-4" />
+                <Skeleton className="h-[200px] w-full rounded-lg" />
+            </div>
+
+            {/* Generic card skeleton */}
+            <div className="bg-card rounded-xl border border-border p-5">
+                <Skeleton className="h-5 w-28 mb-4" />
                 <div className="flex flex-col items-center">
                     <Skeleton className="w-20 h-20 rounded-lg mb-3" />
                     <Skeleton className="h-4 w-24 mb-1" />
@@ -49,14 +52,7 @@ export function SkeletonSidebar() {
                 </div>
             </div>
 
-            {/* Payment Goal Skeleton */}
-            <div className="bg-card rounded-xl border border-border p-5">
-                <Skeleton className="h-5 w-28 mb-4" />
-                <Skeleton className="h-3 w-full rounded-full mb-2" />
-                <Skeleton className="h-4 w-32 mx-auto" />
-            </div>
-
-            {/* Top Buyers Skeleton */}
+            {/* Generic list skeleton */}
             <div className="bg-card rounded-xl border border-border p-5">
                 <div className="flex justify-between mb-4">
                     <Skeleton className="h-5 w-24" />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
-import { Search, User, Package, ShoppingCart, Ticket, X } from "lucide-react";
+import { Search, User, Package, X } from "lucide-react";
 
 interface SearchResult {
     type: string;
@@ -14,9 +14,6 @@ interface SearchResult {
 
 const typeIcons: Record<string, typeof User> = {
     user: User,
-    product: Package,
-    order: ShoppingCart,
-    ticket: Ticket,
 };
 
 export function AdminSearch() {
@@ -53,7 +50,7 @@ export function AdminSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => results.length > 0 && setOpen(true)}
-                    placeholder="Search users, products, orders..."
+                    placeholder="Search..."
                     className="w-full pl-9 pr-8 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
                 {query && (

@@ -112,7 +112,7 @@ export function Navbar() {
         .filter(nc => NavbarComponentRegistry[nc.id]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
-    const isStaffUser = ["admin", "moderator", "staff"].includes(session?.user?.role || "");
+    const isStaffUser = (session?.user?.rolePriority ?? 0) >= 50;
 
     return (
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">

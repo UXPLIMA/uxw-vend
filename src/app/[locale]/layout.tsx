@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     default: "uxwVend - Game Server Platform",
     template: "%s | uxwVend",
   },
-  description: "Open source game server management platform with store, forum, blog, and support system.",
-  keywords: ["game server", "minecraft", "fivem", "open source"],
+  description: "Open source modular platform with a plugin-based marketplace architecture.",
+  keywords: ["open source", "modular platform", "plugin marketplace"],
   manifest: "/manifest.json",
   authors: [{ name: "uxwVend" }],
   openGraph: {

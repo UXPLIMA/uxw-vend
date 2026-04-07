@@ -5,8 +5,7 @@ export const serverConfig = {
     name: process.env.SITE_NAME || "uxwVend",
     ip: process.env.SERVER_IP || "play.example.com",
     onlineCount: 0,
-    discordUrl: process.env.DISCORD_URL || "",
-    discordWidgetId: process.env.DISCORD_WIDGET_ID || "",
+    communityUrl: process.env.COMMUNITY_URL || "",
     description: process.env.SITE_DESCRIPTION || "",
     email: process.env.SITE_EMAIL || "",
     social: {

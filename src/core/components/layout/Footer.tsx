@@ -66,7 +66,7 @@ export function Footer() {
     const siteName = (settings.site_name as string) || serverConfig.name;
     const siteDescription = (settings.site_description as string) || serverConfig.description;
     const siteEmail = (settings.site_email as string) || serverConfig.email;
-    const discordUrl = (settings.hero_discord_url as string) || serverConfig.discordUrl;
+    const communityUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl;
 
     // Build path→module map from registry — zero hardcoded module names
     const pathToModule: Record<string, string> = {};
@@ -130,8 +130,8 @@ export function Footer() {
                                     yt
                                 </a>
                             )}
-                            {discordUrl && (
-                                <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-indigo-600 flex items-center justify-center transition-colors">
+                            {communityUrl && (
+                                <a href={communityUrl} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors">
                                     <Mail className="w-4 h-4" />
                                 </a>
                             )}

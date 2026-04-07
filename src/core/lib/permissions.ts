@@ -130,5 +130,5 @@ export async function isStaff(userId: string): Promise<boolean> {
         include: { role: true },
     });
 
-    return ["admin", "moderator", "staff"].includes(user?.role?.name || "");
+    return (user?.role?.priority || 0) >= 50;
 }

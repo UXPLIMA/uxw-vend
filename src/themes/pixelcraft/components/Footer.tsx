@@ -89,7 +89,7 @@ export default function PixelCraftFooter() {
                                     {serverConfig.ip.toUpperCase()}
                                 </p>
                             </div>
-                            <a href={serverConfig.discordUrl} target="_blank" rel="noopener noreferrer"
+                            <a href={serverConfig.communityUrl} target="_blank" rel="noopener noreferrer"
                                 className="block p-3 rounded-sm text-center text-sm font-bold uppercase transition-colors"
                                 style={{ background: "#5865F2", color: "#fff", borderBottom: "3px solid #4752c4" }}>
                                 Discord

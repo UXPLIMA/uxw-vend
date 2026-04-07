@@ -1,14 +1,15 @@
-import { Resend } from "resend";
-
 const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
 
-let _resend: Resend | null = null;
+let _resend: unknown = null;
 
-function getResend(): Resend | null {
+async function getResend(): Promise<{ emails: { send: (opts: Record<string, unknown>) => Promise<unknown> } } | null> {
     if (!process.env.RESEND_API_KEY) return null;
-    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
-    return _resend;
+    if (!_resend) {
+        const { Resend } = await import("resend");
+        _resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return _resend as { emails: { send: (opts: Record<string, unknown>) => Promise<unknown> } };
 }
 
 function getEmailEnabled(): boolean {
@@ -21,7 +22,8 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
         return;
     }
 
-    await getResend()!.emails.send({
+    const resend = await getResend();
+    await resend!.emails.send({
         from: `${APP_NAME} <${FROM_EMAIL}>`,
         to: email,
         subject: `Reset your ${APP_NAME} password`,
@@ -47,7 +49,8 @@ export async function sendWelcomeEmail(email: string, username: string) {
         return;
     }
 
-    await getResend()!.emails.send({
+    const resend = await getResend();
+    await resend!.emails.send({
         from: `${APP_NAME} <${FROM_EMAIL}>`,
         to: email,
         subject: `Welcome to ${APP_NAME}!`,
@@ -69,7 +72,8 @@ export async function sendVerificationEmail(email: string, verifyUrl: string) {
         return;
     }
 
-    await getResend()!.emails.send({
+    const resend = await getResend();
+    await resend!.emails.send({
         from: `${APP_NAME} <${FROM_EMAIL}>`,
         to: email,
         subject: `Verify your ${APP_NAME} email`,
@@ -85,4 +89,3 @@ export async function sendVerificationEmail(email: string, verifyUrl: string) {
         `,
     });
 }
-

@@ -1,11 +1,35 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Discord from "next-auth/providers/discord";
-import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
-import { verifyToken, verifyBackupCode } from "./two-factor";
+
+import type { Provider } from "next-auth/providers";
+
+// Build OAuth providers conditionally — modules set env vars, providers activate
+const oauthProviders: Provider[] = [];
+
+if (process.env.AUTH_DISCORD_ID) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Discord = require("next-auth/providers/discord").default;
+    oauthProviders.push(
+        Discord({
+            clientId: process.env.AUTH_DISCORD_ID,
+            clientSecret: process.env.AUTH_DISCORD_SECRET,
+        })
+    );
+}
+
+if (process.env.AUTH_GOOGLE_ID) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Google = require("next-auth/providers/google").default;
+    oauthProviders.push(
+        Google({
+            clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET,
+        })
+    );
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -51,8 +75,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                // 2FA check
-                if (user.twoFactorEnabled && user.twoFactorSecret) {
+                // 2FA check — only if fields exist on user (added by two-factor-auth module)
+                const userAny = user as Record<string, unknown>;
+                if (userAny.twoFactorEnabled && userAny.twoFactorSecret) {
+                    // Dynamic import to avoid hard dependency on two-factor module
+                    const { verifyToken, verifyBackupCode } = await import("./two-factor");
                     const twoFactorCode = credentials.twoFactorCode as string;
 
                     if (!twoFactorCode) {
@@ -60,11 +87,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     }
 
                     // Try TOTP first, then backup code
-                    const isValidTotp = verifyToken(user.twoFactorSecret, twoFactorCode);
+                    const isValidTotp = verifyToken(userAny.twoFactorSecret as string, twoFactorCode);
 
                     if (!isValidTotp) {
                         // Try backup code
-                        const backupCodes: string[] = user.backupCodes ? JSON.parse(user.backupCodes) : [];
+                        const backupCodes: string[] = userAny.backupCodes ? JSON.parse(userAny.backupCodes as string) : [];
                         const { valid, remaining } = verifyBackupCode(twoFactorCode, backupCodes);
 
                         if (!valid) {
@@ -74,7 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         // Update remaining backup codes
                         await prisma.user.update({
                             where: { id: user.id },
-                            data: { backupCodes: JSON.stringify(remaining) },
+                            data: { backupCodes: JSON.stringify(remaining) } as Record<string, unknown>,
                         });
                     }
                 }
@@ -85,17 +112,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     name: user.username,
                     image: user.avatar,
                     role: user.role?.name || "member",
+                    rolePriority: user.role?.priority ?? 0,
                 };
             },
         }),
-        Discord({
-            clientId: process.env.AUTH_DISCORD_ID,
-            clientSecret: process.env.AUTH_DISCORD_SECRET,
-        }),
-        Google({
-            clientId: process.env.AUTH_GOOGLE_ID,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET,
-        }),
+        ...oauthProviders,
     ],
     events: {
         async createUser({ user }) {
@@ -116,6 +137,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (user) {
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
+                token.rolePriority = (user as { rolePriority?: number }).rolePriority ?? 0;
             }
             // Refresh role + ban status from DB on every token refresh
             if (trigger === "update" || !token.role) {
@@ -129,6 +151,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         return null as unknown as typeof token;
                     }
                     token.role = dbUser.role?.name || "member";
+                    token.rolePriority = dbUser.role?.priority ?? 0;
                 }
             }
             return token;
@@ -137,6 +160,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (token && session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
+                session.user.rolePriority = (token.rolePriority as number) ?? 0;
             }
             return session;
         },
@@ -152,11 +176,12 @@ declare module "next-auth" {
             name: string;
             image?: string;
             role: string;
+            rolePriority: number;
         };
     }
 
     interface User {
         role?: string;
+        rolePriority?: number;
     }
 }
-
