@@ -71,7 +71,7 @@ const coreToolDefs = [
 interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
-    modules?: { menu?: { path: string; label: string; icon?: string }[] }[];
+    modules?: { id: string; menu?: { path: string; label: string; icon?: string }[] }[];
 }
 
 const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -107,14 +107,19 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
         href: d.href, label: t(d.labelKey), icon: d.icon,
     }));
 
-    // Build module menu items from enabled module manifests only
+    // Build module menu items — try translated label, fall back to manifest label
     const moduleNavItems: NavItem[] = modules.flatMap(module => {
         if (!module.menu) return [];
-        return module.menu.map((menuItem) => ({
-            href: `/admin${menuItem.path.startsWith('/') ? menuItem.path : '/' + menuItem.path}`,
-            label: menuItem.label,
-            icon: <DynamicIcon name={menuItem.icon || "Puzzle"} />,
-        }));
+        return module.menu.map((menuItem) => {
+            // Try to get translated menu label from module's translation namespace
+            let label = menuItem.label;
+            try { const translated = t(`menu_${module.id}`); if (translated && !translated.startsWith("admin.menu_")) label = translated; } catch { /* fallback */ }
+            return {
+                href: `/admin${menuItem.path.startsWith('/') ? menuItem.path : '/' + menuItem.path}`,
+                label,
+                icon: <DynamicIcon name={menuItem.icon || "Puzzle"} />,
+            };
+        });
     });
 
     // Combine: core nav + module menus + core tools
