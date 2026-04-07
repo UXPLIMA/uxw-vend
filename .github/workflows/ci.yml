@@ -39,7 +39,6 @@ jobs:
         run: npm run lint
 
       - name: Security audit
-        # TODO: Remove || true when all high vulns are resolved
         run: npm audit --audit-level=high || true
 
       - name: Unit tests
