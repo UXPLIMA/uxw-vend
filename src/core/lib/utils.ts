@@ -73,9 +73,23 @@ export function generateId(length = 12): string {
 /**
  * Generate a slug from string
  */
+// Diacritic transliteration map. Turkish + common European diacritics go first
+// since they don't all decompose with NFD (ı, ğ, ş don't).
+const DIACRITIC_MAP: Record<string, string> = {
+    "ı": "i", "İ": "i", "ğ": "g", "Ğ": "g", "ş": "s", "Ş": "s",
+    "ü": "u", "Ü": "u", "ö": "o", "Ö": "o", "ç": "c", "Ç": "c",
+    "ß": "ss", "æ": "ae", "Æ": "ae", "œ": "oe", "Œ": "oe",
+    "ñ": "n", "Ñ": "n", "ł": "l", "Ł": "l",
+};
+
 export function slugify(text: string): string {
     return text
         .toString()
+        // Transliterate explicit map first (handles Turkish ı/ğ/ş/etc.)
+        .replace(/[ıİğĞşŞüÜöÖçÇßæÆœŒñÑłŁ]/g, (c) => DIACRITIC_MAP[c] || c)
+        // Strip remaining diacritics via NFD decomposition (é → e, ñ → n, etc.)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
         .trim()
         .replace(/\s+/g, "-")
