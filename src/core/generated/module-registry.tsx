@@ -1397,13 +1397,13 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
 
 // Widget component registry
 export const WidgetComponentRegistry: Record<string, any> = {
-  'SliderWidget': dynamic(() => import('@/modules/slider/widgets/slider-widget').then((mod: any) => mod.SliderWidget || mod.default || mod), { loading: () => null }),
-  'DiscordWidget': dynamic(() => import('@/modules/discord-widget/widgets/discord-widget').then((mod: any) => mod.DiscordWidget || mod.default || mod), { loading: () => null }),
+  'SliderWidget': dynamic(() => import('@/modules/slider/widgets/slider-widget').then((mod: any) => mod.SliderWidget || mod.SliderWidget || mod.default || mod), { loading: () => null }),
+  'DiscordWidget': dynamic(() => import('@/modules/discord-widget/widgets/discord-widget').then((mod: any) => mod.DiscordWidget || mod.DiscordWidget || mod.default || mod), { loading: () => null }),
 };
 
 // Homepage section component registry
 export const HomepageSectionRegistry: Record<string, any> = {
-  'BlogNewsSection': dynamic(() => import('@/modules/blog/components/BlogNewsSection').then((mod: any) => mod.BlogNewsSection || mod.default || mod), { loading: () => null }),
+  'BlogNewsSection': dynamic(() => import('@/modules/blog/components/BlogNewsSection').then((mod: any) => mod.BlogNewsSection || mod.BlogNewsSection || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = [
@@ -1418,13 +1418,13 @@ export const ModuleHomepageSections: { id: string; type: string; component: stri
 
 // Layout component registry (rendered on every page)
 export const LayoutComponentRegistry: Record<string, any> = {
-  'GoogleAnalytics': dynamic(() => import('@/modules/analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
-  'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
-  'CookieConsent': dynamic(() => import('@/modules/cookie-consent/components/CookieConsent').then((mod: any) => mod.CookieConsent || mod.default || mod), { loading: () => null }),
-  'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.CurrencyProvider || mod.default || mod), { loading: () => null }),
-  'PopupModal': dynamic(() => import('@/modules/popups/components/PopupModal').then((mod: any) => mod.PopupModal || mod.default || mod), { loading: () => null }),
-  'SeoHead': dynamic(() => import('@/modules/seo/components/SeoHead').then((mod: any) => mod.SeoHead || mod.default || mod), { loading: () => null }),
-  'LivePurchaseToast': dynamic(() => import('@/modules/store/components/LivePurchaseToast').then((mod: any) => mod.LivePurchaseToast || mod.default || mod), { loading: () => null }),
+  'GoogleAnalytics': dynamic(() => import('@/modules/analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
+  'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
+  'CookieConsent': dynamic(() => import('@/modules/cookie-consent/components/CookieConsent').then((mod: any) => mod.CookieConsent || mod.CookieConsent || mod.default || mod), { loading: () => null }),
+  'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.Context || mod.CurrencyProvider || mod.default || mod), { loading: () => null }),
+  'PopupModal': dynamic(() => import('@/modules/popups/components/PopupModal').then((mod: any) => mod.PopupModal || mod.PopupModal || mod.default || mod), { loading: () => null }),
+  'SeoHead': dynamic(() => import('@/modules/seo/components/SeoHead').then((mod: any) => mod.SeoHead || mod.SeoHead || mod.default || mod), { loading: () => null }),
+  'LivePurchaseToast': dynamic(() => import('@/modules/store/components/LivePurchaseToast').then((mod: any) => mod.LivePurchaseToast || mod.LivePurchaseToast || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = [
@@ -1476,8 +1476,8 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
 
 // Navbar component registry (rendered in navbar right side)
 export const NavbarComponentRegistry: Record<string, any> = {
-  'NotificationBell': dynamic(() => import('@/modules/notifications/components/NotificationBell').then((mod: any) => mod.NotificationBell || mod.default || mod), { loading: () => null }),
-  'CartIcon': dynamic(() => import('@/modules/store/components/CartIcon').then((mod: any) => mod.CartIcon || mod.default || mod), { loading: () => null }),
+  'NotificationBell': dynamic(() => import('@/modules/notifications/components/NotificationBell').then((mod: any) => mod.NotificationBell || mod.NotificationBell || mod.default || mod), { loading: () => null }),
+  'CartIcon': dynamic(() => import('@/modules/store/components/CartIcon').then((mod: any) => mod.CartIcon || mod.CartIcon || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = [
@@ -1516,7 +1516,7 @@ export const ModuleNavLinks: { label: string; href: string; icon?: string; posit
 
 export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = [];
 
-export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = [
+export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = [
   {
     "id": "articles",
     "label": "Articles",
@@ -1524,6 +1524,7 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/blog/articles",
     "color": "text-indigo-600",
     "statKey": "articles",
+    "labelKey": "dashboard_articles",
     "module": "blog"
   },
   {
@@ -1533,6 +1534,7 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/forum/categories",
     "color": "text-teal-600",
     "statKey": "topics",
+    "labelKey": "dashboard_topics",
     "module": "forum"
   },
   {
@@ -1542,6 +1544,7 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/store/orders",
     "color": "text-green-600",
     "statKey": "revenue",
+    "labelKey": "dashboard_revenue",
     "module": "store"
   },
   {
@@ -1551,6 +1554,7 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/store/orders",
     "color": "text-blue-600",
     "statKey": "orders",
+    "labelKey": "dashboard_orders",
     "module": "store"
   },
   {
@@ -1560,6 +1564,7 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/store/products",
     "color": "text-purple-600",
     "statKey": "products",
+    "labelKey": "dashboard_products",
     "module": "store"
   },
   {
@@ -1569,16 +1574,17 @@ export const ModuleDashboardCards: { id: string; label: string; icon: string; hr
     "href": "/admin/tickets",
     "color": "text-red-600",
     "statKey": "tickets",
+    "labelKey": "dashboard_tickets",
     "module": "tickets"
   }
 ];
 
 // Profile tab component registry
 export const ProfileTabRegistry: Record<string, any> = {
-  'ProfileOrdersTab': dynamic(() => import('@/modules/store/components/ProfileOrdersTab').then((mod: any) => mod.ProfileOrdersTab || mod.default || mod), { loading: () => null }),
-  'ProfileChestTab': dynamic(() => import('@/modules/store/components/ProfileChestTab').then((mod: any) => mod.ProfileChestTab || mod.default || mod), { loading: () => null }),
-  'referrals': dynamic(() => import('@/modules/referral/components/ReferralTab').then((mod: any) => mod.referrals || mod.default || mod), { loading: () => null }),
-  'ProfileSecurityTab': dynamic(() => import('@/modules/two-factor-auth/components/ProfileSecurityTab').then((mod: any) => mod.ProfileSecurityTab || mod.default || mod), { loading: () => null }),
+  'ProfileOrdersTab': dynamic(() => import('@/modules/store/components/ProfileOrdersTab').then((mod: any) => mod.ProfileOrdersTab || mod.ProfileOrdersTab || mod.default || mod), { loading: () => null }),
+  'ProfileChestTab': dynamic(() => import('@/modules/store/components/ProfileChestTab').then((mod: any) => mod.ProfileChestTab || mod.ProfileChestTab || mod.default || mod), { loading: () => null }),
+  'referrals': dynamic(() => import('@/modules/referral/components/ReferralTab').then((mod: any) => mod.ReferralTab || mod.referrals || mod.default || mod), { loading: () => null }),
+  'ProfileSecurityTab': dynamic(() => import('@/modules/two-factor-auth/components/ProfileSecurityTab').then((mod: any) => mod.ProfileSecurityTab || mod.ProfileSecurityTab || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = [

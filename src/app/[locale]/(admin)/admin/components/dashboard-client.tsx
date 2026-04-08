@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket, Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -33,6 +34,7 @@ const badgeColors: Record<string, string> = {
 interface DashboardCard {
     id: string;
     label: string;
+    labelKey?: string;
     icon: string;
     href: string;
     color: string;
@@ -53,12 +55,14 @@ interface SectionItem {
 interface DashboardSection {
     id: string;
     title: string;
+    titleKey?: string;
     viewAllHref?: string;
     items: SectionItem[];
 }
 
 export function DashboardClient() {
     const modules = useAllModules();
+    const t = useTranslations("admin");
     const [cards, setCards] = useState<DashboardCard[]>([]);
     const [stats, setStats] = useState<Record<string, string | number>>({});
     const [sections, setSections] = useState<DashboardSection[]>([]);
@@ -128,6 +132,17 @@ export function DashboardClient() {
         return value || 0;
     };
 
+    // Translate a label using labelKey if present, otherwise fall back to raw label
+    const translateLabel = (raw: string, key?: string): string => {
+        if (!key) return raw;
+        try {
+            const translated = t(key);
+            return translated && translated !== key ? translated : raw;
+        } catch {
+            return raw;
+        }
+    };
+
     return (
         <>
             {/* Stat cards from modules */}
@@ -138,7 +153,7 @@ export function DashboardClient() {
                         <Card className="hover:shadow-md transition-shadow cursor-pointer">
                             <CardContent className="p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{card.label}</span>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{translateLabel(card.label, card.labelKey)}</span>
                                     <Icon className={`w-4 h-4 ${card.color}`} />
                                 </div>
                                 <div className="text-2xl font-bold">{formatValue(card.statKey, stats[card.statKey])}</div>
@@ -158,15 +173,15 @@ export function DashboardClient() {
                         <Card key={section.id}>
                             <CardHeader>
                                 <div className="flex justify-between items-center">
-                                    <CardTitle className="text-base">{section.title}</CardTitle>
+                                    <CardTitle className="text-base">{translateLabel(section.title, section.titleKey)}</CardTitle>
                                     {section.viewAllHref && (
-                                        <Link href={section.viewAllHref} className="text-xs text-primary hover:underline">View All</Link>
+                                        <Link href={section.viewAllHref} className="text-xs text-primary hover:underline">{t("dashboard_viewAll")}</Link>
                                     )}
                                 </div>
                             </CardHeader>
                             <CardContent>
                                 {section.items.length === 0 ? (
-                                    <p className="text-muted-foreground text-center py-4 text-sm">No data</p>
+                                    <p className="text-muted-foreground text-center py-4 text-sm">{t("dashboard_noData")}</p>
                                 ) : (
                                     <div className="space-y-2">
                                         {section.items.map((item) => {
@@ -202,7 +217,7 @@ export function DashboardClient() {
 
             {/* Charts */}
             <div className="col-span-full mt-4">
-                <h2 className="text-xl font-bold mb-4">Analytics</h2>
+                <h2 className="text-xl font-bold mb-4">{t("dashboard_analytics")}</h2>
                 <DashboardCharts />
             </div>
 

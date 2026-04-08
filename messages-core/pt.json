@@ -22,7 +22,9 @@
     "blog": "Blog",
     "forum": "Forum",
     "support": "Suporte",
-    "store": "Loja"
+    "store": "Loja",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel"
   },
   "hero": {
     "playersOnline": "{count} Jogadores online",
@@ -204,7 +206,20 @@
     "crud_deleteItemConfirm": "Excluir este item?",
     "crud_deleteItems": "Excluir itens",
     "crud_deleteItemsConfirm": "Excluir {count} itens?",
-    "crud_noItems": "Nenhum item ainda"
+    "crud_noItems": "Nenhum item ainda",
+    "dashboard_articles": "Articles",
+    "dashboard_topics": "Topics",
+    "dashboard_revenue": "Revenue",
+    "dashboard_orders": "Orders",
+    "dashboard_products": "Products",
+    "dashboard_tickets": "Tickets",
+    "dashboard_openTickets": "Open Tickets",
+    "dashboard_recentOrders": "Recent Orders",
+    "dashboard_latestForumTopics": "Latest Forum Topics",
+    "dashboard_newUsers": "New Users",
+    "dashboard_7days": "7 Days",
+    "dashboard_30days": "30 Days",
+    "dashboard_90days": "90 Days"
   },
   "footer": {
     "quickLinks": "Links rápidos",
@@ -217,6 +232,27 @@
     "allRightsReserved": "Todos os direitos reservados.",
     "builtWith": "Feito com",
     "by": "por"
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Profile Settings",
+    "username": "Username",
+    "avatarUrl": "Avatar URL",
+    "email": "Email",
+    "emailCannotChange": "Email cannot be changed",
+    "memberSince": "Member since",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "failedToUpdate": "Failed to update profile",
+    "somethingWentWrong": "Something went wrong",
+    "accounts": "Accounts",
+    "linkedAccounts": "Linked Accounts",
+    "unlink": "Unlink",
+    "linkGameAccount": "Link Game Account",
+    "gameUsername": "Game username",
+    "link": "Link",
+    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them."
   },
   "auth": {
     "loginTitle": "Bem-vindo de volta",

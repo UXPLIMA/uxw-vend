@@ -22,7 +22,9 @@
     "blog": "Блог",
     "forum": "Форум",
     "support": "Поддержка",
-    "store": "Магазин"
+    "store": "Магазин",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel"
   },
   "hero": {
     "playersOnline": "{count} Игроков онлайн",
@@ -204,7 +206,20 @@
     "crud_deleteItemConfirm": "Удалить этот элемент?",
     "crud_deleteItems": "Удалить элементы",
     "crud_deleteItemsConfirm": "Удалить {count} элементов?",
-    "crud_noItems": "Пока нет элементов"
+    "crud_noItems": "Пока нет элементов",
+    "dashboard_articles": "Articles",
+    "dashboard_topics": "Topics",
+    "dashboard_revenue": "Revenue",
+    "dashboard_orders": "Orders",
+    "dashboard_products": "Products",
+    "dashboard_tickets": "Tickets",
+    "dashboard_openTickets": "Open Tickets",
+    "dashboard_recentOrders": "Recent Orders",
+    "dashboard_latestForumTopics": "Latest Forum Topics",
+    "dashboard_newUsers": "New Users",
+    "dashboard_7days": "7 Days",
+    "dashboard_30days": "30 Days",
+    "dashboard_90days": "90 Days"
   },
   "footer": {
     "quickLinks": "Быстрые ссылки",
@@ -217,6 +232,27 @@
     "allRightsReserved": "Все права защищены.",
     "builtWith": "Создано с помощью",
     "by": "от"
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Profile Settings",
+    "username": "Username",
+    "avatarUrl": "Avatar URL",
+    "email": "Email",
+    "emailCannotChange": "Email cannot be changed",
+    "memberSince": "Member since",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "failedToUpdate": "Failed to update profile",
+    "somethingWentWrong": "Something went wrong",
+    "accounts": "Accounts",
+    "linkedAccounts": "Linked Accounts",
+    "unlink": "Unlink",
+    "linkGameAccount": "Link Game Account",
+    "gameUsername": "Game username",
+    "link": "Link",
+    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them."
   },
   "auth": {
     "loginTitle": "С возвращением",

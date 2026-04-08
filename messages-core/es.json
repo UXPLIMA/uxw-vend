@@ -22,7 +22,9 @@
     "blog": "Blog",
     "forum": "Foro",
     "support": "Soporte",
-    "store": "Tienda"
+    "store": "Tienda",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel"
   },
   "hero": {
     "playersOnline": "{count} Jugadores en línea",
@@ -204,7 +206,20 @@
     "crud_deleteItemConfirm": "¿Eliminar este elemento?",
     "crud_deleteItems": "Eliminar elementos",
     "crud_deleteItemsConfirm": "¿Eliminar {count} elementos?",
-    "crud_noItems": "Sin elementos"
+    "crud_noItems": "Sin elementos",
+    "dashboard_articles": "Articles",
+    "dashboard_topics": "Topics",
+    "dashboard_revenue": "Revenue",
+    "dashboard_orders": "Orders",
+    "dashboard_products": "Products",
+    "dashboard_tickets": "Tickets",
+    "dashboard_openTickets": "Open Tickets",
+    "dashboard_recentOrders": "Recent Orders",
+    "dashboard_latestForumTopics": "Latest Forum Topics",
+    "dashboard_newUsers": "New Users",
+    "dashboard_7days": "7 Days",
+    "dashboard_30days": "30 Days",
+    "dashboard_90days": "90 Days"
   },
   "footer": {
     "quickLinks": "Enlaces rápidos",
@@ -217,6 +232,27 @@
     "allRightsReserved": "Todos los derechos reservados.",
     "builtWith": "Hecho con",
     "by": "por"
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Profile Settings",
+    "username": "Username",
+    "avatarUrl": "Avatar URL",
+    "email": "Email",
+    "emailCannotChange": "Email cannot be changed",
+    "memberSince": "Member since",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "failedToUpdate": "Failed to update profile",
+    "somethingWentWrong": "Something went wrong",
+    "accounts": "Accounts",
+    "linkedAccounts": "Linked Accounts",
+    "unlink": "Unlink",
+    "linkGameAccount": "Link Game Account",
+    "gameUsername": "Game username",
+    "link": "Link",
+    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them."
   },
   "auth": {
     "loginTitle": "Bienvenido de nuevo",

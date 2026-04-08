@@ -210,11 +210,11 @@ export function Navbar() {
                                                 <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
                                             </div>
                                             <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
-                                                <User className="w-4 h-4" /> Profile
+                                                <User className="w-4 h-4" /> {t('profile')}
                                             </Link>
                                             {isStaffUser && (
                                                 <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
-                                                    <Shield className="w-4 h-4" /> Admin Panel
+                                                    <Shield className="w-4 h-4" /> {t('adminPanel')}
                                                 </Link>
                                             )}
                                             <div className="border-t border-border">

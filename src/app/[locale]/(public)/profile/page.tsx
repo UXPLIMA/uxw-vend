@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
@@ -31,6 +32,7 @@ export default function ProfilePage() {
     const { status: authStatus } = useSession();
     const router = useRouter();
     const modules = useAllModules();
+    const t = useTranslations("profile");
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -87,13 +89,13 @@ export default function ProfilePage() {
             });
             const data = await res.json();
             if (!res.ok) {
-                setProfileError(data.error || "Failed to update profile");
+                setProfileError(data.error || t("failedToUpdate"));
                 return;
             }
             setProfileSaved(true);
             setTimeout(() => setProfileSaved(false), 3000);
         } catch {
-            setProfileError("Something went wrong");
+            setProfileError(t("somethingWentWrong"));
         } finally {
             setSavingProfile(false);
         }
@@ -114,9 +116,9 @@ export default function ProfilePage() {
 
     // Build tab list: core tabs + module tabs in between
     const allTabs = [
-        { id: "profile", label: "Profile" },
-        ...moduleProfileTabs.map(t => ({ id: t.id, label: t.label })),
-        { id: "accounts", label: "Accounts" },
+        { id: "profile", label: t("title") },
+        ...moduleProfileTabs.map(mt => ({ id: mt.id, label: mt.label })),
+        { id: "accounts", label: t("accounts") },
     ];
 
     return (
@@ -169,7 +171,7 @@ export default function ProfilePage() {
                 {activeTab === "profile" && (
                     <Card>
                         <CardHeader>
-                            <CardTitle>Profile Settings</CardTitle>
+                            <CardTitle>{t("settings")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={saveProfile} className="space-y-4">
@@ -177,25 +179,25 @@ export default function ProfilePage() {
                                     <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">{profileError}</div>
                                 )}
                                 <div>
-                                    <Label>Username</Label>
+                                    <Label>{t("username")}</Label>
                                     <Input value={username} onChange={(e) => setUsername(e.target.value)} />
                                 </div>
                                 <div>
-                                    <Label>Avatar URL</Label>
+                                    <Label>{t("avatarUrl")}</Label>
                                     <Input value={avatar} onChange={(e) => setAvatar(e.target.value)} placeholder="https://..." />
                                 </div>
                                 <div>
-                                    <Label>Email</Label>
+                                    <Label>{t("email")}</Label>
                                     <Input value={profile?.email || ""} disabled className="bg-muted" />
-                                    <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("emailCannotChange")}</p>
                                 </div>
                                 <div>
-                                    <Label>Member since</Label>
+                                    <Label>{t("memberSince")}</Label>
                                     <Input value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-muted" />
                                 </div>
                                 <Button type="submit" disabled={savingProfile}>
-                                    {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
-                                     profileSaved ? <><Check className="w-4 h-4 mr-2" /> Saved</> : "Save Changes"}
+                                    {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("saving")}</> :
+                                     profileSaved ? <><Check className="w-4 h-4 mr-2" /> {t("saved")}</> : t("saveChanges")}
                                 </Button>
                             </form>
                         </CardContent>
@@ -203,12 +205,12 @@ export default function ProfilePage() {
                 )}
 
                 {/* Module Profile Tabs (rendered dynamically) */}
-                {moduleProfileTabs.map(t => {
-                    if (activeTab !== t.id) return null;
-                    const TabComponent = ProfileTabRegistry[t.id];
+                {moduleProfileTabs.map(mt => {
+                    if (activeTab !== mt.id) return null;
+                    const TabComponent = ProfileTabRegistry[mt.id];
                     if (!TabComponent || typeof TabComponent !== "function") return null;
                     return (
-                        <ModuleErrorBoundary key={t.id}>
+                        <ModuleErrorBoundary key={mt.id}>
                             <TabComponent />
                         </ModuleErrorBoundary>
                     );
@@ -217,7 +219,7 @@ export default function ProfilePage() {
                 {/* Accounts Tab */}
                 {activeTab === "accounts" && (
                     <Card>
-                        <CardHeader><CardTitle>Linked Accounts</CardTitle></CardHeader>
+                        <CardHeader><CardTitle>{t("linkedAccounts")}</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                             {/* Current links */}
                             {linkedAccounts.length > 0 && (
@@ -231,7 +233,7 @@ export default function ProfilePage() {
                                             <Button variant="ghost" size="sm" className="text-destructive" onClick={async () => {
                                                 await fetch("/api/v1/linked-accounts", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: acc.provider }) });
                                                 setLinkedAccounts(linkedAccounts.filter((a) => a.id !== acc.id));
-                                            }}>Unlink</Button>
+                                            }}>{t("unlink")}</Button>
                                         </div>
                                     ))}
                                 </div>
@@ -240,9 +242,9 @@ export default function ProfilePage() {
                             {/* Link Game Account */}
                             {linkedAccounts.length > 0 && !linkedAccounts.find((a) => a.provider === "minecraft") && (
                                 <div className="p-4 border border-dashed border-border rounded-lg">
-                                    <p className="text-sm font-medium mb-2">Link Game Account</p>
+                                    <p className="text-sm font-medium mb-2">{t("linkGameAccount")}</p>
                                     <div className="flex gap-2">
-                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder="Game username" />
+                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder={t("gameUsername")} />
                                         <Button size="sm" onClick={async () => {
                                             if (!mcUsername.trim()) return;
                                             const res = await fetch("/api/v1/linked-accounts", {
@@ -254,12 +256,12 @@ export default function ProfilePage() {
                                                 setLinkedAccounts([...linkedAccounts, data.account]);
                                                 setMcUsername("");
                                             }
-                                        }}>Link</Button>
+                                        }}>{t("link")}</Button>
                                     </div>
                                 </div>
                             )}
 
-                            <p className="text-xs text-muted-foreground">Discord and Google accounts are automatically linked when you log in with them.</p>
+                            <p className="text-xs text-muted-foreground">{t("oauthAutoLink")}</p>
                         </CardContent>
                     </Card>
                 )}

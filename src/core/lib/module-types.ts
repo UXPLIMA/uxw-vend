@@ -122,6 +122,7 @@ export interface ModuleManifest {
     dashboardCards?: {
         id: string;
         label: string;
+        labelKey?: string;  // i18n key (admin namespace) — preferred over `label` when present
         icon: string;
         href: string;
         color: string;

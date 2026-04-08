@@ -146,7 +146,7 @@ function generateRegistry() {
             }
 
             if (manifest.dashboardCards) {
-                manifest.dashboardCards.forEach((card: { id: string; label: string; icon: string; href: string; color: string; statKey: string }) => {
+                manifest.dashboardCards.forEach((card: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string }) => {
                     allDashboardCards.push({ ...card, module: moduleName });
                 });
             }
@@ -233,7 +233,7 @@ function generateRegistry() {
     let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
     // Generate dynamic imports for profile tab components
     allProfileTabs.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
     let profileTabImports = '// Profile tab component registry\nexport const ProfileTabRegistry: Record<string, any> = {\n';

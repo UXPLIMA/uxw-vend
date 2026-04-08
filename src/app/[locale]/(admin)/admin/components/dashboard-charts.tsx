@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -30,6 +31,7 @@ interface StatsData {
  * Module-specific charts (Revenue, Orders) come from module statsApi via DashboardClient.
  */
 export function DashboardCharts() {
+    const t = useTranslations("admin");
     const [data, setData] = useState<StatsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("30");
@@ -73,7 +75,7 @@ export function DashboardCharts() {
     return (
         <div className="space-y-6">
             <div className="flex gap-2">
-                {[{ label: "7 Days", value: "7" }, { label: "30 Days", value: "30" }, { label: "90 Days", value: "90" }].map((p) => (
+                {[{ label: t("dashboard_7days"), value: "7" }, { label: t("dashboard_30days"), value: "30" }, { label: t("dashboard_90days"), value: "90" }].map((p) => (
                     <Button key={p.value} variant={period === p.value ? "default" : "outline"} size="sm" onClick={() => setPeriod(p.value)}>
                         {p.label}
                     </Button>
@@ -82,7 +84,7 @@ export function DashboardCharts() {
 
             <Card>
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">New Users</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard_newUsers")}</CardTitle>
                     <p className="text-2xl font-bold text-purple-600">{data.totals.users}</p>
                 </CardHeader>
                 <CardContent>
@@ -90,7 +92,7 @@ export function DashboardCharts() {
                         <Line data={{
                             labels: shortLabels,
                             datasets: [{
-                                label: "New Users",
+                                label: t("dashboard_newUsers"),
                                 data: data.users,
                                 borderColor: "#8b5cf6",
                                 backgroundColor: "rgba(139,92,246,0.1)",
