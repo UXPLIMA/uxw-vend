@@ -39,6 +39,7 @@ model User {
   mediaItems       MediaItem[]
   revisions        Revision[]         @relation("RevisionAuthor")
   activityFeed     ActivityFeedItem[] @relation("ActivityActor")
+  trophies         UserTrophy[]       @relation("UserTrophies")
 
   // Module relations are injected here by merge-schemas.ts
 
@@ -228,6 +229,38 @@ model Revision {
   @@index([resource, resourceId])
   @@index([authorId])
   @@index([createdAt])
+}
+
+// User trophies / badges. Defined by admins, awarded by hook listeners
+// or manually. Shown on public profile pages.
+model Trophy {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?  // Lucide icon name
+  color       String?  // Tailwind color class or hex
+  points      Int      @default(0)
+  // Optional condition: hook event that auto-awards this trophy.
+  // Format: "<event>:<count>" e.g. "blog.article.created:10" awards
+  // after publishing 10 articles. Listener registered in core/lib/trophies.ts.
+  awardOn     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       UserTrophy[]
+}
+
+model UserTrophy {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserTrophies")
+  trophyId  String
+  trophy    Trophy   @relation(fields: [trophyId], references: [id], onDelete: Cascade)
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, trophyId])
+  @@index([userId])
+  @@index([trophyId])
 }
 
 // Cross-module unified activity feed.

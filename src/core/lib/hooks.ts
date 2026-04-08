@@ -217,10 +217,12 @@ export async function bootstrapHooks(): Promise<void> {
     if (bootstrapped) return;
     bootstrapped = true;
 
-    // Core listeners — activity feed, etc.
+    // Core listeners — activity feed, trophies, etc.
     try {
         const { registerActivityFeedListeners } = await import("./activity-feed");
         registerActivityFeedListeners();
+        const { registerTrophyListeners } = await import("./trophies");
+        await registerTrophyListeners();
     } catch (err) {
         console.error("[hooks] Failed to register core listeners:", err);
     }
