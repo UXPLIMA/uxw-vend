@@ -23,6 +23,8 @@ const PUBLIC_KEYS = [
     "hero_discord_url",
     "hero_show_player_count",
     "hero_height",
+    // Theme customizer overrides
+    "theme_overrides",
 ];
 
 // GET /api/v1/public-settings

@@ -1,14 +1,14 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleSettingsCards } from "@/core/generated/module-registry";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Palette, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
+    Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
     Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell,
 };
 
@@ -20,6 +20,7 @@ export default function SettingsPage() {
     const coreSettings = [
         { title: t("settings_general"), description: t("settings_generalDesc"), href: "/admin/settings/general", icon: "Settings", color: "text-slate-500" },
         { title: t("settings_appearance"), description: t("settings_appearanceDesc"), href: "/admin/settings/theme", icon: "Palette", color: "text-purple-500" },
+        { title: t.has("settings_customizer") ? t("settings_customizer") : "Theme Customizer", description: t.has("settings_customizerDesc") ? t("settings_customizerDesc") : "Edit colors, fonts, and layout properties", href: "/admin/settings/customizer", icon: "Paintbrush", color: "text-fuchsia-500" },
         { title: t("settings_navbar"), description: t("settings_navbarDesc"), href: "/admin/settings/navbar", icon: "Navigation", color: "text-blue-500" },
         { title: t("settings_footer"), description: t("settings_footerDesc"), href: "/admin/settings/footer", icon: "PanelBottom", color: "text-gray-500" },
         { title: t("settings_heroBanner"), description: t("settings_heroBannerDesc"), href: "/admin/settings/hero", icon: "Image", color: "text-pink-500" },

@@ -220,7 +220,9 @@
     "crud_deleteItems": "Öğeleri Sil",
     "crud_deleteItemsConfirm": "{count} öğeyi silmek istediğinizden emin misiniz?",
     "crud_noItems": "Henüz öğe yok",
-    "sidebar_modulesGroup": "Modüller"
+    "sidebar_modulesGroup": "Modüller",
+    "settings_customizer": "Tema Özelleştirici",
+    "settings_customizerDesc": "Renkleri, yazı tiplerini ve yerleşim özelliklerini düzenle"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

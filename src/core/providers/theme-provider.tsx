@@ -5,8 +5,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
+import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
-import { Theme } from "@/core/types/theme";
+import { Theme, ThemeConfig, ThemeOverrides } from "@/core/types/theme";
 
 interface ThemeContextType {
     activeTheme: Theme | null;
@@ -20,6 +21,28 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+/**
+ * Apply user overrides on top of the base theme config.
+ * Overrides are dot-paths like "colors.primary" → "#ff0000".
+ */
+function applyOverrides(config: ThemeConfig, overrides: Record<string, string>): ThemeConfig {
+    if (!overrides || Object.keys(overrides).length === 0) return config;
+
+    const result: ThemeConfig = JSON.parse(JSON.stringify(config));
+    for (const [path, value] of Object.entries(overrides)) {
+        if (!value) continue;
+        const parts = path.split(".");
+        let target: Record<string, unknown> = result as unknown as Record<string, unknown>;
+        for (let i = 0; i < parts.length - 1; i++) {
+            const next = target[parts[i]];
+            if (typeof next !== "object" || next === null) break;
+            target = next as Record<string, unknown>;
+        }
+        target[parts[parts.length - 1]] = value;
+    }
+    return result;
+}
+
 interface AppThemeProviderProps {
     children: React.ReactNode;
     defaultTheme: string;
@@ -31,6 +54,7 @@ function ThemeContent({
 }: AppThemeProviderProps) {
     const { theme: currentThemeId } = useNextTheme();
     const [mounted, setMounted] = useState(false);
+    const { settings } = useSiteSettings();
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only mount detection
@@ -38,11 +62,18 @@ function ThemeContent({
     }, []);
 
     // Determine the actual theme object
-    // If currentThemeId is 'system', we might rely on resolvedTheme to pick light/dark 
-    // BUT our system maps 'theme names' to IDs.
-    // For now, next-themes handles "flat", "obsidian" etc. as simple strings.
     const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
-    const activeTheme = themeRegistry[activeThemeId] || themeRegistry[defaultTheme];
+    const baseTheme = themeRegistry[activeThemeId] || themeRegistry[defaultTheme];
+
+    // Merge user overrides from Setting.theme_overrides
+    const overrides = (settings.theme_overrides as ThemeOverrides) || {};
+    const themeOverrides = overrides[activeThemeId] || {};
+    const activeTheme = baseTheme
+        ? {
+            ...baseTheme,
+            config: applyOverrides(baseTheme.config, themeOverrides),
+        }
+        : null;
 
     // CSS Variable Injection
     useEffect(() => {
