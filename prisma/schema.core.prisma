@@ -43,6 +43,8 @@ model User {
   warnings         UserWarning[]      @relation("UserWarnings")
   warningsIssued   UserWarning[]      @relation("WarningIssuer")
   notifPrefs       NotificationPreference[] @relation("UserNotifPrefs")
+  conversations    ConversationParticipant[] @relation("ConversationMember")
+  messages         Message[]          @relation("MessageAuthor")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -265,6 +267,47 @@ model ResourcePermission {
   @@unique([resource, resourceId, action, principalType, principalId])
   @@index([resource, action])
   @@index([principalType, principalId])
+}
+
+// User-to-user direct messaging.
+// Conversation has 2+ participants and many messages.
+model Conversation {
+  id            String   @id @default(cuid())
+  title         String?  // optional, usually omitted for 1:1 chats
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastMessageAt DateTime?
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade, name: "ConversationMember")
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime?
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User         @relation(fields: [authorId], references: [id], onDelete: Cascade, name: "MessageAuthor")
+  body           String       @db.Text
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([authorId])
 }
 
 // Per-user notification preferences. Each row represents one user's
