@@ -38,6 +38,7 @@ model User {
   apiKeys          ApiKey[]           @relation("ApiKeys")
   mediaItems       MediaItem[]
   revisions        Revision[]         @relation("RevisionAuthor")
+  activityFeed     ActivityFeedItem[] @relation("ActivityActor")
 
   // Module relations are injected here by merge-schemas.ts
 
@@ -227,6 +228,28 @@ model Revision {
   @@index([resource, resourceId])
   @@index([authorId])
   @@index([createdAt])
+}
+
+// Cross-module unified activity feed.
+// Modules emit hooks (e.g. blog.article.created) and a core listener
+// records them here as feed items. Rendered on public profile pages
+// and a sitewide /activity stream.
+model ActivityFeedItem {
+  id         String   @id @default(cuid())
+  type       String   // e.g. "blog.article.created", "store.order.completed"
+  actorId    String?  // user who triggered it
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: Cascade, name: "ActivityActor")
+  title      String   // human-readable headline
+  body       String?  // optional excerpt / preview
+  href       String?  // link to the entity
+  icon       String?  // Lucide icon name for the feed UI
+  isPublic   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([isPublic, createdAt])
 }
 
 // Granular per-resource permission grants on top of role-based defaults.

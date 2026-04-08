@@ -217,6 +217,14 @@ export async function bootstrapHooks(): Promise<void> {
     if (bootstrapped) return;
     bootstrapped = true;
 
+    // Core listeners — activity feed, etc.
+    try {
+        const { registerActivityFeedListeners } = await import("./activity-feed");
+        registerActivityFeedListeners();
+    } catch (err) {
+        console.error("[hooks] Failed to register core listeners:", err);
+    }
+
     try {
         const { ModuleHookListeners } = await import("@/core/generated/module-hooks");
         const { getModuleStates } = await import("@/core/lib/module-cache");
