@@ -229,6 +229,23 @@ model Revision {
   @@index([createdAt])
 }
 
+// Granular per-resource permission grants on top of role-based defaults.
+// See docs in core/lib/permissions.ts for resolution order.
+model ResourcePermission {
+  id            String   @id @default(cuid())
+  resource      String   // e.g. "blog.article"
+  resourceId    String?  // null = applies to all entities of that resource
+  action        String   // "view" | "create" | "edit" | "delete" | "*"
+  principalType String   // "role" | "user"
+  principalId   String   // role.id or user.id
+  allow         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@unique([resource, resourceId, action, principalType, principalId])
+  @@index([resource, action])
+  @@index([principalType, principalId])
+}
+
 // Tracks which per-module SQL migrations have been applied to the DB.
 // Replaces the old `prisma db push` workflow with a forward-only
 // versioned migration system. See docs/MIGRATIONS.md.

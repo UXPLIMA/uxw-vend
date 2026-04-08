@@ -223,7 +223,8 @@
     "sidebar_modulesGroup": "Modüller",
     "settings_customizer": "Tema Özelleştirici",
     "settings_customizerDesc": "Renkleri, yazı tiplerini ve yerleşim özelliklerini düzenle",
-    "sidebar_media": "Medya"
+    "sidebar_media": "Medya",
+    "sidebar_permissions": "İzinler"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

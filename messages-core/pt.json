@@ -223,7 +223,8 @@
     "sidebar_modulesGroup": "Módulos",
     "settings_customizer": "Personalizador de Tema",
     "settings_customizerDesc": "Edite cores, fontes e propriedades de layout",
-    "sidebar_media": "Mídia"
+    "sidebar_media": "Mídia",
+    "sidebar_permissions": "Permissões"
   },
   "footer": {
     "quickLinks": "Links rápidos",

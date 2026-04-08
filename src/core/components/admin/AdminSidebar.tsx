@@ -78,6 +78,7 @@ const coreNavDefs = [
     { href: "/admin/modules", labelKey: "sidebar_modules", icon: <Puzzle size={18} /> },
     { href: "/admin/users", labelKey: "sidebar_users", icon: <Users size={18} /> },
     { href: "/admin/roles", labelKey: "sidebar_roles", icon: <Shield size={18} /> },
+    { href: "/admin/permissions", labelKey: "sidebar_permissions", icon: <ClipboardCheck size={18} /> },
     { href: "/admin/activity-log", labelKey: "sidebar_activityLog", icon: <ScrollText size={18} /> },
     { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
     { href: "/admin/api-keys", labelKey: "sidebar_apiKeys", icon: <KeyRound size={18} /> },

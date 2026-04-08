@@ -223,7 +223,8 @@
     "sidebar_modulesGroup": "Модули",
     "settings_customizer": "Настройщик темы",
     "settings_customizerDesc": "Редактируйте цвета, шрифты и свойства макета",
-    "sidebar_media": "Медиа"
+    "sidebar_media": "Медиа",
+    "sidebar_permissions": "Разрешения"
   },
   "footer": {
     "quickLinks": "Быстрые ссылки",
