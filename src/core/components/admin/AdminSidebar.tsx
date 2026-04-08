@@ -72,7 +72,7 @@ interface SidebarModule {
 
 // Sidebar order requested by user:
 // 1. Dashboard, 2. Module Marketplace, 3. Users, 4. Roles,
-// 5. Activity Log, 6. System Health, 7. API Keys, 8. Settings, 9. Modules group
+// 5. Activity Log, 6. System Health, 7. API Keys, 8. Media, 9. Settings, 10. Modules group
 const coreNavDefs = [
     { href: "/admin", labelKey: "sidebar_dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/admin/modules", labelKey: "sidebar_modules", icon: <Puzzle size={18} /> },
@@ -81,6 +81,7 @@ const coreNavDefs = [
     { href: "/admin/activity-log", labelKey: "sidebar_activityLog", icon: <ScrollText size={18} /> },
     { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
     { href: "/admin/api-keys", labelKey: "sidebar_apiKeys", icon: <KeyRound size={18} /> },
+    { href: "/admin/media", labelKey: "sidebar_media", icon: <ImageIcon size={18} /> },
     { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },
 ] as const;
 

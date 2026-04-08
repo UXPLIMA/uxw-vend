@@ -222,7 +222,8 @@
     "crud_noItems": "Henüz öğe yok",
     "sidebar_modulesGroup": "Modüller",
     "settings_customizer": "Tema Özelleştirici",
-    "settings_customizerDesc": "Renkleri, yazı tiplerini ve yerleşim özelliklerini düzenle"
+    "settings_customizerDesc": "Renkleri, yazı tiplerini ve yerleşim özelliklerini düzenle",
+    "sidebar_media": "Medya"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

@@ -222,7 +222,8 @@
     "dashboard_90days": "90 Days",
     "sidebar_modulesGroup": "Módulos",
     "settings_customizer": "Personalizador de Tema",
-    "settings_customizerDesc": "Edite cores, fontes e propriedades de layout"
+    "settings_customizerDesc": "Edite cores, fontes e propriedades de layout",
+    "sidebar_media": "Mídia"
   },
   "footer": {
     "quickLinks": "Links rápidos",

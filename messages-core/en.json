@@ -222,7 +222,8 @@
     "crud_noItems": "No items yet",
     "sidebar_modulesGroup": "Modules",
     "settings_customizer": "Theme Customizer",
-    "settings_customizerDesc": "Edit colors, fonts, and layout properties"
+    "settings_customizerDesc": "Edit colors, fonts, and layout properties",
+    "sidebar_media": "Media"
   },
   "footer": {
     "quickLinks": "Quick Links",

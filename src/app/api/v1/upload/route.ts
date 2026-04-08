@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { uploadFile } from "@/core/lib/storage";
+import { prisma } from "@/core/lib/db";
 
 /**
  * POST /api/v1/upload
@@ -46,6 +47,23 @@ export async function POST(request: NextRequest) {
 
     try {
         const result = await uploadFile(buffer, blob.name, blob.type);
+
+        // Record in the central media library
+        try {
+            await prisma.mediaItem.create({
+                data: {
+                    filename: blob.name,
+                    url: result.url,
+                    storagePath: result.path,
+                    mimeType: blob.type || "application/octet-stream",
+                    size: blob.size,
+                    uploadedById: session.user.id,
+                },
+            });
+        } catch (err) {
+            console.error("[upload] Failed to record media library entry:", err);
+        }
+
         return NextResponse.json(result);
     } catch (err) {
         const message = err instanceof Error ? err.message : "Upload failed";

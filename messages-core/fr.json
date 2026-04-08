@@ -222,7 +222,8 @@
     "dashboard_90days": "90 Days",
     "sidebar_modulesGroup": "Modules",
     "settings_customizer": "Personnalisateur de Thème",
-    "settings_customizerDesc": "Modifier les couleurs, polices et propriétés de mise en page"
+    "settings_customizerDesc": "Modifier les couleurs, polices et propriétés de mise en page",
+    "sidebar_media": "Médias"
   },
   "footer": {
     "quickLinks": "Liens rapides",

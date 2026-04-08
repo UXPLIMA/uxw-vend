@@ -36,6 +36,7 @@ model User {
   // Core relations
   activityLogs     ActivityLog[]      @relation("ActivityLogs")
   apiKeys          ApiKey[]           @relation("ApiKeys")
+  mediaItems       MediaItem[]
 
   // Module relations are injected here by merge-schemas.ts
 
@@ -186,6 +187,27 @@ model ModuleConfig {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Central media library. Every file uploaded via /api/v1/upload is recorded
+// here so it can be browsed, searched, reused, and deleted from one place.
+model MediaItem {
+  id         String   @id @default(cuid())
+  filename   String   // Original filename
+  url        String   // Public URL (local or S3)
+  storagePath String  // Storage path/key for delete
+  mimeType   String
+  size       Int      // Bytes
+  width      Int?     // For images
+  height     Int?
+  alt        String?  // Accessibility / SEO
+  uploadedById String?
+  uploadedBy User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@index([uploadedById])
+  @@index([mimeType])
+  @@index([createdAt])
 }
 
 // Tracks which per-module SQL migrations have been applied to the DB.
