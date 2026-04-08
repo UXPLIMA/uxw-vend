@@ -37,6 +37,7 @@ model User {
   activityLogs     ActivityLog[]      @relation("ActivityLogs")
   apiKeys          ApiKey[]           @relation("ApiKeys")
   mediaItems       MediaItem[]
+  revisions        Revision[]         @relation("RevisionAuthor")
 
   // Module relations are injected here by merge-schemas.ts
 
@@ -207,6 +208,24 @@ model MediaItem {
 
   @@index([uploadedById])
   @@index([mimeType])
+  @@index([createdAt])
+}
+
+// Generic content revision history. Modules call recordRevision() before
+// updates/deletes to snapshot the previous state. The (resource, resourceId)
+// pair identifies the entity; data holds the JSON snapshot.
+model Revision {
+  id          String   @id @default(cuid())
+  resource    String   // e.g. "blog.article", "store.product"
+  resourceId  String   // entity primary key
+  data        Json     // serialized snapshot before the change
+  action      String   // "update" | "delete"
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull, name: "RevisionAuthor")
+  createdAt   DateTime @default(now())
+
+  @@index([resource, resourceId])
+  @@index([authorId])
   @@index([createdAt])
 }
 
