@@ -7,19 +7,42 @@ import { getRedisClient, isRedisConfigured } from "./redis";
 import { prisma } from "./db";
 
 /**
- * Rate limiter with automatic Redis/in-memory fallback.
- * Uses shared Redis client from redis.ts when REDIS_URL is set.
+ * Rate limiter with a pluggable backend. When REDIS_URL is set the
+ * RedisBackend is used so counts are shared across PM2 workers and
+ * serverless lambdas; otherwise MemoryBackend keeps the legacy
+ * in-process behavior. Both implementations conform to the
+ * RateLimitBackend interface below so new backends (e.g. Memcached,
+ * Cloudflare KV) can be added without touching callers.
  */
+
+export interface RateLimitConfig {
+    maxRequests: number;
+    windowMs: number;
+}
+
+export interface RateLimitResult {
+    success: boolean;
+    remaining: number;
+    resetAt: number;
+}
+
+export interface RateLimitBackend {
+    readonly name: string;
+    hit(identifier: string, config: RateLimitConfig): Promise<RateLimitResult>;
+}
 
 interface RateLimitEntry {
     count: number;
     resetAt: number;
 }
 
-// In-memory store (fallback)
+// ---------------------------------------------------------------------------
+// Memory backend — process-local Map. Always available, used as fallback.
+// ---------------------------------------------------------------------------
+
 const memoryStore = new Map<string, RateLimitEntry>();
 
-// Clean up expired entries periodically (in-memory only)
+// Clean up expired entries periodically
 setInterval(() => {
     const now = Date.now();
     for (const [key, entry] of memoryStore) {
@@ -27,48 +50,7 @@ setInterval(() => {
     }
 }, 60000);
 
-async function redisRateLimit(
-    identifier: string,
-    config: RateLimitConfig
-): Promise<{ success: boolean; remaining: number; resetAt: number } | null> {
-    const redis = await getRedisClient();
-    if (!redis) return null;
-
-    try {
-        const key = `rl:${identifier}`;
-        const now = Date.now();
-
-        const stored = await redis.get(key);
-        if (stored) {
-            const entry: RateLimitEntry = JSON.parse(stored);
-            if (entry.resetAt < now) {
-                const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
-                await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
-                return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
-            }
-
-            entry.count++;
-            const ttl = entry.resetAt - now;
-            await redis.set(key, JSON.stringify(entry), { PX: Math.max(ttl, 1) });
-
-            if (entry.count > config.maxRequests) {
-                return { success: false, remaining: 0, resetAt: entry.resetAt };
-            }
-            return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
-        }
-
-        const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
-        await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
-        return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
-    } catch {
-        return null;
-    }
-}
-
-function memoryRateLimit(
-    identifier: string,
-    config: RateLimitConfig
-): { success: boolean; remaining: number; resetAt: number } {
+function memoryHitSync(identifier: string, config: RateLimitConfig): RateLimitResult {
     const now = Date.now();
     const entry = memoryStore.get(identifier);
 
@@ -86,21 +68,87 @@ function memoryRateLimit(
     return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
 }
 
-export interface RateLimitConfig {
-    maxRequests: number;
-    windowMs: number;
+export const MemoryBackend: RateLimitBackend = {
+    name: "memory",
+    async hit(identifier, config) {
+        return memoryHitSync(identifier, config);
+    },
+};
+
+// ---------------------------------------------------------------------------
+// Redis backend — shared across processes via SET PX + read-modify-write.
+// On any Redis error we transparently fall back to the memory backend so a
+// flaky Redis can never take down request handling.
+// ---------------------------------------------------------------------------
+
+export const RedisBackend: RateLimitBackend = {
+    name: "redis",
+    async hit(identifier, config) {
+        const redis = await getRedisClient();
+        if (!redis) return memoryHitSync(identifier, config);
+
+        try {
+            const key = `rl:${identifier}`;
+            const now = Date.now();
+
+            const stored = await redis.get(key);
+            if (stored) {
+                const entry: RateLimitEntry = JSON.parse(stored);
+                if (entry.resetAt < now) {
+                    const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
+                    await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
+                    return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
+                }
+
+                entry.count++;
+                const ttl = entry.resetAt - now;
+                await redis.set(key, JSON.stringify(entry), { PX: Math.max(ttl, 1) });
+
+                if (entry.count > config.maxRequests) {
+                    return { success: false, remaining: 0, resetAt: entry.resetAt };
+                }
+                return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
+            }
+
+            const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
+            await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
+            return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
+        } catch {
+            return memoryHitSync(identifier, config);
+        }
+    },
+};
+
+/**
+ * Select the active backend once at module load. Consumers should not
+ * import the backends directly — use rateLimit() or rateLimitForRole().
+ */
+const activeBackend: RateLimitBackend = isRedisConfigured() ? RedisBackend : MemoryBackend;
+
+/**
+ * Health check helper — returns true if Redis is configured AND currently
+ * reachable. Safe to call from admin endpoints / ops dashboards.
+ */
+export async function isRedisReady(): Promise<boolean> {
+    if (!isRedisConfigured()) return false;
+    try {
+        const redis = await getRedisClient();
+        if (!redis) return false;
+        await redis.ping();
+        return true;
+    } catch {
+        return false;
+    }
 }
 
+/**
+ * Primary async rate limiter. Uses the selected backend (Redis or memory).
+ */
 export async function rateLimit(
     identifier: string,
     config: RateLimitConfig = { maxRequests: 60, windowMs: 60000 }
-): Promise<{ success: boolean; remaining: number; resetAt: number }> {
-    if (isRedisConfigured()) {
-        const result = await redisRateLimit(identifier, config);
-        if (result) return result;
-    }
-
-    return memoryRateLimit(identifier, config);
+): Promise<RateLimitResult> {
+    return activeBackend.hit(identifier, config);
 }
 
 /**
@@ -247,7 +295,7 @@ export async function rateLimitForRole(
     identifier: string,
     baseConfig: RateLimitConfig,
     role?: string | null
-): Promise<{ success: boolean; remaining: number; resetAt: number }> {
+): Promise<RateLimitResult> {
     let multiplier = 1;
     if (role) {
         const map = await getRoleMultipliers();

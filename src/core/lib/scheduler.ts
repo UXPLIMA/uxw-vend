@@ -145,6 +145,31 @@ export async function bootstrapScheduler(): Promise<void> {
         },
     });
 
+    registerCronJob({
+        key: "core:process-email-queue",
+        schedule: "every-5-minutes",
+        handler: async () => {
+            const { processEmailQueue } = await import("./email");
+            const result = await processEmailQueue();
+            if (result.sent > 0 || result.failed > 0) {
+                console.log(`[cron] email-queue: sent=${result.sent} failed=${result.failed}`);
+            }
+        },
+    });
+
+    registerCronJob({
+        key: "core:retention-prune",
+        schedule: "every-day",
+        handler: async () => {
+            const { pruneOldRecords } = await import("./retention");
+            const r = await pruneOldRecords();
+            const total = r.activityFeed + r.webhookLog + r.cronRun + r.revision;
+            if (total > 0) {
+                console.log(`[cron] retention: activityFeed=${r.activityFeed} webhookLog=${r.webhookLog} cronRun=${r.cronRun} revision=${r.revision}`);
+            }
+        },
+    });
+
     // ─── Module-contributed jobs ───
     try {
         const { ModuleCronJobs } = await import("@/core/generated/module-crons");

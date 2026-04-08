@@ -445,3 +445,28 @@ model ActivityLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// Outbound email queue. Synchronous SMTP calls would block request
+// handling and fail silently on transient errors; instead most callers
+// enqueue via queueEmail() and a core cron (processEmailQueue) drains
+// the queue every 5 minutes with exponential backoff.
+//
+// status flow:  pending → sending → sent
+//                       \→ pending (retry, attempts < 3)
+//                       \→ failed  (attempts >= 3)
+model EmailJob {
+  id          String    @id @default(cuid())
+  to          String
+  subject     String
+  body        String
+  html        String?
+  status      String    @default("pending") // pending | sending | sent | failed
+  attempts    Int       @default(0)
+  lastError   String?
+  scheduledAt DateTime  @default(now())
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, scheduledAt])
+  @@index([createdAt])
+}
