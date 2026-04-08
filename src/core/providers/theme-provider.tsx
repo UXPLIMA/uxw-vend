@@ -68,10 +68,32 @@ function ThemeContent({
     // Merge user overrides from Setting.theme_overrides
     const overrides = (settings.theme_overrides as ThemeOverrides) || {};
     const themeOverrides = overrides[activeThemeId] || {};
+
+    // Live preview overrides — when this page is loaded inside the customizer
+    // iframe, the parent posts in-progress edits via postMessage. We track them
+    // in state and merge ON TOP of saved overrides without persisting.
+    const [previewOverrides, setPreviewOverrides] = useState<Record<string, string>>({});
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (window.parent === window) return; // Not iframed
+        const handler = (event: MessageEvent) => {
+            if (event.data?.type === "uxwvend:theme-preview" && typeof event.data.overrides === "object") {
+                setPreviewOverrides(event.data.overrides as Record<string, string>);
+            }
+        };
+        window.addEventListener("message", handler);
+        // Tell the parent we're ready to receive previews
+        try {
+            window.parent.postMessage({ type: "uxwvend:preview-ready" }, "*");
+        } catch { /* cross-origin — ignore */ }
+        return () => window.removeEventListener("message", handler);
+    }, []);
+
+    const mergedOverrides = { ...themeOverrides, ...previewOverrides };
     const activeTheme = baseTheme
         ? {
             ...baseTheme,
-            config: applyOverrides(baseTheme.config, themeOverrides),
+            config: applyOverrides(baseTheme.config, mergedOverrides),
         }
         : null;
 
