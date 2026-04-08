@@ -48,7 +48,8 @@ export function RichTextEditor({
         []
     );
 
-    // Quill formats
+    // Quill formats — "bullet" is not a standalone format in Quill 2+;
+    // bullet lists are covered by "list".
     const formats = [
         "header",
         "bold",
@@ -58,7 +59,6 @@ export function RichTextEditor({
         "color",
         "background",
         "list",
-        "bullet",
         "indent",
         "align",
         "blockquote",

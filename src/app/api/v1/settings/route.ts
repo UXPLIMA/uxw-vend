@@ -3,10 +3,15 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
-const settingValueSchema = z.string().max(10000, "Setting value too long");
-const settingsBodySchema = z.record(settingKeySchema, settingValueSchema);
+// Value is a Json column — accept any JSON-serializable value (string, number, boolean, array, object, null)
+// Max serialized size: 100KB to prevent abuse
+const settingsBodySchema = z.record(settingKeySchema, z.unknown()).refine(
+    (data) => JSON.stringify(data).length <= 100_000,
+    { message: "Settings payload too large (max 100KB)" }
+);
 
 // GET /api/v1/settings
 export async function GET() {
@@ -54,12 +59,13 @@ export async function PATCH(request: NextRequest) {
         );
     }
 
-    // Upsert each setting
+    // Upsert each setting. Setting.value is Json; cast through InputJsonValue.
     for (const [key, value] of Object.entries(parsed.data)) {
+        const jsonValue = (value ?? Prisma.JsonNull) as Prisma.InputJsonValue;
         await prisma.setting.upsert({
             where: { key },
-            update: { value },
-            create: { key, value },
+            update: { value: jsonValue },
+            create: { key, value: jsonValue },
         });
     }
 
