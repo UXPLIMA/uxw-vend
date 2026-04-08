@@ -15,6 +15,14 @@ const PUBLIC_KEYS = [
     "theme_color_accent",
     "currency",
     "currency_symbol",
+    // Hero banner settings (rendered on every public page)
+    "hero_background_image",
+    "hero_logo_image",
+    "hero_logo_url",
+    "hero_server_ip",
+    "hero_discord_url",
+    "hero_show_player_count",
+    "hero_height",
 ];
 
 // GET /api/v1/public-settings
