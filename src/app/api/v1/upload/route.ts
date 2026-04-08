@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
-import { uploadFile } from "@/core/lib/file-upload";
+import { uploadFile } from "@/core/lib/storage";
 
 /**
  * POST /api/v1/upload

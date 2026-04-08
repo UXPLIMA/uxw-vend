@@ -13,6 +13,7 @@ export const ModuleRegistry: Record<string, any> = {
   'blog:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/categories/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/public/page.tsx': dynamic(() => import('@/modules/changelog/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/admin/page.tsx': dynamic(() => import('@/modules/changelog/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'cloudflare-r2:pages/admin/page.tsx': dynamic(() => import('@/modules/cloudflare-r2/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'currency:pages/admin/page.tsx': dynamic(() => import('@/modules/currency/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -140,6 +141,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/admin/changelog",
     "key": "changelog:pages/admin/page.tsx",
     "module": "changelog",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/storage/cloudflare-r2",
+    "key": "cloudflare-r2:pages/admin/page.tsx",
+    "module": "cloudflare-r2",
     "isAdmin": true
   },
   {
@@ -598,6 +605,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "path": "/changelog/[id]",
     "key": "changelog:api:/changelog/[id]",
     "module": "changelog",
+    "method": "ALL"
+  },
+  {
+    "path": "/storage/cloudflare-r2/settings",
+    "key": "cloudflare-r2:api:/storage/cloudflare-r2/settings",
+    "module": "cloudflare-r2",
     "method": "ALL"
   },
   {
@@ -1292,6 +1305,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'blog:api:/blog/stats': () => import('@/modules/blog/api/stats/route'),
   'changelog:api:/changelog': () => import('@/modules/changelog/api/route'),
   'changelog:api:/changelog/[id]': () => import('@/modules/changelog/api/[id]/route'),
+  'cloudflare-r2:api:/storage/cloudflare-r2/settings': () => import('@/modules/cloudflare-r2/api/settings/route'),
   'credits:api:/credits': () => import('@/modules/credits/api/credits/route'),
   'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
   'currency:api:/currency': () => import('@/modules/currency/api/route'),
@@ -1673,6 +1687,14 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "icon": "BarChart",
     "color": "text-green-500",
     "module": "analytics"
+  },
+  {
+    "title": "Cloudflare R2 Storage",
+    "description": "Configure R2 bucket for file uploads (S3-compatible)",
+    "href": "/admin/storage/cloudflare-r2",
+    "icon": "Cloud",
+    "color": "text-orange-500",
+    "module": "cloudflare-r2"
   },
   {
     "title": "Currency Settings",

@@ -67,6 +67,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/storage/cloudflare-r2/settings",
+    "key": "cloudflare-r2:api:/storage/cloudflare-r2/settings",
+    "module": "cloudflare-r2",
+    "method": "ALL"
+  },
+  {
     "path": "/credits",
     "key": "credits:api:/credits",
     "module": "credits",
@@ -802,6 +808,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/admin/changelog",
     "key": "changelog:pages/admin/page.tsx",
     "module": "changelog",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/storage/cloudflare-r2",
+    "key": "cloudflare-r2:pages/admin/page.tsx",
+    "module": "cloudflare-r2",
     "isAdmin": true
   },
   {

@@ -99,6 +99,15 @@ export interface ModuleManifest {
         order?: number;      // render order (lower = first)
     }[];
 
+    // Storage providers — implement the StorageProvider interface from @/core/lib/storage
+    // Used by core's file upload system. Multiple providers can coexist; the active one is
+    // selected via the `storage_active_provider` Setting key (or STORAGE_PROVIDER env var).
+    storageProviders?: {
+        id: string;          // unique provider id, e.g. "cloudflare-r2"
+        name: string;        // human-readable, e.g. "Cloudflare R2"
+        handler: string;     // path to file exporting `default: StorageProvider`
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

@@ -120,6 +120,8 @@ function generateRegistry() {
     const allSettingsCards: ManifestItem[] = [];
     const allOauthButtons: ManifestItem[] = [];
     const allProfileTabs: SectionItem[] = [];
+    interface StorageProviderItem { id: string; name: string; handler: string; module: string }
+    const allStorageProviders: StorageProviderItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -185,6 +187,12 @@ function generateRegistry() {
             if (manifest.footerComponents) {
                 manifest.footerComponents.forEach((fc: { id: string; component: string; section?: string; order?: number }) => {
                     allFooterComponents.push({ ...fc, module: moduleName });
+                });
+            }
+
+            if (manifest.storageProviders) {
+                manifest.storageProviders.forEach((sp: { id: string; name: string; handler: string }) => {
+                    allStorageProviders.push({ ...sp, module: moduleName });
                 });
             }
 
@@ -316,6 +324,21 @@ function generateRegistry() {
     dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
     dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n`;
     fs.writeFileSync(DATA_FILE, dataContent);
+
+    // Generate server-only storage provider registry (no React, no dynamic())
+    // storage.ts dynamically imports this file to resolve the active provider.
+    const STORAGE_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-storage.ts');
+    let storageContent = '// Auto-generated server-only storage provider registry\n';
+    storageContent += '// Plain dynamic import() — no React/Next dynamic. Safe for server contexts.\n\n';
+    storageContent += 'export const StorageProviderRegistry: Record<string, () => Promise<{ upload: (buffer: Buffer, filename: string, mimeType: string) => Promise<{ url: string; path: string }> }>> = {\n';
+    for (const sp of allStorageProviders) {
+        const handlerPath = sp.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${sp.module}/${handlerPath}`;
+        storageContent += `  '${sp.id}': () => import('${importPath}').then((mod) => mod.default || mod),\n`;
+    }
+    storageContent += '};\n\n';
+    storageContent += `export const ModuleStorageProviders = ${JSON.stringify(allStorageProviders, null, 2)};\n`;
+    fs.writeFileSync(STORAGE_FILE, storageContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');
