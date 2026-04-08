@@ -59,6 +59,8 @@ export function Navbar() {
     const corePaths = new Set(['/', '/profile', '/admin', '/auth', '/terms', '/privacy', '/rules', '/refund']);
 
     const isLinkEnabled = (href: string) => {
+        // Dropdown parent placeholders ("#") — always allowed; children are filtered separately
+        if (!href || href === "#") return true;
         // External URLs always allowed
         if (href.startsWith('http')) return true;
         // Core paths always allowed
