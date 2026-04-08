@@ -13,6 +13,7 @@ export const ModuleRegistry: Record<string, any> = {
   'blog:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/blog/pages/admin/categories/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/public/page.tsx': dynamic(() => import('@/modules/changelog/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/admin/page.tsx': dynamic(() => import('@/modules/changelog/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'currency:pages/admin/page.tsx': dynamic(() => import('@/modules/currency/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/submissions/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/submissions/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -139,6 +140,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/admin/changelog",
     "key": "changelog:pages/admin/page.tsx",
     "module": "changelog",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/currency",
+    "key": "currency:pages/admin/page.tsx",
+    "module": "currency",
     "isAdmin": true
   },
   {
@@ -603,6 +610,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "path": "/credits/purchase",
     "key": "credits:api:/credits/purchase",
     "module": "credits",
+    "method": "ALL"
+  },
+  {
+    "path": "/currency",
+    "key": "currency:api:/currency",
+    "module": "currency",
     "method": "ALL"
   },
   {
@@ -1281,6 +1294,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'changelog:api:/changelog/[id]': () => import('@/modules/changelog/api/[id]/route'),
   'credits:api:/credits': () => import('@/modules/credits/api/credits/route'),
   'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
+  'currency:api:/currency': () => import('@/modules/currency/api/route'),
   'custom-forms:api:/forms': () => import('@/modules/custom-forms/api/route'),
   'custom-forms:api:/forms/[slug]': () => import('@/modules/custom-forms/api/[slug]/route'),
   'custom-forms:api:/forms/submissions': () => import('@/modules/custom-forms/api/submissions/route'),
@@ -1495,6 +1509,20 @@ export const ModuleNavbarComponents: { id: string; component: string; order: num
   }
 ];
 
+// Footer component registry (rendered in site footer)
+export const FooterComponentRegistry: Record<string, any> = {
+  'CurrencySelector': dynamic(() => import('@/modules/currency/components/CurrencySelector').then((mod: any) => mod.CurrencySelector || mod.CurrencySelector || mod.default || mod), { loading: () => null }),
+};
+
+export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = [
+  {
+    "id": "CurrencySelector",
+    "component": "components/CurrencySelector",
+    "order": 10,
+    "module": "currency"
+  }
+];
+
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [
   {
     "id": "SliderWidget",
@@ -1645,6 +1673,14 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "icon": "BarChart",
     "color": "text-green-500",
     "module": "analytics"
+  },
+  {
+    "title": "Currency Settings",
+    "description": "Manage currencies and exchange rates",
+    "href": "/admin/currency",
+    "icon": "DollarSign",
+    "color": "text-green-500",
+    "module": "currency"
   },
   {
     "title": "Discord OAuth",

@@ -79,6 +79,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/currency",
+    "key": "currency:api:/currency",
+    "module": "currency",
+    "method": "ALL"
+  },
+  {
     "path": "/forms",
     "key": "custom-forms:api:/forms",
     "module": "custom-forms",
@@ -796,6 +802,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/admin/changelog",
     "key": "changelog:pages/admin/page.tsx",
     "module": "changelog",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/currency",
+    "key": "currency:pages/admin/page.tsx",
+    "module": "currency",
     "isAdmin": true
   },
   {

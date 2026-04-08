@@ -116,6 +116,7 @@ function generateRegistry() {
     const allHomepageSections: SectionItem[] = [];
     const allLayoutComponents: SectionItem[] = [];
     const allNavbarComponents: SectionItem[] = [];
+    const allFooterComponents: SectionItem[] = [];
     const allSettingsCards: ManifestItem[] = [];
     const allOauthButtons: ManifestItem[] = [];
     const allProfileTabs: SectionItem[] = [];
@@ -181,6 +182,12 @@ function generateRegistry() {
                 });
             }
 
+            if (manifest.footerComponents) {
+                manifest.footerComponents.forEach((fc: { id: string; component: string; section?: string; order?: number }) => {
+                    allFooterComponents.push({ ...fc, module: moduleName });
+                });
+            }
+
             if (manifest.homepageSections) {
                 manifest.homepageSections.forEach((section: { id: string; component: string; order: number }) => {
                     allHomepageSections.push({ ...section, module: moduleName });
@@ -194,6 +201,7 @@ function generateRegistry() {
     allWidgets.sort((a, b) => a.defaultOrder - b.defaultOrder);
     allHomepageSections.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
     allNavbarComponents.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    allFooterComponents.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
     // Generate dynamic imports for widget components
     let widgetImports = '\n// Widget component registry\nexport const WidgetComponentRegistry: Record<string, any> = {\n';
@@ -278,7 +286,20 @@ function generateRegistry() {
     navbarImports += '};\n\n';
     navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + widgetRegistry;
+    // Generate dynamic imports for footer components
+    let footerImports = '// Footer component registry (rendered in site footer)\nexport const FooterComponentRegistry: Record<string, any> = {\n';
+    for (const fc of allFooterComponents) {
+        let importPath = fc.component.startsWith('@core/')
+            ? `@/core/components/${fc.component.replace('@core/', '')}`
+            : `@/modules/${fc.module}/${fc.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        const baseName = toComponentName(path.basename(importPath));
+        footerImports += `  '${fc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${fc.id} || mod.default || mod), { loading: () => null }),\n`;
+    }
+    footerImports += '};\n\n';
+    footerImports += `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
+
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);

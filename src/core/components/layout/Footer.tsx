@@ -8,7 +8,8 @@ import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes } from "@/core/generated/module-registry";
+import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents, FooterComponentRegistry } from "@/core/generated/module-registry";
+import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 // Custom Dropdown Component for Footer
 function CustomDropdown({
@@ -175,6 +176,17 @@ export function Footer() {
                                     formatLabel={(l) => localeNames[l as Locale]}
                                 />
                             </div>
+                            {ModuleFooterComponents
+                                .filter((fc) => moduleStatus[fc.module] === true && FooterComponentRegistry[fc.id])
+                                .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+                                .map((fc) => {
+                                    const Comp = FooterComponentRegistry[fc.id];
+                                    return (
+                                        <ModuleErrorBoundary key={fc.id}>
+                                            <Comp />
+                                        </ModuleErrorBoundary>
+                                    );
+                                })}
                         </div>
 
                         <div className="mt-6">

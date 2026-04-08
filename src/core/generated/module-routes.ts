@@ -20,6 +20,10 @@ export const moduleRouteMap: Record<string, RegExp[]> = {
   "credits": [
     /^\/api\/v1\/credits/,
   ],
+  "currency": [
+    /^\/[a-z]{2}\/admin\/currency/,
+    /^\/api\/v1\/currency/,
+  ],
   "custom-forms": [
     /^\/[a-z]{2}\/form/,
     /^\/[a-z]{2}\/admin\/forms/,

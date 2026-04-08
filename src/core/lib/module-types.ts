@@ -91,6 +91,14 @@ export interface ModuleManifest {
         order: number;        // render order (lower = left)
     }[];
 
+    // Footer components — rendered in the footer (e.g. currency selector next to language)
+    footerComponents?: {
+        id: string;
+        component: string;   // path to component
+        section?: string;    // optional footer section name (default: "settings")
+        order?: number;      // render order (lower = first)
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;
