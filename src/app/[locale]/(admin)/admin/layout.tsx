@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
 import { AdminSearch } from "@/core/components/admin/AdminSearch";
+import { AdminSpotlight } from "@/core/components/admin/AdminSpotlight";
 import moduleSystem from "@/core/lib/modules";
 import { prisma } from "@/core/lib/db";
 
@@ -45,6 +46,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 </div>
                 {children}
             </main>
+            <AdminSpotlight />
         </div>
     );
 }
