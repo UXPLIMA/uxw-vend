@@ -17,11 +17,13 @@ export default function PixelCraftHeroBanner() {
     const logoUrl = (settings.hero_logo_url as string) || "";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
     const discordUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl;
+    const heightSetting = parseInt((settings.hero_height as string) || "340");
+    const heroHeight = Number.isFinite(heightSetting) && heightSetting >= 120 ? heightSetting : 340;
 
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
     return (
-        <div className="relative overflow-hidden" style={{ height: 340, background: "#111" }}>
+        <div className="relative overflow-hidden" style={{ height: heroHeight, background: "#111" }}>
             {/* Background */}
             <div className="absolute inset-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

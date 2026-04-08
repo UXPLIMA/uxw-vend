@@ -20,7 +20,9 @@ export function HeroBanner() {
     const communityUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl || "";
     const siteName = (settings.site_name as string) || serverConfig.name;
     const playerCount = serverConfig.onlineCount;
-    const height = parseInt((settings.hero_height as string) || "260");
+    // Minimum 120px so a badly-entered value can't hide the banner entirely
+    const heightSetting = parseInt((settings.hero_height as string) || "260");
+    const height = Number.isFinite(heightSetting) && heightSetting >= 120 ? heightSetting : 260;
 
     const showServerIp = !!serverIp;
     const showCommunity = !!communityUrl;
