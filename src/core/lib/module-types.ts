@@ -157,6 +157,15 @@ export interface ModuleManifest {
         handler: string;      // path to file exporting default async fn
     }[];
 
+    // Public search providers — handlers the /search endpoint queries
+    // when a user searches the site. Handler default-exports an async
+    // function: (query: string) => Promise<SearchResult[]>
+    searchProviders?: {
+        id: string;           // e.g. "blog-articles"
+        label: string;        // group label in results UI
+        handler: string;      // path to file exporting default async fn
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

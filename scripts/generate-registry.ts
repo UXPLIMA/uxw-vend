@@ -131,6 +131,8 @@ function generateRegistry() {
     const allPageBlocks: PageBlockItem[] = [];
     interface CronJobItem { id: string; schedule: string; handler: string; module: string }
     const allCronJobs: CronJobItem[] = [];
+    interface SearchProviderItem { id: string; label: string; handler: string; module: string }
+    const allSearchProviders: SearchProviderItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -232,6 +234,12 @@ function generateRegistry() {
             if (manifest.cronJobs) {
                 manifest.cronJobs.forEach((cj: { id: string; schedule: string; handler: string }) => {
                     allCronJobs.push({ ...cj, module: moduleName });
+                });
+            }
+
+            if (manifest.searchProviders) {
+                manifest.searchProviders.forEach((sp: { id: string; label: string; handler: string }) => {
+                    allSearchProviders.push({ ...sp, module: moduleName });
                 });
             }
 
@@ -450,6 +458,20 @@ function generateRegistry() {
     }
     cronsContent += '];\n';
     fs.writeFileSync(CRONS_FILE, cronsContent);
+
+    // Generate public search providers registry
+    const SEARCH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-search.ts');
+    let searchContent = '// Auto-generated public search providers registry\n';
+    searchContent += '// Each entry points to a module file exporting a default async fn:\n';
+    searchContent += '//   (query: string) => Promise<SearchResult[]>\n\n';
+    searchContent += 'export const ModuleSearchProviders: { id: string; label: string; module: string; loader: () => Promise<{ default: (query: string) => Promise<unknown[]> }> }[] = [\n';
+    for (const sp of allSearchProviders) {
+        const handlerPath = sp.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${sp.module}/${handlerPath}`;
+        searchContent += `  { id: ${JSON.stringify(sp.id)}, label: ${JSON.stringify(sp.label)}, module: ${JSON.stringify(sp.module)}, loader: () => import('${importPath}') as Promise<{ default: (query: string) => Promise<unknown[]> }> },\n`;
+    }
+    searchContent += '];\n';
+    fs.writeFileSync(SEARCH_FILE, searchContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');
