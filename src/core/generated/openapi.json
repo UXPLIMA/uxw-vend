@@ -6140,6 +6140,7 @@
             "description": "Invalid credentials"
           }
         },
+        "description": "Authenticate a user with email/username and password; returns a session cookie and enforces 2FA when enabled.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6177,6 +6178,7 @@
             "description": "Validation error"
           }
         },
+        "description": "Create a new user account with email, username and password; validates input with Zod and hashes credentials with bcrypt.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -6218,7 +6220,8 @@
           "200": {
             "description": "Reset email sent"
           }
-        }
+        },
+        "description": "Initiate password recovery by emailing a time-limited reset token to the account on file."
       }
     },
     "/api/v1/auth/reset-password": {
@@ -6231,7 +6234,8 @@
           "200": {
             "description": "Password reset"
           }
-        }
+        },
+        "description": "Consume a password reset token and set a new password for the associated user."
       }
     },
     "/api/v1/auth/profile": {
@@ -6245,6 +6249,7 @@
             "description": "Profile data"
           }
         },
+        "description": "Return the authenticated user's profile, including display fields and preferences.",
         "security": [
           {
             "bearerAuth": []
@@ -6261,6 +6266,7 @@
             "description": "Updated"
           }
         },
+        "description": "Update the authenticated user's own profile fields (name, bio, avatar, preferences).",
         "security": [
           {
             "bearerAuth": []
@@ -6279,6 +6285,7 @@
             "description": "User list"
           }
         },
+        "description": "Return a paginated list of users with their roles; requires admin permissions.",
         "security": [
           {
             "bearerAuth": []
@@ -6297,6 +6304,7 @@
             "description": "User object"
           }
         },
+        "description": "Fetch a single user's full record by ID, including role and profile data.",
         "security": [
           {
             "bearerAuth": []
@@ -6323,6 +6331,7 @@
             "description": "Updated"
           }
         },
+        "description": "Update a user's fields (role, status, profile) as an administrator.",
         "security": [
           {
             "bearerAuth": []
@@ -6349,6 +6358,7 @@
             "description": "Deleted"
           }
         },
+        "description": "Permanently delete a user account and its owned records; admin-only.",
         "security": [
           {
             "bearerAuth": []
@@ -6377,6 +6387,7 @@
             "description": "Role list"
           }
         },
+        "description": "Return all roles defined in the platform along with their priority and permission assignments.",
         "security": [
           {
             "bearerAuth": []
@@ -6393,6 +6404,7 @@
             "description": "Role created"
           }
         },
+        "description": "Create a new RBAC role with a name, priority and initial permission set.",
         "security": [
           {
             "bearerAuth": []
@@ -6411,6 +6423,7 @@
             "description": "Module list"
           }
         },
+        "description": "Return all installed modules with their manifest metadata and enabled state.",
         "security": [
           {
             "bearerAuth": []
@@ -6427,6 +6440,7 @@
             "description": "Updated"
           }
         },
+        "description": "Toggle a module's enabled state at runtime without uninstalling its files.",
         "security": [
           {
             "bearerAuth": []
@@ -6445,6 +6459,7 @@
             "description": "Installed"
           }
         },
+        "description": "Download, extract and register a verified marketplace module, then regenerate the module registry and merged Prisma schema.",
         "security": [
           {
             "bearerAuth": []
@@ -6463,6 +6478,7 @@
             "description": "Settings"
           }
         },
+        "description": "Return all platform settings (site metadata, branding, navigation, feature flags) for admin editing.",
         "security": [
           {
             "bearerAuth": []
@@ -6479,6 +6495,7 @@
             "description": "Updated"
           }
         },
+        "description": "Upsert one or more platform setting key/value pairs and invalidate the public settings cache.",
         "security": [
           {
             "bearerAuth": []
@@ -6496,7 +6513,8 @@
           "200": {
             "description": "Public settings"
           }
-        }
+        },
+        "description": "Return the subset of settings safe for unauthenticated clients (site name, logo, hero config, etc.)."
       }
     },
     "/api/v1/upload": {
@@ -6513,6 +6531,7 @@
             "description": "File too large"
           }
         },
+        "description": "Accept a multipart file upload, validate its size and MIME type, persist it to media storage and return its public URL.",
         "security": [
           {
             "bearerAuth": []
@@ -6531,6 +6550,7 @@
             "description": "Media list"
           }
         },
+        "description": "Return a paginated list of media library assets uploaded to the platform.",
         "security": [
           {
             "bearerAuth": []
@@ -6549,6 +6569,7 @@
             "description": "Search results"
           }
         },
+        "description": "Run a federated search query against every enabled module that registers a search provider and return merged results.",
         "parameters": [
           {
             "name": "q",
@@ -6572,6 +6593,7 @@
             "description": "API key list"
           }
         },
+        "description": "Return all issued API keys with metadata (name, scopes, last used) but never the raw secret.",
         "security": [
           {
             "bearerAuth": []
@@ -6588,6 +6610,7 @@
             "description": "Created"
           }
         },
+        "description": "Generate a new API key with scoped permissions; the raw secret is returned exactly once in the response.",
         "security": [
           {
             "bearerAuth": []
@@ -6608,7 +6631,8 @@
           "503": {
             "description": "Degraded"
           }
-        }
+        },
+        "description": "Liveness and readiness probe that verifies database connectivity and returns service health."
       }
     },
     "/api/v1/admin/metrics": {
@@ -6622,6 +6646,7 @@
             "description": "Metrics"
           }
         },
+        "description": "Return in-memory request metrics (per-route counts, latency buckets, error rates) for the admin dashboard.",
         "security": [
           {
             "bearerAuth": []
@@ -6640,6 +6665,7 @@
             "description": "System info"
           }
         },
+        "description": "Return detailed system information including Node version, memory usage, uptime and environment details.",
         "security": [
           {
             "bearerAuth": []
@@ -6658,6 +6684,7 @@
             "description": "Backup list"
           }
         },
+        "description": "Return all database backup archives currently stored on disk with their size and creation timestamp.",
         "security": [
           {
             "bearerAuth": []
@@ -6674,6 +6701,7 @@
             "description": "Backup created"
           }
         },
+        "description": "Trigger a new database backup dump and write the archive to the backups directory.",
         "security": [
           {
             "bearerAuth": []
@@ -6692,6 +6720,7 @@
             "description": "Stats payload"
           }
         },
+        "description": "Aggregate statistics for the admin dashboard combining core counters and registered module statsApi contributions.",
         "security": [
           {
             "bearerAuth": []

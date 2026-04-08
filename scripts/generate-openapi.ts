@@ -65,6 +65,7 @@ interface CoreEndpoint {
     path: string;
     method: HttpMethod;
     summary: string;
+    description?: string;
     tags: string[];
     secured?: boolean;
     parameters?: OpenApiOperation["parameters"];
@@ -80,6 +81,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/login",
         method: "post",
         summary: "Log in with credentials",
+        description: "Authenticate a user with email/username and password; returns a session cookie and enforces 2FA when enabled.",
         tags: ["Auth"],
         requestBody: {
             content: {
@@ -104,6 +106,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/register",
         method: "post",
         summary: "Register new user",
+        description: "Create a new user account with email, username and password; validates input with Zod and hashes credentials with bcrypt.",
         tags: ["Auth"],
         requestBody: {
             content: {
@@ -135,6 +138,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/forgot-password",
         method: "post",
         summary: "Request password reset email",
+        description: "Initiate password recovery by emailing a time-limited reset token to the account on file.",
         tags: ["Auth"],
         responses: { "200": { description: "Reset email sent" } },
     },
@@ -142,6 +146,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/reset-password",
         method: "post",
         summary: "Reset password with token",
+        description: "Consume a password reset token and set a new password for the associated user.",
         tags: ["Auth"],
         responses: { "200": { description: "Password reset" } },
     },
@@ -149,6 +154,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/profile",
         method: "get",
         summary: "Get current user profile",
+        description: "Return the authenticated user's profile, including display fields and preferences.",
         tags: ["Auth"],
         secured: true,
         responses: { "200": { description: "Profile data" } },
@@ -157,6 +163,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/auth/profile",
         method: "patch",
         summary: "Update current user profile",
+        description: "Update the authenticated user's own profile fields (name, bio, avatar, preferences).",
         tags: ["Auth"],
         secured: true,
         responses: { "200": { description: "Updated" } },
@@ -167,6 +174,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/users",
         method: "get",
         summary: "List users (admin)",
+        description: "Return a paginated list of users with their roles; requires admin permissions.",
         tags: ["Users"],
         secured: true,
         responses: { "200": { description: "User list" } },
@@ -175,6 +183,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/users/{id}",
         method: "get",
         summary: "Get user by id (admin)",
+        description: "Fetch a single user's full record by ID, including role and profile data.",
         tags: ["Users"],
         secured: true,
         parameters: [
@@ -191,6 +200,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/users/{id}",
         method: "patch",
         summary: "Update user (admin)",
+        description: "Update a user's fields (role, status, profile) as an administrator.",
         tags: ["Users"],
         secured: true,
         parameters: [
@@ -207,6 +217,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/users/{id}",
         method: "delete",
         summary: "Delete user (admin)",
+        description: "Permanently delete a user account and its owned records; admin-only.",
         tags: ["Users"],
         secured: true,
         parameters: [
@@ -225,6 +236,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/roles",
         method: "get",
         summary: "List roles",
+        description: "Return all roles defined in the platform along with their priority and permission assignments.",
         tags: ["Roles"],
         secured: true,
         responses: { "200": { description: "Role list" } },
@@ -233,6 +245,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/roles",
         method: "post",
         summary: "Create role (admin)",
+        description: "Create a new RBAC role with a name, priority and initial permission set.",
         tags: ["Roles"],
         secured: true,
         responses: { "201": { description: "Role created" } },
@@ -243,6 +256,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/modules",
         method: "get",
         summary: "List modules (admin)",
+        description: "Return all installed modules with their manifest metadata and enabled state.",
         tags: ["Modules"],
         secured: true,
         responses: { "200": { description: "Module list" } },
@@ -251,6 +265,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/modules",
         method: "patch",
         summary: "Enable/disable module (admin)",
+        description: "Toggle a module's enabled state at runtime without uninstalling its files.",
         tags: ["Modules"],
         secured: true,
         responses: { "200": { description: "Updated" } },
@@ -259,6 +274,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/modules/marketplace/install",
         method: "post",
         summary: "Install module from marketplace (admin)",
+        description: "Download, extract and register a verified marketplace module, then regenerate the module registry and merged Prisma schema.",
         tags: ["Modules"],
         secured: true,
         responses: { "200": { description: "Installed" } },
@@ -269,6 +285,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/settings",
         method: "get",
         summary: "Get settings (admin)",
+        description: "Return all platform settings (site metadata, branding, navigation, feature flags) for admin editing.",
         tags: ["Settings"],
         secured: true,
         responses: { "200": { description: "Settings" } },
@@ -277,6 +294,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/settings",
         method: "patch",
         summary: "Update settings (admin)",
+        description: "Upsert one or more platform setting key/value pairs and invalidate the public settings cache.",
         tags: ["Settings"],
         secured: true,
         responses: { "200": { description: "Updated" } },
@@ -285,6 +303,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/public-settings",
         method: "get",
         summary: "Get public settings",
+        description: "Return the subset of settings safe for unauthenticated clients (site name, logo, hero config, etc.).",
         tags: ["Settings"],
         responses: { "200": { description: "Public settings" } },
     },
@@ -294,6 +313,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/upload",
         method: "post",
         summary: "Upload file",
+        description: "Accept a multipart file upload, validate its size and MIME type, persist it to media storage and return its public URL.",
         tags: ["Media"],
         secured: true,
         responses: {
@@ -305,6 +325,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/media",
         method: "get",
         summary: "List media library entries (admin)",
+        description: "Return a paginated list of media library assets uploaded to the platform.",
         tags: ["Media"],
         secured: true,
         responses: { "200": { description: "Media list" } },
@@ -315,6 +336,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/search",
         method: "get",
         summary: "Global search across enabled module search providers",
+        description: "Run a federated search query against every enabled module that registers a search provider and return merged results.",
         tags: ["Search"],
         parameters: [
             {
@@ -332,6 +354,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/api-keys",
         method: "get",
         summary: "List API keys (admin)",
+        description: "Return all issued API keys with metadata (name, scopes, last used) but never the raw secret.",
         tags: ["API Keys"],
         secured: true,
         responses: { "200": { description: "API key list" } },
@@ -340,6 +363,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/api-keys",
         method: "post",
         summary: "Create API key (admin)",
+        description: "Generate a new API key with scoped permissions; the raw secret is returned exactly once in the response.",
         tags: ["API Keys"],
         secured: true,
         responses: { "201": { description: "Created" } },
@@ -350,6 +374,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/health",
         method: "get",
         summary: "Health check",
+        description: "Liveness and readiness probe that verifies database connectivity and returns service health.",
         tags: ["System"],
         responses: {
             "200": { description: "Healthy" },
@@ -360,6 +385,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/admin/metrics",
         method: "get",
         summary: "Request metrics (admin)",
+        description: "Return in-memory request metrics (per-route counts, latency buckets, error rates) for the admin dashboard.",
         tags: ["System"],
         secured: true,
         responses: { "200": { description: "Metrics" } },
@@ -368,6 +394,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/admin/system",
         method: "get",
         summary: "System health info (admin)",
+        description: "Return detailed system information including Node version, memory usage, uptime and environment details.",
         tags: ["System"],
         secured: true,
         responses: { "200": { description: "System info" } },
@@ -376,6 +403,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/admin/backup",
         method: "get",
         summary: "List backups (admin)",
+        description: "Return all database backup archives currently stored on disk with their size and creation timestamp.",
         tags: ["System"],
         secured: true,
         responses: { "200": { description: "Backup list" } },
@@ -384,6 +412,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/admin/backup",
         method: "post",
         summary: "Create backup (admin)",
+        description: "Trigger a new database backup dump and write the archive to the backups directory.",
         tags: ["System"],
         secured: true,
         responses: { "201": { description: "Backup created" } },
@@ -394,6 +423,7 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
         path: "/api/v1/stats",
         method: "get",
         summary: "Dashboard statistics (admin)",
+        description: "Aggregate statistics for the admin dashboard combining core counters and registered module statsApi contributions.",
         tags: ["Stats"],
         secured: true,
         responses: { "200": { description: "Stats payload" } },
@@ -512,6 +542,7 @@ function buildPathsFromCore(): Record<string, PathItem> {
                 "200": { description: "Success" },
             },
         };
+        if (ep.description) op.description = ep.description;
         if (ep.secured) op.security = [{ bearerAuth: [] }];
         if (ep.parameters) op.parameters = ep.parameters;
         if (ep.requestBody) op.requestBody = ep.requestBody;

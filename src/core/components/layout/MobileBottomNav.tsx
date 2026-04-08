@@ -5,6 +5,7 @@ import { Home, User, Package } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
+import { Slot } from "@/core/components/Slot";
 
 // Icon map for dynamic rendering from registry
 import { ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download, Gift, Crown, Trophy, Vote, Dices, History, Users, Shield } from "lucide-react";
@@ -40,6 +41,7 @@ export function MobileBottomNav() {
 
     return (
         <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+            <Slot name="mobile.nav" />
             <div className="flex items-center justify-around h-14">
                 {items.map((item) => (
                     <Link

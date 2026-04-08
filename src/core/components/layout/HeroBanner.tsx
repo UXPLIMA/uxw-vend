@@ -7,6 +7,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useState } from "react";
 import Image from "next/image";
+import { Slot } from "@/core/components/Slot";
 
 export function HeroBanner() {
     const t = useTranslations('hero');
@@ -30,6 +31,8 @@ export function HeroBanner() {
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
     return (
+        <>
+        <Slot name="hero.top" />
         <div className="relative overflow-hidden bg-[#1a1f2e]" style={{ height }}>
             <div className="absolute inset-0">
                 <Image src={bgImage} alt="" fill className="object-cover opacity-50" unoptimized priority />
@@ -82,5 +85,7 @@ export function HeroBanner() {
                 </div>
             </div>
         </div>
+        <Slot name="hero.bottom" />
+        </>
     );
 }

@@ -12,6 +12,7 @@ import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { Slot } from "@/core/components/Slot";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
@@ -118,10 +119,13 @@ export function Navbar() {
     const isStaffUser = (session?.user?.rolePriority ?? 0) >= 50;
 
     return (
+        <>
+        <Slot name="layout.top" />
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12">
                     <nav className="flex items-center gap-1">
+                        <Slot name="navbar.start" />
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
 
@@ -193,6 +197,8 @@ export function Navbar() {
                                     );
                                 })}
 
+                                <Slot name="navbar.end" />
+
                                 <div className="relative" ref={menuRef}>
                                     <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors">
                                         {session.user.image ? (
@@ -238,5 +244,6 @@ export function Navbar() {
                 </div>
             </div>
         </header>
+        </>
     );
 }

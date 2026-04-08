@@ -10,6 +10,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents, FooterComponentRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
+import { Slot } from "@/core/components/Slot";
 
 
 export function Footer() {
@@ -57,7 +58,9 @@ export function Footer() {
     };
 
     return (
+        <>
         <footer className="bg-[#111827] text-white mt-12">
+            <Slot name="footer.top" />
             <div className="container mx-auto px-4 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
                     {/* Brand */}
@@ -174,5 +177,7 @@ export function Footer() {
                 </div>
             </div>
         </footer>
+        <Slot name="layout.bottom" />
+        </>
     );
 }

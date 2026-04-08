@@ -17,6 +17,7 @@ import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/core/components/ErrorBoundary";
+import { Slot } from "@/core/components/Slot";
 import "../globals.css";
 
 const inter = Inter({
@@ -95,6 +96,9 @@ export default async function RootLayout({
                   {children}
                   <MobileBottomNav />
                   </ErrorBoundary>
+                  <div className="relative z-[9999]">
+                    <Slot name="layout.overlay" />
+                  </div>
                   <Toaster position="bottom-right" richColors closeButton />
                 </ConfirmProvider>
                 </ModuleContextProviders>
