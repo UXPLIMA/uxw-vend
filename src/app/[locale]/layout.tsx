@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { buildPageMeta, buildOrganizationJsonLd } from "@/core/lib/seo";
+import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -13,6 +15,7 @@ import { ModuleContextProviders } from "@/core/components/layout/ModuleContextPr
 import { bootstrapHooks } from "@/core/lib/hooks";
 import { bootstrapScheduler } from "@/core/lib/scheduler";
 import { registerTrophyListeners } from "@/core/lib/trophy-engine";
+import { ensureIndexes as ensureSearchIndexes } from "../../../scripts/ensure-search-indexes";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -39,21 +42,25 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "uxwVend - Game Server Platform",
-    template: "%s | uxwVend",
-  },
-  description: "Open source modular platform with a plugin-based marketplace architecture.",
-  keywords: ["open source", "modular platform", "plugin marketplace"],
-  manifest: "/manifest.json",
-  authors: [{ name: "uxwVend" }],
-  openGraph: {
-    title: "uxwVend - Game Server Platform",
-    description: "Open source game server management platform",
+export async function generateMetadata(): Promise<Metadata> {
+  // Pull site_name/description from Settings via buildPageMeta, then layer
+  // root-layout-only fields (title template, manifest) on top.
+  const base = await buildPageMeta({
+    title: serverConfig.name,
     type: "website",
-  },
-};
+    url: "/",
+  });
+  return {
+    ...base,
+    title: {
+      default: serverConfig.name,
+      template: `%s | ${serverConfig.name}`,
+    },
+    keywords: ["open source", "modular platform", "plugin marketplace"],
+    manifest: "/manifest.json",
+    authors: [{ name: serverConfig.name }],
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -71,6 +78,10 @@ export default async function RootLayout({
   await registerTrophyListeners();
   // Start the cron scheduler (idempotent)
   await bootstrapScheduler();
+  // Ensure full-text search GIN indexes exist (fire-and-forget, idempotent)
+  ensureSearchIndexes().catch((err: unknown) => {
+    console.warn("[search-indexes] bootstrap failed:", err instanceof Error ? err.message : String(err));
+  });
 
   const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
   const moduleStates: Record<string, boolean> = {};
@@ -82,6 +93,10 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           try { if (localStorage.getItem('color-mode') === 'dark') document.documentElement.setAttribute('data-mode', 'dark'); } catch {}
         ` }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: buildOrganizationJsonLd() }}
+        />
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}

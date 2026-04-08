@@ -1,10 +1,21 @@
+import type { Metadata } from "next";
 import { Award, Check, Users } from "lucide-react";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
+import { buildPageMeta } from "@/core/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+    return buildPageMeta({
+        title: "Trophies",
+        description: "Achievements you can earn across the community.",
+        url: "/trophies",
+        type: "website",
+    });
+}
 
 interface TrophyRow {
     id: string;

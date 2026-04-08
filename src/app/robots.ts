@@ -1,16 +1,16 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
 
     return {
         rules: [
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/admin/", "/api/", "/auth/"],
+                disallow: ["/admin", "/api", "/auth", "/profile"],
             },
         ],
-        sitemap: `${baseUrl}/sitemap.xml`,
+        sitemap: `${siteUrl}/sitemap.xml`,
     };
 }

@@ -209,6 +209,13 @@ export interface ModuleManifest {
     // Dashboard integration — module provides its own stats
     statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
 
+    // SEO sitemap contributor — module decides which of its URLs should
+    // appear in the sitemap. Handler default-exports an async function:
+    //   () => Promise<SitemapEntry[]>
+    seoRoutes?: {
+        handler: string;   // path to file exporting default async fn
+    };
+
     // Homepage sections — modules register their own content areas
     homepageSections?: {
         id: string;

@@ -137,6 +137,8 @@ function generateRegistry() {
     const allWebhookReceivers: WebhookReceiverItem[] = [];
     interface NotificationTypeItem { eventType: string; label: string; description?: string; channels?: string[]; module: string }
     const allNotificationTypes: NotificationTypeItem[] = [];
+    interface SeoRouteItem { module: string; handler: string }
+    const allSeoRoutes: SeoRouteItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -257,6 +259,10 @@ function generateRegistry() {
                 manifest.notificationTypes.forEach((nt: { eventType: string; label: string; description?: string; channels?: string[] }) => {
                     allNotificationTypes.push({ ...nt, module: moduleName });
                 });
+            }
+
+            if (manifest.seoRoutes && typeof manifest.seoRoutes.handler === "string") {
+                allSeoRoutes.push({ module: moduleName, handler: manifest.seoRoutes.handler });
             }
 
             if (manifest.homepageSections) {
@@ -503,6 +509,28 @@ function generateRegistry() {
     }
     webhooksContent += '];\n';
     fs.writeFileSync(WEBHOOKS_FILE, webhooksContent);
+
+    // Generate SEO sitemap contributors registry — server-only, dynamic imports.
+    // Each module points to an async handler that returns SitemapEntry[].
+    // /sitemap.xml iterates this list and merges results from enabled modules.
+    const SEO_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-seo.ts');
+    let seoContent = '// Auto-generated module SEO sitemap registry — server only\n';
+    seoContent += '// Each entry points to a module file exporting a default async fn:\n';
+    seoContent += '//   () => Promise<SitemapEntry[]>\n\n';
+    seoContent += 'export interface SitemapEntry {\n';
+    seoContent += '    url: string;\n';
+    seoContent += '    lastModified?: Date;\n';
+    seoContent += "    changeFreq?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';\n";
+    seoContent += '    priority?: number;\n';
+    seoContent += '}\n\n';
+    seoContent += 'export const ModuleSeoRoutes: { module: string; loader: () => Promise<{ default: () => Promise<SitemapEntry[]> }> }[] = [\n';
+    for (const sr of allSeoRoutes) {
+        const handlerPath = sr.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${sr.module}/${handlerPath}`;
+        seoContent += `  { module: ${JSON.stringify(sr.module)}, loader: () => import('${importPath}') as Promise<{ default: () => Promise<SitemapEntry[]> }> },\n`;
+    }
+    seoContent += '];\n';
+    fs.writeFileSync(SEO_FILE, seoContent);
 
     // Generate user-facing notification types registry — pure data, no imports
     const NOTIFTYPES_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-notification-types.ts');

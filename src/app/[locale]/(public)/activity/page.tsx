@@ -1,10 +1,21 @@
+import type { Metadata } from "next";
 import { Activity } from "lucide-react";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
 import { prisma } from "@/core/lib/db";
+import { buildPageMeta } from "@/core/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+    return buildPageMeta({
+        title: "Activity Feed",
+        description: "Latest activity across the site — posts, trophies, and community events.",
+        url: "/activity",
+        type: "website",
+    });
+}
 
 async function fetchPublicFeed(limit = 20): Promise<ActivityItem[]> {
     try {
