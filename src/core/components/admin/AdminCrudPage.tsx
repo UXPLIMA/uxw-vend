@@ -10,15 +10,19 @@ import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
+import { FileUpload } from "@/core/components/ui/file-upload";
+import { UrlOrFile } from "@/core/components/ui/url-or-file";
+import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 
 export interface CrudField {
     key: string;
     label: string;
-    type?: "text" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color";
+    type?: "text" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color" | "image" | "urlOrFile" | "richtext";
     placeholder?: string;
     options?: { value: string; label: string }[];
     defaultValue?: string;
     required?: boolean;
+    accept?: string;
 }
 
 interface AdminCrudPageProps {
@@ -167,6 +171,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <Input value={val} onChange={(e) => onChange(e.target.value)} placeholder="#3b82f6" />
                     </div>
                 );
+            case "image":
+                return <FileUpload value={val || null} onChange={(v) => onChange(v || "")} accept={field.accept || "image/*"} />;
+            case "urlOrFile":
+                return <UrlOrFile value={val} onChange={onChange} accept={field.accept} placeholder={field.placeholder} />;
+            case "richtext":
+                return <RichTextEditor value={val} onChange={onChange} placeholder={field.placeholder} />;
             default:
                 return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} />;
         }
@@ -206,12 +216,15 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
-                                {fields.map((field) => (
-                                    <div key={field.key} className={field.type === "textarea" ? "md:col-span-2" : ""}>
-                                        <Label>{field.label} {field.required && <span className="text-red-500">*</span>}</Label>
-                                        {renderField(field)}
-                                    </div>
-                                ))}
+                                {fields.map((field) => {
+                                    const fullWidth = field.type === "textarea" || field.type === "richtext" || field.type === "urlOrFile" || field.type === "image";
+                                    return (
+                                        <div key={field.key} className={fullWidth ? "md:col-span-2" : ""}>
+                                            <Label>{field.label} {field.required && <span className="text-red-500">*</span>}</Label>
+                                            {renderField(field)}
+                                        </div>
+                                    );
+                                })}
                             </div>
                             <Button type="submit" disabled={saving}>
                                 {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}

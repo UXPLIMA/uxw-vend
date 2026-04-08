@@ -88,3 +88,7 @@ src/modules/*
 
 # Generated translation files (rebuilt from messages-core/ + installed modules)
 messages/*.json
+
+# User-uploaded files (local fallback when S3 not configured)
+public/uploads/*
+!public/uploads/.gitkeep

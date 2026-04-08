@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
   poweredByHeader: false,
   ...(process.env.NODE_ENV === 'development' ? { allowedDevOrigins: ['*'] } : {}),
-  serverExternalPackages: ["redis", "net", "fs", "dns", "tls", "pg", "@prisma/adapter-pg"],
+  serverExternalPackages: ["redis", "net", "fs", "dns", "tls", "pg", "@prisma/adapter-pg", "@aws-sdk/client-s3"],
   images: {
     remotePatterns: [
       // Allow any user-provided image URL (Next.js image optimization is read-only fetch+resize)
