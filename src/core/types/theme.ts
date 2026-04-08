@@ -55,6 +55,13 @@ export interface ThemeConfig {
     version?: string;
     type: 'light' | 'dark';
 
+    /**
+     * Parent theme id. Child themes inherit colors/fonts/radius/schema/etc.
+     * from the parent and override only what they explicitly define.
+     * Resolved at registry build time.
+     */
+    extends?: string;
+
     colors: ThemeColors;
     fonts: ThemeFonts;
     radius: string;
