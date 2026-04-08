@@ -219,7 +219,8 @@
     "dashboard_newUsers": "New Users",
     "dashboard_7days": "7 Days",
     "dashboard_30days": "30 Days",
-    "dashboard_90days": "90 Days"
+    "dashboard_90days": "90 Days",
+    "sidebar_modulesGroup": "Модули"
   },
   "footer": {
     "quickLinks": "Быстрые ссылки",

@@ -219,7 +219,8 @@
     "crud_deleteItemConfirm": "Bu öğeyi silmek istediğinizden emin misiniz?",
     "crud_deleteItems": "Öğeleri Sil",
     "crud_deleteItemsConfirm": "{count} öğeyi silmek istediğinizden emin misiniz?",
-    "crud_noItems": "Henüz öğe yok"
+    "crud_noItems": "Henüz öğe yok",
+    "sidebar_modulesGroup": "Modüller"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

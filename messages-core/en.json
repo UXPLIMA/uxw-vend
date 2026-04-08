@@ -219,7 +219,8 @@
     "crud_deleteItemConfirm": "Delete this item?",
     "crud_deleteItems": "Delete Items",
     "crud_deleteItemsConfirm": "Delete {count} items?",
-    "crud_noItems": "No items yet"
+    "crud_noItems": "No items yet",
+    "sidebar_modulesGroup": "Modules"
   },
   "footer": {
     "quickLinks": "Quick Links",
