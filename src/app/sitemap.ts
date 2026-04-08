@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { ModuleSeoRoutes, type SitemapEntry } from "@/core/generated/module-seo";
+import { safeCall } from "@/core/lib/module-sandbox";
 
 // Revalidate sitemap every hour so bots hitting /sitemap.xml don't force
 // a DB query per request but newly published content still surfaces quickly.
@@ -53,22 +54,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const seoRoute of ModuleSeoRoutes) {
         if (!enabledStates[seoRoute.module]) continue;
 
-        try {
-            const mod = await seoRoute.loader();
-            const handler = mod.default;
-            if (typeof handler !== "function") continue;
-            const moduleEntries = await handler();
-            for (const e of moduleEntries) {
-                entries.push({
-                    url: e.url.startsWith("http") ? e.url : `${siteUrl}${e.url.startsWith("/") ? "" : "/"}${e.url}`,
-                    ...(e.lastModified ? { lastModified: e.lastModified } : {}),
-                    ...(e.changeFreq ? { changeFrequency: mapChangeFreq(e.changeFreq) } : {}),
-                    ...(typeof e.priority === "number" ? { priority: e.priority } : {}),
-                });
-            }
-        } catch (err) {
-            // Swallow per-module errors so the rest of the sitemap still renders.
-            console.error(`[sitemap] module "${seoRoute.module}" failed:`, err);
+        // Wrap each loader + handler in the sandbox so a broken module
+        // can't break the sitemap for the whole site. Runtime errors get
+        // logged to ActivityLog for admin visibility.
+        const moduleEntries = await safeCall<SitemapEntry[]>(
+            seoRoute.module,
+            "seo.sitemap",
+            async () => {
+                const mod = await seoRoute.loader();
+                const handler = mod.default;
+                if (typeof handler !== "function") return [];
+                const result = await handler();
+                return Array.isArray(result) ? result : [];
+            },
+            [],
+        );
+
+        for (const e of moduleEntries) {
+            entries.push({
+                url: e.url.startsWith("http") ? e.url : `${siteUrl}${e.url.startsWith("/") ? "" : "/"}${e.url}`,
+                ...(e.lastModified ? { lastModified: e.lastModified } : {}),
+                ...(e.changeFreq ? { changeFrequency: mapChangeFreq(e.changeFreq) } : {}),
+                ...(typeof e.priority === "number" ? { priority: e.priority } : {}),
+            });
         }
     }
 

@@ -4,6 +4,10 @@ import createIntlMiddleware from 'next-intl/middleware';
 import { locales, defaultLocale } from './core/lib/i18n/config';
 import { moduleRouteMap } from '@/core/generated/module-routes';
 import { randomUUID } from 'crypto';
+import { isSetupComplete } from '@/core/lib/setup-state';
+import { getMaintenanceConfig } from '@/core/lib/maintenance';
+import { auth } from '@/core/lib/auth';
+import prisma from '@/core/lib/db';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -60,6 +64,50 @@ async function getModuleEnabled(moduleId: string, request: NextRequest): Promise
     return true;
 }
 
+function extractLocale(pathname: string): string {
+    const match = pathname.match(/^\/([a-z]{2})(?:\/|$)/);
+    if (match && (locales as readonly string[]).includes(match[1])) {
+        return match[1];
+    }
+    return defaultLocale;
+}
+
+function isStaticAsset(pathname: string): boolean {
+    return (
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/_vercel') ||
+        pathname.includes('.') // files with extensions (images, css, js, etc.)
+    );
+}
+
+/**
+ * Best-effort session-role extraction for middleware gating.
+ * Returns "guest" when there is no session or when the lookup fails so
+ * the caller can safely treat them as an unprivileged visitor.
+ */
+async function getSessionRole(request: NextRequest): Promise<string> {
+    const cookieHeader = request.headers.get('cookie') || '';
+    if (
+        !cookieHeader.includes('authjs.session-token') &&
+        !cookieHeader.includes('next-auth.session-token')
+    ) {
+        return 'guest';
+    }
+
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+        if (!userId) return 'guest';
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: { select: { name: true } } },
+        });
+        return user?.role?.name || 'guest';
+    } catch {
+        return 'guest';
+    }
+}
+
 export async function proxy(request: NextRequest) {
     // Inject correlation ID for request tracking
     const correlationId = request.headers.get('x-correlation-id') || randomUUID();
@@ -87,6 +135,67 @@ export async function proxy(request: NextRequest) {
             const locale = pathname.match(/^\/([a-z]{2})\//)?.[1] || 'en';
             const url = new URL(`/${locale}/not-found`, request.url);
             return NextResponse.rewrite(url, { status: 404 });
+        }
+    }
+
+    // ==================== SETUP WIZARD GATE ====================
+    // If the platform hasn't been set up yet (no users exist), force every
+    // visitor through the setup wizard. The setup API route itself remains
+    // reachable so the wizard can function.
+    if (!isStaticAsset(pathname) && !pathname.startsWith('/api/setup')) {
+        const setupDone = await isSetupComplete();
+        if (!setupDone) {
+            const locale = extractLocale(pathname);
+            const setupPath = `/${locale}/setup`;
+            const isAlreadyOnSetup =
+                pathname === setupPath || pathname.startsWith(`${setupPath}/`);
+
+            if (!isAlreadyOnSetup) {
+                if (pathname.startsWith('/api/')) {
+                    return NextResponse.json(
+                        { error: 'Setup required', redirectTo: setupPath },
+                        { status: 503 }
+                    );
+                }
+                const url = new URL(setupPath, request.url);
+                return NextResponse.rewrite(url);
+            }
+        }
+    }
+
+    // ==================== MAINTENANCE MODE GATE ====================
+    // After setup is complete, enforce maintenance mode. Admins (and any
+    // explicitly allowlisted roles) can still browse. Auth endpoints remain
+    // accessible so admins can sign in.
+    if (!isStaticAsset(pathname)) {
+        const locale = extractLocale(pathname);
+        const maintenancePath = `/${locale}/maintenance`;
+        const authPrefix = `/${locale}/auth`;
+        const isOnMaintenancePage =
+            pathname === maintenancePath || pathname.startsWith(`${maintenancePath}/`);
+        const isOnAuthPage = pathname.startsWith(authPrefix);
+        const isSetupPath =
+            pathname === `/${locale}/setup` || pathname.startsWith(`/${locale}/setup/`);
+
+        if (!isOnMaintenancePage && !isOnAuthPage && !isSetupPath) {
+            const config = await getMaintenanceConfig();
+            if (config.enabled) {
+                const allowedRoles = config.allowedRoles?.length
+                    ? config.allowedRoles
+                    : ['admin'];
+                const role = await getSessionRole(request);
+
+                if (!allowedRoles.includes(role)) {
+                    if (pathname.startsWith('/api/')) {
+                        return NextResponse.json(
+                            { error: 'Service Unavailable', maintenance: true },
+                            { status: 503 }
+                        );
+                    }
+                    const url = new URL(maintenancePath, request.url);
+                    return NextResponse.rewrite(url, { status: 503 });
+                }
+            }
         }
     }
 

@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle, UserCog } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface UserDetail {
     id: string;
@@ -36,6 +38,8 @@ interface Role {
 export default function AdminUserDetailPage() {
     const params = useParams();
     const userId = params.id as string;
+    const { data: session, update: updateSession } = useSession();
+    const { confirm } = useConfirm();
 
     const [user, setUser] = useState<UserDetail | null>(null);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -43,6 +47,7 @@ export default function AdminUserDetailPage() {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [impersonating, setImpersonating] = useState(false);
 
     const [form, setForm] = useState({
         username: "",
@@ -57,6 +62,44 @@ export default function AdminUserDetailPage() {
     const [deleteReason, setDeleteReason] = useState("");
     const [deletingAccount, setDeletingAccount] = useState(false);
     const [deleteError, setDeleteError] = useState("");
+
+    const canImpersonate =
+        !!session?.user &&
+        !session.user.originalUserId &&
+        session.user.id !== userId;
+
+    const handleImpersonate = async () => {
+        if (!user) return;
+        const ok = await confirm({
+            title: "Log in as this user?",
+            message: `You are about to impersonate ${user.username}. Every action will be audited. You can return to your admin account at any time from the banner at the top of the page.`,
+            confirmText: "Log in as user",
+            cancelText: "Cancel",
+            variant: "default",
+        });
+        if (!ok) return;
+
+        setImpersonating(true);
+        try {
+            const res = await fetch("/api/v1/admin/impersonate/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId }),
+            });
+            const data = (await res.json().catch(() => ({}))) as { error?: string };
+            if (!res.ok) {
+                toast.error(data.error || "Failed to start impersonation");
+                return;
+            }
+            await updateSession({ impersonate: userId });
+            toast.success(`Now logged in as ${user.username}`);
+            window.location.href = "/";
+        } catch {
+            toast.error("Failed to start impersonation");
+        } finally {
+            setImpersonating(false);
+        }
+    };
 
     const handleExportUserData = async () => {
         setExportingData(true);
@@ -351,6 +394,42 @@ export default function AdminUserDetailPage() {
                             )}
                         </CardContent>
                     </Card>
+
+                    {canImpersonate && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <UserCog className="w-4 h-4 text-yellow-600" />
+                                    Impersonate
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <p className="text-xs text-muted-foreground">
+                                    Debug or support this user by logging in as them. Every
+                                    impersonation is written to the activity log.
+                                </p>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={handleImpersonate}
+                                    disabled={impersonating || user.isBanned}
+                                >
+                                    {impersonating ? (
+                                        <>
+                                            <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                            Switching
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserCog className="w-3 h-3 mr-2" />
+                                            Log in as this user
+                                        </>
+                                    )}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <Card>
                         <CardHeader>

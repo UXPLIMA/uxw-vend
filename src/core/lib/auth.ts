@@ -171,7 +171,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
     },
     callbacks: {
-        async jwt({ token, user, trigger }) {
+        async jwt({ token, user, trigger, session: updatePayload }) {
             if (user) {
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
@@ -179,6 +179,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // Generate a stable per-login token id for session tracking
                 token.tokenId = crypto.randomUUID();
             }
+
+            // ─── Impersonation: start ───
+            // Triggered by client calling update({ impersonate: userId }).
+            // Only the CURRENT token (pre-swap) may be admin, and it cannot
+            // stack another impersonation on top of an existing one.
+            if (
+                trigger === "update" &&
+                updatePayload &&
+                typeof updatePayload === "object" &&
+                "impersonate" in updatePayload &&
+                typeof (updatePayload as { impersonate?: unknown }).impersonate === "string"
+            ) {
+                const targetUserId = (updatePayload as { impersonate: string }).impersonate;
+                const currentRole = token.role as string | undefined;
+                if (currentRole !== "admin") return token;
+                if (token.originalUserId) return token;
+                const target = await prisma.user.findUnique({
+                    where: { id: targetUserId },
+                    include: { role: true },
+                });
+                if (!target) return token;
+                token.originalUserId = token.id;
+                token.id = target.id;
+                token.role = target.role?.name || "member";
+                token.rolePriority = target.role?.priority ?? 0;
+                return token;
+            }
+
+            // ─── Impersonation: stop ───
+            // Restores the original admin identity on the token.
+            if (
+                trigger === "update" &&
+                updatePayload &&
+                typeof updatePayload === "object" &&
+                "stopImpersonating" in updatePayload &&
+                (updatePayload as { stopImpersonating?: unknown }).stopImpersonating === true
+            ) {
+                const original = token.originalUserId as string | undefined;
+                if (!original) return token;
+                const admin = await prisma.user.findUnique({
+                    where: { id: original },
+                    include: { role: true },
+                });
+                if (!admin) return token;
+                token.id = admin.id;
+                token.role = admin.role?.name || "member";
+                token.rolePriority = admin.role?.priority ?? 0;
+                token.originalUserId = undefined;
+                return token;
+            }
+
             // Refresh role + ban status from DB on every token refresh
             if (trigger === "update" || !token.role || token.rolePriority === undefined) {
                 const dbUser = await prisma.user.findUnique({
@@ -210,6 +261,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.id = token.id as string;
                 session.user.role = token.role as string;
                 session.user.rolePriority = (token.rolePriority as number) ?? 0;
+                session.user.originalUserId = (token.originalUserId as string | undefined) ?? undefined;
             }
             return session;
         },
@@ -226,11 +278,28 @@ declare module "next-auth" {
             image?: string;
             role: string;
             rolePriority: number;
+            /**
+             * When set, this session is an admin impersonating another user.
+             * The value is the admin's real user id. `session.user.id` reflects
+             * the impersonated target while this field is populated.
+             */
+            originalUserId?: string;
         };
     }
 
     interface User {
         role?: string;
         rolePriority?: number;
+    }
+}
+
+declare module "@auth/core/jwt" {
+    interface JWT {
+        id?: string;
+        role?: string;
+        rolePriority?: number;
+        tokenId?: string;
+        /** Set while impersonating — holds the real admin's user id. */
+        originalUserId?: string;
     }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ModuleSearchProviders } from "@/core/generated/module-search";
 import { applyFiltersAsync } from "@/core/lib/hooks";
 import { getModuleStates } from "@/core/lib/module-cache";
+import { safeCall } from "@/core/lib/module-sandbox";
 
 interface SearchResult {
     type?: string;
@@ -35,17 +36,23 @@ export async function GET(request: NextRequest) {
     const moduleStates = await getModuleStates();
     const enabledProviders = ModuleSearchProviders.filter((p) => moduleStates[p.module] !== false);
 
+    // Wrap each provider's loader + handler in the sandbox: a broken
+    // module search provider logs + returns [] instead of crashing the
+    // whole /api/v1/search request.
     const groups: ResultGroup[] = await Promise.all(
         enabledProviders.map(async (provider): Promise<ResultGroup> => {
-            try {
-                const mod = await provider.loader();
-                const handler = mod.default;
-                const results = (await handler(q)) as SearchResult[];
-                return { id: provider.id, label: provider.label, results: Array.isArray(results) ? results.slice(0, 10) : [] };
-            } catch (err) {
-                console.error(`[search] ${provider.id} failed:`, err);
-                return { id: provider.id, label: provider.label, results: [] };
-            }
+            const results = await safeCall<SearchResult[]>(
+                provider.module,
+                `search:${provider.id}`,
+                async () => {
+                    const mod = await provider.loader();
+                    const handler = mod.default;
+                    const out = (await handler(q)) as SearchResult[];
+                    return Array.isArray(out) ? out.slice(0, 10) : [];
+                },
+                [],
+            );
+            return { id: provider.id, label: provider.label, results };
         })
     );
 

@@ -21,6 +21,7 @@ import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/core/components/ErrorBoundary";
+import { ImpersonationBanner } from "@/core/components/ImpersonationBanner";
 import { Slot } from "@/core/components/Slot";
 import "../globals.css";
 
@@ -108,6 +109,7 @@ export default async function RootLayout({
                 <ModuleContextProviders>
                 <ConfirmProvider>
                   <ErrorBoundary>
+                  <ImpersonationBanner />
                   <ProgressBar />
                   <CustomCssInjector />
                   <ModuleLayoutComponents />

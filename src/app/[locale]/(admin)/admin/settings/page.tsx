@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -10,7 +10,7 @@ import { ModuleSettingsCards } from "@/core/generated/module-registry";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
     Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson,
-    History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText,
+    History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText, Wrench,
 };
 
 export default function SettingsPage() {
@@ -111,6 +111,13 @@ export default function SettingsPage() {
             href: "/admin/audit-log",
             icon: "ScrollText",
             color: "text-orange-500",
+        },
+        {
+            title: t.has("settings_maintenance") ? t("settings_maintenance") : "Maintenance Mode",
+            description: t.has("settings_maintenanceDesc") ? t("settings_maintenanceDesc") : "Take the site offline for visitors while admins keep access.",
+            href: "/admin/settings/maintenance",
+            icon: "Wrench",
+            color: "text-yellow-600",
         },
     ];
 

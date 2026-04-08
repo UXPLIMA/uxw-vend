@@ -1,0 +1,78 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { auth } from "@/core/lib/auth";
+import { isAdmin } from "@/core/lib/permissions";
+import { logActivity } from "@/core/lib/activity-log";
+import {
+    getMaintenanceConfig,
+    setMaintenanceConfig,
+    type MaintenanceConfig,
+} from "@/core/lib/maintenance";
+
+const configSchema = z.object({
+    enabled: z.boolean(),
+    message: z.string().max(2000).optional(),
+    allowedRoles: z.array(z.string().min(1).max(50)).max(20).optional(),
+});
+
+export async function GET() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id))) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const config = await getMaintenanceConfig();
+    return NextResponse.json({ data: config });
+}
+
+export async function POST(request: NextRequest) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id))) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    let body: unknown;
+    try {
+        body = await request.json();
+    } catch {
+        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+
+    const parsed = configSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json(
+            { error: "Invalid payload", issues: parsed.error.issues },
+            { status: 400 }
+        );
+    }
+
+    const next: MaintenanceConfig = {
+        enabled: parsed.data.enabled,
+        message: parsed.data.message ?? "",
+        allowedRoles:
+            parsed.data.allowedRoles && parsed.data.allowedRoles.length > 0
+                ? parsed.data.allowedRoles
+                : ["admin"],
+    };
+
+    await setMaintenanceConfig(next);
+
+    logActivity({
+        userId: session.user.id,
+        action: next.enabled ? "maintenance.enable" : "maintenance.disable",
+        entity: "setting",
+        entityId: "maintenance_mode",
+        metadata: {
+            enabled: next.enabled,
+            allowedRoles: next.allowedRoles,
+        },
+    }).catch(() => {});
+
+    return NextResponse.json({ data: next });
+}
