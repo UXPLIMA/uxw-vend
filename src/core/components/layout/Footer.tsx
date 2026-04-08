@@ -1,58 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, Mail, ChevronDown, Heart } from "lucide-react";
+import { Globe, Mail, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents, FooterComponentRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 
-// Custom Dropdown Component for Footer
-function CustomDropdown({
-    options,
-    value,
-    onChange,
-    formatLabel
-}: {
-    options: readonly string[] | string[];
-    value: string;
-    onChange: (value: string) => void;
-    formatLabel?: (value: string) => string;
-}) {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className="relative">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm min-w-[100px]"
-            >
-                <span className="flex-1 text-left">{formatLabel ? formatLabel(value) : value}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {isOpen && (
-                <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-card border border-white/10 rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
-                        {options.map((option) => (
-                            <button
-                                key={option}
-                                onClick={() => { onChange(option); setIsOpen(false); }}
-                                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/10 transition-colors ${value === option ? 'bg-blue-600 text-white' : 'text-muted-foreground'}`}
-                            >
-                                {formatLabel ? formatLabel(option) : option}
-                            </button>
-                        ))}
-                    </div>
-                </>
-            )}
-        </div>
-    );
-}
 
 export function Footer() {
     const t = useTranslations('footer');
@@ -169,7 +127,7 @@ export function Footer() {
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Globe className="w-4 h-4 text-muted-foreground" />
-                                <CustomDropdown
+                                <FooterDropdown
                                     options={locales}
                                     value={locale}
                                     onChange={handleLocaleChange}
