@@ -25,6 +25,35 @@ function getEmailEnabled(): boolean {
     return !!process.env.RESEND_API_KEY;
 }
 
+/**
+ * Generic send-email helper. Used by broadcasts and any module that
+ * needs to send arbitrary HTML email. Returns true on success.
+ */
+export async function sendEmail(opts: {
+    to: string;
+    subject: string;
+    html: string;
+}): Promise<boolean> {
+    if (!getEmailEnabled()) {
+        console.log(`[Email Disabled] To ${opts.to}: ${opts.subject}`);
+        return false;
+    }
+    const resend = await getResend();
+    if (!resend) return false;
+    try {
+        await resend.emails.send({
+            from: `${APP_NAME} <${FROM_EMAIL}>`,
+            to: opts.to,
+            subject: opts.subject,
+            html: opts.html,
+        });
+        return true;
+    } catch (err) {
+        console.error("[email] sendEmail failed:", err);
+        return false;
+    }
+}
+
 export async function sendPasswordResetEmail(email: string, resetUrl: string) {
     if (!getEmailEnabled()) {
         console.log(`[Email Disabled] Password reset for ${email}: ${resetUrl}`);

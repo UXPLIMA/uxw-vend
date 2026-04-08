@@ -266,6 +266,29 @@ model ResourcePermission {
   @@index([principalType, principalId])
 }
 
+// Email broadcast — admin sends a single message to many users.
+// Status: draft → queued → sending → sent (or failed)
+model EmailBroadcast {
+  id            String   @id @default(cuid())
+  subject       String
+  body          String   @db.Text
+  status        String   @default("draft") // draft|queued|sending|sent|failed
+  filter        Json     @default("{}")    // { roleIds?, userIds?, all? }
+  createdById   String?
+  totalCount    Int      @default(0)
+  sentCount     Int      @default(0)
+  failedCount   Int      @default(0)
+  lastError     String?
+  scheduledFor  DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
+}
+
 // Tracks per-cron-job last-run timestamps. The scheduler reads/writes
 // this on every tick to decide which jobs are due.
 model CronRun {

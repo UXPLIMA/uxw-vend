@@ -136,6 +136,15 @@ export async function bootstrapScheduler(): Promise<void> {
         },
     });
 
+    registerCronJob({
+        key: "core:process-broadcasts",
+        schedule: "every-minute",
+        handler: async () => {
+            const { processQueuedBroadcasts } = await import("./broadcasts");
+            await processQueuedBroadcasts();
+        },
+    });
+
     // ─── Module-contributed jobs ───
     try {
         const { ModuleCronJobs } = await import("@/core/generated/module-crons");
