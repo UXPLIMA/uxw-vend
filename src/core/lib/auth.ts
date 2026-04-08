@@ -141,7 +141,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.rolePriority = (user as { rolePriority?: number }).rolePriority ?? 0;
             }
             // Refresh role + ban status from DB on every token refresh
-            if (trigger === "update" || !token.role) {
+            if (trigger === "update" || !token.role || token.rolePriority === undefined) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     include: { role: true },
