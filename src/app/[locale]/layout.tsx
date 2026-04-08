@@ -9,6 +9,7 @@ import prisma from "@/core/lib/db";
 import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
+import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -78,6 +79,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
               <AppThemeProvider defaultTheme={defaultThemeId}>
                 <ModuleProvider moduleStates={moduleStates}>
+                <ModuleContextProviders>
                 <ConfirmProvider>
                   <ErrorBoundary>
                   <ProgressBar />
@@ -88,6 +90,7 @@ export default async function RootLayout({
                   </ErrorBoundary>
                   <Toaster position="bottom-right" richColors closeButton />
                 </ConfirmProvider>
+                </ModuleContextProviders>
                 </ModuleProvider>
               </AppThemeProvider>
           </NextIntlClientProvider>

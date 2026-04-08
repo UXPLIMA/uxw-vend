@@ -108,6 +108,15 @@ export interface ModuleManifest {
         handler: string;     // path to file exporting `default: StorageProvider`
     }[];
 
+    // Context providers — React components that wrap the entire app tree.
+    // Use for context (CurrencyProvider, ThemeProvider, etc.) that descendants need to consume.
+    // Unlike layoutComponents (rendered as siblings), contextProviders WRAP children.
+    contextProviders?: {
+        id: string;          // unique id
+        component: string;   // path to file exporting the provider (default or named)
+        order?: number;      // wrap order (lower = outer)
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

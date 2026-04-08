@@ -122,6 +122,7 @@ function generateRegistry() {
     const allProfileTabs: SectionItem[] = [];
     interface StorageProviderItem { id: string; name: string; handler: string; module: string }
     const allStorageProviders: StorageProviderItem[] = [];
+    const allContextProviders: SectionItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -193,6 +194,12 @@ function generateRegistry() {
             if (manifest.storageProviders) {
                 manifest.storageProviders.forEach((sp: { id: string; name: string; handler: string }) => {
                     allStorageProviders.push({ ...sp, module: moduleName });
+                });
+            }
+
+            if (manifest.contextProviders) {
+                manifest.contextProviders.forEach((cp: { id: string; component: string; order?: number }) => {
+                    allContextProviders.push({ ...cp, module: moduleName });
                 });
             }
 
@@ -307,7 +314,21 @@ function generateRegistry() {
     footerImports += '};\n\n';
     footerImports += `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + widgetRegistry;
+    // Generate dynamic imports for context providers (wrap children, not siblings)
+    allContextProviders.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    let contextImports = '// Context provider registry — wraps children, used for React contexts\nexport const ContextProviderRegistry: Record<string, any> = {\n';
+    for (const cp of allContextProviders) {
+        let importPath = cp.component.startsWith('@core/')
+            ? `@/core/components/${cp.component.replace('@core/', '')}`
+            : `@/modules/${cp.module}/${cp.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        const baseName = toComponentName(path.basename(importPath));
+        contextImports += `  '${cp.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${cp.id} || mod.${baseName} || mod.default || mod), { ssr: true, loading: () => null }),\n`;
+    }
+    contextImports += '};\n\n';
+    contextImports += `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
+
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);

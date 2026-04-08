@@ -1448,7 +1448,6 @@ export const ModuleHomepageSections: { id: string; type: string; component: stri
 export const LayoutComponentRegistry: Record<string, any> = {
   'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
   'CookieConsent': dynamic(() => import('@/modules/cookie-consent/components/CookieConsent').then((mod: any) => mod.CookieConsent || mod.CookieConsent || mod.default || mod), { loading: () => null }),
-  'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.Context || mod.CurrencyProvider || mod.default || mod), { loading: () => null }),
   'GoogleAnalytics': dynamic(() => import('@/modules/google-analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
   'PopupModal': dynamic(() => import('@/modules/popups/components/PopupModal').then((mod: any) => mod.PopupModal || mod.PopupModal || mod.default || mod), { loading: () => null }),
   'SeoHead': dynamic(() => import('@/modules/seo/components/SeoHead').then((mod: any) => mod.SeoHead || mod.SeoHead || mod.default || mod), { loading: () => null }),
@@ -1471,11 +1470,6 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
       "/admin/*"
     ],
     "module": "cookie-consent"
-  },
-  {
-    "id": "CurrencyProvider",
-    "component": "lib/context",
-    "module": "currency"
   },
   {
     "id": "GoogleAnalytics",
@@ -1532,6 +1526,20 @@ export const ModuleFooterComponents: { id: string; component: string; section?: 
   {
     "id": "CurrencySelector",
     "component": "components/CurrencySelector",
+    "order": 10,
+    "module": "currency"
+  }
+];
+
+// Context provider registry — wraps children, used for React contexts
+export const ContextProviderRegistry: Record<string, any> = {
+  'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.CurrencyProvider || mod.Context || mod.default || mod), { ssr: true, loading: () => null }),
+};
+
+export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = [
+  {
+    "id": "CurrencyProvider",
+    "component": "lib/context",
     "order": 10,
     "module": "currency"
   }
