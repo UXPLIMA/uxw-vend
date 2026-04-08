@@ -3,9 +3,9 @@
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Puck, type Data } from "@measured/puck";
+import { Puck, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
-import { coreBlockConfig } from "@/core/lib/blocks";
+import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Save, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +24,14 @@ export default function PageBuilderPage(props: PageProps) {
     const [data, setData] = useState<Data | null>(null);
     const [pageTitle, setPageTitle] = useState("");
     const [pageSlug, setPageSlug] = useState("");
+    const [blockConfig, setBlockConfig] = useState<Config | null>(null);
+
+    // Load merged block config (core + module blocks) once on mount
+    useEffect(() => {
+        buildMergedBlockConfig().then(setBlockConfig).catch(() => {
+            toast.error("Failed to load block library");
+        });
+    }, []);
 
     useEffect(() => {
         if (pageId === "new") {
@@ -90,7 +98,7 @@ export default function PageBuilderPage(props: PageProps) {
         }
     };
 
-    if (loading || !data) {
+    if (loading || !data || !blockConfig) {
         return (
             <div className="flex justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -121,7 +129,7 @@ export default function PageBuilderPage(props: PageProps) {
             {/* Puck editor fills the rest */}
             <div className="flex-1 min-h-0 puck-wrapper">
                 <Puck
-                    config={coreBlockConfig}
+                    config={blockConfig}
                     data={data}
                     onPublish={save}
                     onChange={(d) => setData(d)}

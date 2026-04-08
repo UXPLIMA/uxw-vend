@@ -138,6 +138,16 @@ export interface ModuleManifest {
         order?: number;       // render order within the slot (lower first)
     }[];
 
+    // Page-builder blocks — custom Puck blocks the module contributes.
+    // Each entry points to a module file that exports a Puck-compatible
+    // ComponentConfig as its default export. Merged into the page editor
+    // and renderer at build time.
+    pageBlocks?: {
+        id: string;           // unique component name (e.g. "ProductGrid")
+        category?: string;    // sidebar category in the editor
+        component: string;    // path to the file relative to module root
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

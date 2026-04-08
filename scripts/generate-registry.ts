@@ -127,6 +127,8 @@ function generateRegistry() {
     const allHookListeners: HookListenerItem[] = [];
     interface SlotContentItem { id: string; slot: string; component: string; order?: number; module: string }
     const allSlotContents: SlotContentItem[] = [];
+    interface PageBlockItem { id: string; category?: string; component: string; module: string }
+    const allPageBlocks: PageBlockItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -216,6 +218,12 @@ function generateRegistry() {
             if (manifest.slotContents) {
                 manifest.slotContents.forEach((sc: { id: string; slot: string; component: string; order?: number }) => {
                     allSlotContents.push({ ...sc, module: moduleName });
+                });
+            }
+
+            if (manifest.pageBlocks) {
+                manifest.pageBlocks.forEach((pb: { id: string; category?: string; component: string }) => {
+                    allPageBlocks.push({ ...pb, module: moduleName });
                 });
             }
 
@@ -405,6 +413,22 @@ function generateRegistry() {
     storageContent += '};\n\n';
     storageContent += `export const ModuleStorageProviders = ${JSON.stringify(allStorageProviders, null, 2)};\n`;
     fs.writeFileSync(STORAGE_FILE, storageContent);
+
+    // Generate page-builder blocks registry — dynamic imports of each
+    // module block file's default export. Used by both the editor and
+    // the public renderer to extend the core Puck block library.
+    const BLOCKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-blocks.ts');
+    let blocksContent = '// Auto-generated page-builder blocks registry\n';
+    blocksContent += '// Each entry points to a module file exporting a Puck ComponentConfig\n';
+    blocksContent += '// as its default export.\n\n';
+    blocksContent += 'export const ModulePageBlocks: { id: string; category?: string; component: string; module: string; loader: () => Promise<{ default: unknown }> }[] = [\n';
+    for (const pb of allPageBlocks) {
+        const handlerPath = pb.component.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${pb.module}/${handlerPath}`;
+        blocksContent += `  { id: ${JSON.stringify(pb.id)}, category: ${JSON.stringify(pb.category || 'modules')}, component: ${JSON.stringify(pb.component)}, module: ${JSON.stringify(pb.module)}, loader: () => import('${importPath}') },\n`;
+    }
+    blocksContent += '];\n';
+    fs.writeFileSync(BLOCKS_FILE, blocksContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');
