@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -157,6 +158,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = user.id;
                 token.role = (user as { role?: string }).role;
                 token.rolePriority = (user as { rolePriority?: number }).rolePriority ?? 0;
+                // Generate a stable per-login token id for session tracking
+                token.tokenId = crypto.randomUUID();
             }
             // Refresh role + ban status from DB on every token refresh
             if (trigger === "update" || !token.role || token.rolePriority === undefined) {
@@ -168,6 +171,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     // Invalidate session if user is banned
                     if (dbUser.isBanned) {
                         return null as unknown as typeof token;
+                    }
+                    // Invalidate if this session has been revoked
+                    if (token.tokenId) {
+                        const sess = await prisma.userSession.findUnique({
+                            where: { tokenId: token.tokenId as string },
+                        });
+                        if (sess?.isRevoked) {
+                            return null as unknown as typeof token;
+                        }
                     }
                     token.role = dbUser.role?.name || "member";
                     token.rolePriority = dbUser.role?.priority ?? 0;

@@ -259,7 +259,8 @@
     "link": "Link",
     "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them.",
     "messages": "Mensagens",
-    "notifications": "Notificações"
+    "notifications": "Notificações",
+    "sessions": "Sessões"
   },
   "auth": {
     "loginTitle": "Bem-vindo de volta",

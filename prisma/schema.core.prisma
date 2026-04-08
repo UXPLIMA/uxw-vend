@@ -45,6 +45,7 @@ model User {
   notifPrefs       NotificationPreference[] @relation("UserNotifPrefs")
   conversations    ConversationParticipant[] @relation("ConversationMember")
   messages         Message[]          @relation("MessageAuthor")
+  loginSessions    UserSession[]      @relation("UserSessions")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -267,6 +268,26 @@ model ResourcePermission {
   @@unique([resource, resourceId, action, principalType, principalId])
   @@index([resource, action])
   @@index([principalType, principalId])
+}
+
+// Active user sessions. Tracks per-device login info so users can review
+// and revoke other sessions from the profile page.
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserSessions")
+  tokenId      String   @unique
+  deviceInfo   String?
+  ipAddress    String?
+  userAgent    String?
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+  isRevoked    Boolean  @default(false)
+
+  @@index([userId])
+  @@index([tokenId])
+  @@index([expiresAt])
 }
 
 // User-to-user direct messaging.

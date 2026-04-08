@@ -18,6 +18,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { NotificationPrefsTab } from "@/core/components/profile/NotificationPrefsTab";
 import { MessagesTab } from "@/core/components/profile/MessagesTab";
+import { SessionsTab } from "@/core/components/profile/SessionsTab";
 
 interface UserProfile {
     id: string;
@@ -121,6 +122,7 @@ export default function ProfilePage() {
         { id: "profile", label: t("title") },
         { id: "messages", label: t.has("messages") ? t("messages") : "Messages" },
         { id: "notifications", label: t.has("notifications") ? t("notifications") : "Notifications" },
+        { id: "sessions", label: t.has("sessions") ? t("sessions") : "Sessions" },
         ...moduleProfileTabs.map(mt => ({ id: mt.id, label: mt.label })),
         { id: "accounts", label: t("accounts") },
     ];
@@ -213,6 +215,9 @@ export default function ProfilePage() {
 
                 {/* Notification Preferences Tab */}
                 {activeTab === "notifications" && <NotificationPrefsTab />}
+
+                {/* Active Sessions Tab */}
+                {activeTab === "sessions" && <SessionsTab />}
 
                 {/* Module Profile Tabs (rendered dynamically) */}
                 {moduleProfileTabs.map(mt => {
