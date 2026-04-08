@@ -85,6 +85,18 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/admin/export",
+    "key": "csv-import-export:api:/admin/export",
+    "module": "csv-import-export",
+    "method": "ALL"
+  },
+  {
+    "path": "/admin/import",
+    "key": "csv-import-export:api:/admin/import",
+    "module": "csv-import-export",
+    "method": "ALL"
+  },
+  {
     "path": "/currency",
     "key": "currency:api:/currency",
     "module": "currency",
@@ -118,18 +130,6 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "path": "/custom-pages/[slug]",
     "key": "custom-pages:api:/custom-pages/[slug]",
     "module": "custom-pages",
-    "method": "ALL"
-  },
-  {
-    "path": "/admin/export",
-    "key": "data-tools:api:/admin/export",
-    "module": "data-tools",
-    "method": "ALL"
-  },
-  {
-    "path": "/admin/import",
-    "key": "data-tools:api:/admin/import",
-    "module": "data-tools",
     "method": "ALL"
   },
   {
@@ -205,15 +205,15 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
-    "path": "/leaderboard",
-    "key": "leaderboard:api:/leaderboard",
-    "module": "leaderboard",
+    "path": "/notifications",
+    "key": "in-app-notifications:api:/notifications",
+    "module": "in-app-notifications",
     "method": "ALL"
   },
   {
-    "path": "/notifications",
-    "key": "notifications:api:/notifications",
-    "module": "notifications",
+    "path": "/leaderboard",
+    "key": "leaderboard:api:/leaderboard",
+    "module": "leaderboard",
     "method": "ALL"
   },
   {
@@ -754,12 +754,6 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
 
 export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
   {
-    "path": "/admin/analytics",
-    "key": "analytics:pages/admin/settings/analytics/page.tsx",
-    "module": "analytics",
-    "isAdmin": true
-  },
-  {
     "path": "/admin/announcements",
     "key": "announcements:pages/admin/page.tsx",
     "module": "announcements",
@@ -817,6 +811,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "isAdmin": true
   },
   {
+    "path": "/admin/export",
+    "key": "csv-import-export:pages/admin/page.tsx",
+    "module": "csv-import-export",
+    "isAdmin": true
+  },
+  {
     "path": "/admin/currency",
     "key": "currency:pages/admin/page.tsx",
     "module": "currency",
@@ -851,12 +851,6 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "isAdmin": true
   },
   {
-    "path": "/admin/export",
-    "key": "data-tools:pages/admin/page.tsx",
-    "module": "data-tools",
-    "isAdmin": true
-  },
-  {
     "path": "/admin/settings/discord-auth",
     "key": "discord-auth:pages/admin/settings/discord-auth/page.tsx",
     "module": "discord-auth",
@@ -881,8 +875,8 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
   },
   {
     "path": "/admin/email",
-    "key": "email-system:pages/admin/page.tsx",
-    "module": "email-system",
+    "key": "email-templates:pages/admin/page.tsx",
+    "module": "email-templates",
     "isAdmin": true
   },
   {
@@ -910,6 +904,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/admin/forum/categories",
     "key": "forum:pages/admin/categories/page.tsx",
     "module": "forum",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/analytics",
+    "key": "google-analytics:pages/admin/settings/analytics/page.tsx",
+    "module": "google-analytics",
     "isAdmin": true
   },
   {
@@ -943,6 +943,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/leaderboard",
     "key": "leaderboard:pages/public/page.tsx",
     "module": "leaderboard"
+  },
+  {
+    "path": "/admin/security",
+    "key": "login-protection:pages/admin/page.tsx",
+    "module": "login-protection",
+    "isAdmin": true
   },
   {
     "path": "/admin/settings/paypal",
@@ -981,12 +987,6 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/admin/settings/resend",
     "key": "resend-provider:pages/admin/settings/resend/page.tsx",
     "module": "resend-provider",
-    "isAdmin": true
-  },
-  {
-    "path": "/admin/security",
-    "key": "security:pages/admin/page.tsx",
-    "module": "security",
     "isAdmin": true
   },
   {

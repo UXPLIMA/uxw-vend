@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import { PageLoader } from '@/core/components/ui/page-loader';
 
 export const ModuleRegistry: Record<string, any> = {
-  'analytics:pages/admin/settings/analytics/page.tsx': dynamic(() => import('@/modules/analytics/pages/admin/settings/analytics/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'announcements:pages/admin/page.tsx': dynamic(() => import('@/modules/announcements/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/page.tsx': dynamic(() => import('@/modules/blog/pages/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'blog:pages/[...params]/page.tsx': dynamic(() => import('@/modules/blog/pages/[...params]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -14,29 +13,31 @@ export const ModuleRegistry: Record<string, any> = {
   'changelog:pages/public/page.tsx': dynamic(() => import('@/modules/changelog/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/admin/page.tsx': dynamic(() => import('@/modules/changelog/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'cloudflare-r2:pages/admin/page.tsx': dynamic(() => import('@/modules/cloudflare-r2/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'csv-import-export:pages/admin/page.tsx': dynamic(() => import('@/modules/csv-import-export/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'currency:pages/admin/page.tsx': dynamic(() => import('@/modules/currency/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/admin/submissions/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/admin/submissions/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-pages:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-pages/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-pages:pages/admin/page.tsx': dynamic(() => import('@/modules/custom-pages/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
-  'data-tools:pages/admin/page.tsx': dynamic(() => import('@/modules/data-tools/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'discord-auth:pages/admin/settings/discord-auth/page.tsx': dynamic(() => import('@/modules/discord-auth/pages/admin/settings/discord-auth/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'discord-integration:pages/admin/page.tsx': dynamic(() => import('@/modules/discord-integration/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'downloads:pages/public/page.tsx': dynamic(() => import('@/modules/downloads/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'downloads:pages/admin/page.tsx': dynamic(() => import('@/modules/downloads/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
-  'email-system:pages/admin/page.tsx': dynamic(() => import('@/modules/email-system/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'email-templates:pages/admin/page.tsx': dynamic(() => import('@/modules/email-templates/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/page.tsx': dynamic(() => import('@/modules/forum/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/topic/[...params]/page.tsx': dynamic(() => import('@/modules/forum/pages/public/topic/[...params]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/public/new/page.tsx': dynamic(() => import('@/modules/forum/pages/public/new/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/admin/topics/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/topics/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'forum:pages/admin/categories/page.tsx': dynamic(() => import('@/modules/forum/pages/admin/categories/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'google-analytics:pages/admin/settings/analytics/page.tsx': dynamic(() => import('@/modules/google-analytics/pages/admin/settings/analytics/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'google-auth:pages/admin/settings/google-auth/page.tsx': dynamic(() => import('@/modules/google-auth/pages/admin/settings/google-auth/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'help-center:pages/public/help/page.tsx': dynamic(() => import('@/modules/help-center/pages/public/help/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'help-center:pages/public/help/[slug]/page.tsx': dynamic(() => import('@/modules/help-center/pages/public/help/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'help-center:pages/public/help/category/[slug]/page.tsx': dynamic(() => import('@/modules/help-center/pages/public/help/category/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'help-center:pages/admin/help/page.tsx': dynamic(() => import('@/modules/help-center/pages/admin/help/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'leaderboard:pages/public/page.tsx': dynamic(() => import('@/modules/leaderboard/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'login-protection:pages/admin/page.tsx': dynamic(() => import('@/modules/login-protection/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'paypal-gateway:pages/admin/page.tsx': dynamic(() => import('@/modules/paypal-gateway/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'player-profiles:pages/public/[username]/page.tsx': dynamic(() => import('@/modules/player-profiles/pages/public/[username]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'popups:pages/admin/page.tsx': dynamic(() => import('@/modules/popups/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -44,7 +45,6 @@ export const ModuleRegistry: Record<string, any> = {
   'referral:pages/public/page.tsx': dynamic(() => import('@/modules/referral/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'referral:pages/admin/page.tsx': dynamic(() => import('@/modules/referral/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'resend-provider:pages/admin/settings/resend/page.tsx': dynamic(() => import('@/modules/resend-provider/pages/admin/settings/resend/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
-  'security:pages/admin/page.tsx': dynamic(() => import('@/modules/security/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'seo:pages/admin/page.tsx': dynamic(() => import('@/modules/seo/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'seo:pages/admin/pages/page.tsx': dynamic(() => import('@/modules/seo/pages/admin/pages/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'servers:pages/admin/page.tsx': dynamic(() => import('@/modules/servers/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -86,12 +86,6 @@ export const ModuleRegistry: Record<string, any> = {
 };
 
 export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = [
-  {
-    "path": "/admin/analytics",
-    "key": "analytics:pages/admin/settings/analytics/page.tsx",
-    "module": "analytics",
-    "isAdmin": true
-  },
   {
     "path": "/admin/announcements",
     "key": "announcements:pages/admin/page.tsx",
@@ -150,6 +144,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "isAdmin": true
   },
   {
+    "path": "/admin/export",
+    "key": "csv-import-export:pages/admin/page.tsx",
+    "module": "csv-import-export",
+    "isAdmin": true
+  },
+  {
     "path": "/admin/currency",
     "key": "currency:pages/admin/page.tsx",
     "module": "currency",
@@ -184,12 +184,6 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "isAdmin": true
   },
   {
-    "path": "/admin/export",
-    "key": "data-tools:pages/admin/page.tsx",
-    "module": "data-tools",
-    "isAdmin": true
-  },
-  {
     "path": "/admin/settings/discord-auth",
     "key": "discord-auth:pages/admin/settings/discord-auth/page.tsx",
     "module": "discord-auth",
@@ -214,8 +208,8 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
   },
   {
     "path": "/admin/email",
-    "key": "email-system:pages/admin/page.tsx",
-    "module": "email-system",
+    "key": "email-templates:pages/admin/page.tsx",
+    "module": "email-templates",
     "isAdmin": true
   },
   {
@@ -243,6 +237,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/admin/forum/categories",
     "key": "forum:pages/admin/categories/page.tsx",
     "module": "forum",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/analytics",
+    "key": "google-analytics:pages/admin/settings/analytics/page.tsx",
+    "module": "google-analytics",
     "isAdmin": true
   },
   {
@@ -276,6 +276,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/leaderboard",
     "key": "leaderboard:pages/public/page.tsx",
     "module": "leaderboard"
+  },
+  {
+    "path": "/admin/security",
+    "key": "login-protection:pages/admin/page.tsx",
+    "module": "login-protection",
+    "isAdmin": true
   },
   {
     "path": "/admin/settings/paypal",
@@ -314,12 +320,6 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/admin/settings/resend",
     "key": "resend-provider:pages/admin/settings/resend/page.tsx",
     "module": "resend-provider",
-    "isAdmin": true
-  },
-  {
-    "path": "/admin/security",
-    "key": "security:pages/admin/page.tsx",
-    "module": "security",
     "isAdmin": true
   },
   {
@@ -626,6 +626,18 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/admin/export",
+    "key": "csv-import-export:api:/admin/export",
+    "module": "csv-import-export",
+    "method": "ALL"
+  },
+  {
+    "path": "/admin/import",
+    "key": "csv-import-export:api:/admin/import",
+    "module": "csv-import-export",
+    "method": "ALL"
+  },
+  {
     "path": "/currency",
     "key": "currency:api:/currency",
     "module": "currency",
@@ -659,18 +671,6 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "path": "/custom-pages/[slug]",
     "key": "custom-pages:api:/custom-pages/[slug]",
     "module": "custom-pages",
-    "method": "ALL"
-  },
-  {
-    "path": "/admin/export",
-    "key": "data-tools:api:/admin/export",
-    "module": "data-tools",
-    "method": "ALL"
-  },
-  {
-    "path": "/admin/import",
-    "key": "data-tools:api:/admin/import",
-    "module": "data-tools",
     "method": "ALL"
   },
   {
@@ -746,15 +746,15 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
-    "path": "/leaderboard",
-    "key": "leaderboard:api:/leaderboard",
-    "module": "leaderboard",
+    "path": "/notifications",
+    "key": "in-app-notifications:api:/notifications",
+    "module": "in-app-notifications",
     "method": "ALL"
   },
   {
-    "path": "/notifications",
-    "key": "notifications:api:/notifications",
-    "module": "notifications",
+    "path": "/leaderboard",
+    "key": "leaderboard:api:/leaderboard",
+    "module": "leaderboard",
     "method": "ALL"
   },
   {
@@ -1308,14 +1308,14 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'cloudflare-r2:api:/storage/cloudflare-r2/settings': () => import('@/modules/cloudflare-r2/api/settings/route'),
   'credits:api:/credits': () => import('@/modules/credits/api/credits/route'),
   'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
+  'csv-import-export:api:/admin/export': () => import('@/modules/csv-import-export/api/export/route'),
+  'csv-import-export:api:/admin/import': () => import('@/modules/csv-import-export/api/import/route'),
   'currency:api:/currency': () => import('@/modules/currency/api/route'),
   'custom-forms:api:/forms': () => import('@/modules/custom-forms/api/route'),
   'custom-forms:api:/forms/[slug]': () => import('@/modules/custom-forms/api/[slug]/route'),
   'custom-forms:api:/forms/submissions': () => import('@/modules/custom-forms/api/submissions/route'),
   'custom-pages:api:/custom-pages': () => import('@/modules/custom-pages/api/route'),
   'custom-pages:api:/custom-pages/[slug]': () => import('@/modules/custom-pages/api/[slug]/route'),
-  'data-tools:api:/admin/export': () => import('@/modules/data-tools/api/export/route'),
-  'data-tools:api:/admin/import': () => import('@/modules/data-tools/api/import/route'),
   'downloads:api:/downloads': () => import('@/modules/downloads/api/route'),
   'downloads:api:/downloads/[id]': () => import('@/modules/downloads/api/[id]/route'),
   'forum:api:/forum/categories': () => import('@/modules/forum/api/categories/route'),
@@ -1328,8 +1328,8 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'help-center:api:/help/articles': () => import('@/modules/help-center/api/help/articles/route'),
   'help-center:api:/help/articles/[slug]': () => import('@/modules/help-center/api/help/articles/[slug]/route'),
   'help-center:api:/help/categories': () => import('@/modules/help-center/api/help/categories/route'),
+  'in-app-notifications:api:/notifications': () => import('@/modules/in-app-notifications/api/route'),
   'leaderboard:api:/leaderboard': () => import('@/modules/leaderboard/api/route'),
-  'notifications:api:/notifications': () => import('@/modules/notifications/api/route'),
   'player-profiles:api:/players/[username]': () => import('@/modules/player-profiles/api/[username]/route'),
   'player-profiles:api:/linked-accounts': () => import('@/modules/player-profiles/api/linked-accounts/route'),
   'player-profiles:api:/players/linked-accounts': () => import('@/modules/player-profiles/api/linked-accounts/route'),
@@ -1446,21 +1446,16 @@ export const ModuleHomepageSections: { id: string; type: string; component: stri
 
 // Layout component registry (rendered on every page)
 export const LayoutComponentRegistry: Record<string, any> = {
-  'GoogleAnalytics': dynamic(() => import('@/modules/analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
   'AnnouncementBanner': dynamic(() => import('@/modules/announcements/components/AnnouncementBanner').then((mod: any) => mod.AnnouncementBanner || mod.AnnouncementBanner || mod.default || mod), { loading: () => null }),
   'CookieConsent': dynamic(() => import('@/modules/cookie-consent/components/CookieConsent').then((mod: any) => mod.CookieConsent || mod.CookieConsent || mod.default || mod), { loading: () => null }),
   'CurrencyProvider': dynamic(() => import('@/modules/currency/lib/context').then((mod: any) => mod.Context || mod.CurrencyProvider || mod.default || mod), { loading: () => null }),
+  'GoogleAnalytics': dynamic(() => import('@/modules/google-analytics/components/GoogleAnalytics').then((mod: any) => mod.GoogleAnalytics || mod.GoogleAnalytics || mod.default || mod), { loading: () => null }),
   'PopupModal': dynamic(() => import('@/modules/popups/components/PopupModal').then((mod: any) => mod.PopupModal || mod.PopupModal || mod.default || mod), { loading: () => null }),
   'SeoHead': dynamic(() => import('@/modules/seo/components/SeoHead').then((mod: any) => mod.SeoHead || mod.SeoHead || mod.default || mod), { loading: () => null }),
   'LivePurchaseToast': dynamic(() => import('@/modules/store/components/LivePurchaseToast').then((mod: any) => mod.LivePurchaseToast || mod.LivePurchaseToast || mod.default || mod), { loading: () => null }),
 };
 
 export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = [
-  {
-    "id": "GoogleAnalytics",
-    "component": "components/GoogleAnalytics",
-    "module": "analytics"
-  },
   {
     "id": "AnnouncementBanner",
     "component": "components/AnnouncementBanner",
@@ -1481,6 +1476,11 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
     "id": "CurrencyProvider",
     "component": "lib/context",
     "module": "currency"
+  },
+  {
+    "id": "GoogleAnalytics",
+    "component": "components/GoogleAnalytics",
+    "module": "google-analytics"
   },
   {
     "id": "PopupModal",
@@ -1504,7 +1504,7 @@ export const ModuleLayoutComponents: { id: string; component: string; module: st
 
 // Navbar component registry (rendered in navbar right side)
 export const NavbarComponentRegistry: Record<string, any> = {
-  'NotificationBell': dynamic(() => import('@/modules/notifications/components/NotificationBell').then((mod: any) => mod.NotificationBell || mod.NotificationBell || mod.default || mod), { loading: () => null }),
+  'NotificationBell': dynamic(() => import('@/modules/in-app-notifications/components/NotificationBell').then((mod: any) => mod.NotificationBell || mod.NotificationBell || mod.default || mod), { loading: () => null }),
   'CartIcon': dynamic(() => import('@/modules/store/components/CartIcon').then((mod: any) => mod.CartIcon || mod.CartIcon || mod.default || mod), { loading: () => null }),
 };
 
@@ -1513,7 +1513,7 @@ export const ModuleNavbarComponents: { id: string; component: string; order: num
     "id": "NotificationBell",
     "component": "components/NotificationBell",
     "order": 10,
-    "module": "notifications"
+    "module": "in-app-notifications"
   },
   {
     "id": "CartIcon",
@@ -1681,14 +1681,6 @@ export const ModuleOauthButtons: { id: string; provider: string; label: string; 
 
 export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = [
   {
-    "title": "Analytics",
-    "description": "Google Analytics tracking.",
-    "href": "/analytics",
-    "icon": "BarChart",
-    "color": "text-green-500",
-    "module": "analytics"
-  },
-  {
     "title": "Cloudflare R2 Storage",
     "description": "Configure R2 bucket for file uploads (S3-compatible)",
     "href": "/admin/storage/cloudflare-r2",
@@ -1721,12 +1713,28 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "module": "discord-integration"
   },
   {
+    "title": "Analytics",
+    "description": "Google Analytics tracking.",
+    "href": "/analytics",
+    "icon": "BarChart",
+    "color": "text-green-500",
+    "module": "google-analytics"
+  },
+  {
     "title": "Google OAuth",
     "description": "Google application credentials.",
     "href": "/settings/google-auth",
     "icon": "Globe",
     "color": "text-red-500",
     "module": "google-auth"
+  },
+  {
+    "title": "Security",
+    "description": "CAPTCHA, login protection, and security settings.",
+    "href": "/security",
+    "icon": "Shield",
+    "color": "text-red-500",
+    "module": "login-protection"
   },
   {
     "title": "PayPal",
@@ -1743,14 +1751,6 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "icon": "Mail",
     "color": "text-cyan-500",
     "module": "resend-provider"
-  },
-  {
-    "title": "Security",
-    "description": "CAPTCHA, login protection, and security settings.",
-    "href": "/security",
-    "icon": "Shield",
-    "color": "text-red-500",
-    "module": "security"
   },
   {
     "title": "SEO Settings",

@@ -1,26 +1,7 @@
 {
   "version": "1.0.0",
-  "updated": "2026-04-07",
+  "updated": "2026-04-08",
   "modules": [
-    {
-      "id": "analytics",
-      "name": "Google Analytics",
-      "description": "Google Analytics tracking integration",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "BarChart",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "analytics.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
     {
       "id": "announcements",
       "name": "Announcements",
@@ -79,6 +60,25 @@
       }
     },
     {
+      "id": "cloudflare-r2",
+      "name": "Cloudflare R2 Storage",
+      "description": "S3-compatible object storage with zero egress fees (Cloudflare R2)",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Cloud",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "cloudflare-r2.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "cookie-consent",
       "name": "Cookie Consent",
       "description": "GDPR cookie consent banner",
@@ -112,6 +112,25 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 0,
+        "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "csv-import-export",
+      "name": "CSV Import/Export",
+      "description": "CSV export and import utilities for data backup",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Download",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "csv-import-export.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
       }
@@ -168,25 +187,6 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 1,
-        "apiRoutes": 2,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "data-tools",
-      "name": "Data Tools",
-      "description": "CSV export and import utilities",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Download",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "data-tools.zip",
-      "dependencies": [],
-      "stats": {
-        "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
@@ -271,8 +271,8 @@
       }
     },
     {
-      "id": "email-system",
-      "name": "Email System",
+      "id": "email-templates",
+      "name": "Email Templates",
       "description": "Email service configuration and templates",
       "version": "1.0.0",
       "author": "uxwVend",
@@ -280,7 +280,7 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
-      "zip": "email-system.zip",
+      "zip": "email-templates.zip",
       "dependencies": [],
       "stats": {
         "publicRoutes": 0,
@@ -305,6 +305,25 @@
         "publicRoutes": 3,
         "adminRoutes": 2,
         "apiRoutes": 7,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "google-analytics",
+      "name": "Google Analytics",
+      "description": "Google Analytics tracking integration",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "BarChart",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "google-analytics.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
         "widgets": 0
       }
     },
@@ -347,6 +366,25 @@
       }
     },
     {
+      "id": "in-app-notifications",
+      "name": "In-App Notifications",
+      "description": "In-app notification system with bell icon",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Bell",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "in-app-notifications.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "leaderboard",
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
@@ -368,21 +406,21 @@
       }
     },
     {
-      "id": "notifications",
-      "name": "Notifications",
-      "description": "In-app notification system with bell icon",
+      "id": "login-protection",
+      "name": "Login Protection",
+      "description": "CAPTCHA, login throttling, and account security",
       "version": "1.0.0",
       "author": "uxwVend",
-      "icon": "Bell",
+      "icon": "Shield",
       "category": "management",
       "verified": true,
       "downloads": 0,
-      "zip": "notifications.zip",
+      "zip": "login-protection.zip",
       "dependencies": [],
       "stats": {
         "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
         "widgets": 0
       }
     },
@@ -497,27 +535,8 @@
       "downloads": 0,
       "zip": "resend-provider.zip",
       "dependencies": [
-        "email-system"
+        "email-templates"
       ],
-      "stats": {
-        "publicRoutes": 0,
-        "adminRoutes": 1,
-        "apiRoutes": 0,
-        "widgets": 0
-      }
-    },
-    {
-      "id": "security",
-      "name": "Security",
-      "description": "CAPTCHA, login protection, and security settings",
-      "version": "1.0.0",
-      "author": "uxwVend",
-      "icon": "Shield",
-      "category": "management",
-      "verified": true,
-      "downloads": 0,
-      "zip": "security.zip",
-      "dependencies": [],
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,

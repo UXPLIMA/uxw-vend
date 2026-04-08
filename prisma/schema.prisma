@@ -49,7 +49,7 @@ model User {
   topicLikes ForumTopicLike[]
   postLikes  ForumPostLike[]
 
-  // notifications module
+  // in-app-notifications module
   notifications    Notification[]     @relation("Notifications")
 
   // player-profiles module
@@ -523,7 +523,7 @@ model HelpArticle {
   @@index([categoryId])
 }
 
-// ==================== MODULE: notifications ====================
+// ==================== MODULE: in-app-notifications ====================
 
 model Notification {
   id        String   @id @default(cuid())
