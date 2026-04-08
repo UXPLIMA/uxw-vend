@@ -13,6 +13,7 @@ export const ModuleRegistry: Record<string, any> = {
   'changelog:pages/public/page.tsx': dynamic(() => import('@/modules/changelog/pages/public/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'changelog:pages/admin/page.tsx': dynamic(() => import('@/modules/changelog/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'cloudflare-r2:pages/admin/page.tsx': dynamic(() => import('@/modules/cloudflare-r2/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
+  'cloudflare-turnstile:pages/admin/page.tsx': dynamic(() => import('@/modules/cloudflare-turnstile/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'csv-import-export:pages/admin/page.tsx': dynamic(() => import('@/modules/csv-import-export/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'currency:pages/admin/page.tsx': dynamic(() => import('@/modules/currency/pages/admin/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
   'custom-forms:pages/public/[slug]/page.tsx': dynamic(() => import('@/modules/custom-forms/pages/public/[slug]/page').then((mod: any) => mod.default || mod), { loading: () => <PageLoader /> }),
@@ -141,6 +142,12 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "path": "/admin/storage/cloudflare-r2",
     "key": "cloudflare-r2:pages/admin/page.tsx",
     "module": "cloudflare-r2",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/security/turnstile",
+    "key": "cloudflare-turnstile:pages/admin/page.tsx",
+    "module": "cloudflare-turnstile",
     "isAdmin": true
   },
   {
@@ -611,6 +618,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "path": "/storage/cloudflare-r2/settings",
     "key": "cloudflare-r2:api:/storage/cloudflare-r2/settings",
     "module": "cloudflare-r2",
+    "method": "ALL"
+  },
+  {
+    "path": "/security/turnstile/settings",
+    "key": "cloudflare-turnstile:api:/security/turnstile/settings",
+    "module": "cloudflare-turnstile",
     "method": "ALL"
   },
   {
@@ -1306,6 +1319,7 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'changelog:api:/changelog': () => import('@/modules/changelog/api/route'),
   'changelog:api:/changelog/[id]': () => import('@/modules/changelog/api/[id]/route'),
   'cloudflare-r2:api:/storage/cloudflare-r2/settings': () => import('@/modules/cloudflare-r2/api/settings/route'),
+  'cloudflare-turnstile:api:/security/turnstile/settings': () => import('@/modules/cloudflare-turnstile/api/settings/route'),
   'credits:api:/credits': () => import('@/modules/credits/api/credits/route'),
   'credits:api:/credits/purchase': () => import('@/modules/credits/api/credits/purchase/route'),
   'csv-import-export:api:/admin/export': () => import('@/modules/csv-import-export/api/export/route'),
@@ -1697,6 +1711,14 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "module": "cloudflare-r2"
   },
   {
+    "title": "Cloudflare Turnstile",
+    "description": "Configure Turnstile site key and secret",
+    "href": "/admin/security/turnstile",
+    "icon": "Shield",
+    "color": "text-orange-500",
+    "module": "cloudflare-turnstile"
+  },
+  {
     "title": "Currency Settings",
     "description": "Manage currencies and exchange rates",
     "href": "/admin/currency",
@@ -1721,7 +1743,7 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
     "module": "discord-integration"
   },
   {
-    "title": "Analytics",
+    "title": "Google Analytics",
     "description": "Google Analytics tracking.",
     "href": "/analytics",
     "icon": "BarChart",

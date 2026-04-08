@@ -73,6 +73,12 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/security/turnstile/settings",
+    "key": "cloudflare-turnstile:api:/security/turnstile/settings",
+    "module": "cloudflare-turnstile",
+    "method": "ALL"
+  },
+  {
     "path": "/credits",
     "key": "credits:api:/credits",
     "module": "credits",
@@ -808,6 +814,12 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "path": "/admin/storage/cloudflare-r2",
     "key": "cloudflare-r2:pages/admin/page.tsx",
     "module": "cloudflare-r2",
+    "isAdmin": true
+  },
+  {
+    "path": "/admin/security/turnstile",
+    "key": "cloudflare-turnstile:pages/admin/page.tsx",
+    "module": "cloudflare-turnstile",
     "isAdmin": true
   },
   {

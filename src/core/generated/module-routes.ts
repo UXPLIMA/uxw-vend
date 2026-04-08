@@ -18,6 +18,10 @@ export const moduleRouteMap: Record<string, RegExp[]> = {
     /^\/[a-z]{2}\/admin\/storage/,
     /^\/api\/v1\/storage/,
   ],
+  "cloudflare-turnstile": [
+    /^\/[a-z]{2}\/admin\/security/,
+    /^\/api\/v1\/security/,
+  ],
   "credits": [
     /^\/api\/v1\/credits/,
   ],

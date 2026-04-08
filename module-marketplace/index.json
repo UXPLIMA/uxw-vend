@@ -79,6 +79,25 @@
       }
     },
     {
+      "id": "cloudflare-turnstile",
+      "name": "Cloudflare Turnstile",
+      "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Shield",
+      "category": "management",
+      "verified": true,
+      "downloads": 0,
+      "zip": "cloudflare-turnstile.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "cookie-consent",
       "name": "Cookie Consent",
       "description": "GDPR cookie consent banner",
