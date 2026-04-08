@@ -78,9 +78,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                         <img
                             src={value}
                             alt="Preview"
-                            width={80}
-                            height={80}
-                            className="h-20 w-20 rounded object-cover border border-border"
+                            className="h-20 w-20 rounded object-contain border border-border bg-muted p-1"
                         />
                     ) : (
                         <div className="flex h-20 w-20 items-center justify-center rounded border border-border bg-muted text-muted-foreground">

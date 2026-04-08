@@ -14,6 +14,7 @@ export default function PixelCraftHeroBanner() {
 
     const bgImage = (settings.hero_background_image as string) || "/background1.png";
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
+    const logoUrl = (settings.hero_logo_url as string) || "";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip;
     const discordUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl;
 
@@ -44,8 +45,22 @@ export default function PixelCraftHeroBanner() {
 
             <div className="relative container mx-auto px-4 h-full z-10 flex flex-col items-center justify-center text-center">
                 {/* Logo */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
+                {logoUrl ? (
+                    logoUrl.startsWith("http") ? (
+                        <a href={logoUrl} target="_blank" rel="noopener noreferrer">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6 cursor-pointer hover:scale-105 transition-transform" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
+                        </a>
+                    ) : (
+                        <Link href={logoUrl}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6 cursor-pointer hover:scale-105 transition-transform" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
+                        </Link>
+                    )
+                ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
+                )}
 
                 {/* CTA Buttons */}
                 <div className="flex items-center gap-3">
