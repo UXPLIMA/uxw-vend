@@ -129,6 +129,8 @@ function generateRegistry() {
     const allSlotContents: SlotContentItem[] = [];
     interface PageBlockItem { id: string; category?: string; component: string; module: string }
     const allPageBlocks: PageBlockItem[] = [];
+    interface CronJobItem { id: string; schedule: string; handler: string; module: string }
+    const allCronJobs: CronJobItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -224,6 +226,12 @@ function generateRegistry() {
             if (manifest.pageBlocks) {
                 manifest.pageBlocks.forEach((pb: { id: string; category?: string; component: string }) => {
                     allPageBlocks.push({ ...pb, module: moduleName });
+                });
+            }
+
+            if (manifest.cronJobs) {
+                manifest.cronJobs.forEach((cj: { id: string; schedule: string; handler: string }) => {
+                    allCronJobs.push({ ...cj, module: moduleName });
                 });
             }
 
@@ -429,6 +437,19 @@ function generateRegistry() {
     }
     blocksContent += '];\n';
     fs.writeFileSync(BLOCKS_FILE, blocksContent);
+
+    // Generate module cron jobs registry — server-only, dynamic imports
+    const CRONS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-crons.ts');
+    let cronsContent = '// Auto-generated module cron jobs registry\n';
+    cronsContent += '// Each entry points to a module file exporting a default async function\n\n';
+    cronsContent += 'export const ModuleCronJobs: { id: string; schedule: string; module: string; loader: () => Promise<{ default: () => Promise<void> }> }[] = [\n';
+    for (const cj of allCronJobs) {
+        const handlerPath = cj.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${cj.module}/${handlerPath}`;
+        cronsContent += `  { id: ${JSON.stringify(cj.id)}, schedule: ${JSON.stringify(cj.schedule)}, module: ${JSON.stringify(cj.module)}, loader: () => import('${importPath}') as Promise<{ default: () => Promise<void> }> },\n`;
+    }
+    cronsContent += '];\n';
+    fs.writeFileSync(CRONS_FILE, cronsContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');

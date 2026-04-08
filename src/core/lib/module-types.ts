@@ -148,6 +148,15 @@ export interface ModuleManifest {
         component: string;    // path to the file relative to module root
     }[];
 
+    // Cron jobs — periodic tasks run by the core scheduler.
+    // Schedule keywords: every-minute | every-5-minutes | every-15-minutes
+    //                    every-hour | every-day | every-week | every-month
+    cronJobs?: {
+        id: string;           // unique within the module
+        schedule: string;
+        handler: string;      // path to file exporting default async fn
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

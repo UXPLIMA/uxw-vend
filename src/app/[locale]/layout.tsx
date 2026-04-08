@@ -11,6 +11,7 @@ import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
 import { bootstrapHooks } from "@/core/lib/hooks";
+import { bootstrapScheduler } from "@/core/lib/scheduler";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -64,6 +65,8 @@ export default async function RootLayout({
 
   // Initialize module hook listeners (idempotent — runs once per process)
   await bootstrapHooks();
+  // Start the cron scheduler (idempotent)
+  await bootstrapScheduler();
 
   const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
   const moduleStates: Record<string, boolean> = {};

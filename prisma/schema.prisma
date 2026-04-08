@@ -324,6 +324,19 @@ model ResourcePermission {
   @@index([principalType, principalId])
 }
 
+// Tracks per-cron-job last-run timestamps. The scheduler reads/writes
+// this on every tick to decide which jobs are due.
+model CronRun {
+  jobKey      String   @id   // "<moduleId>:<jobId>" or "core:<jobId>"
+  lastRunAt   DateTime
+  lastStatus  String?  // "ok" | "error"
+  lastError   String?
+  lastRunMs   Int?
+  nextRunAt   DateTime?
+
+  @@index([nextRunAt])
+}
+
 // Tracks which per-module SQL migrations have been applied to the DB.
 // Replaces the old `prisma db push` workflow with a forward-only
 // versioned migration system. See docs/MIGRATIONS.md.
