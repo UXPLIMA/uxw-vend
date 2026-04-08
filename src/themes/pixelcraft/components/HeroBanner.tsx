@@ -48,17 +48,10 @@ export default function PixelCraftHeroBanner() {
             <div className="relative container mx-auto px-4 h-full z-10 flex flex-col items-center justify-center text-center">
                 {/* Logo */}
                 {logoUrl ? (
-                    logoUrl.startsWith("http") ? (
-                        <a href={logoUrl} target="_blank" rel="noopener noreferrer">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6 cursor-pointer hover:scale-105 transition-transform" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
-                        </a>
-                    ) : (
-                        <Link href={logoUrl}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6 cursor-pointer hover:scale-105 transition-transform" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
-                        </Link>
-                    )
+                    <a href={logoUrl}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6 cursor-pointer hover:scale-105 transition-transform" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />
+                    </a>
                 ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={logoImage} alt={serverConfig.name} className="h-28 md:h-36 w-auto object-contain mb-6" style={{ imageRendering: "auto", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.5))" }} />

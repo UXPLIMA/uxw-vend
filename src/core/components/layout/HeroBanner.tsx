@@ -60,15 +60,9 @@ export function HeroBanner() {
 
                     <div className="animate-float">
                         {logoUrl ? (
-                            logoUrl.startsWith("http") ? (
-                                <a href={logoUrl} target="_blank" rel="noopener noreferrer">
-                                    <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer hover:scale-105 transition-transform" unoptimized priority />
-                                </a>
-                            ) : (
-                                <Link href={logoUrl}>
-                                    <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer hover:scale-105 transition-transform" unoptimized priority />
-                                </Link>
-                            )
+                            <a href={logoUrl}>
+                                <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer hover:scale-105 transition-transform" unoptimized priority />
+                            </a>
                         ) : (
                             <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" unoptimized priority />
                         )}

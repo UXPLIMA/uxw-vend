@@ -215,7 +215,7 @@ export function Navbar() {
                                                 <User className="w-4 h-4" /> {t('profile')}
                                             </Link>
                                             {isStaffUser && (
-                                                <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
+                                                <Link href="/admin" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMenuOpen(false)}>
                                                     <Shield className="w-4 h-4" /> {t('adminPanel')}
                                                 </Link>
                                             )}
