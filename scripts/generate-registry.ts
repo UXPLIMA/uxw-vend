@@ -133,6 +133,8 @@ function generateRegistry() {
     const allCronJobs: CronJobItem[] = [];
     interface SearchProviderItem { id: string; label: string; handler: string; module: string }
     const allSearchProviders: SearchProviderItem[] = [];
+    interface WebhookReceiverItem { provider: string; handler: string; signatureHeader?: string; secretEnv?: string; module: string }
+    const allWebhookReceivers: WebhookReceiverItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -240,6 +242,12 @@ function generateRegistry() {
             if (manifest.searchProviders) {
                 manifest.searchProviders.forEach((sp: { id: string; label: string; handler: string }) => {
                     allSearchProviders.push({ ...sp, module: moduleName });
+                });
+            }
+
+            if (manifest.webhookReceivers) {
+                manifest.webhookReceivers.forEach((wr: { provider: string; handler: string; signatureHeader?: string; secretEnv?: string }) => {
+                    allWebhookReceivers.push({ ...wr, module: moduleName });
                 });
             }
 
@@ -472,6 +480,21 @@ function generateRegistry() {
     }
     searchContent += '];\n';
     fs.writeFileSync(SEARCH_FILE, searchContent);
+
+    // Generate inbound webhook receivers registry
+    const WEBHOOKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-webhooks.ts');
+    let webhooksContent = '// Auto-generated inbound webhook receivers registry\n';
+    webhooksContent += '// /api/v1/webhook/[provider] dispatches to the matching handler\n\n';
+    webhooksContent += 'export const ModuleWebhookReceivers: { provider: string; module: string; signatureHeader?: string; secretEnv?: string; loader: () => Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> }[] = [\n';
+    for (const wr of allWebhookReceivers) {
+        const handlerPath = wr.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${wr.module}/${handlerPath}`;
+        const sigHeader = wr.signatureHeader ? JSON.stringify(wr.signatureHeader) : "undefined";
+        const secretEnv = wr.secretEnv ? JSON.stringify(wr.secretEnv) : "undefined";
+        webhooksContent += `  { provider: ${JSON.stringify(wr.provider)}, module: ${JSON.stringify(wr.module)}, signatureHeader: ${sigHeader}, secretEnv: ${secretEnv}, loader: () => import('${importPath}') as Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> },\n`;
+    }
+    webhooksContent += '];\n';
+    fs.writeFileSync(WEBHOOKS_FILE, webhooksContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');

@@ -166,6 +166,18 @@ export interface ModuleManifest {
         handler: string;      // path to file exporting default async fn
     }[];
 
+    // Inbound webhook receivers — external services can POST to
+    // /api/v1/webhook/<provider> and the dispatcher routes to the
+    // matching handler. Handler default-exports:
+    //   (request: Request) => Promise<{ status: number; body?: unknown }>
+    // Optional signatureHeader + secretEnv enables HMAC verification.
+    webhookReceivers?: {
+        provider: string;     // unique slug — used in the URL
+        handler: string;      // path to file exporting default async fn
+        signatureHeader?: string;  // e.g. "stripe-signature"
+        secretEnv?: string;        // env var holding the shared secret
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;
