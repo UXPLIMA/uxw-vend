@@ -1,9 +1,12 @@
 import type { PrismaClient } from "@prisma/client";
 
 /**
- * Seed the 5 built-in trophies awarded by `src/core/lib/trophy-engine.ts`.
- * Idempotent — safe to re-run. Trophy ids match the rule slugs so the
- * engine can award them without an extra lookup.
+ * Seed the 5 built-in trophies. The DB-driven engine in
+ * `src/core/lib/trophy-engine.ts` reads the structured rule columns
+ * (ruleType / ruleEvent / ruleThreshold) to auto-award them.
+ *
+ * Idempotent — safe to re-run. Trophy ids are stable slugs so upserts
+ * keep existing UserTrophy awards intact across re-seeds.
  */
 
 interface TrophySeed {
@@ -14,6 +17,10 @@ interface TrophySeed {
     color: string;
     points: number;
     awardOn: string;
+    ruleType: string;
+    ruleEvent: string;
+    ruleThreshold: number;
+    isActive: boolean;
 }
 
 const TROPHIES: TrophySeed[] = [
@@ -25,6 +32,10 @@ const TROPHIES: TrophySeed[] = [
         color: "#3b82f6",
         points: 5,
         awardOn: "forum.topic.created:1",
+        ruleType: "event-count",
+        ruleEvent: "forum.topic.created",
+        ruleThreshold: 1,
+        isActive: true,
     },
     {
         id: "commenter",
@@ -34,6 +45,10 @@ const TROPHIES: TrophySeed[] = [
         color: "#06b6d4",
         points: 15,
         awardOn: "forum.post.created:10",
+        ruleType: "event-count",
+        ruleEvent: "forum.post.created",
+        ruleThreshold: 10,
+        isActive: true,
     },
     {
         id: "voter",
@@ -43,6 +58,10 @@ const TROPHIES: TrophySeed[] = [
         color: "#10b981",
         points: 10,
         awardOn: "vote.vote.cast:5",
+        ruleType: "event-count",
+        ruleEvent: "vote.vote.cast",
+        ruleThreshold: 5,
+        isActive: true,
     },
     {
         id: "shopaholic",
@@ -52,6 +71,10 @@ const TROPHIES: TrophySeed[] = [
         color: "#f59e0b",
         points: 20,
         awardOn: "store.order.completed:1",
+        ruleType: "event-count",
+        ruleEvent: "store.order.completed",
+        ruleThreshold: 1,
+        isActive: true,
     },
     {
         id: "suggestion-maker",
@@ -61,6 +84,10 @@ const TROPHIES: TrophySeed[] = [
         color: "#eab308",
         points: 5,
         awardOn: "suggestions.suggestion.created:1",
+        ruleType: "event-count",
+        ruleEvent: "suggestions.suggestion.created",
+        ruleThreshold: 1,
+        isActive: true,
     },
 ];
 
@@ -76,6 +103,10 @@ export async function seedTrophies(prisma: PrismaClient): Promise<void> {
                     color: t.color,
                     points: t.points,
                     awardOn: t.awardOn,
+                    ruleType: t.ruleType,
+                    ruleEvent: t.ruleEvent,
+                    ruleThreshold: t.ruleThreshold,
+                    isActive: t.isActive,
                 },
                 create: t,
             });

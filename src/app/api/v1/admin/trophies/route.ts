@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { auth } from "@/core/lib/auth";
+import { isAdmin } from "@/core/lib/permissions";
+import { prisma } from "@/core/lib/db";
+
+/**
+ * Admin trophy CRUD.
+ *
+ * GET  /api/v1/admin/trophies        — list with award counts
+ * POST /api/v1/admin/trophies        — create a new trophy
+ *
+ * All routes require the caller to pass `isAdmin()`.
+ */
+
+async function requireAdmin() {
+    const session = await auth();
+    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+        return null;
+    }
+    return session;
+}
+
+export async function GET() {
+    if (!(await requireAdmin())) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const trophies = await prisma.trophy.findMany({
+        orderBy: [{ isActive: "desc" }, { points: "desc" }, { name: "asc" }],
+        include: { _count: { select: { users: true } } },
+    });
+
+    return NextResponse.json({ trophies });
+}
+
+const createSchema = z.object({
+    name: z.string().min(1).max(100),
+    description: z.string().max(500).optional().nullable(),
+    icon: z.string().max(50).optional().nullable(),
+    color: z.string().max(50).optional().nullable(),
+    points: z.number().int().min(0).default(0),
+    ruleType: z.string().max(50).optional().nullable(),
+    ruleEvent: z.string().max(120).optional().nullable(),
+    ruleThreshold: z.number().int().min(1).optional().nullable(),
+    isActive: z.boolean().optional(),
+});
+
+export async function POST(request: NextRequest) {
+    if (!(await requireAdmin())) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const parsed = createSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json(
+            { error: parsed.error.issues[0]?.message || "Invalid input" },
+            { status: 400 }
+        );
+    }
+
+    const data = parsed.data;
+    const trophy = await prisma.trophy.create({
+        data: {
+            name: data.name,
+            description: data.description ?? null,
+            icon: data.icon ?? null,
+            color: data.color ?? null,
+            points: data.points ?? 0,
+            ruleType: data.ruleType ?? "event-count",
+            ruleEvent: data.ruleEvent || null,
+            ruleThreshold: data.ruleThreshold ?? 1,
+            isActive: data.isActive ?? true,
+            // Keep legacy awardOn in sync so older consumers keep working.
+            awardOn: data.ruleEvent ? `${data.ruleEvent}:${data.ruleThreshold ?? 1}` : null,
+        },
+    });
+
+    return NextResponse.json({ trophy }, { status: 201 });
+}

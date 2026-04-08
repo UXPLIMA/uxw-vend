@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -10,7 +10,7 @@ import { ModuleSettingsCards } from "@/core/generated/module-registry";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
     Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson,
-    History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox,
+    History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database,
 };
 
 export default function SettingsPage() {
@@ -90,6 +90,20 @@ export default function SettingsPage() {
             href: "/admin/observability",
             icon: "Activity",
             color: "text-emerald-500",
+        },
+        {
+            title: t.has("settings_trophies") ? t("settings_trophies") : "Trophies",
+            description: t.has("settings_trophiesDesc") ? t("settings_trophiesDesc") : "Manage achievement badges and rules",
+            href: "/admin/trophies",
+            icon: "Award",
+            color: "text-amber-500",
+        },
+        {
+            title: t.has("settings_backup") ? t("settings_backup") : "Backup",
+            description: t.has("settings_backupDesc") ? t("settings_backupDesc") : "Database backup & restore",
+            href: "/admin/backup",
+            icon: "Database",
+            color: "text-sky-500",
         },
     ];
 

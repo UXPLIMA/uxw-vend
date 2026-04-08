@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, Award } from "lucide-react";
+import Link from "next/link";
 import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -42,6 +43,22 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<string>("profile");
 
+    // Trophies earned by this user
+    interface EarnedTrophy {
+        id: string;
+        awardedAt: string;
+        trophy: {
+            id: string;
+            name: string;
+            description: string | null;
+            icon: string | null;
+            color: string | null;
+            points: number;
+        };
+    }
+    const [earnedTrophies, setEarnedTrophies] = useState<EarnedTrophy[]>([]);
+    const [totalTrophies, setTotalTrophies] = useState(0);
+
     // Linked accounts
     const [linkedAccounts, setLinkedAccounts] = useState<{ id: string; provider: string; username: string | null }[]>([]);
     const [mcUsername, setMcUsername] = useState("");
@@ -68,13 +85,16 @@ export default function ProfilePage() {
         Promise.all([
             fetch("/api/v1/auth/profile").then(r => r.json()),
             fetch("/api/v1/linked-accounts").then(r => r.json()).catch(() => ({ accounts: [] })),
-        ]).then(([profileData, accountsData]) => {
+            fetch("/api/v1/me/trophies").then(r => r.json()).catch(() => ({ earned: [], total: 0 })),
+        ]).then(([profileData, accountsData, trophyData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
                 setUsername(profileData.user.username);
                 setAvatar(profileData.user.avatar || "");
             }
             setLinkedAccounts(accountsData.accounts || []);
+            setEarnedTrophies(trophyData.earned || []);
+            setTotalTrophies(trophyData.total || 0);
             setLoading(false);
         }).catch(() => setLoading(false));
     }, [authStatus, router]);
@@ -177,6 +197,7 @@ export default function ProfilePage() {
 
                 {/* Profile Tab */}
                 {activeTab === "profile" && (
+                    <div className="space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle>{t("settings")}</CardTitle>
@@ -210,6 +231,52 @@ export default function ProfilePage() {
                             </form>
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Award className="w-5 h-5 text-amber-500" />
+                                Trophies
+                                <span className="text-sm font-normal text-muted-foreground ml-2">
+                                    {earnedTrophies.length} of {totalTrophies} earned
+                                </span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {earnedTrophies.length === 0 ? (
+                                <div className="text-sm text-muted-foreground">
+                                    No trophies yet. {" "}
+                                    <Link href="/trophies" className="text-primary hover:underline">
+                                        See what you can earn
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                    {earnedTrophies.map((et) => (
+                                        <div
+                                            key={et.id}
+                                            className="flex items-center gap-2 p-2 rounded-md border border-border"
+                                            title={et.trophy.description || et.trophy.name}
+                                        >
+                                            <div
+                                                className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0"
+                                                style={{ backgroundColor: et.trophy.color || "#6366f1" }}
+                                            >
+                                                <Award className="w-5 h-5" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="font-medium text-xs truncate">{et.trophy.name}</div>
+                                                <div className="text-[10px] text-muted-foreground">
+                                                    {formatDate(new Date(et.awardedAt))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                    </div>
                 )}
 
                 {/* Activity Tab */}

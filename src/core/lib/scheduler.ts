@@ -170,6 +170,20 @@ export async function bootstrapScheduler(): Promise<void> {
         },
     });
 
+    registerCronJob({
+        key: "core:automated-backup",
+        schedule: "every-day",
+        handler: async () => {
+            const { createBackup } = await import("./backup");
+            try {
+                const meta = await createBackup("scheduled", "Daily automated backup");
+                console.log(`[cron] automated-backup: created ${meta.filename} (${meta.sizeBytes} bytes)`);
+            } catch (err) {
+                console.error("[cron] automated-backup failed:", err);
+            }
+        },
+    });
+
     // ─── Module-contributed jobs ───
     try {
         const { ModuleCronJobs } = await import("@/core/generated/module-crons");

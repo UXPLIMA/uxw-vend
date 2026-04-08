@@ -67,8 +67,8 @@ export default async function RootLayout({
 
   // Initialize module hook listeners (idempotent — runs once per process)
   await bootstrapHooks();
-  // Register the built-in trophy auto-award engine (idempotent)
-  registerTrophyListeners();
+  // Register the DB-driven trophy auto-award engine (idempotent)
+  await registerTrophyListeners();
   // Start the cron scheduler (idempotent)
   await bootstrapScheduler();
 

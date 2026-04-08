@@ -13,6 +13,20 @@ import { prisma } from "./db";
  * in-process behavior. Both implementations conform to the
  * RateLimitBackend interface below so new backends (e.g. Memcached,
  * Cloudflare KV) can be added without touching callers.
+ *
+ * Public API:
+ *   - rateLimit(identifier, config)
+ *       Low-level hit against the module-load-time selected backend.
+ *   - rateLimitForRole(identifier, config, role?)
+ *       Role-multiplier-aware wrapper. Returns a full RateLimitResult.
+ *       Used by all 16+ existing call sites — DO NOT break.
+ *   - rateLimitForRoleAsync(identifier, config, role?)
+ *       Thin boolean-returning variant that probes Redis readiness at
+ *       call time (via isRedisReady) and falls back to the memory
+ *       backend when Redis is configured but unreachable. Shares the
+ *       role-multiplier pipeline with rateLimitForRole via the private
+ *       resolveRoleMultiplier helper. Prefer this in new code paths
+ *       where only the allow/deny bit matters.
  */
 
 export interface RateLimitConfig {
@@ -281,6 +295,38 @@ export async function getRoleMultipliers(): Promise<Map<string, number>> {
 }
 
 /**
+ * Resolve a role's effective multiplier from the Setting cache.
+ * Returns 1 as the safe default on any missing entry / error.
+ * Shared by both rateLimitForRole and rateLimitForRoleAsync so the
+ * multiplier lookup code lives in exactly one place.
+ */
+async function resolveRoleMultiplier(role?: string | null): Promise<number> {
+    if (!role) return 1;
+    try {
+        const map = await getRoleMultipliers();
+        const entry = map.get(role);
+        return typeof entry === "number" ? entry : 1;
+    } catch {
+        return 1;
+    }
+}
+
+/**
+ * Apply the role multiplier to the base config. Returns `null` when the
+ * multiplier is 0 (unlimited) so callers can short-circuit.
+ */
+function applyMultiplier(
+    baseConfig: RateLimitConfig,
+    multiplier: number
+): RateLimitConfig | null {
+    if (multiplier === 0) return null;
+    return {
+        maxRequests: Math.max(1, Math.floor(baseConfig.maxRequests * multiplier)),
+        windowMs: baseConfig.windowMs,
+    };
+}
+
+/**
  * Role-aware wrapper around {@link rateLimit}.
  *
  * - If the role has multiplier `0`, the request is treated as unlimited:
@@ -296,20 +342,51 @@ export async function rateLimitForRole(
     baseConfig: RateLimitConfig,
     role?: string | null
 ): Promise<RateLimitResult> {
-    let multiplier = 1;
-    if (role) {
-        const map = await getRoleMultipliers();
-        const entry = map.get(role);
-        if (typeof entry === "number") multiplier = entry;
-    }
-
-    if (multiplier === 0) {
+    const multiplier = await resolveRoleMultiplier(role);
+    const effective = applyMultiplier(baseConfig, multiplier);
+    if (effective === null) {
         return { success: true, remaining: Number.POSITIVE_INFINITY, resetAt: 0 };
     }
+    return rateLimit(identifier, effective);
+}
 
-    const effectiveMax = Math.max(1, Math.floor(baseConfig.maxRequests * multiplier));
-    return rateLimit(identifier, {
-        maxRequests: effectiveMax,
-        windowMs: baseConfig.windowMs,
-    });
+/**
+ * Boolean-returning role-aware rate limiter.
+ *
+ * Differs from {@link rateLimitForRole} in two ways:
+ *  1. Picks the backend at CALL time — probes Redis readiness with
+ *     {@link isRedisReady} and uses the Redis backend only if currently
+ *     reachable, otherwise transparently uses the memory backend. This
+ *     lets long-running processes recover from a Redis outage without
+ *     a restart.
+ *  2. Returns just the allow/deny bit (`Promise<boolean>`) for callers
+ *     that don't need remaining/resetAt metadata.
+ *
+ * The existing sync-shaped call sites of {@link rateLimitForRole} are
+ * NOT affected — that function still uses the module-load-time selected
+ * `activeBackend` and returns a full `RateLimitResult`.
+ */
+export async function rateLimitForRoleAsync(
+    identifier: string,
+    baseConfig: RateLimitConfig,
+    role?: string | null
+): Promise<boolean> {
+    const multiplier = await resolveRoleMultiplier(role);
+    const effective = applyMultiplier(baseConfig, multiplier);
+    if (effective === null) return true;
+
+    const backend: RateLimitBackend = (await isRedisReady())
+        ? RedisBackend
+        : MemoryBackend;
+
+    try {
+        const result = await backend.hit(identifier, effective);
+        return result.success;
+    } catch {
+        // Last-resort safety net — on any unexpected backend error,
+        // fall back to the memory backend so we never 500 a request
+        // just because the limiter blew up.
+        const result = await MemoryBackend.hit(identifier, effective);
+        return result.success;
+    }
 }

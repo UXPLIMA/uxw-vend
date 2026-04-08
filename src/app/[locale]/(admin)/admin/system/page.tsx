@@ -25,9 +25,11 @@ interface SystemData {
 }
 
 interface BackupItem {
+    id: string;
     filename: string;
     sizeHuman: string;
     createdAt: string;
+    type?: "manual" | "scheduled";
 }
 
 export default function SystemPage() {
@@ -67,36 +69,35 @@ export default function SystemPage() {
         setBacking(false);
     };
 
-    const downloadBackup = (filename: string) => {
-        window.open(`/api/v1/admin/backup/${encodeURIComponent(filename)}`, "_blank");
+    const downloadBackup = (id: string) => {
+        window.location.href = `/api/v1/admin/backup/${encodeURIComponent(id)}/download`;
     };
 
-    const deleteBackup = async (filename: string) => {
-        const ok = await confirm({ title: t("system_deleteBackupTitle"), message: t("system_deleteBackupMessage", { filename }), variant: "danger", confirmText: "Delete" });
+    const deleteBackup = async (b: BackupItem) => {
+        const ok = await confirm({ title: t("system_deleteBackupTitle"), message: t("system_deleteBackupMessage", { filename: b.filename }), variant: "danger", confirmText: "Delete" });
         if (!ok) return;
-        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(filename)}`, { method: "DELETE" });
+        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(b.id)}`, { method: "DELETE" });
         if (res.ok) { toast.success("Backup deleted"); fetchData(); }
         else { toast.error("Failed to delete"); }
     };
 
-    const restoreBackup = async (filename: string) => {
-        if (!filename.endsWith(".zip")) { toast.error("Only ZIP backups can be restored"); return; }
+    const restoreBackup = async (b: BackupItem) => {
         const ok = await confirm({
             title: t("system_restoreBackupTitle"),
-            message: t("system_restoreBackupMessage", { filename }),
+            message: t("system_restoreBackupMessage", { filename: b.filename }),
             variant: "danger",
             confirmText: "Restore",
         });
         if (!ok) return;
-        setRestoring(filename);
-        const res = await fetch("/api/v1/admin/backup/restore", {
+        setRestoring(b.id);
+        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(b.id)}/restore`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ filename }),
+            body: JSON.stringify({ confirmText: "RESTORE" }),
         });
         const data = await res.json();
-        if (res.ok) {
-            toast.success(`Restored: ${(data.restored || []).join(", ")}`);
+        if (res.ok && data.success) {
+            toast.success("Database restored successfully");
             fetchData();
         } else {
             toast.error(data.error || "Restore failed");
@@ -217,21 +218,19 @@ export default function SystemPage() {
                     ) : (
                         <div className="divide-y">
                             {backups.map((b) => (
-                                <div key={b.filename} className="flex items-center justify-between py-3">
+                                <div key={b.id} className="flex items-center justify-between py-3">
                                     <div>
                                         <p className="font-medium text-sm">{b.filename}</p>
                                         <p className="text-xs text-muted-foreground">{new Date(b.createdAt).toLocaleString()} - {b.sizeHuman}</p>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <Button variant="ghost" size="sm" onClick={() => downloadBackup(b.filename)} title="Download">
+                                        <Button variant="ghost" size="sm" onClick={() => downloadBackup(b.id)} title="Download">
                                             <Download className="w-4 h-4" />
                                         </Button>
-                                        {b.filename.endsWith(".zip") && (
-                                            <Button variant="ghost" size="sm" onClick={() => restoreBackup(b.filename)} disabled={restoring === b.filename} title="Restore">
-                                                {restoring === b.filename ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-                                            </Button>
-                                        )}
-                                        <Button variant="ghost" size="sm" onClick={() => deleteBackup(b.filename)} className="text-destructive" title="Delete">
+                                        <Button variant="ghost" size="sm" onClick={() => restoreBackup(b)} disabled={restoring === b.id} title="Restore">
+                                            {restoring === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                                        </Button>
+                                        <Button variant="ghost" size="sm" onClick={() => deleteBackup(b)} className="text-destructive" title="Delete">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
