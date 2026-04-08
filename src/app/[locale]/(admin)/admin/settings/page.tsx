@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -9,7 +9,7 @@ import { ModuleSettingsCards } from "@/core/generated/module-registry";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
-    Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell,
+    Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson,
 };
 
 export default function SettingsPage() {
@@ -27,6 +27,20 @@ export default function SettingsPage() {
         { title: t("settings_widgets"), description: t("settings_widgetsDesc"), href: "/admin/settings/widgets", icon: "LayoutGrid", color: "text-teal-500" },
         { title: t("settings_customCss"), description: t("settings_customCssDesc"), href: "/admin/settings/css", icon: "Code", color: "text-yellow-500" },
         { title: t("settings_siteConfig"), description: t("settings_siteConfigDesc"), href: "/admin/settings/site", icon: "Globe", color: "text-blue-400" },
+        {
+            title: t.has("settings_rateLimits") ? t("settings_rateLimits") : "Rate Limits",
+            description: t.has("settings_rateLimitsDesc") ? t("settings_rateLimitsDesc") : "Per-role API rate limit multipliers.",
+            href: "/admin/settings/rate-limits",
+            icon: "Gauge",
+            color: "text-indigo-500",
+        },
+        {
+            title: t.has("settings_apiDocs") ? t("settings_apiDocs") : "API Docs",
+            description: t.has("settings_apiDocsDesc") ? t("settings_apiDocsDesc") : "Interactive OpenAPI reference for core and module endpoints.",
+            href: "/admin/api-docs",
+            icon: "FileJson",
+            color: "text-emerald-500",
+        },
     ];
 
     // Module settings cards — only from enabled modules

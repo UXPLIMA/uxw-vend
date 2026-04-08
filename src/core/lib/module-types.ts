@@ -30,6 +30,7 @@ export interface ModuleManifest {
         path: string;
         handler: string; // Relative path to handler file
         method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "ALL";
+        description?: string; // Optional OpenAPI summary (used by /api/v1/openapi)
     }[];
 
     dependencies?: string[];

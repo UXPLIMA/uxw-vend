@@ -703,6 +703,18 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/auth/two-factor/status",
+    "key": "two-factor-auth:api:/auth/two-factor/status",
+    "module": "two-factor-auth",
+    "method": "ALL"
+  },
+  {
+    "path": "/auth/two-factor/regenerate-codes",
+    "key": "two-factor-auth:api:/auth/two-factor/regenerate-codes",
+    "module": "two-factor-auth",
+    "method": "ALL"
+  },
+  {
     "path": "/auth/verify",
     "key": "two-factor-auth:api:/auth/verify",
     "module": "two-factor-auth",

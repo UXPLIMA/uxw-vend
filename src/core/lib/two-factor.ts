@@ -36,7 +36,7 @@ export async function generateQRCode(uri: string): Promise<string> {
     return QRCode.toDataURL(uri);
 }
 
-export function generateBackupCodes(count: number = 8): { codes: string[]; hashed: string[] } {
+export function generateBackupCodes(count: number = 10): { codes: string[]; hashed: string[] } {
     const codes: string[] = [];
     const hashed: string[] = [];
 
@@ -65,4 +65,22 @@ export function verifyBackupCode(code: string, hashedCodes: string[]): { valid: 
     const remaining = [...hashedCodes];
     remaining.splice(index, 1);
     return { valid: true, remaining };
+}
+
+export function parseBackupCodes(value: unknown): string[] {
+    if (!value) return [];
+    if (Array.isArray(value)) return value as string[];
+    if (typeof value === "string") {
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? (parsed as string[]) : [];
+        } catch {
+            return [];
+        }
+    }
+    return [];
+}
+
+export function countRemainingBackupCodes(value: unknown): number {
+    return parseBackupCodes(value).length;
 }

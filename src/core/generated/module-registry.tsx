@@ -1251,6 +1251,18 @@ export const ModuleApiRoutes: { path: string; key: string; module: string; metho
     "method": "ALL"
   },
   {
+    "path": "/auth/two-factor/status",
+    "key": "two-factor-auth:api:/auth/two-factor/status",
+    "module": "two-factor-auth",
+    "method": "ALL"
+  },
+  {
+    "path": "/auth/two-factor/regenerate-codes",
+    "key": "two-factor-auth:api:/auth/two-factor/regenerate-codes",
+    "module": "two-factor-auth",
+    "method": "ALL"
+  },
+  {
     "path": "/auth/verify",
     "key": "two-factor-auth:api:/auth/verify",
     "module": "two-factor-auth",
@@ -1424,6 +1436,8 @@ export const ModuleApiRegistry: Record<string, () => Promise<any>> = {
   'two-factor-auth:api:/auth/two-factor/setup': () => import('@/modules/two-factor-auth/api/setup/route'),
   'two-factor-auth:api:/auth/two-factor/verify': () => import('@/modules/two-factor-auth/api/verify/route'),
   'two-factor-auth:api:/auth/two-factor/disable': () => import('@/modules/two-factor-auth/api/disable/route'),
+  'two-factor-auth:api:/auth/two-factor/status': () => import('@/modules/two-factor-auth/api/status/route'),
+  'two-factor-auth:api:/auth/two-factor/regenerate-codes': () => import('@/modules/two-factor-auth/api/regenerate-codes/route'),
   'two-factor-auth:api:/auth/verify': () => import('@/modules/two-factor-auth/api/verify/route'),
   'two-factor-auth:api:/auth/setup': () => import('@/modules/two-factor-auth/api/setup/route'),
   'two-factor-auth:api:/auth/disable': () => import('@/modules/two-factor-auth/api/disable/route'),

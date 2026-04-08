@@ -67,6 +67,8 @@ ROADMAP.md
 *.png
 !public/**/*.png
 .playwright-mcp/
+test-results/
+playwright-report/
 nabvar-dropdown.png
 wheel-new.png
 widgets-working.png

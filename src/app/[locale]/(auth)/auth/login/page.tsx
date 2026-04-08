@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Home } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
@@ -48,6 +49,25 @@ export default function LoginPage() {
                     setError(t('invalidCredentials'));
                 }
             } else {
+                // If a non-TOTP (backup) code was used, warn about remaining codes.
+                const submittedCode = needs2FA ? twoFactorCode.trim() : "";
+                const looksLikeBackupCode = submittedCode.length > 0 && !/^\d{6}$/.test(submittedCode);
+                if (looksLikeBackupCode) {
+                    try {
+                        const statusRes = await fetch("/api/v1/auth/two-factor/status");
+                        if (statusRes.ok) {
+                            const status = await statusRes.json();
+                            const remaining = Number(status?.remainingBackupCodes) || 0;
+                            if (remaining <= 3) {
+                                toast.warning(`${remaining} backup codes remaining — regenerate at /profile if low`);
+                            } else {
+                                toast.info(`${remaining} backup codes remaining — regenerate at /profile if low`);
+                            }
+                        }
+                    } catch {
+                        // silent — not critical
+                    }
+                }
                 router.push("/");
                 router.refresh();
             }
