@@ -6,15 +6,17 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
+import { FileUpload } from "@/core/components/ui/file-upload";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
 
 export interface SettingsField {
     key: string;
     label: string;
-    type?: "text" | "password" | "number" | "url" | "email" | "textarea";
+    type?: "text" | "password" | "number" | "url" | "email" | "textarea" | "image";
     placeholder?: string;
     description?: string;
     defaultValue?: string;
+    accept?: string;
 }
 
 interface SettingsFormProps {
@@ -100,6 +102,12 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         placeholder={field.placeholder}
                                         rows={3}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    />
+                                ) : field.type === "image" ? (
+                                    <FileUpload
+                                        value={values[field.key] || null}
+                                        onChange={(v) => setValues({ ...values, [field.key]: v || "" })}
+                                        accept={field.accept || "image/*"}
                                     />
                                 ) : (
                                     <Input

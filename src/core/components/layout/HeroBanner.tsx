@@ -15,6 +15,7 @@ export function HeroBanner() {
 
     const bgImage = (settings.hero_background_image as string) || "/background1.png";
     const logoImage = (settings.hero_logo_image as string) || "/logo.png";
+    const logoUrl = (settings.hero_logo_url as string) || "";
     const serverIp = (settings.hero_server_ip as string) || serverConfig.ip || "";
     const communityUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl || "";
     const siteName = (settings.site_name as string) || serverConfig.name;
@@ -56,7 +57,19 @@ export function HeroBanner() {
                     )}
 
                     <div className="animate-float">
-                        <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" unoptimized priority />
+                        {logoUrl ? (
+                            logoUrl.startsWith("http") ? (
+                                <a href={logoUrl} target="_blank" rel="noopener noreferrer">
+                                    <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer hover:scale-105 transition-transform" unoptimized priority />
+                                </a>
+                            ) : (
+                                <Link href={logoUrl}>
+                                    <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer hover:scale-105 transition-transform" unoptimized priority />
+                                </Link>
+                            )
+                        ) : (
+                            <Image src={logoImage} alt={siteName} width={200} height={160} className="h-32 md:h-40 w-auto object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]" unoptimized priority />
+                        )}
                     </div>
 
                     {showCommunity && (
