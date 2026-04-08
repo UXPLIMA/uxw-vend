@@ -40,6 +40,8 @@ model User {
   revisions        Revision[]         @relation("RevisionAuthor")
   activityFeed     ActivityFeedItem[] @relation("ActivityActor")
   trophies         UserTrophy[]       @relation("UserTrophies")
+  warnings         UserWarning[]      @relation("UserWarnings")
+  warningsIssued   UserWarning[]      @relation("WarningIssuer")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -171,6 +173,26 @@ model Revision {
   @@index([resource, resourceId])
   @@index([authorId])
   @@index([createdAt])
+}
+
+// User warnings issued by moderators. Configurable point values; when
+// a user accumulates enough points, automatic actions can fire (mute,
+// ban, etc.) via hook listeners.
+model UserWarning {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserWarnings")
+  issuedById  String?
+  issuedBy    User?    @relation(fields: [issuedById], references: [id], onDelete: SetNull, name: "WarningIssuer")
+  reason      String
+  points      Int      @default(1)
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([issuedById])
+  @@index([isActive, expiresAt])
 }
 
 // User trophies / badges. Defined by admins, awarded by hook listeners
