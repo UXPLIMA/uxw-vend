@@ -35,4 +35,33 @@ export const flatDarkTheme: ThemeConfig = {
         mono: '"JetBrains Mono", monospace',
     },
     radius: "0.625rem",
+
+    // Inherits layout surfaces from the parent "flat" theme, but we declare
+    // the slots here too so the child is self-documenting.
+    slots: [
+        "layout.top",
+        "layout.bottom",
+        "homepage.sidebar",
+        "navbar.icons",
+    ],
+
+    cssVariables: [
+        "--color-primary",
+        "--color-secondary",
+        "--color-accent",
+        "--color-background",
+        "--color-foreground",
+        "--color-muted",
+        "--color-muted-foreground",
+        "--color-border",
+        "--color-card",
+        "--color-card-foreground",
+        "--color-destructive",
+        "--color-success",
+        "--color-warning",
+        "--font-heading",
+        "--font-body",
+        "--font-mono",
+        "--radius",
+    ],
 };

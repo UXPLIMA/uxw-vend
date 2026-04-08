@@ -59,4 +59,37 @@ export const flatTheme: ThemeConfig = {
     },
     radius: "0.625rem",
     schema,
+
+    // Named template slots rendered by this theme's layout surfaces.
+    // Modules can inject content into any of these via manifest.slotContents.
+    slots: [
+        "layout.top",
+        "layout.bottom",
+        "homepage.sidebar",
+        "navbar.icons",
+    ],
+
+    // CSS custom properties the theme honors — kept in sync with the set
+    // written by the theme-provider from the active ThemeConfig + customizer
+    // overrides. All hard-coded values in the theme should trace back to one
+    // of these (or resolve from the ThemeConfig at runtime).
+    cssVariables: [
+        "--color-primary",
+        "--color-secondary",
+        "--color-accent",
+        "--color-background",
+        "--color-foreground",
+        "--color-muted",
+        "--color-muted-foreground",
+        "--color-border",
+        "--color-card",
+        "--color-card-foreground",
+        "--color-destructive",
+        "--color-success",
+        "--color-warning",
+        "--font-heading",
+        "--font-body",
+        "--font-mono",
+        "--radius",
+    ],
 };

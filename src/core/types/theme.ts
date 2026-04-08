@@ -78,6 +78,22 @@ export interface ThemeConfig {
      * If absent, the theme is considered "locked" (only code-level changes).
      */
     schema?: ThemeProperty[];
+
+    /**
+     * Documentation-only: list of named slots (see {@link Slot}) the theme's
+     * templates render. Modules can inject content into any of these via their
+     * manifest.slotContents. Not read at runtime — used by tooling and to
+     * advertise extension points in marketplace listings.
+     */
+    slots?: string[];
+
+    /**
+     * Documentation-only: list of CSS custom properties the theme honors.
+     * These are the variable names the customizer writes into the document
+     * root (e.g. "--color-primary", "--radius"). Used by tooling to validate
+     * that the theme will respond to customizer changes.
+     */
+    cssVariables?: string[];
 }
 
 /**

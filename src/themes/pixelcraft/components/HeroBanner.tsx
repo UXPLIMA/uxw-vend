@@ -23,19 +23,19 @@ export default function PixelCraftHeroBanner() {
     const copyIp = () => { navigator.clipboard.writeText(serverIp); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
     return (
-        <div className="relative overflow-hidden" style={{ height: heroHeight, background: "#111" }}>
+        <div className="relative overflow-hidden" style={{ height: heroHeight, background: "var(--color-background)" }}>
             {/* Background */}
             <div className="absolute inset-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={bgImage} alt="" className="w-full h-full object-cover opacity-40" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(17,17,17,0.3) 0%, rgba(17,17,17,0.8) 70%, #1a1a1a 100%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 70%, var(--color-background) 100%)" }} />
             </div>
 
             {/* Floating particles effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(6)].map((_, i) => (
                     <div key={i} className="absolute w-1 h-1 rounded-none animate-float" style={{
-                        background: "#ffb800",
+                        background: "var(--color-secondary)",
                         opacity: 0.4,
                         left: `${15 + i * 15}%`,
                         top: `${20 + (i % 3) * 25}%`,
@@ -63,12 +63,12 @@ export default function PixelCraftHeroBanner() {
                         onClick={copyIp}
                         className="px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all"
                         style={{
-                            background: "linear-gradient(180deg, #5dbd4a 0%, #3ea72d 100%)",
+                            background: "var(--color-primary)",
                             color: "#fff",
                             border: "none",
-                            borderBottom: "4px solid #2d7a20",
-                            borderRadius: "2px",
-                            fontFamily: "'Press Start 2P', monospace",
+                            borderBottom: "4px solid rgba(0,0,0,0.3)",
+                            borderRadius: "var(--radius)",
+                            fontFamily: "var(--font-heading)",
                             fontSize: "10px",
                         }}
                     >
@@ -81,12 +81,12 @@ export default function PixelCraftHeroBanner() {
                     <Link href={discordUrl} target="_blank"
                         className="px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all inline-block"
                         style={{
-                            background: "linear-gradient(180deg, #7289da 0%, #5865F2 100%)",
+                            background: "#5865F2",
                             color: "#fff",
                             border: "none",
                             borderBottom: "4px solid #4752c4",
-                            borderRadius: "2px",
-                            fontFamily: "'Press Start 2P', monospace",
+                            borderRadius: "var(--radius)",
+                            fontFamily: "var(--font-heading)",
                             fontSize: "10px",
                         }}
                     >
@@ -95,9 +95,9 @@ export default function PixelCraftHeroBanner() {
                 </div>
 
                 {/* Player count */}
-                <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: "#8c8c8c" }}>
-                    <span className="w-2 h-2 rounded-none animate-pulse" style={{ background: "#3ea72d" }} />
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: "8px" }}>
+                <div className="mt-4 flex items-center gap-2 text-sm" style={{ color: "var(--color-muted-foreground)" }}>
+                    <span className="w-2 h-2 rounded-none animate-pulse" style={{ background: "var(--color-primary)" }} />
+                    <span style={{ fontFamily: "var(--font-heading)", fontSize: "8px" }}>
                         {t('playersOnline', { count: serverConfig.onlineCount })}
                     </span>
                 </div>
