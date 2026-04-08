@@ -19,6 +19,7 @@ import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { NotificationPrefsTab } from "@/core/components/profile/NotificationPrefsTab";
 import { MessagesTab } from "@/core/components/profile/MessagesTab";
 import { SessionsTab } from "@/core/components/profile/SessionsTab";
+import { ActivityTab } from "@/core/components/profile/ActivityTab";
 
 interface UserProfile {
     id: string;
@@ -120,6 +121,7 @@ export default function ProfilePage() {
     // Build tab list: core tabs + module tabs in between
     const allTabs = [
         { id: "profile", label: t("title") },
+        { id: "activity", label: t.has("activity") ? t("activity") : "Activity" },
         { id: "messages", label: t.has("messages") ? t("messages") : "Messages" },
         { id: "notifications", label: t.has("notifications") ? t("notifications") : "Notifications" },
         { id: "sessions", label: t.has("sessions") ? t("sessions") : "Sessions" },
@@ -209,6 +211,9 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Activity Tab */}
+                {activeTab === "activity" && <ActivityTab />}
 
                 {/* Messages Tab */}
                 {activeTab === "messages" && <MessagesTab />}

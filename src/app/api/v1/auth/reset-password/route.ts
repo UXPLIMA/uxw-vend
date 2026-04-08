@@ -70,6 +70,13 @@ export async function POST(request: NextRequest) {
         // Audit log
         await logActivity({ userId: user.id, action: "password.reset", entity: "user", entityId: user.id }).catch(() => {});
 
+        // Fire user.password.changed hook
+        import("@/core/lib/hooks")
+            .then(({ doActionAsync }) =>
+                doActionAsync("user.password.changed", { userId: user.id })
+            )
+            .catch(() => {});
+
         return NextResponse.json({ message: "Password has been reset successfully" });
     } catch (error) {
         console.error("Reset password error:", error);

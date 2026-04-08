@@ -50,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" },
                 twoFactorCode: { label: "2FA Code", type: "text" },
             },
-            async authorize(credentials) {
+            async authorize(credentials, request) {
                 if (!credentials?.email || !credentials?.password) {
                     return null;
                 }
@@ -107,6 +107,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         });
                     }
                 }
+
+                // Fire user.login hook — modules can react to successful credential auth.
+                // Extract ip + userAgent from the incoming Request (best-effort).
+                try {
+                    const headers = (request as Request | undefined)?.headers;
+                    const ip =
+                        headers?.get("x-forwarded-for")?.split(",")[0].trim() ||
+                        headers?.get("x-real-ip") ||
+                        "";
+                    const userAgent = headers?.get("user-agent") || "";
+                    const { doActionAsync } = await import("./hooks");
+                    await doActionAsync("user.login", {
+                        userId: user.id,
+                        email: user.email,
+                        ip,
+                        userAgent,
+                    }).catch(() => {});
+                } catch { /* non-fatal */ }
 
                 return {
                     id: user.id,

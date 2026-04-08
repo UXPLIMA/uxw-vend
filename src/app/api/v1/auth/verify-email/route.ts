@@ -66,5 +66,20 @@ export async function GET(request: NextRequest) {
         where: { identifier_token: { identifier: email, token } },
     });
 
+    // Fire user.email.verified hook — look up user id for payload
+    try {
+        const verifiedUser = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true },
+        });
+        if (verifiedUser) {
+            const { doActionAsync } = await import("@/core/lib/hooks");
+            await doActionAsync("user.email.verified", {
+                userId: verifiedUser.id,
+                email,
+            }).catch(() => {});
+        }
+    } catch { /* non-fatal */ }
+
     return NextResponse.json({ message: "Email verified successfully" });
 }

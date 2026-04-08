@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -10,6 +10,7 @@ import { ModuleSettingsCards } from "@/core/generated/module-registry";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
     Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson,
+    History, ShieldCheck, AlertTriangle,
 };
 
 export default function SettingsPage() {
@@ -40,6 +41,34 @@ export default function SettingsPage() {
             href: "/admin/api-docs",
             icon: "FileJson",
             color: "text-emerald-500",
+        },
+        {
+            title: t.has("settings_revisions") ? t("settings_revisions") : "Revision History",
+            description: t.has("settings_revisionsDesc") ? t("settings_revisionsDesc") : "Audit trail of every content update and delete.",
+            href: "/admin/revisions",
+            icon: "History",
+            color: "text-cyan-500",
+        },
+        {
+            title: t.has("settings_resourcePermissions") ? t("settings_resourcePermissions") : "Resource Permissions",
+            description: t.has("settings_resourcePermissionsDesc") ? t("settings_resourcePermissionsDesc") : "Granular per-entity allow/deny access grants.",
+            href: "/admin/resource-permissions",
+            icon: "ShieldCheck",
+            color: "text-lime-500",
+        },
+        {
+            title: t.has("settings_warnings") ? t("settings_warnings") : "User Warnings",
+            description: t.has("settings_warningsDesc") ? t("settings_warningsDesc") : "Issue and review moderator warnings.",
+            href: "/admin/warnings",
+            icon: "AlertTriangle",
+            color: "text-amber-500",
+        },
+        {
+            title: t.has("settings_broadcasts") ? t("settings_broadcasts") : "Email Broadcasts",
+            description: t.has("settings_broadcastsDesc") ? t("settings_broadcastsDesc") : "Compose and send bulk email to users.",
+            href: "/admin/broadcasts",
+            icon: "Mail",
+            color: "text-rose-500",
         },
     ];
 

@@ -79,6 +79,17 @@ export async function POST(request: NextRequest) {
         notifyUserRegistered({ username, email }).catch(console.error);
         logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch(console.error);
 
+        // Fire user.registered hook action — modules can react (welcome coupons, etc.)
+        import("@/core/lib/hooks")
+            .then(({ doActionAsync }) =>
+                doActionAsync("user.registered", {
+                    userId: user.id,
+                    email: user.email,
+                    username: user.username,
+                })
+            )
+            .catch(() => {});
+
         return NextResponse.json(
             { message: "User created successfully", user },
             { status: 201 }

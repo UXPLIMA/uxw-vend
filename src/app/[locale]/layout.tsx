@@ -12,6 +12,7 @@ import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutCom
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
 import { bootstrapHooks } from "@/core/lib/hooks";
 import { bootstrapScheduler } from "@/core/lib/scheduler";
+import { registerTrophyListeners } from "@/core/lib/trophy-engine";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -66,6 +67,8 @@ export default async function RootLayout({
 
   // Initialize module hook listeners (idempotent — runs once per process)
   await bootstrapHooks();
+  // Register the built-in trophy auto-award engine (idempotent)
+  registerTrophyListeners();
   // Start the cron scheduler (idempotent)
   await bootstrapScheduler();
 

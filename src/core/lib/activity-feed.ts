@@ -33,6 +33,55 @@ export function registerActivityFeedListeners(): void {
         } catch { /* non-fatal */ }
     });
 
+    // Profile updates — private (only visible to the user in their own feed)
+    addAction<{ userId: string; changes: Record<string, unknown> }>("user.profile.updated", async (payload) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: payload.userId },
+                select: { username: true },
+            });
+            await prisma.activityFeedItem.create({
+                data: {
+                    type: "user.profile.updated",
+                    actorId: payload.userId,
+                    title: `${user?.username || "A user"} updated their profile`,
+                    icon: "UserCog",
+                    isPublic: false,
+                },
+            });
+        } catch { /* non-fatal */ }
+    });
+
+    // 2FA enabled — private security audit trail
+    addAction<{ userId: string }>("user.2fa.enabled", async (payload) => {
+        try {
+            await prisma.activityFeedItem.create({
+                data: {
+                    type: "user.2fa.enabled",
+                    actorId: payload.userId,
+                    title: "Two-factor authentication enabled",
+                    icon: "ShieldCheck",
+                    isPublic: false,
+                },
+            });
+        } catch { /* non-fatal */ }
+    });
+
+    // 2FA disabled — private security audit trail
+    addAction<{ userId: string }>("user.2fa.disabled", async (payload) => {
+        try {
+            await prisma.activityFeedItem.create({
+                data: {
+                    type: "user.2fa.disabled",
+                    actorId: payload.userId,
+                    title: "Two-factor authentication disabled",
+                    icon: "ShieldOff",
+                    isPublic: false,
+                },
+            });
+        } catch { /* non-fatal */ }
+    });
+
     // ─── Blog events ───
     addAction<{ id: string; title: string; slug: string; status: string; authorId: string }>("blog.article.created", async (payload) => {
         if (payload.status !== "PUBLISHED") return;

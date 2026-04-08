@@ -678,7 +678,7 @@
     },
     "/api/v1/credits": {
       "get": {
-        "summary": "Credit System — /credits",
+        "summary": "Get the current user credit balance.",
         "description": "Module: credits",
         "tags": [
           "credits"
@@ -698,7 +698,7 @@
         }
       },
       "post": {
-        "summary": "Credit System — /credits",
+        "summary": "Get the current user credit balance.",
         "description": "Module: credits",
         "tags": [
           "credits"
@@ -720,7 +720,7 @@
     },
     "/api/v1/credits/purchase": {
       "get": {
-        "summary": "Credit System — /credits/purchase",
+        "summary": "Purchase credits via the configured payment gateway.",
         "description": "Module: credits",
         "tags": [
           "credits"
@@ -740,7 +740,7 @@
         }
       },
       "post": {
-        "summary": "Credit System — /credits/purchase",
+        "summary": "Purchase credits via the configured payment gateway.",
         "description": "Module: credits",
         "tags": [
           "credits"
@@ -3098,7 +3098,7 @@
     },
     "/api/v1/store/cart": {
       "get": {
-        "summary": "Store Module — /store/cart",
+        "summary": "Get, add items to, or clear the current user shopping cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3118,7 +3118,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/cart",
+        "summary": "Get, add items to, or clear the current user shopping cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3140,7 +3140,7 @@
     },
     "/api/v1/store/checkout": {
       "get": {
-        "summary": "Store Module — /store/checkout",
+        "summary": "Initiate checkout and create a payment session for the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3160,7 +3160,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/checkout",
+        "summary": "Initiate checkout and create a payment session for the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3182,7 +3182,7 @@
     },
     "/api/v1/store/categories": {
       "get": {
-        "summary": "Store Module — /store/categories",
+        "summary": "List store categories and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3202,7 +3202,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/categories",
+        "summary": "List store categories and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3224,7 +3224,7 @@
     },
     "/api/v1/store/categories/{id}": {
       "get": {
-        "summary": "Store Module — /store/categories/[id]",
+        "summary": "Get, update, or delete a single store category.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3254,7 +3254,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/categories/[id]",
+        "summary": "Get, update, or delete a single store category.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3286,7 +3286,7 @@
     },
     "/api/v1/store/products": {
       "get": {
-        "summary": "Store Module — /store/products",
+        "summary": "List store products and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3306,7 +3306,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/products",
+        "summary": "List store products and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3328,7 +3328,7 @@
     },
     "/api/v1/store/products/{id}": {
       "get": {
-        "summary": "Store Module — /store/products/[id]",
+        "summary": "Get, update, or delete a single store product.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3358,7 +3358,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/products/[id]",
+        "summary": "Get, update, or delete a single store product.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3390,7 +3390,7 @@
     },
     "/api/v1/store/orders": {
       "get": {
-        "summary": "Store Module — /store/orders",
+        "summary": "List orders and create a new order (admin creates manual orders).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3410,7 +3410,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/orders",
+        "summary": "List orders and create a new order (admin creates manual orders).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3432,7 +3432,7 @@
     },
     "/api/v1/store/orders/{id}": {
       "get": {
-        "summary": "Store Module — /store/orders/[id]",
+        "summary": "Get a single order or update its status (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3462,7 +3462,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/orders/[id]",
+        "summary": "Get a single order or update its status (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3494,7 +3494,7 @@
     },
     "/api/v1/store/coupons": {
       "get": {
-        "summary": "Store Module — /store/coupons",
+        "summary": "List coupons and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3514,7 +3514,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/coupons",
+        "summary": "List coupons and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3536,7 +3536,7 @@
     },
     "/api/v1/store/coupons/{id}": {
       "get": {
-        "summary": "Store Module — /store/coupons/[id]",
+        "summary": "Update or delete a single coupon (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3566,7 +3566,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/coupons/[id]",
+        "summary": "Update or delete a single coupon (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3598,7 +3598,7 @@
     },
     "/api/v1/store/coupons/validate": {
       "get": {
-        "summary": "Store Module — /store/coupons/validate",
+        "summary": "Validate a coupon code against the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3618,7 +3618,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/coupons/validate",
+        "summary": "Validate a coupon code against the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3640,7 +3640,7 @@
     },
     "/api/v1/store/stats": {
       "get": {
-        "summary": "Store Module — /store/stats",
+        "summary": "Get aggregate store statistics for the admin dashboard.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3660,7 +3660,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/stats",
+        "summary": "Get aggregate store statistics for the admin dashboard.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3682,7 +3682,7 @@
     },
     "/api/v1/gift-codes": {
       "get": {
-        "summary": "Store Module — /gift-codes",
+        "summary": "List gift codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3702,7 +3702,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /gift-codes",
+        "summary": "List gift codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3724,7 +3724,7 @@
     },
     "/api/v1/gift-codes/redeem": {
       "get": {
-        "summary": "Store Module — /gift-codes/redeem",
+        "summary": "Redeem a gift code for the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3744,7 +3744,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /gift-codes/redeem",
+        "summary": "Redeem a gift code for the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3766,7 +3766,7 @@
     },
     "/api/v1/creator-codes": {
       "get": {
-        "summary": "Store Module — /creator-codes",
+        "summary": "List creator codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3786,7 +3786,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /creator-codes",
+        "summary": "List creator codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3808,7 +3808,7 @@
     },
     "/api/v1/bulk-discounts": {
       "get": {
-        "summary": "Store Module — /bulk-discounts",
+        "summary": "List bulk discount tiers and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3828,7 +3828,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /bulk-discounts",
+        "summary": "List bulk discount tiers and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3850,7 +3850,7 @@
     },
     "/api/v1/chest": {
       "get": {
-        "summary": "Store Module — /chest",
+        "summary": "List loot chests available to the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3870,7 +3870,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /chest",
+        "summary": "List loot chests available to the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3892,7 +3892,7 @@
     },
     "/api/v1/product-commands": {
       "get": {
-        "summary": "Store Module — /product-commands",
+        "summary": "List or create product delivery commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3912,7 +3912,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /product-commands",
+        "summary": "List or create product delivery commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3934,7 +3934,7 @@
     },
     "/api/v1/product-variables": {
       "get": {
-        "summary": "Store Module — /product-variables",
+        "summary": "List or create product variables used in commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3954,7 +3954,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /product-variables",
+        "summary": "List or create product variables used in commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3976,7 +3976,7 @@
     },
     "/api/v1/widget-stats": {
       "get": {
-        "summary": "Store Module — /widget-stats",
+        "summary": "Get store widget statistics for homepage display.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -3996,7 +3996,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /widget-stats",
+        "summary": "Get store widget statistics for homepage display.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4018,7 +4018,7 @@
     },
     "/api/v1/webhooks/stripe": {
       "get": {
-        "summary": "Store Module — /webhooks/stripe",
+        "summary": "Stripe webhook endpoint for payment events.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4038,7 +4038,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /webhooks/stripe",
+        "summary": "Stripe webhook endpoint for payment events.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4060,7 +4060,7 @@
     },
     "/api/v1/chest/{id}": {
       "get": {
-        "summary": "Store Module — /chest/[id]",
+        "summary": "Open a loot chest and receive rewards.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4090,7 +4090,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /chest/[id]",
+        "summary": "Open a loot chest and receive rewards.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4122,7 +4122,7 @@
     },
     "/api/v1/creator-codes/{id}": {
       "get": {
-        "summary": "Store Module — /creator-codes/[id]",
+        "summary": "Update or delete a single creator code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4152,7 +4152,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /creator-codes/[id]",
+        "summary": "Update or delete a single creator code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4184,7 +4184,7 @@
     },
     "/api/v1/gift-codes/{id}": {
       "get": {
-        "summary": "Store Module — /gift-codes/[id]",
+        "summary": "Delete a single gift code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4214,7 +4214,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /gift-codes/[id]",
+        "summary": "Delete a single gift code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4246,7 +4246,7 @@
     },
     "/api/v1/community-goal": {
       "get": {
-        "summary": "Store Module — /community-goal",
+        "summary": "Get current community goal progress or update the goal (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4266,7 +4266,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /community-goal",
+        "summary": "Get current community goal progress or update the goal (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4288,7 +4288,7 @@
     },
     "/api/v1/store/product-variables": {
       "get": {
-        "summary": "Store Module — /store/product-variables",
+        "summary": "List or create product variables used in commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4308,7 +4308,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/product-variables",
+        "summary": "List or create product variables used in commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4330,7 +4330,7 @@
     },
     "/api/v1/store/widget-stats": {
       "get": {
-        "summary": "Store Module — /store/widget-stats",
+        "summary": "Get store widget statistics for homepage display.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4350,7 +4350,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/widget-stats",
+        "summary": "Get store widget statistics for homepage display.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4372,7 +4372,7 @@
     },
     "/api/v1/store/chest": {
       "get": {
-        "summary": "Store Module — /store/chest",
+        "summary": "List loot chests available to the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4392,7 +4392,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/chest",
+        "summary": "List loot chests available to the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4414,7 +4414,7 @@
     },
     "/api/v1/store/chest/{id}": {
       "get": {
-        "summary": "Store Module — /store/chest/[id]",
+        "summary": "Open a loot chest and receive rewards.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4444,7 +4444,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/chest/[id]",
+        "summary": "Open a loot chest and receive rewards.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4476,7 +4476,7 @@
     },
     "/api/v1/store/product-commands": {
       "get": {
-        "summary": "Store Module — /store/product-commands",
+        "summary": "List or create product delivery commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4496,7 +4496,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/product-commands",
+        "summary": "List or create product delivery commands (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4518,7 +4518,7 @@
     },
     "/api/v1/store/bulk-discounts": {
       "get": {
-        "summary": "Store Module — /store/bulk-discounts",
+        "summary": "List bulk discount tiers and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4538,7 +4538,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/bulk-discounts",
+        "summary": "List bulk discount tiers and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4560,7 +4560,7 @@
     },
     "/api/v1/store/creator-codes": {
       "get": {
-        "summary": "Store Module — /store/creator-codes",
+        "summary": "List creator codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4580,7 +4580,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/creator-codes",
+        "summary": "List creator codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4602,7 +4602,7 @@
     },
     "/api/v1/store/creator-codes/{id}": {
       "get": {
-        "summary": "Store Module — /store/creator-codes/[id]",
+        "summary": "Update or delete a single creator code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4632,7 +4632,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/creator-codes/[id]",
+        "summary": "Update or delete a single creator code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4664,7 +4664,7 @@
     },
     "/api/v1/store/creator-codes/validate": {
       "get": {
-        "summary": "Store Module — /store/creator-codes/validate",
+        "summary": "Validate a creator code at checkout.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4684,7 +4684,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/creator-codes/validate",
+        "summary": "Validate a creator code at checkout.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4706,7 +4706,7 @@
     },
     "/api/v1/store/gift-codes": {
       "get": {
-        "summary": "Store Module — /store/gift-codes",
+        "summary": "List gift codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4726,7 +4726,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/gift-codes",
+        "summary": "List gift codes and create new ones (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4748,7 +4748,7 @@
     },
     "/api/v1/store/gift-codes/{id}": {
       "get": {
-        "summary": "Store Module — /store/gift-codes/[id]",
+        "summary": "Delete a single gift code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4778,7 +4778,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/gift-codes/[id]",
+        "summary": "Delete a single gift code (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4810,7 +4810,7 @@
     },
     "/api/v1/store/gift-codes/redeem": {
       "get": {
-        "summary": "Store Module — /store/gift-codes/redeem",
+        "summary": "Redeem a gift code for the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4830,7 +4830,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/gift-codes/redeem",
+        "summary": "Redeem a gift code for the current user.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4852,7 +4852,7 @@
     },
     "/api/v1/store/webhooks/stripe": {
       "get": {
-        "summary": "Store Module — /store/webhooks/stripe",
+        "summary": "Stripe webhook endpoint for payment events.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4872,7 +4872,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/webhooks/stripe",
+        "summary": "Stripe webhook endpoint for payment events.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4894,7 +4894,7 @@
     },
     "/api/v1/store/community-goal": {
       "get": {
-        "summary": "Store Module — /store/community-goal",
+        "summary": "Get current community goal progress or update the goal (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4914,7 +4914,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/community-goal",
+        "summary": "Get current community goal progress or update the goal (admin).",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4936,7 +4936,7 @@
     },
     "/api/v1/store/checkout/paypal": {
       "get": {
-        "summary": "Store Module — /store/checkout/paypal",
+        "summary": "Create a PayPal checkout order for the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4956,7 +4956,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/checkout/paypal",
+        "summary": "Create a PayPal checkout order for the current cart.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4978,7 +4978,7 @@
     },
     "/api/v1/store/checkout/paypal/capture": {
       "get": {
-        "summary": "Store Module — /store/checkout/paypal/capture",
+        "summary": "Capture a PayPal payment after approval.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -4998,7 +4998,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/checkout/paypal/capture",
+        "summary": "Capture a PayPal payment after approval.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -5020,7 +5020,7 @@
     },
     "/api/v1/store/credits/buy": {
       "get": {
-        "summary": "Store Module — /store/credits/buy",
+        "summary": "Buy store credits via the configured payment gateway.",
         "description": "Module: store",
         "tags": [
           "store"
@@ -5040,7 +5040,7 @@
         }
       },
       "post": {
-        "summary": "Store Module — /store/credits/buy",
+        "summary": "Buy store credits via the configured payment gateway.",
         "description": "Module: store",
         "tags": [
           "store"
