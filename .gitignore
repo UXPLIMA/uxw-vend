@@ -85,3 +85,6 @@ module-sources/
 # Installed modules (runtime, not committed)
 src/modules/*
 !src/modules/.gitkeep
+
+# Generated translation files (rebuilt from messages-core/ + installed modules)
+messages/*.json

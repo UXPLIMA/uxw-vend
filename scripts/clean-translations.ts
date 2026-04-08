@@ -1,12 +1,13 @@
 /**
- * Ensures core message files contain core namespaces + installed module translations.
- * 1. Strips everything to core-only
- * 2. Re-merges translations from installed modules' manifests
- *    - Module namespaces (store, forum, etc.) are added directly
- *    - Protected namespaces (admin, common, etc.) are DEEP MERGED, not overwritten
+ * Generates messages/[locale].json from messages-core/[locale].json
+ * + translations from installed modules' manifests.
  *
- * Uses the same deep merge strategy as the install route's safeMerge to ensure
- * consistent results regardless of which code path runs.
+ * messages-core/ contains the canonical core-only translations (committed to git).
+ * messages/ is generated and gitignored — never edit by hand.
+ *
+ * Module namespaces (store, forum, etc.) are added directly.
+ * Core namespaces (admin, common, etc.) are DEEP MERGED so module-supplied
+ * sub-keys (e.g. admin.menu_store) extend core without overwriting.
  *
  * Runs on predev/prebuild to keep translations in sync with installed modules.
  */
@@ -37,23 +38,27 @@ function deepMerge(
 }
 
 const MESSAGES_DIR = path.join(process.cwd(), "messages");
+const CORE_DIR = path.join(process.cwd(), "messages-core");
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const CORE_NAMESPACES = ["common", "nav", "hero", "admin", "footer", "auth"];
 
-const files = fs.readdirSync(MESSAGES_DIR).filter((f) => f.endsWith(".json"));
-
-// Step 1: Strip to core-only
-for (const file of files) {
-    const filePath = path.join(MESSAGES_DIR, file);
-    const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const coreOnly: Record<string, unknown> = {};
-    for (const ns of CORE_NAMESPACES) {
-        if (data[ns]) coreOnly[ns] = data[ns];
-    }
-    fs.writeFileSync(filePath, JSON.stringify(coreOnly, null, 2));
+if (!fs.existsSync(CORE_DIR)) {
+    console.error("messages-core/ directory not found — cannot regenerate translations");
+    process.exit(1);
 }
 
-// Step 2: Re-merge installed module translations
+if (!fs.existsSync(MESSAGES_DIR)) {
+    fs.mkdirSync(MESSAGES_DIR, { recursive: true });
+}
+
+// Step 1: Reset messages/ from messages-core/ baseline
+const coreFiles = fs.readdirSync(CORE_DIR).filter((f) => f.endsWith(".json"));
+for (const file of coreFiles) {
+    const data = JSON.parse(fs.readFileSync(path.join(CORE_DIR, file), "utf-8"));
+    fs.writeFileSync(path.join(MESSAGES_DIR, file), JSON.stringify(data, null, 2));
+}
+
+// Step 2: Merge installed module translations
 if (!fs.existsSync(MODULES_DIR)) {
     console.log("Translation files synced (no modules installed)");
     process.exit(0);
@@ -78,13 +83,11 @@ for (const mod of modules) {
 
         for (const [key, value] of Object.entries(translations)) {
             if (CORE_NAMESPACES.includes(key)) {
-                // Deep merge into protected namespace (e.g. admin.menu_store)
                 existing[key] = deepMerge(
                     (existing[key] as Record<string, unknown>) || {},
                     value as Record<string, unknown>
                 );
             } else {
-                // Module namespace — add directly
                 existing[key] = value;
             }
         }
