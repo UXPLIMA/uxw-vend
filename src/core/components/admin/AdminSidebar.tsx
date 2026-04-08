@@ -70,19 +70,20 @@ interface SidebarModule {
     menu?: { path: string; label: string; icon?: string }[];
 }
 
+// Sidebar order requested by user:
+// 1. Dashboard, 2. Module Marketplace, 3. Users, 4. Roles,
+// 5. Activity Log, 6. System Health, 7. API Keys, 8. Settings, 9. Modules group
 const coreNavDefs = [
     { href: "/admin", labelKey: "sidebar_dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/admin/modules", labelKey: "sidebar_modules", icon: <Puzzle size={18} /> },
-] as const;
-
-const coreToolDefs = [
     { href: "/admin/users", labelKey: "sidebar_users", icon: <Users size={18} /> },
     { href: "/admin/roles", labelKey: "sidebar_roles", icon: <Shield size={18} /> },
-    { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },
-    { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
     { href: "/admin/activity-log", labelKey: "sidebar_activityLog", icon: <ScrollText size={18} /> },
+    { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
     { href: "/admin/api-keys", labelKey: "sidebar_apiKeys", icon: <KeyRound size={18} /> },
+    { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },
 ] as const;
+
 
 interface AdminSidebarProps {
     userName?: string;
@@ -254,12 +255,6 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
         icon: d.icon,
     }));
 
-    const coreToolItems: NavItem[] = coreToolDefs.map((d) => ({
-        href: d.href,
-        label: t(d.labelKey),
-        icon: d.icon,
-    }));
-
     const renderLink = (item: NavItem, indent = false) => (
         <Link
             key={item.href}
@@ -283,10 +278,11 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             </Link>
 
             <nav className="space-y-0.5 mb-6 px-1 flex-1">
-                {/* Core nav */}
+                {/* Core nav (1-8): Dashboard, Module Marketplace, Users, Roles,
+                    Activity Log, System Health, API Keys, Settings */}
                 {coreNavItems.map((item) => renderLink(item))}
 
-                {/* Modules group (forum-engine-style) */}
+                {/* (9) Installed modules group — forum-engine-style collapsible */}
                 {hasAnyModules && (
                     <div className="mt-3">
                         <button
@@ -294,7 +290,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                             onClick={() => setModulesOpen(!modulesOpen)}
                             className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
                         >
-                            <Puzzle size={18} />
+                            <Layers size={18} />
                             <span className="flex-1 text-left font-medium">{t.has("sidebar_modulesGroup") ? t("sidebar_modulesGroup") : "Modules"}</span>
                             <ChevronRight
                                 size={16}
@@ -353,9 +349,6 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                         )}
                     </div>
                 )}
-
-                {/* Core tools */}
-                <div className="mt-3">{coreToolItems.map((item) => renderLink(item))}</div>
             </nav>
 
             {/* Dark mode toggle */}
