@@ -131,6 +131,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     data: { roleId: defaultRole.id },
                 });
             }
+            // Fire user.registered action for modules to react to
+            const { doActionAsync, HookNames } = await import("./hooks");
+            await doActionAsync(HookNames.USER_REGISTERED, {
+                userId: user.id!,
+                email: user.email || "",
+                username: user.name || "",
+            });
+        },
+        async signIn({ user }) {
+            const { doActionAsync, HookNames } = await import("./hooks");
+            await doActionAsync(HookNames.USER_LOGGED_IN, {
+                userId: user.id!,
+                email: user.email || "",
+            });
+        },
+        async signOut() {
+            const { doActionAsync, HookNames } = await import("./hooks");
+            await doActionAsync(HookNames.USER_LOGGED_OUT, {});
         },
     },
     callbacks: {

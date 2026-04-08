@@ -123,6 +123,8 @@ function generateRegistry() {
     interface StorageProviderItem { id: string; name: string; handler: string; module: string }
     const allStorageProviders: StorageProviderItem[] = [];
     const allContextProviders: SectionItem[] = [];
+    interface HookListenerItem { hook: string; type: "action" | "filter"; handler: string; priority?: number; module: string }
+    const allHookListeners: HookListenerItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -200,6 +202,12 @@ function generateRegistry() {
             if (manifest.contextProviders) {
                 manifest.contextProviders.forEach((cp: { id: string; component: string; order?: number }) => {
                     allContextProviders.push({ ...cp, module: moduleName });
+                });
+            }
+
+            if (manifest.hookListeners) {
+                manifest.hookListeners.forEach((hl: { hook: string; type: "action" | "filter"; handler: string; priority?: number }) => {
+                    allHookListeners.push({ ...hl, module: moduleName });
                 });
             }
 
@@ -345,6 +353,22 @@ function generateRegistry() {
     dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
     dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n`;
     fs.writeFileSync(DATA_FILE, dataContent);
+
+    // Generate server-only hook listener registry
+    // Loaded once at server startup by initModuleHooks() — registers each
+    // listener with the core hooks runtime. No React, no dynamic().
+    const HOOKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-hooks.ts');
+    let hooksContent = '// Auto-generated hook listener registry — server only\n';
+    hooksContent += '// Imports each listener as a plain dynamic import so it can be registered\n';
+    hooksContent += '// into the core hooks runtime at initialization.\n\n';
+    hooksContent += `export const ModuleHookListeners: { hook: string; type: "action" | "filter"; module: string; priority?: number; loader: () => Promise<{ default: (...args: unknown[]) => unknown }> }[] = [\n`;
+    for (const hl of allHookListeners) {
+        const handlerPath = hl.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${hl.module}/${handlerPath}`;
+        hooksContent += `  { hook: ${JSON.stringify(hl.hook)}, type: ${JSON.stringify(hl.type)}, module: ${JSON.stringify(hl.module)}, priority: ${hl.priority ?? 10}, loader: () => import('${importPath}') as Promise<{ default: (...args: unknown[]) => unknown }> },\n`;
+    }
+    hooksContent += '];\n';
+    fs.writeFileSync(HOOKS_FILE, hooksContent);
 
     // Generate server-only storage provider registry (no React, no dynamic())
     // storage.ts dynamically imports this file to resolve the active provider.

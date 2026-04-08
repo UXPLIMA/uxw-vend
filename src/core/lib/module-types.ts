@@ -117,6 +117,17 @@ export interface ModuleManifest {
         order?: number;      // wrap order (lower = outer)
     }[];
 
+    // Hook listeners — actions/filters the module subscribes to.
+    // Each entry points to a file exporting default: (payload, context?) => ... (or returns new value for filters).
+    // Wired into a build-time registry so listeners are bundled as static imports.
+    // Listeners are automatically registered when the module is enabled and removed on disable.
+    hookListeners?: {
+        hook: string;         // hook name, e.g. "user.registered" or "post.content"
+        type: "action" | "filter";
+        handler: string;      // path to file (relative to module root) exporting default fn
+        priority?: number;    // default 10; lower runs earlier
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

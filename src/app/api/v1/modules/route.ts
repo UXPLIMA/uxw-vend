@@ -221,6 +221,11 @@ export async function PATCH(request: NextRequest) {
     // Invalidate module states cache (Redis + in-memory)
     await invalidateModuleCache();
 
+    // Reset hook registry so listeners from the changed module are refreshed
+    const { resetHooks, doActionAsync, HookNames } = await import("@/core/lib/hooks");
+    resetHooks();
+    await doActionAsync(wantEnabled ? HookNames.MODULE_ENABLED : HookNames.MODULE_DISABLED, { moduleId });
+
     // Execute onEnable/onDisable hooks if defined in manifest
     const hookKey = wantEnabled ? "onEnable" as const : "onDisable" as const;
     const hookRelPath = definition.hooks?.[hookKey];

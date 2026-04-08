@@ -10,6 +10,7 @@ import { defaultThemeId } from "@/core/generated/theme-registry";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
+import { bootstrapHooks } from "@/core/lib/hooks";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -60,6 +61,9 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const messages = await getMessages();
+
+  // Initialize module hook listeners (idempotent — runs once per process)
+  await bootstrapHooks();
 
   const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
   const moduleStates: Record<string, boolean> = {};
