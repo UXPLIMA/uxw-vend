@@ -14,6 +14,7 @@ import { Loader2, Check } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
+import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 interface UserProfile {
     id: string;
@@ -205,7 +206,12 @@ export default function ProfilePage() {
                 {moduleProfileTabs.map(t => {
                     if (activeTab !== t.id) return null;
                     const TabComponent = ProfileTabRegistry[t.id];
-                    return <TabComponent key={t.id} />;
+                    if (!TabComponent || typeof TabComponent !== "function") return null;
+                    return (
+                        <ModuleErrorBoundary key={t.id}>
+                            <TabComponent />
+                        </ModuleErrorBoundary>
+                    );
                 })}
 
                 {/* Accounts Tab */}
