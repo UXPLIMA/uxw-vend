@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { roleSchema } from "@/core/lib/validations";
+import { logActivity } from "@/core/lib/activity-log";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -58,6 +59,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         include: { permissions: true, _count: { select: { users: true } } },
     });
 
+    logActivity({
+        userId: session.user.id,
+        action: "role.update",
+        entity: "role",
+        entityId: role.id,
+        metadata: { name: role.name, changes: Object.keys(roleData) },
+    }).catch(() => {});
+
     return NextResponse.json({ role });
 }
 
@@ -96,6 +105,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     await prisma.role.delete({ where: { id } });
+
+    logActivity({
+        userId: session.user.id,
+        action: "role.delete",
+        entity: "role",
+        entityId: id,
+        metadata: { name: existing.name },
+    }).catch(() => {});
 
     return NextResponse.json({ message: "Role deleted" });
 }

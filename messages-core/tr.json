@@ -241,6 +241,8 @@
     "settings_emailQueueDesc": "Arka plan e-posta gönderim kuyruğu",
     "settings_backup": "Yedekleme",
     "settings_backupDesc": "Veritabanı yedekleme ve geri yükleme",
+    "settings_auditLog": "Denetim Kaydı",
+    "settings_auditLogDesc": "Hassas yönetici işlemlerini inceleyin",
     "settings_trophies": "Kupalar",
     "settings_trophiesDesc": "Başarı rozetlerini ve kurallarını yönet",
     "revisions_title": "Revizyon Geçmişi",

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { logActivity } from "@/core/lib/activity-log";
 
 /**
  * GET /api/v1/admin/warnings
@@ -86,6 +87,19 @@ export async function POST(request: NextRequest) {
             issuedBy: { select: { id: true, username: true } },
         },
     });
+
+    logActivity({
+        userId: session.user.id,
+        action: "warning.issue",
+        entity: "user",
+        entityId: parsed.data.userId,
+        metadata: {
+            warningId: warning.id,
+            reason: parsed.data.reason,
+            points: parsed.data.points,
+            expiresAt: parsed.data.expiresAt ?? null,
+        },
+    }).catch(() => {});
 
     return NextResponse.json({ warning }, { status: 201 });
 }

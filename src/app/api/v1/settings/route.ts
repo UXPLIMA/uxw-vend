@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { logActivity } from "@/core/lib/activity-log";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
 // Value is a Json column — accept any JSON-serializable value (string, number, boolean, array, object, null)
@@ -68,6 +69,13 @@ export async function PATCH(request: NextRequest) {
             create: { key, value: jsonValue },
         });
     }
+
+    logActivity({
+        userId: session.user.id,
+        action: "settings.update",
+        entity: "setting",
+        metadata: { keys: Object.keys(parsed.data) },
+    }).catch(() => {});
 
     return NextResponse.json({ message: "Settings updated" });
 }

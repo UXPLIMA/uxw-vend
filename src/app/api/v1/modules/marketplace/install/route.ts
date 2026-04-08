@@ -8,6 +8,8 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
+import { logActivity } from "@/core/lib/activity-log";
+import { incrementIndexDownloads } from "../_index-writer";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -139,6 +141,27 @@ export async function POST(request: NextRequest) {
         // Schedule deferred build + restart (debounced — waits for more installs)
         // Bulk install: 37 modules call this, but only ONE build runs after all finish
         scheduleBuild();
+
+        logActivity({
+            userId: session.user.id,
+            action: "module.install",
+            entity: "module",
+            entityId: moduleId,
+            metadata: { name: manifest.name, version: manifest.version },
+        }).catch(() => {});
+
+        // Track the install as a marketplace download. Best-effort — we never
+        // fail the install just because the counter couldn't be persisted.
+        try {
+            await prisma.moduleInstallEvent.create({
+                data: {
+                    moduleId,
+                    version: String(manifest.version ?? "unknown"),
+                    installedById: session.user.id,
+                },
+            });
+        } catch { /* non-fatal */ }
+        incrementIndexDownloads(moduleId).catch(() => { /* non-fatal */ });
 
         return NextResponse.json({
             message: "Module installed and enabled",

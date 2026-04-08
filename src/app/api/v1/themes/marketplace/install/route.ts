@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
+import { logActivity } from "@/core/lib/activity-log";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/theme-marketplace";
@@ -88,6 +89,14 @@ export async function POST(request: NextRequest) {
                 catch { process.kill(process.pid, "SIGUSR2"); }
             } catch { /* will work after manual restart */ }
         }
+
+        logActivity({
+            userId: session.user.id,
+            action: "theme.install",
+            entity: "theme",
+            entityId: themeId,
+            metadata: { zipFile },
+        }).catch(() => {});
 
         return NextResponse.json({ message: "Theme installed", theme: { id: themeId } });
     } catch (err: unknown) {

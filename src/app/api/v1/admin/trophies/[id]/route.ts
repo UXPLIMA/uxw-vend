@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { logActivity } from "@/core/lib/activity-log";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -40,7 +41,8 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-    if (!(await requireAdmin())) {
+    const session = await requireAdmin();
+    if (!session) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -79,15 +81,33 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const trophy = await prisma.trophy.update({ where: { id }, data: update });
+
+    logActivity({
+        userId: session.user.id,
+        action: "trophy.update",
+        entity: "trophy",
+        entityId: trophy.id,
+        metadata: { changes: Object.keys(update) },
+    }).catch(() => {});
+
     return NextResponse.json({ trophy });
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-    if (!(await requireAdmin())) {
+    const session = await requireAdmin();
+    if (!session) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
     // UserTrophy rows cascade via onDelete: Cascade
     await prisma.trophy.delete({ where: { id } });
+
+    logActivity({
+        userId: session.user.id,
+        action: "trophy.delete",
+        entity: "trophy",
+        entityId: id,
+    }).catch(() => {});
+
     return NextResponse.json({ ok: true });
 }

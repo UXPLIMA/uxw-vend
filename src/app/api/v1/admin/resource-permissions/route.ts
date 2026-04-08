@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { isAdmin, setResourcePermission, removeResourcePermission, listGrantsForRole } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { logActivity } from "@/core/lib/activity-log";
 
 /** GET
  *  - ?roleId=xxx → list all grants for a single role
@@ -129,6 +130,22 @@ export async function POST(request: NextRequest) {
     }
 
     await setResourcePermission(parsed.data);
+
+    logActivity({
+        userId: session.user.id,
+        action: "permission.grant",
+        entity: parsed.data.resource,
+        entityId: parsed.data.resourceId ?? undefined,
+        metadata: {
+            resource: parsed.data.resource,
+            resourceId: parsed.data.resourceId ?? null,
+            action: parsed.data.action,
+            principalType: parsed.data.principalType,
+            principalId: parsed.data.principalId,
+            allow: parsed.data.allow,
+        },
+    }).catch(() => {});
+
     return NextResponse.json({ ok: true });
 }
 
@@ -148,5 +165,20 @@ export async function DELETE(request: NextRequest) {
     }
 
     await removeResourcePermission(parsed.data);
+
+    logActivity({
+        userId: session.user.id,
+        action: "permission.revoke",
+        entity: parsed.data.resource,
+        entityId: parsed.data.resourceId ?? undefined,
+        metadata: {
+            resource: parsed.data.resource,
+            resourceId: parsed.data.resourceId ?? null,
+            action: parsed.data.action,
+            principalType: parsed.data.principalType,
+            principalId: parsed.data.principalId,
+        },
+    }).catch(() => {});
+
     return NextResponse.json({ ok: true });
 }

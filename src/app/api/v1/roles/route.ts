@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { roleSchema } from "@/core/lib/validations";
+import { logActivity } from "@/core/lib/activity-log";
 
 // GET /api/v1/roles - List all roles
 export async function GET() {
@@ -73,6 +74,14 @@ export async function POST(request: NextRequest) {
         },
         include: { permissions: true, _count: { select: { users: true } } },
     });
+
+    logActivity({
+        userId: session.user.id,
+        action: "role.create",
+        entity: "role",
+        entityId: role.id,
+        metadata: { name: role.name, displayName: role.displayName, priority: role.priority },
+    }).catch(() => {});
 
     return NextResponse.json({ role }, { status: 201 });
 }

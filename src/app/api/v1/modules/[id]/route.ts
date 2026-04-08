@@ -40,7 +40,7 @@ export async function DELETE(
         // If the module is reinstalled later, its data will still be available.
 
         // Log the uninstall action
-        await logActivity({ action: "module_uninstall", entity: "module", entityId: moduleId, userId: session.user.id });
+        logActivity({ action: "module.uninstall", entity: "module", entityId: moduleId, userId: session.user.id }).catch(() => {});
 
         // 5. Regenerate registry + rebuild
         try {

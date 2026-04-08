@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { queueBroadcast } from "@/core/lib/broadcasts";
+import { logActivity } from "@/core/lib/activity-log";
 
 /** GET — list broadcasts (admin) */
 export async function GET() {
@@ -56,8 +57,29 @@ export async function POST(request: NextRequest) {
 
     if (parsed.data.sendNow) {
         const result = await queueBroadcast(broadcast.id);
+
+        logActivity({
+            userId: session.user.id,
+            action: "broadcast.send",
+            entity: "broadcast",
+            entityId: broadcast.id,
+            metadata: {
+                subject: broadcast.subject,
+                recipientCount: result.totalCount,
+                filter: parsed.data.filter,
+            },
+        }).catch(() => {});
+
         return NextResponse.json({ broadcast, queuedRecipients: result.totalCount }, { status: 201 });
     }
+
+    logActivity({
+        userId: session.user.id,
+        action: "broadcast.create",
+        entity: "broadcast",
+        entityId: broadcast.id,
+        metadata: { subject: broadcast.subject },
+    }).catch(() => {});
 
     return NextResponse.json({ broadcast }, { status: 201 });
 }

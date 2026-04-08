@@ -96,17 +96,30 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         });
 
         // Audit log
-        const actions: string[] = [];
-        if (body.roleId) actions.push("role_change");
-        if (body.isBanned !== undefined) actions.push(body.isBanned ? "user_ban" : "user_unban");
-        for (const action of actions) {
+        if (body.roleId && existing.roleId !== body.roleId) {
             logActivity({
                 userId: session.user.id,
-                action: `admin.${action}`,
+                action: "user.role.change",
                 entity: "user",
                 entityId: id,
-                metadata: { targetUsername: user.username, ...data },
-            }).catch(console.error);
+                metadata: {
+                    targetUsername: user.username,
+                    from: existing.roleId,
+                    to: body.roleId,
+                },
+            }).catch(() => {});
+        }
+        if (body.isBanned !== undefined) {
+            logActivity({
+                userId: session.user.id,
+                action: body.isBanned ? "user.ban" : "user.unban",
+                entity: "user",
+                entityId: id,
+                metadata: {
+                    targetUsername: user.username,
+                    reason: body.isBanned ? (body.banReason || null) : null,
+                },
+            }).catch(() => {});
         }
 
         return NextResponse.json({ user });

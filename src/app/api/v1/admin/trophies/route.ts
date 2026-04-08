@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { logActivity } from "@/core/lib/activity-log";
 
 /**
  * Admin trophy CRUD.
@@ -47,7 +48,8 @@ const createSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-    if (!(await requireAdmin())) {
+    const session = await requireAdmin();
+    if (!session) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -76,6 +78,14 @@ export async function POST(request: NextRequest) {
             awardOn: data.ruleEvent ? `${data.ruleEvent}:${data.ruleThreshold ?? 1}` : null,
         },
     });
+
+    logActivity({
+        userId: session.user.id,
+        action: "trophy.create",
+        entity: "trophy",
+        entityId: trophy.id,
+        metadata: { name: trophy.name, points: trophy.points },
+    }).catch(() => {});
 
     return NextResponse.json({ trophy }, { status: 201 });
 }

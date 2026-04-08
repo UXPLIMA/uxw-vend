@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import fs from "fs";
 import path from "path";
+import { logActivity } from "@/core/lib/activity-log";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 const PROTECTED_THEMES = ["flat"];
@@ -37,5 +38,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     fs.rmSync(themeDir, { recursive: true, force: true });
+
+    logActivity({
+        userId: session.user.id,
+        action: "theme.uninstall",
+        entity: "theme",
+        entityId: id,
+    }).catch(() => {});
+
     return NextResponse.json({ message: `Theme "${id}" deleted.` });
 }

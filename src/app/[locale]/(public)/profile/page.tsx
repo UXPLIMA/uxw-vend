@@ -11,7 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check, Award } from "lucide-react";
+import { Loader2, Check, Award, Download, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
@@ -69,6 +71,68 @@ export default function ProfilePage() {
     const [savingProfile, setSavingProfile] = useState(false);
     const [profileSaved, setProfileSaved] = useState(false);
     const [profileError, setProfileError] = useState("");
+
+    // Privacy / GDPR
+    const [exportingData, setExportingData] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deletePassword, setDeletePassword] = useState("");
+    const [deleteConfirmText, setDeleteConfirmText] = useState("");
+    const [deletingAccount, setDeletingAccount] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
+    const handleExportData = async () => {
+        setExportingData(true);
+        try {
+            const res = await fetch("/api/v1/auth/profile/export");
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                toast.error(body.error || "Failed to export data");
+                return;
+            }
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const cd = res.headers.get("Content-Disposition") || "";
+            const match = cd.match(/filename="([^"]+)"/);
+            a.download = match?.[1] || "uxwvend-data.zip";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast.success("Data exported");
+        } catch {
+            toast.error("Failed to export data");
+        } finally {
+            setExportingData(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        setDeleteError("");
+        setDeletingAccount(true);
+        try {
+            const res = await fetch("/api/v1/auth/profile/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    password: deletePassword,
+                    confirmText: deleteConfirmText,
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setDeleteError(data.error || "Failed to delete account");
+                return;
+            }
+            toast.success("Account deleted");
+            await signOut({ callbackUrl: "/" });
+        } catch {
+            setDeleteError("Something went wrong");
+        } finally {
+            setDeletingAccount(false);
+        }
+    };
 
     // Module profile tabs filtered by enabled modules and registered components
     const moduleProfileTabs = ModuleProfileTabs
@@ -276,6 +340,71 @@ export default function ProfilePage() {
                             )}
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Download className="w-5 h-5 text-blue-500" />
+                                Privacy
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="text-sm">
+                                    <div className="font-medium text-foreground">
+                                        Download your data
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                        Get a ZIP archive of every piece of
+                                        data we hold about your account.
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleExportData}
+                                    disabled={exportingData}
+                                >
+                                    {exportingData ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            Preparing
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Download className="w-4 h-4 mr-2" />
+                                            Download
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                            <div className="border-t border-border pt-4 flex items-start justify-between gap-4">
+                                <div className="text-sm">
+                                    <div className="font-medium text-foreground">
+                                        Delete your account
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                        Permanently anonymise your profile.
+                                        Public posts you have made will be
+                                        preserved but no longer attributed
+                                        to your username.
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => {
+                                        setDeletePassword("");
+                                        setDeleteConfirmText("");
+                                        setDeleteError("");
+                                        setDeleteModalOpen(true);
+                                    }}
+                                >
+                                    Delete account
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                     </div>
                 )}
 
@@ -355,6 +484,109 @@ export default function ProfilePage() {
             </main>
 
             <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+
+            {deleteModalOpen && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center"
+                    role="presentation"
+                >
+                    <div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={() => !deletingAccount && setDeleteModalOpen(false)}
+                        aria-hidden="true"
+                    />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="delete-title"
+                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
+                    >
+                        <div className="flex items-start gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3 id="delete-title" className="font-semibold text-foreground">
+                                    Delete your account permanently
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    This cannot be undone. Your sessions,
+                                    linked accounts, notification preferences,
+                                    cart, and direct messages will be
+                                    permanently erased. Public contributions
+                                    (forum posts, blog articles, orders) will
+                                    be kept for record but shown as belonging
+                                    to a deleted user.
+                                </p>
+                            </div>
+                        </div>
+
+                        {deleteError && (
+                            <div className="mb-3 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                                {deleteError}
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            <div>
+                                <Label>Current password</Label>
+                                <Input
+                                    type="password"
+                                    value={deletePassword}
+                                    onChange={(e) => setDeletePassword(e.target.value)}
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                            <div>
+                                <Label>
+                                    Type{" "}
+                                    <span className="font-mono text-red-600">
+                                        DELETE
+                                    </span>{" "}
+                                    to confirm
+                                </Label>
+                                <Input
+                                    value={deleteConfirmText}
+                                    onChange={(e) =>
+                                        setDeleteConfirmText(e.target.value)
+                                    }
+                                    placeholder="DELETE"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-6">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setDeleteModalOpen(false)}
+                                disabled={deletingAccount}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleDeleteAccount}
+                                disabled={
+                                    deletingAccount ||
+                                    deletePassword.length === 0 ||
+                                    deleteConfirmText !== "DELETE"
+                                }
+                            >
+                                {deletingAccount ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                        Deleting
+                                    </>
+                                ) : (
+                                    "Delete account"
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

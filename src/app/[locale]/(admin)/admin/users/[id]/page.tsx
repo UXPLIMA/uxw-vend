@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, Ban, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
+import { toast } from "sonner";
 
 interface UserDetail {
     id: string;
@@ -48,6 +49,69 @@ export default function AdminUserDetailPage() {
         email: "",
         roleId: "",
     });
+
+    // GDPR tooling
+    const [exportingData, setExportingData] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deleteConfirmUsername, setDeleteConfirmUsername] = useState("");
+    const [deleteReason, setDeleteReason] = useState("");
+    const [deletingAccount, setDeletingAccount] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
+    const handleExportUserData = async () => {
+        setExportingData(true);
+        try {
+            const res = await fetch(`/api/v1/users/${userId}/export`);
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                toast.error(body.error || "Failed to export user data");
+                return;
+            }
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const cd = res.headers.get("Content-Disposition") || "";
+            const match = cd.match(/filename="([^"]+)"/);
+            a.download = match?.[1] || `uxwvend-data-${userId}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast.success("User data exported");
+        } catch {
+            toast.error("Failed to export user data");
+        } finally {
+            setExportingData(false);
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        setDeleteError("");
+        setDeletingAccount(true);
+        try {
+            const res = await fetch(`/api/v1/users/${userId}/delete`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    confirmUsername: deleteConfirmUsername,
+                    reason: deleteReason || undefined,
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setDeleteError(data.error || "Failed to delete user");
+                return;
+            }
+            toast.success("User account deleted");
+            setDeleteModalOpen(false);
+            window.location.reload();
+        } catch {
+            setDeleteError("Something went wrong");
+        } finally {
+            setDeletingAccount(false);
+        }
+    };
 
     useEffect(() => {
         Promise.all([
@@ -287,8 +351,152 @@ export default function AdminUserDetailPage() {
                             )}
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Download className="w-4 h-4 text-blue-500" />
+                                GDPR
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={handleExportUserData}
+                                disabled={exportingData}
+                            >
+                                {exportingData ? (
+                                    <>
+                                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                        Preparing
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="w-3 h-3 mr-2" />
+                                        Export data
+                                    </>
+                                )}
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => {
+                                    setDeleteConfirmUsername("");
+                                    setDeleteReason("");
+                                    setDeleteError("");
+                                    setDeleteModalOpen(true);
+                                }}
+                            >
+                                <Trash2 className="w-3 h-3 mr-2" />
+                                Delete account
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
+
+            {deleteModalOpen && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center"
+                    role="presentation"
+                >
+                    <div
+                        className="fixed inset-0 bg-black/50"
+                        onClick={() => !deletingAccount && setDeleteModalOpen(false)}
+                        aria-hidden="true"
+                    />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="admin-delete-title"
+                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
+                    >
+                        <div className="flex items-start gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                            </div>
+                            <div>
+                                <h3
+                                    id="admin-delete-title"
+                                    className="font-semibold text-foreground"
+                                >
+                                    Delete {user.username}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    This anonymises the user row and purges
+                                    private data (sessions, messages, cart).
+                                    Public contributions are preserved.
+                                </p>
+                            </div>
+                        </div>
+
+                        {deleteError && (
+                            <div className="mb-3 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                                {deleteError}
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            <div>
+                                <Label>
+                                    Type{" "}
+                                    <span className="font-mono text-red-600">
+                                        {user.username}
+                                    </span>{" "}
+                                    to confirm
+                                </Label>
+                                <Input
+                                    value={deleteConfirmUsername}
+                                    onChange={(e) =>
+                                        setDeleteConfirmUsername(e.target.value)
+                                    }
+                                    placeholder={user.username}
+                                />
+                            </div>
+                            <div>
+                                <Label>Reason (optional)</Label>
+                                <Input
+                                    value={deleteReason}
+                                    onChange={(e) => setDeleteReason(e.target.value)}
+                                    placeholder="e.g. GDPR request ticket #123"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-6">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setDeleteModalOpen(false)}
+                                disabled={deletingAccount}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleDeleteUser}
+                                disabled={
+                                    deletingAccount ||
+                                    deleteConfirmUsername !== user.username
+                                }
+                            >
+                                {deletingAccount ? (
+                                    <>
+                                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                        Deleting
+                                    </>
+                                ) : (
+                                    "Delete account"
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

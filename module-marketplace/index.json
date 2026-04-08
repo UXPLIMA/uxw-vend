@@ -1,6 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-04-08",
+  "updatedAt": "2026-04-08T19:41:36Z",
   "modules": [
     {
       "id": "announcements",
@@ -12,6 +13,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "announcements.zip",
       "dependencies": [],
       "stats": {
@@ -31,6 +39,13 @@
       "category": "community",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "community"
+      ],
       "zip": "blog.zip",
       "dependencies": [],
       "stats": {
@@ -50,6 +65,13 @@
       "category": "community",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "community"
+      ],
       "zip": "changelog.zip",
       "dependencies": [],
       "stats": {
@@ -69,6 +91,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "cloudflare-r2.zip",
       "dependencies": [],
       "stats": {
@@ -88,6 +117,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "cloudflare-turnstile.zip",
       "dependencies": [],
       "stats": {
@@ -107,6 +143,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "cookie-consent.zip",
       "dependencies": [],
       "stats": {
@@ -126,6 +169,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "credits.zip",
       "dependencies": [],
       "stats": {
@@ -145,6 +195,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "csv-import-export.zip",
       "dependencies": [],
       "stats": {
@@ -164,6 +221,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "currency.zip",
       "dependencies": [],
       "stats": {
@@ -183,6 +247,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "custom-forms.zip",
       "dependencies": [],
       "stats": {
@@ -202,6 +273,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "custom-pages.zip",
       "dependencies": [],
       "stats": {
@@ -221,6 +299,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "discord-auth.zip",
       "dependencies": [],
       "stats": {
@@ -240,6 +325,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "discord-integration.zip",
       "dependencies": [],
       "stats": {
@@ -259,6 +351,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "discord-widget.zip",
       "dependencies": [
         "discord-integration"
@@ -280,6 +379,13 @@
       "category": "gaming",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "gaming"
+      ],
       "zip": "downloads.zip",
       "dependencies": [],
       "stats": {
@@ -299,6 +405,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "email-templates.zip",
       "dependencies": [],
       "stats": {
@@ -318,6 +431,13 @@
       "category": "community",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "community"
+      ],
       "zip": "forum.zip",
       "dependencies": [],
       "stats": {
@@ -337,6 +457,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "google-analytics.zip",
       "dependencies": [],
       "stats": {
@@ -356,6 +483,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "google-auth.zip",
       "dependencies": [],
       "stats": {
@@ -375,6 +509,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "help-center.zip",
       "dependencies": [],
       "stats": {
@@ -394,6 +535,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "in-app-notifications.zip",
       "dependencies": [],
       "stats": {
@@ -413,6 +561,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "leaderboard.zip",
       "dependencies": [
         "store"
@@ -434,6 +589,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "login-protection.zip",
       "dependencies": [],
       "stats": {
@@ -453,6 +615,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "paypal-gateway.zip",
       "dependencies": [
         "store"
@@ -474,6 +643,13 @@
       "category": "gaming",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "gaming"
+      ],
       "zip": "player-profiles.zip",
       "dependencies": [],
       "stats": {
@@ -493,6 +669,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "popups.zip",
       "dependencies": [],
       "stats": {
@@ -512,6 +695,13 @@
       "category": "gaming",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "gaming"
+      ],
       "zip": "punishments.zip",
       "dependencies": [],
       "stats": {
@@ -531,6 +721,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "referral.zip",
       "dependencies": [
         "store"
@@ -552,6 +749,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "resend-provider.zip",
       "dependencies": [
         "email-templates"
@@ -573,6 +777,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "seo.zip",
       "dependencies": [],
       "stats": {
@@ -592,6 +803,13 @@
       "category": "gaming",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "gaming"
+      ],
       "zip": "servers.zip",
       "dependencies": [],
       "stats": {
@@ -611,6 +829,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "slider.zip",
       "dependencies": [],
       "stats": {
@@ -630,6 +855,13 @@
       "category": "content",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
       "zip": "staff.zip",
       "dependencies": [],
       "stats": {
@@ -649,6 +881,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "store.zip",
       "dependencies": [
         "currency"
@@ -670,6 +909,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "stripe-gateway.zip",
       "dependencies": [
         "store"
@@ -691,6 +937,13 @@
       "category": "community",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "community"
+      ],
       "zip": "suggestions.zip",
       "dependencies": [],
       "stats": {
@@ -710,6 +963,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "tickets.zip",
       "dependencies": [],
       "stats": {
@@ -729,6 +989,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "two-factor-auth.zip",
       "dependencies": [],
       "stats": {
@@ -748,6 +1015,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "vote.zip",
       "dependencies": [
         "credits"
@@ -769,6 +1043,13 @@
       "category": "management",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "management"
+      ],
       "zip": "webhook-logs.zip",
       "dependencies": [],
       "stats": {
@@ -788,6 +1069,13 @@
       "category": "commerce",
       "verified": true,
       "downloads": 0,
+      "rating": null,
+      "ratingCount": 0,
+      "updatedAt": "2026-04-08T19:41:36Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
       "zip": "wheel.zip",
       "dependencies": [
         "credits"

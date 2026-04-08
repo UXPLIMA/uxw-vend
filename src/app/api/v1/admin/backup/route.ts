@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { createBackup, listBackups, formatBytes } from "@/core/lib/backup";
+import { logActivity } from "@/core/lib/activity-log";
 
 /**
  * GET /api/v1/admin/backup
@@ -56,6 +57,15 @@ export async function POST(request: NextRequest) {
 
     try {
         const meta = await createBackup("manual", notes);
+
+        logActivity({
+            userId: session.user.id,
+            action: "backup.create",
+            entity: "backup",
+            entityId: meta.id,
+            metadata: { id: meta.id, filename: meta.filename, sizeBytes: meta.sizeBytes, notes: meta.notes ?? null },
+        }).catch(() => {});
+
         return NextResponse.json(
             {
                 message: "Backup created",

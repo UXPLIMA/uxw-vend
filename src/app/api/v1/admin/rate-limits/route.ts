@@ -8,6 +8,7 @@ import {
     ROLE_MULTIPLIER_SETTING_KEY,
     invalidateRoleMultiplierCache,
 } from "@/core/lib/rate-limit";
+import { logActivity } from "@/core/lib/activity-log";
 
 /**
  * Admin API for managing per-role rate limit multipliers.
@@ -108,6 +109,14 @@ export async function POST(request: NextRequest) {
 
     // Force the next rateLimitForRole() call to reload from DB.
     invalidateRoleMultiplierCache();
+
+    logActivity({
+        userId: guard.session?.user?.id,
+        action: "rate-limits.update",
+        entity: "setting",
+        entityId: ROLE_MULTIPLIER_SETTING_KEY,
+        metadata: { multipliers: parsed.data.multipliers },
+    }).catch(() => {});
 
     return NextResponse.json({ ok: true, multipliers: parsed.data.multipliers });
 }
