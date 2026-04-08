@@ -16,6 +16,8 @@ import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { NotificationPrefsTab } from "@/core/components/profile/NotificationPrefsTab";
+import { MessagesTab } from "@/core/components/profile/MessagesTab";
 
 interface UserProfile {
     id: string;
@@ -117,6 +119,8 @@ export default function ProfilePage() {
     // Build tab list: core tabs + module tabs in between
     const allTabs = [
         { id: "profile", label: t("title") },
+        { id: "messages", label: t.has("messages") ? t("messages") : "Messages" },
+        { id: "notifications", label: t.has("notifications") ? t("notifications") : "Notifications" },
         ...moduleProfileTabs.map(mt => ({ id: mt.id, label: mt.label })),
         { id: "accounts", label: t("accounts") },
     ];
@@ -203,6 +207,12 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
                 )}
+
+                {/* Messages Tab */}
+                {activeTab === "messages" && <MessagesTab />}
+
+                {/* Notification Preferences Tab */}
+                {activeTab === "notifications" && <NotificationPrefsTab />}
 
                 {/* Module Profile Tabs (rendered dynamically) */}
                 {moduleProfileTabs.map(mt => {

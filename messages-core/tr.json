@@ -257,7 +257,9 @@
     "linkGameAccount": "Oyun Hesabı Bağla",
     "gameUsername": "Oyun kullanıcı adı",
     "link": "Bağla",
-    "oauthAutoLink": "Discord ve Google hesapları, onlarla giriş yaptığınızda otomatik olarak bağlanır."
+    "oauthAutoLink": "Discord ve Google hesapları, onlarla giriş yaptığınızda otomatik olarak bağlanır.",
+    "messages": "Mesajlar",
+    "notifications": "Bildirimler"
   },
   "auth": {
     "loginTitle": "Tekrar Hoş Geldin",

@@ -257,7 +257,9 @@
     "linkGameAccount": "Link Game Account",
     "gameUsername": "Game username",
     "link": "Link",
-    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them."
+    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them.",
+    "messages": "Mensagens",
+    "notifications": "Notificações"
   },
   "auth": {
     "loginTitle": "Bem-vindo de volta",
