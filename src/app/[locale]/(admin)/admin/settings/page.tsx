@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -10,7 +10,7 @@ import { ModuleSettingsCards } from "@/core/generated/module-registry";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
     Shield, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson,
-    History, ShieldCheck, AlertTriangle,
+    History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox,
 };
 
 export default function SettingsPage() {
@@ -69,6 +69,27 @@ export default function SettingsPage() {
             href: "/admin/broadcasts",
             icon: "Mail",
             color: "text-rose-500",
+        },
+        {
+            title: t.has("settings_cronJobs") ? t("settings_cronJobs") : "Cron Jobs",
+            description: t.has("settings_cronJobsDesc") ? t("settings_cronJobsDesc") : "Monitor scheduled jobs and run history",
+            href: "/admin/cron",
+            icon: "Clock",
+            color: "text-amber-500",
+        },
+        {
+            title: t.has("settings_emailQueue") ? t("settings_emailQueue") : "Email Queue",
+            description: t.has("settings_emailQueueDesc") ? t("settings_emailQueueDesc") : "Background email delivery queue",
+            href: "/admin/email-queue",
+            icon: "Inbox",
+            color: "text-cyan-500",
+        },
+        {
+            title: t.has("settings_observability") ? t("settings_observability") : "Observability",
+            description: t.has("settings_observabilityDesc") ? t("settings_observabilityDesc") : "Platform health and metrics",
+            href: "/admin/observability",
+            icon: "Activity",
+            color: "text-emerald-500",
         },
     ];
 

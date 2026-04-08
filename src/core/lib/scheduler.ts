@@ -205,3 +205,23 @@ export async function bootstrapScheduler(): Promise<void> {
 export function listScheduledJobs(): { key: string; schedule: string }[] {
     return Array.from(registeredJobs.values()).map((j) => ({ key: j.key, schedule: j.schedule }));
 }
+
+/**
+ * List all currently registered jobs (key + schedule). Used by the admin
+ * cron page to show every job, even ones that have never executed yet.
+ */
+export function listRegisteredJobs(): { key: string; schedule: string }[] {
+    return Array.from(registeredJobs.values()).map((j) => ({ key: j.key, schedule: j.schedule }));
+}
+
+/**
+ * Manually invoke a registered job by key. Updates CronRun like a normal
+ * scheduled execution. Throws if no job is registered with that key.
+ */
+export async function runJobNow(key: string): Promise<void> {
+    const job = registeredJobs.get(key);
+    if (!job) {
+        throw new Error(`No registered cron job with key "${key}"`);
+    }
+    await runJob(job);
+}
