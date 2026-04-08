@@ -338,6 +338,7 @@ model ChangelogEntry {
   title     String
   content   String   @db.Text
   type      String   @default("update")
+  color     String?  @default("#3b82f6")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }

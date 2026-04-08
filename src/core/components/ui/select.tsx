@@ -110,7 +110,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
                 ref={ref}
                 data-select-content
                 className={cn(
-                    "absolute z-50 min-w-[8rem] w-full mt-1 overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md",
+                    "absolute z-50 min-w-[8rem] w-full mt-1 overflow-hidden rounded-md border border-border bg-card text-card-foreground shadow-md",
                     className
                 )}
                 {...props}
@@ -136,8 +136,8 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
             <div
                 ref={ref}
                 className={cn(
-                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
-                    isSelected && "bg-accent text-accent-foreground",
+                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-muted hover:text-foreground",
+                    isSelected && "bg-muted text-foreground",
                     className
                 )}
                 onClick={() => {
