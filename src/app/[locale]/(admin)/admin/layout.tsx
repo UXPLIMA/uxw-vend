@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
 import { AdminSearch } from "@/core/components/admin/AdminSearch";
 import { AdminSpotlight } from "@/core/components/admin/AdminSpotlight";
+import { ModuleUpdateBadge } from "@/core/components/admin/ModuleUpdateBadge";
 import moduleSystem from "@/core/lib/modules";
 import { prisma } from "@/core/lib/db";
 
@@ -41,8 +42,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             />
             {/* Main Content Wrapper */}
             <main className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 min-h-screen bg-background">
-                <div className="mb-6 max-w-md">
-                    <AdminSearch />
+                <div className="mb-6 flex items-center justify-between gap-4">
+                    <div className="max-w-md flex-1">
+                        <AdminSearch />
+                    </div>
+                    <ModuleUpdateBadge />
                 </div>
                 {children}
             </main>
