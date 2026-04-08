@@ -178,6 +178,16 @@ export interface ModuleManifest {
         secretEnv?: string;        // env var holding the shared secret
     }[];
 
+    // User-facing notification types — surfaces in the profile preferences
+    // grid so users can opt out of specific event types per channel.
+    // Modules contribute their event types here so users see them.
+    notificationTypes?: {
+        eventType: string;    // matches the hook name, e.g. "blog.article.created"
+        label: string;        // human-readable label
+        description?: string;
+        channels?: string[];  // ["email", "inapp"] — default both
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

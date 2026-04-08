@@ -135,6 +135,8 @@ function generateRegistry() {
     const allSearchProviders: SearchProviderItem[] = [];
     interface WebhookReceiverItem { provider: string; handler: string; signatureHeader?: string; secretEnv?: string; module: string }
     const allWebhookReceivers: WebhookReceiverItem[] = [];
+    interface NotificationTypeItem { eventType: string; label: string; description?: string; channels?: string[]; module: string }
+    const allNotificationTypes: NotificationTypeItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -248,6 +250,12 @@ function generateRegistry() {
             if (manifest.webhookReceivers) {
                 manifest.webhookReceivers.forEach((wr: { provider: string; handler: string; signatureHeader?: string; secretEnv?: string }) => {
                     allWebhookReceivers.push({ ...wr, module: moduleName });
+                });
+            }
+
+            if (manifest.notificationTypes) {
+                manifest.notificationTypes.forEach((nt: { eventType: string; label: string; description?: string; channels?: string[] }) => {
+                    allNotificationTypes.push({ ...nt, module: moduleName });
                 });
             }
 
@@ -495,6 +503,13 @@ function generateRegistry() {
     }
     webhooksContent += '];\n';
     fs.writeFileSync(WEBHOOKS_FILE, webhooksContent);
+
+    // Generate user-facing notification types registry — pure data, no imports
+    const NOTIFTYPES_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-notification-types.ts');
+    let notifTypesContent = '// Auto-generated notification types registry\n';
+    notifTypesContent += '// Surfaces in the profile preferences UI so users can opt out\n\n';
+    notifTypesContent += `export const ModuleNotificationTypes: { eventType: string; label: string; description?: string; channels?: string[]; module: string }[] = ${JSON.stringify(allNotificationTypes, null, 2)};\n`;
+    fs.writeFileSync(NOTIFTYPES_FILE, notifTypesContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');

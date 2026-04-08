@@ -42,6 +42,7 @@ model User {
   trophies         UserTrophy[]       @relation("UserTrophies")
   warnings         UserWarning[]      @relation("UserWarnings")
   warningsIssued   UserWarning[]      @relation("WarningIssuer")
+  notifPrefs       NotificationPreference[] @relation("UserNotifPrefs")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -264,6 +265,21 @@ model ResourcePermission {
   @@unique([resource, resourceId, action, principalType, principalId])
   @@index([resource, action])
   @@index([principalType, principalId])
+}
+
+// Per-user notification preferences. Each row represents one user's
+// choice for one event type + channel. Missing rows default to enabled.
+model NotificationPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserNotifPrefs")
+  eventType String
+  channel   String   // "email" | "inapp"
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventType, channel])
+  @@index([userId])
 }
 
 // Email broadcast — admin sends a single message to many users.
