@@ -128,6 +128,16 @@ export interface ModuleManifest {
         priority?: number;    // default 10; lower runs earlier
     }[];
 
+    // Slot contributions — React components that render into named <Slot> points
+    // declared by other modules' (or core) templates. This is the module-extends-module
+    // mechanism (a forum engine's template modifications).
+    slotContents?: {
+        id: string;           // unique id
+        slot: string;         // slot name, e.g. "blog.article.belowContent"
+        component: string;    // path to component file
+        order?: number;       // render order within the slot (lower first)
+    }[];
+
     // Layout components — rendered on every page when module is enabled
     layoutComponents?: {
         id: string;

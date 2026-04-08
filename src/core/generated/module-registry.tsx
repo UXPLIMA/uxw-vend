@@ -1559,6 +1559,12 @@ export const ModuleContextProviders: { id: string; component: string; order?: nu
   }
 ];
 
+// Slot content registry — modules injecting into other modules' named slots
+export const SlotContentRegistry: Record<string, any> = {
+};
+
+export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = [];
+
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [
   {
     "id": "SliderWidget",

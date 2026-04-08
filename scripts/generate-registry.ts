@@ -125,6 +125,8 @@ function generateRegistry() {
     const allContextProviders: SectionItem[] = [];
     interface HookListenerItem { hook: string; type: "action" | "filter"; handler: string; priority?: number; module: string }
     const allHookListeners: HookListenerItem[] = [];
+    interface SlotContentItem { id: string; slot: string; component: string; order?: number; module: string }
+    const allSlotContents: SlotContentItem[] = [];
 
     modules.forEach(moduleName => {
         const manifestPath = path.join(MODULES_DIR, moduleName, 'module.json');
@@ -208,6 +210,12 @@ function generateRegistry() {
             if (manifest.hookListeners) {
                 manifest.hookListeners.forEach((hl: { hook: string; type: "action" | "filter"; handler: string; priority?: number }) => {
                     allHookListeners.push({ ...hl, module: moduleName });
+                });
+            }
+
+            if (manifest.slotContents) {
+                manifest.slotContents.forEach((sc: { id: string; slot: string; component: string; order?: number }) => {
+                    allSlotContents.push({ ...sc, module: moduleName });
                 });
             }
 
@@ -336,7 +344,20 @@ function generateRegistry() {
     contextImports += '};\n\n';
     contextImports += `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
 
-    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + widgetRegistry;
+    // Generate dynamic imports for slot contents (template injection points)
+    let slotImports = '// Slot content registry — modules injecting into other modules\' named slots\nexport const SlotContentRegistry: Record<string, any> = {\n';
+    for (const sc of allSlotContents) {
+        let importPath = sc.component.startsWith('@core/')
+            ? `@/core/components/${sc.component.replace('@core/', '')}`
+            : `@/modules/${sc.module}/${sc.component}`;
+        importPath = importPath.replace(/\.tsx$/, '');
+        const baseName = toComponentName(path.basename(importPath));
+        slotImports += `  '${sc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${sc.id} || mod.default || mod), { loading: () => null }),\n`;
+    }
+    slotImports += '};\n\n';
+    slotImports += `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
+
+    const content = imports + mapping + "\n\n" + apiMapping + "\n" + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + slotImports + widgetRegistry;
 
     // Ensure directory exists
     const dir = path.dirname(OUTPUT_FILE);
