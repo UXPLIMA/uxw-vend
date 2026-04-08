@@ -54,19 +54,19 @@ export function scheduleBuild(): void {
         buildScheduled = false;
 
         try {
-            // 1. Merge schemas
+            // 1. Merge schemas (for Prisma Client type generation only — not for DB)
             try {
                 await execFileAsync("npx", ["tsx", "scripts/merge-schemas.ts"], {
                     cwd: process.cwd(), timeout: 60000,
                 });
             } catch { /* schema merge failed — non-fatal */ }
 
-            // 2. DB push
+            // 2. Apply per-module SQL migrations (replaces db push)
             try {
-                await execFileAsync("npx", ["prisma", "db", "push"], {
-                    cwd: process.cwd(), timeout: 60000,
+                await execFileAsync("npx", ["tsx", "scripts/apply-migrations.ts"], {
+                    cwd: process.cwd(), timeout: 120000,
                 });
-            } catch { /* db push failed — non-fatal */ }
+            } catch { /* migrations failed — non-fatal, but logged */ }
 
             // 3. Generate registry
             try {

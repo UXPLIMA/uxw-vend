@@ -188,6 +188,21 @@ model ModuleConfig {
   updatedAt DateTime @updatedAt
 }
 
+// Tracks which per-module SQL migrations have been applied to the DB.
+// Replaces the old `prisma db push` workflow with a forward-only
+// versioned migration system. See docs/MIGRATIONS.md.
+model ModuleMigration {
+  id            String   @id @default(cuid())
+  moduleId      String
+  migrationName String
+  checksum      String
+  appliedAt     DateTime @default(now())
+  executionMs   Int?
+
+  @@unique([moduleId, migrationName])
+  @@index([moduleId])
+}
+
 model ThemeConfig {
   id        String   @id
   name      String
