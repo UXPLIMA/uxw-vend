@@ -2,6 +2,14 @@
 import fs from 'fs';
 import path from 'path';
 
+/** Convert a file basename (kebab/snake/PascalCase) to a valid JS identifier (PascalCase) */
+function toComponentName(basename: string): string {
+    return basename
+        .split(/[-_]/)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join('');
+}
+
 const MODULES_DIR = path.join(process.cwd(), 'src/modules');
 const OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-registry.tsx');
 
@@ -199,7 +207,8 @@ function generateRegistry() {
         }
         // Remove .tsx extension for import
         importPath = importPath.replace(/\.tsx$/, '');
-        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${w.id} || mod.default || mod), { loading: () => null }),\n`;
+        const baseName = toComponentName(path.basename(importPath));
+        widgetImports += `  '${w.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${w.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     widgetImports += '};\n\n';
 
@@ -214,7 +223,8 @@ function generateRegistry() {
             importPath = `@/modules/${s.module}/${comp}`;
         }
         importPath = importPath.replace(/\.tsx$/, '');
-        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${s.id} || mod.default || mod), { loading: () => null }),\n`;
+        const baseName = toComponentName(path.basename(importPath));
+        homepageSectionImports += `  '${s.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${s.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     homepageSectionImports += '};\n\n';
 
@@ -232,7 +242,8 @@ function generateRegistry() {
             ? `@/core/components/${pt.component.replace('@core/', '')}`
             : `@/modules/${pt.module}/${pt.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${pt.id} || mod.default || mod), { loading: () => null }),\n`;
+        const baseName = toComponentName(path.basename(importPath));
+        profileTabImports += `  '${pt.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${pt.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     profileTabImports += '};\n\n';
     profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
@@ -248,7 +259,8 @@ function generateRegistry() {
             ? `@/core/components/${lc.component.replace('@core/', '')}`
             : `@/modules/${lc.module}/${lc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${lc.id} || mod.default || mod), { loading: () => null }),\n`;
+        const baseName = toComponentName(path.basename(importPath));
+        layoutImports += `  '${lc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${lc.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     layoutImports += '};\n\n';
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
@@ -260,7 +272,8 @@ function generateRegistry() {
             ? `@/core/components/${nc.component.replace('@core/', '')}`
             : `@/modules/${nc.module}/${nc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
-        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${nc.id} || mod.default || mod), { loading: () => null }),\n`;
+        const baseName = toComponentName(path.basename(importPath));
+        navbarImports += `  '${nc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${nc.id} || mod.default || mod), { loading: () => null }),\n`;
     }
     navbarImports += '};\n\n';
     navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
