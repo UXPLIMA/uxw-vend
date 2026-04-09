@@ -108,6 +108,12 @@ export default async function RootLayout({
                 <ModuleProvider moduleStates={moduleStates}>
                 <ModuleContextProviders>
                 <ConfirmProvider>
+                  <a
+                    href="#main-content"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10001] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/70 focus:ring-offset-2"
+                  >
+                    Skip to content
+                  </a>
                   <ErrorBoundary>
                   <ImpersonationBanner />
                   <ProgressBar />

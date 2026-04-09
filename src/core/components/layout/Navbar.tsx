@@ -123,8 +123,13 @@ export function Navbar() {
         <Slot name="layout.top" />
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between h-12">
-                    <nav className="flex items-center gap-1">
+                <div className="flex items-center justify-between h-12 gap-2">
+                    {/* Mobile-only brand link (nav links live in MobileBottomNav) */}
+                    <Link href="/" className="sm:hidden flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-semibold text-foreground hover:bg-muted transition-colors">
+                        <Home className="w-4 h-4" />
+                        <span className="truncate">{t('home')}</span>
+                    </Link>
+                    <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 overflow-x-auto" aria-label="Primary">
                         <Slot name="navbar.start" />
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
@@ -137,6 +142,9 @@ export function Navbar() {
                                         onMouseLeave={() => setNavDropdown(null)}
                                     >
                                         <button
+                                            type="button"
+                                            aria-haspopup="menu"
+                                            aria-expanded={navDropdown === link.label}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                                         >
                                             {IconComp && <IconComp className="w-4 h-4" />}
@@ -200,7 +208,13 @@ export function Navbar() {
                                 <Slot name="navbar.end" />
 
                                 <div className="relative" ref={menuRef}>
-                                    <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMenuOpen(!menuOpen)}
+                                        aria-label={`${t('profile')} menu`}
+                                        aria-haspopup="menu"
+                                        aria-expanded={menuOpen}
+                                        className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted transition-colors">
                                         {session.user.image ? (
                                             <Image src={session.user.image} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                                         ) : (

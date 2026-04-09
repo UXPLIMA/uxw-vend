@@ -42,7 +42,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 modules={modules}
             />
             {/* Main Content Wrapper */}
-            <main className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 min-h-screen bg-background">
+            <main id="main-content" tabIndex={-1} className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 min-h-screen bg-background">
                 <div className="mb-6 flex items-center justify-between gap-4">
                     <div className="max-w-md flex-1">
                         <AdminSearch />

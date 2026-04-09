@@ -290,6 +290,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                         <button
                             type="button"
                             onClick={() => setModulesOpen(!modulesOpen)}
+                            aria-expanded={modulesOpen}
                             className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
                         >
                             <Layers size={18} />
@@ -314,6 +315,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                                             <button
                                                 type="button"
                                                 onClick={() => toggleModuleGroup(group.id)}
+                                                aria-expanded={isOpen}
                                                 className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 ml-6 rounded-lg text-sm w-full ${
                                                     hasActiveChild ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                                                 }`}
@@ -356,7 +358,9 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             {/* Dark mode toggle */}
             <div className="px-1 mt-auto pt-4 border-t border-border">
                 <button
+                    type="button"
                     onClick={toggleDarkMode}
+                    aria-label={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
                     className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
                 >
                     {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -382,11 +386,13 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                 <div
                     className="lg:hidden fixed inset-0 bg-black/50 z-40"
                     onClick={() => setMobileOpen(false)}
+                    aria-hidden="true"
                 />
             )}
 
             {/* Mobile sidebar */}
             <aside
+                aria-label="Admin navigation"
                 className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 flex flex-col ${
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
@@ -402,7 +408,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             </aside>
 
             {/* Desktop sidebar */}
-            <aside className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
+            <aside aria-label="Admin navigation" className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
                 {sidebarContent}
             </aside>
         </>

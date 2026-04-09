@@ -1,14 +1,30 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { Users } from "lucide-react";
-import { Card, CardContent } from "@/core/components/ui/card";
 import { DashboardClient } from "./components/dashboard-client";
+import { DashboardCustomizer } from "@/core/components/admin/DashboardCustomizer";
+import { getLayout, getAvailableWidgets } from "@/core/lib/dashboard-layout";
+import UsersCountWidget from "@/core/components/admin/widgets/UsersCountWidget";
+import ActivityFeedWidget from "@/core/components/admin/widgets/ActivityFeedWidget";
+import HealthSnapshotWidget from "@/core/components/admin/widgets/HealthSnapshotWidget";
+import RecentErrorsWidget from "@/core/components/admin/widgets/RecentErrorsWidget";
+import EmailQueueStatusWidget from "@/core/components/admin/widgets/EmailQueueStatusWidget";
+import TopTrophiesWidget from "@/core/components/admin/widgets/TopTrophiesWidget";
 
 export const dynamic = "force-dynamic";
+
+// Map core widget ids to their server components. Module widget ids
+// (prefixed with "mod:") still render via the existing DashboardClient
+// which fetches each module's statsApi at runtime.
+const CORE_WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
+    "users-count": () => <UsersCountWidget key="users-count" />,
+    "activity-feed": () => <ActivityFeedWidget key="activity-feed" />,
+    "health-snapshot": () => <HealthSnapshotWidget key="health-snapshot" />,
+    "recent-errors": () => <RecentErrorsWidget key="recent-errors" />,
+    "email-queue-status": () => <EmailQueueStatusWidget key="email-queue-status" />,
+    "top-trophies": () => <TopTrophiesWidget key="top-trophies" />,
+};
 
 export default async function AdminDashboard() {
     const session = await auth();
@@ -16,28 +32,31 @@ export default async function AdminDashboard() {
     if (!(await isAdmin(session.user.id))) redirect("/");
 
     const t = await getTranslations("admin");
-    const totalUsers = await prisma.user.count();
+    const [layout, available] = await Promise.all([
+        getLayout(session.user.id),
+        getAvailableWidgets(),
+    ]);
+
+    const visible = layout.filter((w) => w.visible);
+    const availableById = new Map(available.map((a) => [a.id, a]));
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("dashboard_title")}</h1>
-                <p className="text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
+            <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("dashboard_title")}</h1>
+                    <p className="text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
+                </div>
+                <DashboardCustomizer />
             </div>
 
-            {/* Users card — core, always visible */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                <Link href="/admin/users">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                        <CardContent className="p-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("dashboard_users")}</span>
-                                <Users className="w-4 h-4 text-orange-600" />
-                            </div>
-                            <div className="text-2xl font-bold">{totalUsers}</div>
-                        </CardContent>
-                    </Card>
-                </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {visible.map((w) => {
+                    const info = availableById.get(w.id);
+                    if (!info || info.source !== "core") return null;
+                    const render = CORE_WIDGET_COMPONENTS[w.id];
+                    return render ? render() : null;
+                })}
 
                 {/* Module cards rendered client-side from module stats APIs */}
                 <DashboardClient />

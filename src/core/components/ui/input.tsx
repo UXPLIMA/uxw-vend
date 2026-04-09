@@ -7,11 +7,18 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, error, ...props }, ref) => {
+    ({ className, type, error, id, "aria-describedby": ariaDescribedBy, ...props }, ref) => {
+        const reactId = React.useId();
+        const inputId = id || reactId;
+        const errorId = error ? `${inputId}-error` : undefined;
+        const describedBy = [ariaDescribedBy, errorId].filter(Boolean).join(" ") || undefined;
         return (
             <div className="w-full">
                 <input
+                    id={inputId}
                     type={type}
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={describedBy}
                     className={cn(
                         "flex h-11 w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-200",
                         "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
@@ -23,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     {...props}
                 />
                 {error && (
-                    <p className="mt-1.5 text-sm text-destructive">{error}</p>
+                    <p id={errorId} className="mt-1.5 text-sm text-destructive">{error}</p>
                 )}
             </div>
         );

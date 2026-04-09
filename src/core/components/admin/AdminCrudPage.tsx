@@ -191,12 +191,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
-                    <p className="text-muted-foreground">{subtitle}</p>
+            <div className="flex flex-wrap justify-between items-start sm:items-center gap-4 mb-8">
+                <div className="min-w-0 flex-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold break-words">{title}</h1>
+                    <p className="text-muted-foreground text-sm sm:text-base">{subtitle}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                     {selected.size > 0 && (
                         <Button variant="destructive" size="sm" onClick={bulkDelete}>
                             <Trash2 className="w-3 h-3 mr-1" /> {ct("crud_delete")} {selected.size}

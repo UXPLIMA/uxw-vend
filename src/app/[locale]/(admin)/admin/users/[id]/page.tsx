@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -54,6 +54,13 @@ export default function AdminUserDetailPage() {
         email: "",
         roleId: "",
     });
+
+    // Stable ids for label associations
+    const usernameId = useId();
+    const emailFieldId = useId();
+    const roleFieldId = useId();
+    const deleteConfirmUsernameId = useId();
+    const deleteReasonId = useId();
 
     // GDPR tooling
     const [exportingData, setExportingData] = useState(false);
@@ -156,6 +163,16 @@ export default function AdminUserDetailPage() {
         }
     };
 
+    // Close delete modal on Escape
+    useEffect(() => {
+        if (!deleteModalOpen) return;
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && !deletingAccount) setDeleteModalOpen(false);
+        };
+        document.addEventListener("keydown", handler);
+        return () => document.removeEventListener("keydown", handler);
+    }, [deleteModalOpen, deletingAccount]);
+
     useEffect(() => {
         Promise.all([
             fetch(`/api/v1/users/${userId}`).then((r) => r.json()),
@@ -224,9 +241,9 @@ export default function AdminUserDetailPage() {
     return (
         <>
             <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/users">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
+                <Link href="/admin/users" aria-label="Back to users list">
+                    <Button variant="ghost" size="icon" aria-label="Back to users list">
+                        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                     </Button>
                 </Link>
                 <div className="flex items-center gap-3">
@@ -257,25 +274,29 @@ export default function AdminUserDetailPage() {
                             )}
                             <form onSubmit={handleSave} className="space-y-4">
                                 <div>
-                                    <Label>Username</Label>
+                                    <Label htmlFor={usernameId}>Username</Label>
                                     <Input
+                                        id={usernameId}
                                         value={form.username}
                                         onChange={(e) => setForm({ ...form, username: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <Label>Email</Label>
+                                    <Label htmlFor={emailFieldId}>Email</Label>
                                     <Input
+                                        id={emailFieldId}
+                                        type="email"
                                         value={form.email}
                                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <Label>Role</Label>
+                                    <Label htmlFor={roleFieldId}>Role</Label>
                                     <select
+                                        id={roleFieldId}
                                         value={form.roleId}
                                         onChange={(e) => setForm({ ...form, roleId: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/70 focus:ring-offset-2"
                                     >
                                         <option value="">No role</option>
                                         {roles.map((role) => (
@@ -520,7 +541,7 @@ export default function AdminUserDetailPage() {
 
                         <div className="space-y-3">
                             <div>
-                                <Label>
+                                <Label htmlFor={deleteConfirmUsernameId}>
                                     Type{" "}
                                     <span className="font-mono text-red-600">
                                         {user.username}
@@ -528,6 +549,7 @@ export default function AdminUserDetailPage() {
                                     to confirm
                                 </Label>
                                 <Input
+                                    id={deleteConfirmUsernameId}
                                     value={deleteConfirmUsername}
                                     onChange={(e) =>
                                         setDeleteConfirmUsername(e.target.value)
@@ -536,8 +558,9 @@ export default function AdminUserDetailPage() {
                                 />
                             </div>
                             <div>
-                                <Label>Reason (optional)</Label>
+                                <Label htmlFor={deleteReasonId}>Reason (optional)</Label>
                                 <Input
+                                    id={deleteReasonId}
                                     value={deleteReason}
                                     onChange={(e) => setDeleteReason(e.target.value)}
                                     placeholder="e.g. GDPR request ticket #123"

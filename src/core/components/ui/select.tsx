@@ -56,6 +56,8 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
             <button
                 ref={ref}
                 type="button"
+                aria-haspopup="listbox"
+                aria-expanded={open}
                 className={cn(
                     "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
                     className
@@ -108,6 +110,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         return (
             <div
                 ref={ref}
+                role="listbox"
                 data-select-content
                 className={cn(
                     "absolute z-50 min-w-[8rem] w-full mt-1 overflow-hidden rounded-md border border-border bg-card text-card-foreground shadow-md",
@@ -132,17 +135,28 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         const { value: selectedValue, onValueChange, setOpen } = useSelectContext();
         const isSelected = selectedValue === value;
 
+        const select = () => {
+            onValueChange(value);
+            setOpen(false);
+        };
+
         return (
             <div
                 ref={ref}
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={0}
                 className={cn(
-                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-muted hover:text-foreground",
+                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70",
                     isSelected && "bg-muted text-foreground",
                     className
                 )}
-                onClick={() => {
-                    onValueChange(value);
-                    setOpen(false);
+                onClick={select}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        select();
+                    }
                 }}
                 {...props}
             >

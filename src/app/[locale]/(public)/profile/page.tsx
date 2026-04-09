@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -44,6 +44,15 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<string>("profile");
+
+    // Stable ids for label associations
+    const usernameId = useId();
+    const avatarId = useId();
+    const emailId = useId();
+    const memberSinceId = useId();
+    const deletePasswordId = useId();
+    const deleteConfirmId = useId();
+    const mcUsernameId = useId();
 
     // Trophies earned by this user
     interface EarnedTrophy {
@@ -139,6 +148,16 @@ export default function ProfilePage() {
         .filter(t => modules[t.module] === true)
         .filter(t => ProfileTabRegistry[t.id]);
 
+    // Close delete modal on Escape
+    useEffect(() => {
+        if (!deleteModalOpen) return;
+        const handler = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && !deletingAccount) setDeleteModalOpen(false);
+        };
+        document.addEventListener("keydown", handler);
+        return () => document.removeEventListener("keydown", handler);
+    }, [deleteModalOpen, deletingAccount]);
+
     useEffect(() => {
         if (authStatus === "unauthenticated") {
             router.push("/auth/login");
@@ -194,8 +213,8 @@ export default function ProfilePage() {
             <div className="min-h-screen flex flex-col bg-background">
                 <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
                 <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
-                <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label="Loading profile" />
                 </main>
                 <ThemeSlot name="Footer" defaultComponent={<Footer />} />
             </div>
@@ -218,7 +237,7 @@ export default function ProfilePage() {
             <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
             <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
+            <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
@@ -245,18 +264,29 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="flex gap-2 mb-6">
-                    {allTabs.map((tab) => (
-                        <Button
-                            key={tab.id}
-                            variant={activeTab === tab.id ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            {tab.label}
-                        </Button>
-                    ))}
+                {/* Tabs — horizontally scrollable on mobile so they never wrap awkwardly */}
+                <div className="-mx-4 px-4 mb-6 overflow-x-auto">
+                    <div
+                        className="flex gap-2 w-max"
+                        role="tablist"
+                        aria-label={t("title")}
+                    >
+                        {allTabs.map((tab) => (
+                            <Button
+                                key={tab.id}
+                                role="tab"
+                                aria-selected={activeTab === tab.id}
+                                aria-controls={`profile-tabpanel-${tab.id}`}
+                                id={`profile-tab-${tab.id}`}
+                                variant={activeTab === tab.id ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setActiveTab(tab.id)}
+                                className="shrink-0"
+                            >
+                                {tab.label}
+                            </Button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Profile Tab */}
@@ -272,21 +302,21 @@ export default function ProfilePage() {
                                     <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">{profileError}</div>
                                 )}
                                 <div>
-                                    <Label>{t("username")}</Label>
-                                    <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+                                    <Label htmlFor={usernameId}>{t("username")}</Label>
+                                    <Input id={usernameId} value={username} onChange={(e) => setUsername(e.target.value)} />
                                 </div>
                                 <div>
-                                    <Label>{t("avatarUrl")}</Label>
-                                    <Input value={avatar} onChange={(e) => setAvatar(e.target.value)} placeholder="https://..." />
+                                    <Label htmlFor={avatarId}>{t("avatarUrl")}</Label>
+                                    <Input id={avatarId} value={avatar} onChange={(e) => setAvatar(e.target.value)} placeholder="https://..." />
                                 </div>
                                 <div>
-                                    <Label>{t("email")}</Label>
-                                    <Input value={profile?.email || ""} disabled className="bg-muted" />
-                                    <p className="text-xs text-muted-foreground mt-1">{t("emailCannotChange")}</p>
+                                    <Label htmlFor={emailId}>{t("email")}</Label>
+                                    <Input id={emailId} value={profile?.email || ""} disabled className="bg-muted" aria-describedby={`${emailId}-help`} />
+                                    <p id={`${emailId}-help`} className="text-xs text-muted-foreground mt-1">{t("emailCannotChange")}</p>
                                 </div>
                                 <div>
-                                    <Label>{t("memberSince")}</Label>
-                                    <Input value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-muted" />
+                                    <Label htmlFor={memberSinceId}>{t("memberSince")}</Label>
+                                    <Input id={memberSinceId} value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-muted" />
                                 </div>
                                 <Button type="submit" disabled={savingProfile}>
                                     {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("saving")}</> :
@@ -460,7 +490,7 @@ export default function ProfilePage() {
                                 <div className="p-4 border border-dashed border-border rounded-lg">
                                     <p className="text-sm font-medium mb-2">{t("linkGameAccount")}</p>
                                     <div className="flex gap-2">
-                                        <Input value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder={t("gameUsername")} />
+                                        <Input id={mcUsernameId} value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder={t("gameUsername")} aria-label={t("gameUsername")} />
                                         <Button size="sm" onClick={async () => {
                                             if (!mcUsername.trim()) return;
                                             const res = await fetch("/api/v1/linked-accounts", {
@@ -499,7 +529,7 @@ export default function ProfilePage() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="delete-title"
-                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
+                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-start gap-3 mb-4">
                             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
@@ -529,8 +559,9 @@ export default function ProfilePage() {
 
                         <div className="space-y-3">
                             <div>
-                                <Label>Current password</Label>
+                                <Label htmlFor={deletePasswordId}>Current password</Label>
                                 <Input
+                                    id={deletePasswordId}
                                     type="password"
                                     value={deletePassword}
                                     onChange={(e) => setDeletePassword(e.target.value)}
@@ -538,7 +569,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div>
-                                <Label>
+                                <Label htmlFor={deleteConfirmId}>
                                     Type{" "}
                                     <span className="font-mono text-red-600">
                                         DELETE
@@ -546,6 +577,7 @@ export default function ProfilePage() {
                                     to confirm
                                 </Label>
                                 <Input
+                                    id={deleteConfirmId}
                                     value={deleteConfirmText}
                                     onChange={(e) =>
                                         setDeleteConfirmText(e.target.value)
