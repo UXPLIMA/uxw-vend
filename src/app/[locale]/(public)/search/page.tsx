@@ -1,13 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
-import { Search, Loader2 } from "lucide-react";
+import {
+    Search,
+    Loader2,
+    FileText,
+    MessageSquare,
+    BookOpen,
+    ShoppingBag,
+    File,
+} from "lucide-react";
 
 interface SearchResult {
     type?: string;
@@ -23,6 +31,17 @@ interface ResultGroup {
     results: SearchResult[];
 }
 
+const GROUP_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
+    "blog-search": FileText,
+    "forum-search": MessageSquare,
+    "help-center-search": BookOpen,
+    "store-search": ShoppingBag,
+};
+
+function iconFor(groupId: string) {
+    return GROUP_ICON[groupId] ?? File;
+}
+
 export default function SearchPage() {
     const params = useSearchParams();
     const initial = params.get("q") || "";
@@ -31,6 +50,7 @@ export default function SearchPage() {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const runSearch = async (q: string) => {
         if (q.trim().length < 2) return;
@@ -46,8 +66,8 @@ export default function SearchPage() {
         }
     };
 
-    // Auto-run if landing with ?q=
     useEffect(() => {
+        inputRef.current?.focus();
         if (initial.length >= 2) {
             runSearch(initial);
         }
@@ -69,57 +89,92 @@ export default function SearchPage() {
             <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
             <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
 
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
+            <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-6xl">
                 <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
                     <Search className="w-7 h-7" />
                     Search
                 </h1>
 
-                <form onSubmit={onSubmit} className="flex gap-2 mb-6">
+                <form onSubmit={onSubmit} className="flex gap-2 mb-6 max-w-2xl">
                     <Input
+                        ref={inputRef}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search the site..."
+                        placeholder="Search across all installed modules…"
                         className="flex-1"
+                        aria-label="Search query"
                     />
-                    <Button type="submit">Search</Button>
+                    <Button type="submit" disabled={query.trim().length < 2}>Search</Button>
                 </form>
 
                 {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label="Loading" />
+                    </div>
                 ) : !searched ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">
-                        Type at least 2 characters to search across all installed modules.
-                    </CardContent></Card>
+                    <Card>
+                        <CardContent className="py-12 text-center text-muted-foreground">
+                            Type at least 2 characters to search across all installed modules.
+                        </CardContent>
+                    </Card>
                 ) : groups.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">
-                        No results for &ldquo;{query}&rdquo;
-                    </CardContent></Card>
+                    <Card>
+                        <CardContent className="py-12 text-center text-muted-foreground">
+                            No results for &ldquo;{query}&rdquo;. Try different keywords.
+                        </CardContent>
+                    </Card>
                 ) : (
                     <>
-                        <p className="text-sm text-muted-foreground mb-4">{total} result{total !== 1 ? "s" : ""}</p>
-                        <div className="space-y-6">
-                            {groups.map((group) => (
-                                <Card key={group.id}>
-                                    <CardHeader className="pb-2">
-                                        <CardTitle className="text-base">{group.label}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-1">
-                                        {group.results.map((r, i) => (
-                                            <a
-                                                key={`${group.id}-${i}`}
-                                                href={r.href}
-                                                className="block p-3 -mx-3 rounded-md hover:bg-muted transition-colors"
-                                            >
-                                                <div className="font-medium text-foreground">{r.title}</div>
-                                                {r.excerpt && (
-                                                    <div className="text-sm text-muted-foreground line-clamp-2">{r.excerpt}</div>
-                                                )}
-                                            </a>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            ))}
+                        <p className="text-sm text-muted-foreground mb-4">
+                            {total} result{total !== 1 ? "s" : ""} across {groups.length} source{groups.length !== 1 ? "s" : ""}
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+                            {groups.map((group) => {
+                                const Icon = iconFor(group.id);
+                                return (
+                                    <Card key={group.id} className="flex flex-col">
+                                        <CardHeader className="pb-2">
+                                            <CardTitle className="text-base flex items-center justify-between gap-2">
+                                                <span className="flex items-center gap-2">
+                                                    <Icon className="w-4 h-4 text-primary" />
+                                                    {group.label}
+                                                </span>
+                                                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                                    {group.results.length}
+                                                </span>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-1 flex-1">
+                                            {group.results.map((r, i) => (
+                                                <a
+                                                    key={`${group.id}-${i}`}
+                                                    href={r.href}
+                                                    className="block p-3 -mx-3 rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        {r.image && (
+                                                            // eslint-disable-next-line @next/next/no-img-element
+                                                            <img
+                                                                src={r.image}
+                                                                alt=""
+                                                                className="w-12 h-12 rounded object-cover flex-shrink-0"
+                                                            />
+                                                        )}
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="font-medium text-foreground truncate">{r.title}</div>
+                                                            {r.excerpt && (
+                                                                <div className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                                                                    {r.excerpt}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
                         </div>
                     </>
                 )}

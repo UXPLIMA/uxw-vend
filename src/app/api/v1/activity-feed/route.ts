@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
-import { getClientIP, rateLimitForRole } from "@/core/lib/rate-limit";
+import { getClientIP, rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { auth } from "@/core/lib/auth";
 
 /**
@@ -16,16 +16,13 @@ import { auth } from "@/core/lib/auth";
  */
 export async function GET(request: NextRequest) {
     const ip = getClientIP(request.headers);
-    const rl = await rateLimitForRole(
+    const allowed = await rateLimitForRoleAsync(
         `activity-feed:${ip}`,
         { maxRequests: 60, windowMs: 60_000 },
         null,
     );
-    if (!rl.success) {
-        return NextResponse.json(
-            { error: "Too Many Requests" },
-            { status: 429, headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
-        );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
     }
 
     const { searchParams } = new URL(request.url);

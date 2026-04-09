@@ -1575,9 +1575,34 @@ export const ModuleContextProviders: { id: string; component: string; order?: nu
 
 // Slot content registry — modules injecting into other modules' named slots
 export const SlotContentRegistry: Record<string, any> = {
+  'top-banner': dynamic(() => import('@/modules/announcements/slots/AnnouncementTopBanner').then((mod: any) => mod.AnnouncementTopBanner || mod['top-banner'] || mod.default || mod), { loading: () => null }),
+  'popup-renderer': dynamic(() => import('@/modules/popups/slots/PopupRenderer').then((mod: any) => mod.PopupRenderer || mod['popup-renderer'] || mod.default || mod), { loading: () => null }),
+  'online-staff': dynamic(() => import('@/modules/staff/slots/OnlineStaff').then((mod: any) => mod.OnlineStaff || mod['online-staff'] || mod.default || mod), { loading: () => null }),
 };
 
-export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = [];
+export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = [
+  {
+    "id": "top-banner",
+    "slot": "layout.top",
+    "component": "slots/AnnouncementTopBanner",
+    "order": 5,
+    "module": "announcements"
+  },
+  {
+    "id": "popup-renderer",
+    "slot": "layout.overlay",
+    "component": "slots/PopupRenderer",
+    "order": 20,
+    "module": "popups"
+  },
+  {
+    "id": "online-staff",
+    "slot": "hero.bottom",
+    "component": "slots/OnlineStaff",
+    "order": 30,
+    "module": "staff"
+  }
+];
 
 export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = [
   {

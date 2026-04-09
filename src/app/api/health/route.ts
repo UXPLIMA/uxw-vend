@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
-import { isRedisReady, rateLimitForRole, getClientIP } from "@/core/lib/rate-limit";
+import { isRedisReady, rateLimitForRoleAsync, getClientIP } from "@/core/lib/rate-limit";
 import { isRedisConfigured } from "@/core/lib/redis";
 import pkg from "../../../../package.json";
 
@@ -82,8 +82,8 @@ async function checkScheduler(): Promise<{ ok: boolean; staleJobs: number; error
 export async function GET(req: Request) {
     // Public endpoint — rate limit per IP to prevent abuse.
     const ip = getClientIP(req.headers);
-    const rl = await rateLimitForRole(`health:${ip}`, { maxRequests: 30, windowMs: 60_000 }, null);
-    if (!rl.success) {
+    const allowed = await rateLimitForRoleAsync(`health:${ip}`, { maxRequests: 30, windowMs: 60_000 }, null);
+    if (!allowed) {
         return NextResponse.json(
             { status: "down", error: "Too Many Requests" },
             { status: 429, headers: { "Cache-Control": "no-store" } },

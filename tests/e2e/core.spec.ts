@@ -18,7 +18,9 @@ test.describe('Core Platform', () => {
         await expect(nav).toBeVisible();
         // Home link uses translated label ("Home" in EN, "Ana Sayfa" in TR)
         // and always has href="/"
-        const homeLink = page.locator('header a[href="/"], header a[href="/en"], nav a[href="/"], nav a[href="/en"]').first();
+        // Multiple Home links exist (mobile brand, desktop nav, footer) —
+        // assert that at least one visible Home link is present at desktop width.
+        const homeLink = page.locator('header nav[aria-label="Primary"] a[href="/en"], header nav[aria-label="Primary"] a[href="/"]').first();
         await expect(homeLink).toBeVisible();
     });
 

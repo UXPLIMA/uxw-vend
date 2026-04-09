@@ -398,7 +398,7 @@ function generateRegistry() {
             : `@/modules/${sc.module}/${sc.component}`;
         importPath = importPath.replace(/\.tsx$/, '');
         const baseName = toComponentName(path.basename(importPath));
-        slotImports += `  '${sc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod.${sc.id} || mod.default || mod), { loading: () => null }),\n`;
+        slotImports += `  '${sc.id}': dynamic(() => import('${importPath}').then((mod: any) => mod.${baseName} || mod['${sc.id}'] || mod.default || mod), { loading: () => null }),\n`;
     }
     slotImports += '};\n\n';
     slotImports += `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
