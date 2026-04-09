@@ -1,91 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "@/core/lib/i18n/navigation";
-import { usePathname } from "@/core/lib/i18n/navigation";
+import { useState, useMemo } from "react";
+import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
+import { Menu, X, Sun, Moon, Package } from "lucide-react";
 import {
-    LayoutDashboard,
-    Package,
-    ShoppingCart,
-    FileText,
-    FolderOpen,
-    Users,
-    Settings,
-    Puzzle,
-    Ticket,
-    HelpCircle,
-    Shield,
-    Menu,
-    X,
-    Tag,
-    Megaphone,
-    History,
-    UserCheck,
-    Gift,
-    Download,
-    Vote,
-    Dices,
-    Percent,
-    ImageIcon,
-    Search,
-    Webhook,
-    ScrollText,
-    Server,
-    Bell,
-    FileEdit,
-    MessageSquare,
-    LayoutList,
-    Layers,
-    Crown,
-    ClipboardCheck,
-    KeyRound,
-    Trophy,
-    Sun,
-    Moon,
-    ChevronRight,
-    DollarSign,
-    Cloud,
-    Mail,
-    UserPlus,
-    Globe,
-} from "lucide-react";
-
-interface NavItem {
-    href: string;
-    label: string;
-    icon: React.ReactNode;
-}
-
-interface ModuleGroup {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    children: NavItem[];
-}
+    CORE_NAV_GROUPS,
+    findActiveGroupId,
+    inferModuleGroup,
+    type NavGroup,
+    type NavItem,
+    type NavSection,
+} from "@/core/lib/admin-nav-groups";
 
 interface SidebarModule {
     id: string;
-    menu?: { path: string; label: string; icon?: string }[];
+    menu?: { path: string; label: string; icon?: string; group?: string }[];
 }
-
-// Sidebar order requested by user:
-// 1. Dashboard, 2. Module Marketplace, 3. Users, 4. Roles,
-// 5. Activity Log, 6. System Health, 7. API Keys, 8. Media, 9. Settings, 10. Modules group
-const coreNavDefs = [
-    { href: "/admin", labelKey: "sidebar_dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/admin/modules", labelKey: "sidebar_modules", icon: <Puzzle size={18} /> },
-    { href: "/admin/users", labelKey: "sidebar_users", icon: <Users size={18} /> },
-    { href: "/admin/roles", labelKey: "sidebar_roles", icon: <Shield size={18} /> },
-    { href: "/admin/permissions", labelKey: "sidebar_permissions", icon: <ClipboardCheck size={18} /> },
-    { href: "/admin/activity-log", labelKey: "sidebar_activityLog", icon: <ScrollText size={18} /> },
-    { href: "/admin/system", labelKey: "sidebar_systemHealth", icon: <Server size={18} /> },
-    { href: "/admin/api-keys", labelKey: "sidebar_apiKeys", icon: <KeyRound size={18} /> },
-    { href: "/admin/media", labelKey: "sidebar_media", icon: <ImageIcon size={18} /> },
-    { href: "/admin/settings", labelKey: "sidebar_settings", icon: <Settings size={18} /> },
-] as const;
-
 
 interface AdminSidebarProps {
     userName?: string;
@@ -93,281 +25,188 @@ interface AdminSidebarProps {
     modules?: SidebarModule[];
 }
 
-const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
-    LayoutDashboard, Package, ShoppingCart, FileText, FolderOpen, Users,
-    Settings, Puzzle, Ticket, HelpCircle, Tag, Megaphone, History,
-    UserCheck, Gift, Download, Vote, Dices, Percent, ImageIcon, Search,
-    Webhook, ScrollText, Server, Bell, FileEdit, Shield, Menu, X,
-    MessageSquare, LayoutList, Layers, Crown, ClipboardCheck, KeyRound, Trophy,
-    DollarSign, Cloud, Mail, UserPlus, Globe,
-};
-
-const DynamicIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
-    const Icon = iconMap[name] || Package;
-    return <Icon size={size} />;
-};
-
-const STORAGE_KEY = "admin_sidebar_state_v2";
-
-interface SidebarState {
-    modulesOpen: boolean;
-    expandedModules: string[];
-}
-
-function loadState(): SidebarState {
-    if (typeof window === "undefined") return { modulesOpen: true, expandedModules: [] };
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { modulesOpen: true, expandedModules: [] };
-        const parsed = JSON.parse(raw);
-        return {
-            modulesOpen: parsed.modulesOpen !== false,
-            expandedModules: Array.isArray(parsed.expandedModules) ? parsed.expandedModules : [],
-        };
-    } catch {
-        return { modulesOpen: true, expandedModules: [] };
-    }
-}
-
-function saveState(state: SidebarState) {
-    if (typeof window === "undefined") return;
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-        /* ignore */
-    }
-}
-
+/**
+ * Two-level admin sidebar.
+ *
+ *   [ icon rail ] [ contextual sidebar ]
+ *       w-14            w-56
+ *
+ * Icon rail: one icon per top-level group (Dashboard, Users, Content,
+ * Commerce, Design, Marketplace, Activity, Advanced, Settings). Clicking
+ * an icon selects that group.
+ *
+ * Contextual sidebar: shows the items in the currently-selected group,
+ * broken into sections with small uppercase headers. Module `menu[]`
+ * contributions are merged in under the matching group at render time.
+ *
+ * Mobile: both rails collapse into a single overlay sheet.
+ */
 export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
 
-    const [modulesOpen, setModulesOpen] = useState(true);
-    const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
-
-    // Load persisted state on mount
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    useEffect(() => {
-        const s = loadState();
-        setModulesOpen(s.modulesOpen);
-        setExpandedModules(new Set(s.expandedModules));
-    }, []);
-
-    const isActive = (href: string) => {
-        if (href === "/admin") return pathname === "/admin";
-        return pathname.startsWith(href);
-    };
-
-    // Resolve a module's display label
-    const resolveModuleLabel = (mod: SidebarModule): string => {
-        const key = `menu_${mod.id}`;
-        if (t.has(key)) return t(key);
-        // Fallback: capitalize id
-        return mod.id.charAt(0).toUpperCase() + mod.id.slice(1).replace(/-/g, " ");
-    };
-
-    // Resolve a module's first/representative icon
-    const resolveModuleIcon = (mod: SidebarModule): string => {
-        return mod.menu?.[0]?.icon || "Puzzle";
-    };
-
-    // Build module tree: separate single-page modules and multi-page modules
-    const { singleModules, groupedModules } = useMemo(() => {
-        const singles: NavItem[] = [];
-        const groups: ModuleGroup[] = [];
+    // Merge module menus into matching groups
+    const groups: NavGroup[] = useMemo(() => {
+        const byId = new Map(CORE_NAV_GROUPS.map((g) => [g.id, { ...g, sections: g.sections.map((s) => ({ ...s, items: [...s.items] })) }]));
 
         for (const mod of modules) {
             if (!mod.menu || mod.menu.length === 0) continue;
-
-            if (mod.menu.length === 1) {
-                // Single-page → flat button
-                const item = mod.menu[0];
-                const key = `menu_${mod.id}`;
-                const label = t.has(key) ? t(key) : item.label;
-                singles.push({
-                    href: `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`,
-                    label,
-                    icon: <DynamicIcon name={item.icon || "Puzzle"} />,
-                });
-            } else {
-                // Multi-page → nested group
-                const children: NavItem[] = mod.menu.map((item, idx) => {
-                    const itemKey = `menu_${mod.id}_${idx}`;
-                    const label = t.has(itemKey) ? t(itemKey) : item.label;
-                    return {
-                        href: `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`,
-                        label,
-                        icon: <DynamicIcon name={item.icon || "Puzzle"} size={16} />,
-                    };
-                });
-                groups.push({
-                    id: mod.id,
-                    label: resolveModuleLabel(mod),
-                    icon: <DynamicIcon name={resolveModuleIcon(mod)} />,
-                    children,
-                });
+            for (const item of mod.menu) {
+                const groupId = item.group || inferModuleGroup(mod.id);
+                const target = byId.get(groupId);
+                if (!target) continue;
+                const labelKey = `menu_${mod.id}_${item.label.replace(/\s+/g, "_").toLowerCase()}`;
+                const label = t.has(labelKey) ? t(labelKey) : item.label;
+                const href = `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`;
+                // Append to the module's section (create one if missing)
+                let modSection = target.sections.find((s) => s.header === mod.id);
+                if (!modSection) {
+                    const modLabelKey = `menu_${mod.id}`;
+                    const modLabel = t.has(modLabelKey) ? t(modLabelKey) : mod.id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                    modSection = { header: modLabel, items: [] };
+                    target.sections.push(modSection);
+                }
+                modSection.items.push({ href, label, icon: Package });
             }
         }
 
-        // Sort alphabetically
-        singles.sort((a, b) => a.label.localeCompare(b.label));
-        groups.sort((a, b) => a.label.localeCompare(b.label));
-        return { singleModules: singles, groupedModules: groups };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return Array.from(byId.values());
     }, [modules, t]);
 
-    // Auto-expand the group containing the active route
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    useEffect(() => {
-        const activeGroup = groupedModules.find((g) => g.children.some((c) => isActive(c.href)));
-        if (activeGroup && !expandedModules.has(activeGroup.id)) {
-            setExpandedModules((prev) => {
-                const next = new Set(prev);
-                next.add(activeGroup.id);
-                return next;
-            });
-            setModulesOpen(true);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pathname, groupedModules]);
+    const activeGroupId = findActiveGroupId(pathname, groups) || "dashboard";
+    const [selectedGroupId, setSelectedGroupId] = useState<string>(activeGroupId);
 
-    // Persist state when it changes
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    useEffect(() => {
-        saveState({ modulesOpen, expandedModules: Array.from(expandedModules) });
-    }, [modulesOpen, expandedModules]);
+    // Keep selection in sync with URL — if user clicks a link outside the
+    // current group (e.g. from a search result), update the rail.
+    const effectiveGroupId = activeGroupId !== selectedGroupId && pathname ? activeGroupId : selectedGroupId;
+    const activeGroup = groups.find((g) => g.id === effectiveGroupId) || groups[0];
 
-    const toggleModuleGroup = (id: string) => {
-        setExpandedModules((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            return next;
-        });
+    const isActive = (href: string) => {
+        if (href === "/admin") return pathname === "/admin" || pathname === "/admin/";
+        return pathname === href || pathname.startsWith(href + "/");
     };
 
-    const coreNavItems: NavItem[] = coreNavDefs.map((d) => ({
-        href: d.href,
-        label: t(d.labelKey),
-        icon: d.icon,
-    }));
+    const labelOf = (item: NavItem): string => {
+        if (item.labelKey && t.has(item.labelKey)) return t(item.labelKey);
+        return item.label;
+    };
 
-    const renderLink = (item: NavItem, indent = false) => (
-        <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setMobileOpen(false)}
-            className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
-                indent ? "ml-6" : ""
-            } ${isActive(item.href) ? "active" : "text-muted-foreground hover:text-foreground"}`}
-        >
-            {item.icon}
-            <span className="truncate">{item.label}</span>
-        </Link>
-    );
+    const sectionHeaderOf = (section: NavSection): string | undefined => {
+        if (section.headerKey && t.has(section.headerKey)) return t(section.headerKey);
+        return section.header;
+    };
 
-    const hasAnyModules = singleModules.length > 0 || groupedModules.length > 0;
+    const groupLabelOf = (group: NavGroup): string => {
+        if (group.labelKey && t.has(group.labelKey)) return t(group.labelKey);
+        return group.label;
+    };
 
-    const sidebarContent = (
-        <>
-            <Link href="/" className="flex items-center mb-6 px-3" onClick={() => setMobileOpen(false)}>
-                <span className="font-bold text-xl text-foreground">uxwVend</span>
+    // ─── Icon rail ───
+    const iconRail = (
+        <div className="flex flex-col h-full py-3 items-center gap-1">
+            <Link
+                href="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="w-10 h-10 mb-2 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition"
+                aria-label="uxwVend admin"
+            >
+                <span className="text-xs font-bold">UV</span>
             </Link>
-
-            <nav className="space-y-0.5 mb-6 px-1 flex-1">
-                {/* Core nav (1-8): Dashboard, Module Marketplace, Users, Roles,
-                    Activity Log, System Health, API Keys, Settings */}
-                {coreNavItems.map((item) => renderLink(item))}
-
-                {/* (9) Installed modules group — forum-engine-style collapsible */}
-                {hasAnyModules && (
-                    <div className="mt-3">
-                        <button
-                            type="button"
-                            onClick={() => setModulesOpen(!modulesOpen)}
-                            aria-expanded={modulesOpen}
-                            className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
-                        >
-                            <Layers size={18} />
-                            <span className="flex-1 text-left font-medium">{t.has("sidebar_modulesGroup") ? t("sidebar_modulesGroup") : "Modules"}</span>
-                            <ChevronRight
-                                size={16}
-                                className={`transition-transform ${modulesOpen ? "rotate-90" : ""}`}
-                            />
-                        </button>
-
-                        {modulesOpen && (
-                            <div className="mt-1 space-y-0.5">
-                                {/* Single-page modules first */}
-                                {singleModules.map((item) => renderLink(item, true))}
-
-                                {/* Multi-page module groups */}
-                                {groupedModules.map((group) => {
-                                    const isOpen = expandedModules.has(group.id);
-                                    const hasActiveChild = group.children.some((c) => isActive(c.href));
-                                    return (
-                                        <div key={group.id}>
-                                            <button
-                                                type="button"
-                                                onClick={() => toggleModuleGroup(group.id)}
-                                                aria-expanded={isOpen}
-                                                className={`admin-sidebar-link flex items-center gap-3 px-3 py-2 ml-6 rounded-lg text-sm w-full ${
-                                                    hasActiveChild ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                {group.icon}
-                                                <span className="flex-1 text-left truncate">{group.label}</span>
-                                                <ChevronRight
-                                                    size={14}
-                                                    className={`transition-transform ${isOpen ? "rotate-90" : ""}`}
-                                                />
-                                            </button>
-                                            {isOpen && (
-                                                <div className="mt-0.5 space-y-0.5">
-                                                    {group.children.map((child) => (
-                                                        <Link
-                                                            key={child.href}
-                                                            href={child.href}
-                                                            onClick={() => setMobileOpen(false)}
-                                                            className={`admin-sidebar-link flex items-center gap-3 px-3 py-1.5 ml-12 rounded-lg text-sm ${
-                                                                isActive(child.href)
-                                                                    ? "active"
-                                                                    : "text-muted-foreground hover:text-foreground"
-                                                            }`}
-                                                        >
-                                                            {child.icon}
-                                                            <span className="truncate">{child.label}</span>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+            {groups.map((group) => {
+                const Icon = group.icon;
+                const isSelected = effectiveGroupId === group.id;
+                return (
+                    <button
+                        key={group.id}
+                        type="button"
+                        onClick={() => {
+                            setSelectedGroupId(group.id);
+                            // Navigate to first item of the group for immediate feedback
+                            const firstItem = group.sections.find((s) => s.items.length > 0)?.items[0];
+                            if (firstItem && typeof window !== "undefined") {
+                                // Client-side push — use location since Link would require href binding
+                                const locale = window.location.pathname.split("/")[1] || "en";
+                                window.location.href = `/${locale}${firstItem.href}`;
+                            }
+                        }}
+                        aria-label={groupLabelOf(group)}
+                        title={groupLabelOf(group)}
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative group ${
+                            isSelected
+                                ? "bg-primary/15 text-primary"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
+                    >
+                        <Icon size={18} />
+                        {isSelected && (
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r" />
                         )}
-                    </div>
-                )}
-            </nav>
+                    </button>
+                );
+            })}
 
-            {/* Dark mode toggle */}
-            <div className="px-1 mt-auto pt-4 border-t border-border">
+            <div className="mt-auto flex flex-col items-center gap-1">
                 <button
                     type="button"
                     onClick={toggleDarkMode}
                     aria-label={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
-                    className="admin-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground"
+                    title={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition"
                 >
                     {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                    {isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
                 </button>
             </div>
-        </>
+        </div>
+    );
+
+    // ─── Contextual sidebar ───
+    const contextSidebar = (
+        <div className="flex flex-col h-full py-4 px-3 overflow-y-auto">
+            <div className="px-2 mb-4">
+                <h2 className="text-sm font-semibold text-foreground">{groupLabelOf(activeGroup)}</h2>
+            </div>
+
+            <nav className="flex-1 space-y-4" aria-label={groupLabelOf(activeGroup)}>
+                {activeGroup.sections.map((section, sIdx) => (
+                    <div key={`${activeGroup.id}-${sIdx}`}>
+                        {section.header && (
+                            <div className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                                {sectionHeaderOf(section)}
+                            </div>
+                        )}
+                        <ul className="space-y-0.5">
+                            {section.items.map((item) => {
+                                const Icon = item.icon;
+                                const active = isActive(item.href);
+                                return (
+                                    <li key={item.href}>
+                                        <Link
+                                            href={item.href}
+                                            onClick={() => setMobileOpen(false)}
+                                            className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm transition ${
+                                                active
+                                                    ? "bg-primary/10 text-primary font-medium"
+                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                                            }`}
+                                        >
+                                            {Icon && <Icon size={15} className={active ? "text-primary" : ""} />}
+                                            <span className="truncate flex-1">{labelOf(item)}</span>
+                                        </Link>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                ))}
+                {activeGroup.sections.every((s) => s.items.length === 0) && (
+                    <div className="px-2 py-4 text-xs text-muted-foreground">
+                        {t.has("sidebar_emptyGroup") ? t("sidebar_emptyGroup") : "No items in this group yet."}
+                    </div>
+                )}
+            </nav>
+        </div>
     );
 
     return (
@@ -390,26 +229,33 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                 />
             )}
 
-            {/* Mobile sidebar */}
+            {/* Mobile sidebar: stacks icon rail above contextual items */}
             <aside
                 aria-label="Admin navigation"
-                className={`lg:hidden fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto z-50 transition-transform duration-200 flex flex-col ${
+                className={`lg:hidden fixed top-0 left-0 bottom-0 flex z-50 transition-transform duration-200 bg-card border-r border-border ${
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
-                <button
-                    onClick={() => setMobileOpen(false)}
-                    aria-label="Close menu"
-                    className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center"
-                >
-                    <X size={18} />
-                </button>
-                {sidebarContent}
+                <div className="w-14 border-r border-border bg-background/50">{iconRail}</div>
+                <div className="w-56 relative">
+                    <button
+                        onClick={() => setMobileOpen(false)}
+                        aria-label="Close menu"
+                        className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center z-10"
+                    >
+                        <X size={18} />
+                    </button>
+                    {contextSidebar}
+                </div>
             </aside>
 
-            {/* Desktop sidebar */}
-            <aside aria-label="Admin navigation" className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-64 admin-sidebar p-4 overflow-y-auto">
-                {sidebarContent}
+            {/* Desktop: fixed icon rail + contextual sidebar */}
+            <aside
+                aria-label="Admin navigation"
+                className="hidden lg:flex fixed top-0 left-0 bottom-0 bg-card border-r border-border z-30"
+            >
+                <div className="w-14 border-r border-border bg-background/30">{iconRail}</div>
+                <div className="w-56">{contextSidebar}</div>
             </aside>
         </>
     );

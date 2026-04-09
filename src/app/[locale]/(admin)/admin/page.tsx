@@ -42,15 +42,15 @@ export default async function AdminDashboard() {
 
     return (
         <>
-            <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+            <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-3xl font-bold">{t("dashboard_title")}</h1>
-                    <p className="text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
+                    <h1 className="text-xl font-semibold text-foreground">{t("dashboard_title")}</h1>
+                    <p className="text-xs text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
                 </div>
                 <DashboardCustomizer />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                 {visible.map((w) => {
                     const info = availableById.get(w.id);
                     if (!info || info.source !== "core") return null;

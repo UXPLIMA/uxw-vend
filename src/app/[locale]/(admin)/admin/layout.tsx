@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
 import { AdminSearch } from "@/core/components/admin/AdminSearch";
 import { AdminSpotlight } from "@/core/components/admin/AdminSpotlight";
+import { AdminBreadcrumb } from "@/core/components/admin/AdminBreadcrumb";
 import { ModuleUpdateBadge } from "@/core/components/admin/ModuleUpdateBadge";
 import { UpdateNotificationBanner } from "@/core/components/admin/UpdateNotificationBanner";
 import moduleSystem from "@/core/lib/modules";
@@ -41,16 +42,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 userEmail={session.user.email || ""}
                 modules={modules}
             />
-            {/* Main Content Wrapper */}
-            <main id="main-content" tabIndex={-1} className="lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8 min-h-screen bg-background">
-                <div className="mb-6 flex items-center justify-between gap-4">
-                    <div className="max-w-md flex-1">
-                        <AdminSearch />
+            {/* Main content — cleared 56 (icon rail) + 224 (context sidebar) = 280px */}
+            <main
+                id="main-content"
+                tabIndex={-1}
+                className="lg:ml-[280px] min-h-screen bg-background flex flex-col"
+            >
+                <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-sm border-b border-border">
+                    <div className="flex items-center justify-between gap-4 px-4 lg:px-6 h-14 pl-16 lg:pl-6">
+                        <AdminBreadcrumb />
+                        <div className="flex items-center gap-3">
+                            <div className="hidden md:block w-64">
+                                <AdminSearch />
+                            </div>
+                            <ModuleUpdateBadge />
+                        </div>
                     </div>
-                    <ModuleUpdateBadge />
+                </header>
+                <div className="flex-1 p-4 lg:p-6">
+                    <UpdateNotificationBanner />
+                    {children}
                 </div>
-                <UpdateNotificationBanner />
-                {children}
             </main>
             <AdminSpotlight />
         </div>
