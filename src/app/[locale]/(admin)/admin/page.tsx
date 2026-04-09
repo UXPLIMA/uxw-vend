@@ -2,7 +2,11 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { getTranslations } from "next-intl/server";
-import { DashboardClient } from "./components/dashboard-client";
+import {
+    ModuleStatCards,
+    ModuleSections,
+    DashboardAnalytics,
+} from "./components/dashboard-client";
 import { DashboardCustomizer } from "@/core/components/admin/DashboardCustomizer";
 import { getLayout, getAvailableWidgets } from "@/core/lib/dashboard-layout";
 import UsersCountWidget from "@/core/components/admin/widgets/UsersCountWidget";
@@ -14,10 +18,39 @@ import TopTrophiesWidget from "@/core/components/admin/widgets/TopTrophiesWidget
 
 export const dynamic = "force-dynamic";
 
-// Map core widget ids to their server components. Module widget ids
-// (prefixed with "mod:") still render via the existing DashboardClient
-// which fetches each module's statsApi at runtime.
-const CORE_WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
+/*
+ * Admin dashboard — grouped into distinct visual sections so the grid
+ * stays uniform and nothing orphans on its own row.
+ *
+ *   ┌─ Header ────────────────────────────────────────┐
+ *   │ Title + Customize                               │
+ *   ├─ KPI row ───────────────────────────────────────┤
+ *   │ [ Users ] [ Health ] [ Email ] [ Errors ]       │ <- core 1x1 cards
+ *   │ + module-contributed stat cards (same row)      │
+ *   ├─ Panels row ────────────────────────────────────┤
+ *   │ [ Activity feed      ] [ Top trophies ]         │ <- 2-col panels
+ *   ├─ Module sections ───────────────────────────────┤
+ *   │ [ Open tickets       ] [ Latest orders ]        │ <- module-contributed
+ *   │ [ Recent forum topics ... ]                     │
+ *   ├─ Analytics ─────────────────────────────────────┤
+ *   │ [         Users chart, full width        ]      │
+ *   └─────────────────────────────────────────────────┘
+ *
+ * Widgets are grouped by shape:
+ *  - KPI:    users-count, health-snapshot, email-queue-status,
+ *            recent-errors  (1x1)
+ *  - Panels: activity-feed, top-trophies (1x1 but larger cards)
+ */
+
+const KPI_WIDGET_IDS = new Set([
+    "users-count",
+    "health-snapshot",
+    "email-queue-status",
+    "recent-errors",
+]);
+const PANEL_WIDGET_IDS = new Set(["activity-feed", "top-trophies"]);
+
+const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
     "users-count": () => <UsersCountWidget key="users-count" />,
     "activity-feed": () => <ActivityFeedWidget key="activity-feed" />,
     "health-snapshot": () => <HealthSnapshotWidget key="health-snapshot" />,
@@ -40,9 +73,20 @@ export default async function AdminDashboard() {
     const visible = layout.filter((w) => w.visible);
     const availableById = new Map(available.map((a) => [a.id, a]));
 
+    const renderWidget = (id: string) => {
+        const info = availableById.get(id);
+        if (!info || info.source !== "core") return null;
+        const render = WIDGET_COMPONENTS[id];
+        return render ? render() : null;
+    };
+
+    const visibleKpiWidgets = visible.filter((w) => KPI_WIDGET_IDS.has(w.id));
+    const visiblePanelWidgets = visible.filter((w) => PANEL_WIDGET_IDS.has(w.id));
+
     return (
-        <>
-            <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                     <h1 className="text-xl font-semibold text-foreground">{t("dashboard_title")}</h1>
                     <p className="text-xs text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
@@ -50,17 +94,26 @@ export default async function AdminDashboard() {
                 <DashboardCustomizer />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                {visible.map((w) => {
-                    const info = availableById.get(w.id);
-                    if (!info || info.source !== "core") return null;
-                    const render = CORE_WIDGET_COMPONENTS[w.id];
-                    return render ? render() : null;
-                })}
+            {/* KPI row — core KPIs + module stat cards, uniform 1x1 grid */}
+            {(visibleKpiWidgets.length > 0 || true) && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {visibleKpiWidgets.map((w) => renderWidget(w.id))}
+                    <ModuleStatCards />
+                </div>
+            )}
 
-                {/* Module cards rendered client-side from module stats APIs */}
-                <DashboardClient />
-            </div>
-        </>
+            {/* Panel row — larger activity/engagement cards */}
+            {visiblePanelWidgets.length > 0 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {visiblePanelWidgets.map((w) => renderWidget(w.id))}
+                </div>
+            )}
+
+            {/* Module sections — 2-col panels contributed by modules */}
+            <ModuleSections />
+
+            {/* Analytics — full-width chart strip */}
+            <DashboardAnalytics />
+        </div>
     );
 }

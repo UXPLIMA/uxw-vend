@@ -20,7 +20,7 @@ export default async function ActivityFeedWidget() {
     } catch { /* degrade */ }
 
     return (
-        <Card className="col-span-2">
+        <Card>
             <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                     <Activity className="w-4 h-4" />

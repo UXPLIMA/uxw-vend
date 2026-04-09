@@ -60,27 +60,28 @@ interface DashboardSection {
     items: SectionItem[];
 }
 
-export function DashboardClient() {
+/**
+ * Shared data-fetch hook — one call to /api/v1/modules + each enabled
+ * module's statsApi endpoint. All three dashboard subcomponents below
+ * read from the same hook so we only hit the network once per render.
+ */
+function useModuleDashboardData() {
     const modules = useAllModules();
-    const t = useTranslations("admin");
     const [cards, setCards] = useState<DashboardCard[]>([]);
     const [stats, setStats] = useState<Record<string, string | number>>({});
     const [sections, setSections] = useState<DashboardSection[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch module list to get dashboardCards and statsApi from manifests
         fetch("/api/v1/modules")
             .then(r => r.json())
             .then(async (data) => {
                 const enabledModules = ((data.modules || []) as ModuleManifest[]).filter((m) => modules[m.id] === true);
 
-                // Collect dashboard cards from enabled modules
                 const allCards: DashboardCard[] = [];
                 const allStats: Record<string, string | number> = {};
                 const allSections: DashboardSection[] = [];
 
-                // Fetch stats from each module's statsApi
                 const fetches = enabledModules
                     .filter((m) => m.statsApi)
                     .map(async (m) => {
@@ -95,7 +96,6 @@ export function DashboardClient() {
 
                 await Promise.all(fetches);
 
-                // Collect cards
                 for (const m of enabledModules) {
                     if (m.dashboardCards) {
                         for (const card of m.dashboardCards) {
@@ -112,27 +112,23 @@ export function DashboardClient() {
             .catch(() => setLoading(false));
     }, [modules]);
 
-    if (loading) {
-        return (
-            <>
-                {[1, 2, 3].map(i => (
-                    <Card key={i} className="animate-pulse">
-                        <CardContent className="p-4">
-                            <div className="h-4 bg-muted rounded w-20 mb-2" />
-                            <div className="h-8 bg-muted rounded w-16" />
-                        </CardContent>
-                    </Card>
-                ))}
-            </>
-        );
-    }
+    return { cards, stats, sections, loading };
+}
 
-    const formatValue = (key: string, value: string | number) => {
-        if (key === "revenue") return `$${Number(value || 0).toFixed(2)}`;
-        return value || 0;
-    };
+function formatValue(key: string, value: string | number | undefined): string | number {
+    if (value === undefined) return 0;
+    if (key === "revenue") return `$${Number(value || 0).toFixed(2)}`;
+    return value || 0;
+}
 
-    // Translate a label using labelKey if present, otherwise fall back to raw label
+/**
+ * Flat list of module-contributed stat cards. Designed to sit inside a
+ * uniform 4-col grid alongside core KPI widgets.
+ */
+export function ModuleStatCards() {
+    const { cards, stats, loading } = useModuleDashboardData();
+    const t = useTranslations("admin");
+
     const translateLabel = (raw: string, key?: string): string => {
         if (!key) return raw;
         try {
@@ -143,17 +139,33 @@ export function DashboardClient() {
         }
     };
 
+    if (loading) {
+        return (
+            <>
+                {[1, 2, 3].map(i => (
+                    <Card key={`skel-${i}`} className="animate-pulse">
+                        <CardContent className="p-4">
+                            <div className="h-4 bg-muted rounded w-20 mb-2" />
+                            <div className="h-8 bg-muted rounded w-16" />
+                        </CardContent>
+                    </Card>
+                ))}
+            </>
+        );
+    }
+
     return (
         <>
-            {/* Stat cards from modules */}
             {cards.map((card) => {
                 const Icon = iconMap[card.icon] || Package;
                 return (
-                    <Link key={card.id} href={card.href}>
-                        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <Link key={card.id} href={card.href} className="block">
+                        <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                             <CardContent className="p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{translateLabel(card.label, card.labelKey)}</span>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                        {translateLabel(card.label, card.labelKey)}
+                                    </span>
                                     <Icon className={`w-4 h-4 ${card.color}`} />
                                 </div>
                                 <div className="text-2xl font-bold">{formatValue(card.statKey, stats[card.statKey])}</div>
@@ -162,65 +174,108 @@ export function DashboardClient() {
                     </Link>
                 );
             })}
+        </>
+    );
+}
 
-            {/* Close the grid from parent, render sections below */}
-            <div className="col-span-full" />
+/**
+ * Module-contributed section panels (e.g. open tickets, latest orders,
+ * recent forum topics). Rendered as a 2-col grid of larger Cards.
+ */
+export function ModuleSections() {
+    const { sections, loading } = useModuleDashboardData();
+    const t = useTranslations("admin");
 
-            {/* Sections from modules */}
-            {sections.length > 0 && (
-                <div className="col-span-full grid lg:grid-cols-2 gap-6 mt-2">
-                    {sections.map((section) => (
-                        <Card key={section.id}>
-                            <CardHeader>
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="text-base">{translateLabel(section.title, section.titleKey)}</CardTitle>
-                                    {section.viewAllHref && (
-                                        <Link href={section.viewAllHref} className="text-xs text-primary hover:underline">{t("dashboard_viewAll")}</Link>
-                                    )}
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                {section.items.length === 0 ? (
-                                    <p className="text-muted-foreground text-center py-4 text-sm">{t("dashboard_noData")}</p>
-                                ) : (
-                                    <div className="space-y-2">
-                                        {section.items.map((item) => {
-                                            const content = (
-                                                <div className="flex justify-between items-center p-3 rounded-lg hover:bg-muted/50 transition-colors text-sm">
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-medium truncate">{item.primary}</p>
-                                                        {item.secondary && <p className="text-xs text-muted-foreground">{item.secondary}</p>}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                                                        {item.value && <span className="font-bold text-sm">{item.value}</span>}
-                                                        {item.badge && (
-                                                            <span className={`text-xs px-2 py-0.5 rounded ${badgeColors[item.badgeColor || "gray"]}`}>
-                                                                {item.badge}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                            return item.href ? (
-                                                <Link key={item.id} href={item.href}>{content}</Link>
-                                            ) : (
-                                                <div key={item.id}>{content}</div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
+    const translateLabel = (raw: string, key?: string): string => {
+        if (!key) return raw;
+        try {
+            const translated = t(key);
+            return translated && translated !== key ? translated : raw;
+        } catch {
+            return raw;
+        }
+    };
 
-            {/* Charts */}
+    if (loading || sections.length === 0) return null;
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {sections.map((section) => (
+                <Card key={section.id}>
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-base">{translateLabel(section.title, section.titleKey)}</CardTitle>
+                            {section.viewAllHref && (
+                                <Link href={section.viewAllHref} className="text-xs text-primary hover:underline">
+                                    {t("dashboard_viewAll")}
+                                </Link>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {section.items.length === 0 ? (
+                            <p className="text-muted-foreground text-center py-4 text-sm">{t("dashboard_noData")}</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {section.items.map((item) => {
+                                    const content = (
+                                        <div className="flex justify-between items-center p-3 rounded-lg hover:bg-muted/50 transition-colors text-sm">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium truncate">{item.primary}</p>
+                                                {item.secondary && <p className="text-xs text-muted-foreground">{item.secondary}</p>}
+                                            </div>
+                                            <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                                                {item.value && <span className="font-bold text-sm">{item.value}</span>}
+                                                {item.badge && (
+                                                    <span className={`text-xs px-2 py-0.5 rounded ${badgeColors[item.badgeColor || "gray"]}`}>
+                                                        {item.badge}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                    return item.href ? (
+                                        <Link key={item.id} href={item.href}>{content}</Link>
+                                    ) : (
+                                        <div key={item.id}>{content}</div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+    );
+}
+
+/**
+ * Analytics chart strip, full-width.
+ */
+export function DashboardAnalytics() {
+    const t = useTranslations("admin");
+    return (
+        <div>
+            <h2 className="text-lg font-semibold mb-3">{t("dashboard_analytics")}</h2>
+            <DashboardCharts />
+        </div>
+    );
+}
+
+/**
+ * Legacy wrapper — still exported for components that import it directly.
+ * New dashboard layout composes the three pieces independently.
+ */
+export function DashboardClient() {
+    return (
+        <>
+            <ModuleStatCards />
             <div className="col-span-full mt-4">
-                <h2 className="text-xl font-bold mb-4">{t("dashboard_analytics")}</h2>
-                <DashboardCharts />
+                <ModuleSections />
             </div>
-
+            <div className="col-span-full mt-4">
+                <DashboardAnalytics />
+            </div>
         </>
     );
 }
