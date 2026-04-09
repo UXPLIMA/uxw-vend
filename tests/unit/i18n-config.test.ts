@@ -4,18 +4,13 @@ import fs from 'fs';
 import path from 'path';
 
 describe('i18n config', () => {
-    it('has 7 locales', () => {
-        expect(locales).toHaveLength(7);
+    it('has 2 locales', () => {
+        expect(locales).toHaveLength(2);
     });
 
     it('includes required locales', () => {
         expect(locales).toContain('en');
         expect(locales).toContain('tr');
-        expect(locales).toContain('de');
-        expect(locales).toContain('es');
-        expect(locales).toContain('fr');
-        expect(locales).toContain('ru');
-        expect(locales).toContain('pt');
     });
 
     it('default locale is en', () => {

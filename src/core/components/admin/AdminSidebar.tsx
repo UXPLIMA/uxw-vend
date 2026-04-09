@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
+import type { ComponentType } from "react";
+import * as LucideIcons from "lucide-react";
 import { Menu, X, Sun, Moon, Package } from "lucide-react";
 import {
     CORE_NAV_GROUPS,
@@ -13,6 +15,18 @@ import {
     type NavItem,
     type NavSection,
 } from "@/core/lib/admin-nav-groups";
+
+type IconComponent = ComponentType<{ size?: number; className?: string }>;
+
+/**
+ * Resolves a Lucide icon name (as stored on a module menu item) to its
+ * React component. Falls back to Package so unknown icons still render.
+ */
+function resolveIcon(name: string | undefined): IconComponent {
+    if (!name) return Package;
+    const lib = LucideIcons as unknown as Record<string, IconComponent>;
+    return lib[name] || Package;
+}
 
 interface SidebarModule {
     id: string;
@@ -84,6 +98,8 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                 const label = t.has(itemLabelKey) ? t(itemLabelKey) : item.label;
                 const href = `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`;
 
+                const itemIcon = resolveIcon(item.icon);
+
                 if (isMulti) {
                     // Named section for multi-item modules, keyed by moduleId
                     const key = `${groupId}::${mod.id}`;
@@ -93,7 +109,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                         sectionByGroupAndModule.set(key, section);
                         target.sections.push(section);
                     }
-                    section.items.push({ href, label, icon: Package });
+                    section.items.push({ href, label, icon: itemIcon });
                 } else {
                     // Single-item module: append to shared extensions tail
                     let section = extensionSectionByGroup.get(groupId);
@@ -106,7 +122,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
                         extensionSectionByGroup.set(groupId, section);
                         target.sections.push(section);
                     }
-                    section.items.push({ href, label, icon: Package });
+                    section.items.push({ href, label, icon: itemIcon });
                 }
             }
         }
