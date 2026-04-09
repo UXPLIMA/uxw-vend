@@ -243,6 +243,8 @@
     "settings_backupDesc": "Database backup & restore",
     "settings_auditLog": "Audit Log",
     "settings_auditLogDesc": "Review sensitive admin actions",
+    "settings_moderation": "Moderation",
+    "settings_moderationDesc": "Review pending comments, topics, and suggestions.",
     "settings_trophies": "Trophies",
     "settings_trophiesDesc": "Manage achievement badges and rules",
     "revisions_title": "Revision History",

@@ -5,6 +5,10 @@ import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { buildPageMeta } from "@/core/lib/seo";
+import { cached } from "@/core/lib/cache";
+
+const TROPHIES_PUBLIC_CACHE_KEY = "trophies:public";
+const TROPHIES_PUBLIC_TTL_MS = 30_000;
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +33,16 @@ interface TrophyRow {
 
 async function fetchTrophies(): Promise<TrophyRow[]> {
     try {
-        return await prisma.trophy.findMany({
-            where: { isActive: true },
-            orderBy: [{ points: "desc" }, { name: "asc" }],
-            include: { _count: { select: { users: true } } },
-        });
+        return await cached<TrophyRow[]>(
+            TROPHIES_PUBLIC_CACHE_KEY,
+            TROPHIES_PUBLIC_TTL_MS,
+            () =>
+                prisma.trophy.findMany({
+                    where: { isActive: true },
+                    orderBy: [{ points: "desc" }, { name: "asc" }],
+                    include: { _count: { select: { users: true } } },
+                }),
+        );
     } catch {
         return [];
     }

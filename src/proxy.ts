@@ -8,6 +8,7 @@ import { isSetupComplete } from '@/core/lib/setup-state';
 import { getMaintenanceConfig } from '@/core/lib/maintenance';
 import { auth } from '@/core/lib/auth';
 import prisma from '@/core/lib/db';
+import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -70,6 +71,32 @@ function extractLocale(pathname: string): string {
         return match[1];
     }
     return defaultLocale;
+}
+
+/**
+ * Extract the caller's IP using the same header precedence as
+ * core/lib/rate-limit.ts (x-forwarded-for → x-real-ip → "unknown").
+ * Kept inline here so the middleware can stay self-contained.
+ */
+function getClientIpFromRequest(request: NextRequest): string {
+    const xff = request.headers.get('x-forwarded-for');
+    if (xff) {
+        const first = xff.split(',')[0]?.trim();
+        if (first) return first;
+    }
+    const real = request.headers.get('x-real-ip');
+    if (real) return real.trim();
+    return 'unknown';
+}
+
+function resolveIpScope(pathname: string): IpBlockScope {
+    // Admin UI under /{locale}/admin
+    if (/^\/[a-z]{2}\/admin(\/|$)/.test(pathname)) return 'admin';
+    // Admin APIs
+    if (pathname.startsWith('/api/v1/admin')) return 'admin';
+    // Any API route
+    if (pathname.startsWith('/api/')) return 'api';
+    return 'all';
 }
 
 function isStaticAsset(pathname: string): boolean {
@@ -196,6 +223,24 @@ export async function proxy(request: NextRequest) {
                     return NextResponse.rewrite(url, { status: 503 });
                 }
             }
+        }
+    }
+
+    // ==================== IP BLOCKLIST GATE ====================
+    // After setup and maintenance checks, refuse any request whose
+    // source IP is in the active IpBlock list for the request's scope.
+    // The block list is cached in-process for 60s so middleware stays
+    // fast, and `isIpBlocked` fails open on DB errors — a DB outage
+    // must never lock every visitor out.
+    if (!isStaticAsset(pathname)) {
+        const clientIp = getClientIpFromRequest(request);
+        const ipScope = resolveIpScope(pathname);
+        try {
+            if (await isIpBlocked(clientIp, ipScope)) {
+                return new NextResponse('Access denied', { status: 403 });
+            }
+        } catch {
+            // Fail-open: never block due to loader errors.
         }
     }
 

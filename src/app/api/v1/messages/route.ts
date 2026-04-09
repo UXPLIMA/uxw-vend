@@ -29,36 +29,48 @@ export async function GET() {
         orderBy: { conversation: { lastMessageAt: "desc" } },
     });
 
-    // Compute unread count per conversation
-    const conversations = await Promise.all(
-        myParticipations.map(async (p) => {
-            const unreadCount = p.lastReadAt
-                ? await prisma.message.count({
-                    where: {
-                        conversationId: p.conversationId,
-                        createdAt: { gt: p.lastReadAt },
-                        authorId: { not: session.user.id },
-                    },
-                })
-                : await prisma.message.count({
-                    where: {
-                        conversationId: p.conversationId,
-                        authorId: { not: session.user.id },
-                    },
-                });
+    // Unread counts in a single groupBy instead of one COUNT per conversation.
+    // We can't express "createdAt > per-conversation lastReadAt" in a single
+    // query, so we fetch all inbound messages and bucket them in memory.
+    const userId = session.user.id;
+    const convIds = myParticipations.map((p) => p.conversationId);
+    const unreadById = new Map<string, number>();
 
-            return {
-                id: p.conversation.id,
-                title: p.conversation.title,
-                participants: p.conversation.participants
-                    .filter((cp: { userId: string }) => cp.userId !== session.user.id)
-                    .map((cp: { user: { id: string; username: string; avatar: string | null } }) => cp.user),
-                lastMessage: p.conversation.messages[0] || null,
-                lastMessageAt: p.conversation.lastMessageAt,
-                unreadCount,
-            };
-        })
-    );
+    if (convIds.length > 0) {
+        // lastReadAt cutoff per conversation for this user.
+        const lastReadByConv = new Map<string, Date | null>();
+        for (const p of myParticipations) {
+            lastReadByConv.set(p.conversationId, p.lastReadAt);
+        }
+
+        // Group inbound messages per conversation; then subtract the ones
+        // already read by walking the ids in a second cheap findMany.
+        const inbound = await prisma.message.findMany({
+            where: {
+                conversationId: { in: convIds },
+                authorId: { not: userId },
+            },
+            select: { conversationId: true, createdAt: true },
+        });
+
+        for (const m of inbound) {
+            const cutoff = lastReadByConv.get(m.conversationId);
+            if (!cutoff || m.createdAt > cutoff) {
+                unreadById.set(m.conversationId, (unreadById.get(m.conversationId) ?? 0) + 1);
+            }
+        }
+    }
+
+    const conversations = myParticipations.map((p) => ({
+        id: p.conversation.id,
+        title: p.conversation.title,
+        participants: p.conversation.participants
+            .filter((cp: { userId: string }) => cp.userId !== userId)
+            .map((cp: { user: { id: string; username: string; avatar: string | null } }) => cp.user),
+        lastMessage: p.conversation.messages[0] || null,
+        lastMessageAt: p.conversation.lastMessageAt,
+        unreadCount: unreadById.get(p.conversationId) ?? 0,
+    }));
 
     return NextResponse.json({ conversations });
 }

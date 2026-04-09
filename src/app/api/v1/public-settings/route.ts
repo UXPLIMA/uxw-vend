@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
+import { cached } from "@/core/lib/cache";
 
 // Public settings keys that can be read without authentication
 // Only core platform keys — module-specific settings should be served by each module's own API
@@ -27,16 +28,25 @@ const PUBLIC_KEYS = [
     "theme_overrides",
 ];
 
+const PUBLIC_SETTINGS_CACHE_KEY = "public-settings";
+const PUBLIC_SETTINGS_TTL_MS = 60_000;
+
 // GET /api/v1/public-settings
 export async function GET() {
-    const settings = await prisma.setting.findMany({
-        where: { key: { in: PUBLIC_KEYS } },
-    });
-
-    const settingsMap: Record<string, unknown> = {};
-    for (const s of settings) {
-        settingsMap[s.key] = s.value;
-    }
+    const settingsMap = await cached<Record<string, unknown>>(
+        PUBLIC_SETTINGS_CACHE_KEY,
+        PUBLIC_SETTINGS_TTL_MS,
+        async () => {
+            const rows = await prisma.setting.findMany({
+                where: { key: { in: PUBLIC_KEYS } },
+            });
+            const map: Record<string, unknown> = {};
+            for (const s of rows) {
+                map[s.key] = s.value;
+            }
+            return map;
+        },
+    );
 
     return NextResponse.json({ settings: settingsMap }, {
         headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },

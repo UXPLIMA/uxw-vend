@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
+import { invalidate } from "@/core/lib/cache";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -82,6 +83,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const trophy = await prisma.trophy.update({ where: { id }, data: update });
 
+    await invalidate("trophies:public");
+
     logActivity({
         userId: session.user.id,
         action: "trophy.update",
@@ -101,6 +104,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     // UserTrophy rows cascade via onDelete: Cascade
     await prisma.trophy.delete({ where: { id } });
+
+    await invalidate("trophies:public");
 
     logActivity({
         userId: session.user.id,

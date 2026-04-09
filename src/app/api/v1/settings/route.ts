@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { logActivity } from "@/core/lib/activity-log";
+import { invalidate } from "@/core/lib/cache";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
 // Value is a Json column — accept any JSON-serializable value (string, number, boolean, array, object, null)
@@ -69,6 +70,10 @@ export async function PATCH(request: NextRequest) {
             create: { key, value: jsonValue },
         });
     }
+
+    // Drop the cached public-settings payload so clients see fresh values
+    // immediately instead of waiting out the 60s TTL.
+    await invalidate("public-settings");
 
     logActivity({
         userId: session.user.id,

@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
+import { invalidate } from "@/core/lib/cache";
 
 /**
  * Admin trophy CRUD.
@@ -78,6 +79,8 @@ export async function POST(request: NextRequest) {
             awardOn: data.ruleEvent ? `${data.ruleEvent}:${data.ruleThreshold ?? 1}` : null,
         },
     });
+
+    await invalidate("trophies:public");
 
     logActivity({
         userId: session.user.id,

@@ -171,6 +171,38 @@ export async function bootstrapScheduler(): Promise<void> {
     });
 
     registerCronJob({
+        key: "core:health-alerting",
+        schedule: "every-5-minutes",
+        handler: async () => {
+            const { checkAndAlert } = await import("./health-alerting");
+            const result = await checkAndAlert();
+            if (result.notified) {
+                console.log(`[cron] health-alerting: notified status=${result.status}`);
+            }
+        },
+    });
+
+    registerCronJob({
+        key: "core:prune-ip-blocks",
+        schedule: "every-hour",
+        handler: async () => {
+            const { invalidateIpBlockCache } = await import("./ip-blocks");
+            // Hard-delete blocks that expired > 7 days ago so the
+            // table doesn't accumulate stale rows forever. Expired
+            // blocks are already filtered at query time, but pruning
+            // keeps the list tidy.
+            const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const result = await prisma.ipBlock.deleteMany({
+                where: { expiresAt: { lt: cutoff, not: null } },
+            });
+            invalidateIpBlockCache();
+            if (result.count > 0) {
+                console.log(`[cron] prune-ip-blocks: removed ${result.count} expired entries`);
+            }
+        },
+    });
+
+    registerCronJob({
         key: "core:automated-backup",
         schedule: "every-day",
         handler: async () => {
@@ -180,6 +212,79 @@ export async function bootstrapScheduler(): Promise<void> {
                 console.log(`[cron] automated-backup: created ${meta.filename} (${meta.sizeBytes} bytes)`);
             } catch (err) {
                 console.error("[cron] automated-backup failed:", err);
+            }
+        },
+    });
+
+    registerCronJob({
+        key: "core:publish-scheduled",
+        schedule: "every-5-minutes",
+        handler: async () => {
+            const now = new Date();
+            // Each model is owned by a module; absent models are silently skipped.
+            // We cast through unknown so scheduler.ts stays compilable regardless
+            // of which modules are installed at merge time.
+            const prismaAny = prisma as unknown as {
+                blogArticle?: {
+                    updateMany: (args: unknown) => Promise<{ count: number }>;
+                };
+                changelogEntry?: {
+                    updateMany: (args: unknown) => Promise<{ count: number }>;
+                };
+                announcement?: {
+                    updateMany: (args: unknown) => Promise<{ count: number }>;
+                };
+            };
+
+            const runBlog = async (): Promise<number> => {
+                if (!prismaAny.blogArticle) return 0;
+                try {
+                    const r = await prismaAny.blogArticle.updateMany({
+                        where: { publishAt: { lte: now }, status: "SCHEDULED" },
+                        data: { status: "PUBLISHED", publishAt: null, publishedAt: now },
+                    });
+                    return r.count;
+                } catch {
+                    return 0;
+                }
+            };
+
+            const runChangelog = async (): Promise<number> => {
+                if (!prismaAny.changelogEntry) return 0;
+                try {
+                    const r = await prismaAny.changelogEntry.updateMany({
+                        where: { publishAt: { lte: now } },
+                        data: { publishAt: null },
+                    });
+                    return r.count;
+                } catch {
+                    return 0;
+                }
+            };
+
+            const runAnnouncements = async (): Promise<number> => {
+                if (!prismaAny.announcement) return 0;
+                try {
+                    const r = await prismaAny.announcement.updateMany({
+                        where: { publishAt: { lte: now } },
+                        data: { publishAt: null },
+                    });
+                    return r.count;
+                } catch {
+                    return 0;
+                }
+            };
+
+            const [blogCount, changelogCount, announcementCount] = await Promise.all([
+                runBlog(),
+                runChangelog(),
+                runAnnouncements(),
+            ]);
+
+            if (blogCount || changelogCount || announcementCount) {
+                console.log(
+                    `[cron] publish-scheduled: blog=${blogCount} changelog=${changelogCount} announcements=${announcementCount}`
+                );
             }
         },
     });

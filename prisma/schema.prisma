@@ -543,6 +543,25 @@ model ActivityLog {
   @@index([createdAt])
 }
 
+// IP allowlist / blocklist. Supports single IPv4 addresses and
+// IPv4 CIDR ranges (e.g. "192.168.1.0/24"). Scope limits where the
+// block applies: "all" = entire site, "admin" = only /{locale}/admin
+// and admin APIs, "api" = only /api/* endpoints. Optional expiresAt
+// makes the block temporary; null = permanent.
+model IpBlock {
+  id          String    @id @default(cuid())
+  ip          String    @unique
+  scope       String    @default("all")
+  reason      String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  createdById String?
+
+  @@index([ip])
+  @@index([scope])
+  @@index([expiresAt])
+}
+
 // Outbound email queue. Synchronous SMTP calls would block request
 // handling and fail silently on transient errors; instead most callers
 // enqueue via queueEmail() and a core cron (processEmailQueue) drains
@@ -582,6 +601,7 @@ model Announcement {
   excludePages String?
   startsAt     DateTime?
   endsAt       DateTime?
+  publishAt    DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
@@ -611,6 +631,7 @@ model BlogArticle {
   coverImage  String?
   status      ArticleStatus @default(DRAFT)
   publishedAt DateTime?
+  publishAt   DateTime?
   views       Int           @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -636,11 +657,12 @@ enum ArticleStatus {
 }
 
 model BlogComment {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  isApproved Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+  isApproved      Boolean  @default(true)
+  moderationState String   @default("APPROVED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   articleId String
   article   BlogArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
@@ -671,6 +693,7 @@ model ChangelogEntry {
   type      String   @default("update")
   color     String?  @default("#3b82f6")
   isActive  Boolean  @default(true)
+  publishAt DateTime?
   createdAt DateTime @default(now())
 }
 
@@ -752,16 +775,17 @@ model ForumCategory {
 }
 
 model ForumTopic {
-  id          String   @id @default(cuid())
-  number      Int      @unique @default(autoincrement())
-  title       String
-  slug        String   @unique
-  content     String   @db.Text
-  isPinned    Boolean  @default(false)
-  isLocked    Boolean  @default(false)
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  number          Int      @unique @default(autoincrement())
+  title           String
+  slug            String   @unique
+  content         String   @db.Text
+  isPinned        Boolean  @default(false)
+  isLocked        Boolean  @default(false)
+  moderationState String   @default("APPROVED")
+  views           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   categoryId String
   category   ForumCategory @relation(fields: [categoryId], references: [id])
@@ -777,10 +801,11 @@ model ForumTopic {
 }
 
 model ForumPost {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+  moderationState String   @default("APPROVED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   topicId  String
   topic    ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
@@ -1332,9 +1357,10 @@ model Suggestion {
   id        String   @id @default(cuid())
   title     String
   content   String   @db.Text
-  status      String   @default("open")
-  visibility  String   @default("public")
-  upvotes     Int      @default(0)
+  status          String   @default("open")
+  visibility      String   @default("public")
+  moderationState String   @default("APPROVED")
+  upvotes         Int      @default(0)
   authorId  String
   author    User     @relation("Suggestions", fields: [authorId], references: [id])
   createdAt DateTime @default(now())
