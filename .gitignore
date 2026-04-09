@@ -79,7 +79,7 @@ backups/
 .env.production
 .env.staging
 logs/
-uploads/
+/uploads/
 
 # Module sources (dev only, ZIPs are built from these)
 module-sources/
