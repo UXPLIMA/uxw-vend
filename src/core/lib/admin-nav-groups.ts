@@ -28,6 +28,7 @@ import {
     Palette,
     Package,
     Activity,
+    LineChart,
     Wrench,
     Settings,
     History,
@@ -97,7 +98,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
             {
                 items: [
                     { href: "/admin", label: "Overview", labelKey: "sidebar_overview", icon: LayoutDashboard },
-                    { href: "/admin/analytics", label: "Analytics", labelKey: "sidebar_analytics", icon: Activity },
+                    { href: "/admin/analytics", label: "Analytics", labelKey: "sidebar_analytics", icon: LineChart },
                     { href: "/admin/observability", label: "Observability", labelKey: "sidebar_observability", icon: Activity },
                 ],
             },

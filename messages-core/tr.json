@@ -611,7 +611,10 @@
     "analytics_forumTopicsPerDay": "Günlük forum konusu",
     "analytics_ticketsPerDay": "Günlük açılan talep",
     "analytics_total": "Toplam",
-    "crumb_analytics": "Analitik"
+    "crumb_analytics": "Analitik",
+    "health_ok": "Sağlıklı",
+    "health_degraded": "Bozulmuş",
+    "health_down": "Çevrimdışı"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

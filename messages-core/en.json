@@ -611,7 +611,10 @@
     "analytics_forumTopicsPerDay": "Forum topics per day",
     "analytics_ticketsPerDay": "Tickets opened per day",
     "analytics_total": "Total",
-    "crumb_analytics": "Analytics"
+    "crumb_analytics": "Analytics",
+    "health_ok": "Healthy",
+    "health_degraded": "Degraded",
+    "health_down": "Down"
   },
   "footer": {
     "quickLinks": "Quick Links",
