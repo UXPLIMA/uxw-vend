@@ -4,8 +4,6 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/
 import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, ShieldOff, ShieldAlert, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleSettingsCards } from "@/core/generated/module-registry";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
@@ -15,7 +13,6 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function SettingsPage() {
     const t = useTranslations("admin");
-    const modules = useAllModules();
 
     // Core settings — always visible
     const coreSettings = [
@@ -142,9 +139,6 @@ export default function SettingsPage() {
         },
     ];
 
-    // Module settings cards — only from enabled modules
-    const moduleCards = ModuleSettingsCards.filter(sc => modules[sc.module] === true);
-
     return (
         <div className="space-y-6">
             <div>
@@ -158,23 +152,6 @@ export default function SettingsPage() {
                     return (
                         <Link href={item.href} key={item.href}>
                             <Card className="hover:bg-accent/50 transition-colors cursor-pointer h-full">
-                                <CardHeader className="p-4">
-                                    <CardTitle className="flex items-center space-x-2 text-sm">
-                                        <Icon className={`w-4 h-4 ${item.color}`} />
-                                        <span>{item.title}</span>
-                                    </CardTitle>
-                                    <CardDescription className="text-xs">{item.description}</CardDescription>
-                                </CardHeader>
-                            </Card>
-                        </Link>
-                    );
-                })}
-
-                {moduleCards.map((item) => {
-                    const Icon = iconMap[item.icon] || Package;
-                    return (
-                        <Link href={`/admin${item.href}`} key={item.href}>
-                            <Card className="hover:bg-accent/50 transition-colors cursor-pointer h-full border-dashed">
                                 <CardHeader className="p-4">
                                     <CardTitle className="flex items-center space-x-2 text-sm">
                                         <Icon className={`w-4 h-4 ${item.color}`} />
