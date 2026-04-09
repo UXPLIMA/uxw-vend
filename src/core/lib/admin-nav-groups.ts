@@ -342,15 +342,21 @@ export function inferModuleGroup(moduleId: string): string {
 
 /**
  * Finds which group a given pathname belongs to. Returns the group id
- * or null if no core group matches.
+ * or null if no group matches.
+ *
+ * Matching strategy:
+ *   1. Exact /admin → dashboard
+ *   2. Longest-matching explicit `pathPrefix` across all groups
+ *   3. Longest-matching item `href` across all groups (covers
+ *      module-contributed entries that aren't in any pathPrefix)
  */
 export function findActiveGroupId(pathname: string, groups: NavGroup[]): string | null {
-    // Exact /admin match must go to dashboard specifically
     if (pathname === "/admin" || pathname === "/admin/") return "dashboard";
 
-    // Look for the longest matching prefix across all groups
     let best: { id: string; length: number } | null = null;
+
     for (const group of groups) {
+        // Explicit path prefixes
         const prefixes = Array.isArray(group.pathPrefix)
             ? group.pathPrefix
             : group.pathPrefix
@@ -363,6 +369,19 @@ export function findActiveGroupId(pathname: string, groups: NavGroup[]): string 
                 }
             }
         }
+
+        // Item hrefs — covers module-contributed items and
+        // items in groups that don't declare an explicit pathPrefix
+        for (const section of group.sections) {
+            for (const item of section.items) {
+                if (pathname === item.href || pathname.startsWith(item.href + "/")) {
+                    if (!best || item.href.length > best.length) {
+                        best = { id: group.id, length: item.href.length };
+                    }
+                }
+            }
+        }
     }
+
     return best?.id ?? null;
 }

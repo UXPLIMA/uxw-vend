@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Link, usePathname } from "@/core/lib/i18n/navigation";
+import { useState, useMemo, useEffect } from "react";
+import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
 import { Menu, X, Sun, Moon, Package } from "lucide-react";
@@ -43,6 +43,7 @@ interface AdminSidebarProps {
  */
 export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
@@ -75,13 +76,35 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
         return Array.from(byId.values());
     }, [modules, t]);
 
-    const activeGroupId = findActiveGroupId(pathname, groups) || "dashboard";
-    const [selectedGroupId, setSelectedGroupId] = useState<string>(activeGroupId);
+    // Selection state machine:
+    //   - `pathDerivedId` is the group the current URL resolves to
+    //   - `userSelection` is an explicit icon click that may diverge
+    //     from the URL (e.g. clicking Commerce while still on Dashboard
+    //     to browse an empty group before picking a module item)
+    //   - On pathname change we clear `userSelection` so the URL-derived
+    //     group takes over naturally after any Link navigation
+    const pathDerivedId = findActiveGroupId(pathname, groups) || "dashboard";
+    const [userSelection, setUserSelection] = useState<string | null>(null);
 
-    // Keep selection in sync with URL — if user clicks a link outside the
-    // current group (e.g. from a search result), update the rail.
-    const effectiveGroupId = activeGroupId !== selectedGroupId && pathname ? activeGroupId : selectedGroupId;
+    useEffect(() => {
+        setUserSelection(null);
+    }, [pathname]);
+
+    const effectiveGroupId = userSelection || pathDerivedId;
     const activeGroup = groups.find((g) => g.id === effectiveGroupId) || groups[0];
+
+    const handleGroupClick = (group: NavGroup) => {
+        setUserSelection(group.id);
+        setMobileOpen(false);
+        // If the group has items and the current pathname isn't already
+        // in that group, navigate to the first item so the main content
+        // updates immediately. Commerce-style empty groups just reveal
+        // the contextual sidebar with a "no items" message.
+        const firstItem = group.sections.find((s) => s.items.length > 0)?.items[0];
+        if (firstItem && pathDerivedId !== group.id) {
+            router.push(firstItem.href);
+        }
+    };
 
     const isActive = (href: string) => {
         if (href === "/admin") return pathname === "/admin" || pathname === "/admin/";
@@ -117,26 +140,21 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
             {groups.map((group) => {
                 const Icon = group.icon;
                 const isSelected = effectiveGroupId === group.id;
+                const hasItems = group.sections.some((s) => s.items.length > 0);
                 return (
                     <button
                         key={group.id}
                         type="button"
-                        onClick={() => {
-                            setSelectedGroupId(group.id);
-                            // Navigate to first item of the group for immediate feedback
-                            const firstItem = group.sections.find((s) => s.items.length > 0)?.items[0];
-                            if (firstItem && typeof window !== "undefined") {
-                                // Client-side push — use location since Link would require href binding
-                                const locale = window.location.pathname.split("/")[1] || "en";
-                                window.location.href = `/${locale}${firstItem.href}`;
-                            }
-                        }}
+                        onClick={() => handleGroupClick(group)}
                         aria-label={groupLabelOf(group)}
+                        aria-current={isSelected ? "page" : undefined}
                         title={groupLabelOf(group)}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative group ${
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative ${
                             isSelected
                                 ? "bg-primary/15 text-primary"
-                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                : hasItems
+                                    ? "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                    : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
                         }`}
                     >
                         <Icon size={18} />
