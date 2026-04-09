@@ -48,28 +48,66 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
 
-    // Merge module menus into matching groups
+    // Merge module menus into matching groups.
+    // - Multi-item modules get one labelled section per module
+    // - Single-item modules append to a shared "Extensions" tail section
+    //   (no per-module header — avoids a wall of one-item headers)
     const groups: NavGroup[] = useMemo(() => {
-        const byId = new Map(CORE_NAV_GROUPS.map((g) => [g.id, { ...g, sections: g.sections.map((s) => ({ ...s, items: [...s.items] })) }]));
+        const byId = new Map(
+            CORE_NAV_GROUPS.map((g) => [
+                g.id,
+                { ...g, sections: g.sections.map((s) => ({ ...s, items: [...s.items] })) },
+            ]),
+        );
+
+        // Per-group, track a section per module id so we don't create
+        // duplicate headers for the same module.
+        const sectionByGroupAndModule = new Map<string, NavSection>();
+        const extensionSectionByGroup = new Map<string, NavSection>();
 
         for (const mod of modules) {
             if (!mod.menu || mod.menu.length === 0) continue;
+
+            const modLabelKey = `menu_${mod.id}`;
+            const modLabel = t.has(modLabelKey)
+                ? t(modLabelKey)
+                : mod.id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+            const isMulti = mod.menu.length > 1;
+
             for (const item of mod.menu) {
                 const groupId = item.group || inferModuleGroup(mod.id);
                 const target = byId.get(groupId);
                 if (!target) continue;
-                const labelKey = `menu_${mod.id}_${item.label.replace(/\s+/g, "_").toLowerCase()}`;
-                const label = t.has(labelKey) ? t(labelKey) : item.label;
+
+                const itemLabelKey = `menu_${mod.id}_${item.label.replace(/\s+/g, "_").toLowerCase()}`;
+                const label = t.has(itemLabelKey) ? t(itemLabelKey) : item.label;
                 const href = `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`;
-                // Append to the module's section (create one if missing)
-                let modSection = target.sections.find((s) => s.header === mod.id);
-                if (!modSection) {
-                    const modLabelKey = `menu_${mod.id}`;
-                    const modLabel = t.has(modLabelKey) ? t(modLabelKey) : mod.id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-                    modSection = { header: modLabel, items: [] };
-                    target.sections.push(modSection);
+
+                if (isMulti) {
+                    // Named section for multi-item modules, keyed by moduleId
+                    const key = `${groupId}::${mod.id}`;
+                    let section = sectionByGroupAndModule.get(key);
+                    if (!section) {
+                        section = { header: modLabel, items: [] };
+                        sectionByGroupAndModule.set(key, section);
+                        target.sections.push(section);
+                    }
+                    section.items.push({ href, label, icon: Package });
+                } else {
+                    // Single-item module: append to shared extensions tail
+                    let section = extensionSectionByGroup.get(groupId);
+                    if (!section) {
+                        const headerKey = "sidebar_extensions";
+                        section = {
+                            header: t.has(headerKey) ? t(headerKey) : "Extensions",
+                            items: [],
+                        };
+                        extensionSectionByGroup.set(groupId, section);
+                        target.sections.push(section);
+                    }
+                    section.items.push({ href, label, icon: Package });
                 }
-                modSection.items.push({ href, label, icon: Package });
             }
         }
 
@@ -129,52 +167,75 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     // ─── Icon rail ───
     const iconRail = (
         <div className="flex flex-col h-full py-3 items-center gap-1">
-            <Link
-                href="/admin"
-                onClick={() => setMobileOpen(false)}
-                className="w-10 h-10 mb-2 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition"
-                aria-label="uxwVend admin"
-            >
-                <span className="text-xs font-bold">UV</span>
-            </Link>
+            <div className="relative group/rail mb-2">
+                <Link
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition"
+                    aria-label="uxwVend admin"
+                >
+                    <span className="text-xs font-bold">UV</span>
+                </Link>
+                <span
+                    role="tooltip"
+                    className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium whitespace-nowrap shadow-lg opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 z-50"
+                >
+                    uxwVend
+                </span>
+            </div>
             {groups.map((group) => {
                 const Icon = group.icon;
                 const isSelected = effectiveGroupId === group.id;
                 const hasItems = group.sections.some((s) => s.items.length > 0);
+                const label = groupLabelOf(group);
                 return (
-                    <button
-                        key={group.id}
-                        type="button"
-                        onClick={() => handleGroupClick(group)}
-                        aria-label={groupLabelOf(group)}
-                        aria-current={isSelected ? "page" : undefined}
-                        title={groupLabelOf(group)}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative ${
-                            isSelected
-                                ? "bg-primary/15 text-primary"
-                                : hasItems
-                                    ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                    : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
-                        }`}
-                    >
-                        <Icon size={18} />
-                        {isSelected && (
-                            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r" />
-                        )}
-                    </button>
+                    <div key={group.id} className="relative group/rail">
+                        <button
+                            type="button"
+                            onClick={() => handleGroupClick(group)}
+                            aria-label={label}
+                            aria-current={isSelected ? "page" : undefined}
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative ${
+                                isSelected
+                                    ? "bg-primary/15 text-primary"
+                                    : hasItems
+                                        ? "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                        : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
+                            }`}
+                        >
+                            <Icon size={18} />
+                            {isSelected && (
+                                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r" />
+                            )}
+                        </button>
+                        {/* CSS tooltip — appears to the right on hover */}
+                        <span
+                            role="tooltip"
+                            className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium whitespace-nowrap shadow-lg opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 z-50"
+                        >
+                            {label}
+                        </span>
+                    </div>
                 );
             })}
 
             <div className="mt-auto flex flex-col items-center gap-1">
-                <button
-                    type="button"
-                    onClick={toggleDarkMode}
-                    aria-label={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
-                    title={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition"
-                >
-                    {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
+                <div className="relative group/rail">
+                    <button
+                        type="button"
+                        onClick={toggleDarkMode}
+                        aria-label={isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
+                        className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                    >
+                        {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
+                    <span
+                        role="tooltip"
+                        className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium whitespace-nowrap shadow-lg opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 z-50"
+                    >
+                        {isDark ? t("sidebar_lightMode") : t("sidebar_darkMode")}
+                    </span>
+                </div>
             </div>
         </div>
     );
