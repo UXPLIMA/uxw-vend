@@ -5,7 +5,6 @@ import { getTranslations } from "next-intl/server";
 import {
     ModuleStatCards,
     ModuleSections,
-    DashboardAnalytics,
 } from "./components/dashboard-client";
 import { DashboardCustomizer } from "@/core/components/admin/DashboardCustomizer";
 import { getLayout, getAvailableWidgets } from "@/core/lib/dashboard-layout";
@@ -111,9 +110,6 @@ export default async function AdminDashboard() {
 
             {/* Module sections — 2-col panels contributed by modules */}
             <ModuleSections />
-
-            {/* Analytics — full-width chart strip */}
-            <DashboardAnalytics />
         </div>
     );
 }

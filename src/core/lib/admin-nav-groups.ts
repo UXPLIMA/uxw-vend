@@ -92,11 +92,12 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: LayoutDashboard,
         label: "Dashboard",
         labelKey: "sidebar_dashboard",
-        pathPrefix: ["/admin", "/admin/observability"],
+        pathPrefix: ["/admin", "/admin/analytics", "/admin/observability"],
         sections: [
             {
                 items: [
                     { href: "/admin", label: "Overview", labelKey: "sidebar_overview", icon: LayoutDashboard },
+                    { href: "/admin/analytics", label: "Analytics", labelKey: "sidebar_analytics", icon: Activity },
                     { href: "/admin/observability", label: "Observability", labelKey: "sidebar_observability", icon: Activity },
                 ],
             },
