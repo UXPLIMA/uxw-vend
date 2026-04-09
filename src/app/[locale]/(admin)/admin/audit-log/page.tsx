@@ -203,8 +203,8 @@ export default function AuditLogPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
-                    <p className="text-muted-foreground">{subtitle}</p>
+                    <h1 className="text-xl font-semibold">{title}</h1>
+                    <p className="text-sm text-muted-foreground">{subtitle}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={exportCsv}>
                     <Download className="w-4 h-4 mr-2" />

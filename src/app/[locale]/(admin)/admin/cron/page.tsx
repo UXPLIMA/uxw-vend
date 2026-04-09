@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Clock, Loader2, Play, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface CronJobRow {
     key: string;
@@ -34,6 +35,7 @@ function formatDuration(ms: number | null): string {
 }
 
 export default function CronAdminPage() {
+    const t = useTranslations("admin");
     const [jobs, setJobs] = useState<CronJobRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [runningKey, setRunningKey] = useState<string | null>(null);
@@ -93,15 +95,15 @@ export default function CronAdminPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Clock className="w-7 h-7" />
-                        Cron Jobs
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <Clock className="w-5 h-5" />
+                        {t("cron_title")}
                     </h1>
-                    <p className="text-muted-foreground">Monitor scheduled jobs and run history</p>
+                    <p className="text-sm text-muted-foreground">{t("cron_description")}</p>
                 </div>
                 <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
                     <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                    Refresh
+                    {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
                 </Button>
             </div>
 
@@ -121,13 +123,13 @@ export default function CronAdminPage() {
                         <table className="w-full text-sm">
                             <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">Job Key</th>
-                                    <th className="px-4 py-3 font-medium">Schedule</th>
-                                    <th className="px-4 py-3 font-medium">Last Run</th>
-                                    <th className="px-4 py-3 font-medium">Status</th>
-                                    <th className="px-4 py-3 font-medium">Duration</th>
-                                    <th className="px-4 py-3 font-medium">Next Run</th>
-                                    <th className="px-4 py-3 font-medium text-right">Actions</th>
+                                    <th className="px-4 py-3 font-medium">{t("cron_jobKey")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("cron_schedule")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("cron_lastRun")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("common_status")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("cron_duration")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("cron_nextRun")}</th>
+                                    <th className="px-4 py-3 font-medium text-right">{t("common_actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>

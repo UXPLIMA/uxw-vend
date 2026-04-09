@@ -5,6 +5,7 @@ import { Settings as SettingsIcon, ChevronUp, ChevronDown, RotateCcw, Loader2 } 
 import { Button } from "@/core/components/ui/button";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface DashboardWidget {
     id: string;
@@ -21,6 +22,7 @@ interface AvailableWidget {
 }
 
 export function DashboardCustomizer() {
+    const t = useTranslations("admin");
     const [open, setOpen] = useState(false);
     const [layout, setLayout] = useState<DashboardWidget[]>([]);
     const [available, setAvailable] = useState<AvailableWidget[]>([]);
@@ -37,7 +39,7 @@ export function DashboardCustomizer() {
                 setLayout(d.layout || []);
                 setAvailable(d.available || []);
             })
-            .catch(() => toast.error("Failed to load dashboard layout"))
+            .catch(() => toast.error(t("customizer_loadError")))
             .finally(() => setLoading(false));
     }, [open]);
 
@@ -62,11 +64,11 @@ export function DashboardCustomizer() {
                 body: JSON.stringify({ widgets: layout }),
             });
             if (!res.ok) throw new Error();
-            toast.success("Dashboard layout saved");
+            toast.success(t("customizer_saved"));
             setOpen(false);
             window.location.reload();
         } catch {
-            toast.error("Failed to save layout");
+            toast.error(t("customizer_saveError"));
         } finally {
             setSaving(false);
         }
@@ -74,9 +76,9 @@ export function DashboardCustomizer() {
 
     const reset = async () => {
         const ok = await confirm({
-            title: "Reset dashboard layout?",
-            message: "All widgets will be restored to their default order and visibility.",
-            confirmText: "Reset",
+            title: t("customizer_resetConfirmTitle"),
+            message: t("customizer_resetConfirmMessage"),
+            confirmText: t("customizer_reset"),
             variant: "danger",
         });
         if (!ok) return;
@@ -84,11 +86,11 @@ export function DashboardCustomizer() {
         try {
             const res = await fetch("/api/v1/admin/dashboard-layout", { method: "DELETE" });
             if (!res.ok) throw new Error();
-            toast.success("Dashboard layout reset");
+            toast.success(t("customizer_resetDone"));
             setOpen(false);
             window.location.reload();
         } catch {
-            toast.error("Failed to reset layout");
+            toast.error(t("customizer_resetError"));
         } finally {
             setSaving(false);
         }
@@ -100,7 +102,7 @@ export function DashboardCustomizer() {
         <>
             <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
                 <SettingsIcon className="w-4 h-4 mr-2" />
-                Customize
+                {t("customizer_button")}
             </Button>
 
             {open && (
@@ -109,15 +111,15 @@ export function DashboardCustomizer() {
                     onClick={() => setOpen(false)}
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Customize dashboard"
+                    aria-label={t("customizer_title")}
                 >
                     <div
                         className="bg-card rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-4 border-b border-border">
-                            <h2 className="text-lg font-semibold">Customize dashboard</h2>
-                            <p className="text-xs text-muted-foreground">Show, hide, and reorder widgets.</p>
+                            <h2 className="text-lg font-semibold">{t("customizer_title")}</h2>
+                            <p className="text-xs text-muted-foreground">{t("customizer_description")}</p>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -135,7 +137,7 @@ export function DashboardCustomizer() {
                                                     onClick={() => move(i, -1)}
                                                     disabled={i === 0}
                                                     className="p-0.5 disabled:opacity-30 hover:bg-muted rounded"
-                                                    aria-label={`Move ${info.label} up`}
+                                                    aria-label={t("customizer_moveUp", { label: info.label })}
                                                 >
                                                     <ChevronUp className="w-3.5 h-3.5" />
                                                 </button>
@@ -144,7 +146,7 @@ export function DashboardCustomizer() {
                                                     onClick={() => move(i, 1)}
                                                     disabled={i === layout.length - 1}
                                                     className="p-0.5 disabled:opacity-30 hover:bg-muted rounded"
-                                                    aria-label={`Move ${info.label} down`}
+                                                    aria-label={t("customizer_moveDown", { label: info.label })}
                                                 >
                                                     <ChevronDown className="w-3.5 h-3.5" />
                                                 </button>
@@ -163,7 +165,7 @@ export function DashboardCustomizer() {
                                                 )}
                                             </label>
                                             <span className={`text-[10px] px-1.5 py-0.5 rounded ${info.source === "core" ? "bg-blue-500/10 text-blue-600" : "bg-purple-500/10 text-purple-600"}`}>
-                                                {info.source === "core" ? "Core" : info.moduleId}
+                                                {info.source === "core" ? t("customizer_core") : info.moduleId}
                                             </span>
                                         </div>
                                     );
@@ -174,14 +176,14 @@ export function DashboardCustomizer() {
                         <div className="p-4 border-t border-border flex justify-between gap-2">
                             <Button variant="outline" size="sm" onClick={reset} disabled={saving}>
                                 <RotateCcw className="w-4 h-4 mr-2" />
-                                Reset
+                                {t("customizer_reset")}
                             </Button>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="sm" onClick={() => setOpen(false)} disabled={saving}>
-                                    Cancel
+                                    {t("customizer_cancel")}
                                 </Button>
                                 <Button size="sm" onClick={save} disabled={saving || loading}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t("customizer_save")}
                                 </Button>
                             </div>
                         </div>

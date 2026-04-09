@@ -107,11 +107,11 @@ export default function ObservabilityPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
                         <Activity className={`w-7 h-7 ${statusColor}`} />
                         {t.has("observability_title") ? t("observability_title") : "Observability"}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                         {t.has("observability_subtitle") ? t("observability_subtitle") : "Platform health and metrics"}
                         {health?.version && <span className="ml-2 text-xs">v{health.version}</span>}
                     </p>

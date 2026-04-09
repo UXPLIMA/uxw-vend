@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 type ModerationType = "blog-comment" | "forum-topic" | "forum-post" | "suggestion";
 
@@ -48,6 +49,7 @@ const TABS: { key: "all" | ModerationType; label: string }[] = [
 ];
 
 export default function ModerationPage() {
+    const t = useTranslations("admin");
     const [activeTab, setActiveTab] = useState<"all" | ModerationType>("all");
     const [counts, setCounts] = useState<Record<ModerationType, number>>({
         "blog-comment": 0,
@@ -240,12 +242,12 @@ export default function ModerationPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <ShieldAlert className="w-7 h-7" />
-                        Moderation Queue
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5" />
+                        {t("sidebar_moderationQueue")}
                     </h1>
-                    <p className="text-muted-foreground">
-                        Review user-submitted content waiting for approval.
+                    <p className="text-sm text-muted-foreground">
+                        {t("moderation_description")}
                     </p>
                 </div>
             </div>

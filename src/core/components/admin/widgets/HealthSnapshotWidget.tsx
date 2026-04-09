@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Activity as ActivityIcon, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface CheckState { ok: boolean; enabled?: boolean }
 interface HealthResponse {
@@ -20,6 +21,7 @@ interface HealthResponse {
  * Health snapshot widget — polls /api/health every 15s.
  */
 export default function HealthSnapshotWidget() {
+    const t = useTranslations("admin");
     const [data, setData] = useState<HealthResponse | null>(null);
 
     useEffect(() => {
@@ -50,7 +52,7 @@ export default function HealthSnapshotWidget() {
                     <CardTitle className="text-sm flex items-center justify-between">
                         <span className="flex items-center gap-2">
                             <ActivityIcon className="w-4 h-4" />
-                            Health
+                            {t("widget_health")}
                         </span>
                         {data && (data.status === "ok"
                             ? <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -60,13 +62,13 @@ export default function HealthSnapshotWidget() {
                 </CardHeader>
                 <CardContent className="p-4 pt-0 text-xs space-y-1">
                     {!data ? (
-                        <p className="text-muted-foreground">Loading…</p>
+                        <p className="text-muted-foreground">{t("widget_loading")}</p>
                     ) : (
                         <>
-                            <div className="flex items-center gap-2">{dot(data.checks.database.ok)} Database {data.checks.database.latencyMs && <span className="text-muted-foreground">({data.checks.database.latencyMs}ms)</span>}</div>
-                            <div className="flex items-center gap-2">{dot(data.checks.redis.ok, data.checks.redis.enabled)} Redis {data.checks.redis.enabled === false && <span className="text-muted-foreground">(disabled)</span>}</div>
-                            <div className="flex items-center gap-2">{dot(data.checks.emailQueue.ok)} Email queue <span className="text-muted-foreground">({data.checks.emailQueue.pending}/{data.checks.emailQueue.failed})</span></div>
-                            <div className="flex items-center gap-2">{dot(data.checks.scheduler.ok)} Scheduler {data.checks.scheduler.staleJobs > 0 && <span className="text-muted-foreground">({data.checks.scheduler.staleJobs} stale)</span>}</div>
+                            <div className="flex items-center gap-2">{dot(data.checks.database.ok)} {t("widget_database")} {data.checks.database.latencyMs && <span className="text-muted-foreground">({data.checks.database.latencyMs}ms)</span>}</div>
+                            <div className="flex items-center gap-2">{dot(data.checks.redis.ok, data.checks.redis.enabled)} Redis {data.checks.redis.enabled === false && <span className="text-muted-foreground">({t("widget_disabled")})</span>}</div>
+                            <div className="flex items-center gap-2">{dot(data.checks.emailQueue.ok)} {t("widget_emailQueue")} <span className="text-muted-foreground">({data.checks.emailQueue.pending}/{data.checks.emailQueue.failed})</span></div>
+                            <div className="flex items-center gap-2">{dot(data.checks.scheduler.ok)} {t("widget_scheduler")} {data.checks.scheduler.staleJobs > 0 && <span className="text-muted-foreground">({data.checks.scheduler.staleJobs} {t("widget_stale")})</span>}</div>
                         </>
                     )}
                 </CardContent>

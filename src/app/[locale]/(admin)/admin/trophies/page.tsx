@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface AdminTrophy {
     id: string;
@@ -76,6 +77,7 @@ const BLANK_FORM: FormState = {
 };
 
 export default function AdminTrophiesPage() {
+    const tt = useTranslations("admin");
     const { confirm } = useConfirm();
     const [trophies, setTrophies] = useState<AdminTrophy[]>([]);
     const [loading, setLoading] = useState(true);
@@ -231,16 +233,16 @@ export default function AdminTrophiesPage() {
         <div>
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Award className="w-7 h-7 text-amber-500" />
-                        Trophies
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <Award className="w-5 h-5 text-amber-500" />
+                        {tt("sidebar_trophies")}
                     </h1>
-                    <p className="text-muted-foreground">
-                        Manage achievement badges and the hook events that auto-award them.
+                    <p className="text-sm text-muted-foreground">
+                        {tt("trophies_description")}
                     </p>
                 </div>
                 <Button onClick={openCreate}>
-                    <Plus className="w-4 h-4 mr-1" /> New trophy
+                    <Plus className="w-4 h-4 mr-1" /> {tt.has("common_add") ? tt("common_add") : "Add"}
                 </Button>
             </div>
 

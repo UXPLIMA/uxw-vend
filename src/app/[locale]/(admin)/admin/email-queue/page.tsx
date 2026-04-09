@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Inbox, Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 type EmailStatus = "pending" | "sending" | "sent" | "failed";
 type StatusFilter = "all" | EmailStatus;
@@ -58,6 +59,7 @@ function formatDate(value: string | null): string {
 }
 
 export default function EmailQueueAdminPage() {
+    const t = useTranslations("admin");
     const [jobs, setJobs] = useState<EmailJobRow[]>([]);
     const [summary, setSummary] = useState<Record<EmailStatus, number>>({ pending: 0, sending: 0, sent: 0, failed: 0 });
     const [total, setTotal] = useState(0);
@@ -174,20 +176,20 @@ export default function EmailQueueAdminPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Inbox className="w-7 h-7" />
-                        Email Queue
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <Inbox className="w-5 h-5" />
+                        {t("emailQueue_title")}
                     </h1>
-                    <p className="text-muted-foreground">Background email delivery queue</p>
+                    <p className="text-sm text-muted-foreground">{t("emailQueue_description")}</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                        Refresh
+                        {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
                     </Button>
                     <Button onClick={handleProcess} disabled={processing}>
                         {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
-                        Process queue now
+                        {t("emailQueue_processNow")}
                     </Button>
                 </div>
             </div>
@@ -237,11 +239,11 @@ export default function EmailQueueAdminPage() {
                             <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">To</th>
-                                    <th className="px-4 py-3 font-medium">Subject</th>
-                                    <th className="px-4 py-3 font-medium">Status</th>
-                                    <th className="px-4 py-3 font-medium">Attempts</th>
-                                    <th className="px-4 py-3 font-medium">Scheduled</th>
-                                    <th className="px-4 py-3 font-medium text-right">Actions</th>
+                                    <th className="px-4 py-3 font-medium">{t("common_subject")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("common_status")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("emailQueue_attempts")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("emailQueue_scheduled")}</th>
+                                    <th className="px-4 py-3 font-medium text-right">{t("common_actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -198,11 +198,11 @@ export default function ResourcePermissionsPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <ShieldCheck className="w-7 h-7" />
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5" />
                         {fallback("rp_title", "Resource Permissions")}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                         {fallback(
                             "rp_subtitle",
                             "Granular per-resource allow/deny grants on top of role defaults.",

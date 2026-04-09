@@ -97,11 +97,11 @@ export default function RevisionsPage() {
     return (
         <>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <History className="w-7 h-7" />
+                <h1 className="text-xl font-semibold flex items-center gap-2">
+                    <History className="w-5 h-5" />
                     {fallback("revisions_title", "Revision History")}
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                     {fallback(
                         "revisions_subtitle",
                         "Audit trail of every content update and delete across modules.",

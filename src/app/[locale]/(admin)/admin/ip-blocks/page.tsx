@@ -118,11 +118,11 @@ export default function IpBlocksPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <ShieldOff className="w-7 h-7" />
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <ShieldOff className="w-5 h-5" />
                         {fallback("ipBlocks_title", "IP Blocks")}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                         {fallback(
                             "ipBlocks_subtitle",
                             "Ban specific IPs or CIDR ranges from accessing the site or admin panel.",

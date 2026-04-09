@@ -9,6 +9,7 @@ import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 import { Mail, Send, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface Broadcast {
     id: string;
@@ -23,6 +24,7 @@ interface Broadcast {
 }
 
 export default function BroadcastsPage() {
+    const t = useTranslations("admin");
     const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
     const [loading, setLoading] = useState(true);
     const [composing, setComposing] = useState(false);
@@ -119,14 +121,14 @@ export default function BroadcastsPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Mail className="w-7 h-7" />
-                        Email Broadcasts
+                    <h1 className="text-xl font-semibold flex items-center gap-2">
+                        <Mail className="w-5 h-5" />
+                        {t("sidebar_broadcasts")}
                     </h1>
-                    <p className="text-muted-foreground">Send bulk email to all users</p>
+                    <p className="text-sm text-muted-foreground">{t.has("settings_broadcastsDesc") ? t("settings_broadcastsDesc") : "Compose and send bulk email to users."}</p>
                 </div>
                 <Button onClick={() => setComposing(!composing)}>
-                    {composing ? "Cancel" : "Compose"}
+                    {composing ? t("customizer_cancel") : (t.has("common_new") ? t("common_new") : "New")}
                 </Button>
             </div>
 
