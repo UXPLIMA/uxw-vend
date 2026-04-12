@@ -137,7 +137,7 @@ export function Navbar() {
                         <Home className="w-4 h-4" />
                         <span className="truncate">{t('home')}</span>
                     </Link>
-                    <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 overflow-x-auto" aria-label="Primary">
+                    <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-wrap" aria-label="Primary">
                         <Slot name="navbar.start" />
                         {navLinks.map((link) => {
                             const IconComp = link.icon ? iconMap[link.icon] : null;
