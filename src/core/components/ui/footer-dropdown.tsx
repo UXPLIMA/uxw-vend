@@ -31,7 +31,7 @@ export function FooterDropdown({ options, value, onChange, formatLabel }: Footer
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-card border border-border rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                    <div className="absolute bottom-full left-0 mb-1 w-full bg-zinc-800 border border-zinc-700 rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {options.map((option) => (
                             <button
                                 key={option}
@@ -41,7 +41,7 @@ export function FooterDropdown({ options, value, onChange, formatLabel }: Footer
                                     setIsOpen(false);
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm transition-colors ${
-                                    value === option ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
+                                    value === option ? "bg-primary text-white" : "text-zinc-200 hover:bg-zinc-700 hover:text-white"
                                 }`}
                             >
                                 {formatLabel ? formatLabel(option) : option}
