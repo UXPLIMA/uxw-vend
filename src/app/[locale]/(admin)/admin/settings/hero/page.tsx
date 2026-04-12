@@ -1,19 +1,21 @@
 "use client";
 import { SettingsForm } from "../settings-form";
+import { useTranslations } from "next-intl";
 
 export default function HeroSettingsPage() {
+    const t = useTranslations("admin");
     return (
         <SettingsForm
-            title="Hero Banner"
-            subtitle="Customize the main hero section"
+            title={t("hero_title")}
+            subtitle={t("hero_subtitle")}
             fields={[
-                { key: "hero_background_image", label: "Background Image", type: "image" },
-                { key: "hero_logo_image", label: "Logo Image", type: "image" },
-                { key: "hero_logo_url", label: "Logo Click URL", type: "url", placeholder: "https://example.com", description: "Where to navigate when the logo is clicked. Leave empty to disable click." },
-                { key: "hero_server_ip", label: "Server IP (displayed)", placeholder: "play.example.com" },
-                { key: "hero_discord_url", label: "Discord Invite URL", type: "url", placeholder: "https://discord.gg/..." },
-                { key: "hero_show_player_count", label: "Show Player Count", placeholder: "true", description: "'true' to show live player count from server query" },
-                { key: "hero_height", label: "Banner Height (px)", type: "number", placeholder: "280" },
+                { key: "hero_background_image", label: t("hero_backgroundImage"), type: "image" },
+                { key: "hero_logo_image", label: t("hero_logoImage"), type: "image" },
+                { key: "hero_logo_url", label: t("hero_logoUrl"), type: "url", placeholder: t("hero_logoUrlPlaceholder"), description: t("hero_logoUrlDesc") },
+                { key: "hero_server_ip", label: t("hero_serverIp"), placeholder: "play.example.com" },
+                { key: "hero_discord_url", label: t("hero_discordUrl"), type: "url", placeholder: "https://discord.gg/..." },
+                { key: "hero_show_player_count", label: t("hero_showPlayerCount"), placeholder: "true", description: t("hero_showPlayerCountDesc") },
+                { key: "hero_height", label: t("hero_height"), type: "number", placeholder: "280" },
             ]}
         />
     );

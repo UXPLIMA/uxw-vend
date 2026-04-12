@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { themeRegistry } from "@/core/generated/theme-registry";
 import type { ThemeProperty, ThemeOverrides } from "@/core/types/theme";
 import { invalidateSettingsCache } from "@/core/hooks/useSiteSettings";
+import { useTranslations } from "next-intl";
 
 function getNestedValue(obj: unknown, path: string): string {
     const parts = path.split(".");
@@ -23,6 +24,7 @@ function getNestedValue(obj: unknown, path: string): string {
 }
 
 export default function ThemeCustomizerPage() {
+    const t = useTranslations("admin");
     const [activeThemeId, setActiveThemeId] = useState<string>("flat");
     const [overrides, setOverrides] = useState<Record<string, string>>({});
     const [allOverrides, setAllOverrides] = useState<ThemeOverrides>({});
@@ -124,16 +126,16 @@ export default function ThemeCustomizerPage() {
                 body: JSON.stringify({ theme_overrides: nextAll }),
             });
             if (!res.ok) {
-                toast.error("Failed to save");
+                toast.error(t("customizer_saveFailed"));
                 return;
             }
             setAllOverrides(nextAll);
             invalidateSettingsCache();
             setSaved(true);
-            toast.success("Theme updated");
+            toast.success(t("customizer_themeUpdated"));
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("customizer_error"));
         } finally {
             setSaving(false);
         }
@@ -183,7 +185,7 @@ export default function ThemeCustomizerPage() {
                         type="button"
                         onClick={() => setDevice("desktop")}
                         className={`p-1.5 rounded ${device === "desktop" ? "bg-card shadow-sm" : ""}`}
-                        title="Desktop"
+                        title={t("customizer_desktop")}
                     >
                         <Monitor className="w-4 h-4" />
                     </button>
@@ -191,7 +193,7 @@ export default function ThemeCustomizerPage() {
                         type="button"
                         onClick={() => setDevice("tablet")}
                         className={`p-1.5 rounded ${device === "tablet" ? "bg-card shadow-sm" : ""}`}
-                        title="Tablet"
+                        title={t("customizer_tablet")}
                     >
                         <Tablet className="w-4 h-4" />
                     </button>
@@ -199,7 +201,7 @@ export default function ThemeCustomizerPage() {
                         type="button"
                         onClick={() => setDevice("mobile")}
                         className={`p-1.5 rounded ${device === "mobile" ? "bg-card shadow-sm" : ""}`}
-                        title="Mobile"
+                        title={t("customizer_mobile")}
                     >
                         <Smartphone className="w-4 h-4" />
                     </button>
@@ -235,7 +237,7 @@ export default function ThemeCustomizerPage() {
                                                         type="button"
                                                         onClick={() => resetProperty(prop.key)}
                                                         className="text-xs text-muted-foreground hover:text-foreground"
-                                                        title="Reset to default"
+                                                        title={t("customizer_resetDefault")}
                                                     >
                                                         <RotateCcw className="w-3 h-3" />
                                                     </button>
@@ -298,7 +300,7 @@ export default function ThemeCustomizerPage() {
                     <iframe
                         ref={iframeRef}
                         src="/"
-                        title="Live preview"
+                        title={t("customizer_livePreview")}
                         className="bg-card rounded shadow-lg border border-border"
                         style={{
                             width: deviceWidth,

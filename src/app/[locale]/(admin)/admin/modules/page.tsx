@@ -211,7 +211,7 @@ export default function AdminModulesPage() {
             } else {
                 toast.error(data.error || "Failed");
             }
-        } catch { toast.error("Network error"); }
+        } catch { toast.error(t("modules_networkError")); }
         finally { setUpdating(null); }
     };
 
@@ -226,8 +226,8 @@ export default function AdminModulesPage() {
             const res = await fetch("/api/v1/modules/upload", { method: "POST", body: formData });
             const data = await res.json();
             if (res.ok) { toast.success(`"${data.module?.name}" installed`); fetchModules(); }
-            else toast.error(data.error || "Upload failed");
-        } catch { toast.error("Upload failed"); }
+            else toast.error(data.error || t("modules_uploadFailed"));
+        } catch { toast.error(t("modules_uploadFailed")); }
         finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
     };
 
@@ -240,15 +240,15 @@ export default function AdminModulesPage() {
             const res = await fetch(`/api/v1/modules/${moduleId}`, { method: "DELETE" });
             const data = await res.json();
             if (res.ok) { toast.success(`"${moduleName}" deleted`); fetchModules(); }
-            else toast.error(data.error || "Delete failed");
-        } catch { toast.error("Delete failed"); }
+            else toast.error(data.error || t("modules_deleteFailed"));
+        } catch { toast.error(t("modules_deleteFailed")); }
         finally { setDeleting(null); }
     };
 
     const handleUpdate = async (mod: Module) => {
         if (isBusy) { toast.error(t("modules_pleaseWait")); return; }
         const mpMod = marketplace.find(m => m.id === mod.id);
-        if (!mpMod) { toast.error("Module not found in marketplace"); return; }
+        if (!mpMod) { toast.error(t("modules_notFound")); return; }
         setUpdatingModule(mod.id);
         try {
             const res = await fetch("/api/v1/modules/update", {
@@ -261,9 +261,9 @@ export default function AdminModulesPage() {
                 toast.success(`"${mod.name}" updated to v${data.module?.version ?? mpMod.version}`);
                 fetchModules();
             } else {
-                toast.error(data.error || "Update failed");
+                toast.error(data.error || t("modules_updateFailed"));
             }
-        } catch { toast.error("Update failed"); }
+        } catch { toast.error(t("modules_updateFailed")); }
         finally { setUpdatingModule(null); }
     };
 
@@ -290,9 +290,9 @@ export default function AdminModulesPage() {
                 fetchModules();
                 fetchMarketplace();
             } else {
-                toast.error(data.error || "Install failed");
+                toast.error(data.error || t("modules_installFailed"));
             }
-        } catch { toast.error("Install failed"); }
+        } catch { toast.error(t("modules_installFailed")); }
         finally {
             setTimeout(() => { setInstalling(null); setInstallProgress(null); }, 500);
         }
@@ -315,7 +315,7 @@ export default function AdminModulesPage() {
         if (toInstall.length === 0) return;
 
         const ok = await confirm({
-            title: "Bulk Install",
+            title: t("modules_bulkInstall"),
             message: `Install ${toInstall.length} modules? This may take a few minutes as the system will rebuild after all modules are installed.`,
             confirmText: `Install ${toInstall.length} modules`,
         });
@@ -341,10 +341,10 @@ export default function AdminModulesPage() {
                     toast.error(`Failed: ${failedNames}`);
                 }
             } else {
-                toast.error(data.error || "Bulk install failed");
+                toast.error(data.error || t("modules_bulkFailed"));
             }
         } catch {
-            toast.error("Bulk install failed");
+            toast.error(t("modules_bulkFailed"));
         }
 
         setSelectedModules(new Set());
@@ -564,7 +564,7 @@ export default function AdminModulesPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    title="View details"
+                                                    title={t("modules_viewDetails")}
                                                     onClick={() => setDetailModule(mp)}
                                                 >
                                                     <SearchIcon className="w-3 h-3" />
@@ -631,10 +631,10 @@ export default function AdminModulesPage() {
                                 onChange={(e) => setSortKey(e.target.value as SortKey)}
                                 className="text-xs border rounded-md px-2 py-1.5 bg-background"
                             >
-                                <option value="popular">Popular</option>
-                                <option value="newest">Newest</option>
-                                <option value="rating">Rating</option>
-                                <option value="alphabetical">Alphabetical</option>
+                                <option value="popular">{t("modules_popular")}</option>
+                                <option value="newest">{t("modules_newest")}</option>
+                                <option value="rating">{t("modules_rating")}</option>
+                                <option value="alphabetical">{t("modules_alphabetical")}</option>
                             </select>
                         </div>
                     </div>
@@ -681,7 +681,7 @@ export default function AdminModulesPage() {
                                     onClick={() => setSelectedTags(new Set())}
                                     className="text-[10px] text-muted-foreground underline ml-1"
                                 >
-                                    Clear tags
+                                    {t("modules_clearTags")}
                                 </button>
                             )}
                         </div>
@@ -749,7 +749,7 @@ export default function AdminModulesPage() {
                                                 {mod.rating.toFixed(1)} ({mod.ratingCount})
                                             </span>
                                         ) : (
-                                            <span className="text-[10px] text-muted-foreground">Unrated</span>
+                                            <span className="text-[10px] text-muted-foreground">{t("modules_unrated")}</span>
                                         )}
                                     </div>
 
@@ -817,6 +817,7 @@ interface DetailProps {
 }
 
 function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailProps) {
+    const t = useTranslations("admin");
     const [ratings, setRatings] = useState<RatingsResponse | null>(null);
     const [loadingRatings, setLoadingRatings] = useState(true);
     const [reviewRating, setReviewRating] = useState<number>(5);
@@ -844,7 +845,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
 
     const submitReview = async () => {
         if (reviewRating < 1 || reviewRating > 5) {
-            toast.error("Rating must be between 1 and 5");
+            toast.error(t("modules_ratingRange"));
             return;
         }
         setSubmitting(true);
@@ -856,7 +857,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
             });
             const data = await res.json();
             if (res.ok) {
-                toast.success("Review saved");
+                toast.success(t("modules_reviewSaved"));
                 setReviewText("");
                 // Refetch ratings list
                 const r = await fetch(`/api/v1/modules/marketplace/${mod.id}/ratings`);
@@ -867,7 +868,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                 toast.error(data.error || "Failed to save review");
             }
         } catch {
-            toast.error("Network error");
+            toast.error(t("modules_networkError"));
         } finally {
             setSubmitting(false);
         }
@@ -890,7 +891,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                             by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString()}
                         </p>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+                    <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("common_close")}>
                         <X className="w-4 h-4" />
                     </Button>
                 </div>
@@ -926,7 +927,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
 
                     {mod.dependencies.length > 0 && (
                         <div>
-                            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">Dependencies</h4>
+                            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">{t("modules_dependencies")}</h4>
                             <div className="flex flex-wrap gap-1.5">
                                 {mod.dependencies.map((dep) => (
                                     <span key={dep} className="px-2 py-0.5 text-xs rounded bg-muted text-foreground">{dep}</span>
@@ -936,13 +937,13 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                     )}
 
                     <div>
-                        <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Reviews</h4>
+                        <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">{t("modules_reviews")}</h4>
                         {loadingRatings ? (
                             <div className="flex justify-center py-4">
                                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                             </div>
                         ) : !ratings || ratings.ratings.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No reviews yet.</p>
+                            <p className="text-sm text-muted-foreground">{t("modules_noReviews")}</p>
                         ) : (
                             <ul className="space-y-3">
                                 {ratings.ratings.map((r) => (
@@ -972,7 +973,7 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                     {installed ? (
                         <div className="border rounded-lg p-3 bg-muted/30">
                             <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
-                                Leave a review
+                                {t("modules_leaveReview")}
                             </h4>
                             <div className="flex items-center gap-1 mb-2">
                                 {[1, 2, 3, 4, 5].map((n) => (
@@ -996,19 +997,19 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                                 onChange={(e) => setReviewText(e.target.value)}
                                 rows={3}
                                 maxLength={2000}
-                                placeholder="Share your thoughts (optional)"
+                                placeholder={t("modules_reviewPlaceholder")}
                                 className="w-full text-xs border rounded-md px-2 py-1.5 bg-background"
                             />
                             <div className="mt-2 flex justify-end">
                                 <Button size="sm" onClick={submitReview} disabled={submitting}>
                                     {submitting ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : null}
-                                    Submit review
+                                    {t("modules_submitReview")}
                                 </Button>
                             </div>
                         </div>
                     ) : (
                         <p className="text-xs text-muted-foreground italic">
-                            Install this module to leave a review.
+                            {t("modules_installToReview")}
                         </p>
                     )}
                 </div>

@@ -9,6 +9,7 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, Plus, X, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { invalidateSettingsCache } from "@/core/hooks/useSiteSettings";
+import { useTranslations } from "next-intl";
 
 interface NavChild {
     label: string;
@@ -23,6 +24,7 @@ interface NavLink {
 }
 
 export default function NavbarSettingsPage() {
+    const t = useTranslations("admin");
     const [links, setLinks] = useState<NavLink[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -91,9 +93,9 @@ export default function NavbarSettingsPage() {
         });
         if (res.ok) {
             invalidateSettingsCache();
-            toast.success("Navbar saved");
+            toast.success(t("navbar_saved"));
         } else {
-            toast.error("Failed to save");
+            toast.error(t("navbar_saveFailed"));
         }
         setSaving(false);
     };
@@ -110,7 +112,7 @@ export default function NavbarSettingsPage() {
             <Card className="mb-6">
                 <CardHeader>
                     <div className="flex items-center justify-between">
-                        <CardTitle>Navigation Links</CardTitle>
+                        <CardTitle>{t("navbar_links")}</CardTitle>
                         <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={addLink}><Plus className="w-4 h-4 mr-1" /> Link</Button>
                             <Button variant="outline" size="sm" onClick={addDropdown}><Plus className="w-4 h-4 mr-1" /> Dropdown</Button>
@@ -149,7 +151,7 @@ export default function NavbarSettingsPage() {
                                                 newLinks[i].href = "#";
                                                 setLinks(newLinks);
                                                 setExpandedDropdown(i);
-                                            }} title="Convert to dropdown">
+                                            }} title={t("navbar_convertDropdown")}>
                                                 <ChevronDown className="w-3 h-3" />
                                             </Button>
                                         )}
@@ -185,8 +187,8 @@ export default function NavbarSettingsPage() {
             </Button>
 
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground">
-                <strong>Icons:</strong> Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Crown, Download, Gift, Star. Leave empty for no icon.
-                <br /><strong>Dropdown:</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
+                <strong>{t("navbar_icons")}</strong> Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Crown, Download, Gift, Star. Leave empty for no icon.
+                <br /><strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
             </div>
         </>
     );

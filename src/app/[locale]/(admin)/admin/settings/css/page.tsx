@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function CssSettingsPage() {
+    const t = useTranslations("admin");
     const [css, setCss] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -29,7 +31,7 @@ export default function CssSettingsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ custom_css: css }),
         });
-        toast.success("Custom CSS saved. Refresh the site to see changes.");
+        toast.success(t("css_saved"));
         setSaving(false);
     };
 
@@ -38,12 +40,12 @@ export default function CssSettingsPage() {
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Custom CSS</h1>
-                <p className="text-muted-foreground">Inject custom styles into your site</p>
+                <h1 className="text-3xl font-bold">{t("css_title")}</h1>
+                <p className="text-muted-foreground">{t("css_subtitle")}</p>
             </div>
 
             <Card className="mb-6">
-                <CardHeader><CardTitle>CSS Editor</CardTitle></CardHeader>
+                <CardHeader><CardTitle>{t("css_editor")}</CardTitle></CardHeader>
                 <CardContent>
                     <textarea
                         value={css}
@@ -57,7 +59,7 @@ export default function CssSettingsPage() {
             </Card>
 
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Check className="w-4 h-4 mr-2" /> Save CSS</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("css_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("css_saveCss")}</>}
             </Button>
         </>
     );

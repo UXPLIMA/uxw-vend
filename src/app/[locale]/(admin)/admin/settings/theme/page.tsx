@@ -9,10 +9,12 @@ import { Label } from "@/core/components/ui/label";
 import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette, Download, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
 
 export default function ThemeSettingsPage() {
+    const t = useTranslations("admin");
     const { setTheme, theme: currentThemeId } = useNextTheme();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
@@ -64,12 +66,12 @@ export default function ThemeSettingsPage() {
             const res = await fetch(`/api/v1/themes/${themeId}`, { method: "DELETE" });
             const data = await res.json();
             if (!res.ok) {
-                toast.error(data.error || "Failed to delete theme");
+                toast.error(data.error || t("theme_deleteFailed"));
             } else {
                 setUploadMessage({ type: "success", text: data.message });
             }
         } catch {
-            toast.error("Failed to delete theme");
+            toast.error(t("theme_deleteFailed"));
         } finally {
             setDeleting(null);
         }
@@ -132,9 +134,9 @@ export default function ThemeSettingsPage() {
             if (res.ok) {
                 toast.success(`"${theme.name}" installed. Restart server to activate.`);
             } else {
-                toast.error(data.error || "Install failed");
+                toast.error(data.error || t("theme_installFailed"));
             }
-        } catch { toast.error("Install failed"); }
+        } catch { toast.error(t("theme_installFailed")); }
         finally { setInstalling(null); }
     };
 
@@ -293,6 +295,7 @@ export default function ThemeSettingsPage() {
 
 // Color Customizer Component
 function ColorCustomizer() {
+    const t = useTranslations("admin");
     const colorFields = [
         { key: "primary", label: "Primary" },
         { key: "secondary", label: "Secondary" },
@@ -342,7 +345,7 @@ function ColorCustomizer() {
             body: JSON.stringify(payload),
         });
         applyColors();
-        toast.success("Colors saved");
+        toast.success(t("theme_colorsSaved"));
         setSaving(false);
     };
 
@@ -364,7 +367,7 @@ function ColorCustomizer() {
                 <CardTitle className="flex items-center gap-2 text-base">
                     <Palette className="w-4 h-4" /> Color Customization
                 </CardTitle>
-                <CardDescription>Override theme colors. Changes apply instantly and persist in settings.</CardDescription>
+                <CardDescription>{t("theme_overrideDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
@@ -396,7 +399,7 @@ function ColorCustomizer() {
                         {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
                         Save Colors
                     </Button>
-                    <Button size="sm" variant="outline" onClick={resetColors}>Reset to Default</Button>
+                    <Button size="sm" variant="outline" onClick={resetColors}>{t("theme_resetDefault")}</Button>
                 </div>
             </CardContent>
         </Card>

@@ -13,6 +13,7 @@ import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTri
 import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface UserDetail {
     id: string;
@@ -36,6 +37,7 @@ interface Role {
 }
 
 export default function AdminUserDetailPage() {
+    const t = useTranslations("admin");
     const params = useParams();
     const userId = params.id as string;
     const { data: session, update: updateSession } = useSession();
@@ -78,10 +80,10 @@ export default function AdminUserDetailPage() {
     const handleImpersonate = async () => {
         if (!user) return;
         const ok = await confirm({
-            title: "Log in as this user?",
-            message: `You are about to impersonate ${user.username}. Every action will be audited. You can return to your admin account at any time from the banner at the top of the page.`,
-            confirmText: "Log in as user",
-            cancelText: "Cancel",
+            title: t("users_impersonateConfirm"),
+            message: t("users_impersonateMessage", { username: user.username }),
+            confirmText: t("users_impersonateButton"),
+            cancelText: t("users_cancel"),
             variant: "default",
         });
         if (!ok) return;
@@ -95,14 +97,14 @@ export default function AdminUserDetailPage() {
             });
             const data = (await res.json().catch(() => ({}))) as { error?: string };
             if (!res.ok) {
-                toast.error(data.error || "Failed to start impersonation");
+                toast.error(data.error || t("users_impersonateFailed"));
                 return;
             }
             await updateSession({ impersonate: userId });
-            toast.success(`Now logged in as ${user.username}`);
+            toast.success(t("users_nowLoggedAs", { username: user.username }));
             window.location.href = "/";
         } catch {
-            toast.error("Failed to start impersonation");
+            toast.error(t("users_impersonateFailed"));
         } finally {
             setImpersonating(false);
         }
@@ -114,7 +116,7 @@ export default function AdminUserDetailPage() {
             const res = await fetch(`/api/v1/users/${userId}/export`);
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || "Failed to export user data");
+                toast.error(body.error || t("users_exportFailed"));
                 return;
             }
             const blob = await res.blob();
@@ -128,9 +130,9 @@ export default function AdminUserDetailPage() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            toast.success("User data exported");
+            toast.success(t("users_dataExported"));
         } catch {
-            toast.error("Failed to export user data");
+            toast.error(t("users_exportFailed"));
         } finally {
             setExportingData(false);
         }
@@ -150,14 +152,14 @@ export default function AdminUserDetailPage() {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setDeleteError(data.error || "Failed to delete user");
+                setDeleteError(data.error || t("users_deleteFailed"));
                 return;
             }
-            toast.success("User account deleted");
+            toast.success(t("users_deleted"));
             setDeleteModalOpen(false);
             window.location.reload();
         } catch {
-            setDeleteError("Something went wrong");
+            setDeleteError(t("users_somethingWrong"));
         } finally {
             setDeletingAccount(false);
         }
@@ -206,14 +208,14 @@ export default function AdminUserDetailPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                setError(data.error || "Failed to update user");
+                setError(data.error || t("users_somethingWrong"));
                 return;
             }
 
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            setError("Something went wrong");
+            setError(t("users_somethingWrong"));
         } finally {
             setSaving(false);
         }
@@ -230,9 +232,9 @@ export default function AdminUserDetailPage() {
     if (!user) {
         return (
             <div className="text-center py-12">
-                <p className="text-muted-foreground">User not found</p>
+                <p className="text-muted-foreground">{t("users_notFound")}</p>
                 <Link href="/admin/users">
-                    <Button variant="outline" className="mt-4">Back to Users</Button>
+                    <Button variant="outline" className="mt-4">{t("users_backToUsers")}</Button>
                 </Link>
             </div>
         );
@@ -241,8 +243,8 @@ export default function AdminUserDetailPage() {
     return (
         <>
             <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/users" aria-label="Back to users list">
-                    <Button variant="ghost" size="icon" aria-label="Back to users list">
+                <Link href="/admin/users" aria-label={t("users_backToList")}>
+                    <Button variant="ghost" size="icon" aria-label={t("users_backToList")}>
                         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                     </Button>
                 </Link>
@@ -266,7 +268,7 @@ export default function AdminUserDetailPage() {
                 <div className="lg:col-span-2">
                     <Card>
                         <CardHeader>
-                            <CardTitle>User Details</CardTitle>
+                            <CardTitle>{t("users_details")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {error && (
@@ -274,7 +276,7 @@ export default function AdminUserDetailPage() {
                             )}
                             <form onSubmit={handleSave} className="space-y-4">
                                 <div>
-                                    <Label htmlFor={usernameId}>Username</Label>
+                                    <Label htmlFor={usernameId}>{t("users_username")}</Label>
                                     <Input
                                         id={usernameId}
                                         value={form.username}
@@ -282,7 +284,7 @@ export default function AdminUserDetailPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor={emailFieldId}>Email</Label>
+                                    <Label htmlFor={emailFieldId}>{t("users_email")}</Label>
                                     <Input
                                         id={emailFieldId}
                                         type="email"
@@ -291,22 +293,22 @@ export default function AdminUserDetailPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor={roleFieldId}>Role</Label>
+                                    <Label htmlFor={roleFieldId}>{t("users_role")}</Label>
                                     <select
                                         id={roleFieldId}
                                         value={form.roleId}
                                         onChange={(e) => setForm({ ...form, roleId: e.target.value })}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/70 focus:ring-offset-2"
                                     >
-                                        <option value="">No role</option>
+                                        <option value="">{t("users_noRole")}</option>
                                         {roles.map((role) => (
                                             <option key={role.id} value={role.id}>{role.displayName}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
-                                     saved ? <><Check className="w-4 h-4 mr-2" /> Saved</> : "Save Changes"}
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("users_saving")}</> :
+                                     saved ? <><Check className="w-4 h-4 mr-2" /> {t("users_saved")}</> : t("common_save")}
                                 </Button>
                             </form>
                         </CardContent>
@@ -327,7 +329,7 @@ export default function AdminUserDetailPage() {
                         return (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Activity</CardTitle>
+                                    <CardTitle>{t("users_activity")}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
                                     {statItems.map((stat) => (
@@ -345,19 +347,19 @@ export default function AdminUserDetailPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Info</CardTitle>
+                            <CardTitle>{t("users_info")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Locale</span>
+                                <span className="text-muted-foreground">{t("users_locale")}</span>
                                 <span>{user.locale}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Currency</span>
+                                <span className="text-muted-foreground">{t("users_currency")}</span>
                                 <span>{user.currency}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Joined</span>
+                                <span className="text-muted-foreground">{t("users_joined")}</span>
                                 <span>{formatDate(new Date(user.createdAt))}</span>
                             </div>
                         </CardContent>
@@ -368,17 +370,17 @@ export default function AdminUserDetailPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 {user.isBanned ? <Ban className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-green-500" />}
-                                {user.isBanned ? "Banned" : "Account Active"}
+                                {user.isBanned ? t("users_banned") : t("users_accountActive")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {user.isBanned ? (
                                 <div>
                                     {user.banReason && (
-                                        <p className="text-sm text-muted-foreground mb-2">Reason: {user.banReason}</p>
+                                        <p className="text-sm text-muted-foreground mb-2">{t("users_reason")}: {user.banReason}</p>
                                     )}
                                     {user.bannedAt && (
-                                        <p className="text-xs text-muted-foreground mb-3">Since: {formatDate(new Date(user.bannedAt))}</p>
+                                        <p className="text-xs text-muted-foreground mb-3">{t("users_since")}: {formatDate(new Date(user.bannedAt))}</p>
                                     )}
                                     <Button
                                         variant="outline"
@@ -392,7 +394,7 @@ export default function AdminUserDetailPage() {
                                             window.location.reload();
                                         }}
                                     >
-                                        <ShieldCheck className="w-3 h-3 mr-2" /> Unban User
+                                        <ShieldCheck className="w-3 h-3 mr-2" /> {t("users_unbanUser")}
                                     </Button>
                                 </div>
                             ) : (
@@ -410,7 +412,7 @@ export default function AdminUserDetailPage() {
                                         window.location.reload();
                                     }}
                                 >
-                                    <Ban className="w-3 h-3 mr-2" /> Ban User
+                                    <Ban className="w-3 h-3 mr-2" /> {t("users_banUser")}
                                 </Button>
                             )}
                         </CardContent>
@@ -421,13 +423,12 @@ export default function AdminUserDetailPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <UserCog className="w-4 h-4 text-yellow-600" />
-                                    Impersonate
+                                    {t("users_impersonate")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <p className="text-xs text-muted-foreground">
-                                    Debug or support this user by logging in as them. Every
-                                    impersonation is written to the activity log.
+                                    {t("users_impersonateDesc")}
                                 </p>
                                 <Button
                                     variant="outline"
@@ -439,12 +440,12 @@ export default function AdminUserDetailPage() {
                                     {impersonating ? (
                                         <>
                                             <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                                            Switching
+                                            {t("users_switching")}
                                         </>
                                     ) : (
                                         <>
                                             <UserCog className="w-3 h-3 mr-2" />
-                                            Log in as this user
+                                            {t("users_loginAsUser")}
                                         </>
                                     )}
                                 </Button>
@@ -470,12 +471,12 @@ export default function AdminUserDetailPage() {
                                 {exportingData ? (
                                     <>
                                         <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                                        Preparing
+                                        {t("users_preparing")}
                                     </>
                                 ) : (
                                     <>
                                         <Download className="w-3 h-3 mr-2" />
-                                        Export data
+                                        {t("users_exportData")}
                                     </>
                                 )}
                             </Button>
@@ -491,7 +492,7 @@ export default function AdminUserDetailPage() {
                                 }}
                             >
                                 <Trash2 className="w-3 h-3 mr-2" />
-                                Delete account
+                                {t("users_deleteAccount")}
                             </Button>
                         </CardContent>
                     </Card>
@@ -523,12 +524,10 @@ export default function AdminUserDetailPage() {
                                     id="admin-delete-title"
                                     className="font-semibold text-foreground"
                                 >
-                                    Delete {user.username}
+                                    {t("users_deleteTitle", { username: user.username })}
                                 </h3>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                    This anonymises the user row and purges
-                                    private data (sessions, messages, cart).
-                                    Public contributions are preserved.
+                                    {t("users_deleteDesc")}
                                 </p>
                             </div>
                         </div>
@@ -558,7 +557,7 @@ export default function AdminUserDetailPage() {
                                 />
                             </div>
                             <div>
-                                <Label htmlFor={deleteReasonId}>Reason (optional)</Label>
+                                <Label htmlFor={deleteReasonId}>{t("users_reasonOptional")}</Label>
                                 <Input
                                     id={deleteReasonId}
                                     value={deleteReason}
@@ -575,7 +574,7 @@ export default function AdminUserDetailPage() {
                                 onClick={() => setDeleteModalOpen(false)}
                                 disabled={deletingAccount}
                             >
-                                Cancel
+                                {t("users_cancel")}
                             </Button>
                             <Button
                                 variant="destructive"
@@ -589,10 +588,10 @@ export default function AdminUserDetailPage() {
                                 {deletingAccount ? (
                                     <>
                                         <Loader2 className="w-3 h-3 animate-spin mr-2" />
-                                        Deleting
+                                        {t("users_deleting")}
                                     </>
                                 ) : (
-                                    "Delete account"
+                                    t("users_deleteAccount")
                                 )}
                             </Button>
                         </div>

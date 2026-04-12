@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 type ModerationMode = "auto" | "manual";
 
@@ -23,30 +24,15 @@ const DEFAULT_CONFIG: ModerationConfig = {
     suggestions: "auto",
 };
 
-const FIELDS: { key: keyof ModerationConfig; label: string; description: string }[] = [
-    {
-        key: "blog_comments",
-        label: "Blog comments",
-        description: "Require approval before comments on blog articles appear publicly.",
-    },
-    {
-        key: "forum_topics",
-        label: "Forum topics",
-        description: "Require approval before new forum topics are listed.",
-    },
-    {
-        key: "forum_posts",
-        label: "Forum replies",
-        description: "Require approval before forum replies appear in a topic.",
-    },
-    {
-        key: "suggestions",
-        label: "Suggestions",
-        description: "Require approval before user suggestions are listed publicly.",
-    },
+const FIELD_KEYS: { key: keyof ModerationConfig; labelKey: string; descKey: string }[] = [
+    { key: "blog_comments", labelKey: "moderationSettings_blogComments", descKey: "moderationSettings_blogCommentsDesc" },
+    { key: "forum_topics", labelKey: "moderationSettings_forumTopics", descKey: "moderationSettings_forumTopicsDesc" },
+    { key: "forum_posts", labelKey: "moderationSettings_forumReplies", descKey: "moderationSettings_forumRepliesDesc" },
+    { key: "suggestions", labelKey: "moderationSettings_suggestions", descKey: "moderationSettings_suggestionsDesc" },
 ];
 
 export default function ModerationSettingsPage() {
+    const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [config, setConfig] = useState<ModerationConfig>(DEFAULT_CONFIG);
@@ -66,7 +52,7 @@ export default function ModerationSettingsPage() {
                 }
             })
             .catch(() => {
-                toast.error("Failed to load moderation settings");
+                toast.error(t("moderationSettings_loadFailed"));
             })
             .finally(() => setLoading(false));
     }, []);
@@ -88,12 +74,12 @@ export default function ModerationSettingsPage() {
             });
             if (!res.ok) {
                 const data = (await res.json().catch(() => null)) as { error?: string } | null;
-                toast.error(data?.error || "Failed to save");
+                toast.error(data?.error || t("moderationSettings_saveFailed"));
                 return;
             }
-            toast.success("Moderation settings saved");
+            toast.success(t("moderationSettings_saved"));
         } catch {
-            toast.error("Failed to save");
+            toast.error(t("moderationSettings_saveFailed"));
         } finally {
             setSaving(false);
         }
@@ -111,20 +97,19 @@ export default function ModerationSettingsPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold">
-                    Moderation
+                    {t("moderationSettings_title")}
                 </h1>
                 <p className="text-muted-foreground">
-                    Choose which user-submitted content types require admin approval before being
-                    visible to visitors.
+                    {t("moderationSettings_subtitle")}
                 </p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-base">Approval required</CardTitle>
+                    <CardTitle className="text-base">{t("moderationSettings_approvalRequired")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {FIELDS.map((field) => (
+                    {FIELD_KEYS.map((field) => (
                         <label
                             key={field.key}
                             className="flex items-start gap-3 cursor-pointer border rounded-md p-3 hover:bg-accent/40"
@@ -136,8 +121,8 @@ export default function ModerationSettingsPage() {
                                 className="w-4 h-4 mt-1"
                             />
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground">{field.label}</p>
-                                <p className="text-xs text-muted-foreground">{field.description}</p>
+                                <p className="text-sm font-medium text-foreground">{t(field.labelKey)}</p>
+                                <p className="text-xs text-muted-foreground">{t(field.descKey)}</p>
                             </div>
                             <span
                                 className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${
@@ -158,16 +143,16 @@ export default function ModerationSettingsPage() {
                     href="/admin/moderation"
                     className="text-sm text-primary hover:underline"
                 >
-                    Open moderation queue
+                    {t("moderationSettings_openQueue")}
                 </Link>
                 <Button onClick={onSave} disabled={saving}>
                     {saving ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("moderationSettings_saving")}
                         </>
                     ) : (
                         <>
-                            <Save className="w-4 h-4 mr-2" /> Save changes
+                            <Save className="w-4 h-4 mr-2" /> {t("moderationSettings_saveChanges")}
                         </>
                     )}
                 </Button>

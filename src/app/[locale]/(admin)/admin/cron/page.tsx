@@ -46,13 +46,13 @@ export default function CronAdminPage() {
         try {
             const res = await fetch("/api/v1/admin/cron");
             if (!res.ok) {
-                toast.error("Failed to load cron jobs");
+                toast.error(t("cron_loadFailed"));
                 return;
             }
             const data = await res.json();
             setJobs(data.jobs || []);
         } catch {
-            toast.error("Failed to load cron jobs");
+            toast.error(t("cron_loadFailed"));
         } finally {
             setLoading(false);
         }
@@ -66,9 +66,9 @@ export default function CronAdminPage() {
 
     const handleRunNow = async (job: CronJobRow) => {
         const ok = await confirm({
-            title: "Run job now",
-            message: `Trigger "${job.key}" immediately? It will execute synchronously and update its run history.`,
-            confirmText: "Run",
+            title: t("cron_runJobTitle"),
+            message: t("cron_runJobMessage", { key: job.key }),
+            confirmText: t("cron_runJobConfirm"),
         });
         if (!ok) return;
 
@@ -78,14 +78,14 @@ export default function CronAdminPage() {
                 method: "POST",
             });
             if (res.ok) {
-                toast.success(`Ran ${job.key}`);
+                toast.success(t("cron_ranJob", { key: job.key }));
                 void fetchJobs();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Failed to run job");
+                toast.error(data.error || t("cron_runFailed"));
             }
         } catch {
-            toast.error("Failed to run job");
+            toast.error(t("cron_runFailed"));
         } finally {
             setRunningKey(null);
         }
@@ -113,7 +113,7 @@ export default function CronAdminPage() {
             ) : jobs.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
-                        No registered cron jobs.
+                        {t("cron_noCronJobs")}
                     </CardContent>
                 </Card>
             ) : (
@@ -163,7 +163,7 @@ export default function CronAdminPage() {
                                                                 size="sm"
                                                                 onClick={() => setExpandedKey(isExpanded ? null : job.key)}
                                                             >
-                                                                {isExpanded ? "Hide" : "Error"}
+                                                                {isExpanded ? t("cron_hide") : t("cron_error")}
                                                             </Button>
                                                         )}
                                                         <Button
@@ -177,7 +177,7 @@ export default function CronAdminPage() {
                                                             ) : (
                                                                 <Play className="w-3 h-3 mr-1" />
                                                             )}
-                                                            Run now
+                                                            {t("cron_runNow")}
                                                         </Button>
                                                     </div>
                                                 </td>

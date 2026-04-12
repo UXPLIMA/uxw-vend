@@ -8,6 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { FileUpload } from "@/core/components/ui/file-upload";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface SettingsField {
     key: string;
@@ -27,6 +28,7 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
+    const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -61,11 +63,11 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
             });
-            if (!res.ok) { setError("Failed to save"); return; }
+            if (!res.ok) { setError(t("settingsForm_failedToSave")); return; }
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            setError("Something went wrong");
+            setError(t("settingsForm_somethingWrong"));
         } finally {
             setSaving(false);
         }
@@ -129,8 +131,8 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
-                         saved ? <><Check className="w-4 h-4 mr-2" /> Saved</> : "Save Settings"}
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("settingsForm_saving")}</> :
+                         saved ? <><Check className="w-4 h-4 mr-2" /> {t("settingsForm_saved")}</> : t("settingsForm_saveSettings")}
                     </Button>
                 </div>
             </form>

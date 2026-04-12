@@ -80,7 +80,7 @@ export default function EmailQueueAdminPage() {
             params.set("page", String(page));
             const res = await fetch(`/api/v1/admin/email-queue?${params.toString()}`);
             if (!res.ok) {
-                toast.error("Failed to load email queue");
+                toast.error(t("emailQueue_loadFailed"));
                 return;
             }
             const data: QueueResponse = await res.json();
@@ -89,7 +89,7 @@ export default function EmailQueueAdminPage() {
             setPageSize(data.pageSize || 50);
             setSummary(data.summary || { pending: 0, sending: 0, sent: 0, failed: 0 });
         } catch {
-            toast.error("Failed to load email queue");
+            toast.error(t("emailQueue_loadFailed"));
         } finally {
             setLoading(false);
         }
@@ -101,8 +101,8 @@ export default function EmailQueueAdminPage() {
 
     const handleProcess = async () => {
         const ok = await confirm({
-            title: "Process queue now",
-            message: "Drain pending email jobs immediately?",
+            title: t("emailQueue_processTitle"),
+            message: t("emailQueue_processConfirm"),
             confirmText: "Process",
         });
         if (!ok) return;
@@ -117,10 +117,10 @@ export default function EmailQueueAdminPage() {
                 );
                 void fetchJobs();
             } else {
-                toast.error("Failed to process queue");
+                toast.error(t("emailQueue_processFailed"));
             }
         } catch {
-            toast.error("Failed to process queue");
+            toast.error(t("emailQueue_processFailed"));
         } finally {
             setProcessing(false);
         }
@@ -128,7 +128,7 @@ export default function EmailQueueAdminPage() {
 
     const handleRetry = async (job: EmailJobRow) => {
         const ok = await confirm({
-            title: "Retry email",
+            title: t("emailQueue_retryTitle"),
             message: `Reset "${job.subject}" to pending and clear its attempts?`,
             confirmText: "Retry",
         });
@@ -138,10 +138,10 @@ export default function EmailQueueAdminPage() {
         try {
             const res = await fetch(`/api/v1/admin/email-queue/${job.id}/retry`, { method: "POST" });
             if (res.ok) {
-                toast.success("Job reset to pending");
+                toast.success(t("emailQueue_retrySuccess"));
                 void fetchJobs();
             } else {
-                toast.error("Failed to retry");
+                toast.error(t("emailQueue_retryFailed"));
             }
         } finally {
             setBusyId(null);
@@ -150,7 +150,7 @@ export default function EmailQueueAdminPage() {
 
     const handleDelete = async (job: EmailJobRow) => {
         const ok = await confirm({
-            title: "Delete email job",
+            title: t("emailQueue_deleteTitle"),
             message: `Delete "${job.subject}"? This cannot be undone.`,
             variant: "danger",
         });
@@ -160,10 +160,10 @@ export default function EmailQueueAdminPage() {
         try {
             const res = await fetch(`/api/v1/admin/email-queue/${job.id}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success("Job deleted");
+                toast.success(t("emailQueue_jobDeleted"));
                 void fetchJobs();
             } else {
-                toast.error("Failed to delete");
+                toast.error(t("emailQueue_deleteFailed"));
             }
         } finally {
             setBusyId(null);

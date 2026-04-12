@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const steps = ["Welcome", "Site Info", "Modules", "Theme", "Done"];
 
@@ -76,6 +77,7 @@ const ESSENTIAL_CATEGORIES = ["commerce", "community", "management"];
 const MAX_RECOMMENDED = 6;
 
 export default function SetupWizardPage() {
+    const t = useTranslations("admin");
     const router = useRouter();
     const [step, setStep] = useState(0);
     const [saving, setSaving] = useState(false);
@@ -157,9 +159,9 @@ export default function SetupWizardPage() {
                 toast.success(`"${mod.name}" installed`);
                 setInstalledModules(prev => [...prev, { id: mod.id, name: mod.name, enabled: true }]);
             } else {
-                toast.error(data.error || "Install failed");
+                toast.error(data.error || t("setup_installFailed"));
             }
-        } catch { toast.error("Install failed"); }
+        } catch { toast.error(t("setup_installFailed")); }
         finally { setInstallingModule(null); }
     };
 
@@ -195,10 +197,10 @@ export default function SetupWizardPage() {
                     setup_completed: "true",
                 }),
             });
-            toast.success("Setup complete!");
+            toast.success(t("setup_complete"));
             setStep(4);
         } catch {
-            toast.error("Failed to save settings");
+            toast.error(t("setup_saveFailed"));
         }
         setSaving(false);
     };
@@ -223,10 +225,10 @@ export default function SetupWizardPage() {
             {step === 0 && (
                 <Card>
                     <CardContent className="p-8 text-center">
-                        <h1 className="text-3xl font-bold mb-4">Welcome to uxwVend!</h1>
-                        <p className="text-muted-foreground mb-8">Let&apos;s set up your game server platform in a few quick steps.</p>
+                        <h1 className="text-3xl font-bold mb-4">{t("setup_welcome")}</h1>
+                        <p className="text-muted-foreground mb-8">{t("setup_welcomeDesc")}</p>
                         <Button size="lg" onClick={() => setStep(1)}>
-                            Get Started <ArrowRight className="w-4 h-4 ml-2" />
+                            {t("setup_getStarted")} <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                     </CardContent>
                 </Card>
@@ -235,23 +237,23 @@ export default function SetupWizardPage() {
             {/* Step 1: Site Info */}
             {step === 1 && (
                 <Card>
-                    <CardHeader><CardTitle>Site Information</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{t("setup_siteInfo")}</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <Label>Site Name</Label>
+                            <Label>{t("setup_siteName")}</Label>
                             <Input value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} />
                         </div>
                         <div>
-                            <Label>Description</Label>
+                            <Label>{t("setup_description")}</Label>
                             <Textarea
                                 value={form.siteDescription}
                                 onChange={(e) => setForm({ ...form, siteDescription: e.target.value })}
-                                placeholder="Describe your server or community"
+                                placeholder={t("setup_describePlaceholder")}
                                 rows={3}
                             />
                         </div>
                         <div>
-                            <Label>Logo</Label>
+                            <Label>{t("setup_logo")}</Label>
                             <div className="flex items-center gap-4 mt-1">
                                 {logoPreview ? (
                                     <Image src={logoPreview} alt="Logo preview" width={64} height={64} className="w-16 h-16 rounded-lg object-contain border" />
@@ -263,23 +265,23 @@ export default function SetupWizardPage() {
                                 <div>
                                     <input type="file" accept="image/*" ref={logoInputRef} className="hidden" onChange={handleLogoChange} />
                                     <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()}>
-                                        <Upload className="w-4 h-4 mr-2" /> Upload Logo
+                                        <Upload className="w-4 h-4 mr-2" /> {t("setup_uploadLogo")}
                                     </Button>
-                                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, or SVG. Optional.</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("setup_logoHint")}</p>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <Label>Server IP</Label>
+                            <Label>{t("setup_serverIp")}</Label>
                             <Input value={form.serverIp} onChange={(e) => setForm({ ...form, serverIp: e.target.value })} placeholder="play.example.com" />
                         </div>
                         <div>
-                            <Label>Contact Email</Label>
+                            <Label>{t("setup_contactEmail")}</Label>
                             <Input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder="admin@example.com" />
                         </div>
                         <div className="flex justify-between pt-4">
-                            <Button variant="outline" onClick={() => setStep(0)}><ArrowLeft className="w-4 h-4 mr-2" /> Back</Button>
-                            <Button onClick={() => setStep(2)}>Next <ArrowRight className="w-4 h-4 ml-2" /></Button>
+                            <Button variant="outline" onClick={() => setStep(0)}><ArrowLeft className="w-4 h-4 mr-2" /> {t("setup_back")}</Button>
+                            <Button onClick={() => setStep(2)}>{t("setup_next")} <ArrowRight className="w-4 h-4 ml-2" /></Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -290,10 +292,10 @@ export default function SetupWizardPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Package className="w-5 h-5" /> Recommended Modules
+                            <Package className="w-5 h-5" /> {t("setup_recommendedModules")}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                            Install essential modules to get started. You can install more later from the marketplace.
+                            {t("setup_recommendedDesc")}
                         </p>
                     </CardHeader>
                     <CardContent>
@@ -304,7 +306,7 @@ export default function SetupWizardPage() {
                         ) : recommendedModules.length === 0 ? (
                             <div className="py-8 text-center text-muted-foreground">
                                 <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
-                                <p>All recommended modules are already installed!</p>
+                                <p>{t("setup_allInstalled")}</p>
                             </div>
                         ) : (
                             <div className="grid gap-3">
@@ -324,7 +326,7 @@ export default function SetupWizardPage() {
                                             </div>
                                             {isInstalled ? (
                                                 <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                                    <Check className="w-3 h-3" /> Installed
+                                                    <Check className="w-3 h-3" /> {t("setup_installed")}
                                                 </span>
                                             ) : (
                                                 <Button
@@ -336,7 +338,7 @@ export default function SetupWizardPage() {
                                                     {installingModule === mod.id ? (
                                                         <Loader2 className="w-3 h-3 animate-spin" />
                                                     ) : (
-                                                        <><Download className="w-3 h-3 mr-1.5" /> Install</>
+                                                        <><Download className="w-3 h-3 mr-1.5" /> {t("modules_install")}</>
                                                     )}
                                                 </Button>
                                             )}
@@ -346,8 +348,8 @@ export default function SetupWizardPage() {
                             </div>
                         )}
                         <div className="flex justify-between pt-6">
-                            <Button variant="outline" onClick={() => setStep(1)}><ArrowLeft className="w-4 h-4 mr-2" /> Back</Button>
-                            <Button onClick={() => setStep(3)}>Next <ArrowRight className="w-4 h-4 ml-2" /></Button>
+                            <Button variant="outline" onClick={() => setStep(1)}><ArrowLeft className="w-4 h-4 mr-2" /> {t("setup_back")}</Button>
+                            <Button onClick={() => setStep(3)}>{t("setup_next")} <ArrowRight className="w-4 h-4 ml-2" /></Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -358,10 +360,10 @@ export default function SetupWizardPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Palette className="w-5 h-5" /> Choose a Theme
+                            <Palette className="w-5 h-5" /> {t("setup_chooseTheme")}
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                            Select a theme for your site. You can change this anytime in Settings.
+                            {t("setup_chooseThemeDesc")}
                         </p>
                     </CardHeader>
                     <CardContent>
@@ -371,7 +373,7 @@ export default function SetupWizardPage() {
                             </div>
                         ) : themes.length === 0 ? (
                             <div className="py-8 text-center text-muted-foreground">
-                                <p>No themes available. The default theme will be used.</p>
+                                <p>{t("setup_noThemes")}</p>
                             </div>
                         ) : (
                             <div className="grid gap-3">
@@ -411,9 +413,9 @@ export default function SetupWizardPage() {
                             </div>
                         )}
                         <div className="flex justify-between pt-6">
-                            <Button variant="outline" onClick={() => setStep(2)}><ArrowLeft className="w-4 h-4 mr-2" /> Back</Button>
+                            <Button variant="outline" onClick={() => setStep(2)}><ArrowLeft className="w-4 h-4 mr-2" /> {t("setup_back")}</Button>
                             <Button onClick={saveAll} disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <>Finish Setup <Check className="w-4 h-4 ml-2" /></>}
+                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("setup_saving")}</> : <>{t("setup_finishSetup")} <Check className="w-4 h-4 ml-2" /></>}
                             </Button>
                         </div>
                     </CardContent>
@@ -427,9 +429,9 @@ export default function SetupWizardPage() {
                         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                             <Check className="w-8 h-8 text-green-600" />
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">You&apos;re all set!</h2>
-                        <p className="text-muted-foreground mb-6">Your platform is ready. You can configure payments, Discord, and more in Settings.</p>
-                        <Button onClick={() => router.push("/admin")}>Go to Dashboard</Button>
+                        <h2 className="text-2xl font-bold mb-2">{t("setup_allSet")}</h2>
+                        <p className="text-muted-foreground mb-6">{t("setup_allSetDesc")}</p>
+                        <Button onClick={() => router.push("/admin")}>{t("setup_goToDashboard")}</Button>
                     </CardContent>
                 </Card>
             )}

@@ -9,6 +9,7 @@ import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Save, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface PageProps {
     params: Promise<{ id: string; locale: string }>;
@@ -16,6 +17,7 @@ interface PageProps {
 
 export default function PageBuilderPage(props: PageProps) {
     const params = use(props.params);
+    const t = useTranslations("admin");
     const router = useRouter();
     const pageId = params.id;
 
@@ -29,7 +31,7 @@ export default function PageBuilderPage(props: PageProps) {
     // Load merged block config (core + module blocks) once on mount
     useEffect(() => {
         buildMergedBlockConfig().then(setBlockConfig).catch(() => {
-            toast.error("Failed to load block library");
+            toast.error(t("pageBuilder_loadFailed"));
         });
     }, []);
 
@@ -46,7 +48,7 @@ export default function PageBuilderPage(props: PageProps) {
             .then((r) => r.json())
             .then((d) => {
                 if (!d.page) {
-                    toast.error("Page not found");
+                    toast.error(t("pageBuilder_notFound"));
                     return;
                 }
                 setPageTitle(d.page.title);
@@ -83,16 +85,16 @@ export default function PageBuilderPage(props: PageProps) {
                 body: JSON.stringify(body),
             });
             if (!res.ok) {
-                toast.error("Failed to save");
+                toast.error(t("pageBuilder_saveFailed"));
                 return;
             }
-            toast.success("Saved");
+            toast.success(t("pageBuilder_saved"));
             if (pageId === "new") {
                 const created = await res.json();
                 router.replace(`/admin/page-builder/${created.page?.id || created.id}`);
             }
         } catch {
-            toast.error("Save failed");
+            toast.error(t("pageBuilder_error"));
         } finally {
             setSaving(false);
         }
@@ -122,7 +124,7 @@ export default function PageBuilderPage(props: PageProps) {
                     )}
                 </div>
                 <Button onClick={() => save(data)} disabled={saving}>
-                    {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…</> : <><Save className="w-4 h-4 mr-2" /> Save</>}
+                    {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("pageBuilder_saving")}</> : <><Save className="w-4 h-4 mr-2" /> {t("pageBuilder_save")}</>}
                 </Button>
             </div>
 

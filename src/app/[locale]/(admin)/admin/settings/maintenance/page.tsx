@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface MaintenanceConfig {
     enabled: boolean;
@@ -17,6 +18,7 @@ interface MaintenanceConfig {
 const ROLE_OPTIONS = ["admin", "moderator", "member"];
 
 export default function MaintenanceSettingsPage() {
+    const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [enabled, setEnabled] = useState(false);
@@ -39,7 +41,7 @@ export default function MaintenanceSettingsPage() {
                 }
             })
             .catch(() => {
-                toast.error("Failed to load maintenance settings");
+                toast.error(t("maintenance_loadFailed"));
             })
             .finally(() => setLoading(false));
     }, []);
@@ -52,7 +54,7 @@ export default function MaintenanceSettingsPage() {
 
     const onSave = async () => {
         if (!allowedRoles.includes("admin")) {
-            toast.error("Admin role must always be allowed during maintenance.");
+            toast.error(t("maintenance_adminRequired"));
             return;
         }
         setSaving(true);
@@ -64,12 +66,12 @@ export default function MaintenanceSettingsPage() {
             });
             if (!res.ok) {
                 const data = (await res.json().catch(() => null)) as { error?: string } | null;
-                toast.error(data?.error || "Failed to save");
+                toast.error(data?.error || t("maintenance_saveFailed"));
                 return;
             }
-            toast.success("Maintenance settings saved");
+            toast.success(t("maintenance_saved"));
         } catch {
-            toast.error("Failed to save");
+            toast.error(t("maintenance_saveFailed"));
         } finally {
             setSaving(false);
         }
@@ -128,7 +130,7 @@ export default function MaintenanceSettingsPage() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         rows={4}
-                        placeholder="We'll be back soon."
+                        placeholder={t("maintenance_defaultMessage")}
                         className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
@@ -165,7 +167,7 @@ export default function MaintenanceSettingsPage() {
                     ))}
                     <Input
                         type="text"
-                        placeholder="Add custom role name and press Enter"
+                        placeholder={t("maintenance_addRole")}
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
                                 e.preventDefault();
