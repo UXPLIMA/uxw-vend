@@ -7,6 +7,7 @@ import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
+import { useTranslations } from "next-intl";
 import {
     Search,
     Loader2,
@@ -43,6 +44,7 @@ function iconFor(groupId: string) {
 }
 
 export default function SearchPage() {
+    const t = useTranslations("search");
     const params = useSearchParams();
     const initial = params.get("q") || "";
     const [query, setQuery] = useState(initial);
@@ -92,7 +94,7 @@ export default function SearchPage() {
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-6xl">
                 <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
                     <Search className="w-7 h-7" />
-                    Search
+                    {t("title")}
                 </h1>
 
                 <form onSubmit={onSubmit} className="flex gap-2 mb-6 max-w-2xl">
@@ -100,33 +102,38 @@ export default function SearchPage() {
                         ref={inputRef}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search across all installed modules…"
+                        placeholder={t("placeholder")}
                         className="flex-1"
-                        aria-label="Search query"
+                        aria-label={t("searchQuery")}
                     />
-                    <Button type="submit" disabled={query.trim().length < 2}>Search</Button>
+                    <Button type="submit" disabled={query.trim().length < 2}>{t("searchButton")}</Button>
                 </form>
 
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label="Loading" />
+                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label={t("loading")} />
                     </div>
                 ) : !searched ? (
                     <Card>
                         <CardContent className="py-12 text-center text-muted-foreground">
-                            Type at least 2 characters to search across all installed modules.
+                            {t("initialHint")}
                         </CardContent>
                     </Card>
                 ) : groups.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center text-muted-foreground">
-                            No results for &ldquo;{query}&rdquo;. Try different keywords.
+                            {t("noResults", { query })}
                         </CardContent>
                     </Card>
                 ) : (
                     <>
                         <p className="text-sm text-muted-foreground mb-4">
-                            {total} result{total !== 1 ? "s" : ""} across {groups.length} source{groups.length !== 1 ? "s" : ""}
+                            {t("resultsSummary", {
+                                total,
+                                totalLabel: total !== 1 ? t("results") : t("result"),
+                                groups: groups.length,
+                                groupsLabel: groups.length !== 1 ? t("sources") : t("source"),
+                            })}
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
                             {groups.map((group) => {

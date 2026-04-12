@@ -24,7 +24,9 @@
     "support": "Support",
     "store": "Store",
     "profile": "Profile",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
   },
   "hero": {
     "playersOnline": "{count} Players Online",
@@ -1074,7 +1076,29 @@
     "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them.",
     "messages": "Messages",
     "notifications": "Notifications",
-    "sessions": "Sessions"
+    "sessions": "Sessions",
+    "activity": "Activity",
+    "trophies": "Trophies",
+    "trophiesEarnedCount": "{earned} of {total} earned",
+    "noTrophiesYet": "No trophies yet.",
+    "seeWhatYouCanEarn": "See what you can earn",
+    "privacy": "Privacy",
+    "downloadYourData": "Download your data",
+    "downloadYourDataDesc": "Get a ZIP archive of every piece of data we hold about your account.",
+    "preparing": "Preparing",
+    "download": "Download",
+    "deleteYourAccount": "Delete your account",
+    "deleteYourAccountDesc": "Permanently anonymise your profile. Public posts you have made will be preserved but no longer attributed to your username.",
+    "deleteAccount": "Delete account",
+    "deleteAccountPermanently": "Delete your account permanently",
+    "deleteAccountWarning": "This cannot be undone. Your sessions, linked accounts, notification preferences, cart, and direct messages will be permanently erased. Public contributions (forum posts, blog articles, orders) will be kept for record but shown as belonging to a deleted user.",
+    "currentPassword": "Current password",
+    "typeDeleteToConfirm": "Type {keyword} to confirm",
+    "deleting": "Deleting",
+    "dataExported": "Data exported",
+    "failedToExportData": "Failed to export data",
+    "accountDeleted": "Account deleted",
+    "loadingProfile": "Loading profile"
   },
   "auth": {
     "loginTitle": "Welcome Back",
@@ -1097,5 +1121,19 @@
     "invalidCredentials": "Invalid email or password",
     "passwordsDontMatch": "Passwords don't match",
     "genericError": "Something went wrong. Please try again."
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search across all installed modules...",
+    "searchButton": "Search",
+    "searchQuery": "Search query",
+    "loading": "Loading",
+    "initialHint": "Type at least 2 characters to search across all installed modules.",
+    "noResults": "No results for \"{query}\". Try different keywords.",
+    "resultsSummary": "{total} {totalLabel} across {groups} {groupsLabel}",
+    "result": "result",
+    "results": "results",
+    "source": "source",
+    "sources": "sources"
   }
 }

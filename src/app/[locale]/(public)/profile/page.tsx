@@ -40,6 +40,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const modules = useAllModules();
     const t = useTranslations("profile");
+    const commonT = useTranslations("common");
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -95,7 +96,7 @@ export default function ProfilePage() {
             const res = await fetch("/api/v1/auth/profile/export");
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || "Failed to export data");
+                toast.error(body.error || t("failedToExportData"));
                 return;
             }
             const blob = await res.blob();
@@ -109,9 +110,9 @@ export default function ProfilePage() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            toast.success("Data exported");
+            toast.success(t("dataExported"));
         } catch {
-            toast.error("Failed to export data");
+            toast.error(t("failedToExportData"));
         } finally {
             setExportingData(false);
         }
@@ -131,13 +132,13 @@ export default function ProfilePage() {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setDeleteError(data.error || "Failed to delete account");
+                setDeleteError(data.error || t("failedToUpdate"));
                 return;
             }
-            toast.success("Account deleted");
+            toast.success(t("accountDeleted"));
             await signOut({ callbackUrl: "/" });
         } catch {
-            setDeleteError("Something went wrong");
+            setDeleteError(t("somethingWentWrong"));
         } finally {
             setDeletingAccount(false);
         }
@@ -214,7 +215,7 @@ export default function ProfilePage() {
                 <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
                 <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
                 <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label="Loading profile" />
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label={t("loadingProfile")} />
                 </main>
                 <ThemeSlot name="Footer" defaultComponent={<Footer />} />
             </div>
@@ -224,10 +225,10 @@ export default function ProfilePage() {
     // Build tab list: core tabs + module tabs in between
     const allTabs = [
         { id: "profile", label: t("title") },
-        { id: "activity", label: t.has("activity") ? t("activity") : "Activity" },
-        { id: "messages", label: t.has("messages") ? t("messages") : "Messages" },
-        { id: "notifications", label: t.has("notifications") ? t("notifications") : "Notifications" },
-        { id: "sessions", label: t.has("sessions") ? t("sessions") : "Sessions" },
+        { id: "activity", label: t("activity") },
+        { id: "messages", label: t("messages") },
+        { id: "notifications", label: t("notifications") },
+        { id: "sessions", label: t("sessions") },
         ...moduleProfileTabs.map(mt => ({ id: mt.id, label: mt.label })),
         { id: "accounts", label: t("accounts") },
     ];
@@ -330,18 +331,18 @@ export default function ProfilePage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Award className="w-5 h-5 text-amber-500" />
-                                Trophies
+                                {t("trophies")}
                                 <span className="text-sm font-normal text-muted-foreground ml-2">
-                                    {earnedTrophies.length} of {totalTrophies} earned
+                                    {t("trophiesEarnedCount", { earned: earnedTrophies.length, total: totalTrophies })}
                                 </span>
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {earnedTrophies.length === 0 ? (
                                 <div className="text-sm text-muted-foreground">
-                                    No trophies yet. {" "}
+                                    {t("noTrophiesYet")}{" "}
                                     <Link href="/trophies" className="text-primary hover:underline">
-                                        See what you can earn
+                                        {t("seeWhatYouCanEarn")}
                                     </Link>
                                 </div>
                             ) : (
@@ -375,18 +376,17 @@ export default function ProfilePage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Download className="w-5 h-5 text-blue-500" />
-                                Privacy
+                                {t("privacy")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="text-sm">
                                     <div className="font-medium text-foreground">
-                                        Download your data
+                                        {t("downloadYourData")}
                                     </div>
                                     <div className="text-muted-foreground">
-                                        Get a ZIP archive of every piece of
-                                        data we hold about your account.
+                                        {t("downloadYourDataDesc")}
                                     </div>
                                 </div>
                                 <Button
@@ -398,12 +398,12 @@ export default function ProfilePage() {
                                     {exportingData ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                            Preparing
+                                            {t("preparing")}
                                         </>
                                     ) : (
                                         <>
                                             <Download className="w-4 h-4 mr-2" />
-                                            Download
+                                            {t("download")}
                                         </>
                                     )}
                                 </Button>
@@ -411,13 +411,10 @@ export default function ProfilePage() {
                             <div className="border-t border-border pt-4 flex items-start justify-between gap-4">
                                 <div className="text-sm">
                                     <div className="font-medium text-foreground">
-                                        Delete your account
+                                        {t("deleteYourAccount")}
                                     </div>
                                     <div className="text-muted-foreground">
-                                        Permanently anonymise your profile.
-                                        Public posts you have made will be
-                                        preserved but no longer attributed
-                                        to your username.
+                                        {t("deleteYourAccountDesc")}
                                     </div>
                                 </div>
                                 <Button
@@ -430,7 +427,7 @@ export default function ProfilePage() {
                                         setDeleteModalOpen(true);
                                     }}
                                 >
-                                    Delete account
+                                    {t("deleteAccount")}
                                 </Button>
                             </div>
                         </CardContent>
@@ -537,16 +534,10 @@ export default function ProfilePage() {
                             </div>
                             <div>
                                 <h3 id="delete-title" className="font-semibold text-foreground">
-                                    Delete your account permanently
+                                    {t("deleteAccountPermanently")}
                                 </h3>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                    This cannot be undone. Your sessions,
-                                    linked accounts, notification preferences,
-                                    cart, and direct messages will be
-                                    permanently erased. Public contributions
-                                    (forum posts, blog articles, orders) will
-                                    be kept for record but shown as belonging
-                                    to a deleted user.
+                                    {t("deleteAccountWarning")}
                                 </p>
                             </div>
                         </div>
@@ -559,7 +550,7 @@ export default function ProfilePage() {
 
                         <div className="space-y-3">
                             <div>
-                                <Label htmlFor={deletePasswordId}>Current password</Label>
+                                <Label htmlFor={deletePasswordId}>{t("currentPassword")}</Label>
                                 <Input
                                     id={deletePasswordId}
                                     type="password"
@@ -570,11 +561,7 @@ export default function ProfilePage() {
                             </div>
                             <div>
                                 <Label htmlFor={deleteConfirmId}>
-                                    Type{" "}
-                                    <span className="font-mono text-red-600">
-                                        DELETE
-                                    </span>{" "}
-                                    to confirm
+                                    {t("typeDeleteToConfirm", { keyword: "DELETE" })}
                                 </Label>
                                 <Input
                                     id={deleteConfirmId}
@@ -594,7 +581,7 @@ export default function ProfilePage() {
                                 onClick={() => setDeleteModalOpen(false)}
                                 disabled={deletingAccount}
                             >
-                                Cancel
+                                {commonT("cancel")}
                             </Button>
                             <Button
                                 variant="destructive"
@@ -609,10 +596,10 @@ export default function ProfilePage() {
                                 {deletingAccount ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                        Deleting
+                                        {t("deleting")}
                                     </>
                                 ) : (
-                                    "Delete account"
+                                    t("deleteAccount")
                                 )}
                             </Button>
                         </div>

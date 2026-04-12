@@ -24,7 +24,9 @@
     "support": "Destek",
     "store": "Mağaza",
     "profile": "Profil",
-    "adminPanel": "Yönetici Paneli"
+    "adminPanel": "Yönetici Paneli",
+    "switchToLight": "Açık moda geç",
+    "switchToDark": "Karanlık moda geç"
   },
   "hero": {
     "playersOnline": "{count} Oyuncu Çevrimiçi",
@@ -1074,7 +1076,29 @@
     "oauthAutoLink": "Discord ve Google hesapları, onlarla giriş yaptığınızda otomatik olarak bağlanır.",
     "messages": "Mesajlar",
     "notifications": "Bildirimler",
-    "sessions": "Oturumlar"
+    "sessions": "Oturumlar",
+    "activity": "Etkinlik",
+    "trophies": "Kupalar",
+    "trophiesEarnedCount": "{total} kupadan {earned} kazanıldı",
+    "noTrophiesYet": "Henüz kupa yok.",
+    "seeWhatYouCanEarn": "Neler kazanabileceğini gör",
+    "privacy": "Gizlilik",
+    "downloadYourData": "Verilerini indir",
+    "downloadYourDataDesc": "Hesabınızla ilgili tuttuğumuz tüm verilerin ZIP arşivini alın.",
+    "preparing": "Hazırlanıyor",
+    "download": "İndir",
+    "deleteYourAccount": "Hesabını sil",
+    "deleteYourAccountDesc": "Profilinizi kalıcı olarak anonimleştirir. Yaptığınız herkese açık paylaşımlar korunur ancak artık kullanıcı adınızla ilişkilendirilmez.",
+    "deleteAccount": "Hesabı sil",
+    "deleteAccountPermanently": "Hesabınızı kalıcı olarak silin",
+    "deleteAccountWarning": "Bu işlem geri alınamaz. Oturumlarınız, bağlı hesaplarınız, bildirim tercihleriniz, sepetiniz ve doğrudan mesajlarınız kalıcı olarak silinecektir. Herkese açık katkılar (forum gönderileri, blog yazıları, siparişler) kayıt için tutulacak ancak silinen bir kullanıcıya ait olarak gösterilecektir.",
+    "currentPassword": "Mevcut şifre",
+    "typeDeleteToConfirm": "Onaylamak için {keyword} yazın",
+    "deleting": "Siliniyor",
+    "dataExported": "Veriler indirildi",
+    "failedToExportData": "Veriler indirilemedi",
+    "accountDeleted": "Hesap silindi",
+    "loadingProfile": "Profil yükleniyor"
   },
   "auth": {
     "loginTitle": "Tekrar Hoş Geldin",
@@ -1097,5 +1121,19 @@
     "invalidCredentials": "Geçersiz e-posta veya şifre",
     "passwordsDontMatch": "Şifreler eşleşmiyor",
     "genericError": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
+  },
+  "search": {
+    "title": "Arama",
+    "placeholder": "Tüm yüklü modüllerde ara…",
+    "searchButton": "Ara",
+    "searchQuery": "Arama sorgusu",
+    "loading": "Yükleniyor",
+    "initialHint": "Tüm yüklü modüllerde aramak için en az 2 karakter yazın.",
+    "noResults": "“{query}” için sonuç bulunamadı. Farklı anahtar kelimeler deneyin.",
+    "resultsSummary": "{groups} {groupsLabel} üzerinde {total} {totalLabel}",
+    "result": "sonuç",
+    "results": "sonuç",
+    "source": "kaynak",
+    "sources": "kaynak"
   }
 }

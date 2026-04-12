@@ -193,7 +193,7 @@ export function Navbar() {
 
                     <div className="flex items-center gap-2">
                         {mounted && (
-                            <button onClick={toggleDarkMode} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                            <button onClick={toggleDarkMode} aria-label={isDark ? t('switchToLight') : t('switchToDark')}
                                 className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
