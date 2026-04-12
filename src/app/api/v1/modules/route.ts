@@ -221,6 +221,12 @@ export async function PATCH(request: NextRequest) {
     // Invalidate module states cache (Redis + in-memory)
     await invalidateModuleCache();
 
+    // Invalidate translation cache (disabled modules' translations should disappear)
+    try {
+        const { invalidateTranslationCache } = await import("@/core/lib/i18n/translation-service");
+        await invalidateTranslationCache();
+    } catch { /* non-fatal */ }
+
     // Reset hook registry so listeners from the changed module are refreshed
     const { resetHooks, doActionAsync, HookNames } = await import("@/core/lib/hooks");
     resetHooks();

@@ -132,6 +132,23 @@ model Setting {
   @@index([module])
 }
 
+model Translation {
+  id        String   @id @default(cuid())
+  locale    String
+  namespace String
+  key       String
+  value     String   @db.Text
+  module    String   @default("core")
+  isCustom  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, namespace, key, module])
+  @@index([locale])
+  @@index([module])
+  @@index([locale, namespace])
+}
+
 model ModuleConfig {
   id        String   @id
   name      String

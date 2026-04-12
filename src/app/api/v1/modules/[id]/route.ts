@@ -39,6 +39,12 @@ export async function DELETE(
         // Note: Module DB tables are intentionally left intact for data preservation.
         // If the module is reinstalled later, its data will still be available.
 
+        // Remove module translations from DB
+        try {
+            const { removeModuleTranslations } = await import("@/core/lib/i18n/translation-service");
+            await removeModuleTranslations(moduleId);
+        } catch { /* non-fatal */ }
+
         // Log the uninstall action
         logActivity({ action: "module.uninstall", entity: "module", entityId: moduleId, userId: session.user.id }).catch(() => {});
 

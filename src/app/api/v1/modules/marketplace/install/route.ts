@@ -135,8 +135,11 @@ export async function POST(request: NextRequest) {
         });
         await invalidateModuleCache();
 
-        // Merge translations
-        await mergeModuleTranslations(manifest, targetDir);
+        // Sync translations to DB (instant, no rebuild needed)
+        if (manifest.translations) {
+            const { syncModuleTranslations } = await import("@/core/lib/i18n/translation-service");
+            await syncModuleTranslations(moduleId, manifest.translations);
+        }
 
         // Schedule deferred build + restart (debounced — waits for more installs)
         // Bulk install: 37 modules call this, but only ONE build runs after all finish
