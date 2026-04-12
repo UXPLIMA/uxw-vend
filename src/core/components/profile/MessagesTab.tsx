@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -38,6 +39,7 @@ function relativeTime(date: string): string {
 }
 
 export function MessagesTab() {
+    const t = useTranslations("profile");
     const [conversations, setConversations] = useState<ConversationListItem[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -89,7 +91,7 @@ export function MessagesTab() {
                 setReply("");
                 fetchConversations();
             } else {
-                toast.error("Failed to send");
+                toast.error(t("failedToSend"));
             }
         } finally {
             setSending(false);
@@ -105,7 +107,7 @@ export function MessagesTab() {
                         <button onClick={() => { setActiveId(null); setMessages([]); }} className="text-muted-foreground hover:text-foreground">
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-                        {conv?.participants.map((p) => p.username).join(", ") || "Conversation"}
+                        {conv?.participants.map((p) => p.username).join(", ") || t("conversation")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -130,14 +132,14 @@ export function MessagesTab() {
                                     );
                                 })}
                                 {messages.length === 0 && (
-                                    <p className="text-center text-sm text-muted-foreground py-4">No messages yet.</p>
+                                    <p className="text-center text-sm text-muted-foreground py-4">{t("noMessagesYet")}</p>
                                 )}
                             </div>
                             <form onSubmit={sendReply} className="flex gap-2">
                                 <Input
                                     value={reply}
                                     onChange={(e) => setReply(e.target.value)}
-                                    placeholder="Type a message..."
+                                    placeholder={t("typeAMessage")}
                                     disabled={sending}
                                     className="flex-1"
                                 />
@@ -157,14 +159,14 @@ export function MessagesTab() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
-                    Messages
+                    {t("messagesTitle")}
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {loadingList ? (
                     <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
                 ) : conversations.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4 text-center">No conversations yet.</p>
+                    <p className="text-sm text-muted-foreground py-4 text-center">{t("noConversationsYet")}</p>
                 ) : (
                     <div className="space-y-1">
                         {conversations.map((c) => (

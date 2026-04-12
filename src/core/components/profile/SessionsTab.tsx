@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Smartphone, Monitor, Trash2, Globe } from "lucide-react";
@@ -21,17 +22,18 @@ function formatDate(d: string): string {
     return new Date(d).toLocaleString();
 }
 
-function detectDevice(ua: string | null): { icon: typeof Monitor; label: string } {
-    if (!ua) return { icon: Globe, label: "Unknown device" };
-    if (/iPhone|iPad|Android/i.test(ua)) return { icon: Smartphone, label: "Mobile" };
-    return { icon: Monitor, label: "Desktop" };
-}
-
 export function SessionsTab() {
+    const t = useTranslations("profile");
     const [sessions, setSessions] = useState<UserSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<Set<string>>(new Set());
     const { confirm } = useConfirm();
+
+    function detectDevice(ua: string | null): { icon: typeof Monitor; label: string } {
+        if (!ua) return { icon: Globe, label: t("unknownDevice") };
+        if (/iPhone|iPad|Android/i.test(ua)) return { icon: Smartphone, label: t("mobile") };
+        return { icon: Monitor, label: t("desktop") };
+    }
 
     const fetchSessions = async () => {
         setLoading(true);
@@ -48,8 +50,8 @@ export function SessionsTab() {
 
     const revoke = async (s: UserSession) => {
         const ok = await confirm({
-            title: "Revoke session",
-            message: "End this session? It will be signed out immediately.",
+            title: t("revokeSession"),
+            message: t("revokeSessionMessage"),
             variant: "danger",
         });
         if (!ok) return;
@@ -57,10 +59,10 @@ export function SessionsTab() {
         try {
             const res = await fetch(`/api/v1/sessions/${s.id}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success("Session revoked");
+                toast.success(t("sessionRevoked"));
                 fetchSessions();
             } else {
-                toast.error("Failed");
+                toast.error(t("failed"));
             }
         } finally {
             setRevoking((set) => {
@@ -73,15 +75,15 @@ export function SessionsTab() {
 
     const revokeAll = async () => {
         const ok = await confirm({
-            title: "Sign out everywhere",
-            message: "Sign out of every device. You'll need to log in again on each.",
+            title: t("signOutEverywhere"),
+            message: t("signOutEverywhereMessage"),
             variant: "danger",
         });
         if (!ok) return;
         const res = await fetch("/api/v1/sessions/revoke-all", { method: "POST" });
         if (res.ok) {
             const data = await res.json();
-            toast.success(`Revoked ${data.count} sessions`);
+            toast.success(t("revokedSessions", { count: data.count }));
             // After revoking all, the current request will fail next time → user is logged out
             window.location.href = "/auth/login";
         }
@@ -97,11 +99,11 @@ export function SessionsTab() {
                 <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
                         <Monitor className="w-5 h-5" />
-                        Active Sessions
+                        {t("activeSessions")}
                     </span>
                     {sessions.length > 1 && (
                         <Button variant="outline" size="sm" onClick={revokeAll}>
-                            Sign out everywhere
+                            {t("signOutEverywhere")}
                         </Button>
                     )}
                 </CardTitle>
@@ -109,7 +111,7 @@ export function SessionsTab() {
             <CardContent>
                 {sessions.length === 0 ? (
                     <p className="text-sm text-muted-foreground py-4 text-center">
-                        Session tracking starts on your next login.
+                        {t("sessionTrackingStarts")}
                     </p>
                 ) : (
                     <div className="space-y-2">
@@ -126,7 +128,7 @@ export function SessionsTab() {
                                             {s.deviceInfo || device.label}
                                         </div>
                                         <div className="text-xs text-muted-foreground">
-                                            {s.ipAddress || "unknown IP"} · last active {formatDate(s.lastActiveAt)}
+                                            {s.ipAddress || t("unknownIp")} · {t("lastActive", { date: formatDate(s.lastActiveAt) })}
                                         </div>
                                     </div>
                                     <Button

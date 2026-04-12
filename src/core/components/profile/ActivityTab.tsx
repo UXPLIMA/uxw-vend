@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Activity, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
 
 export function ActivityTab() {
+    const t = useTranslations("profile");
     const [items, setItems] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -30,7 +32,7 @@ export function ActivityTab() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Activity className="w-5 h-5" />
-                    My Activity
+                    {t("myActivity")}
                 </CardTitle>
             </CardHeader>
             <CardContent>
@@ -39,7 +41,7 @@ export function ActivityTab() {
                         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                     </div>
                 ) : (
-                    <ActivityFeedList items={items} />
+                    <ActivityFeedList items={items} emptyMessage={t("noRecentActivity")} />
                 )}
             </CardContent>
         </Card>

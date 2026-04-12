@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, Bell } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ interface Pref {
 const DEFAULT_CHANNELS = ["email", "inapp"];
 
 export function NotificationPrefsTab() {
+    const t = useTranslations("profile");
     const [types, setTypes] = useState<NotifType[]>([]);
     const [prefs, setPrefs] = useState<Pref[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export function NotificationPrefsTab() {
                 body: JSON.stringify({ eventType, channel, enabled: next }),
             });
             if (!res.ok) {
-                toast.error("Failed to update");
+                toast.error(t("failedToUpdate"));
                 // Revert
                 setPrefs((prev) => {
                     const without = prev.filter((p) => !(p.eventType === eventType && p.channel === channel));
@@ -89,18 +91,18 @@ export function NotificationPrefsTab() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Bell className="w-5 h-5" />
-                    Notification Preferences
+                    {t("notificationPreferences")}
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 {types.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-4">No notification types are configured by any installed module yet.</p>
+                    <p className="text-sm text-muted-foreground py-4">{t("noNotificationTypes")}</p>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="border-b border-border">
-                                    <th className="text-left py-2 pr-4">Event</th>
+                                    <th className="text-left py-2 pr-4">{t("event")}</th>
                                     {DEFAULT_CHANNELS.map((c) => (
                                         <th key={c} className="text-center py-2 px-3 text-xs uppercase font-medium text-muted-foreground">{c}</th>
                                     ))}

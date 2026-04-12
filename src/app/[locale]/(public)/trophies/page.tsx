@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Award, Check, Users } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { prisma } from "@/core/lib/db";
@@ -62,7 +63,7 @@ async function fetchEarnedIds(userId: string | undefined): Promise<Set<string>> 
 }
 
 export default async function PublicTrophiesPage() {
-    const [trophies, session] = await Promise.all([fetchTrophies(), auth()]);
+    const [trophies, session, t] = await Promise.all([fetchTrophies(), auth(), getTranslations("profile")]);
     const earnedIds = await fetchEarnedIds(session?.user?.id);
 
     return (
@@ -74,24 +75,24 @@ export default async function PublicTrophiesPage() {
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold flex items-center gap-2">
                         <Award className="w-7 h-7 text-amber-500" />
-                        Trophies
+                        {t("trophiesPageTitle")}
                     </h1>
                     <p className="text-muted-foreground">
-                        Achievements you can earn across the community.
+                        {t("trophiesPageDesc")}
                     </p>
                 </div>
 
                 {trophies.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">
-                        No trophies available yet.
+                        {t("noTrophiesAvailable")}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {trophies.map((t) => {
-                            const earned = earnedIds.has(t.id);
+                        {trophies.map((tr) => {
+                            const earned = earnedIds.has(tr.id);
                             return (
                                 <div
-                                    key={t.id}
+                                    key={tr.id}
                                     className={`relative rounded-lg border p-4 transition-colors ${
                                         earned ? "border-amber-500/40 bg-amber-500/5" : "border-border bg-card"
                                     }`}
@@ -101,30 +102,30 @@ export default async function PublicTrophiesPage() {
                                             className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-green-500/15 text-green-600 text-xs px-2 py-0.5"
                                             title="You have earned this trophy"
                                         >
-                                            <Check className="w-3 h-3" /> Earned
+                                            <Check className="w-3 h-3" /> {t("earned")}
                                         </span>
                                     )}
                                     <div className="flex items-start gap-3">
                                         <div
                                             className="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0"
-                                            style={{ backgroundColor: t.color || "#6366f1" }}
+                                            style={{ backgroundColor: tr.color || "#6366f1" }}
                                         >
                                             <Award className="w-6 h-6" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold truncate">{t.name}</h3>
-                                            {t.description && (
+                                            <h3 className="font-semibold truncate">{tr.name}</h3>
+                                            {tr.description && (
                                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                                    {t.description}
+                                                    {tr.description}
                                                 </p>
                                             )}
                                             <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                                                 <span className="inline-flex items-center gap-1 font-medium text-amber-600">
-                                                    {t.points} pts
+                                                    {tr.points} pts
                                                 </span>
                                                 <span className="inline-flex items-center gap-1">
                                                     <Users className="w-3 h-3" />
-                                                    {t._count.users}
+                                                    {tr._count.users}
                                                 </span>
                                             </div>
                                         </div>

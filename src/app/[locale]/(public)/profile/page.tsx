@@ -229,7 +229,10 @@ export default function ProfilePage() {
         { id: "messages", label: t("messages") },
         { id: "notifications", label: t("notifications") },
         { id: "sessions", label: t("sessions") },
-        ...moduleProfileTabs.map(mt => ({ id: mt.id, label: mt.label })),
+        ...moduleProfileTabs.map(mt => {
+            const key = `profileTab_${mt.id}`;
+            return { id: mt.id, label: t.has(key) ? t(key) : mt.label };
+        }),
         { id: "accounts", label: t("accounts") },
     ];
 
