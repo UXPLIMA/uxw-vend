@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Clock, Loader2, Play, RefreshCw } from "lucide-react";
+import { Loader2, Play, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -95,8 +95,7 @@ export default function CronAdminPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <Clock className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {t("cron_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">{t("cron_description")}</p>

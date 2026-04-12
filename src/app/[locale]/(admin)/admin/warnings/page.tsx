@@ -7,7 +7,6 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import {
-    AlertTriangle,
     Plus,
     X,
     Loader2,
@@ -185,8 +184,7 @@ export default function WarningsPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <AlertTriangle className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {fallback("warnings_title", "User Warnings")}
                     </h1>
                     <p className="text-sm text-muted-foreground">

@@ -64,7 +64,7 @@ export const moduleRouteMap: Record<string, RegExp[]> = {
     /^\/api\/v1\/forum/,
   ],
   "google-analytics": [
-    /^\/[a-z]{2}\/admin\/analytics/,
+    /^\/[a-z]{2}\/admin\/google-analytics/,
   ],
   "google-auth": [
     /^\/[a-z]{2}\/admin\/settings/,

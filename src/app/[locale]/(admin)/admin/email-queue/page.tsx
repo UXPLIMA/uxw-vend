@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Inbox, Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
+import { Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -38,19 +38,19 @@ const STATUS_BADGE: Record<string, string> = {
     failed: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
 };
 
-const STATUS_CARD: { key: EmailStatus; label: string; color: string }[] = [
-    { key: "pending", label: "Pending", color: "text-blue-500" },
-    { key: "sending", label: "Sending", color: "text-yellow-500" },
-    { key: "sent", label: "Sent", color: "text-green-500" },
-    { key: "failed", label: "Failed", color: "text-red-500" },
+const STATUS_CARD: { key: EmailStatus; labelKey: string; color: string }[] = [
+    { key: "pending", labelKey: "emailQueue_pending", color: "text-blue-500" },
+    { key: "sending", labelKey: "emailQueue_sending", color: "text-yellow-500" },
+    { key: "sent", labelKey: "emailQueue_sent", color: "text-green-500" },
+    { key: "failed", labelKey: "emailQueue_failed", color: "text-red-500" },
 ];
 
-const TABS: { key: StatusFilter; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "pending", label: "Pending" },
-    { key: "sending", label: "Sending" },
-    { key: "sent", label: "Sent" },
-    { key: "failed", label: "Failed" },
+const TABS: { key: StatusFilter; labelKey: string }[] = [
+    { key: "all", labelKey: "emailQueue_all" },
+    { key: "pending", labelKey: "emailQueue_pending" },
+    { key: "sending", labelKey: "emailQueue_sending" },
+    { key: "sent", labelKey: "emailQueue_sent" },
+    { key: "failed", labelKey: "emailQueue_failed" },
 ];
 
 function formatDate(value: string | null): string {
@@ -176,8 +176,7 @@ export default function EmailQueueAdminPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <Inbox className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {t("emailQueue_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">{t("emailQueue_description")}</p>
@@ -198,7 +197,7 @@ export default function EmailQueueAdminPage() {
                 {STATUS_CARD.map((s) => (
                     <Card key={s.key}>
                         <CardContent className="p-4">
-                            <div className="text-xs uppercase font-mono text-muted-foreground">{s.label}</div>
+                            <div className="text-xs uppercase font-mono text-muted-foreground">{t(s.labelKey)}</div>
                             <div className={`text-2xl font-bold ${s.color}`}>{summary[s.key] ?? 0}</div>
                         </CardContent>
                     </Card>
@@ -217,7 +216,7 @@ export default function EmailQueueAdminPage() {
                                 : "border-transparent text-muted-foreground hover:text-foreground"
                         }`}
                     >
-                        {tab.label}
+                        {t(tab.labelKey)}
                     </button>
                 ))}
             </div>
@@ -229,7 +228,7 @@ export default function EmailQueueAdminPage() {
             ) : jobs.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
-                        No email jobs in this view.
+                        {t("emailQueue_noJobs")}
                     </CardContent>
                 </Card>
             ) : (
@@ -238,7 +237,7 @@ export default function EmailQueueAdminPage() {
                         <table className="w-full text-sm">
                             <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">To</th>
+                                    <th className="px-4 py-3 font-medium">{t("emailQueue_to")}</th>
                                     <th className="px-4 py-3 font-medium">{t("common_subject")}</th>
                                     <th className="px-4 py-3 font-medium">{t("common_status")}</th>
                                     <th className="px-4 py-3 font-medium">{t("emailQueue_attempts")}</th>
@@ -272,7 +271,7 @@ export default function EmailQueueAdminPage() {
                                                                 size="sm"
                                                                 onClick={() => setExpandedId(isExpanded ? null : job.id)}
                                                             >
-                                                                {isExpanded ? "Hide" : "Error"}
+                                                                {isExpanded ? t("emailQueue_hide") : t("emailQueue_error")}
                                                             </Button>
                                                         )}
                                                         {job.status === "failed" && (
@@ -283,7 +282,7 @@ export default function EmailQueueAdminPage() {
                                                                 disabled={busyId === job.id}
                                                             >
                                                                 <RotateCcw className="w-3 h-3 mr-1" />
-                                                                Retry
+                                                                {t("emailQueue_retry")}
                                                             </Button>
                                                         )}
                                                         <Button
@@ -319,7 +318,7 @@ export default function EmailQueueAdminPage() {
             {total > pageSize && (
                 <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
                     <span>
-                        Page {page} of {totalPages} · {total} total
+                        {t("emailQueue_page")} {page} / {totalPages} · {total} total
                     </span>
                     <div className="flex gap-2">
                         <Button
@@ -328,7 +327,7 @@ export default function EmailQueueAdminPage() {
                             disabled={page <= 1}
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                         >
-                            Previous
+                            {t("emailQueue_previous")}
                         </Button>
                         <Button
                             variant="outline"
@@ -336,7 +335,7 @@ export default function EmailQueueAdminPage() {
                             disabled={page >= totalPages}
                             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         >
-                            Next
+                            {t("emailQueue_next")}
                         </Button>
                     </div>
                 </div>

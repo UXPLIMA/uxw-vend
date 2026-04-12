@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 
 export default function SiteSettingsPage() {
+    const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -62,14 +64,14 @@ export default function SiteSettingsPage() {
             });
 
             if (!res.ok) {
-                setError("Failed to save settings");
+                setError(t("siteSettings_saveFailed"));
                 return;
             }
 
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            setError("Something went wrong");
+            setError(t("siteSettings_saveFailed"));
         } finally {
             setSaving(false);
         }
@@ -85,16 +87,9 @@ export default function SiteSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold">Site Configuration</h1>
-                    <p className="text-muted-foreground">General platform settings</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-xl font-semibold">{t("siteSettings_title")}</h1>
+                <p className="text-muted-foreground">{t("siteSettings_subtitle")}</p>
             </div>
 
             {error && (
@@ -105,18 +100,18 @@ export default function SiteSettingsPage() {
                 <div className="grid lg:grid-cols-2 gap-8">
                     <Card>
                         <CardHeader>
-                            <CardTitle>General</CardTitle>
+                            <CardTitle>{t("siteSettings_general")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <Label>Site Name</Label>
+                                <Label>{t("siteSettings_siteName")}</Label>
                                 <Input
                                     value={form.siteName}
                                     onChange={(e) => setForm({ ...form, siteName: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <Label>Description</Label>
+                                <Label>{t("siteSettings_description")}</Label>
                                 <Textarea
                                     value={form.siteDescription}
                                     onChange={(e) => setForm({ ...form, siteDescription: e.target.value })}
@@ -124,7 +119,7 @@ export default function SiteSettingsPage() {
                                 />
                             </div>
                             <div>
-                                <Label>Server IP</Label>
+                                <Label>{t("siteSettings_serverIp")}</Label>
                                 <Input
                                     value={form.serverIp}
                                     onChange={(e) => setForm({ ...form, serverIp: e.target.value })}
@@ -132,7 +127,7 @@ export default function SiteSettingsPage() {
                                 />
                             </div>
                             <div>
-                                <Label>Contact Email</Label>
+                                <Label>{t("siteSettings_contactEmail")}</Label>
                                 <Input
                                     type="email"
                                     value={form.contactEmail}
@@ -145,7 +140,7 @@ export default function SiteSettingsPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Social Links</CardTitle>
+                            <CardTitle>{t("siteSettings_socialLinks")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
@@ -194,8 +189,8 @@ export default function SiteSettingsPage() {
 
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> :
-                         saved ? <><Check className="w-4 h-4 mr-2" /> Saved</> : "Save Settings"}
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("siteSettings_saving")}</> :
+                         saved ? <><Check className="w-4 h-4 mr-2" /> {t("siteSettings_saved")}</> : t("siteSettings_saveSettings")}
                     </Button>
                 </div>
             </form>

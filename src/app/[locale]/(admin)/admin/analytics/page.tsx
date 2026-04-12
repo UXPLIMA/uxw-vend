@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Activity as ActivityIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
 import {
     Chart as ChartJS,
@@ -147,8 +147,7 @@ export default function AnalyticsPage() {
             {/* Header */}
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <ActivityIcon className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {t("analytics_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">{t("analytics_description")}</p>

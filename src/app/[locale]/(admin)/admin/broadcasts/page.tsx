@@ -6,7 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
-import { Mail, Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -48,15 +48,15 @@ export default function BroadcastsPage() {
 
     const send = async (sendNow: boolean) => {
         if (!subject.trim() || !body.trim()) {
-            toast.error("Subject and body required");
+            toast.error(t("broadcasts_subjectRequired"));
             return;
         }
         if (sendNow) {
             const ok = await confirm({
-                title: "Send broadcast",
-                message: "Send this email to ALL users? This cannot be undone.",
+                title: t("broadcasts_sendTitle"),
+                message: t("broadcasts_sendConfirm"),
                 variant: "danger",
-                confirmText: "Send Now",
+                confirmText: t("broadcasts_sendNow"),
             });
             if (!ok) return;
         }
@@ -88,7 +88,7 @@ export default function BroadcastsPage() {
 
     const deleteBroadcast = async (b: Broadcast) => {
         const ok = await confirm({
-            title: "Delete broadcast",
+            title: t("broadcasts_deleteTitle"),
             message: `Delete "${b.subject}"?`,
             variant: "danger",
         });
@@ -99,7 +99,7 @@ export default function BroadcastsPage() {
 
     const queueDraft = async (b: Broadcast) => {
         const ok = await confirm({
-            title: "Send broadcast",
+            title: t("broadcasts_sendTitle"),
             message: `Queue "${b.subject}" for delivery?`,
             variant: "danger",
             confirmText: "Send",
@@ -121,8 +121,7 @@ export default function BroadcastsPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <Mail className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {t("sidebar_broadcasts")}
                     </h1>
                     <p className="text-sm text-muted-foreground">{t.has("settings_broadcastsDesc") ? t("settings_broadcastsDesc") : "Compose and send bulk email to users."}</p>
@@ -135,23 +134,23 @@ export default function BroadcastsPage() {
             {composing && (
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>New Broadcast</CardTitle>
+                        <CardTitle>{t("broadcasts_newBroadcast")}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <Label>Subject</Label>
-                            <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Important update" />
+                            <Label>{t("broadcasts_subject")}</Label>
+                            <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("broadcasts_subjectPlaceholder")} />
                         </div>
                         <div>
-                            <Label>Body (HTML)</Label>
+                            <Label>{t("broadcasts_body")}</Label>
                             <RichTextEditor value={body} onChange={setBody} placeholder="Hello {username}, ..." />
-                            <p className="text-xs text-muted-foreground mt-1">Use {"{username}"} as a personalization placeholder.</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t("broadcasts_usernamePlaceholder")}</p>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" onClick={() => send(false)} disabled={sending}>Save Draft</Button>
+                            <Button variant="outline" onClick={() => send(false)} disabled={sending}>{t("broadcasts_saveDraft")}</Button>
                             <Button onClick={() => send(true)} disabled={sending}>
                                 {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                                Send Now
+                                {t("broadcasts_sendNow")}
                             </Button>
                         </div>
                     </CardContent>
@@ -161,7 +160,7 @@ export default function BroadcastsPage() {
             {loading ? (
                 <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
             ) : broadcasts.length === 0 ? (
-                <Card><CardContent className="py-12 text-center text-muted-foreground">No broadcasts yet</CardContent></Card>
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t("broadcasts_noBroadcasts")}</CardContent></Card>
             ) : (
                 <div className="space-y-2">
                     {broadcasts.map((b) => (

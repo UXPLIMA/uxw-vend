@@ -193,7 +193,8 @@ export async function proxy(request: NextRequest) {
     // ==================== MAINTENANCE MODE GATE ====================
     // After setup is complete, enforce maintenance mode. Admins (and any
     // explicitly allowlisted roles) can still browse. Auth endpoints remain
-    // accessible so admins can sign in.
+    // accessible so admins can sign in. Internal API routes used by the
+    // proxy itself (module status) and auth API routes are always exempt.
     if (!isStaticAsset(pathname)) {
         const locale = extractLocale(pathname);
         const maintenancePath = `/${locale}/maintenance`;
@@ -203,8 +204,17 @@ export async function proxy(request: NextRequest) {
         const isOnAuthPage = pathname.startsWith(authPrefix);
         const isSetupPath =
             pathname === `/${locale}/setup` || pathname.startsWith(`/${locale}/setup/`);
+        // Auth API routes must stay accessible so admins can sign in.
+        // Internal module-status API is used by the proxy itself (avoid circular block).
+        // Admin maintenance API must stay accessible so admins can toggle the setting.
+        const isAuthApi = pathname.startsWith('/api/auth');
+        const isInternalApi = pathname === '/api/v1/modules/status';
+        const isMaintenanceApi = pathname === '/api/v1/admin/maintenance';
 
-        if (!isOnMaintenancePage && !isOnAuthPage && !isSetupPath) {
+        if (
+            !isOnMaintenancePage && !isOnAuthPage && !isSetupPath &&
+            !isAuthApi && !isInternalApi && !isMaintenanceApi
+        ) {
             const config = await getMaintenanceConfig();
             if (config.enabled) {
                 const allowedRoles = config.allowedRoles?.length

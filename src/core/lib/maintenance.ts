@@ -2,8 +2,8 @@ import prisma from "@/core/lib/db";
 
 /**
  * Maintenance mode configuration, backed by the Setting table under key
- * `maintenance_mode`. Values are cached in memory for 30 seconds to keep
- * middleware hot-path cheap.
+ * `maintenance_mode`. Values are cached in memory for 5 seconds via a
+ * globalThis-backed store so the proxy and API route chunks share state.
  */
 
 export interface MaintenanceConfig {
@@ -19,10 +19,36 @@ const DEFAULT_CONFIG: MaintenanceConfig = {
 };
 
 const SETTING_KEY = "maintenance_mode";
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 5_000; // 5 seconds — short enough to feel instant after admin save
 
-let cached: MaintenanceConfig | null = null;
-let cachedAt = 0;
+// Use globalThis so proxy.ts and API route chunks (separate Turbopack bundles)
+// share the same in-memory cache object. Without this, setMaintenanceConfig()
+// in the API route updates a *different* `cached` variable than the one
+// getMaintenanceConfig() reads inside the proxy, causing a stale-cache window
+// where the proxy keeps serving old state for up to CACHE_TTL_MS.
+const GLOBAL_KEY = "__uxwvend_maintenance_cache__" as const;
+
+interface MaintenanceCache {
+    config: MaintenanceConfig | null;
+    at: number;
+}
+
+function getGlobalCache(): MaintenanceCache {
+    const g = globalThis as unknown as Record<string, MaintenanceCache | undefined>;
+    if (!g[GLOBAL_KEY]) {
+        g[GLOBAL_KEY] = { config: null, at: 0 };
+    }
+    return g[GLOBAL_KEY]!;
+}
+
+// Convenience aliases so the rest of the file stays readable.
+function getCached(): MaintenanceConfig | null { return getGlobalCache().config; }
+function getCachedAt(): number { return getGlobalCache().at; }
+function setCache(config: MaintenanceConfig | null, at: number): void {
+    const c = getGlobalCache();
+    c.config = config;
+    c.at = at;
+}
 
 function normalize(raw: unknown): MaintenanceConfig {
     if (!raw || typeof raw !== "object") return { ...DEFAULT_CONFIG };
@@ -39,13 +65,13 @@ function normalize(raw: unknown): MaintenanceConfig {
 
 export async function getMaintenanceConfig(): Promise<MaintenanceConfig> {
     const now = Date.now();
-    if (cached && now - cachedAt < CACHE_TTL_MS) return cached;
+    const cached = getCached();
+    if (cached && now - getCachedAt() < CACHE_TTL_MS) return cached;
 
     try {
         const row = await prisma.setting.findUnique({ where: { key: SETTING_KEY } });
         const config = row ? normalize(row.value) : { ...DEFAULT_CONFIG };
-        cached = config;
-        cachedAt = now;
+        setCache(config, now);
         return config;
     } catch {
         // On DB error, fail-safe: return disabled so site stays up.
@@ -60,11 +86,9 @@ export async function setMaintenanceConfig(config: MaintenanceConfig): Promise<v
         update: { value: normalized as unknown as object },
         create: { key: SETTING_KEY, value: normalized as unknown as object, module: "core" },
     });
-    cached = normalized;
-    cachedAt = Date.now();
+    setCache(normalized, Date.now());
 }
 
 export function invalidateMaintenanceCache(): void {
-    cached = null;
-    cachedAt = 0;
+    setCache(null, 0);
 }

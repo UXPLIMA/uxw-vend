@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import {
-    ShieldAlert,
     Check,
     X,
     Loader2,
@@ -40,12 +39,12 @@ interface ListPayload {
     pages: number;
 }
 
-const TABS: { key: "all" | ModerationType; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "blog-comment", label: "Blog Comments" },
-    { key: "forum-topic", label: "Forum Topics" },
-    { key: "forum-post", label: "Forum Posts" },
-    { key: "suggestion", label: "Suggestions" },
+const TABS: { key: "all" | ModerationType; labelKey: string }[] = [
+    { key: "all", labelKey: "moderation_all" },
+    { key: "blog-comment", labelKey: "moderation_blogComment" },
+    { key: "forum-topic", labelKey: "moderation_forumTopic" },
+    { key: "forum-post", labelKey: "moderation_forumPost" },
+    { key: "suggestion", labelKey: "moderation_suggestion" },
 ];
 
 export default function ModerationPage() {
@@ -168,10 +167,10 @@ export default function ModerationPage() {
     const handleSingle = async (item: ModerationItem, action: "approve" | "reject") => {
         if (action === "reject") {
             const ok = await confirm({
-                title: "Reject content",
-                message: "This item will be marked as rejected and hidden from the public site.",
+                title: t("moderation_rejectSingleTitle"),
+                message: t("moderation_rejectSingleMessage"),
                 variant: "danger",
-                confirmText: "Reject",
+                confirmText: t("moderation_rejectSingle"),
             });
             if (!ok) return;
         }
@@ -179,7 +178,7 @@ export default function ModerationPage() {
         try {
             const ok = await performAction(item.type, [item.id], action);
             if (ok) {
-                toast.success(action === "approve" ? "Approved" : "Rejected");
+                toast.success(action === "approve" ? t("moderation_approvedSingle") : t("moderation_rejectedSingle"));
                 await fetchCounts();
                 await fetchItems();
             }
@@ -190,15 +189,15 @@ export default function ModerationPage() {
 
     const handleBulk = async (action: "approve" | "reject") => {
         if (selected.size === 0) {
-            toast.error("Select at least one item");
+            toast.error(t("moderation_selectAtLeast"));
             return;
         }
         if (action === "reject") {
             const ok = await confirm({
-                title: `Reject ${selected.size} items`,
-                message: "Selected items will be marked as rejected and hidden from the public site.",
+                title: t("moderation_rejectTitle", { count: selected.size }),
+                message: t("moderation_rejectMessage"),
                 variant: "danger",
-                confirmText: "Reject all",
+                confirmText: t("moderation_rejectAll"),
             });
             if (!ok) return;
         }
@@ -217,7 +216,7 @@ export default function ModerationPage() {
                 const ok = await performAction(type, ids, action);
                 if (ok) totalAffected += ids.length;
             }
-            toast.success(`${action === "approve" ? "Approved" : "Rejected"} ${totalAffected} items`);
+            toast.success(action === "approve" ? t("moderation_approved", { count: totalAffected }) : t("moderation_rejected", { count: totalAffected }));
             await fetchCounts();
             await fetchItems();
         } finally {
@@ -225,16 +224,16 @@ export default function ModerationPage() {
         }
     };
 
-    const typeLabel = (t: ModerationType): string => {
-        switch (t) {
+    const typeLabel = (type: ModerationType): string => {
+        switch (type) {
             case "blog-comment":
-                return "Blog comment";
+                return t("moderation_blogComment");
             case "forum-topic":
-                return "Forum topic";
+                return t("moderation_forumTopic");
             case "forum-post":
-                return "Forum post";
+                return t("moderation_forumPost");
             case "suggestion":
-                return "Suggestion";
+                return t("moderation_suggestion");
         }
     };
 
@@ -242,8 +241,7 @@ export default function ModerationPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <ShieldAlert className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {t("sidebar_moderationQueue")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
@@ -273,10 +271,10 @@ export default function ModerationPage() {
                             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                                 isActive
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-muted hover:bg-muted/80"
+                                    : "bg-muted text-foreground hover:bg-muted/80"
                             }`}
                         >
-                            {tab.label}
+                            {t(tab.labelKey)}
                             {count > 0 && (
                                 <span
                                     className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${
@@ -335,7 +333,7 @@ export default function ModerationPage() {
                         </div>
                     ) : items.length === 0 ? (
                         <p className="text-muted-foreground text-center py-12">
-                            Nothing is waiting for review.
+                            {t("moderation_nothingToReview")}
                         </p>
                     ) : (
                         <div className="divide-y">

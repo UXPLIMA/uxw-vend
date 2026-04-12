@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Loader2, Code2, Zap, Layers, Cpu } from "lucide-react";
+import { Loader2, Zap, Layers, Cpu } from "lucide-react";
 
 interface DevData {
     hooks: {
@@ -71,8 +71,7 @@ export default function DevToolsPage() {
     return (
         <>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Code2 className="w-7 h-7" />
+                <h1 className="text-3xl font-bold">
                     Developer Tools
                 </h1>
                 <p className="text-muted-foreground">Runtime introspection of hooks, registries, and process state</p>

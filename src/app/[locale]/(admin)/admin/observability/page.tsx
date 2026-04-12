@@ -107,8 +107,7 @@ export default function ObservabilityPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <Activity className={`w-7 h-7 ${statusColor}`} />
+                    <h1 className="text-xl font-semibold">
                         {t.has("observability_title") ? t("observability_title") : "Observability"}
                     </h1>
                     <p className="text-sm text-muted-foreground">

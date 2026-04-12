@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CssSettingsPage() {
@@ -37,12 +37,9 @@ export default function CssSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
-                <div>
-                    <h1 className="text-3xl font-bold">Custom CSS</h1>
-                    <p className="text-muted-foreground">Inject custom styles into your site</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">Custom CSS</h1>
+                <p className="text-muted-foreground">Inject custom styles into your site</p>
             </div>
 
             <Card className="mb-6">

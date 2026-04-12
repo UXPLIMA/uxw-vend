@@ -1,41 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface FieldDef {
     key: string;
-    label: string;
+    labelKey: string;
     type: "number";
     defaultValue: number;
     description?: string;
 }
 
 interface SectionDef {
-    title: string;
+    titleKey: string;
     fields: FieldDef[];
 }
 
 const sections: SectionDef[] = [
     {
-        title: "Authentication & Security",
+        titleKey: "generalSettings_authSecurity",
         fields: [
-            { key: "password_min_length", label: "Minimum password length", type: "number", defaultValue: 6 },
-            { key: "email_verify_expiry_hours", label: "Email verification link expiry (hours)", type: "number", defaultValue: 24 },
-            { key: "password_reset_expiry_minutes", label: "Password reset link expiry (minutes)", type: "number", defaultValue: 60 },
+            { key: "password_min_length", labelKey: "generalSettings_minPasswordLength", type: "number", defaultValue: 6 },
+            { key: "email_verify_expiry_hours", labelKey: "generalSettings_emailVerifyExpiry", type: "number", defaultValue: 24 },
+            { key: "password_reset_expiry_minutes", labelKey: "generalSettings_passwordResetExpiry", type: "number", defaultValue: 60 },
         ],
     },
     {
-        title: "Cache & Performance",
+        titleKey: "generalSettings_cachePerformance",
         fields: [
-            { key: "settings_cache_seconds", label: "Settings cache TTL (seconds)", type: "number", defaultValue: 60 },
-            { key: "widget_refresh_seconds", label: "Widget data refresh (seconds)", type: "number", defaultValue: 30 },
+            { key: "settings_cache_seconds", labelKey: "generalSettings_cacheSeconds", type: "number", defaultValue: 60 },
+            { key: "widget_refresh_seconds", labelKey: "generalSettings_widgetRefresh", type: "number", defaultValue: 30 },
         ],
     },
 ];
@@ -43,6 +44,7 @@ const sections: SectionDef[] = [
 const allFields = sections.flatMap((s) => s.fields);
 
 export default function GeneralSettingsPage() {
+    const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [values, setValues] = useState<Record<string, string>>({});
@@ -80,13 +82,13 @@ export default function GeneralSettingsPage() {
             });
 
             if (!res.ok) {
-                toast.error("Failed to save settings");
+                toast.error(t("generalSettings_saveFailed"));
                 return;
             }
 
-            toast.success("Settings saved successfully");
+            toast.success(t("generalSettings_saved"));
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("generalSettings_saveFailed"));
         } finally {
             setSaving(false);
         }
@@ -102,29 +104,22 @@ export default function GeneralSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold">General Settings</h1>
-                    <p className="text-muted-foreground">Authentication, security, cache, and performance settings</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-xl font-semibold">{t("generalSettings_title")}</h1>
+                <p className="text-muted-foreground">{t("generalSettings_subtitle")}</p>
             </div>
 
             <form onSubmit={handleSave}>
                 <div className="grid lg:grid-cols-2 gap-6">
                     {sections.map((section) => (
-                        <Card key={section.title}>
+                        <Card key={section.titleKey}>
                             <CardHeader>
-                                <CardTitle>{section.title}</CardTitle>
+                                <CardTitle>{t(section.titleKey)}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {section.fields.map((field) => (
                                     <div key={field.key}>
-                                        <Label>{field.label}</Label>
+                                        <Label>{t(field.labelKey)}</Label>
                                         <Input
                                             type="number"
                                             value={values[field.key] as string}
@@ -145,9 +140,9 @@ export default function GeneralSettingsPage() {
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
                         {saving ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</>
+                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generalSettings_saving")}</>
                         ) : (
-                            <><Check className="w-4 h-4 mr-2" /> Save Settings</>
+                            <><Check className="w-4 h-4 mr-2" /> {t("generalSettings_saveSettings")}</>
                         )}
                     </Button>
                 </div>

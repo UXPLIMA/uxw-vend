@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ArrowLeft, Loader2, Check, Eye, EyeOff } from "lucide-react";
+import { Loader2, Check, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -120,12 +120,9 @@ export default function WidgetSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
-                <div>
-                    <h1 className="text-3xl font-bold">Sidebar Widgets</h1>
-                    <p className="text-muted-foreground">Toggle visibility and reorder homepage sidebar widgets</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">Sidebar Widgets</h1>
+                <p className="text-muted-foreground">Toggle visibility and reorder homepage sidebar widgets</p>
             </div>
 
             <Card className="mb-6">

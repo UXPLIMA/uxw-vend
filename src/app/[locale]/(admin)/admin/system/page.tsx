@@ -5,12 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import {
     Database, HardDrive, Cpu, Users, Puzzle, Clock,
-    Download, Loader2, Trash2, RefreshCw, Activity, RotateCcw,
+    Loader2, RefreshCw, Activity,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { SystemMetrics } from "../components/system-metrics";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface SystemData {
     database: { size: string; totalUsers: number; newUsersWeek: number; totalModules: number; enabledModules: number };
@@ -24,86 +22,19 @@ interface SystemData {
     };
 }
 
-interface BackupItem {
-    id: string;
-    filename: string;
-    sizeHuman: string;
-    createdAt: string;
-    type?: "manual" | "scheduled";
-}
-
 export default function SystemPage() {
     const t = useTranslations("admin");
     const [system, setSystem] = useState<SystemData | null>(null);
-    const [backups, setBackups] = useState<BackupItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [backing, setBacking] = useState(false);
-    const [restoring, setRestoring] = useState<string | null>(null);
-    const { confirm } = useConfirm();
 
     const fetchData = useCallback(async () => {
-        const [sysRes, backupRes] = await Promise.all([
-            fetch("/api/v1/admin/system").then((r) => r.ok ? r.json() : null),
-            fetch("/api/v1/admin/backup").then((r) => r.ok ? r.json() : null),
-        ]);
+        const sysRes = await fetch("/api/v1/admin/system").then((r) => r.ok ? r.json() : null);
         if (sysRes) setSystem(sysRes);
-        if (backupRes) setBackups(backupRes.backups || []);
         setLoading(false);
     }, []);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { fetchData(); }, [fetchData]);
-
-    const createBackup = async () => {
-        const ok = await confirm({ title: t("system_createBackupTitle"), message: t("system_createBackupMessage"), confirmText: t("system_createBackup") });
-        if (!ok) return;
-        setBacking(true);
-        const res = await fetch("/api/v1/admin/backup", { method: "POST" });
-        if (res.ok) {
-            toast.success("Backup created");
-            fetchData();
-        } else {
-            const data = await res.json();
-            toast.error(data.error || "Backup failed");
-        }
-        setBacking(false);
-    };
-
-    const downloadBackup = (id: string) => {
-        window.location.href = `/api/v1/admin/backup/${encodeURIComponent(id)}/download`;
-    };
-
-    const deleteBackup = async (b: BackupItem) => {
-        const ok = await confirm({ title: t("system_deleteBackupTitle"), message: t("system_deleteBackupMessage", { filename: b.filename }), variant: "danger", confirmText: "Delete" });
-        if (!ok) return;
-        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(b.id)}`, { method: "DELETE" });
-        if (res.ok) { toast.success("Backup deleted"); fetchData(); }
-        else { toast.error("Failed to delete"); }
-    };
-
-    const restoreBackup = async (b: BackupItem) => {
-        const ok = await confirm({
-            title: t("system_restoreBackupTitle"),
-            message: t("system_restoreBackupMessage", { filename: b.filename }),
-            variant: "danger",
-            confirmText: "Restore",
-        });
-        if (!ok) return;
-        setRestoring(b.id);
-        const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(b.id)}/restore`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ confirmText: "RESTORE" }),
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-            toast.success("Database restored successfully");
-            fetchData();
-        } else {
-            toast.error(data.error || "Restore failed");
-        }
-        setRestoring(null);
-    };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
     if (!system) return <p className="text-muted-foreground text-center py-8">{t("system_failedToLoad")}</p>;
@@ -200,46 +131,6 @@ export default function SystemPage() {
                     </CardContent>
                 </Card>
             </div>
-
-            {/* Backups */}
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-base">{t("system_backups")}</CardTitle>
-                        <Button size="sm" onClick={createBackup} disabled={backing}>
-                            {backing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Download className="w-4 h-4 mr-2" />}
-                            {backing ? t("system_creating") : t("system_createBackup")}
-                        </Button>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    {backups.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4 text-sm">{t("system_noBackups")}</p>
-                    ) : (
-                        <div className="divide-y">
-                            {backups.map((b) => (
-                                <div key={b.id} className="flex items-center justify-between py-3">
-                                    <div>
-                                        <p className="font-medium text-sm">{b.filename}</p>
-                                        <p className="text-xs text-muted-foreground">{new Date(b.createdAt).toLocaleString()} - {b.sizeHuman}</p>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Button variant="ghost" size="sm" onClick={() => downloadBackup(b.id)} title="Download">
-                                            <Download className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="sm" onClick={() => restoreBackup(b)} disabled={restoring === b.id} title="Restore">
-                                            {restoring === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
-                                        </Button>
-                                        <Button variant="ghost" size="sm" onClick={() => deleteBackup(b)} className="text-destructive" title="Delete">
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
 
             {/* Request Metrics */}
             <div className="mt-8">

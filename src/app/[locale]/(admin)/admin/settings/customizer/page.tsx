@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import Link from "next/link";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, RotateCcw, Palette, Monitor, Smartphone, Tablet } from "lucide-react";
+import { Loader2, Check, RotateCcw, Monitor, Smartphone, Tablet } from "lucide-react";
 import { toast } from "sonner";
 import { themeRegistry } from "@/core/generated/theme-registry";
 import type { ThemeProperty, ThemeOverrides } from "@/core/types/theme";
@@ -154,12 +154,9 @@ export default function ThemeCustomizerPage() {
     if (schema.length === 0) {
         return (
             <>
-                <div className="flex items-center gap-4 mb-8">
-                    <Link href="/admin/settings"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
-                    <div>
-                        <h1 className="text-3xl font-bold">Theme Customizer</h1>
-                        <p className="text-muted-foreground">Customize theme colors, fonts, and layout</p>
-                    </div>
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold">Theme Customizer</h1>
+                    <p className="text-muted-foreground">Customize theme colors, fonts, and layout</p>
                 </div>
                 <Card><CardContent className="py-8 text-center text-muted-foreground">
                     The active theme <strong>{theme.config.name}</strong> does not expose any editable properties.
@@ -174,10 +171,8 @@ export default function ThemeCustomizerPage() {
         <div className="flex flex-col h-[calc(100vh-2rem)]">
             {/* Top toolbar */}
             <div className="flex items-center gap-4 mb-4 flex-shrink-0">
-                <Link href="/admin/settings"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
                 <div className="flex-1">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Palette className="w-6 h-6" />
+                    <h1 className="text-2xl font-bold">
                         Theme Customizer
                     </h1>
                     <p className="text-xs text-muted-foreground">Active theme: {theme.config.name}</p>

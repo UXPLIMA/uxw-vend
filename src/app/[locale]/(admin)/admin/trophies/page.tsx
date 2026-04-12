@@ -7,7 +7,6 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import {
-    Award,
     Plus,
     X,
     Loader2,
@@ -94,14 +93,14 @@ export default function AdminTrophiesPage() {
                 const data = await res.json();
                 setTrophies(data.trophies || []);
             } else {
-                toast.error("Failed to load trophies");
+                toast.error(tt("trophies_loadFailed"));
             }
         } catch {
-            toast.error("Failed to load trophies");
+            toast.error(tt("trophies_loadFailed"));
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [tt]);
 
     useEffect(() => {
         fetchTrophies();
@@ -144,7 +143,7 @@ export default function AdminTrophiesPage() {
 
     const handleSave = async () => {
         if (!form.name.trim()) {
-            toast.error("Name is required");
+            toast.error(tt("trophies_nameRequired"));
             return;
         }
         setSaving(true);
@@ -171,17 +170,17 @@ export default function AdminTrophiesPage() {
             );
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Save failed");
+                toast.error(data.error || tt("trophies_saveFailed"));
                 return;
             }
-            toast.success(editing ? "Trophy updated" : "Trophy created");
+            toast.success(editing ? tt("trophies_updated") : tt("trophies_created"));
             if (payload.ruleEvent !== originalEvent) {
                 await reloadEngine();
             }
             closeModal();
             fetchTrophies();
         } catch {
-            toast.error("Save failed");
+            toast.error(tt("trophies_saveFailed"));
         } finally {
             setSaving(false);
         }
@@ -189,22 +188,22 @@ export default function AdminTrophiesPage() {
 
     const handleDelete = async (t: AdminTrophy) => {
         const ok = await confirm({
-            title: "Delete trophy",
-            message: `Delete "${t.name}"? This also removes it from every user who earned it.`,
+            title: tt("trophies_deleteTitle"),
+            message: tt("trophies_deleteMessage", { name: t.name }),
             variant: "danger",
-            confirmText: "Delete",
+            confirmText: tt("common_delete"),
         });
         if (!ok) return;
         try {
             const res = await fetch(`/api/v1/admin/trophies/${t.id}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success("Trophy deleted");
+                toast.success(tt("trophies_deleted"));
                 fetchTrophies();
             } else {
-                toast.error("Delete failed");
+                toast.error(tt("trophies_deleteFailed"));
             }
         } catch {
-            toast.error("Delete failed");
+            toast.error(tt("trophies_deleteFailed"));
         }
     };
 
@@ -219,13 +218,13 @@ export default function AdminTrophiesPage() {
                 setTrophies((prev) =>
                     prev.map((x) => (x.id === t.id ? { ...x, isActive: !t.isActive } : x))
                 );
-                toast.success(!t.isActive ? "Trophy activated" : "Trophy deactivated");
+                toast.success(!t.isActive ? tt("trophies_activated") : tt("trophies_deactivated"));
                 await reloadEngine();
             } else {
-                toast.error("Failed to toggle");
+                toast.error(tt("trophies_toggleFailed"));
             }
         } catch {
-            toast.error("Failed to toggle");
+            toast.error(tt("trophies_toggleFailed"));
         }
     };
 
@@ -233,8 +232,7 @@ export default function AdminTrophiesPage() {
         <div>
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <Award className="w-5 h-5 text-amber-500" />
+                    <h1 className="text-xl font-semibold">
                         {tt("sidebar_trophies")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
@@ -242,14 +240,14 @@ export default function AdminTrophiesPage() {
                     </p>
                 </div>
                 <Button onClick={openCreate}>
-                    <Plus className="w-4 h-4 mr-1" /> {tt.has("common_add") ? tt("common_add") : "Add"}
+                    <Plus className="w-4 h-4 mr-1" /> {tt("common_add")}
                 </Button>
             </div>
 
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">
-                        {trophies.length} trophy{trophies.length === 1 ? "" : "s"}
+                        {trophies.length} {trophies.length === 1 ? tt("trophies_trophy") : tt("trophies_title")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -259,20 +257,20 @@ export default function AdminTrophiesPage() {
                         </div>
                     ) : trophies.length === 0 ? (
                         <p className="text-sm text-muted-foreground py-4">
-                            No trophies defined yet.
+                            {tt("trophies_noTrophies")}
                         </p>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-border text-left text-muted-foreground">
-                                        <th className="py-2 pr-3">Trophy</th>
-                                        <th className="py-2 pr-3">Description</th>
-                                        <th className="py-2 pr-3">Points</th>
-                                        <th className="py-2 pr-3">Rule</th>
-                                        <th className="py-2 pr-3">Earned</th>
-                                        <th className="py-2 pr-3">Active</th>
-                                        <th className="py-2 pr-3 text-right">Actions</th>
+                                        <th className="py-2 pr-3">{tt("trophies_trophy")}</th>
+                                        <th className="py-2 pr-3">{tt("common_description")}</th>
+                                        <th className="py-2 pr-3">{tt("trophies_points")}</th>
+                                        <th className="py-2 pr-3">{tt("trophies_rule")}</th>
+                                        <th className="py-2 pr-3">{tt("trophies_earned")}</th>
+                                        <th className="py-2 pr-3">{tt("trophies_active")}</th>
+                                        <th className="py-2 pr-3 text-right">{tt("trophies_actions")}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -293,7 +291,7 @@ export default function AdminTrophiesPage() {
                                                 </div>
                                             </td>
                                             <td className="py-2 pr-3 max-w-[240px] truncate text-muted-foreground">
-                                                {t.description || "—"}
+                                                {t.description || "\u2014"}
                                             </td>
                                             <td className="py-2 pr-3 font-medium">{t.points}</td>
                                             <td className="py-2 pr-3">
@@ -305,7 +303,7 @@ export default function AdminTrophiesPage() {
                                                         </span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-muted-foreground text-xs">Manual only</span>
+                                                    <span className="text-muted-foreground text-xs">{tt("trophies_manualOnly")}</span>
                                                 )}
                                             </td>
                                             <td className="py-2 pr-3">
@@ -323,10 +321,9 @@ export default function AdminTrophiesPage() {
                                                             ? "bg-green-500/10 text-green-600"
                                                             : "bg-muted text-muted-foreground"
                                                     }`}
-                                                    title={t.isActive ? "Deactivate" : "Activate"}
                                                 >
                                                     <Power className="w-3 h-3" />
-                                                    {t.isActive ? "Active" : "Inactive"}
+                                                    {t.isActive ? tt("trophies_activeLabel") : tt("trophies_inactiveLabel")}
                                                 </button>
                                             </td>
                                             <td className="py-2 pr-3 text-right whitespace-nowrap">
@@ -334,7 +331,7 @@ export default function AdminTrophiesPage() {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => openEdit(t)}
-                                                    title="Edit"
+                                                    title={tt("common_edit")}
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </Button>
@@ -343,7 +340,7 @@ export default function AdminTrophiesPage() {
                                                     size="sm"
                                                     className="text-destructive"
                                                     onClick={() => handleDelete(t)}
-                                                    title="Delete"
+                                                    title={tt("common_delete")}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -362,7 +359,7 @@ export default function AdminTrophiesPage() {
                     <div className="bg-background border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <h2 className="text-lg font-semibold">
-                                {editing ? "Edit trophy" : "New trophy"}
+                                {editing ? tt("trophies_editTrophy") : tt("trophies_newTrophy")}
                             </h2>
                             <Button variant="ghost" size="sm" onClick={closeModal}>
                                 <X className="w-4 h-4" />
@@ -370,7 +367,7 @@ export default function AdminTrophiesPage() {
                         </div>
                         <div className="p-4 space-y-4">
                             <div>
-                                <Label>Name</Label>
+                                <Label>{tt("trophies_name")}</Label>
                                 <Input
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -378,7 +375,7 @@ export default function AdminTrophiesPage() {
                                 />
                             </div>
                             <div>
-                                <Label>Description</Label>
+                                <Label>{tt("trophies_descriptionLabel")}</Label>
                                 <Textarea
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -388,7 +385,7 @@ export default function AdminTrophiesPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <Label>Lucide icon</Label>
+                                    <Label>{tt("trophies_lucideIcon")}</Label>
                                     <Input
                                         value={form.icon}
                                         onChange={(e) => setForm({ ...form, icon: e.target.value })}
@@ -396,7 +393,7 @@ export default function AdminTrophiesPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>Color (hex)</Label>
+                                    <Label>{tt("trophies_color")}</Label>
                                     <div className="flex gap-2 items-center">
                                         <Input
                                             type="color"
@@ -414,7 +411,7 @@ export default function AdminTrophiesPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <Label>Points</Label>
+                                    <Label>{tt("trophies_points")}</Label>
                                     <Input
                                         type="number"
                                         value={form.points}
@@ -422,7 +419,7 @@ export default function AdminTrophiesPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>Rule type</Label>
+                                    <Label>{tt("trophies_ruleType")}</Label>
                                     <select
                                         value={form.ruleType}
                                         onChange={(e) => setForm({ ...form, ruleType: e.target.value })}
@@ -433,7 +430,7 @@ export default function AdminTrophiesPage() {
                                 </div>
                             </div>
                             <div>
-                                <Label>Rule event</Label>
+                                <Label>{tt("trophies_ruleEvent")}</Label>
                                 <Input
                                     list="trophy-event-suggestions"
                                     value={form.ruleEvent}
@@ -446,11 +443,11 @@ export default function AdminTrophiesPage() {
                                     ))}
                                 </datalist>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    Leave empty for manual awards only. Any hook event works.
+                                    {tt("trophies_ruleEventHint")}
                                 </p>
                             </div>
                             <div>
-                                <Label>Rule threshold</Label>
+                                <Label>{tt("trophies_ruleThreshold")}</Label>
                                 <Input
                                     type="number"
                                     min="1"
@@ -458,7 +455,7 @@ export default function AdminTrophiesPage() {
                                     onChange={(e) => setForm({ ...form, ruleThreshold: e.target.value })}
                                 />
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    How many matching events before the trophy is awarded.
+                                    {tt("trophies_thresholdHint")}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
@@ -470,23 +467,23 @@ export default function AdminTrophiesPage() {
                                     className="w-4 h-4"
                                 />
                                 <Label htmlFor="trophy-active" className="m-0 cursor-pointer">
-                                    Active
+                                    {tt("trophies_activeLabel")}
                                 </Label>
                             </div>
                         </div>
                         <div className="flex justify-end gap-2 p-4 border-t border-border">
                             <Button variant="outline" onClick={closeModal} disabled={saving}>
-                                Cancel
+                                {tt("common_cancel")}
                             </Button>
                             <Button onClick={handleSave} disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin mr-1" /> Saving
+                                        <Loader2 className="w-4 h-4 animate-spin mr-1" /> {tt("trophies_saving")}
                                     </>
                                 ) : editing ? (
-                                    "Save changes"
+                                    tt("trophies_saveChanges")
                                 ) : (
-                                    "Create"
+                                    tt("common_create")
                                 )}
                             </Button>
                         </div>

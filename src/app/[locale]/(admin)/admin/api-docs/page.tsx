@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { FileJson, ExternalLink } from "lucide-react";
 import "swagger-ui-react/swagger-ui.css";
@@ -20,13 +21,15 @@ const SwaggerUI = dynamic(
 );
 
 export default function ApiDocsPage() {
+    const t = useTranslations("admin");
+
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold">API Documentation</h1>
+                    <h1 className="text-xl font-semibold">{t("apiDocs_title")}</h1>
                     <p className="text-muted-foreground">
-                        Interactive OpenAPI 3.0 reference for core and module endpoints.
+                        {t("apiDocs_subtitle")}
                     </p>
                 </div>
                 <a
@@ -36,14 +39,14 @@ export default function ApiDocsPage() {
                     className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <FileJson className="w-4 h-4" />
-                    Raw spec
+                    {t("apiDocs_rawSpec")}
                     <ExternalLink className="w-3 h-3" />
                 </a>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-base">Endpoints</CardTitle>
+                    <CardTitle className="text-base">{t("apiDocs_endpoints")}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="swagger-ui-wrapper">

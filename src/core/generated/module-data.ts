@@ -931,7 +931,7 @@ export const ModuleRoutesList: { path: string; key: string; module: string; isAd
     "isAdmin": true
   },
   {
-    "path": "/admin/analytics",
+    "path": "/admin/google-analytics",
     "key": "google-analytics:pages/admin/settings/analytics/page.tsx",
     "module": "google-analytics",
     "isAdmin": true

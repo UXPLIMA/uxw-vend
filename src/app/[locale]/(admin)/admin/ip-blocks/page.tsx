@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Plus, ShieldOff, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -118,8 +118,7 @@ export default function IpBlocksPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <ShieldOff className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {fallback("ipBlocks_title", "IP Blocks")}
                     </h1>
                     <p className="text-sm text-muted-foreground">

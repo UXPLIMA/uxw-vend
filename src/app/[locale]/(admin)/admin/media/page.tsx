@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
-import { Loader2, ImageIcon, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucide-react";
+import { Loader2, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
@@ -37,6 +38,7 @@ export default function MediaLibraryPage() {
     const [uploading, setUploading] = useState(false);
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const { confirm } = useConfirm();
+    const t = useTranslations("admin");
 
     const fetchItems = async () => {
         setLoading(true);
@@ -52,7 +54,7 @@ export default function MediaLibraryPage() {
             setItems(data.items || []);
             setTotalPages(data.totalPages || 1);
         } catch {
-            toast.error("Failed to load media");
+            toast.error(t("media_loadFailed"));
         } finally {
             setLoading(false);
         }
@@ -78,14 +80,14 @@ export default function MediaLibraryPage() {
             const res = await fetch("/api/v1/upload", { method: "POST", body: fd });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Upload failed");
+                toast.error(data.error || t("media_uploadFailed"));
                 return;
             }
-            toast.success("Uploaded");
+            toast.success(t("media_uploaded"));
             setPage(1);
             fetchItems();
         } catch {
-            toast.error("Upload failed");
+            toast.error(t("media_uploadFailed"));
         } finally {
             setUploading(false);
         }
@@ -93,18 +95,18 @@ export default function MediaLibraryPage() {
 
     const deleteItem = async (item: MediaItem) => {
         const ok = await confirm({
-            title: "Delete media",
+            title: t("media_deleteTitle"),
             message: `Delete "${item.filename}"? This cannot be undone.`,
             variant: "danger",
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/media/${item.id}`, { method: "DELETE" });
         if (res.ok) {
-            toast.success("Deleted");
+            toast.success(t("media_deleted"));
             if (selected?.id === item.id) setSelected(null);
             fetchItems();
         } else {
-            toast.error("Failed to delete");
+            toast.error(t("media_deleteFailed"));
         }
     };
 
@@ -118,7 +120,7 @@ export default function MediaLibraryPage() {
             const updated = await res.json();
             setItems(items.map((i) => (i.id === id ? { ...i, ...updated } : i)));
             if (selected?.id === id) setSelected({ ...selected, ...updated });
-            toast.success("Updated");
+            toast.success(t("media_updated"));
         }
     };
 
@@ -134,16 +136,15 @@ export default function MediaLibraryPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <ImageIcon className="w-7 h-7" />
-                        Media Library
+                    <h1 className="text-xl font-semibold">
+                        {t("media_title")}
                     </h1>
-                    <p className="text-muted-foreground">Browse, search, and manage uploaded files</p>
+                    <p className="text-muted-foreground">{t("media_subtitle")}</p>
                 </div>
                 <label className="cursor-pointer">
                     <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} />
                     <span className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4">
-                        {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading…</> : <><Upload className="w-4 h-4 mr-2" /> Upload</>}
+                        {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin text-primary-foreground" /> <span className="text-primary-foreground">{t("media_uploading")}</span></> : <><Upload className="w-4 h-4 mr-2 text-primary-foreground" /> <span className="text-primary-foreground">{t("media_upload")}</span></>}
                     </span>
                 </label>
             </div>
@@ -156,20 +157,20 @@ export default function MediaLibraryPage() {
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search filename…"
-                            className="pl-8"
+                            placeholder={t("media_searchPlaceholder")}
+                            className="pl-8 bg-background"
                         />
                     </div>
-                    <Button type="submit" variant="outline">Search</Button>
+                    <Button type="submit" variant="outline">{t("media_search")}</Button>
                 </form>
                 <select
                     value={type}
                     onChange={(e) => { setType(e.target.value as "" | "image" | "document"); setPage(1); }}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
-                    <option value="">All types</option>
-                    <option value="image">Images</option>
-                    <option value="document">Documents</option>
+                    <option value="">{t("media_allTypes")}</option>
+                    <option value="image">{t("media_images")}</option>
+                    <option value="document">{t("media_documents")}</option>
                 </select>
             </div>
 
@@ -177,7 +178,7 @@ export default function MediaLibraryPage() {
                 <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
             ) : items.length === 0 ? (
                 <Card><CardContent className="py-12 text-center text-muted-foreground">
-                    No media items yet. Upload your first file.
+                    {t("media_noItems")}
                 </CardContent></Card>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -207,9 +208,9 @@ export default function MediaLibraryPage() {
 
             {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-6">
-                    <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</Button>
-                    <span className="text-sm text-muted-foreground">Page {page} / {totalPages}</span>
-                    <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next</Button>
+                    <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>{t("common_prev")}</Button>
+                    <span className="text-sm text-muted-foreground">{t("media_page")} {page} / {totalPages}</span>
+                    <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>{t("common_next")}</Button>
                 </div>
             )}
 
@@ -234,15 +235,15 @@ export default function MediaLibraryPage() {
                             )}
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <div className="text-muted-foreground text-xs">Size</div>
+                                    <div className="text-muted-foreground text-xs">{t("media_size")}</div>
                                     <div>{formatBytes(selected.size)}</div>
                                 </div>
                                 <div>
-                                    <div className="text-muted-foreground text-xs">Type</div>
+                                    <div className="text-muted-foreground text-xs">{t("media_type")}</div>
                                     <div className="font-mono text-xs">{selected.mimeType}</div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div className="text-muted-foreground text-xs">URL</div>
+                                    <div className="text-muted-foreground text-xs">{t("media_url")}</div>
                                     <div className="flex gap-2">
                                         <Input value={selected.url} readOnly className="text-xs font-mono" />
                                         <Button variant="outline" size="sm" onClick={() => copyUrl(selected)}>
@@ -251,18 +252,18 @@ export default function MediaLibraryPage() {
                                     </div>
                                 </div>
                                 <div className="col-span-2">
-                                    <div className="text-muted-foreground text-xs mb-1">Alt text (accessibility)</div>
+                                    <div className="text-muted-foreground text-xs mb-1">{t("media_altText")}</div>
                                     <Input
                                         value={selected.alt || ""}
                                         onChange={(e) => setSelected({ ...selected, alt: e.target.value })}
                                         onBlur={(e) => updateItem(selected.id, { alt: e.target.value })}
-                                        placeholder="Describe this image…"
+                                        placeholder={t("media_altPlaceholder")}
                                     />
                                 </div>
                             </div>
                             <div className="flex justify-end">
                                 <Button variant="destructive" size="sm" onClick={() => deleteItem(selected)}>
-                                    <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                    <Trash2 className="w-4 h-4 mr-2" /> {t("common_delete")}
                                 </Button>
                             </div>
                         </div>

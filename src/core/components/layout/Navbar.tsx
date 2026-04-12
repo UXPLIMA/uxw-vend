@@ -59,6 +59,11 @@ export function Navbar() {
     // Core paths that are always valid (not served by modules)
     const corePaths = new Set(['/', '/profile', '/admin', '/auth', '/terms', '/privacy', '/rules', '/refund']);
 
+    // When admin has explicitly configured navbar_links, we use a permissive filter:
+    // only hide links that are *known* to belong to a disabled/uninstalled module.
+    // When using auto-generated registry links, be strict and hide unknown paths.
+    const adminConfigured = Array.isArray(settings.navbar_links);
+
     const isLinkEnabled = (href: string) => {
         // Dropdown parent placeholders ("#") — always allowed; children are filtered separately
         if (!href || href === "#") return true;
@@ -66,12 +71,15 @@ export function Navbar() {
         if (href.startsWith('http')) return true;
         // Core paths always allowed
         if (corePaths.has(href)) return true;
-        // Check if this href maps to a known installed module
+        // Check if this href maps to a known module
         const moduleId = pathToModule[href];
         if (moduleId) return moduleStatus[moduleId] === true;
         // For DB-saved links: if the path is served by an installed module, allow it
         if (installedModulePaths.has(href)) return true;
-        // Unknown internal path not served by any installed module — likely a stale module link, hide it
+        // If admin explicitly configured these links, trust unknown paths
+        // (they may point to static pages, external redirects, or custom routes)
+        if (adminConfigured) return true;
+        // Auto-generated registry links: unknown internal path not served by any installed module — hide it
         return false;
     };
 

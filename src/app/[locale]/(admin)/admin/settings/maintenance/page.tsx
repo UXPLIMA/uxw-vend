@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
-import { ArrowLeft, Loader2, Wrench, Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 interface MaintenanceConfig {
@@ -85,18 +85,8 @@ export default function MaintenanceSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-3">
-                <Link
-                    href="/admin/settings"
-                    className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-1" /> Back to settings
-                </Link>
-            </div>
-
             <div>
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Wrench className="w-7 h-7 text-amber-600" />
+                <h1 className="text-3xl font-bold">
                     Maintenance Mode
                 </h1>
                 <p className="text-muted-foreground">

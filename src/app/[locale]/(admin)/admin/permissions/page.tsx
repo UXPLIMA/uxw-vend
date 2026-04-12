@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Loader2, ShieldCheck, Plus, X } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface Role {
     id: string;
@@ -44,6 +45,7 @@ const COMMON_RESOURCES = [
 const ACTIONS = ["view", "create", "edit", "delete"];
 
 export default function PermissionsMatrixPage() {
+    const t = useTranslations("admin");
     const [roles, setRoles] = useState<Role[]>([]);
     const [grants, setGrants] = useState<Grant[]>([]);
     const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export default function PermissionsMatrixPage() {
             setRoles(data.roles || []);
             setGrants(data.grants || []);
         } catch {
-            toast.error("Failed to load");
+            toast.error(t("permissions_loadFailed"));
         } finally {
             setLoading(false);
         }
@@ -113,7 +115,7 @@ export default function PermissionsMatrixPage() {
             }
             fetchData();
         } catch {
-            toast.error("Failed to update");
+            toast.error(t("permissions_updateFailed"));
         }
     };
 
@@ -140,27 +142,26 @@ export default function PermissionsMatrixPage() {
     return (
         <>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <ShieldCheck className="w-7 h-7" />
-                    Permission Matrix
+                <h1 className="text-xl font-semibold">
+                    {t("permissions_title")}
                 </h1>
-                <p className="text-muted-foreground">Granular per-resource permissions on top of role defaults. Admin role bypasses everything.</p>
+                <p className="text-muted-foreground">{t("permissions_subtitle")}</p>
             </div>
 
             <Card className="mb-6">
                 <CardHeader>
-                    <CardTitle>Add Resource</CardTitle>
+                    <CardTitle>{t("permissions_addResource")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
                         <Input
                             value={customResource}
                             onChange={(e) => setCustomResource(e.target.value)}
-                            placeholder="my-module.entity"
+                            placeholder={t("permissions_resourcePlaceholder")}
                             className="max-w-sm"
                         />
                         <Button variant="outline" onClick={addCustomResource}>
-                            <Plus className="w-4 h-4 mr-2" /> Add
+                            <Plus className="w-4 h-4 mr-2" /> {t("common_add")}
                         </Button>
                     </div>
                     {customResources.length > 0 && (
@@ -185,7 +186,7 @@ export default function PermissionsMatrixPage() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-border">
-                                        <th className="text-left py-2 pr-4">Role</th>
+                                        <th className="text-left py-2 pr-4">{t("permissions_role")}</th>
                                         {ACTIONS.map((a) => (
                                             <th key={a} className="text-center py-2 px-2 font-medium capitalize">{a}</th>
                                         ))}
@@ -212,9 +213,9 @@ export default function PermissionsMatrixPage() {
                                                                 state === "deny" ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-950 dark:text-red-300" :
                                                                 "bg-muted text-muted-foreground hover:bg-muted/70"
                                                             }`}
-                                                            title="Click: default → allow → deny → default"
+                                                            title={t("permissions_clickHint")}
                                                         >
-                                                            {state === "allow" ? "✓ Allow" : state === "deny" ? "✗ Deny" : "—"}
+                                                            {state === "allow" ? `✓ ${t("permissions_allow")}` : state === "deny" ? `✗ ${t("permissions_deny")}` : "—"}
                                                         </button>
                                                     </td>
                                                 );

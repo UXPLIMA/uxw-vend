@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Bell, Loader2, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -112,8 +112,7 @@ export default function AlertingSettingsPage() {
     return (
         <>
             <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Bell className="w-7 h-7" />
+                <h1 className="text-3xl font-bold">
                     {fallback("alerting_title", "Health Alerting")}
                 </h1>
                 <p className="text-muted-foreground">

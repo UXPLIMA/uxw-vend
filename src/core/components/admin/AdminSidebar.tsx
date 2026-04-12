@@ -162,7 +162,20 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
 
     const isActive = (href: string) => {
         if (href === "/admin") return pathname === "/admin" || pathname === "/admin/";
-        return pathname === href || pathname.startsWith(href + "/");
+        // Collect all item hrefs in the current group so we can use
+        // longest-prefix matching. This prevents "/admin/settings" from
+        // lighting up when "/admin/settings/general" is the real match.
+        const allHrefs = activeGroup.sections.flatMap((s) => s.items.map((i) => i.href));
+        const matchesHref = pathname === href || pathname.startsWith(href + "/");
+        if (!matchesHref) return false;
+        // If another item in the same group is a longer (more specific) match, this one loses.
+        for (const other of allHrefs) {
+            if (other === href) continue;
+            if (other.length > href.length && (pathname === other || pathname.startsWith(other + "/"))) {
+                return false;
+            }
+        }
+        return true;
     };
 
     const labelOf = (item: NavItem): string => {

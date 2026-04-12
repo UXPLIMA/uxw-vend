@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ArrowLeft, Loader2, Package, Download, Check, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Loader2, Download, Check, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 interface UpdateInfo {
@@ -79,8 +79,7 @@ export default function ModuleUpdatesPage() {
             <div className="flex items-center gap-4 mb-6">
                 <Link href="/admin/modules"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
                 <div className="flex-1">
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Package className="w-7 h-7" />
+                    <h1 className="text-3xl font-bold">
                         Module Updates
                     </h1>
                     <p className="text-muted-foreground">

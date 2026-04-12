@@ -247,7 +247,7 @@ export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?
     "isAdmin": true
   },
   {
-    "path": "/admin/analytics",
+    "path": "/admin/google-analytics",
     "key": "google-analytics:pages/admin/settings/analytics/page.tsx",
     "module": "google-analytics",
     "isAdmin": true
@@ -1790,7 +1790,7 @@ export const ModuleSettingsCards: { title: string; description: string; href: st
   {
     "title": "Google Analytics",
     "description": "Google Analytics tracking.",
-    "href": "/analytics",
+    "href": "/google-analytics",
     "icon": "BarChart",
     "color": "text-green-500",
     "module": "google-analytics"

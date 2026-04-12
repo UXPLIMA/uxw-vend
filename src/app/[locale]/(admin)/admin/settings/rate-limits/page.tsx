@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link } from "@/core/lib/i18n/navigation";
+
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, Infinity as InfinityIcon, Gauge } from "lucide-react";
+import { Loader2, Check, Infinity as InfinityIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface RoleRow {
@@ -104,19 +104,9 @@ export default function RateLimitsSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Gauge className="w-7 h-7 text-indigo-500" />
-                        {titleText}
-                    </h1>
-                    <p className="text-muted-foreground">{subtitleText}</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">{titleText}</h1>
+                <p className="text-muted-foreground">{subtitleText}</p>
             </div>
 
             <form onSubmit={handleSave} className="space-y-6 max-w-3xl">

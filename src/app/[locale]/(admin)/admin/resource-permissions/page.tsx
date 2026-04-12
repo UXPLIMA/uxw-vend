@@ -6,7 +6,6 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import {
-    ShieldCheck,
     Plus,
     X,
     Loader2,
@@ -198,8 +197,7 @@ export default function ResourcePermissionsPage() {
         <>
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-xl font-semibold flex items-center gap-2">
-                        <ShieldCheck className="w-5 h-5" />
+                    <h1 className="text-xl font-semibold">
                         {fallback("rp_title", "Resource Permissions")}
                     </h1>
                     <p className="text-sm text-muted-foreground">

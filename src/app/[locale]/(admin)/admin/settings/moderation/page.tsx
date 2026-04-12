@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ArrowLeft, Loader2, ShieldAlert, Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
 type ModerationMode = "auto" | "manual";
@@ -109,18 +109,8 @@ export default function ModerationSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-3">
-                <Link
-                    href="/admin/settings"
-                    className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-1" /> Back to settings
-                </Link>
-            </div>
-
             <div>
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <ShieldAlert className="w-7 h-7 text-rose-500" />
+                <h1 className="text-3xl font-bold">
                     Moderation
                 </h1>
                 <p className="text-muted-foreground">
