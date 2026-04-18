@@ -9,6 +9,8 @@ import { getMaintenanceConfig } from '@/core/lib/maintenance';
 import { auth } from '@/core/lib/auth';
 import prisma from '@/core/lib/db';
 import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
+import { getModuleStates } from '@/core/lib/module-cache';
+import { checkCsrf } from '@/core/lib/csrf';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -29,40 +31,23 @@ function getModuleForPath(pathname: string): string | null {
     return null;
 }
 
-// Cache for module states (avoid DB calls on every request)
-let moduleCache: Map<string, boolean> = new Map();
-let cacheUpdatedAt = 0;
-// Cache TTL for module status. HTTP fetch is used because middleware runs in
-// edge runtime which cannot import Prisma directly.
-const CACHE_TTL = 30 * 1000; // 30 seconds
-
-async function getModuleEnabled(moduleId: string, request: NextRequest): Promise<boolean> {
-    const now = Date.now();
-
-    // Check cache
-    if (now - cacheUpdatedAt < CACHE_TTL && moduleCache.has(moduleId)) {
-        return moduleCache.get(moduleId) ?? true;
-    }
-
-    // Use hardcoded internal URL to prevent SSRF via Origin header spoofing
-    const port = process.env.PORT || '3001';
-    const internalUrl = `http://127.0.0.1:${port}/api/v1/modules/status`;
+/**
+ * Resolve a single module's enabled flag. We hit the shared module state
+ * cache directly (Redis when available, in-memory fallback) — no internal
+ * HTTP round-trip. Next.js 16 runs middleware in Node runtime so direct
+ * Prisma reads via getModuleStates are safe here.
+ *
+ * Unknown module IDs default to "enabled" — a module that has routes in the
+ * registry but no ModuleConfig row is assumed on until an admin toggles it
+ * off. Failing open is preferable to black-holing traffic during a DB blip.
+ */
+async function getModuleEnabled(moduleId: string): Promise<boolean> {
     try {
-        const res = await fetch(internalUrl, {
-            headers: { 'x-internal-request': process.env.INTERNAL_API_SECRET || '1' },
-        });
-        if (res.ok) {
-            const data = await res.json();
-            moduleCache = new Map(Object.entries(data.modules || {}));
-            cacheUpdatedAt = now;
-            return moduleCache.get(moduleId) ?? true;
-        }
+        const states = await getModuleStates();
+        return states[moduleId] ?? true;
     } catch {
-        // If API fails, default to enabled
+        return true;
     }
-
-    void request; // consumed for type safety
-    return true;
 }
 
 function extractLocale(pathname: string): string {
@@ -143,11 +128,33 @@ export async function proxy(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
+    // ==================== CSRF GATE ====================
+    // State-changing API calls must come from an allowed origin. NextAuth's
+    // own endpoints (/api/auth/*) handle CSRF internally; inbound webhooks
+    // (/api/v1/webhook/*, /api/webhook/*) are exempt since external services
+    // POST them without a browser origin. Everything else goes through the
+    // same-origin check so an attacker's site cannot ride a victim's cookies
+    // to a mutating endpoint.
+    if (
+        pathname.startsWith('/api/') &&
+        !pathname.startsWith('/api/auth/') &&
+        !pathname.startsWith('/api/v1/webhook/') &&
+        !pathname.startsWith('/api/webhook/')
+    ) {
+        const csrf = checkCsrf(request);
+        if (!csrf.ok) {
+            return NextResponse.json(
+                { ok: false, error: 'Origin not allowed', code: 'csrf_rejected' },
+                { status: 403 },
+            );
+        }
+    }
+
     // Check if path belongs to a module
     const moduleId = getModuleForPath(pathname);
 
     if (moduleId) {
-        const isEnabled = await getModuleEnabled(moduleId, request);
+        const isEnabled = await getModuleEnabled(moduleId);
 
         if (!isEnabled) {
             // For API routes, return 404 JSON

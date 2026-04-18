@@ -10,6 +10,8 @@ import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { logActivity } from "@/core/lib/activity-log";
 import { incrementIndexDownloads } from "../_index-writer";
+import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
+import { validateZipEntries } from "@/core/lib/module-zip-validator";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -80,14 +82,21 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid ZIP file" }, { status: 400 });
         }
 
+        const zip = new AdmZip(buffer);
+        const entries = zip.getEntries();
+
+        const contentCheck = validateZipEntries(entries);
+        if (!contentCheck.ok) {
+            return NextResponse.json({ error: contentCheck.error ?? "ZIP validation failed" }, { status: 400 });
+        }
+
         // Extract to module directory
         await fs.mkdir(targetDir, { recursive: true });
-        const zip = new AdmZip(buffer);
-        for (const entry of zip.getEntries()) {
+        const targetRoot = path.resolve(targetDir);
+        for (const entry of entries) {
             if (entry.isDirectory) continue;
-            if (entry.entryName.includes("../")) continue;
             const resolvedPath = path.resolve(targetDir, entry.entryName);
-            if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
+            if (!resolvedPath.startsWith(targetRoot + path.sep)) continue;
             await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
             await fs.writeFile(resolvedPath, entry.getData());
         }
@@ -100,11 +109,52 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
         }
 
-        // Verify manifest.id matches requested moduleId
-        const manifestData = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+        // Parse + validate manifest with Zod
+        let manifestJson: unknown;
+        try {
+            manifestJson = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+        } catch {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json({ error: "Invalid module.json — not valid JSON" }, { status: 400 });
+        }
+
+        const parsed = moduleManifestSchema.safeParse(manifestJson);
+        if (!parsed.success) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            const first = parsed.error.issues[0];
+            const where = first.path.join(".");
+            return NextResponse.json(
+                { error: `Invalid module.json: ${where ? where + " — " : ""}${first.message}` },
+                { status: 400 },
+            );
+        }
+        const manifestData = parsed.data;
+
         if (manifestData.id !== moduleId) {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: `Manifest ID '${manifestData.id}' does not match requested module '${moduleId}'` }, { status: 400 });
+        }
+
+        const missingRefs: string[] = [];
+        for (const ref of collectManifestFileRefs(manifestData)) {
+            const cleaned = ref.replace(/^\.\//, "");
+            const refPath = path.resolve(targetDir, cleaned);
+            if (!refPath.startsWith(targetRoot + path.sep)) {
+                await fs.rm(targetDir, { recursive: true, force: true });
+                return NextResponse.json(
+                    { error: `Manifest references escape module root: ${ref}` },
+                    { status: 400 },
+                );
+            }
+            const refExists = await fs.access(refPath).then(() => true).catch(() => false);
+            if (!refExists) missingRefs.push(ref);
+        }
+        if (missingRefs.length > 0) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json(
+                { error: `Manifest references missing files: ${missingRefs.slice(0, 5).join(", ")}` },
+                { status: 400 },
+            );
         }
 
         // Schema merge (sync, lightweight — just merges files)
@@ -126,8 +176,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Create DB record
-        const manifestRaw = await fs.readFile(manifestPath, "utf-8");
-        const manifest = JSON.parse(manifestRaw);
+        const manifest = manifestData;
         await prisma.moduleConfig.upsert({
             where: { id: moduleId },
             update: { name: manifest.name, enabled: true },
@@ -181,57 +230,3 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// --- Translation merge helpers ---
-
-const PROTECTED_KEYS = ["common", "nav", "auth", "hero", "footer", "errors", "metadata", "admin"];
-
-function sanitizeTranslations(obj: Record<string, unknown>): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (typeof value === 'string') {
-            result[key] = value.replace(/<[^>]*>/g, '');
-        } else if (typeof value === 'object' && value !== null) {
-            result[key] = sanitizeTranslations(value as Record<string, unknown>);
-        } else {
-            result[key] = value;
-        }
-    }
-    return result;
-}
-
-function safeMerge(existing: Record<string, unknown>, incoming: Record<string, unknown>): Record<string, unknown> {
-    const sanitized = sanitizeTranslations(incoming);
-    for (const key of PROTECTED_KEYS) delete sanitized[key];
-    return { ...existing, ...sanitized };
-}
-
-async function mergeModuleTranslations(manifest: Record<string, unknown>, targetDir: string) {
-    const messagesDir = path.join(process.cwd(), "messages");
-
-    // From manifest translations field
-    if (manifest.translations && typeof manifest.translations === 'object') {
-        for (const [locale, translations] of Object.entries(manifest.translations as Record<string, unknown>)) {
-            const msgPath = path.join(messagesDir, `${locale}.json`);
-            try {
-                const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
-                await fs.writeFile(msgPath, JSON.stringify(safeMerge(existing, translations as Record<string, unknown>), null, 2));
-            } catch { /* skip */ }
-        }
-    }
-
-    // From messages/ directory
-    const moduleMessagesDir = path.join(targetDir, "messages");
-    const hasDir = await fs.access(moduleMessagesDir).then(() => true).catch(() => false);
-    if (hasDir) {
-        const files = await fs.readdir(moduleMessagesDir);
-        for (const file of files) {
-            if (!file.endsWith(".json")) continue;
-            try {
-                const moduleTranslations = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
-                const corePath = path.join(messagesDir, file);
-                const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
-                await fs.writeFile(corePath, JSON.stringify(safeMerge(existing, moduleTranslations), null, 2));
-            } catch { /* skip */ }
-        }
-    }
-}

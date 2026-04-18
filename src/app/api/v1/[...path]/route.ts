@@ -33,9 +33,11 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
 
     try {
         const handlerModule = await loadHandler();
-        const handler = handlerModule[method];
+        const handler = handlerModule[method] as
+            | ((req: NextRequest, ctx: { params: Record<string, string | string[]> }) => Promise<NextResponse>)
+            | undefined;
 
-        if (!handler) {
+        if (typeof handler !== "function") {
             finish(405);
             recordMetric(method, fullPath, 405, Date.now() - requestStart);
             return NextResponse.json({ error: `Method ${method} not allowed` }, { status: 405 });

@@ -95,11 +95,22 @@ export const MemoryBackend: RateLimitBackend = {
 // flaky Redis can never take down request handling.
 // ---------------------------------------------------------------------------
 
+let lastRedisFallbackWarnAt = 0;
+function warnRedisFallback(reason: string): void {
+    const now = Date.now();
+    if (now - lastRedisFallbackWarnAt < 30_000) return;
+    lastRedisFallbackWarnAt = now;
+    console.error(`[rate-limit] Redis unavailable (${reason}) — serving requests with in-memory fallback. Counts are NOT shared across workers.`);
+}
+
 export const RedisBackend: RateLimitBackend = {
     name: "redis",
     async hit(identifier, config) {
         const redis = await getRedisClient();
-        if (!redis) return memoryHitSync(identifier, config);
+        if (!redis) {
+            warnRedisFallback("client not connected");
+            return memoryHitSync(identifier, config);
+        }
 
         try {
             const key = `rl:${identifier}`;
@@ -127,17 +138,64 @@ export const RedisBackend: RateLimitBackend = {
             const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
             await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
             return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
-        } catch {
+        } catch (err) {
+            warnRedisFallback(err instanceof Error ? err.message : "unknown error");
             return memoryHitSync(identifier, config);
         }
     },
 };
 
 /**
- * Select the active backend once at module load. Consumers should not
- * import the backends directly — use rateLimit() or rateLimitForRole().
+ * Pick the backend on first use (not at module load) so that `next build`
+ * doesn't refuse to compile when REDIS_URL is only present at runtime.
+ *
+ * In production, REDIS_URL is mandatory: the memory backend is process-local
+ * and breaks under multi-worker deployments (PM2 cluster, multi-pod), leaving
+ * rate limits trivially bypassable. When a production server actually tries
+ * to rate-limit a request without Redis configured, we fail the request loudly
+ * instead of silently falling back. Dev and test environments always allow
+ * the memory backend. Set ALLOW_MEMORY_RATE_LIMIT=1 to override in production
+ * if you genuinely run a single worker and accept the risk.
  */
-const activeBackend: RateLimitBackend = isRedisConfigured() ? RedisBackend : MemoryBackend;
+let cachedBackend: RateLimitBackend | null = null;
+let prodMisconfigLoggedAt = 0;
+
+function getActiveBackend(): RateLimitBackend {
+    if (cachedBackend) return cachedBackend;
+
+    if (isRedisConfigured()) {
+        cachedBackend = RedisBackend;
+        return cachedBackend;
+    }
+
+    const isProd = process.env.NODE_ENV === "production";
+    const override = process.env.ALLOW_MEMORY_RATE_LIMIT === "1";
+    if (isProd && !override) {
+        const now = Date.now();
+        if (now - prodMisconfigLoggedAt > 60_000) {
+            prodMisconfigLoggedAt = now;
+            console.error(
+                "[rate-limit] REDIS_URL is required in production. " +
+                "The in-memory backend does not share state across workers and is bypassable. " +
+                "Set REDIS_URL, or ALLOW_MEMORY_RATE_LIMIT=1 to opt out (single-worker only). " +
+                "Requests are being denied until Redis is configured.",
+            );
+        }
+        // Do NOT cache this — we want to pick up the correct backend as soon
+        // as operators set REDIS_URL and restart / the env becomes readable.
+        return DenyAllBackend;
+    }
+
+    cachedBackend = MemoryBackend;
+    return cachedBackend;
+}
+
+const DenyAllBackend: RateLimitBackend = {
+    name: "deny-all",
+    async hit(_identifier, _config) {
+        return { success: false, remaining: 0, resetAt: Date.now() + 60_000 };
+    },
+};
 
 /**
  * Health check helper — returns true if Redis is configured AND currently
@@ -162,7 +220,7 @@ export async function rateLimit(
     identifier: string,
     config: RateLimitConfig = { maxRequests: 60, windowMs: 60000 }
 ): Promise<RateLimitResult> {
-    return activeBackend.hit(identifier, config);
+    return getActiveBackend().hit(identifier, config);
 }
 
 /**
@@ -375,17 +433,19 @@ export async function rateLimitForRoleAsync(
     const effective = applyMultiplier(baseConfig, multiplier);
     if (effective === null) return true;
 
-    const backend: RateLimitBackend = (await isRedisReady())
-        ? RedisBackend
-        : MemoryBackend;
+    // When Redis is configured, probe readiness per-call so a flaky Redis
+    // can transparently fall back to memory for this one request (logged
+    // via warnRedisFallback in RedisBackend). When Redis is NOT configured
+    // at all, go through getActiveBackend() so the production misconfig
+    // guard kicks in rather than silently using the memory backend.
+    const backend: RateLimitBackend = isRedisConfigured()
+        ? ((await isRedisReady()) ? RedisBackend : MemoryBackend)
+        : getActiveBackend();
 
     try {
         const result = await backend.hit(identifier, effective);
         return result.success;
     } catch {
-        // Last-resort safety net — on any unexpected backend error,
-        // fall back to the memory backend so we never 500 a request
-        // just because the limiter blew up.
         const result = await MemoryBackend.hit(identifier, effective);
         return result.success;
     }

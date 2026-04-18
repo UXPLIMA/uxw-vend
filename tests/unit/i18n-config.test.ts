@@ -30,15 +30,15 @@ describe('i18n config', () => {
     });
 
     it('every locale has a message file', () => {
-        const messagesDir = path.resolve(__dirname, '../../messages');
+        const messagesDir = path.resolve(__dirname, '../../messages-core');
         for (const locale of locales) {
             const filePath = path.join(messagesDir, `${locale}.json`);
-            expect(fs.existsSync(filePath), `Missing: messages/${locale}.json`).toBe(true);
+            expect(fs.existsSync(filePath), `Missing: messages-core/${locale}.json`).toBe(true);
         }
     });
 
     it('all message files have the same keys', () => {
-        const messagesDir = path.resolve(__dirname, '../../messages');
+        const messagesDir = path.resolve(__dirname, '../../messages-core');
         const flatKeys = (obj: Record<string, unknown>, prefix = ''): string[] => {
             const keys: string[] = [];
             for (const [k, v] of Object.entries(obj)) {

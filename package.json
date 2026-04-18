@@ -10,9 +10,10 @@
     "generate:themes": "npx tsx scripts/generate-themes.ts",
     "build:marketplace": "bash scripts/build-marketplace.sh",
     "db:merge": "npx tsx scripts/merge-schemas.ts",
-    "predev": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/clean-translations.ts",
+    "postinstall": "npx tsx scripts/postinstall.ts",
+    "predev": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts",
     "dev": "NEXT_DEV=1 next dev --turbopack --port 3001 --hostname 0.0.0.0",
-    "prebuild": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/clean-translations.ts && npx tsx scripts/generate-openapi.ts",
+    "prebuild": "npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/generate-openapi.ts",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
@@ -104,6 +105,7 @@
     "eslint-config-next": "^16.2.2",
     "prisma": "^7.6.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
   }
