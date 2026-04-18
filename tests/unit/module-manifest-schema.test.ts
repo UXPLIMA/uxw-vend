@@ -59,6 +59,24 @@ describe("moduleManifestSchema", () => {
         const extra = { ...minimal, surprise: "nope" };
         expect(moduleManifestSchema.safeParse(extra).success).toBe(false);
     });
+
+    it("accepts a module with slots contributions", () => {
+        const m = {
+            ...minimal,
+            slots: [
+                { name: "home.afterHero", component: "sections/Feature.tsx", order: 10 },
+            ],
+        };
+        expect(moduleManifestSchema.safeParse(m).success).toBe(true);
+    });
+
+    it("rejects an invalid slot name", () => {
+        const m = {
+            ...minimal,
+            slots: [{ name: "bad slot!!", component: "sections/X.tsx" }],
+        };
+        expect(moduleManifestSchema.safeParse(m).success).toBe(false);
+    });
 });
 
 describe("collectManifestFileRefs", () => {
