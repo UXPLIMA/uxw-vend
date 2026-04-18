@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "flat",
+  "name": "Flat",
+  "description": "Default light theme — clean, minimal, neutral.",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "type": "light",
+  "tokens": {
+    "colors": {
+      "primary":         { "type": "color", "default": "#2563eb", "group": "Brand" },
+      "secondary":       { "type": "color", "default": "#64748b", "group": "Brand" },
+      "accent":          { "type": "color", "default": "#f59e0b", "group": "Brand" },
+      "background":      { "type": "color", "default": "#ffffff", "group": "Surface" },
+      "foreground":      { "type": "color", "default": "#0f172a", "group": "Surface" },
+      "muted":           { "type": "color", "default": "#f1f5f9", "group": "Surface" },
+      "mutedForeground": { "type": "color", "default": "#64748b", "group": "Surface" },
+      "border":          { "type": "color", "default": "#e2e8f0", "group": "Surface" },
+      "card":            { "type": "color", "default": "#ffffff", "group": "Surface" },
+      "cardForeground":  { "type": "color", "default": "#0f172a", "group": "Surface" },
+      "destructive":     { "type": "color", "default": "#ef4444", "group": "State" },
+      "success":         { "type": "color", "default": "#16a34a", "group": "State" },
+      "warning":         { "type": "color", "default": "#f59e0b", "group": "State" }
+    },
+    "fonts": {
+      "heading": { "type": "font", "default": "Inter, system-ui, sans-serif" },
+      "body":    { "type": "font", "default": "Inter, system-ui, sans-serif" },
+      "mono":    { "type": "font", "default": "ui-monospace, SFMono-Regular, monospace" }
+    },
+    "radius": {
+      "type": "select",
+      "default": "md",
+      "options": [
+        { "value": "none", "label": "Square (0)" },
+        { "value": "sm",   "label": "Subtle (0.25rem)" },
+        { "value": "md",   "label": "Rounded (0.5rem)" },
+        { "value": "lg",   "label": "Soft (0.75rem)" }
+      ]
+    }
+  },
+  "config": {}
+}
