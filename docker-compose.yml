@@ -1,6 +1,22 @@
+# Single-command stack: Postgres, Redis, and the uxwVend app.
+#
+#   cp .env.example .env && docker compose up --build
+#
+# Named volumes persist DB rows, Redis state, uploaded files, and installed
+# modules across restarts. Use `docker compose down -v` to wipe everything.
+#
+# Ports on the host:
+#   app      → http://localhost:3001
+#   postgres → localhost:5432
+#   redis    → localhost:6379
+#
+# Env vars come from .env (via env_file). The connection strings below
+# override what .env has so the app always talks to the sibling services
+# rather than a localhost Postgres that doesn't exist inside the container.
+
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: uxwvend
@@ -8,25 +24,70 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U uxwvend"]
+      test: ["CMD-SHELL", "pg_isready -U uxwvend -d uxwvend"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    # Append-only persistence so cached module state + rate-limit counters
+    # survive restarts cleanly. Drop --appendonly yes for ephemeral dev.
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "3001:3001"
-    environment:
-      DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
-      AUTH_URL: http://localhost:3001
-      NEXTAUTH_URL: http://localhost:3001
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3001}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
+    ports:
+      - "3001:3001"
+    # Runtime state that must not live inside the read-only image layers.
+    volumes:
+      # Uploaded files (local storage provider fallback).
+      - uploads:/app/public/uploads
+      # Installed module code. The image boots with zero modules so admins
+      # can pick from the marketplace; this volume keeps their choices.
+      - modules:/app/src/modules
+      # DB backups written by the automated-backup cron + admin UI.
+      - backups:/app/backups
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 volumes:
   pgdata:
+  redisdata:
+  uploads:
+  modules:
+  backups:

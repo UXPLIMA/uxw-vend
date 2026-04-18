@@ -12,6 +12,7 @@ import { logActivity } from "@/core/lib/activity-log";
 import { incrementIndexDownloads } from "../_index-writer";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -50,6 +51,13 @@ export async function POST(request: NextRequest) {
         if (exists) {
             return NextResponse.json({ error: "Module already installed" }, { status: 409 });
         }
+
+        // Opt-in pre-install DB snapshot. Modules can ship schema.prisma
+        // fragments that merge into the core schema, and a half-applied
+        // migration is the single most common "why is production broken"
+        // scenario. Snapshot fails silently when pg_dump isn't available
+        // (dev boxes, minimal Docker images) — the install still proceeds.
+        await backupBeforeModuleChange("install", moduleId);
 
         // Check available disk space (need at least 100MB free)
         try {

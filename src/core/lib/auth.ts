@@ -4,6 +4,11 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import {
+    getLockoutStatus,
+    registerFailedLogin,
+    resetFailedLogins,
+} from "./account-lockout";
 
 import type { Provider } from "next-auth/providers";
 
@@ -75,12 +80,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     throw new Error("BANNED");
                 }
 
+                // Account-level lockout check — short-circuits before bcrypt
+                // so a locked account can't be brute-forced and can't be
+                // used to fingerprint valid emails via response-time delta.
+                const lockStatus = getLockoutStatus(user);
+                if (lockStatus.locked) {
+                    throw new Error("ACCOUNT_LOCKED");
+                }
+
                 const isPasswordValid = await bcrypt.compare(
                     credentials.password as string,
                     user.password
                 );
 
                 if (!isPasswordValid) {
+                    // Bump the failure counter; when it crosses the
+                    // threshold the account is automatically locked for
+                    // ACCOUNT_LOCKOUT_MS (default 15m).
+                    await registerFailedLogin(user.id);
                     return null;
                 }
 
@@ -114,6 +131,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         });
                     }
                 }
+
+                // Clear any residual failed-login counter — this login
+                // succeeded, so any lockout from earlier failures (including
+                // stale rows from an old attempt) should be reset before the
+                // session is minted.
+                await resetFailedLogins(user.id);
 
                 // Fire user.login hook — modules can react to successful credential auth.
                 // Extract ip + userAgent from the incoming Request (best-effort).

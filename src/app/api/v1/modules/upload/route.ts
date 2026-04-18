@@ -10,6 +10,7 @@ import AdmZip from "adm-zip";
 import { acquireInstallLock } from "@/core/lib/install-lock";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const RESERVED_IDS = new Set([
@@ -150,6 +151,13 @@ export async function POST(request: NextRequest) {
         }
 
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
+
+        // Opt-in pre-install DB snapshot (MODULE_INSTALL_BACKUP=1). Runs
+        // AFTER validation so a rejected upload never creates a backup
+        // file, but BEFORE the file-system change so ops can roll back
+        // the DB to its pre-upload state if a later migration explodes.
+        await backupBeforeModuleChange(exists ? "update" : "install", manifest.id);
+
         if (exists) {
             await fs.rm(targetDir, { recursive: true, force: true });
         }

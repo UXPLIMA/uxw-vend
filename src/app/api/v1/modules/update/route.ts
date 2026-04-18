@@ -8,6 +8,7 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -42,6 +43,11 @@ export async function POST(request: NextRequest) {
         if (!exists) {
             return NextResponse.json({ error: "Module not installed — use install instead" }, { status: 404 });
         }
+
+        // Opt-in pre-update DB snapshot (MODULE_INSTALL_BACKUP=1). Module
+        // updates can ship schema changes; a snapshot gives ops a point
+        // to roll back to when a migration half-applies.
+        await backupBeforeModuleChange("update", moduleId);
 
         const zipUrl = `${MARKETPLACE_BASE}/${zipFile}`;
         const res = await fetch(zipUrl);

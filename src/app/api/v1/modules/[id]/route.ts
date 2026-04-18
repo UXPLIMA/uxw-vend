@@ -9,6 +9,7 @@ import { logActivity } from "@/core/lib/activity-log";
 import { acquireInstallLock } from "@/core/lib/install-lock";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
+import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -51,6 +52,12 @@ export async function DELETE(
             await invalidateModuleCache().catch(() => {});
             return NextResponse.json({ error: "Module not found on disk" }, { status: 404 });
         }
+
+        // Opt-in pre-uninstall snapshot (MODULE_INSTALL_BACKUP=1). Even
+        // though we preserve module-owned tables for reinstall, the
+        // registry regen + build may still brick runtime state on a bad
+        // module — a snapshot buys the operator a clean rollback.
+        await backupBeforeModuleChange("uninstall", moduleId);
 
         await fs.rm(moduleDir, { recursive: true, force: true });
 

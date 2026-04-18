@@ -26,6 +26,14 @@ model User {
   bannedAt         DateTime?
   isDeleted        Boolean   @default(false)
   deletedAt        DateTime?
+  // Failed-login throttling. Per-IP rate limiting only slows brute force
+  // from a single attacker host; a distributed credential-stuffing attack
+  // can pepper a single account from thousands of IPs without tripping
+  // any IP limit. These fields let us lock the account itself after too
+  // many failures in a row and reset on any successful login.
+  failedLoginAttempts Int       @default(0)
+  lastFailedLoginAt   DateTime?
+  lockedUntil         DateTime?
   createdAt        DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
