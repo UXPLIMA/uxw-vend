@@ -249,7 +249,12 @@ export async function proxy(request: NextRequest) {
     // The block list is cached in-process for 60s so middleware stays
     // fast, and `isIpBlocked` fails open on DB errors — a DB outage
     // must never lock every visitor out.
-    if (!isStaticAsset(pathname)) {
+    //
+    // IP gating is skipped until setup is complete: during the bootstrap
+    // wizard the admin hasn't had a chance to whitelist their IP yet, and
+    // a stale DB rule from a test environment must never lock the operator
+    // out of the initial install screen.
+    if (!isStaticAsset(pathname) && (await isSetupComplete())) {
         const clientIp = getClientIpFromRequest(request);
         const ipScope = resolveIpScope(pathname);
         try {

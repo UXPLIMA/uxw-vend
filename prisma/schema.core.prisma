@@ -488,8 +488,11 @@ model ApiKey {
 
 model ActivityLog {
   id        String   @id @default(cuid())
+  // Deleting the acting user must NOT erase their audit trail — the row
+  // stays with userId nulled out so compliance / forensic queries over
+  // historical events still surface the entity, action, and metadata.
   userId    String?
-  user      User?    @relation("ActivityLogs", fields: [userId], references: [id])
+  user      User?    @relation("ActivityLogs", fields: [userId], references: [id], onDelete: SetNull)
   action    String
   entity    String?
   entityId  String?

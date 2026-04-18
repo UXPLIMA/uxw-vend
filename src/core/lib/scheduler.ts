@@ -183,9 +183,9 @@ export async function bootstrapScheduler(): Promise<void> {
         handler: async () => {
             const { pruneOldRecords } = await import("./retention");
             const r = await pruneOldRecords();
-            const total = r.activityFeed + r.webhookLog + r.cronRun + r.revision;
+            const total = r.activityFeed + r.webhookLog + r.cronRun + r.revision + r.userSession;
             if (total > 0) {
-                console.log(`[cron] retention: activityFeed=${r.activityFeed} webhookLog=${r.webhookLog} cronRun=${r.cronRun} revision=${r.revision}`);
+                console.log(`[cron] retention: activityFeed=${r.activityFeed} webhookLog=${r.webhookLog} cronRun=${r.cronRun} revision=${r.revision} userSession=${r.userSession}`);
             }
         },
     });

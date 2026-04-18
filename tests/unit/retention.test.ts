@@ -5,6 +5,7 @@ const activityFeedItemDeleteMany = vi.fn();
 const webhookLogDeleteMany = vi.fn();
 const cronRunDeleteMany = vi.fn();
 const revisionDeleteMany = vi.fn();
+const userSessionDeleteMany = vi.fn();
 
 // Toggle whether webhookLog key exists on prisma mock
 let includeWebhookLog = true;
@@ -20,6 +21,9 @@ vi.mock("@/core/lib/db", () => {
         },
         revision: {
             deleteMany: (...args: unknown[]) => revisionDeleteMany(...args),
+        },
+        userSession: {
+            deleteMany: (...args: unknown[]) => userSessionDeleteMany(...args),
         },
     };
     return {
@@ -46,6 +50,8 @@ beforeEach(async () => {
     webhookLogDeleteMany.mockReset();
     cronRunDeleteMany.mockReset();
     revisionDeleteMany.mockReset();
+    userSessionDeleteMany.mockReset();
+    userSessionDeleteMany.mockResolvedValue({ count: 0 });
     includeWebhookLog = true;
     // Silence expected error logs
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -70,6 +76,7 @@ describe("retention: pruneOldRecords", () => {
             webhookLog: 2,
             cronRun: 7,
             revision: 3,
+            userSession: 0,
         });
     });
 

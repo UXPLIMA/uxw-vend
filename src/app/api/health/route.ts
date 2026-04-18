@@ -30,13 +30,25 @@ interface HealthResponse {
     version: string;
 }
 
+// Health is a PUBLIC endpoint (load balancer probes have no auth). Leaking
+// raw driver errors here reveals database hostnames, connection strings, and
+// filesystem paths to anyone on the internet. In production we reply with a
+// generic "check failed" — dev still surfaces the message for debugging.
+const IS_PROD = process.env.NODE_ENV === "production";
+function safeErrorMessage(err: unknown): string | undefined {
+    if (IS_PROD) return "check failed";
+    if (err instanceof Error) return err.message;
+    if (err === undefined || err === null) return undefined;
+    return String(err);
+}
+
 async function checkDatabase(): Promise<{ ok: boolean; latencyMs: number; error?: string }> {
     const start = Date.now();
     try {
         await prisma.$queryRaw`SELECT 1`;
         return { ok: true, latencyMs: Date.now() - start };
     } catch (err) {
-        return { ok: false, latencyMs: Date.now() - start, error: (err as Error).message };
+        return { ok: false, latencyMs: Date.now() - start, error: safeErrorMessage(err) };
     }
 }
 
@@ -46,9 +58,9 @@ async function checkRedis(): Promise<{ ok: boolean; enabled: boolean; error?: st
         const ready = await isRedisReady();
         return ready
             ? { ok: true, enabled: true }
-            : { ok: false, enabled: true, error: "Redis ping failed" };
+            : { ok: false, enabled: true, error: IS_PROD ? "check failed" : "Redis ping failed" };
     } catch (err) {
-        return { ok: false, enabled: true, error: (err as Error).message };
+        return { ok: false, enabled: true, error: safeErrorMessage(err) };
     }
 }
 
@@ -60,7 +72,7 @@ async function checkEmailQueue(): Promise<{ ok: boolean; pending: number; failed
         ]);
         return { ok: failed < 10, pending, failed };
     } catch (err) {
-        return { ok: false, pending: 0, failed: 0, error: (err as Error).message };
+        return { ok: false, pending: 0, failed: 0, error: safeErrorMessage(err) };
     }
 }
 
@@ -75,7 +87,7 @@ async function checkScheduler(): Promise<{ ok: boolean; staleJobs: number; error
         });
         return { ok: staleJobs === 0, staleJobs };
     } catch (err) {
-        return { ok: false, staleJobs: 0, error: (err as Error).message };
+        return { ok: false, staleJobs: 0, error: safeErrorMessage(err) };
     }
 }
 

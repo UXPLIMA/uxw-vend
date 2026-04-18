@@ -8,6 +8,7 @@ import AdmZip from "adm-zip";
 import prisma from "@/core/lib/db";
 import { markSetupComplete } from "@/core/lib/setup-state";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
+import { devOnlyDetail } from "@/core/lib/api-utils";
 
 /**
  * First-run setup API.
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         existingUsers = await prisma.user.count();
     } catch (err) {
         return NextResponse.json(
-            { error: "Database unreachable", details: err instanceof Error ? err.message : "unknown" },
+            { error: "Database unreachable", details: devOnlyDetail(err) },
             { status: 500 }
         );
     }
@@ -146,8 +147,10 @@ export async function POST(request: NextRequest) {
                 { status: 409 }
             );
         }
-        const msg = err instanceof Error ? err.message : "Setup failed";
-        return NextResponse.json({ error: msg }, { status: 500 });
+        return NextResponse.json(
+            { error: "Setup failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     }
     void adminRoleId;
 
@@ -245,8 +248,10 @@ export async function POST(request: NextRequest) {
             failedModules,
         });
     } catch (err) {
-        const msg = err instanceof Error ? err.message : "Setup failed";
-        return NextResponse.json({ error: msg }, { status: 500 });
+        return NextResponse.json(
+            { error: "Setup failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     }
 }
 

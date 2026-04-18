@@ -8,6 +8,7 @@ import { execFileSync } from "child_process";
 import { logActivity } from "@/core/lib/activity-log";
 import { acquireInstallLock } from "@/core/lib/install-lock";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
+import { devOnlyDetail } from "@/core/lib/api-utils";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -91,8 +92,10 @@ export async function DELETE(
 
         return NextResponse.json({ message: "Module deleted successfully" });
     } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        return NextResponse.json({ error: "Delete failed: " + message }, { status: 500 });
+        return NextResponse.json(
+            { error: "Delete failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     } finally {
         releaseLock();
     }

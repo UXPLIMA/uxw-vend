@@ -12,6 +12,7 @@ import { prisma } from "@/core/lib/db";
  *   WebhookLog          30
  *   CronRun             30
  *   Revision           365  (longer — it's a compliance/audit trail)
+ *   UserSession         30  (past expiresAt OR revoked)
  *
  * Returns a summary of how many rows each table dropped so the cron log
  * is useful for ops.
@@ -24,12 +25,14 @@ export interface PruneResult {
     webhookLog: number;
     cronRun: number;
     revision: number;
+    userSession: number;
 }
 
 export async function pruneOldRecords(): Promise<PruneResult> {
-    const result: PruneResult = { activityFeed: 0, webhookLog: 0, cronRun: 0, revision: 0 };
+    const result: PruneResult = { activityFeed: 0, webhookLog: 0, cronRun: 0, revision: 0, userSession: 0 };
 
     const cutoff = (days: number) => new Date(Date.now() - days * DAY_MS);
+    const now = new Date();
 
     try {
         const r = await prisma.activityFeedItem.deleteMany({
@@ -68,6 +71,23 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         result.revision = r.count;
     } catch (err) {
         console.error("[retention] revision prune failed:", err);
+    }
+
+    // UserSession: drop anything that's already expired, plus revoked rows
+    // older than the retention window. Keeping recent revoked sessions lets
+    // admins audit "why did you sign me out on device X" for a while.
+    try {
+        const r = await prisma.userSession.deleteMany({
+            where: {
+                OR: [
+                    { expiresAt: { lt: now } },
+                    { isRevoked: true, createdAt: { lt: cutoff(30) } },
+                ],
+            },
+        });
+        result.userSession = r.count;
+    } catch (err) {
+        console.error("[retention] userSession prune failed:", err);
     }
 
     return result;

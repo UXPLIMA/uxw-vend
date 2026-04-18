@@ -250,18 +250,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 return token;
             }
 
-            // Refresh role + ban status from DB on every token refresh
+            // Refresh role + ban status from DB on every token refresh.
+            //
+            // When impersonating, we check the impersonated user (token.id) —
+            // if they become banned/deleted the impersonation session ends
+            // immediately, not at the next manual update(). When not
+            // impersonating, this also refreshes the admin's own role so a
+            // demotion takes effect on the next request.
             if (trigger === "update" || !token.role || token.rolePriority === undefined) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     include: { role: true },
                 });
                 if (dbUser) {
-                    // Invalidate session if user is banned
-                    if (dbUser.isBanned) {
+                    if (dbUser.isBanned || dbUser.isDeleted) {
                         return null as unknown as typeof token;
                     }
-                    // Invalidate if this session has been revoked
                     if (token.tokenId) {
                         const sess = await prisma.userSession.findUnique({
                             where: { tokenId: token.tokenId as string },
@@ -272,6 +276,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     }
                     token.role = dbUser.role?.name || "member";
                     token.rolePriority = dbUser.role?.priority ?? 0;
+                }
+
+                // Double-check the original admin identity during impersonation
+                // — if the admin has been banned / demoted since starting the
+                // impersonation, we must NOT let them keep acting as someone else.
+                if (token.originalUserId) {
+                    const realAdmin = await prisma.user.findUnique({
+                        where: { id: token.originalUserId as string },
+                        select: { isBanned: true, isDeleted: true, role: { select: { name: true } } },
+                    });
+                    if (!realAdmin || realAdmin.isBanned || realAdmin.isDeleted || realAdmin.role?.name !== "admin") {
+                        return null as unknown as typeof token;
+                    }
                 }
             }
             return token;

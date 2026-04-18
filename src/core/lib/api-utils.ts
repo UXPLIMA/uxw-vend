@@ -54,6 +54,27 @@ export function apiError(message: string, status = 400, options: ApiErrorOptions
     return NextResponse.json(body, { status, headers: options.headers });
 }
 
+/**
+ * Return the error message only outside production. In production we mask
+ * internal details so a crashing Prisma / fs / fetch call cannot leak DB
+ * hostnames, filesystem paths, stack frames, or other reconnaissance data
+ * to the caller. Use this whenever `err.message` would otherwise appear
+ * verbatim in a response body.
+ *
+ *   catch (err) {
+ *     return apiError("Upload failed", 500, { details: devOnlyDetail(err) });
+ *   }
+ *
+ * `details` is dropped by apiError when undefined so the wire envelope
+ * stays clean.
+ */
+export function devOnlyDetail(err: unknown): string | undefined {
+    if (process.env.NODE_ENV === "production") return undefined;
+    if (err instanceof Error) return err.message;
+    if (err === undefined || err === null) return undefined;
+    return String(err);
+}
+
 export function apiPaginated<T>(
     items: T[],
     total: number,
