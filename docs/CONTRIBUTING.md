@@ -89,6 +89,8 @@ Examples of what belongs in a module:
 - New endpoints: use `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils` — the canonical envelope is `{ ok: true, data }` or `{ ok: false, error, code? }`. Legacy `{ error }` shapes still exist and are being migrated.
 - State-changing endpoints (`POST/PUT/DELETE/PATCH`) must pass the proxy-level CSRF check; they do automatically as long as the browser sends the request. Server-to-server callers set `x-internal-request: $CSRF_INTERNAL_SECRET`.
 - Admin mutations should log to `ActivityLog` via `logActivity({ userId, action, entity, entityId, metadata })`.
+- Session cookies (configured in `src/core/lib/auth.ts`): `httpOnly: true`, `sameSite: "lax"`, `path: "/"`, `secure` only in production. Production uses the `__Secure-` prefix for the session/callback cookies and the stricter `__Host-` prefix for the CSRF cookie. Do not weaken these attributes without a code-review note.
+- JWT `updateAge` is 1 hour — role, ban, and revocation changes reach dormant sessions within that window.
 - Use `rateLimit()` on auth-related endpoints.
 - Soft delete for products (`isActive = false`), not hard delete.
 

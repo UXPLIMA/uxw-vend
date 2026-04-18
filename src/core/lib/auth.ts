@@ -44,15 +44,68 @@ if (process.env.AUTH_GOOGLE_ID) {
     );
 }
 
+// Session cookie hardening.
+//
+// Auth.js v5 already sets httpOnly + sameSite=lax and prepends the
+// `__Secure-` prefix automatically in production (secure=true cookies
+// only). We spell the configuration out explicitly here so a future
+// change can't accidentally demote any of these attributes without
+// showing up in code review.
+//
+// SameSite=lax is the right balance for this app: it protects against
+// CSRF on cross-site POSTs while still allowing OAuth redirects
+// (which arrive as top-level GETs) to carry the session.
+//
+// We do NOT set `__Host-` — it bans the Domain attribute AND requires
+// Path=/. Auth.js's defaults meet those requirements, but using the
+// explicit __Host- prefix name inside the cookies config confuses the
+// Auth.js cookie-reading path in dev (HTTP localhost) because the
+// browser silently drops the cookie without TLS. Leaving the prefix
+// selection to Auth.js (__Secure- in prod, unprefixed in dev) is the
+// safe default.
+const IS_PROD_COOKIE = process.env.NODE_ENV === "production";
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: {
         strategy: "jwt",
         maxAge: 24 * 60 * 60,
+        // Force a token refresh every hour so role/ban/permission changes
+        // propagate within an hour even on dormant sessions.
+        updateAge: 60 * 60,
     },
     pages: {
         signIn: "/auth/login",
         error: "/auth/error",
+    },
+    cookies: {
+        sessionToken: {
+            name: IS_PROD_COOKIE ? "__Secure-authjs.session-token" : "authjs.session-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: IS_PROD_COOKIE,
+            },
+        },
+        callbackUrl: {
+            name: IS_PROD_COOKIE ? "__Secure-authjs.callback-url" : "authjs.callback-url",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: IS_PROD_COOKIE,
+            },
+        },
+        csrfToken: {
+            name: IS_PROD_COOKIE ? "__Host-authjs.csrf-token" : "authjs.csrf-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: IS_PROD_COOKIE,
+            },
+        },
     },
     providers: [
         Credentials({

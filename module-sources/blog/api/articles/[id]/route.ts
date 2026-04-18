@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(article);
 }
 
-// PATCH /api/v1/blog/articles/[id] - Update article (admin only)
+// PATCH /api/v1/blog/articles/[id] - Update article (author or admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     const { id } = await params;
@@ -55,17 +55,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     const article = await prisma.blogArticle.findUnique({
         where: { id },
         include: { tags: true, category: true },
     });
     if (!article) {
         return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
+
+    // Object-level ownership: authors can edit their own article; admins can
+    // edit any article. Checked BEFORE pulling the request body so a
+    // non-owner never hits the update path at all.
+    const adminCheck = await isAdmin(session.user.id);
+    const isAuthor = article.authorId === session.user.id;
+    if (!adminCheck && !isAuthor) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Snapshot the previous state for rollback
@@ -147,18 +151,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(updatedArticle);
 }
 
-// DELETE /api/v1/blog/articles/[id] - Delete article (admin only)
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+// DELETE /api/v1/blog/articles/[id] - Delete article (author or admin)
+export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     const { id } = await params;
 
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const article = await prisma.blogArticle.findUnique({
@@ -167,6 +166,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
     if (!article) {
         return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
+
+    const adminCheck = await isAdmin(session.user.id);
+    const isAuthor = article.authorId === session.user.id;
+    if (!adminCheck && !isAuthor) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Snapshot the deleted entity for potential restore

@@ -5,7 +5,7 @@ import { createHash } from "crypto";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
-import { checkPasswordPolicy } from "@/core/lib/password-policy";
+import { checkPasswordPolicy, checkPasswordBreach } from "@/core/lib/password-policy";
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
         if (!policyCheck.ok) {
             return NextResponse.json(
                 { error: policyCheck.message ?? "Invalid password" },
+                { status: 400 },
+            );
+        }
+
+        const breach = await checkPasswordBreach(password);
+        if (!breach.ok) {
+            return NextResponse.json(
+                { error: "This password has appeared in a known data breach — pick something else." },
                 { status: 400 },
             );
         }

@@ -7,6 +7,7 @@ import { notifyUserRegistered } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { checkPasswordBreach } from "@/core/lib/password-policy";
 
 export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute per IP
@@ -25,6 +26,17 @@ export async function POST(request: NextRequest) {
         }
 
         const { email, username, password } = validation.data;
+
+        // Optional HIBP breach check (opt-in via PASSWORD_BREACH_CHECK=1).
+        // Uses k-anonymity so only the first 5 chars of the SHA-1 digest
+        // ever leave the server. A flaky HIBP fails open.
+        const breach = await checkPasswordBreach(password);
+        if (!breach.ok) {
+            return NextResponse.json(
+                { error: "This password has appeared in a known data breach — pick something else." },
+                { status: 400 },
+            );
+        }
 
         // Fast-path rejection for the common (non-concurrent) duplicate case
         // so we don't burn bcrypt cycles on a doomed insert. Concurrent
