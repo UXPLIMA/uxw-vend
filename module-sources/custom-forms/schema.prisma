@@ -1,0 +1,30 @@
+// Custom Forms Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== CUSTOM FORMS ====================
+
+model CustomForm {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  fields      Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  submissions CustomFormSubmission[]
+  @@index([slug])
+}
+
+model CustomFormSubmission {
+  id        String     @id @default(cuid())
+  formId    String
+  form      CustomForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  userId    String?
+  data      Json
+  status    String     @default("new")
+  createdAt DateTime   @default(now())
+
+  @@index([formId])
+}

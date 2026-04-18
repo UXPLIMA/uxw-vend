@@ -1,0 +1,85 @@
+// Tickets Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   tickets        Ticket[]
+//   ticketMessages TicketMessage[]
+//   assignedTickets Ticket[] @relation("AssignedTickets")
+// @@user-relations-end
+
+// ==================== TICKETS MODULE ====================
+
+model TicketDepartment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tickets Ticket[]
+}
+
+model Ticket {
+  id          String         @id @default(cuid())
+  subject     String
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  closedAt    DateTime?
+
+  departmentId String
+  department   TicketDepartment @relation(fields: [departmentId], references: [id])
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+  assignedToId String?
+  assignedTo   User?            @relation("AssignedTickets", fields: [assignedToId], references: [id])
+
+  messages TicketMessage[]
+
+  @@index([userId])
+  @@index([departmentId])
+  @@index([status])
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_REPLY
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model TicketMessage {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  isStaffReply Boolean @default(false)
+  attachments String[] @default([])
+  createdAt   DateTime @default(now())
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+}
+
+model CannedResponse {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

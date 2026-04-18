@@ -1,0 +1,318 @@
+{
+  "id": "stripe-gateway",
+  "name": "Stripe Payment Gateway",
+  "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "CreditCard",
+  "dependencies": [
+    "store"
+  ],
+  "settingsCards": [
+    {
+      "title": "Stripe",
+      "description": "Stripe API keys and webhook configuration.",
+      "href": "/settings/stripe",
+      "icon": "CreditCard",
+      "color": "text-purple-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Stripe Settings",
+      "path": "/settings/stripe",
+      "icon": "CreditCard"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/stripe",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "webhookReceivers": [
+    {
+      "provider": "stripe",
+      "handler": "hooks/webhook.ts",
+      "signatureHeader": "stripe-signature",
+      "secretEnv": "STRIPE_WEBHOOK_SECRET"
+    }
+  ],
+  "translations": {
+    "en": {
+      "stripeGateway": {
+        "title": "Stripe Settings",
+        "description": "Configure Stripe payment gateway",
+        "publishableKey": "Publishable Key",
+        "secretKey": "Secret Key",
+        "webhookSecret": "Webhook Secret",
+        "webhookUrl": "Webhook URL",
+        "testMode": "Test Mode",
+        "testModeDescription": "Enable test mode for development",
+        "liveMode": "Live Mode",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "saveSettings": "Save Settings",
+        "settingsSaved": "Stripe settings saved successfully",
+        "settingsError": "Failed to save Stripe settings",
+        "testConnection": "Test Connection",
+        "connectionSuccess": "Stripe connection successful",
+        "connectionFailed": "Stripe connection failed",
+        "currency": "Currency",
+        "paymentMethods": "Payment Methods",
+        "creditCard": "Credit Card",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Stripe Settings",
+        "adm_subtitle": "Configure Stripe payment gateway",
+        "adm_field1Label": "Publishable Key",
+        "adm_field1Desc": "Stripe publishable API key (pk_...)",
+        "adm_field2Label": "Secret Key",
+        "adm_field2Desc": "Stripe secret API key (sk_...)",
+        "adm_field3Label": "Webhook Secret",
+        "adm_field3Desc": "Stripe webhook signing secret (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Stripe Gateway",
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content",
+        "menu_stripe-gateway_stripe_settings": "Stripe Settings"
+      }
+    },
+    "tr": {
+      "stripeGateway": {
+        "title": "Stripe Ayarlari",
+        "description": "Stripe odeme agirligi yapilandirmasi",
+        "publishableKey": "Yayinlanabilir Anahtar",
+        "secretKey": "Gizli Anahtar",
+        "webhookSecret": "Webhook Gizli Anahtari",
+        "webhookUrl": "Webhook URL",
+        "testMode": "Test Modu",
+        "testModeDescription": "Gelistirme icin test modunu etkinlestir",
+        "liveMode": "Canli Mod",
+        "enabled": "Etkin",
+        "disabled": "Devre Disi",
+        "saveSettings": "Ayarlari Kaydet",
+        "settingsSaved": "Stripe ayarlari basariyla kaydedildi",
+        "settingsError": "Stripe ayarlari kaydedilemedi",
+        "testConnection": "Baglanti Testi",
+        "connectionSuccess": "Stripe baglantisi başarılı",
+        "connectionFailed": "Stripe baglantisi başarısız",
+        "currency": "Para Birimi",
+        "paymentMethods": "Odeme Yontemleri",
+        "creditCard": "Kredi Karti",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Stripe Ayarları",
+        "adm_subtitle": "Stripe ödeme ağ geçidini yapılandırın",
+        "adm_field1Label": "Yayınlanabilir Anahtar",
+        "adm_field1Desc": "Stripe yayınlanabilir API anahtarı (pk_...)",
+        "adm_field2Label": "Gizli Anahtar",
+        "adm_field2Desc": "Stripe gizli API anahtarı (sk_...)",
+        "adm_field3Label": "Webhook Sırrı",
+        "adm_field3Desc": "Stripe webhook imzalama sırrı (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Stripe Ayarları",
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "menu_stripe-gateway_stripe_settings": "Stripe Ayarları"
+      }
+    },
+    "de": {
+      "stripeGateway": {
+        "title": "Stripe-Einstellungen",
+        "description": "Stripe-Zahlungsgateway konfigurieren",
+        "publishableKey": "Oeffentlicher Schluessel",
+        "secretKey": "Geheimer Schluessel",
+        "webhookSecret": "Webhook-Geheimnis",
+        "webhookUrl": "Webhook-URL",
+        "testMode": "Testmodus",
+        "testModeDescription": "Testmodus fuer Entwicklung aktivieren",
+        "liveMode": "Live-Modus",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "saveSettings": "Einstellungen speichern",
+        "settingsSaved": "Stripe-Einstellungen erfolgreich gespeichert",
+        "settingsError": "Stripe-Einstellungen konnten nicht gespeichert werden",
+        "testConnection": "Verbindung testen",
+        "connectionSuccess": "Stripe-Verbindung erfolgreich",
+        "connectionFailed": "Stripe-Verbindung fehlgeschlagen",
+        "currency": "Waehrung",
+        "paymentMethods": "Zahlungsmethoden",
+        "creditCard": "Kreditkarte",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Stripe-Einstellungen",
+        "adm_subtitle": "Stripe-Zahlungsgateway konfigurieren",
+        "adm_field1Label": "Öffentlicher Schlüssel",
+        "adm_field1Desc": "Öffentlicher Stripe-API-Schlüssel (pk_...)",
+        "adm_field2Label": "Geheimer Schlüssel",
+        "adm_field2Desc": "Geheimer Stripe-API-Schlüssel (sk_...)",
+        "adm_field3Label": "Webhook-Secret",
+        "adm_field3Desc": "Stripe-Webhook-Signierungsgeheimnis (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Stripe-Einstellungen",
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "stripeGateway": {
+        "title": "Configuracion de Stripe",
+        "description": "Configurar pasarela de pago Stripe",
+        "publishableKey": "Clave publica",
+        "secretKey": "Clave secreta",
+        "webhookSecret": "Secreto del webhook",
+        "webhookUrl": "URL del webhook",
+        "testMode": "Modo de prueba",
+        "testModeDescription": "Activar modo de prueba para desarrollo",
+        "liveMode": "Modo en vivo",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "saveSettings": "Guardar configuracion",
+        "settingsSaved": "Configuracion de Stripe guardada correctamente",
+        "settingsError": "Error al guardar la configuracion de Stripe",
+        "testConnection": "Probar conexion",
+        "connectionSuccess": "Conexion con Stripe exitosa",
+        "connectionFailed": "Conexion con Stripe fallida",
+        "currency": "Moneda",
+        "paymentMethods": "Metodos de pago",
+        "creditCard": "Tarjeta de credito",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Configuración de Stripe",
+        "adm_subtitle": "Configura la pasarela de pago Stripe",
+        "adm_field1Label": "Clave Publicable",
+        "adm_field1Desc": "Clave API publicable de Stripe (pk_...)",
+        "adm_field2Label": "Clave Secreta",
+        "adm_field2Desc": "Clave API secreta de Stripe (sk_...)",
+        "adm_field3Label": "Secreto del Webhook",
+        "adm_field3Desc": "Secreto de firma de webhook de Stripe (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Configuración Stripe",
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "stripeGateway": {
+        "title": "Parametres Stripe",
+        "description": "Configurer la passerelle de paiement Stripe",
+        "publishableKey": "Cle publique",
+        "secretKey": "Cle secrete",
+        "webhookSecret": "Secret du webhook",
+        "webhookUrl": "URL du webhook",
+        "testMode": "Mode test",
+        "testModeDescription": "Activer le mode test pour le developpement",
+        "liveMode": "Mode production",
+        "enabled": "Active",
+        "disabled": "Desactive",
+        "saveSettings": "Enregistrer les parametres",
+        "settingsSaved": "Parametres Stripe enregistres avec succes",
+        "settingsError": "Echec de l'enregistrement des parametres Stripe",
+        "testConnection": "Tester la connexion",
+        "connectionSuccess": "Connexion Stripe reussie",
+        "connectionFailed": "Connexion Stripe echouee",
+        "currency": "Devise",
+        "paymentMethods": "Methodes de paiement",
+        "creditCard": "Carte de credit",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Paramètres Stripe",
+        "adm_subtitle": "Configurez la passerelle de paiement Stripe",
+        "adm_field1Label": "Clé Publique",
+        "adm_field1Desc": "Clé API publique Stripe (pk_...)",
+        "adm_field2Label": "Clé Secrète",
+        "adm_field2Desc": "Clé API secrète Stripe (sk_...)",
+        "adm_field3Label": "Secret du Webhook",
+        "adm_field3Desc": "Secret de signature de webhook Stripe (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Paramètres Stripe",
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "stripeGateway": {
+        "title": "Nastroiki Stripe",
+        "description": "Nastroika platezhnogo shliuza Stripe",
+        "publishableKey": "Publikuemyi kliuch",
+        "secretKey": "Sekretnyi kliuch",
+        "webhookSecret": "Sekret vebkhuka",
+        "webhookUrl": "URL vebkhuka",
+        "testMode": "Testovyi rezhim",
+        "testModeDescription": "Vkliuchit testovyi rezhim dlia razrabotki",
+        "liveMode": "Boevoi rezhim",
+        "enabled": "Vkliucheno",
+        "disabled": "Otkliucheno",
+        "saveSettings": "Sokhranit nastroiki",
+        "settingsSaved": "Nastroiki Stripe uspeshno sokhraneny",
+        "settingsError": "Ne udalos sokhranit nastroiki Stripe",
+        "testConnection": "Proverit podkliuchenie",
+        "connectionSuccess": "Podkliuchenie k Stripe uspeshno",
+        "connectionFailed": "Podkliuchenie k Stripe ne udalos",
+        "currency": "Valiuta",
+        "paymentMethods": "Sposoby oplaty",
+        "creditCard": "Kreditnaia karta",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Настройки Stripe",
+        "adm_subtitle": "Настройте платёжный шлюз Stripe",
+        "adm_field1Label": "Публикуемый ключ",
+        "adm_field1Desc": "Публикуемый API-ключ Stripe (pk_...)",
+        "adm_field2Label": "Секретный ключ",
+        "adm_field2Desc": "Секретный API-ключ Stripe (sk_...)",
+        "adm_field3Label": "Секрет вебхука",
+        "adm_field3Desc": "Секрет подписи вебхука Stripe (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Настройки Stripe",
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "stripeGateway": {
+        "title": "Configuracoes do Stripe",
+        "description": "Configurar gateway de pagamento Stripe",
+        "publishableKey": "Chave publica",
+        "secretKey": "Chave secreta",
+        "webhookSecret": "Segredo do webhook",
+        "webhookUrl": "URL do webhook",
+        "testMode": "Modo de teste",
+        "testModeDescription": "Ativar modo de teste para desenvolvimento",
+        "liveMode": "Modo producao",
+        "enabled": "Ativado",
+        "disabled": "Desativado",
+        "saveSettings": "Salvar configuracoes",
+        "settingsSaved": "Configuracoes do Stripe salvas com sucesso",
+        "settingsError": "Falha ao salvar configuracoes do Stripe",
+        "testConnection": "Testar conexao",
+        "connectionSuccess": "Conexao com Stripe bem-sucedida",
+        "connectionFailed": "Conexao com Stripe falhou",
+        "currency": "Moeda",
+        "paymentMethods": "Metodos de pagamento",
+        "creditCard": "Cartao de credito",
+        "applePay": "Apple Pay",
+        "googlePay": "Google Pay",
+        "adm_title": "Configurações Stripe",
+        "adm_subtitle": "Configure o gateway de pagamento Stripe",
+        "adm_field1Label": "Chave Publicável",
+        "adm_field1Desc": "Chave API publicável do Stripe (pk_...)",
+        "adm_field2Label": "Chave Secreta",
+        "adm_field2Desc": "Chave API secreta do Stripe (sk_...)",
+        "adm_field3Label": "Segredo do Webhook",
+        "adm_field3Desc": "Segredo de assinatura de webhook do Stripe (whsec_...)"
+      },
+      "admin": {
+        "menu_stripe-gateway": "Configurações Stripe",
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

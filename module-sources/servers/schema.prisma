@@ -1,0 +1,20 @@
+// Servers Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== GAME SERVERS ====================
+
+model GameServer {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   @default("minecraft")
+  host        String
+  port        Int      @default(25565)
+  rconPort    Int?
+  rconPassword String?
+  queryPort   Int?
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

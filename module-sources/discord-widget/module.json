@@ -1,0 +1,112 @@
+{
+  "id": "discord-widget",
+  "name": "Discord Widget",
+  "description": "Discord server widget on homepage sidebar",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "MessageSquare",
+  "widgets": [
+    {
+      "id": "DiscordWidget",
+      "component": "widgets/discord-widget",
+      "defaultOrder": 0,
+      "defaultVisible": true
+    }
+  ],
+  "dependencies": [
+    "discord-integration"
+  ],
+  "translations": {
+    "en": {
+      "discordWidget": {
+        "title": "Discord Server",
+        "membersOnline": "Members Online",
+        "totalMembers": "Total Members",
+        "joinServer": "Join Server",
+        "online": "Online",
+        "offline": "Offline",
+        "loading": "Loading Discord widget...",
+        "error": "Failed to load Discord widget",
+        "noServer": "No Discord server configured"
+      }
+    },
+    "tr": {
+      "discordWidget": {
+        "title": "Discord Sunucusu",
+        "membersOnline": "Çevrimiçi Üyeler",
+        "totalMembers": "Toplam Üye",
+        "joinServer": "Sunucuya Katıl",
+        "online": "Çevrimiçi",
+        "offline": "Çevrimdışı",
+        "loading": "Discord widget'ı yükleniyor...",
+        "error": "Discord widget'ı yüklenemedi",
+        "noServer": "Discord sunucusu yapılandırılmamış"
+      }
+    },
+    "de": {
+      "discordWidget": {
+        "title": "Discord-Server",
+        "membersOnline": "Mitglieder online",
+        "totalMembers": "Gesamtmitglieder",
+        "joinServer": "Server beitreten",
+        "online": "Online",
+        "offline": "Offline",
+        "loading": "Discord-Widget wird geladen...",
+        "error": "Discord-Widget konnte nicht geladen werden",
+        "noServer": "Kein Discord-Server konfiguriert"
+      }
+    },
+    "es": {
+      "discordWidget": {
+        "title": "Servidor de Discord",
+        "membersOnline": "Miembros en línea",
+        "totalMembers": "Total de miembros",
+        "joinServer": "Unirse al servidor",
+        "online": "En línea",
+        "offline": "Desconectado",
+        "loading": "Cargando widget de Discord...",
+        "error": "Error al cargar el widget de Discord",
+        "noServer": "No hay servidor de Discord configurado"
+      }
+    },
+    "fr": {
+      "discordWidget": {
+        "title": "Serveur Discord",
+        "membersOnline": "Membres en ligne",
+        "totalMembers": "Total des membres",
+        "joinServer": "Rejoindre le serveur",
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "loading": "Chargement du widget Discord...",
+        "error": "Échec du chargement du widget Discord",
+        "noServer": "Aucun serveur Discord configuré"
+      }
+    },
+    "ru": {
+      "discordWidget": {
+        "title": "Сервер Discord",
+        "membersOnline": "Участников онлайн",
+        "totalMembers": "Всего участников",
+        "joinServer": "Присоединиться к серверу",
+        "online": "Онлайн",
+        "offline": "Офлайн",
+        "loading": "Загрузка виджета Discord...",
+        "error": "Не удалось загрузить виджет Discord",
+        "noServer": "Сервер Discord не настроен"
+      }
+    },
+    "pt": {
+      "discordWidget": {
+        "title": "Servidor Discord",
+        "membersOnline": "Membros online",
+        "totalMembers": "Total de membros",
+        "joinServer": "Entrar no servidor",
+        "online": "Online",
+        "offline": "Offline",
+        "loading": "Carregando widget do Discord...",
+        "error": "Falha ao carregar widget do Discord",
+        "noServer": "Nenhum servidor Discord configurado"
+      }
+    }
+  }
+}

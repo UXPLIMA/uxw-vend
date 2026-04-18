@@ -1,0 +1,201 @@
+{
+  "id": "leaderboard",
+  "name": "Leaderboard",
+  "description": "Player rankings by purchases, votes, and activity",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Trophy",
+  "dependencies": [
+    "store"
+  ],
+  "routes": [
+    {
+      "path": "/leaderboard",
+      "component": "pages/public/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/leaderboard",
+      "handler": "api/route.ts",
+      "description": "Get the top players leaderboard ranking."
+    }
+  ],
+  "translations": {
+    "en": {
+      "leaderboard": {
+        "title": "Leaderboard",
+        "rank": "Rank",
+        "player": "Player",
+        "score": "Score",
+        "purchases": "Purchases",
+        "votes": "Votes",
+        "activity": "Activity",
+        "totalSpent": "Total Spent",
+        "topBuyers": "Top Buyers",
+        "topVoters": "Top Voters",
+        "mostActive": "Most Active",
+        "period": "Period",
+        "allTime": "All Time",
+        "thisMonth": "This Month",
+        "thisWeek": "This Week",
+        "today": "Today",
+        "noData": "No leaderboard data available",
+        "loading": "Loading leaderboard...",
+        "yourRank": "Your Rank",
+        "viewProfile": "View Profile"
+      }
+    },
+    "tr": {
+      "leaderboard": {
+        "title": "Sıralama",
+        "rank": "Sıra",
+        "player": "Oyuncu",
+        "score": "Puan",
+        "purchases": "Satın Almalar",
+        "votes": "Oylar",
+        "activity": "Aktivite",
+        "totalSpent": "Toplam Harcama",
+        "topBuyers": "En Çok Satın Alanlar",
+        "topVoters": "En Çok Oy Verenler",
+        "mostActive": "En Aktifler",
+        "period": "Dönem",
+        "allTime": "Tüm Zamanlar",
+        "thisMonth": "Bu Ay",
+        "thisWeek": "Bu Hafta",
+        "today": "Bugün",
+        "noData": "Sıralama verisi bulunamadı",
+        "loading": "Sıralama yükleniyor...",
+        "yourRank": "Sıralamanız",
+        "viewProfile": "Profili Gör"
+      }
+    },
+    "de": {
+      "leaderboard": {
+        "title": "Bestenliste",
+        "rank": "Rang",
+        "player": "Spieler",
+        "score": "Punktzahl",
+        "purchases": "Käufe",
+        "votes": "Stimmen",
+        "activity": "Aktivität",
+        "totalSpent": "Gesamtausgaben",
+        "topBuyers": "Top-Käufer",
+        "topVoters": "Top-Abstimmer",
+        "mostActive": "Aktivste",
+        "period": "Zeitraum",
+        "allTime": "Gesamt",
+        "thisMonth": "Diesen Monat",
+        "thisWeek": "Diese Woche",
+        "today": "Heute",
+        "noData": "Keine Bestenlisten-Daten verfügbar",
+        "loading": "Bestenliste wird geladen...",
+        "yourRank": "Ihr Rang",
+        "viewProfile": "Profil anzeigen"
+      }
+    },
+    "es": {
+      "leaderboard": {
+        "title": "Clasificación",
+        "rank": "Posición",
+        "player": "Jugador",
+        "score": "Puntuación",
+        "purchases": "Compras",
+        "votes": "Votos",
+        "activity": "Actividad",
+        "totalSpent": "Total gastado",
+        "topBuyers": "Mejores compradores",
+        "topVoters": "Mejores votantes",
+        "mostActive": "Más activos",
+        "period": "Período",
+        "allTime": "Todo el tiempo",
+        "thisMonth": "Este mes",
+        "thisWeek": "Esta semana",
+        "today": "Hoy",
+        "noData": "No hay datos de clasificación disponibles",
+        "loading": "Cargando clasificación...",
+        "yourRank": "Tu posición",
+        "viewProfile": "Ver perfil"
+      }
+    },
+    "fr": {
+      "leaderboard": {
+        "title": "Classement",
+        "rank": "Rang",
+        "player": "Joueur",
+        "score": "Score",
+        "purchases": "Achats",
+        "votes": "Votes",
+        "activity": "Activité",
+        "totalSpent": "Total dépensé",
+        "topBuyers": "Meilleurs acheteurs",
+        "topVoters": "Meilleurs votants",
+        "mostActive": "Plus actifs",
+        "period": "Période",
+        "allTime": "Depuis toujours",
+        "thisMonth": "Ce mois-ci",
+        "thisWeek": "Cette semaine",
+        "today": "Aujourd'hui",
+        "noData": "Aucune donnée de classement disponible",
+        "loading": "Chargement du classement...",
+        "yourRank": "Votre rang",
+        "viewProfile": "Voir le profil"
+      }
+    },
+    "ru": {
+      "leaderboard": {
+        "title": "Таблица лидеров",
+        "rank": "Место",
+        "player": "Игрок",
+        "score": "Очки",
+        "purchases": "Покупки",
+        "votes": "Голоса",
+        "activity": "Активность",
+        "totalSpent": "Всего потрачено",
+        "topBuyers": "Лучшие покупатели",
+        "topVoters": "Лучшие голосующие",
+        "mostActive": "Самые активные",
+        "period": "Период",
+        "allTime": "За все время",
+        "thisMonth": "Этот месяц",
+        "thisWeek": "Эта неделя",
+        "today": "Сегодня",
+        "noData": "Нет данных таблицы лидеров",
+        "loading": "Загрузка таблицы лидеров...",
+        "yourRank": "Ваше место",
+        "viewProfile": "Посмотреть профиль"
+      }
+    },
+    "pt": {
+      "leaderboard": {
+        "title": "Classificação",
+        "rank": "Posição",
+        "player": "Jogador",
+        "score": "Pontuação",
+        "purchases": "Compras",
+        "votes": "Votos",
+        "activity": "Atividade",
+        "totalSpent": "Total gasto",
+        "topBuyers": "Maiores compradores",
+        "topVoters": "Maiores votantes",
+        "mostActive": "Mais ativos",
+        "period": "Período",
+        "allTime": "Todos os tempos",
+        "thisMonth": "Este mês",
+        "thisWeek": "Esta semana",
+        "today": "Hoje",
+        "noData": "Nenhum dado de classificação disponível",
+        "loading": "Carregando classificação...",
+        "yourRank": "Sua posição",
+        "viewProfile": "Ver perfil"
+      }
+    }
+  },
+  "pageBlocks": [
+    {
+      "id": "LeaderboardTop",
+      "category": "Leaderboard",
+      "component": "blocks/LeaderboardTop.tsx"
+    }
+  ]
+}

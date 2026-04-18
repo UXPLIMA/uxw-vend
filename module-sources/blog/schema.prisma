@@ -1,0 +1,84 @@
+// Blog Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   articles BlogArticle[]
+//   comments BlogComment[]
+// @@user-relations-end
+
+// ==================== BLOG MODULE ====================
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles BlogArticle[]
+
+  @@index([slug])
+}
+
+model BlogArticle {
+  id          String        @id @default(cuid())
+  number      Int           @unique @default(autoincrement())
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  content     String        @db.Text
+  coverImage  String?
+  status      ArticleStatus @default(DRAFT)
+  publishedAt DateTime?
+  publishAt   DateTime?
+  views       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  categoryId String?
+  category   BlogCategory? @relation(fields: [categoryId], references: [id])
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id])
+
+  comments BlogComment[]
+  tags     BlogTag[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([authorId])
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+model BlogComment {
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+  isApproved      Boolean  @default(true)
+  moderationState String   @default("APPROVED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  articleId String
+  article   BlogArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User        @relation(fields: [authorId], references: [id])
+
+  @@index([articleId])
+  @@index([authorId])
+}
+
+model BlogTag {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  articles BlogArticle[]
+
+  @@index([slug])
+}

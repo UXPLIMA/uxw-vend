@@ -1,0 +1,37 @@
+// Staff Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   staffProfile     StaffMember[]      @relation("StaffProfile")
+//   staffApplications StaffApplication[] @relation("StaffApplications")
+// @@user-relations-end
+
+// ==================== STAFF PAGE ====================
+
+model StaffMember {
+  id        String  @id @default(cuid())
+  userId    String?
+  user      User?   @relation("StaffProfile", fields: [userId], references: [id])
+  name      String
+  role      String
+  avatar    String?
+  order     Int     @default(0)
+  isActive  Boolean @default(true)
+}
+
+// ==================== STAFF APPLICATIONS ====================
+
+model StaffApplication {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("StaffApplications", fields: [userId], references: [id])
+  position  String
+  content   String   @db.Text
+  status    String   @default("pending")
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}

@@ -1,0 +1,292 @@
+{
+  "id": "wheel",
+  "name": "Wheel of Fortune",
+  "description": "Spin-to-win game with configurable prizes and cooldowns",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Dices",
+  "permissions": [
+    "wheel.manage"
+  ],
+  "menu": [
+    {
+      "label": "Wheel Prizes",
+      "path": "/wheel-prizes",
+      "icon": "Dices"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/wheel",
+      "component": "pages/public/page.tsx"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/wheel-prizes",
+      "component": "pages/admin/prizes/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/wheel/prizes",
+      "handler": "api/prizes/route.ts",
+      "description": "List wheel prizes and create new ones (admin)."
+    },
+    {
+      "path": "/wheel/prizes/[id]",
+      "handler": "api/prizes/[id]/route.ts",
+      "description": "Update or delete a single wheel prize (admin)."
+    },
+    {
+      "path": "/wheel/spin",
+      "handler": "api/spin/route.ts",
+      "description": "Spin the prize wheel and award a prize to the current user."
+    }
+  ],
+  "dependencies": [
+    "credits"
+  ],
+  "translations": {
+    "en": {
+      "wheel": {
+        "title": "Wheel of Fortune",
+        "subtitle": "Spin the wheel and win amazing prizes",
+        "freeSpinInfo": "One free spin per day",
+        "spinButton": "Spin the Wheel",
+        "loginToSpin": "Login to Spin",
+        "spinning": "Spinning...",
+        "availablePrizes": "Available Prizes",
+        "youWon": "You won!",
+        "betterLuck": "Better luck next time!",
+        "creditsAdded": "{value} credits added to your account",
+        "couponCreated": "${value} coupon has been created",
+        "adm_title": "Wheel Prizes",
+        "adm_subtitle": "Manage spin wheel prizes",
+        "adm_field1Label": "Name",
+        "adm_field1Placeholder": "Prize name",
+        "adm_field2Label": "Type",
+        "adm_field2Placeholder": "e.g. 100",
+        "adm_field3Label": "Credits",
+        "adm_field3Placeholder": "Probability (1-100)",
+        "adm_field4Label": "Coupon",
+        "adm_field5Label": "Nothing",
+        "adm_field6Label": "Value",
+        "adm_field7Label": "Color",
+        "adm_field8Label": "Probability",
+        "adm_field9Label": "Active"
+      },
+      "admin": {
+        "menu_wheel": "Wheel",
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content",
+        "menu_wheel_wheel_prizes": "Wheel Prizes"
+      }
+    },
+    "tr": {
+      "wheel": {
+        "title": "Sans Carki",
+        "subtitle": "Carki cevir ve harika odulleri kazan",
+        "freeSpinInfo": "Gunde bir ücretsiz cevirme hakki",
+        "spinButton": "Carki Cevir",
+        "loginToSpin": "Cevirmek icin giriş yapin",
+        "spinning": "Donuyor...",
+        "availablePrizes": "Mevcut Oduller",
+        "youWon": "Kazandiniz!",
+        "betterLuck": "Bir dahaki sefere bol sans!",
+        "creditsAdded": "{value} kredi hesabiniza eklendi",
+        "couponCreated": "${value} kupon oluşturuldu",
+        "adm_title": "Çark Ödülleri",
+        "adm_subtitle": "Çark ödüllerini yönetin",
+        "adm_field1Label": "Ad",
+        "adm_field1Placeholder": "Ödül adı",
+        "adm_field2Label": "Tür",
+        "adm_field2Placeholder": "örn. 100",
+        "adm_field3Label": "Kredi",
+        "adm_field3Placeholder": "Olasılık (1-100)",
+        "adm_field4Label": "Kupon",
+        "adm_field5Label": "Hiçbiri",
+        "adm_field6Label": "Değer",
+        "adm_field7Label": "Renk",
+        "adm_field8Label": "Olasılık",
+        "adm_field9Label": "Aktif"
+      },
+      "admin": {
+        "menu_wheel": "Çark Ödülleri",
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "menu_wheel_wheel_prizes": "Çark Ödülleri"
+      }
+    },
+    "de": {
+      "wheel": {
+        "title": "Glücksrad",
+        "subtitle": "Drehen Sie das Rad und gewinnen Sie tolle Preise",
+        "freeSpinInfo": "Eine kostenlose Drehung pro Tag",
+        "spinButton": "Rad drehen",
+        "loginToSpin": "Einloggen zum Drehen",
+        "spinning": "Dreht sich...",
+        "availablePrizes": "Verfügbare Preise",
+        "youWon": "Sie haben gewonnen!",
+        "betterLuck": "Nächstes Mal mehr Glück!",
+        "creditsAdded": "{value} Credits wurden Ihrem Konto gutgeschrieben",
+        "couponCreated": "${value} Gutschein wurde erstellt",
+        "adm_title": "Rad-Preise",
+        "adm_subtitle": "Drehrad-Preise verwalten",
+        "adm_field1Label": "Name",
+        "adm_field1Placeholder": "Preisname",
+        "adm_field2Label": "Typ",
+        "adm_field2Placeholder": "z.B. 100",
+        "adm_field3Label": "Credits",
+        "adm_field3Placeholder": "Wahrscheinlichkeit (1-100)",
+        "adm_field4Label": "Gutschein",
+        "adm_field5Label": "Nichts",
+        "adm_field6Label": "Wert",
+        "adm_field7Label": "Farbe",
+        "adm_field8Label": "Wahrscheinlichkeit",
+        "adm_field9Label": "Aktiv"
+      },
+      "admin": {
+        "menu_wheel": "Radpreise",
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "wheel": {
+        "title": "Rueda de la fortuna",
+        "subtitle": "Gira la rueda y gana premios increibles",
+        "freeSpinInfo": "Un giro gratis por dia",
+        "spinButton": "Girar la rueda",
+        "loginToSpin": "Inicia sesion para girar",
+        "spinning": "Girando...",
+        "availablePrizes": "Premios disponibles",
+        "youWon": "Ganaste!",
+        "betterLuck": "Mejor suerte la proxima vez!",
+        "creditsAdded": "{value} creditos agregados a tu cuenta",
+        "couponCreated": "Cupon de ${value} ha sido creado",
+        "adm_title": "Premios de la Ruleta",
+        "adm_subtitle": "Gestionar premios de la ruleta",
+        "adm_field1Label": "Nombre",
+        "adm_field1Placeholder": "Nombre del premio",
+        "adm_field2Label": "Tipo",
+        "adm_field2Placeholder": "ej. 100",
+        "adm_field3Label": "Créditos",
+        "adm_field3Placeholder": "Probabilidad (1-100)",
+        "adm_field4Label": "Cupón",
+        "adm_field5Label": "Nada",
+        "adm_field6Label": "Valor",
+        "adm_field7Label": "Color",
+        "adm_field8Label": "Probabilidad",
+        "adm_field9Label": "Activo"
+      },
+      "admin": {
+        "menu_wheel": "Premios de la Rueda",
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "wheel": {
+        "title": "Roue de la fortune",
+        "subtitle": "Tournez la roue et gagnez des prix incroyables",
+        "freeSpinInfo": "Un tour gratuit par jour",
+        "spinButton": "Tourner la roue",
+        "loginToSpin": "Connectez-vous pour tourner",
+        "spinning": "En rotation...",
+        "availablePrizes": "Prix disponibles",
+        "youWon": "Vous avez gagne !",
+        "betterLuck": "Plus de chance la prochaine fois !",
+        "creditsAdded": "{value} credits ajoutes a votre compte",
+        "couponCreated": "Un coupon de ${value} a ete cree",
+        "adm_title": "Prix de la Roue",
+        "adm_subtitle": "Gérer les prix de la roue",
+        "adm_field1Label": "Nom",
+        "adm_field1Placeholder": "Nom du prix",
+        "adm_field2Label": "Type",
+        "adm_field2Placeholder": "ex. 100",
+        "adm_field3Label": "Crédits",
+        "adm_field3Placeholder": "Probabilité (1-100)",
+        "adm_field4Label": "Coupon",
+        "adm_field5Label": "Rien",
+        "adm_field6Label": "Valeur",
+        "adm_field7Label": "Couleur",
+        "adm_field8Label": "Probabilité",
+        "adm_field9Label": "Actif"
+      },
+      "admin": {
+        "menu_wheel": "Prix de la roue",
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "wheel": {
+        "title": "Колесо фортуны",
+        "subtitle": "Крутите колесо и выигрывайте потрясающие призы",
+        "freeSpinInfo": "Одно бесплатное вращение в день",
+        "spinButton": "Крутить колесо",
+        "loginToSpin": "Войдите, чтобы крутить",
+        "spinning": "Вращается...",
+        "availablePrizes": "Доступные призы",
+        "youWon": "Вы выиграли!",
+        "betterLuck": "Удачи в следующий раз!",
+        "creditsAdded": "{value} кредитов добавлено на ваш счет",
+        "couponCreated": "Купон на ${value} создан",
+        "adm_title": "Призы колеса",
+        "adm_subtitle": "Управление призами колеса",
+        "adm_field1Label": "Название",
+        "adm_field1Placeholder": "Название приза",
+        "adm_field2Label": "Тип",
+        "adm_field2Placeholder": "напр. 100",
+        "adm_field3Label": "Кредиты",
+        "adm_field3Placeholder": "Вероятность (1-100)",
+        "adm_field4Label": "Купон",
+        "adm_field5Label": "Ничего",
+        "adm_field6Label": "Значение",
+        "adm_field7Label": "Цвет",
+        "adm_field8Label": "Вероятность",
+        "adm_field9Label": "Активный"
+      },
+      "admin": {
+        "menu_wheel": "Призы колеса",
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "wheel": {
+        "title": "Roda da fortuna",
+        "subtitle": "Gire a roda e ganhe premios incriveis",
+        "freeSpinInfo": "Uma rodada gratis por dia",
+        "spinButton": "Girar a roda",
+        "loginToSpin": "Faca login para girar",
+        "spinning": "Girando...",
+        "availablePrizes": "Premios disponiveis",
+        "youWon": "Voce ganhou!",
+        "betterLuck": "Mais sorte da proxima vez!",
+        "creditsAdded": "{value} creditos adicionados a sua conta",
+        "couponCreated": "Cupom de ${value} foi criado",
+        "adm_title": "Prêmios da Roleta",
+        "adm_subtitle": "Gerenciar prêmios da roleta",
+        "adm_field1Label": "Nome",
+        "adm_field1Placeholder": "Nome do prêmio",
+        "adm_field2Label": "Tipo",
+        "adm_field2Placeholder": "ex. 100",
+        "adm_field3Label": "Créditos",
+        "adm_field3Placeholder": "Probabilidade (1-100)",
+        "adm_field4Label": "Cupão",
+        "adm_field5Label": "Nada",
+        "adm_field6Label": "Valor",
+        "adm_field7Label": "Cor",
+        "adm_field8Label": "Probabilidade",
+        "adm_field9Label": "Ativo"
+      },
+      "admin": {
+        "menu_wheel": "Prêmios da Roda",
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

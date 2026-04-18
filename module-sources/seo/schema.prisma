@@ -1,0 +1,23 @@
+// SEO Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== SEO ====================
+
+model SeoPage {
+  id              String   @id @default(cuid())
+  path            String   @unique
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  ogTitle         String?
+  ogDescription   String?  @db.Text
+  ogImage         String?
+  keywords        String?
+  canonical       String?
+  noIndex         Boolean  @default(false)
+  noFollow        Boolean  @default(false)
+  structuredData  Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([path])
+}

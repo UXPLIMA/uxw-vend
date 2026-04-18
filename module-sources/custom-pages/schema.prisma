@@ -1,0 +1,17 @@
+// Custom Pages Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== CUSTOM PAGES ====================
+
+model CustomPage {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String   @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}

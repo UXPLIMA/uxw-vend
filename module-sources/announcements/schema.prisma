@@ -1,0 +1,20 @@
+// Announcements Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== ANNOUNCEMENTS ====================
+
+model Announcement {
+  id           String    @id @default(cuid())
+  title        String
+  content      String
+  type         String    @default("info")
+  isActive     Boolean   @default(true)
+  dismissible  Boolean   @default(true)
+  includePages String?
+  excludePages String?
+  startsAt     DateTime?
+  endsAt       DateTime?
+  publishAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

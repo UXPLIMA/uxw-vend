@@ -1,0 +1,21 @@
+// Punishments Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== PUNISHMENTS ====================
+
+model Punishment {
+  id         String    @id @default(cuid())
+  playerName String
+  playerUuid String?
+  type       String
+  reason     String?
+  duration   String?
+  active     Boolean   @default(true)
+  punishedBy String?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+
+  @@index([playerName])
+  @@index([type])
+  @@index([active])
+}

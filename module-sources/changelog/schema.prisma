@@ -1,0 +1,16 @@
+// Changelog Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== CHANGELOG ====================
+
+model ChangelogEntry {
+  id        String   @id @default(cuid())
+  version   String
+  title     String
+  content   String   @db.Text
+  type      String   @default("update")
+  color     String?  @default("#3b82f6")
+  isActive  Boolean  @default(true)
+  publishAt DateTime?
+  createdAt DateTime @default(now())
+}

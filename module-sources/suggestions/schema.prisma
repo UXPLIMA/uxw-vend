@@ -1,0 +1,39 @@
+// Suggestions Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   suggestions      Suggestion[]       @relation("Suggestions")
+//   suggestionVotes  SuggestionVote[]   @relation("SuggestionVotes")
+// @@user-relations-end
+
+// ==================== SUGGESTIONS ====================
+
+model Suggestion {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  status          String   @default("open")
+  visibility      String   @default("public")
+  moderationState String   @default("APPROVED")
+  upvotes         Int      @default(0)
+  authorId  String
+  author    User     @relation("Suggestions", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  votes SuggestionVote[]
+
+  @@index([status])
+  @@index([authorId])
+}
+
+model SuggestionVote {
+  id           String     @id @default(cuid())
+  suggestionId String
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation("SuggestionVotes", fields: [userId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@unique([suggestionId, userId])
+}

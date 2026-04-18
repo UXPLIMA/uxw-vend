@@ -1,0 +1,152 @@
+{
+  "id": "cloudflare-turnstile",
+  "name": "Cloudflare Turnstile",
+  "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Shield",
+  "menu": [
+    {
+      "label": "Cloudflare Turnstile",
+      "path": "/security/turnstile",
+      "icon": "Shield"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/security/turnstile",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/security/turnstile/settings",
+      "handler": "api/settings/route.ts",
+      "description": "Get or update Cloudflare Turnstile captcha settings (admin)."
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Cloudflare Turnstile",
+      "description": "Configure Turnstile site key and secret",
+      "href": "/admin/security/turnstile",
+      "icon": "Shield",
+      "color": "text-orange-500"
+    }
+  ],
+  "translations": {
+    "en": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "Privacy-focused CAPTCHA",
+        "siteKey": "Site Key",
+        "secretKey": "Secret Key",
+        "enableOnLogin": "Enable on Login",
+        "enableOnLoginDesc": "Require Turnstile challenge on the login page",
+        "enableOnRegister": "Enable on Registration",
+        "enableOnRegisterDesc": "Require Turnstile challenge on the register page",
+        "save": "Save",
+        "saved": "Settings saved",
+        "saveError": "Failed to save settings"
+      },
+      "admin": {
+        "menu_cloudflare-turnstile": "Cloudflare Turnstile",
+        "menu_cloudflare-turnstile_cloudflare_turnstile": "Cloudflare Turnstile"
+      }
+    },
+    "tr": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "Gizlilik odaklı CAPTCHA",
+        "siteKey": "Site Anahtarı",
+        "secretKey": "Gizli Anahtar",
+        "enableOnLogin": "Girişte Etkinleştir",
+        "enableOnLoginDesc": "Giriş sayfasında Turnstile doğrulaması iste",
+        "enableOnRegister": "Kayıtta Etkinleştir",
+        "enableOnRegisterDesc": "Kayıt sayfasında Turnstile doğrulaması iste",
+        "save": "Kaydet",
+        "saved": "Ayarlar kaydedildi",
+        "saveError": "Ayarlar kaydedilemedi"
+      },
+      "admin": {
+        "menu_cloudflare-turnstile": "Cloudflare Turnstile",
+        "menu_cloudflare-turnstile_cloudflare_turnstile": "Cloudflare Turnstile"
+      }
+    },
+    "de": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "Datenschutzfreundliches CAPTCHA",
+        "siteKey": "Site Key",
+        "secretKey": "Secret Key",
+        "enableOnLogin": "Beim Login aktivieren",
+        "enableOnLoginDesc": "Turnstile-Challenge auf der Login-Seite erforderlich",
+        "enableOnRegister": "Bei Registrierung aktivieren",
+        "enableOnRegisterDesc": "Turnstile-Challenge auf der Registrierungsseite erforderlich",
+        "save": "Speichern",
+        "saved": "Einstellungen gespeichert",
+        "saveError": "Einstellungen konnten nicht gespeichert werden"
+      }
+    },
+    "es": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "CAPTCHA centrado en la privacidad",
+        "siteKey": "Clave del Sitio",
+        "secretKey": "Clave Secreta",
+        "enableOnLogin": "Habilitar en inicio de sesión",
+        "enableOnLoginDesc": "Requerir desafío Turnstile en la página de inicio de sesión",
+        "enableOnRegister": "Habilitar en registro",
+        "enableOnRegisterDesc": "Requerir desafío Turnstile en la página de registro",
+        "save": "Guardar",
+        "saved": "Configuración guardada",
+        "saveError": "Error al guardar"
+      }
+    },
+    "fr": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "CAPTCHA axé sur la confidentialité",
+        "siteKey": "Clé du Site",
+        "secretKey": "Clé Secrète",
+        "enableOnLogin": "Activer à la connexion",
+        "enableOnLoginDesc": "Exiger le défi Turnstile sur la page de connexion",
+        "enableOnRegister": "Activer à l'inscription",
+        "enableOnRegisterDesc": "Exiger le défi Turnstile sur la page d'inscription",
+        "save": "Enregistrer",
+        "saved": "Paramètres enregistrés",
+        "saveError": "Échec de l'enregistrement"
+      }
+    },
+    "ru": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "CAPTCHA, ориентированный на приватность",
+        "siteKey": "Ключ сайта",
+        "secretKey": "Секретный ключ",
+        "enableOnLogin": "Включить при входе",
+        "enableOnLoginDesc": "Требовать Turnstile на странице входа",
+        "enableOnRegister": "Включить при регистрации",
+        "enableOnRegisterDesc": "Требовать Turnstile на странице регистрации",
+        "save": "Сохранить",
+        "saved": "Настройки сохранены",
+        "saveError": "Не удалось сохранить"
+      }
+    },
+    "pt": {
+      "cloudflareTurnstile": {
+        "title": "Cloudflare Turnstile",
+        "subtitle": "CAPTCHA focado em privacidade",
+        "siteKey": "Chave do Site",
+        "secretKey": "Chave Secreta",
+        "enableOnLogin": "Ativar no login",
+        "enableOnLoginDesc": "Exigir desafio Turnstile na página de login",
+        "enableOnRegister": "Ativar no registro",
+        "enableOnRegisterDesc": "Exigir desafio Turnstile na página de registro",
+        "save": "Salvar",
+        "saved": "Configurações salvas",
+        "saveError": "Falha ao salvar"
+      }
+    }
+  }
+}

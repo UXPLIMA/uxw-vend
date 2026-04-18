@@ -17,12 +17,24 @@ The dev server runs with Turbopack and automatically runs the `predev` script to
 
 All new features must be built as modules. See [PLUGIN_SDK.md](PLUGIN_SDK.md) for the full guide.
 
-1. Create a directory in `src/modules/your-module/`.
-2. Add a `module.json` manifest.
-3. Add pages, API routes, and components.
-4. Run `npx tsx scripts/generate-registry.ts` to regenerate the registry.
-5. Test with `npm run dev`.
-6. Ensure `npm run build` and `npx tsc --noEmit` pass before submitting.
+Three directories work together:
+
+| Directory                    | Role                                                           | Git status |
+|------------------------------|----------------------------------------------------------------|------------|
+| `module-sources/<id>/`       | Authoritative source for first-party modules                   | Tracked    |
+| `module-marketplace/<id>.zip`| Distributable artifact the admin marketplace installs from     | Tracked    |
+| `src/modules/<id>/`          | Runtime install state — what's currently installed locally     | Ignored    |
+
+Steps for a new first-party module:
+
+1. Create `module-sources/your-module/` with a `module.json` manifest, pages, API routes, and components.
+2. Run `npm run build:marketplace` to build `module-marketplace/your-module.zip` and update `module-marketplace/index.json`.
+3. Install it locally through the admin marketplace UI (or copy it into `src/modules/` for quick testing).
+4. Run `npx tsx scripts/generate-registry.ts` to regenerate the module registry.
+5. Commit both `module-sources/your-module/` and `module-marketplace/your-module.zip` (+ `index.json`) in the same commit. Never commit anything under `src/modules/`.
+6. Ensure `npm run build`, `npx tsc --noEmit`, and `npm test` pass before submitting.
+
+Editing an existing first-party module follows the same flow: change `module-sources/<id>/`, rebuild ZIPs, commit source + ZIP together.
 
 ---
 

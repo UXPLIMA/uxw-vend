@@ -1,0 +1,68 @@
+{
+  "id": "cookie-consent",
+  "name": "Cookie Consent",
+  "description": "GDPR cookie consent banner",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Shield",
+  "layoutComponents": [
+    {
+      "id": "CookieConsent",
+      "component": "components/CookieConsent",
+      "exclude": [
+        "/admin/*"
+      ]
+    }
+  ],
+  "translations": {
+    "en": {
+      "cookie": {
+        "message": "We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies.",
+        "accept": "Accept",
+        "reject": "Reject"
+      }
+    },
+    "tr": {
+      "cookie": {
+        "message": "Deneyiminizi iyileştirmek için çerezler kullanıyoruz. Bu siteyi kullanmaya devam ederek çerez kullanımını kabul etmiş olursunuz.",
+        "accept": "Kabul Et",
+        "reject": "Reddet"
+      }
+    },
+    "de": {
+      "cookie": {
+        "message": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Durch die weitere Nutzung dieser Website stimmen Sie der Verwendung von Cookies zu.",
+        "accept": "Akzeptieren",
+        "reject": "Ablehnen"
+      }
+    },
+    "es": {
+      "cookie": {
+        "message": "Usamos cookies para mejorar tu experiencia. Al continuar usando este sitio, aceptas el uso de cookies.",
+        "accept": "Aceptar",
+        "reject": "Rechazar"
+      }
+    },
+    "fr": {
+      "cookie": {
+        "message": "Nous utilisons des cookies pour améliorer votre expérience. En continuant à utiliser ce site, vous acceptez l'utilisation de cookies.",
+        "accept": "Accepter",
+        "reject": "Refuser"
+      }
+    },
+    "ru": {
+      "cookie": {
+        "message": "Мы используем файлы cookie для улучшения вашего опыта. Продолжая использовать этот сайт, вы соглашаетесь с использованием файлов cookie.",
+        "accept": "Принять",
+        "reject": "Отклонить"
+      }
+    },
+    "pt": {
+      "cookie": {
+        "message": "Usamos cookies para melhorar sua experiência. Ao continuar usando este site, você concorda com o uso de cookies.",
+        "accept": "Aceitar",
+        "reject": "Rejeitar"
+      }
+    }
+  }
+}

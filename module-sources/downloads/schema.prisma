@@ -1,0 +1,17 @@
+// Downloads Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== DOWNLOAD CENTER ====================
+
+model Download {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  fileName    String
+  fileUrl     String
+  fileSize    Int?
+  downloads   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

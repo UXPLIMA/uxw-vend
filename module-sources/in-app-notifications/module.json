@@ -1,0 +1,213 @@
+{
+  "id": "in-app-notifications",
+  "name": "In-App Notifications",
+  "description": "In-app notification system with bell icon",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Bell",
+  "navbarComponents": [
+    {
+      "id": "NotificationBell",
+      "component": "components/NotificationBell",
+      "order": 10
+    }
+  ],
+  "api": [
+    {
+      "path": "/notifications",
+      "handler": "api/route.ts",
+      "description": "Get user notifications and mark them read."
+    }
+  ],
+  "translations": {
+    "en": {
+      "inAppNotifications": {
+        "title": "Notifications",
+        "noNotifications": "No notifications",
+        "markAllRead": "Mark all as read",
+        "markRead": "Mark as read",
+        "markUnread": "Mark as unread",
+        "delete": "Delete",
+        "deleteAll": "Delete all",
+        "deleteConfirm": "Are you sure you want to delete all notifications?",
+        "unread": "Unread",
+        "all": "All",
+        "new": "New",
+        "earlier": "Earlier",
+        "justNow": "Just now",
+        "minutesAgo": "{count} minutes ago",
+        "hoursAgo": "{count} hours ago",
+        "daysAgo": "{count} days ago",
+        "viewAll": "View All Notifications",
+        "settings": "Notification Settings",
+        "emailNotifications": "Email Notifications",
+        "pushNotifications": "Push Notifications",
+        "soundEnabled": "Notification Sound",
+        "saved": "Notification settings saved",
+        "saveError": "Failed to save notification settings"
+      }
+    },
+    "tr": {
+      "inAppNotifications": {
+        "title": "Bildirimler",
+        "noNotifications": "Bildirim yok",
+        "markAllRead": "T\u00fcm\u00fcn\u00fc okundu olarak i\u015faretle",
+        "markRead": "Okundu olarak i\u015faretle",
+        "markUnread": "Okunmad\u0131 olarak i\u015faretle",
+        "delete": "Sil",
+        "deleteAll": "T\u00fcm\u00fcn\u00fc sil",
+        "deleteConfirm": "T\u00fcm bildirimleri silmek istedi\u011finizden emin misiniz?",
+        "unread": "Okunmam\u0131\u015f",
+        "all": "T\u00fcm\u00fc",
+        "new": "Yeni",
+        "earlier": "\u00d6nceki",
+        "justNow": "Az \u00f6nce",
+        "minutesAgo": "{count} dakika \u00f6nce",
+        "hoursAgo": "{count} saat \u00f6nce",
+        "daysAgo": "{count} g\u00fcn \u00f6nce",
+        "viewAll": "T\u00fcm Bildirimleri G\u00f6r",
+        "settings": "Bildirim Ayarlar\u0131",
+        "emailNotifications": "E-posta Bildirimleri",
+        "pushNotifications": "Anl\u0131k Bildirimler",
+        "soundEnabled": "Bildirim Sesi",
+        "saved": "Bildirim ayarlar\u0131 kaydedildi",
+        "saveError": "Bildirim ayarlar\u0131 kaydedilemedi"
+      }
+    },
+    "de": {
+      "inAppNotifications": {
+        "title": "Benachrichtigungen",
+        "noNotifications": "Keine Benachrichtigungen",
+        "markAllRead": "Alle als gelesen markieren",
+        "markRead": "Als gelesen markieren",
+        "markUnread": "Als ungelesen markieren",
+        "delete": "L\u00f6schen",
+        "deleteAll": "Alle l\u00f6schen",
+        "deleteConfirm": "Sind Sie sicher, dass Sie alle Benachrichtigungen l\u00f6schen m\u00f6chten?",
+        "unread": "Ungelesen",
+        "all": "Alle",
+        "new": "Neu",
+        "earlier": "Fr\u00fcher",
+        "justNow": "Gerade eben",
+        "minutesAgo": "Vor {count} Minuten",
+        "hoursAgo": "Vor {count} Stunden",
+        "daysAgo": "Vor {count} Tagen",
+        "viewAll": "Alle Benachrichtigungen anzeigen",
+        "settings": "Benachrichtigungseinstellungen",
+        "emailNotifications": "E-Mail-Benachrichtigungen",
+        "pushNotifications": "Push-Benachrichtigungen",
+        "soundEnabled": "Benachrichtigungston",
+        "saved": "Benachrichtigungseinstellungen gespeichert",
+        "saveError": "Benachrichtigungseinstellungen konnten nicht gespeichert werden"
+      }
+    },
+    "es": {
+      "inAppNotifications": {
+        "title": "Notificaciones",
+        "noNotifications": "No hay notificaciones",
+        "markAllRead": "Marcar todas como le\u00eddas",
+        "markRead": "Marcar como le\u00edda",
+        "markUnread": "Marcar como no le\u00edda",
+        "delete": "Eliminar",
+        "deleteAll": "Eliminar todas",
+        "deleteConfirm": "\u00bfEst\u00e1 seguro de que desea eliminar todas las notificaciones?",
+        "unread": "No le\u00eddas",
+        "all": "Todas",
+        "new": "Nuevas",
+        "earlier": "Anteriores",
+        "justNow": "Ahora mismo",
+        "minutesAgo": "Hace {count} minutos",
+        "hoursAgo": "Hace {count} horas",
+        "daysAgo": "Hace {count} d\u00edas",
+        "viewAll": "Ver todas las notificaciones",
+        "settings": "Configuraci\u00f3n de notificaciones",
+        "emailNotifications": "Notificaciones por correo",
+        "pushNotifications": "Notificaciones push",
+        "soundEnabled": "Sonido de notificaci\u00f3n",
+        "saved": "Configuraci\u00f3n de notificaciones guardada",
+        "saveError": "Error al guardar configuraci\u00f3n de notificaciones"
+      }
+    },
+    "fr": {
+      "inAppNotifications": {
+        "title": "Notifications",
+        "noNotifications": "Aucune notification",
+        "markAllRead": "Tout marquer comme lu",
+        "markRead": "Marquer comme lu",
+        "markUnread": "Marquer comme non lu",
+        "delete": "Supprimer",
+        "deleteAll": "Tout supprimer",
+        "deleteConfirm": "\u00cates-vous s\u00fbr de vouloir supprimer toutes les notifications ?",
+        "unread": "Non lues",
+        "all": "Toutes",
+        "new": "Nouvelles",
+        "earlier": "Plus anciennes",
+        "justNow": "\u00c0 l'instant",
+        "minutesAgo": "Il y a {count} minutes",
+        "hoursAgo": "Il y a {count} heures",
+        "daysAgo": "Il y a {count} jours",
+        "viewAll": "Voir toutes les notifications",
+        "settings": "Param\u00e8tres de notification",
+        "emailNotifications": "Notifications par e-mail",
+        "pushNotifications": "Notifications push",
+        "soundEnabled": "Son de notification",
+        "saved": "Param\u00e8tres de notification enregistr\u00e9s",
+        "saveError": "\u00c9chec de l'enregistrement des param\u00e8tres de notification"
+      }
+    },
+    "ru": {
+      "inAppNotifications": {
+        "title": "\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f",
+        "noNotifications": "\u041d\u0435\u0442 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439",
+        "markAllRead": "\u041e\u0442\u043c\u0435\u0442\u0438\u0442\u044c \u0432\u0441\u0435 \u043a\u0430\u043a \u043f\u0440\u043e\u0447\u0438\u0442\u0430\u043d\u043d\u044b\u0435",
+        "markRead": "\u041e\u0442\u043c\u0435\u0442\u0438\u0442\u044c \u043a\u0430\u043a \u043f\u0440\u043e\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0435",
+        "markUnread": "\u041e\u0442\u043c\u0435\u0442\u0438\u0442\u044c \u043a\u0430\u043a \u043d\u0435\u043f\u0440\u043e\u0447\u0438\u0442\u0430\u043d\u043d\u043e\u0435",
+        "delete": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c",
+        "deleteAll": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
+        "deleteConfirm": "\u0412\u044b \u0443\u0432\u0435\u0440\u0435\u043d\u044b, \u0447\u0442\u043e \u0445\u043e\u0442\u0438\u0442\u0435 \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f?",
+        "unread": "\u041d\u0435\u043f\u0440\u043e\u0447\u0438\u0442\u0430\u043d\u043d\u044b\u0435",
+        "all": "\u0412\u0441\u0435",
+        "new": "\u041d\u043e\u0432\u044b\u0435",
+        "earlier": "\u0420\u0430\u043d\u0435\u0435",
+        "justNow": "\u0422\u043e\u043b\u044c\u043a\u043e \u0447\u0442\u043e",
+        "minutesAgo": "{count} \u043c\u0438\u043d\u0443\u0442 \u043d\u0430\u0437\u0430\u0434",
+        "hoursAgo": "{count} \u0447\u0430\u0441\u043e\u0432 \u043d\u0430\u0437\u0430\u0434",
+        "daysAgo": "{count} \u0434\u043d\u0435\u0439 \u043d\u0430\u0437\u0430\u0434",
+        "viewAll": "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0432\u0441\u0435 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f",
+        "settings": "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439",
+        "emailNotifications": "\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f \u043f\u043e \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u0435",
+        "pushNotifications": "Push-\u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f",
+        "soundEnabled": "\u0417\u0432\u0443\u043a \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u044f",
+        "saved": "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u044b",
+        "saveError": "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438 \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0439"
+      }
+    },
+    "pt": {
+      "inAppNotifications": {
+        "title": "Notifica\u00e7\u00f5es",
+        "noNotifications": "Nenhuma notifica\u00e7\u00e3o",
+        "markAllRead": "Marcar todas como lidas",
+        "markRead": "Marcar como lida",
+        "markUnread": "Marcar como n\u00e3o lida",
+        "delete": "Excluir",
+        "deleteAll": "Excluir todas",
+        "deleteConfirm": "Tem certeza de que deseja excluir todas as notifica\u00e7\u00f5es?",
+        "unread": "N\u00e3o lidas",
+        "all": "Todas",
+        "new": "Novas",
+        "earlier": "Anteriores",
+        "justNow": "Agora mesmo",
+        "minutesAgo": "H\u00e1 {count} minutos",
+        "hoursAgo": "H\u00e1 {count} horas",
+        "daysAgo": "H\u00e1 {count} dias",
+        "viewAll": "Ver todas as notifica\u00e7\u00f5es",
+        "settings": "Configura\u00e7\u00f5es de notifica\u00e7\u00e3o",
+        "emailNotifications": "Notifica\u00e7\u00f5es por e-mail",
+        "pushNotifications": "Notifica\u00e7\u00f5es push",
+        "soundEnabled": "Som de notifica\u00e7\u00e3o",
+        "saved": "Configura\u00e7\u00f5es de notifica\u00e7\u00e3o salvas",
+        "saveError": "Falha ao salvar configura\u00e7\u00f5es de notifica\u00e7\u00e3o"
+      }
+    }
+  }
+}

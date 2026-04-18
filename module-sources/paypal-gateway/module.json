@@ -1,0 +1,281 @@
+{
+  "id": "paypal-gateway",
+  "name": "PayPal Payment Gateway",
+  "description": "Accept payments via PayPal",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "DollarSign",
+  "dependencies": [
+    "store"
+  ],
+  "settingsCards": [
+    {
+      "title": "PayPal",
+      "description": "PayPal API credentials.",
+      "href": "/settings/paypal",
+      "icon": "DollarSign",
+      "color": "text-blue-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "PayPal Settings",
+      "path": "/settings/paypal",
+      "icon": "DollarSign"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/paypal",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "translations": {
+    "en": {
+      "paypalGateway": {
+        "title": "PayPal Settings",
+        "description": "Configure PayPal payment gateway",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "sandboxMode": "Sandbox Mode",
+        "sandboxModeDescription": "Enable sandbox mode for testing",
+        "liveMode": "Live Mode",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "saveSettings": "Save Settings",
+        "settingsSaved": "PayPal settings saved successfully",
+        "settingsError": "Failed to save PayPal settings",
+        "testConnection": "Test Connection",
+        "connectionSuccess": "PayPal connection successful",
+        "connectionFailed": "PayPal connection failed",
+        "webhookUrl": "Webhook URL",
+        "currency": "Currency",
+        "adm_title": "PayPal Settings",
+        "adm_subtitle": "Configure PayPal payment gateway",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "PayPal application Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "PayPal application Client Secret",
+        "adm_field3Label": "Mode",
+        "adm_field3Desc": "sandbox or live"
+      },
+      "admin": {
+        "menu_paypal-gateway": "Paypal Gateway",
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content",
+        "menu_paypal-gateway_paypal_settings": "PayPal Settings"
+      }
+    },
+    "tr": {
+      "paypalGateway": {
+        "title": "PayPal Ayarlari",
+        "description": "PayPal odeme agirligi yapilandirmasi",
+        "clientId": "Istemci Kimlik Numarasi",
+        "clientSecret": "Istemci Gizli Anahtari",
+        "sandboxMode": "Sandbox Modu",
+        "sandboxModeDescription": "Test icin sandbox modunu etkinlestir",
+        "liveMode": "Canli Mod",
+        "enabled": "Etkin",
+        "disabled": "Devre Disi",
+        "saveSettings": "Ayarlari Kaydet",
+        "settingsSaved": "PayPal ayarlari basariyla kaydedildi",
+        "settingsError": "PayPal ayarlari kaydedilemedi",
+        "testConnection": "Baglanti Testi",
+        "connectionSuccess": "PayPal baglantisi başarılı",
+        "connectionFailed": "PayPal baglantisi başarısız",
+        "webhookUrl": "Webhook URL",
+        "currency": "Para Birimi",
+        "adm_title": "PayPal Ayarları",
+        "adm_subtitle": "PayPal ödeme ağ geçidini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "PayPal uygulama İstemci Kimliği",
+        "adm_field2Label": "İstemci Sırrı",
+        "adm_field2Desc": "PayPal uygulama İstemci Sırrı",
+        "adm_field3Label": "Mod",
+        "adm_field3Desc": "sandbox veya canlı"
+      },
+      "admin": {
+        "menu_paypal-gateway": "PayPal Ayarları",
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "menu_paypal-gateway_paypal_settings": "PayPal Ayarları"
+      }
+    },
+    "de": {
+      "paypalGateway": {
+        "title": "PayPal-Einstellungen",
+        "description": "PayPal-Zahlungsgateway konfigurieren",
+        "clientId": "Client-ID",
+        "clientSecret": "Client-Geheimnis",
+        "sandboxMode": "Sandbox-Modus",
+        "sandboxModeDescription": "Sandbox-Modus zum Testen aktivieren",
+        "liveMode": "Live-Modus",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "saveSettings": "Einstellungen speichern",
+        "settingsSaved": "PayPal-Einstellungen erfolgreich gespeichert",
+        "settingsError": "PayPal-Einstellungen konnten nicht gespeichert werden",
+        "testConnection": "Verbindung testen",
+        "connectionSuccess": "PayPal-Verbindung erfolgreich",
+        "connectionFailed": "PayPal-Verbindung fehlgeschlagen",
+        "webhookUrl": "Webhook-URL",
+        "currency": "Währung",
+        "adm_title": "PayPal-Einstellungen",
+        "adm_subtitle": "PayPal-Zahlungsgateway konfigurieren",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "PayPal-Anwendung Client-ID",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "PayPal-Anwendung Client-Secret",
+        "adm_field3Label": "Modus",
+        "adm_field3Desc": "Sandbox oder Live"
+      },
+      "admin": {
+        "menu_paypal-gateway": "PayPal-Einstellungen",
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "paypalGateway": {
+        "title": "Configuracion de PayPal",
+        "description": "Configurar pasarela de pago PayPal",
+        "clientId": "ID de cliente",
+        "clientSecret": "Secreto del cliente",
+        "sandboxMode": "Modo Sandbox",
+        "sandboxModeDescription": "Activar modo sandbox para pruebas",
+        "liveMode": "Modo en vivo",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "saveSettings": "Guardar configuracion",
+        "settingsSaved": "Configuracion de PayPal guardada correctamente",
+        "settingsError": "Error al guardar la configuracion de PayPal",
+        "testConnection": "Probar conexion",
+        "connectionSuccess": "Conexion con PayPal exitosa",
+        "connectionFailed": "Conexion con PayPal fallida",
+        "webhookUrl": "URL de webhook",
+        "currency": "Moneda",
+        "adm_title": "Configuración de PayPal",
+        "adm_subtitle": "Configura la pasarela de pago PayPal",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "ID de Cliente de la aplicación PayPal",
+        "adm_field2Label": "Secreto del Cliente",
+        "adm_field2Desc": "Secreto de Cliente de la aplicación PayPal",
+        "adm_field3Label": "Modo",
+        "adm_field3Desc": "sandbox o producción"
+      },
+      "admin": {
+        "menu_paypal-gateway": "Configuración PayPal",
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "paypalGateway": {
+        "title": "Parametres PayPal",
+        "description": "Configurer la passerelle de paiement PayPal",
+        "clientId": "ID client",
+        "clientSecret": "Secret client",
+        "sandboxMode": "Mode Sandbox",
+        "sandboxModeDescription": "Activer le mode sandbox pour les tests",
+        "liveMode": "Mode production",
+        "enabled": "Active",
+        "disabled": "Desactive",
+        "saveSettings": "Enregistrer les parametres",
+        "settingsSaved": "Parametres PayPal enregistres avec succes",
+        "settingsError": "Echec de l'enregistrement des parametres PayPal",
+        "testConnection": "Tester la connexion",
+        "connectionSuccess": "Connexion PayPal reussie",
+        "connectionFailed": "Connexion PayPal echouee",
+        "webhookUrl": "URL du webhook",
+        "currency": "Devise",
+        "adm_title": "Paramètres PayPal",
+        "adm_subtitle": "Configurez la passerelle de paiement PayPal",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "ID Client de l'application PayPal",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Secret Client de l'application PayPal",
+        "adm_field3Label": "Mode",
+        "adm_field3Desc": "sandbox ou production"
+      },
+      "admin": {
+        "menu_paypal-gateway": "Paramètres PayPal",
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "paypalGateway": {
+        "title": "Nastroiki PayPal",
+        "description": "Nastroika platezhnogo shliuza PayPal",
+        "clientId": "ID klienta",
+        "clientSecret": "Sekretnyi kliuch klienta",
+        "sandboxMode": "Rezhim Sandbox",
+        "sandboxModeDescription": "Vkliuchit rezhim sandbox dlia testirovaniya",
+        "liveMode": "Boevoi rezhim",
+        "enabled": "Vkliucheno",
+        "disabled": "Otkliucheno",
+        "saveSettings": "Sokhranit nastroiki",
+        "settingsSaved": "Nastroiki PayPal uspeshno sokhraneny",
+        "settingsError": "Ne udalos sokhranit nastroiki PayPal",
+        "testConnection": "Proverit podkliuchenie",
+        "connectionSuccess": "Podkliuchenie k PayPal uspeshno",
+        "connectionFailed": "Podkliuchenie k PayPal ne udalos",
+        "webhookUrl": "URL vebkhuka",
+        "currency": "Valiuta",
+        "adm_title": "Настройки PayPal",
+        "adm_subtitle": "Настройте платёжный шлюз PayPal",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента приложения PayPal",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента приложения PayPal",
+        "adm_field3Label": "Режим",
+        "adm_field3Desc": "sandbox или рабочий"
+      },
+      "admin": {
+        "menu_paypal-gateway": "Настройки PayPal",
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "paypalGateway": {
+        "title": "Configuracoes do PayPal",
+        "description": "Configurar gateway de pagamento PayPal",
+        "clientId": "ID do cliente",
+        "clientSecret": "Segredo do cliente",
+        "sandboxMode": "Modo Sandbox",
+        "sandboxModeDescription": "Ativar modo sandbox para testes",
+        "liveMode": "Modo producao",
+        "enabled": "Ativado",
+        "disabled": "Desativado",
+        "saveSettings": "Salvar configuracoes",
+        "settingsSaved": "Configuracoes do PayPal salvas com sucesso",
+        "settingsError": "Falha ao salvar configuracoes do PayPal",
+        "testConnection": "Testar conexao",
+        "connectionSuccess": "Conexao com PayPal bem-sucedida",
+        "connectionFailed": "Conexao com PayPal falhou",
+        "webhookUrl": "URL do webhook",
+        "currency": "Moeda",
+        "adm_title": "Configurações PayPal",
+        "adm_subtitle": "Configure o gateway de pagamento PayPal",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "ID do Cliente da aplicação PayPal",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "Segredo do Cliente da aplicação PayPal",
+        "adm_field3Label": "Modo",
+        "adm_field3Desc": "sandbox ou produção"
+      },
+      "admin": {
+        "menu_paypal-gateway": "Configurações PayPal",
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  },
+  "webhookReceivers": [
+    {
+      "provider": "paypal",
+      "handler": "hooks/webhook.ts"
+    }
+  ]
+}

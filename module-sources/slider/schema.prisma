@@ -1,0 +1,15 @@
+// Slider Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== SLIDER ====================
+
+model SliderItem {
+  id        String   @id @default(cuid())
+  title     String?
+  subtitle  String?
+  image     String
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

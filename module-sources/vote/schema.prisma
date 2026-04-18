@@ -1,0 +1,32 @@
+// Vote Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   votes            VoteLog[]
+// @@user-relations-end
+
+// ==================== VOTE ====================
+
+model VoteSite {
+  id        String    @id @default(cuid())
+  name      String
+  url       String
+  reward    Int       @default(0)
+  icon      String?
+  isActive  Boolean   @default(true)
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  votes     VoteLog[]
+}
+
+model VoteLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  voteSiteId String
+  voteSite   VoteSite @relation(fields: [voteSiteId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([voteSiteId])
+}

@@ -1,0 +1,293 @@
+{
+  "id": "google-auth",
+  "name": "Google Login",
+  "description": "Allow users to sign in with their Google account",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Globe",
+  "adminRoutes": [
+    {
+      "path": "/settings/google-auth",
+      "component": "pages/admin/settings/google-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Google OAuth",
+      "description": "Google application credentials.",
+      "href": "/settings/google-auth",
+      "icon": "Globe",
+      "color": "text-red-500"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "google-login",
+      "provider": "google",
+      "label": "Google",
+      "color": "#4285F4",
+      "svgIcon": "M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z|M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z|M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z|M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "googleAuth": {
+        "title": "Google Login",
+        "settings": "Google OAuth Settings",
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter Google application Client ID",
+        "clientSecret": "Client Secret",
+        "clientSecretPlaceholder": "Enter Google application Client Secret",
+        "redirectUri": "Redirect URI",
+        "redirectUriHelp": "Add this URL to your Google Cloud Console authorized redirect URIs",
+        "enabled": "Google Login Enabled",
+        "disabled": "Google Login Disabled",
+        "enable": "Enable Google Login",
+        "save": "Save Settings",
+        "saved": "Google OAuth settings saved successfully",
+        "saveError": "Failed to save Google OAuth settings",
+        "signInWith": "Sign in with Google",
+        "linkAccount": "Link Google Account",
+        "unlinkAccount": "Unlink Google Account",
+        "accountLinked": "Google account linked successfully",
+        "accountUnlinked": "Google account unlinked successfully",
+        "linkError": "Failed to link Google account",
+        "description": "Configure Google OAuth credentials for user login",
+        "adm_title": "Google Auth Settings",
+        "adm_subtitle": "Configure Google OAuth2 login for your site",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "Your Google application's Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "Your Google application's Client Secret",
+        "adm_field3Label": "Redirect URI",
+        "adm_field3Desc": "OAuth2 callback URL (must match Google Cloud Console settings)"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "googleAuth": {
+        "title": "Google ile Giriş",
+        "settings": "Google OAuth Ayarlari",
+        "clientId": "Istemci Kimligi",
+        "clientIdPlaceholder": "Google uygulama Istemci Kimligini girin",
+        "clientSecret": "Istemci Şifresi",
+        "clientSecretPlaceholder": "Google uygulama Istemci Şifresini girin",
+        "redirectUri": "Yonlendirme URI'si",
+        "redirectUriHelp": "Bu URL'yi Google Cloud Console yetkili yonlendirme URI'lerine ekleyin",
+        "enabled": "Google ile Giriş Etkin",
+        "disabled": "Google ile Giriş Devre Disi",
+        "enable": "Google ile Girişi Etkinlestir",
+        "save": "Ayarlari Kaydet",
+        "saved": "Google OAuth ayarlari basariyla kaydedildi",
+        "saveError": "Google OAuth ayarlari kaydedilemedi",
+        "signInWith": "Google ile giriş yap",
+        "linkAccount": "Google Hesabini Bagla",
+        "unlinkAccount": "Google Hesabini Ayir",
+        "accountLinked": "Google hesabi basariyla baglandi",
+        "accountUnlinked": "Google hesabi basariyla ayrildi",
+        "linkError": "Google hesabi baglanamadi",
+        "description": "Kullanıcı girişi icin Google OAuth kimlik bilgilerini yapilandirin",
+        "adm_title": "Google Kimlik Doğrulama Ayarları",
+        "adm_subtitle": "Siteniz için Google OAuth2 girişini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "Google uygulamanızın İstemci Kimliği",
+        "adm_field2Label": "İstemci Gizli Anahtarı",
+        "adm_field2Desc": "Google uygulamanızın Gizli Anahtarı",
+        "adm_field3Label": "Yönlendirme URI",
+        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Google Cloud Console ayarlarıyla eşleşmelidir)"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "googleAuth": {
+        "title": "Google-Anmeldung",
+        "settings": "Google OAuth-Einstellungen",
+        "clientId": "Client-ID",
+        "clientIdPlaceholder": "Google-Anwendungs-Client-ID eingeben",
+        "clientSecret": "Client-Geheimnis",
+        "clientSecretPlaceholder": "Google-Anwendungs-Client-Geheimnis eingeben",
+        "redirectUri": "Weiterleitungs-URI",
+        "redirectUriHelp": "Fuegen Sie diese URL zu den autorisierten Weiterleitungs-URIs in der Google Cloud Console hinzu",
+        "enabled": "Google-Anmeldung aktiviert",
+        "disabled": "Google-Anmeldung deaktiviert",
+        "enable": "Google-Anmeldung aktivieren",
+        "save": "Einstellungen speichern",
+        "saved": "Google OAuth-Einstellungen erfolgreich gespeichert",
+        "saveError": "Google OAuth-Einstellungen konnten nicht gespeichert werden",
+        "signInWith": "Mit Google anmelden",
+        "linkAccount": "Google-Konto verknuepfen",
+        "unlinkAccount": "Google-Konto trennen",
+        "accountLinked": "Google-Konto erfolgreich verknuepft",
+        "accountUnlinked": "Google-Konto erfolgreich getrennt",
+        "linkError": "Google-Konto konnte nicht verknuepft werden",
+        "description": "Google OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
+        "adm_title": "Google-Auth-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie Google OAuth2-Login für Ihre Website",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "Die Client-ID Ihrer Google-Anwendung",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "Das Client-Secret Ihrer Google-Anwendung",
+        "adm_field3Label": "Redirect-URI",
+        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Google Cloud Console-Einstellungen übereinstimmen)"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "googleAuth": {
+        "title": "Inicio de sesion con Google",
+        "settings": "Configuracion de Google OAuth",
+        "clientId": "ID de cliente",
+        "clientIdPlaceholder": "Ingrese el ID de cliente de la aplicacion Google",
+        "clientSecret": "Secreto de cliente",
+        "clientSecretPlaceholder": "Ingrese el secreto de cliente de la aplicacion Google",
+        "redirectUri": "URI de redireccion",
+        "redirectUriHelp": "Agregue esta URL a las URIs de redireccion autorizadas en Google Cloud Console",
+        "enabled": "Inicio de sesion con Google habilitado",
+        "disabled": "Inicio de sesion con Google deshabilitado",
+        "enable": "Habilitar inicio de sesion con Google",
+        "save": "Guardar configuracion",
+        "saved": "Configuracion de Google OAuth guardada correctamente",
+        "saveError": "Error al guardar la configuracion de Google OAuth",
+        "signInWith": "Iniciar sesion con Google",
+        "linkAccount": "Vincular cuenta de Google",
+        "unlinkAccount": "Desvincular cuenta de Google",
+        "accountLinked": "Cuenta de Google vinculada correctamente",
+        "accountUnlinked": "Cuenta de Google desvinculada correctamente",
+        "linkError": "Error al vincular la cuenta de Google",
+        "description": "Configurar credenciales de Google OAuth para inicio de sesion",
+        "adm_title": "Configuración de auth Google",
+        "adm_subtitle": "Configura el inicio de sesión Google OAuth2 para tu sitio",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "El ID de cliente de tu aplicación Google",
+        "adm_field2Label": "Secreto de Cliente",
+        "adm_field2Desc": "El secreto de cliente de tu aplicación Google",
+        "adm_field3Label": "URI de redirección",
+        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de Google Cloud Console)"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "googleAuth": {
+        "title": "Connexion Google",
+        "settings": "Parametres Google OAuth",
+        "clientId": "ID client",
+        "clientIdPlaceholder": "Saisissez l'ID client de l'application Google",
+        "clientSecret": "Secret client",
+        "clientSecretPlaceholder": "Saisissez le secret client de l'application Google",
+        "redirectUri": "URI de redirection",
+        "redirectUriHelp": "Ajoutez cette URL aux URIs de redirection autorisees dans la console Google Cloud",
+        "enabled": "Connexion Google activee",
+        "disabled": "Connexion Google desactivee",
+        "enable": "Activer la connexion Google",
+        "save": "Enregistrer les parametres",
+        "saved": "Parametres Google OAuth enregistres avec succes",
+        "saveError": "Echec de l'enregistrement des parametres Google OAuth",
+        "signInWith": "Se connecter avec Google",
+        "linkAccount": "Lier le compte Google",
+        "unlinkAccount": "Delier le compte Google",
+        "accountLinked": "Compte Google lie avec succes",
+        "accountUnlinked": "Compte Google delie avec succes",
+        "linkError": "Echec de la liaison du compte Google",
+        "description": "Configurer les identifiants Google OAuth pour la connexion",
+        "adm_title": "Paramètres d'auth Google",
+        "adm_subtitle": "Configurez la connexion Google OAuth2 pour votre site",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "L'ID client de votre application Google",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Le secret client de votre application Google",
+        "adm_field3Label": "URI de redirection",
+        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de Google Cloud Console)"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "googleAuth": {
+        "title": "Вход через Google",
+        "settings": "Настройки Google OAuth",
+        "clientId": "ID клиента",
+        "clientIdPlaceholder": "Введите ID клиента приложения Google",
+        "clientSecret": "Секрет клиента",
+        "clientSecretPlaceholder": "Введите секрет клиента приложения Google",
+        "redirectUri": "URI перенаправления",
+        "redirectUriHelp": "Добавьте этот URL в авторизованные URI перенаправления в Google Cloud Console",
+        "enabled": "Вход через Google включен",
+        "disabled": "Вход через Google отключен",
+        "enable": "Включить вход через Google",
+        "save": "Сохранить настройки",
+        "saved": "Настройки Google OAuth успешно сохранены",
+        "saveError": "Не удалось сохранить настройки Google OAuth",
+        "signInWith": "Войти через Google",
+        "linkAccount": "Привязать аккаунт Google",
+        "unlinkAccount": "Отвязать аккаунт Google",
+        "accountLinked": "Аккаунт Google успешно привязан",
+        "accountUnlinked": "Аккаунт Google успешно отвязан",
+        "linkError": "Не удалось привязать аккаунт Google",
+        "description": "Настроить учетные данные Google OAuth для входа пользователей",
+        "adm_title": "Настройки авторизации Google",
+        "adm_subtitle": "Настройте вход Google OAuth2 для вашего сайта",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента вашего приложения Google",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента вашего приложения Google",
+        "adm_field3Label": "URI перенаправления",
+        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками Google Cloud Console)"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "googleAuth": {
+        "title": "Login com Google",
+        "settings": "Configuracoes do Google OAuth",
+        "clientId": "ID do cliente",
+        "clientIdPlaceholder": "Insira o ID do cliente do aplicativo Google",
+        "clientSecret": "Segredo do cliente",
+        "clientSecretPlaceholder": "Insira o segredo do cliente do aplicativo Google",
+        "redirectUri": "URI de redirecionamento",
+        "redirectUriHelp": "Adicione esta URL aos URIs de redirecionamento autorizados no Google Cloud Console",
+        "enabled": "Login com Google ativado",
+        "disabled": "Login com Google desativado",
+        "enable": "Ativar login com Google",
+        "save": "Salvar configuracoes",
+        "saved": "Configuracoes do Google OAuth salvas com sucesso",
+        "saveError": "Falha ao salvar configuracoes do Google OAuth",
+        "signInWith": "Entrar com Google",
+        "linkAccount": "Vincular conta do Google",
+        "unlinkAccount": "Desvincular conta do Google",
+        "accountLinked": "Conta do Google vinculada com sucesso",
+        "accountUnlinked": "Conta do Google desvinculada com sucesso",
+        "linkError": "Falha ao vincular conta do Google",
+        "description": "Configurar credenciais do Google OAuth para login de usuarios",
+        "adm_title": "Configurações de auth Google",
+        "adm_subtitle": "Configure o login Google OAuth2 para o seu site",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "O ID do cliente do seu aplicativo Google",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "O segredo do cliente do seu aplicativo Google",
+        "adm_field3Label": "URI de redirecionamento",
+        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do Google Cloud Console)"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

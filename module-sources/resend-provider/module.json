@@ -1,0 +1,280 @@
+{
+  "id": "resend-provider",
+  "name": "Resend Email Provider",
+  "description": "Send emails via Resend API",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Mail",
+  "adminRoutes": [
+    {
+      "path": "/settings/resend",
+      "component": "pages/admin/settings/resend/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Resend",
+      "description": "Resend API key configuration.",
+      "href": "/settings/resend",
+      "icon": "Mail",
+      "color": "text-cyan-500"
+    }
+  ],
+  "dependencies": [
+    "email-templates"
+  ],
+  "translations": {
+    "en": {
+      "resendProvider": {
+        "title": "Resend Settings",
+        "description": "Configure Resend email provider",
+        "apiKey": "API Key",
+        "apiKeyPlaceholder": "Enter your Resend API key",
+        "fromEmail": "From Email",
+        "fromEmailPlaceholder": "noreply@yourdomain.com",
+        "fromName": "From Name",
+        "fromNamePlaceholder": "Your Site Name",
+        "saveSettings": "Save Settings",
+        "settingsSaved": "Resend settings saved successfully",
+        "settingsError": "Failed to save Resend settings",
+        "testEmail": "Send Test Email",
+        "testEmailSent": "Test email sent successfully",
+        "testEmailFailed": "Failed to send test email",
+        "testRecipient": "Test Recipient",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "status": "Status",
+        "domain": "Domain",
+        "verifyDomain": "Verify Domain",
+        "adm_title": "Resend Email Settings",
+        "adm_subtitle": "Configure Resend as your email provider",
+        "adm_field1Label": "API Key",
+        "adm_field1Desc": "Your Resend API key (starts with re_...)",
+        "adm_field2Label": "From Email",
+        "adm_field2Desc": "Email address that will appear as the sender",
+        "adm_field3Label": "From Name",
+        "adm_field3Desc": "Display name for the sender"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "resendProvider": {
+        "title": "Resend Ayarlari",
+        "description": "Resend e-posta saglayicisini yapilandir",
+        "apiKey": "API Anahtari",
+        "apiKeyPlaceholder": "Resend API anahtarinizi girin",
+        "fromEmail": "Gönderen E-posta",
+        "fromEmailPlaceholder": "bildirim@siteadiniz.com",
+        "fromName": "Gönderen Adi",
+        "fromNamePlaceholder": "Site Adiniz",
+        "saveSettings": "Ayarlari Kaydet",
+        "settingsSaved": "Resend ayarlari basariyla kaydedildi",
+        "settingsError": "Resend ayarlari kaydedilemedi",
+        "testEmail": "Test E-postasi Gönder",
+        "testEmailSent": "Test e-postasi basariyla gönderildi",
+        "testEmailFailed": "Test e-postasi gönderilemedi",
+        "testRecipient": "Test Alicisi",
+        "enabled": "Etkin",
+        "disabled": "Devre Disi",
+        "status": "Durum",
+        "domain": "Alan Adi",
+        "verifyDomain": "Alan Adini Dogrula",
+        "adm_title": "Resend E-posta Ayarları",
+        "adm_subtitle": "Resend'i e-posta sağlayıcınız olarak yapılandırın",
+        "adm_field1Label": "API Anahtarı",
+        "adm_field1Desc": "Resend API anahtarınız (re_... ile başlar)",
+        "adm_field2Label": "Gönderen E-posta",
+        "adm_field2Desc": "Gönderen olarak görünecek e-posta adresi",
+        "adm_field3Label": "Gönderen Adı",
+        "adm_field3Desc": "Gönderen için görünen ad"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "resendProvider": {
+        "title": "Resend-Einstellungen",
+        "description": "Resend-E-Mail-Anbieter konfigurieren",
+        "apiKey": "API-Schluessel",
+        "apiKeyPlaceholder": "Geben Sie Ihren Resend-API-Schluessel ein",
+        "fromEmail": "Absender-E-Mail",
+        "fromEmailPlaceholder": "noreply@ihredomain.de",
+        "fromName": "Absendername",
+        "fromNamePlaceholder": "Ihr Seitenname",
+        "saveSettings": "Einstellungen speichern",
+        "settingsSaved": "Resend-Einstellungen erfolgreich gespeichert",
+        "settingsError": "Resend-Einstellungen konnten nicht gespeichert werden",
+        "testEmail": "Test-E-Mail senden",
+        "testEmailSent": "Test-E-Mail erfolgreich gesendet",
+        "testEmailFailed": "Test-E-Mail konnte nicht gesendet werden",
+        "testRecipient": "Testempfaenger",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "status": "Status",
+        "domain": "Domain",
+        "verifyDomain": "Domain verifizieren",
+        "adm_title": "Resend-E-Mail-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie Resend als Ihren E-Mail-Anbieter",
+        "adm_field1Label": "API-Schlüssel",
+        "adm_field1Desc": "Ihr Resend API-Schlüssel (beginnt mit re_...)",
+        "adm_field2Label": "Absender-E-Mail",
+        "adm_field2Desc": "E-Mail-Adresse, die als Absender angezeigt wird",
+        "adm_field3Label": "Absendername",
+        "adm_field3Desc": "Anzeigename des Absenders"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "resendProvider": {
+        "title": "Configuracion de Resend",
+        "description": "Configurar proveedor de correo Resend",
+        "apiKey": "Clave API",
+        "apiKeyPlaceholder": "Ingrese su clave API de Resend",
+        "fromEmail": "Correo del remitente",
+        "fromEmailPlaceholder": "noreply@sudominio.com",
+        "fromName": "Nombre del remitente",
+        "fromNamePlaceholder": "Nombre de su sitio",
+        "saveSettings": "Guardar configuracion",
+        "settingsSaved": "Configuracion de Resend guardada correctamente",
+        "settingsError": "Error al guardar la configuracion de Resend",
+        "testEmail": "Enviar correo de prueba",
+        "testEmailSent": "Correo de prueba enviado correctamente",
+        "testEmailFailed": "Error al enviar correo de prueba",
+        "testRecipient": "Destinatario de prueba",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "status": "Estado",
+        "domain": "Dominio",
+        "verifyDomain": "Verificar dominio",
+        "adm_title": "Configuración de correo Resend",
+        "adm_subtitle": "Configura Resend como tu proveedor de correo",
+        "adm_field1Label": "Clave API",
+        "adm_field1Desc": "Tu clave API de Resend (comienza con re_...)",
+        "adm_field2Label": "Correo del remitente",
+        "adm_field2Desc": "Dirección de correo que aparecerá como remitente",
+        "adm_field3Label": "Nombre del remitente",
+        "adm_field3Desc": "Nombre para mostrar del remitente"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "resendProvider": {
+        "title": "Parametres Resend",
+        "description": "Configurer le fournisseur d'email Resend",
+        "apiKey": "Cle API",
+        "apiKeyPlaceholder": "Entrez votre cle API Resend",
+        "fromEmail": "Email de l'expediteur",
+        "fromEmailPlaceholder": "noreply@votredomaine.com",
+        "fromName": "Nom de l'expediteur",
+        "fromNamePlaceholder": "Nom de votre site",
+        "saveSettings": "Enregistrer les parametres",
+        "settingsSaved": "Parametres Resend enregistres avec succes",
+        "settingsError": "Echec de l'enregistrement des parametres Resend",
+        "testEmail": "Envoyer un email de test",
+        "testEmailSent": "Email de test envoye avec succes",
+        "testEmailFailed": "Echec de l'envoi de l'email de test",
+        "testRecipient": "Destinataire de test",
+        "enabled": "Active",
+        "disabled": "Desactive",
+        "status": "Statut",
+        "domain": "Domaine",
+        "verifyDomain": "Verifier le domaine",
+        "adm_title": "Paramètres e-mail Resend",
+        "adm_subtitle": "Configurez Resend comme fournisseur d'e-mail",
+        "adm_field1Label": "Clé API",
+        "adm_field1Desc": "Votre clé API Resend (commence par re_...)",
+        "adm_field2Label": "E-mail de l'expéditeur",
+        "adm_field2Desc": "Adresse e-mail qui apparaîtra comme expéditeur",
+        "adm_field3Label": "Nom de l'expéditeur",
+        "adm_field3Desc": "Nom d'affichage de l'expéditeur"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "resendProvider": {
+        "title": "Nastroiki Resend",
+        "description": "Nastroika pochtovoho provaidepa Resend",
+        "apiKey": "Kliuch API",
+        "apiKeyPlaceholder": "Vvedite vash kliuch API Resend",
+        "fromEmail": "Email otpravitelia",
+        "fromEmailPlaceholder": "noreply@vashdomen.com",
+        "fromName": "Imia otpravitelia",
+        "fromNamePlaceholder": "Nazvanie vashego saita",
+        "saveSettings": "Sokhranit nastroiki",
+        "settingsSaved": "Nastroiki Resend uspeshno sokhraneny",
+        "settingsError": "Ne udalos sokhranit nastroiki Resend",
+        "testEmail": "Otpravit testovoe pismo",
+        "testEmailSent": "Testovoe pismo uspeshno otpravleno",
+        "testEmailFailed": "Ne udalos otpravit testovoe pismo",
+        "testRecipient": "Testovyi poluchatel",
+        "enabled": "Vkliucheno",
+        "disabled": "Otkliucheno",
+        "status": "Status",
+        "domain": "Domen",
+        "verifyDomain": "Podtverdit domen",
+        "adm_title": "Настройки email Resend",
+        "adm_subtitle": "Настройте Resend как ваш почтовый провайдер",
+        "adm_field1Label": "API-ключ",
+        "adm_field1Desc": "Ваш API-ключ Resend (начинается с re_...)",
+        "adm_field2Label": "Email отправителя",
+        "adm_field2Desc": "Адрес электронной почты, который будет отображаться как отправитель",
+        "adm_field3Label": "Имя отправителя",
+        "adm_field3Desc": "Отображаемое имя отправителя"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "resendProvider": {
+        "title": "Configuracoes do Resend",
+        "description": "Configurar provedor de email Resend",
+        "apiKey": "Chave API",
+        "apiKeyPlaceholder": "Digite sua chave API do Resend",
+        "fromEmail": "Email do remetente",
+        "fromEmailPlaceholder": "noreply@seudominio.com",
+        "fromName": "Nome do remetente",
+        "fromNamePlaceholder": "Nome do seu site",
+        "saveSettings": "Salvar configuracoes",
+        "settingsSaved": "Configuracoes do Resend salvas com sucesso",
+        "settingsError": "Falha ao salvar configuracoes do Resend",
+        "testEmail": "Enviar email de teste",
+        "testEmailSent": "Email de teste enviado com sucesso",
+        "testEmailFailed": "Falha ao enviar email de teste",
+        "testRecipient": "Destinatario de teste",
+        "enabled": "Ativado",
+        "disabled": "Desativado",
+        "status": "Status",
+        "domain": "Dominio",
+        "verifyDomain": "Verificar dominio",
+        "adm_title": "Configurações de e-mail Resend",
+        "adm_subtitle": "Configure o Resend como seu provedor de e-mail",
+        "adm_field1Label": "Chave API",
+        "adm_field1Desc": "Sua chave API do Resend (começa com re_...)",
+        "adm_field2Label": "E-mail do remetente",
+        "adm_field2Desc": "Endereço de e-mail que aparecerá como remetente",
+        "adm_field3Label": "Nome do remetente",
+        "adm_field3Desc": "Nome de exibição do remetente"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

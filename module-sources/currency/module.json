@@ -1,0 +1,243 @@
+{
+  "id": "currency",
+  "name": "Multi-Currency",
+  "description": "Multi-currency support with automatic conversion",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "DollarSign",
+  "menu": [
+    {
+      "label": "Currency",
+      "path": "/currency",
+      "icon": "DollarSign"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/currency",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/currency",
+      "handler": "api/route.ts",
+      "description": "List available currencies and create new ones (admin)."
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Currency Settings",
+      "description": "Manage currencies and exchange rates",
+      "href": "/admin/currency",
+      "icon": "DollarSign",
+      "color": "text-green-500"
+    }
+  ],
+  "footerComponents": [
+    {
+      "id": "CurrencySelector",
+      "component": "components/CurrencySelector",
+      "order": 10
+    }
+  ],
+  "contextProviders": [
+    {
+      "id": "CurrencyProvider",
+      "component": "lib/context",
+      "order": 10
+    }
+  ],
+  "cronJobs": [
+    {
+      "id": "currency-rate-refresh",
+      "schedule": "every-hour",
+      "handler": "cron/refresh.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "currency": {
+        "title": "Currency",
+        "settings": "Currency Settings",
+        "baseCurrency": "Base Currency",
+        "selectCurrency": "Select Currency",
+        "exchangeRate": "Exchange Rate",
+        "exchangeRates": "Exchange Rates",
+        "autoUpdate": "Auto-update Rates",
+        "lastUpdated": "Last Updated",
+        "updateRates": "Update Rates",
+        "addCurrency": "Add Currency",
+        "removeCurrency": "Remove Currency",
+        "currencyCode": "Currency Code",
+        "currencyName": "Currency Name",
+        "symbol": "Symbol",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "ratesUpdated": "Exchange rates updated successfully",
+        "ratesError": "Failed to update exchange rates",
+        "saved": "Currency settings saved successfully",
+        "saveError": "Failed to save currency settings",
+        "noCurrencies": "No currencies configured"
+      },
+      "admin": {
+        "menu_currency": "Currency",
+        "menu_currency_currency": "Currency"
+      }
+    },
+    "tr": {
+      "currency": {
+        "title": "Para Birimi",
+        "settings": "Para Birimi Ayarları",
+        "baseCurrency": "Ana Para Birimi",
+        "selectCurrency": "Para Birimi Seçin",
+        "exchangeRate": "Döviz Kuru",
+        "exchangeRates": "Döviz Kurları",
+        "autoUpdate": "Kurları Otomatik Güncelle",
+        "lastUpdated": "Son Güncelleme",
+        "updateRates": "Kurları Güncelle",
+        "addCurrency": "Para Birimi Ekle",
+        "removeCurrency": "Para Birimi Kaldır",
+        "currencyCode": "Para Birimi Kodu",
+        "currencyName": "Para Birimi Adı",
+        "symbol": "Sembol",
+        "enabled": "Etkin",
+        "disabled": "Devre Dışı",
+        "ratesUpdated": "Döviz kurları başarıyla güncellendi",
+        "ratesError": "Döviz kurları güncellenemedi",
+        "saved": "Para birimi ayarları başarıyla kaydedildi",
+        "saveError": "Para birimi ayarları kaydedilemedi",
+        "noCurrencies": "Yapılandırılmış para birimi yok"
+      },
+      "admin": {
+        "menu_currency": "Para Birimi",
+        "menu_currency_currency": "Para Birimi"
+      }
+    },
+    "de": {
+      "currency": {
+        "title": "Währung",
+        "settings": "Währungseinstellungen",
+        "baseCurrency": "Basiswährung",
+        "selectCurrency": "Währung auswählen",
+        "exchangeRate": "Wechselkurs",
+        "exchangeRates": "Wechselkurse",
+        "autoUpdate": "Kurse automatisch aktualisieren",
+        "lastUpdated": "Zuletzt aktualisiert",
+        "updateRates": "Kurse aktualisieren",
+        "addCurrency": "Währung hinzufügen",
+        "removeCurrency": "Währung entfernen",
+        "currencyCode": "Währungscode",
+        "currencyName": "Währungsname",
+        "symbol": "Symbol",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "ratesUpdated": "Wechselkurse erfolgreich aktualisiert",
+        "ratesError": "Wechselkurse konnten nicht aktualisiert werden",
+        "saved": "Währungseinstellungen erfolgreich gespeichert",
+        "saveError": "Währungseinstellungen konnten nicht gespeichert werden",
+        "noCurrencies": "Keine Währungen konfiguriert"
+      }
+    },
+    "es": {
+      "currency": {
+        "title": "Moneda",
+        "settings": "Configuración de moneda",
+        "baseCurrency": "Moneda base",
+        "selectCurrency": "Seleccionar moneda",
+        "exchangeRate": "Tipo de cambio",
+        "exchangeRates": "Tipos de cambio",
+        "autoUpdate": "Actualizar tasas automáticamente",
+        "lastUpdated": "Última actualización",
+        "updateRates": "Actualizar tasas",
+        "addCurrency": "Agregar moneda",
+        "removeCurrency": "Eliminar moneda",
+        "currencyCode": "Código de moneda",
+        "currencyName": "Nombre de moneda",
+        "symbol": "Símbolo",
+        "enabled": "Habilitado",
+        "disabled": "Deshabilitado",
+        "ratesUpdated": "Tipos de cambio actualizados correctamente",
+        "ratesError": "Error al actualizar tipos de cambio",
+        "saved": "Configuración de moneda guardada correctamente",
+        "saveError": "Error al guardar configuración de moneda",
+        "noCurrencies": "No hay monedas configuradas"
+      }
+    },
+    "fr": {
+      "currency": {
+        "title": "Devise",
+        "settings": "Paramètres de devise",
+        "baseCurrency": "Devise de base",
+        "selectCurrency": "Sélectionner une devise",
+        "exchangeRate": "Taux de change",
+        "exchangeRates": "Taux de change",
+        "autoUpdate": "Mise à jour automatique des taux",
+        "lastUpdated": "Dernière mise à jour",
+        "updateRates": "Mettre à jour les taux",
+        "addCurrency": "Ajouter une devise",
+        "removeCurrency": "Supprimer la devise",
+        "currencyCode": "Code de la devise",
+        "currencyName": "Nom de la devise",
+        "symbol": "Symbole",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "ratesUpdated": "Taux de change mis à jour avec succès",
+        "ratesError": "Échec de la mise à jour des taux de change",
+        "saved": "Paramètres de devise enregistrés avec succès",
+        "saveError": "Échec de l'enregistrement des paramètres de devise",
+        "noCurrencies": "Aucune devise configurée"
+      }
+    },
+    "ru": {
+      "currency": {
+        "title": "Валюта",
+        "settings": "Настройки валюты",
+        "baseCurrency": "Базовая валюта",
+        "selectCurrency": "Выберите валюту",
+        "exchangeRate": "Курс обмена",
+        "exchangeRates": "Курсы обмена",
+        "autoUpdate": "Автообновление курсов",
+        "lastUpdated": "Последнее обновление",
+        "updateRates": "Обновить курсы",
+        "addCurrency": "Добавить валюту",
+        "removeCurrency": "Удалить валюту",
+        "currencyCode": "Код валюты",
+        "currencyName": "Название валюты",
+        "symbol": "Символ",
+        "enabled": "Включено",
+        "disabled": "Отключено",
+        "ratesUpdated": "Курсы обмена успешно обновлены",
+        "ratesError": "Не удалось обновить курсы обмена",
+        "saved": "Настройки валюты успешно сохранены",
+        "saveError": "Не удалось сохранить настройки валюты",
+        "noCurrencies": "Валюты не настроены"
+      }
+    },
+    "pt": {
+      "currency": {
+        "title": "Moeda",
+        "settings": "Configurações de moeda",
+        "baseCurrency": "Moeda base",
+        "selectCurrency": "Selecionar moeda",
+        "exchangeRate": "Taxa de câmbio",
+        "exchangeRates": "Taxas de câmbio",
+        "autoUpdate": "Atualizar taxas automaticamente",
+        "lastUpdated": "Última atualização",
+        "updateRates": "Atualizar taxas",
+        "addCurrency": "Adicionar moeda",
+        "removeCurrency": "Remover moeda",
+        "currencyCode": "Código da moeda",
+        "currencyName": "Nome da moeda",
+        "symbol": "Símbolo",
+        "enabled": "Ativado",
+        "disabled": "Desativado",
+        "ratesUpdated": "Taxas de câmbio atualizadas com sucesso",
+        "ratesError": "Falha ao atualizar taxas de câmbio",
+        "saved": "Configurações de moeda salvas com sucesso",
+        "saveError": "Falha ao salvar configurações de moeda",
+        "noCurrencies": "Nenhuma moeda configurada"
+      }
+    }
+  }
+}

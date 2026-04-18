@@ -1,0 +1,187 @@
+{
+  "id": "player-profiles",
+  "name": "Player Profiles",
+  "description": "Public player profile pages",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Users",
+  "routes": [
+    {
+      "path": "/player/[username]",
+      "component": "pages/public/[username]/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/players/[username]",
+      "handler": "api/[username]/route.ts",
+      "description": "Get a public player profile by username."
+    },
+    {
+      "path": "/linked-accounts",
+      "handler": "api/linked-accounts/route.ts",
+      "description": "List, link, or unlink connected game accounts for the current user."
+    },
+    {
+      "path": "/players/linked-accounts",
+      "handler": "api/linked-accounts/route.ts",
+      "description": "List, link, or unlink connected game accounts for the current user."
+    }
+  ],
+  "translations": {
+    "en": {
+      "playerProfiles": {
+        "title": "Player Profile",
+        "username": "Username",
+        "joinDate": "Join Date",
+        "lastSeen": "Last Seen",
+        "online": "Online",
+        "offline": "Offline",
+        "linkedAccounts": "Linked Accounts",
+        "noLinkedAccounts": "No linked accounts",
+        "statistics": "Statistics",
+        "playtime": "Playtime",
+        "firstJoined": "First Joined",
+        "playerNotFound": "Player not found",
+        "searchPlayer": "Search player",
+        "searchPlaceholder": "Enter username...",
+        "viewProfile": "View Profile",
+        "rank": "Rank",
+        "badges": "Badges",
+        "activity": "Activity"
+      }
+    },
+    "tr": {
+      "playerProfiles": {
+        "title": "Oyuncu Profili",
+        "username": "Kullan\u0131c\u0131 Ad\u0131",
+        "joinDate": "Kat\u0131lma Tarihi",
+        "lastSeen": "Son G\u00f6r\u00fclen",
+        "online": "\u00c7evrimi\u00e7i",
+        "offline": "\u00c7evrimd\u0131\u015f\u0131",
+        "linkedAccounts": "Ba\u011fl\u0131 Hesaplar",
+        "noLinkedAccounts": "Ba\u011fl\u0131 hesap yok",
+        "statistics": "\u0130statistikler",
+        "playtime": "Oynama S\u00fcresi",
+        "firstJoined": "\u0130lk Kat\u0131lma",
+        "playerNotFound": "Oyuncu bulunamad\u0131",
+        "searchPlayer": "Oyuncu ara",
+        "searchPlaceholder": "Kullan\u0131c\u0131 ad\u0131 girin...",
+        "viewProfile": "Profili G\u00f6r\u00fcnt\u00fcle",
+        "rank": "R\u00fctbe",
+        "badges": "Rozetler",
+        "activity": "Aktivite"
+      }
+    },
+    "de": {
+      "playerProfiles": {
+        "title": "Spielerprofil",
+        "username": "Benutzername",
+        "joinDate": "Beitrittsdatum",
+        "lastSeen": "Zuletzt gesehen",
+        "online": "Online",
+        "offline": "Offline",
+        "linkedAccounts": "Verkn\u00fcpfte Konten",
+        "noLinkedAccounts": "Keine verkn\u00fcpften Konten",
+        "statistics": "Statistiken",
+        "playtime": "Spielzeit",
+        "firstJoined": "Erster Beitritt",
+        "playerNotFound": "Spieler nicht gefunden",
+        "searchPlayer": "Spieler suchen",
+        "searchPlaceholder": "Benutzernamen eingeben...",
+        "viewProfile": "Profil anzeigen",
+        "rank": "Rang",
+        "badges": "Abzeichen",
+        "activity": "Aktivit\u00e4t"
+      }
+    },
+    "es": {
+      "playerProfiles": {
+        "title": "Perfil del Jugador",
+        "username": "Nombre de usuario",
+        "joinDate": "Fecha de registro",
+        "lastSeen": "Visto por \u00faltima vez",
+        "online": "En l\u00ednea",
+        "offline": "Desconectado",
+        "linkedAccounts": "Cuentas vinculadas",
+        "noLinkedAccounts": "Sin cuentas vinculadas",
+        "statistics": "Estad\u00edsticas",
+        "playtime": "Tiempo de juego",
+        "firstJoined": "Primera conexi\u00f3n",
+        "playerNotFound": "Jugador no encontrado",
+        "searchPlayer": "Buscar jugador",
+        "searchPlaceholder": "Ingrese nombre de usuario...",
+        "viewProfile": "Ver perfil",
+        "rank": "Rango",
+        "badges": "Insignias",
+        "activity": "Actividad"
+      }
+    },
+    "fr": {
+      "playerProfiles": {
+        "title": "Profil du joueur",
+        "username": "Nom d'utilisateur",
+        "joinDate": "Date d'inscription",
+        "lastSeen": "Vu pour la derni\u00e8re fois",
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "linkedAccounts": "Comptes li\u00e9s",
+        "noLinkedAccounts": "Aucun compte li\u00e9",
+        "statistics": "Statistiques",
+        "playtime": "Temps de jeu",
+        "firstJoined": "Premi\u00e8re connexion",
+        "playerNotFound": "Joueur introuvable",
+        "searchPlayer": "Rechercher un joueur",
+        "searchPlaceholder": "Entrez le nom d'utilisateur...",
+        "viewProfile": "Voir le profil",
+        "rank": "Rang",
+        "badges": "Badges",
+        "activity": "Activit\u00e9"
+      }
+    },
+    "ru": {
+      "playerProfiles": {
+        "title": "\u041f\u0440\u043e\u0444\u0438\u043b\u044c \u0438\u0433\u0440\u043e\u043a\u0430",
+        "username": "\u0418\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+        "joinDate": "\u0414\u0430\u0442\u0430 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438",
+        "lastSeen": "\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0439 \u0440\u0430\u0437 \u0432 \u0441\u0435\u0442\u0438",
+        "online": "\u0412 \u0441\u0435\u0442\u0438",
+        "offline": "\u041d\u0435 \u0432 \u0441\u0435\u0442\u0438",
+        "linkedAccounts": "\u041f\u0440\u0438\u0432\u044f\u0437\u0430\u043d\u043d\u044b\u0435 \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u044b",
+        "noLinkedAccounts": "\u041d\u0435\u0442 \u043f\u0440\u0438\u0432\u044f\u0437\u0430\u043d\u043d\u044b\u0445 \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u043e\u0432",
+        "statistics": "\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430",
+        "playtime": "\u0412\u0440\u0435\u043c\u044f \u0438\u0433\u0440\u044b",
+        "firstJoined": "\u041f\u0435\u0440\u0432\u043e\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435",
+        "playerNotFound": "\u0418\u0433\u0440\u043e\u043a \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d",
+        "searchPlayer": "\u041f\u043e\u0438\u0441\u043a \u0438\u0433\u0440\u043e\u043a\u0430",
+        "searchPlaceholder": "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f...",
+        "viewProfile": "\u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u043f\u0440\u043e\u0444\u0438\u043b\u044f",
+        "rank": "\u0420\u0430\u043d\u0433",
+        "badges": "\u0417\u043d\u0430\u0447\u043a\u0438",
+        "activity": "\u0410\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c"
+      }
+    },
+    "pt": {
+      "playerProfiles": {
+        "title": "Perfil do Jogador",
+        "username": "Nome de usu\u00e1rio",
+        "joinDate": "Data de registro",
+        "lastSeen": "Visto por \u00faltimo",
+        "online": "Online",
+        "offline": "Offline",
+        "linkedAccounts": "Contas vinculadas",
+        "noLinkedAccounts": "Sem contas vinculadas",
+        "statistics": "Estat\u00edsticas",
+        "playtime": "Tempo de jogo",
+        "firstJoined": "Primeira conex\u00e3o",
+        "playerNotFound": "Jogador n\u00e3o encontrado",
+        "searchPlayer": "Buscar jogador",
+        "searchPlaceholder": "Digite o nome de usu\u00e1rio...",
+        "viewProfile": "Ver perfil",
+        "rank": "Ranking",
+        "badges": "Ins\u00edgnias",
+        "activity": "Atividade"
+      }
+    }
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "id": "google-analytics",
+  "name": "Google Analytics",
+  "description": "Google Analytics tracking integration",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "BarChart",
+  "layoutComponents": [
+    {
+      "id": "GoogleAnalytics",
+      "component": "components/GoogleAnalytics"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/analytics",
+      "component": "pages/admin/settings/analytics/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Google Analytics",
+      "description": "Google Analytics tracking.",
+      "href": "/analytics",
+      "icon": "BarChart",
+      "color": "text-green-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Google Analytics",
+      "path": "/analytics",
+      "icon": "BarChart"
+    }
+  ],
+  "translations": {
+    "en": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content",
+        "menu_google-analytics": "Google Analytics",
+        "menu_google-analytics_google_analytics": "Google Analytics"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Google Analytics Settings",
+        "trackingId": "Tracking ID",
+        "trackingIdPlaceholder": "Enter your Google Analytics tracking ID",
+        "trackingIdHelp": "Your Google Analytics measurement ID (e.g. G-XXXXXXXXXX)",
+        "enabled": "Analytics Enabled",
+        "disabled": "Analytics Disabled",
+        "enableTracking": "Enable Tracking",
+        "saveSettings": "Save Settings",
+        "settingsSaved": "Analytics settings saved successfully",
+        "settingsError": "Failed to save analytics settings",
+        "description": "Configure Google Analytics tracking for your site",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Configure Google Analytics tracking for your site",
+        "adm_field1Label": "Google Analytics ID",
+        "adm_field1Desc": "Your Google Analytics measurement ID (e.g. G-XXXXXXXXXX)",
+        "adm_field2Label": "Enable Analytics",
+        "adm_field2Desc": "Set to 'true' to enable tracking on your site"
+      }
+    },
+    "tr": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "menu_google-analytics": "Google Analytics",
+        "menu_google-analytics_google_analytics": "Google Analytics"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Analitik Ayarlari",
+        "trackingId": "Izleme Kimligi",
+        "trackingIdPlaceholder": "Google Analytics izleme kimliginizi girin",
+        "trackingIdHelp": "Google Analytics olcum kimliginiz (orn. G-XXXXXXXXXX)",
+        "enabled": "Analitik Etkin",
+        "disabled": "Analitik Devre Disi",
+        "enableTracking": "Izlemeyi Etkinlestir",
+        "saveSettings": "Ayarlari Kaydet",
+        "settingsSaved": "Analitik ayarlari basariyla kaydedildi",
+        "settingsError": "Analitik ayarlari kaydedilemedi",
+        "description": "Siteniz icin Google Analytics izlemesini yapilandirin",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Siteniz için Google Analytics izlemeyi yapılandırın",
+        "adm_field1Label": "Google Analytics ID",
+        "adm_field1Desc": "Google Analytics ölçüm kimliğiniz (örn. G-XXXXXXXXXX)",
+        "adm_field2Label": "Analitiği Etkinleştir",
+        "adm_field2Desc": "Sitenizde izlemeyi etkinleştirmek için 'true' olarak ayarlayın"
+      }
+    },
+    "de": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Analytik-Einstellungen",
+        "trackingId": "Tracking-ID",
+        "trackingIdPlaceholder": "Geben Sie Ihre Google Analytics Tracking-ID ein",
+        "trackingIdHelp": "Ihre Google Analytics Mess-ID (z.B. G-XXXXXXXXXX)",
+        "enabled": "Analytik aktiviert",
+        "disabled": "Analytik deaktiviert",
+        "enableTracking": "Tracking aktivieren",
+        "saveSettings": "Einstellungen speichern",
+        "settingsSaved": "Analytik-Einstellungen erfolgreich gespeichert",
+        "settingsError": "Analytik-Einstellungen konnten nicht gespeichert werden",
+        "description": "Google Analytics-Tracking fuer Ihre Website konfigurieren",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Konfigurieren Sie Google Analytics-Tracking für Ihre Website",
+        "adm_field1Label": "Google Analytics-ID",
+        "adm_field1Desc": "Ihre Google Analytics Mess-ID (z.B. G-XXXXXXXXXX)",
+        "adm_field2Label": "Analyse aktivieren",
+        "adm_field2Desc": "Auf 'true' setzen, um das Tracking auf Ihrer Website zu aktivieren"
+      }
+    },
+    "es": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Configuracion de analitica",
+        "trackingId": "ID de seguimiento",
+        "trackingIdPlaceholder": "Ingrese su ID de seguimiento de Google Analytics",
+        "trackingIdHelp": "Su ID de medicion de Google Analytics (ej. G-XXXXXXXXXX)",
+        "enabled": "Analitica habilitada",
+        "disabled": "Analitica deshabilitada",
+        "enableTracking": "Habilitar seguimiento",
+        "saveSettings": "Guardar configuracion",
+        "settingsSaved": "Configuracion de analitica guardada correctamente",
+        "settingsError": "Error al guardar la configuracion de analitica",
+        "description": "Configurar el seguimiento de Google Analytics para su sitio",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Configura el seguimiento de Google Analytics para tu sitio",
+        "adm_field1Label": "ID de Google Analytics",
+        "adm_field1Desc": "Tu ID de medición de Google Analytics (ej. G-XXXXXXXXXX)",
+        "adm_field2Label": "Habilitar análisis",
+        "adm_field2Desc": "Establece en 'true' para habilitar el seguimiento en tu sitio"
+      }
+    },
+    "fr": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Parametres d'analytique",
+        "trackingId": "ID de suivi",
+        "trackingIdPlaceholder": "Entrez votre ID de suivi Google Analytics",
+        "trackingIdHelp": "Votre ID de mesure Google Analytics (ex. G-XXXXXXXXXX)",
+        "enabled": "Analytique active",
+        "disabled": "Analytique desactive",
+        "enableTracking": "Activer le suivi",
+        "saveSettings": "Enregistrer les parametres",
+        "settingsSaved": "Parametres d'analytique enregistres avec succes",
+        "settingsError": "Echec de l'enregistrement des parametres d'analytique",
+        "description": "Configurer le suivi Google Analytics pour votre site",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Configurez le suivi Google Analytics pour votre site",
+        "adm_field1Label": "ID Google Analytics",
+        "adm_field1Desc": "Votre identifiant de mesure Google Analytics (ex. G-XXXXXXXXXX)",
+        "adm_field2Label": "Activer l'analyse",
+        "adm_field2Desc": "Définissez sur 'true' pour activer le suivi sur votre site"
+      }
+    },
+    "ru": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Настройки аналитики",
+        "trackingId": "Идентификатор отслеживания",
+        "trackingIdPlaceholder": "Введите идентификатор отслеживания Google Analytics",
+        "trackingIdHelp": "Ваш идентификатор измерения Google Analytics (напр. G-XXXXXXXXXX)",
+        "enabled": "Аналитика включена",
+        "disabled": "Аналитика отключена",
+        "enableTracking": "Включить отслеживание",
+        "saveSettings": "Сохранить настройки",
+        "settingsSaved": "Настройки аналитики успешно сохранены",
+        "settingsError": "Не удалось сохранить настройки аналитики",
+        "description": "Настроить отслеживание Google Analytics для вашего сайта",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Настройте отслеживание Google Analytics для вашего сайта",
+        "adm_field1Label": "ID Google Analytics",
+        "adm_field1Desc": "Ваш идентификатор измерения Google Analytics (например, G-XXXXXXXXXX)",
+        "adm_field2Label": "Включить аналитику",
+        "adm_field2Desc": "Установите 'true' для включения отслеживания на вашем сайте"
+      }
+    },
+    "pt": {
+      "admin": {
+        "menu_analytics": "Google Analytics",
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      },
+      "googleAnalytics": {
+        "title": "Google Analytics",
+        "settings": "Configuracoes de analitica",
+        "trackingId": "ID de rastreamento",
+        "trackingIdPlaceholder": "Insira seu ID de rastreamento do Google Analytics",
+        "trackingIdHelp": "Seu ID de medicao do Google Analytics (ex. G-XXXXXXXXXX)",
+        "enabled": "Analitica ativada",
+        "disabled": "Analitica desativada",
+        "enableTracking": "Ativar rastreamento",
+        "saveSettings": "Salvar configuracoes",
+        "settingsSaved": "Configuracoes de analitica salvas com sucesso",
+        "settingsError": "Falha ao salvar configuracoes de analitica",
+        "description": "Configurar o rastreamento do Google Analytics para o seu site",
+        "adm_title": "Google Analytics",
+        "adm_subtitle": "Configure o rastreamento do Google Analytics para o seu site",
+        "adm_field1Label": "ID do Google Analytics",
+        "adm_field1Desc": "Seu ID de medição do Google Analytics (ex. G-XXXXXXXXXX)",
+        "adm_field2Label": "Ativar análise",
+        "adm_field2Desc": "Defina como 'true' para ativar o rastreamento no seu site"
+      }
+    }
+  }
+}

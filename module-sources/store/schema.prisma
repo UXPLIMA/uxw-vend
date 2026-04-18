@@ -1,0 +1,322 @@
+// Store Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   orders Order[]
+//   cart   CartItem[]
+//   redeemedGifts GiftCode[] @relation("RedeemedGifts")
+//   creditBalance    Decimal            @default(0) @db.Decimal(10, 2)
+//   creditHistory    CreditTransaction[]
+//   creatorCodes     CreatorCode[]      @relation("CreatorCodes")
+//   ownedProducts    OwnedProduct[]     @relation("OwnedProducts")
+//   chestItems       ChestItem[]        @relation("ChestItems")
+//   stripeCustomerId String?
+//   subscriptions    Subscription[]
+// @@user-relations-end
+
+// ==================== STORE MODULE ====================
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  parentId    String?
+  parent      Category? @relation("CategoryChildren", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryChildren")
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  number        Int      @unique @default(autoincrement())
+  name          String
+  slug          String   @unique
+  translations  Json?
+  description   String?  @db.Text
+  shortDesc     String?
+  price         Decimal  @db.Decimal(10, 2)
+  comparePrice  Decimal? @db.Decimal(10, 2)
+  image         String?
+  images        String[] @default([])
+  stock         Int?
+  isActive      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  type          ProductType @default(DIGITAL)
+  deliveryData  Json?
+  subscriptionInterval      String?
+  subscriptionIntervalCount Int?      @default(1)
+  stripePriceId             String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+  subscriptions Subscription[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isActive, isFeatured])
+}
+
+enum ProductType {
+  DIGITAL
+  PHYSICAL
+  GAME_ITEM
+  SUBSCRIPTION
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  status        OrderStatus @default(PENDING)
+  total         Decimal     @db.Decimal(10, 2)
+  subtotal      Decimal     @db.Decimal(10, 2)
+  discount      Decimal     @default(0) @db.Decimal(10, 2)
+  tax           Decimal     @default(0) @db.Decimal(10, 2)
+  currency      String      @default("USD")
+  paymentMethod String?
+  paymentId     String?
+  notes         String?
+  metadata      Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  items    OrderItem[]
+  payments Payment[]
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  quantity  Int     @default(1)
+  price     Decimal @db.Decimal(10, 2)
+  name      String
+  metadata  Json?
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  quantity Int    @default(1)
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("USD")
+  status        PaymentStatus @default(PENDING)
+  provider      String
+  providerId    String?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([providerId])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Coupon {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  description   String?
+  type          CouponType  @default(PERCENTAGE)
+  value         Decimal     @db.Decimal(10, 2)
+  minPurchase   Decimal?    @db.Decimal(10, 2)
+  maxDiscount   Decimal?    @db.Decimal(10, 2)
+  usageLimit    Int?
+  usageCount    Int         @default(0)
+  startsAt      DateTime?
+  expiresAt     DateTime?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+model OwnedProduct {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("OwnedProducts", fields: [userId], references: [id])
+  productId String
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model BulkDiscount {
+  id           String   @id @default(cuid())
+  name         String
+  minQuantity  Int
+  discountPercent Int
+  productId    String?
+  categoryId   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+  @@index([categoryId])
+}
+
+model GiftCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  value       Decimal   @db.Decimal(10, 2)
+  isRedeemed  Boolean   @default(false)
+  redeemedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  redeemedById String?
+  redeemedBy   User?   @relation("RedeemedGifts", fields: [redeemedById], references: [id])
+  createdById  String?
+
+  @@index([code])
+}
+
+model ProductVariable {
+  id          String  @id @default(cuid())
+  productId   String
+  name        String
+  label       String
+  type        String  @default("text")
+  required    Boolean @default(true)
+  placeholder String?
+  options     String?
+
+  @@index([productId])
+}
+
+model ProductCommand {
+  id        String  @id @default(cuid())
+  productId String
+  command   String
+  serverId  String?
+  order     Int     @default(0)
+
+  @@index([productId])
+}
+
+model ChestItem {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("ChestItems", fields: [userId], references: [id])
+  productId   String
+  productName String
+  quantity    Int      @default(1)
+  isRedeemed  Boolean  @default(false)
+  redeemedAt  DateTime?
+  giftedToId  String?
+  orderId     String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CreditTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CreatorCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  creatorId       String
+  creator         User     @relation("CreatorCodes", fields: [creatorId], references: [id])
+  discountPercent Int      @default(5)
+  commissionPercent Int    @default(5)
+  usageCount      Int      @default(0)
+  totalRevenue    Decimal  @default(0) @db.Decimal(10, 2)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([code])
+  @@index([creatorId])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id])
+  productId            String
+  product              Product  @relation(fields: [productId], references: [id])
+  stripeSubscriptionId String   @unique
+  status               String   @default("active")
+  currentPeriodEnd     DateTime?
+  canceledAt           DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId])
+  @@index([stripeSubscriptionId])
+}

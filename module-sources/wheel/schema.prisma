@@ -1,0 +1,31 @@
+// Wheel Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   wheelSpins       WheelSpin[]        @relation("WheelSpins")
+// @@user-relations-end
+
+// ==================== WHEEL OF FORTUNE ====================
+
+model WheelPrize {
+  id          String  @id @default(cuid())
+  name        String
+  type        String
+  value       Int     @default(0)
+  color       String  @default("#3b82f6")
+  probability Int     @default(10)
+  isActive    Boolean @default(true)
+  order       Int     @default(0)
+}
+
+model WheelSpin {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("WheelSpins", fields: [userId], references: [id])
+  prizeId   String?
+  prizeName String
+  prizeValue Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

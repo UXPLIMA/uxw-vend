@@ -1,0 +1,293 @@
+{
+  "id": "discord-auth",
+  "name": "Discord Login",
+  "description": "Allow users to sign in with their Discord account",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "MessageSquare",
+  "adminRoutes": [
+    {
+      "path": "/settings/discord-auth",
+      "component": "pages/admin/settings/discord-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Discord OAuth",
+      "description": "Discord application credentials.",
+      "href": "/settings/discord-auth",
+      "icon": "MessageSquare",
+      "color": "text-indigo-500"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "discord-login",
+      "provider": "discord",
+      "label": "Discord",
+      "color": "#5865F2",
+      "svgIcon": "M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09-.01-.02-.04-.03-.07-.03-1.5.26-2.93.71-4.27 1.33-.01 0-.02.01-.03.02-2.72 4.07-3.47 8.03-3.1 11.95 0 .02.01.04.03.05 1.8 1.32 3.53 2.12 5.24 2.65.03.01.06 0 .07-.02.4-.55.76-1.13 1.07-1.74.02-.04 0-.08-.04-.09-.57-.22-1.11-.48-1.64-.78-.04-.02-.04-.08-.01-.11.11-.08.22-.17.33-.25.02-.02.05-.02.07-.01 3.44 1.57 7.15 1.57 10.55 0 .02-.01.05-.01.07.01.11.09.22.17.33.26.04.03.04.09-.01.11-.52.31-1.07.56-1.64.78-.04.01-.05.06-.04.09.32.61.68 1.19 1.07 1.74.03.01.06.02.09.01 1.72-.53 3.45-1.33 5.25-2.65.02-.01.03-.03.03-.05.44-4.53-.73-8.46-3.1-11.95-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "discordAuth": {
+        "title": "Discord Login",
+        "settings": "Discord OAuth Settings",
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter Discord application Client ID",
+        "clientSecret": "Client Secret",
+        "clientSecretPlaceholder": "Enter Discord application Client Secret",
+        "redirectUri": "Redirect URI",
+        "redirectUriHelp": "Add this URL to your Discord application's redirect URIs",
+        "enabled": "Discord Login Enabled",
+        "disabled": "Discord Login Disabled",
+        "enable": "Enable Discord Login",
+        "save": "Save Settings",
+        "saved": "Discord OAuth settings saved successfully",
+        "saveError": "Failed to save Discord OAuth settings",
+        "signInWith": "Sign in with Discord",
+        "linkAccount": "Link Discord Account",
+        "unlinkAccount": "Unlink Discord Account",
+        "accountLinked": "Discord account linked successfully",
+        "accountUnlinked": "Discord account unlinked successfully",
+        "linkError": "Failed to link Discord account",
+        "description": "Configure Discord OAuth credentials for user login",
+        "adm_title": "Discord Auth Settings",
+        "adm_subtitle": "Configure Discord OAuth2 login for your site",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "Your Discord application's Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "Your Discord application's Client Secret",
+        "adm_field3Label": "Redirect URI",
+        "adm_field3Desc": "OAuth2 callback URL (must match Discord app settings)"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "discordAuth": {
+        "title": "Discord ile Giriş",
+        "settings": "Discord OAuth Ayarlari",
+        "clientId": "Istemci Kimligi",
+        "clientIdPlaceholder": "Discord uygulama Istemci Kimligini girin",
+        "clientSecret": "Istemci Şifresi",
+        "clientSecretPlaceholder": "Discord uygulama Istemci Şifresini girin",
+        "redirectUri": "Yonlendirme URI'si",
+        "redirectUriHelp": "Bu URL'yi Discord uygulamanizin yonlendirme URI'lerine ekleyin",
+        "enabled": "Discord ile Giriş Etkin",
+        "disabled": "Discord ile Giriş Devre Disi",
+        "enable": "Discord ile Girişi Etkinlestir",
+        "save": "Ayarlari Kaydet",
+        "saved": "Discord OAuth ayarlari basariyla kaydedildi",
+        "saveError": "Discord OAuth ayarlari kaydedilemedi",
+        "signInWith": "Discord ile giriş yap",
+        "linkAccount": "Discord Hesabini Bagla",
+        "unlinkAccount": "Discord Hesabini Ayir",
+        "accountLinked": "Discord hesabi basariyla baglandi",
+        "accountUnlinked": "Discord hesabi basariyla ayrildi",
+        "linkError": "Discord hesabi baglanamadi",
+        "description": "Kullanıcı girişi icin Discord OAuth kimlik bilgilerini yapilandirin",
+        "adm_title": "Discord Kimlik Doğrulama Ayarları",
+        "adm_subtitle": "Siteniz için Discord OAuth2 girişini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "Discord uygulamanızın İstemci Kimliği",
+        "adm_field2Label": "İstemci Gizli Anahtarı",
+        "adm_field2Desc": "Discord uygulamanızın Gizli Anahtarı",
+        "adm_field3Label": "Yönlendirme URI",
+        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Discord uygulama ayarlarıyla eşleşmelidir)"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "discordAuth": {
+        "title": "Discord-Anmeldung",
+        "settings": "Discord OAuth-Einstellungen",
+        "clientId": "Client-ID",
+        "clientIdPlaceholder": "Discord-Anwendungs-Client-ID eingeben",
+        "clientSecret": "Client-Geheimnis",
+        "clientSecretPlaceholder": "Discord-Anwendungs-Client-Geheimnis eingeben",
+        "redirectUri": "Weiterleitungs-URI",
+        "redirectUriHelp": "Fuegen Sie diese URL zu den Weiterleitungs-URIs Ihrer Discord-Anwendung hinzu",
+        "enabled": "Discord-Anmeldung aktiviert",
+        "disabled": "Discord-Anmeldung deaktiviert",
+        "enable": "Discord-Anmeldung aktivieren",
+        "save": "Einstellungen speichern",
+        "saved": "Discord OAuth-Einstellungen erfolgreich gespeichert",
+        "saveError": "Discord OAuth-Einstellungen konnten nicht gespeichert werden",
+        "signInWith": "Mit Discord anmelden",
+        "linkAccount": "Discord-Konto verknuepfen",
+        "unlinkAccount": "Discord-Konto trennen",
+        "accountLinked": "Discord-Konto erfolgreich verknuepft",
+        "accountUnlinked": "Discord-Konto erfolgreich getrennt",
+        "linkError": "Discord-Konto konnte nicht verknuepft werden",
+        "description": "Discord OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
+        "adm_title": "Discord-Auth-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie Discord OAuth2-Login für Ihre Website",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "Die Client-ID Ihrer Discord-Anwendung",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "Das Client-Secret Ihrer Discord-Anwendung",
+        "adm_field3Label": "Redirect-URI",
+        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Discord-App-Einstellungen übereinstimmen)"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "discordAuth": {
+        "title": "Inicio de sesion con Discord",
+        "settings": "Configuracion de Discord OAuth",
+        "clientId": "ID de cliente",
+        "clientIdPlaceholder": "Ingrese el ID de cliente de la aplicacion Discord",
+        "clientSecret": "Secreto de cliente",
+        "clientSecretPlaceholder": "Ingrese el secreto de cliente de la aplicacion Discord",
+        "redirectUri": "URI de redireccion",
+        "redirectUriHelp": "Agregue esta URL a las URIs de redireccion de su aplicacion Discord",
+        "enabled": "Inicio de sesion con Discord habilitado",
+        "disabled": "Inicio de sesion con Discord deshabilitado",
+        "enable": "Habilitar inicio de sesion con Discord",
+        "save": "Guardar configuracion",
+        "saved": "Configuracion de Discord OAuth guardada correctamente",
+        "saveError": "Error al guardar la configuracion de Discord OAuth",
+        "signInWith": "Iniciar sesion con Discord",
+        "linkAccount": "Vincular cuenta de Discord",
+        "unlinkAccount": "Desvincular cuenta de Discord",
+        "accountLinked": "Cuenta de Discord vinculada correctamente",
+        "accountUnlinked": "Cuenta de Discord desvinculada correctamente",
+        "linkError": "Error al vincular la cuenta de Discord",
+        "description": "Configurar credenciales de Discord OAuth para inicio de sesion",
+        "adm_title": "Configuración de auth Discord",
+        "adm_subtitle": "Configura el inicio de sesión Discord OAuth2 para tu sitio",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "El ID de cliente de tu aplicación Discord",
+        "adm_field2Label": "Secreto de Cliente",
+        "adm_field2Desc": "El secreto de cliente de tu aplicación Discord",
+        "adm_field3Label": "URI de redirección",
+        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app Discord)"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "discordAuth": {
+        "title": "Connexion Discord",
+        "settings": "Parametres Discord OAuth",
+        "clientId": "ID client",
+        "clientIdPlaceholder": "Saisissez l'ID client de l'application Discord",
+        "clientSecret": "Secret client",
+        "clientSecretPlaceholder": "Saisissez le secret client de l'application Discord",
+        "redirectUri": "URI de redirection",
+        "redirectUriHelp": "Ajoutez cette URL aux URIs de redirection de votre application Discord",
+        "enabled": "Connexion Discord activee",
+        "disabled": "Connexion Discord desactivee",
+        "enable": "Activer la connexion Discord",
+        "save": "Enregistrer les parametres",
+        "saved": "Parametres Discord OAuth enregistres avec succes",
+        "saveError": "Echec de l'enregistrement des parametres Discord OAuth",
+        "signInWith": "Se connecter avec Discord",
+        "linkAccount": "Lier le compte Discord",
+        "unlinkAccount": "Delier le compte Discord",
+        "accountLinked": "Compte Discord lie avec succes",
+        "accountUnlinked": "Compte Discord delie avec succes",
+        "linkError": "Echec de la liaison du compte Discord",
+        "description": "Configurer les identifiants Discord OAuth pour la connexion",
+        "adm_title": "Paramètres d'auth Discord",
+        "adm_subtitle": "Configurez la connexion Discord OAuth2 pour votre site",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "L'ID client de votre application Discord",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Le secret client de votre application Discord",
+        "adm_field3Label": "URI de redirection",
+        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app Discord)"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "discordAuth": {
+        "title": "Вход через Discord",
+        "settings": "Настройки Discord OAuth",
+        "clientId": "ID клиента",
+        "clientIdPlaceholder": "Введите ID клиента приложения Discord",
+        "clientSecret": "Секрет клиента",
+        "clientSecretPlaceholder": "Введите секрет клиента приложения Discord",
+        "redirectUri": "URI перенаправления",
+        "redirectUriHelp": "Добавьте этот URL в URI перенаправления вашего приложения Discord",
+        "enabled": "Вход через Discord включен",
+        "disabled": "Вход через Discord отключен",
+        "enable": "Включить вход через Discord",
+        "save": "Сохранить настройки",
+        "saved": "Настройки Discord OAuth успешно сохранены",
+        "saveError": "Не удалось сохранить настройки Discord OAuth",
+        "signInWith": "Войти через Discord",
+        "linkAccount": "Привязать аккаунт Discord",
+        "unlinkAccount": "Отвязать аккаунт Discord",
+        "accountLinked": "Аккаунт Discord успешно привязан",
+        "accountUnlinked": "Аккаунт Discord успешно отвязан",
+        "linkError": "Не удалось привязать аккаунт Discord",
+        "description": "Настроить учетные данные Discord OAuth для входа пользователей",
+        "adm_title": "Настройки авторизации Discord",
+        "adm_subtitle": "Настройте вход Discord OAuth2 для вашего сайта",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента вашего приложения Discord",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента вашего приложения Discord",
+        "adm_field3Label": "URI перенаправления",
+        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения Discord)"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "discordAuth": {
+        "title": "Login com Discord",
+        "settings": "Configuracoes do Discord OAuth",
+        "clientId": "ID do cliente",
+        "clientIdPlaceholder": "Insira o ID do cliente do aplicativo Discord",
+        "clientSecret": "Segredo do cliente",
+        "clientSecretPlaceholder": "Insira o segredo do cliente do aplicativo Discord",
+        "redirectUri": "URI de redirecionamento",
+        "redirectUriHelp": "Adicione esta URL aos URIs de redirecionamento do seu aplicativo Discord",
+        "enabled": "Login com Discord ativado",
+        "disabled": "Login com Discord desativado",
+        "enable": "Ativar login com Discord",
+        "save": "Salvar configuracoes",
+        "saved": "Configuracoes do Discord OAuth salvas com sucesso",
+        "saveError": "Falha ao salvar configuracoes do Discord OAuth",
+        "signInWith": "Entrar com Discord",
+        "linkAccount": "Vincular conta do Discord",
+        "unlinkAccount": "Desvincular conta do Discord",
+        "accountLinked": "Conta do Discord vinculada com sucesso",
+        "accountUnlinked": "Conta do Discord desvinculada com sucesso",
+        "linkError": "Falha ao vincular conta do Discord",
+        "description": "Configurar credenciais do Discord OAuth para login de usuarios",
+        "adm_title": "Configurações de auth Discord",
+        "adm_subtitle": "Configure o login Discord OAuth2 para o seu site",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "O ID do cliente do seu aplicativo Discord",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "O segredo do cliente do seu aplicativo Discord",
+        "adm_field3Label": "URI de redirecionamento",
+        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app Discord)"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+// Webhook Logs Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== WEBHOOK LOGS ====================
+
+model WebhookLog {
+  id        String   @id @default(cuid())
+  event     String
+  url       String
+  status    Int?
+  response  String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+}

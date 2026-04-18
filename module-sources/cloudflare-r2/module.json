@@ -1,0 +1,190 @@
+{
+  "id": "cloudflare-r2",
+  "name": "Cloudflare R2 Storage",
+  "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Cloud",
+  "permissions": [
+    "cloudflare-r2.manage"
+  ],
+  "menu": [
+    {
+      "label": "Cloudflare R2",
+      "path": "/storage/cloudflare-r2",
+      "icon": "Cloud"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/storage/cloudflare-r2",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/storage/cloudflare-r2/settings",
+      "handler": "api/settings/route.ts",
+      "description": "Get or update Cloudflare R2 storage settings (admin)."
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Cloudflare R2 Storage",
+      "description": "Configure R2 bucket for file uploads (S3-compatible)",
+      "href": "/admin/storage/cloudflare-r2",
+      "icon": "Cloud",
+      "color": "text-orange-500"
+    }
+  ],
+  "storageProviders": [
+    {
+      "id": "cloudflare-r2",
+      "name": "Cloudflare R2",
+      "handler": "lib/provider.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "S3-compatible object storage with zero egress fees",
+        "accountId": "Account ID",
+        "bucket": "Bucket Name",
+        "accessKey": "Access Key ID",
+        "secretKey": "Secret Access Key",
+        "publicUrl": "Public URL",
+        "publicUrlHint": "Your R2 public bucket URL (e.g. https://pub-xxx.r2.dev)",
+        "active": "Set as active storage provider",
+        "saved": "R2 settings saved",
+        "saveError": "Failed to save settings",
+        "test": "Test Connection",
+        "testSuccess": "Connection successful",
+        "testFailed": "Connection failed",
+        "currentlyActive": "Currently active storage provider"
+      },
+      "admin": {
+        "menu_cloudflare-r2": "Cloudflare R2",
+        "menu_cloudflare-r2_cloudflare_r2": "Cloudflare R2"
+      }
+    },
+    "tr": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Depolama",
+        "subtitle": "Sıfır çıkış ücretli S3 uyumlu nesne depolama",
+        "accountId": "Hesap ID",
+        "bucket": "Bucket Adı",
+        "accessKey": "Erişim Anahtarı",
+        "secretKey": "Gizli Anahtar",
+        "publicUrl": "Genel URL",
+        "publicUrlHint": "R2 genel bucket URL'iniz (örn. https://pub-xxx.r2.dev)",
+        "active": "Aktif depolama sağlayıcısı yap",
+        "saved": "R2 ayarları kaydedildi",
+        "saveError": "Ayarlar kaydedilemedi",
+        "test": "Bağlantıyı Test Et",
+        "testSuccess": "Bağlantı başarılı",
+        "testFailed": "Bağlantı başarısız",
+        "currentlyActive": "Şu anki aktif depolama sağlayıcısı"
+      },
+      "admin": {
+        "menu_cloudflare-r2": "Cloudflare R2",
+        "menu_cloudflare-r2_cloudflare_r2": "Cloudflare R2"
+      }
+    },
+    "de": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "S3-kompatibler Objektspeicher ohne Ausgehgebühren",
+        "accountId": "Konto-ID",
+        "bucket": "Bucket-Name",
+        "accessKey": "Zugriffsschlüssel",
+        "secretKey": "Geheimer Schlüssel",
+        "publicUrl": "Öffentliche URL",
+        "publicUrlHint": "Ihre öffentliche R2-Bucket-URL",
+        "active": "Als aktiven Speicher festlegen",
+        "saved": "R2-Einstellungen gespeichert",
+        "saveError": "Speichern fehlgeschlagen",
+        "test": "Verbindung testen",
+        "testSuccess": "Verbindung erfolgreich",
+        "testFailed": "Verbindung fehlgeschlagen",
+        "currentlyActive": "Derzeit aktiver Speicher"
+      }
+    },
+    "es": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "Almacenamiento de objetos compatible con S3 sin tarifas de salida",
+        "accountId": "ID de cuenta",
+        "bucket": "Nombre del bucket",
+        "accessKey": "Clave de acceso",
+        "secretKey": "Clave secreta",
+        "publicUrl": "URL pública",
+        "publicUrlHint": "URL pública de tu bucket R2",
+        "active": "Establecer como almacenamiento activo",
+        "saved": "Configuración R2 guardada",
+        "saveError": "Error al guardar",
+        "test": "Probar conexión",
+        "testSuccess": "Conexión exitosa",
+        "testFailed": "Conexión fallida",
+        "currentlyActive": "Almacenamiento actualmente activo"
+      }
+    },
+    "fr": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "Stockage d'objets compatible S3 sans frais de sortie",
+        "accountId": "ID de compte",
+        "bucket": "Nom du bucket",
+        "accessKey": "Clé d'accès",
+        "secretKey": "Clé secrète",
+        "publicUrl": "URL publique",
+        "publicUrlHint": "URL publique de votre bucket R2",
+        "active": "Définir comme stockage actif",
+        "saved": "Paramètres R2 enregistrés",
+        "saveError": "Échec de l'enregistrement",
+        "test": "Tester la connexion",
+        "testSuccess": "Connexion réussie",
+        "testFailed": "Connexion échouée",
+        "currentlyActive": "Stockage actuellement actif"
+      }
+    },
+    "ru": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "S3-совместимое объектное хранилище без платы за исходящий трафик",
+        "accountId": "ID аккаунта",
+        "bucket": "Имя bucket",
+        "accessKey": "Ключ доступа",
+        "secretKey": "Секретный ключ",
+        "publicUrl": "Публичный URL",
+        "publicUrlHint": "Публичный URL вашего R2 bucket",
+        "active": "Сделать активным хранилищем",
+        "saved": "Настройки R2 сохранены",
+        "saveError": "Не удалось сохранить",
+        "test": "Проверить соединение",
+        "testSuccess": "Соединение успешно",
+        "testFailed": "Соединение не удалось",
+        "currentlyActive": "Активное хранилище"
+      }
+    },
+    "pt": {
+      "cloudflareR2": {
+        "title": "Cloudflare R2 Storage",
+        "subtitle": "Armazenamento de objetos compatível com S3 sem taxas de saída",
+        "accountId": "ID da conta",
+        "bucket": "Nome do bucket",
+        "accessKey": "Chave de acesso",
+        "secretKey": "Chave secreta",
+        "publicUrl": "URL público",
+        "publicUrlHint": "URL público do seu bucket R2",
+        "active": "Definir como armazenamento ativo",
+        "saved": "Configurações R2 salvas",
+        "saveError": "Falha ao salvar",
+        "test": "Testar conexão",
+        "testSuccess": "Conexão bem-sucedida",
+        "testFailed": "Conexão falhou",
+        "currentlyActive": "Armazenamento ativo atualmente"
+      }
+    }
+  }
+}

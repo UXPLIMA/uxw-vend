@@ -1,0 +1,96 @@
+// Forum Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   topics     ForumTopic[]
+//   posts      ForumPost[]
+//   topicLikes ForumTopicLike[]
+//   postLikes  ForumPostLike[]
+// @@user-relations-end
+
+// ==================== FORUM MODULE ====================
+
+model ForumCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  topics ForumTopic[]
+
+  @@index([slug])
+}
+
+model ForumTopic {
+  id              String   @id @default(cuid())
+  number          Int      @unique @default(autoincrement())
+  title           String
+  slug            String   @unique
+  content         String   @db.Text
+  isPinned        Boolean  @default(false)
+  isLocked        Boolean  @default(false)
+  moderationState String   @default("APPROVED")
+  views           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  categoryId String
+  category   ForumCategory @relation(fields: [categoryId], references: [id])
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id])
+
+  posts ForumPost[]
+  likes ForumTopicLike[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([authorId])
+}
+
+model ForumPost {
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+  moderationState String   @default("APPROVED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  topicId  String
+  topic    ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User       @relation(fields: [authorId], references: [id])
+
+  likes ForumPostLike[]
+
+  @@index([topicId])
+  @@index([authorId])
+}
+
+model ForumTopicLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  topicId String
+  topic   ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, userId])
+}
+
+model ForumPostLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  postId String
+  post   ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}

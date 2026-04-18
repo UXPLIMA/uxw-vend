@@ -1,0 +1,17 @@
+// Popups Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// ==================== POPUP ====================
+
+model Popup {
+  id        String    @id @default(cuid())
+  title     String
+  content   String?
+  image     String?
+  link      String?
+  linkText  String?
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+}
