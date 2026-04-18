@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "pixelcraft",
+  "name": "PixelCraft",
+  "description": "Pixel-art gaming theme — bold colors and retro typography.",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "type": "dark",
+  "tokens": {
+    "colors": {
+      "primary":         { "type": "color", "default": "#3ea72d", "group": "Brand" },
+      "secondary":       { "type": "color", "default": "#ffb800", "group": "Brand" },
+      "accent":          { "type": "color", "default": "#52a535", "group": "Brand" },
+      "background":      { "type": "color", "default": "#1a1a1a", "group": "Surface" },
+      "foreground":      { "type": "color", "default": "#e8e8e8", "group": "Surface" },
+      "muted":           { "type": "color", "default": "#2a2a2a", "group": "Surface" },
+      "mutedForeground": { "type": "color", "default": "#8c8c8c", "group": "Surface" },
+      "border":          { "type": "color", "default": "#3a3a3a", "group": "Surface" },
+      "card":            { "type": "color", "default": "#242424", "group": "Surface" },
+      "cardForeground":  { "type": "color", "default": "#e8e8e8", "group": "Surface" },
+      "destructive":     { "type": "color", "default": "#d32f2f", "group": "State" },
+      "success":         { "type": "color", "default": "#3ea72d", "group": "State" },
+      "warning":         { "type": "color", "default": "#ffb800", "group": "State" }
+    },
+    "fonts": {
+      "heading": { "type": "font", "default": "\"Press Start 2P\", \"Outfit\", monospace" },
+      "body":    { "type": "font", "default": "\"Inter\", sans-serif" },
+      "mono":    { "type": "font", "default": "\"JetBrains Mono\", monospace" }
+    }
+  },
+  "config": {}
+}
