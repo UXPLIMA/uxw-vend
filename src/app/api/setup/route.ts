@@ -38,8 +38,9 @@ const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {
-    // Re-verify fresh-install state on every request. This is the ONLY real
-    // protection against setup-wizard replay attacks.
+    // Early rejection: if anyone already exists, reply without reading the
+    // body. This is a fast path only — the real race protection is the
+    // advisory-locked transaction below.
     let existingUsers = 0;
     try {
         existingUsers = await prisma.user.count();
@@ -58,7 +59,6 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Parse + validate payload.
     let body: unknown;
     try {
         body = await request.json();
@@ -75,45 +75,83 @@ export async function POST(request: NextRequest) {
     }
     const data = parsed.data;
 
+    // Hash the password outside the transaction — bcrypt is CPU-heavy and
+    // the advisory-locked transaction below should hold the lock for as
+    // little time as possible.
+    const hashed = await bcrypt.hash(data.admin.password, 12);
+
+    // Stable integer key for pg_advisory_xact_lock. Any constant works as
+    // long as nothing else in the app uses it for another purpose.
+    const SETUP_LOCK_KEY = 738292847;
+
+    let adminUser;
+    let adminRoleId: string;
     try {
-        // ---------- Ensure the admin role exists ----------
-        const adminRole = await prisma.role.upsert({
-            where: { name: "admin" },
-            update: {},
-            create: {
-                name: "admin",
-                displayName: "Administrator",
-                color: "#ef4444",
-                priority: 100,
-            },
-        });
+        const result = await prisma.$transaction(async (tx) => {
+            // Block any concurrent setup attempt on the same Postgres cluster
+            // until this transaction commits or rolls back. The lock is
+            // released automatically at transaction end.
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(${SETUP_LOCK_KEY})`;
 
-        // Default "member" role used by user registration later. Safe-create
-        // here because a fresh DB may not have been seeded.
-        await prisma.role.upsert({
-            where: { name: "member" },
-            update: {},
-            create: {
-                name: "member",
-                displayName: "Member",
-                color: "#6b7280",
-                priority: 0,
-                isDefault: true,
-            },
-        });
+            // Re-check inside the lock. Two requests that raced past the
+            // early-path check outside both serialize here; the second one
+            // sees count > 0 and aborts.
+            const count = await tx.user.count();
+            if (count > 0) {
+                throw new Error("ALREADY_SETUP");
+            }
 
-        // ---------- Create the first admin user ----------
-        const hashed = await bcrypt.hash(data.admin.password, 12);
-        const adminUser = await prisma.user.create({
-            data: {
-                email: data.admin.email,
-                username: data.admin.username,
-                password: hashed,
-                roleId: adminRole.id,
-                emailVerified: new Date(),
-            },
-        });
+            const adminRole = await tx.role.upsert({
+                where: { name: "admin" },
+                update: {},
+                create: {
+                    name: "admin",
+                    displayName: "Administrator",
+                    color: "#ef4444",
+                    priority: 100,
+                },
+            });
 
+            await tx.role.upsert({
+                where: { name: "member" },
+                update: {},
+                create: {
+                    name: "member",
+                    displayName: "Member",
+                    color: "#6b7280",
+                    priority: 0,
+                    isDefault: true,
+                },
+            });
+
+            const admin = await tx.user.create({
+                data: {
+                    email: data.admin.email,
+                    username: data.admin.username,
+                    password: hashed,
+                    roleId: adminRole.id,
+                    emailVerified: new Date(),
+                },
+            });
+
+            return { admin, adminRoleId: adminRole.id };
+        });
+        adminUser = result.admin;
+        adminRoleId = result.adminRoleId;
+    } catch (err) {
+        if (err instanceof Error && err.message === "ALREADY_SETUP") {
+            markSetupComplete();
+            return NextResponse.json(
+                { error: "Setup has already been completed." },
+                { status: 409 }
+            );
+        }
+        const msg = err instanceof Error ? err.message : "Setup failed";
+        return NextResponse.json({ error: msg }, { status: 500 });
+    }
+    void adminRoleId;
+
+    try {
         // ---------- Persist core settings ----------
         const settings: Array<{ key: string; value: unknown }> = [
             { key: "site_name", value: data.site.siteName },

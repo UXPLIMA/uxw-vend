@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { logActivity } from "@/core/lib/activity-log";
 import { invalidate } from "@/core/lib/cache";
+import { sanitizeCustomCss, CSS_SANITIZED_SETTING_KEYS } from "@/core/lib/css-sanitizer";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
 // Value is a Json column — accept any JSON-serializable value (string, number, boolean, array, object, null)
@@ -62,7 +63,13 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Upsert each setting. Setting.value is Json; cast through InputJsonValue.
-    for (const [key, value] of Object.entries(parsed.data)) {
+    // String values for CSS-sanitized keys are scrubbed so a compromised
+    // admin account cannot persist a payload that breaks out of the <style>
+    // tag injected on every public page.
+    for (const [key, rawValue] of Object.entries(parsed.data)) {
+        const value = CSS_SANITIZED_SETTING_KEYS.has(key)
+            ? sanitizeCustomCss(rawValue)
+            : rawValue;
         const jsonValue = (value ?? Prisma.JsonNull) as Prisma.InputJsonValue;
         await prisma.setting.upsert({
             where: { key },

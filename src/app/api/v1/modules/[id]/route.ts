@@ -6,6 +6,8 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import { logActivity } from "@/core/lib/activity-log";
+import { acquireInstallLock } from "@/core/lib/install-lock";
+import { invalidateModuleCache } from "@/core/lib/module-cache";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
@@ -15,40 +17,58 @@ export async function DELETE(
 ) {
     const { id: moduleId } = await params;
 
-    // 1. Auth check
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // 2. Validate moduleId format (prevent path traversal)
     if (!/^[a-z0-9-]+$/.test(moduleId)) {
         return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
     }
 
-    // 3. Check if module directory exists
-    const moduleDir = path.join(MODULES_DIR, moduleId);
-    const exists = await fs.access(moduleDir).then(() => true).catch(() => false);
-    if (!exists) {
-        return NextResponse.json({ error: "Module not found on disk" }, { status: 404 });
+    // Serialize module mutations through the same lock install/update use so
+    // a concurrent install of the same module can't race a delete.
+    const releaseLock = await acquireInstallLock();
+    if (!releaseLock) {
+        return NextResponse.json(
+            { error: "Another module operation is in progress. Please try again." },
+            { status: 429 }
+        );
     }
 
     try {
-        // 4. Remove module directory
+        const moduleDir = path.join(MODULES_DIR, moduleId);
+        const resolvedDir = path.resolve(moduleDir);
+        if (!resolvedDir.startsWith(path.resolve(MODULES_DIR) + path.sep)) {
+            return NextResponse.json({ error: "Invalid module path" }, { status: 400 });
+        }
+
+        const exists = await fs.access(moduleDir).then(() => true).catch(() => false);
+        if (!exists) {
+            // Even with no directory, clean up orphan DB rows — a previous
+            // failed install may have left a ModuleConfig row behind.
+            await prisma.moduleConfig.deleteMany({ where: { id: moduleId } }).catch(() => {});
+            await invalidateModuleCache().catch(() => {});
+            return NextResponse.json({ error: "Module not found on disk" }, { status: 404 });
+        }
+
         await fs.rm(moduleDir, { recursive: true, force: true });
 
-        // Note: Module DB tables are intentionally left intact for data preservation.
-        // If the module is reinstalled later, its data will still be available.
+        // Module-owned tables (e.g. Store products when "store" is uninstalled)
+        // are intentionally preserved so a future reinstall of the same module
+        // does not lose the admin's data. Operators who want a true purge can
+        // drop the module's tables via the schema merge + migration tooling.
 
-        // Remove module translations from DB
         try {
             const { removeModuleTranslations } = await import("@/core/lib/i18n/translation-service");
             await removeModuleTranslations(moduleId);
         } catch { /* non-fatal */ }
 
-        // Log the uninstall action
-        logActivity({ action: "module.uninstall", entity: "module", entityId: moduleId, userId: session.user.id }).catch(() => {});
+        // Remove the DB config row BEFORE registry regeneration so the app
+        // can never observe a state where the registry lists the module but
+        // ModuleConfig says it should be disabled.
+        await prisma.moduleConfig.deleteMany({ where: { id: moduleId } });
+        await invalidateModuleCache().catch(() => {});
 
-        // 5. Regenerate registry + rebuild
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
             if (!process.env.NEXT_DEV) {
@@ -57,17 +77,23 @@ export async function DELETE(
                 catch { process.kill(process.pid, "SIGUSR2"); }
             }
         } catch {
-            // Registry/build failed but module is already removed
+            // Registry/build failure is non-fatal for uninstall — the module
+            // files are already gone and the DB row is cleared. Operator may
+            // need to restart the dev server to see the UI reflect it.
         }
 
-        // 6. Remove DB record
-        await prisma.moduleConfig.deleteMany({
-            where: { id: moduleId },
-        });
+        logActivity({
+            action: "module.uninstall",
+            entity: "module",
+            entityId: moduleId,
+            userId: session.user.id,
+        }).catch(() => {});
 
         return NextResponse.json({ message: "Module deleted successfully" });
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Unknown error";
         return NextResponse.json({ error: "Delete failed: " + message }, { status: 500 });
+    } finally {
+        releaseLock();
     }
 }

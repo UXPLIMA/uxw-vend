@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { logActivity } from "@/core/lib/activity-log";
 
 export async function GET() {
     const session = await auth();
@@ -50,6 +51,14 @@ export async function POST(request: NextRequest) {
             expiresAt: expiresAt ? new Date(expiresAt) : null,
         },
     });
+
+    logActivity({
+        userId: session.user.id,
+        action: "apikey.create",
+        entity: "apiKey",
+        entityId: apiKey.id,
+        metadata: { name: apiKey.name, permissions: apiKey.permissions, expiresAt: apiKey.expiresAt },
+    }).catch(() => {});
 
     // Return the raw key ONLY on creation — it cannot be retrieved again
     return NextResponse.json({

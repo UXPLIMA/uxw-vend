@@ -42,6 +42,47 @@ const filterRegistry = new Map<string, Registration[]>();
 /** Lower priority = runs earlier. Default 10 (WordPress convention). */
 const DEFAULT_PRIORITY = 10;
 
+/**
+ * Per-listener timeout for async hook dispatch. A misbehaving module hook
+ * listener should NEVER be able to stall a user-facing request forever —
+ * login, registration, and checkout all await async hook chains. Listeners
+ * that don't resolve in this many milliseconds are abandoned (the dispatch
+ * moves on) and logged as errors. Override via HOOK_LISTENER_TIMEOUT_MS env
+ * (resolved lazily so tests can tweak the threshold per-run).
+ */
+const DEFAULT_HOOK_TIMEOUT_MS = 5000;
+
+function getHookListenerTimeoutMs(): number {
+    const raw = Number(process.env.HOOK_LISTENER_TIMEOUT_MS);
+    return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_HOOK_TIMEOUT_MS;
+}
+
+function raceWithTimeout<T>(promise: Promise<T> | T, label: string): Promise<T> {
+    const timeoutMs = getHookListenerTimeoutMs();
+    return new Promise<T>((resolve, reject) => {
+        let settled = false;
+        const timer = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            reject(new Error(`hook listener timeout after ${timeoutMs}ms: ${label}`));
+        }, timeoutMs);
+        Promise.resolve(promise).then(
+            (value) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                resolve(value);
+            },
+            (err) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                reject(err);
+            },
+        );
+    });
+}
+
 function addRegistration(map: Map<string, Registration[]>, name: string, reg: Registration) {
     const list = map.get(name) || [];
     list.push(reg);
@@ -97,7 +138,10 @@ export async function doActionAsync<T>(name: string, payload: T): Promise<void> 
     if (!list || list.length === 0) return;
     for (const reg of list) {
         try {
-            await (reg.listener as AsyncActionListener<T>)(payload);
+            await raceWithTimeout(
+                (reg.listener as AsyncActionListener<T>)(payload),
+                `${name} (${reg.moduleId ?? "core"})`,
+            );
         } catch (err) {
             console.error(`[hooks] Async action "${name}" listener failed:`, err);
         }
@@ -145,9 +189,14 @@ export async function applyFiltersAsync<T, C = unknown>(name: string, value: T, 
     let result = value;
     for (const reg of list) {
         try {
-            result = await (reg.listener as AsyncFilterListener<T, C>)(result, context);
+            result = await raceWithTimeout(
+                (reg.listener as AsyncFilterListener<T, C>)(result, context),
+                `${name} (${reg.moduleId ?? "core"})`,
+            );
         } catch (err) {
             console.error(`[hooks] Async filter "${name}" listener failed:`, err);
+            // Keep the previous value so a slow/broken listener doesn't
+            // corrupt the chain — downstream listeners still get a value.
         }
     }
     return result;

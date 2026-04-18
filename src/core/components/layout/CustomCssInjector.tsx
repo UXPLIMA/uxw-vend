@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
 
 export function CustomCssInjector() {
     const [css, setCss] = useState("");
@@ -11,28 +12,19 @@ export function CustomCssInjector() {
             .then((data) => {
                 const s = data.settings || {};
 
-                // Custom CSS
                 const customCss = s.custom_css;
                 if (typeof customCss === "string" && customCss.trim()) {
-                    // Sanitize: remove script injection attempts, @import, expressions, and other XSS vectors
-                    const sanitized = customCss
-                        .replace(/<\/?script[^>]*>/gi, "")
-                        .replace(/javascript\s*:/gi, "")
-                        .replace(/expression\s*\(/gi, "")
-                        .replace(/@import\s/gi, "/* blocked import */")
-                        .replace(/url\s*\(\s*['"]?\s*javascript/gi, "url(blocked")
-                        .replace(/behavior\s*:/gi, "/* blocked behavior */")
-                        .replace(/-moz-binding\s*:/gi, "/* blocked moz-binding */")
-                        .replace(/@charset\s/gi, "/* blocked charset */");
-                    setCss(sanitized);
+                    // Values are already sanitized at write time in the
+                    // settings route; we sanitize again here as defense-in-depth
+                    // in case an older pre-sanitization value is still in the DB.
+                    setCss(sanitizeCustomCss(customCss));
                 }
 
-                // Apply saved theme colors
                 const colorKeys = ["primary", "secondary", "accent", "background", "foreground", "card", "muted", "muted-foreground", "destructive", "success", "warning"];
                 colorKeys.forEach((key) => {
                     const dbKey = `theme_color_${key.replace("-", "_")}`;
                     const value = s[dbKey];
-                    if (typeof value === "string" && value.startsWith("#")) {
+                    if (typeof value === "string" && /^#[0-9a-fA-F]{3,8}$/.test(value)) {
                         document.documentElement.style.setProperty(`--color-${key}`, value);
                     }
                 });
@@ -42,5 +34,9 @@ export function CustomCssInjector() {
 
     if (!css) return null;
 
-    return <style dangerouslySetInnerHTML={{ __html: css }} />;
+    // Rendering as a text child (not dangerouslySetInnerHTML) means React
+    // escapes angle brackets into entities. Combined with sanitizeCustomCss
+    // stripping them at the source, there is no path for a `</style>`
+    // break-out even if sanitization is bypassed somehow.
+    return <style>{css}</style>;
 }

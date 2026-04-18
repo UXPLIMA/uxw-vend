@@ -10,6 +10,11 @@ import type { Provider } from "next-auth/providers";
 // Build OAuth providers conditionally — modules set env vars, providers activate
 const oauthProviders: Provider[] = [];
 
+// `allowDangerousEmailAccountLinking` defaults to false in NextAuth v5, which
+// is the safe choice: if an attacker registers an OAuth identity with the same
+// email as an existing credentials account, Auth.js rejects the sign-in with
+// OAuthAccountNotLinked. We set it explicitly so a future accidental flip to
+// true would be an obvious code review red flag.
 if (process.env.AUTH_DISCORD_ID) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const Discord = require("next-auth/providers/discord").default;
@@ -17,6 +22,7 @@ if (process.env.AUTH_DISCORD_ID) {
         Discord({
             clientId: process.env.AUTH_DISCORD_ID,
             clientSecret: process.env.AUTH_DISCORD_SECRET,
+            allowDangerousEmailAccountLinking: false,
         })
     );
 }
@@ -28,6 +34,7 @@ if (process.env.AUTH_GOOGLE_ID) {
         Google({
             clientId: process.env.AUTH_GOOGLE_ID,
             clientSecret: process.env.AUTH_GOOGLE_SECRET,
+            allowDangerousEmailAccountLinking: false,
         })
     );
 }
@@ -171,6 +178,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
     },
     callbacks: {
+        // Reject OAuth and credential sign-ins at the handshake if the user
+        // is banned, so we never mint a session (even a short-lived one) for
+        // a banned account. The jwt callback below revokes active sessions
+        // on their next refresh as a second line of defense.
+        async signIn({ user }) {
+            if (!user?.id) return true;
+            const existing = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: { isBanned: true, isDeleted: true },
+            });
+            if (existing?.isBanned || existing?.isDeleted) return false;
+            return true;
+        },
         async jwt({ token, user, trigger, session: updatePayload }) {
             if (user) {
                 token.id = user.id;

@@ -26,11 +26,12 @@ export async function POST(request: NextRequest) {
 
         const { email, username, password } = validation.data;
 
-        // Check if user already exists
+        // Fast-path rejection for the common (non-concurrent) duplicate case
+        // so we don't burn bcrypt cycles on a doomed insert. Concurrent
+        // duplicates still race through the unique-constraint catch below.
         const existingUser = await prisma.user.findFirst({
-            where: {
-                OR: [{ email }, { username }],
-            },
+            where: { OR: [{ email }, { username }] },
+            select: { id: true },
         });
 
         if (existingUser) {
@@ -40,23 +41,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get or create default role
-        let defaultRole = await prisma.role.findFirst({
-            where: { isDefault: true },
+        // Default role lookup — upsert so two concurrent first-time registrations
+        // can't both try to INSERT role "member" and one fail with P2002 on
+        // name unique (which would have been reported back as "email taken").
+        const defaultRole = await prisma.role.upsert({
+            where: { name: "member" },
+            update: {},
+            create: {
+                name: "member",
+                displayName: "Member",
+                isDefault: true,
+                priority: 0,
+            },
         });
 
-        if (!defaultRole) {
-            defaultRole = await prisma.role.create({
-                data: {
-                    name: "member",
-                    displayName: "Member",
-                    isDefault: true,
-                    priority: 0,
-                },
-            });
-        }
-
-        // Hash password and create user
         const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
         const user = await prisma.user.create({

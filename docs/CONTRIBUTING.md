@@ -80,13 +80,15 @@ Examples of what belongs in a module:
 ### Routing and i18n
 - Use `Link` and `usePathname` from `@/core/lib/i18n/navigation` (not `next/link`) for locale-aware routing in public pages.
 - Use `useTranslations()` from `next-intl` for all UI text. No hardcoded strings.
-- Translation files are in `/messages/{en,tr,de}.json`.
+- Active locales: `en` and `tr`. Translations live in the `Translation` DB table; the seed source is `messages-core/<locale>.json`.
 
 ### API Routes
 - REST conventions under `/api/v1/`.
 - Auth check: `const session = await auth()`
 - Admin check: `await isAdmin(session.user.id)`
-- Consistent error format: `{ error: "message" }`
+- New endpoints: use `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils` — the canonical envelope is `{ ok: true, data }` or `{ ok: false, error, code? }`. Legacy `{ error }` shapes still exist and are being migrated.
+- State-changing endpoints (`POST/PUT/DELETE/PATCH`) must pass the proxy-level CSRF check; they do automatically as long as the browser sends the request. Server-to-server callers set `x-internal-request: $CSRF_INTERNAL_SECRET`.
+- Admin mutations should log to `ActivityLog` via `logActivity({ userId, action, entity, entityId, metadata })`.
 - Use `rateLimit()` on auth-related endpoints.
 - Soft delete for products (`isActive = false`), not hard delete.
 
