@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "flat-dark",
+  "name": "Flat Dark",
+  "description": "Dark variant of the Flat theme.",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "type": "dark",
+  "parent": "flat",
+  "tokens": {
+    "colors": {
+      "background":      { "type": "color", "default": "#0f172a" },
+      "foreground":      { "type": "color", "default": "#f8fafc" },
+      "muted":           { "type": "color", "default": "#1e293b" },
+      "mutedForeground": { "type": "color", "default": "#94a3b8" },
+      "border":          { "type": "color", "default": "#334155" },
+      "card":            { "type": "color", "default": "#1e293b" },
+      "cardForeground":  { "type": "color", "default": "#f8fafc" }
+    }
+  },
+  "config": {}
+}
