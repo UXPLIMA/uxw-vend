@@ -24,10 +24,27 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
+        # Skip the postinstall regeneration here — we do it explicitly below
+        # AFTER populating src/modules so the registry + Prisma client reflect
+        # the full set of first-party modules.
+        env:
+          SKIP_POSTINSTALL: "1"
         run: npm ci
 
-      - name: Generate Prisma client
-        run: npx prisma generate
+      # Fresh clones start with src/modules empty (runtime install state, see
+      # .gitignore + docs/CONTRIBUTING.md). For the type check to see module-
+      # contributed Prisma models (WebhookLog, BlogComment, StoreProduct, …)
+      # and module-registered routes, we seed src/modules/ from the tracked
+      # module-sources/ directory — the same files the marketplace ZIPs are
+      # built from.
+      - name: Seed src/modules/ from module-sources
+        run: |
+          set -euo pipefail
+          rm -rf src/modules
+          cp -R module-sources src/modules
+
+      - name: Merge Prisma schema + generate client
+        run: npx tsx scripts/merge-schemas.ts
 
       - name: Generate themes & registry
         run: npm run generate:themes && npx tsx scripts/generate-registry.ts
