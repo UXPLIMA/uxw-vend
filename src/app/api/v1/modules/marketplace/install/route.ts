@@ -14,6 +14,7 @@ import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
+import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -142,6 +143,24 @@ export async function POST(request: NextRequest) {
         if (manifestData.id !== moduleId) {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: `Manifest ID '${manifestData.id}' does not match requested module '${moduleId}'` }, { status: 400 });
+        }
+
+        // Refuse install when declared dependencies are missing/disabled or
+        // a declared conflict is currently active. Runs BEFORE the registry
+        // regen so a mis-installed module can't drag half-initialized state
+        // into the runtime registry.
+        const depCheck = await checkModuleDependencies(manifestData);
+        if (!depCheck.ok) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json(
+                {
+                    error: `Module ${moduleId} ${dependencyErrorMessage(depCheck)}`,
+                    missingDependencies: depCheck.missingDependencies,
+                    disabledDependencies: depCheck.disabledDependencies,
+                    activeConflicts: depCheck.activeConflicts,
+                },
+                { status: 409 },
+            );
         }
 
         const missingRefs: string[] = [];

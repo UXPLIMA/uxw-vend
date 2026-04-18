@@ -24,6 +24,31 @@ function verifyHmac(payload: string, signature: string, secret: string): boolean
 }
 
 /**
+ * Max age of a webhook delivery we'll accept. Without this, a captured
+ * valid signature can be replayed forever — the HMAC alone only proves
+ * the sender knew the secret, not that the event is fresh. Tunable via
+ * WEBHOOK_REPLAY_WINDOW_MS; default 5 minutes matches Stripe / GitHub.
+ */
+const REPLAY_WINDOW_MS = (() => {
+    const raw = Number(process.env.WEBHOOK_REPLAY_WINDOW_MS);
+    return Number.isFinite(raw) && raw > 0 ? raw : 5 * 60 * 1000;
+})();
+
+function parseTimestampHeader(value: string | null): number | null {
+    if (!value) return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    // Accept Unix seconds, Unix ms, or ISO-8601. Numeric heuristics first.
+    if (/^\d+$/.test(trimmed)) {
+        const n = Number(trimmed);
+        // Anything below year-2000 ms obviously came in as seconds.
+        return trimmed.length >= 13 ? n : n * 1000;
+    }
+    const parsed = Date.parse(trimmed);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+/**
  * Inbound webhook dispatcher.
  * POST /api/v1/webhook/<provider>
  *
@@ -68,6 +93,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const sig = request.headers.get(entry.signatureHeader!);
         if (!sig) {
             return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+        }
+        // Optional timestamp freshness check — when the manifest advertises a
+        // timestampHeader, refuse anything older than REPLAY_WINDOW_MS so a
+        // captured valid signature can't be replayed indefinitely.
+        if (entry.timestampHeader) {
+            const ts = parseTimestampHeader(request.headers.get(entry.timestampHeader));
+            if (ts === null) {
+                return NextResponse.json({ error: "Missing or invalid timestamp" }, { status: 401 });
+            }
+            const skew = Math.abs(Date.now() - ts);
+            if (skew > REPLAY_WINDOW_MS) {
+                return NextResponse.json({ error: "Timestamp outside allowed window" }, { status: 401 });
+            }
         }
         const rawBody = await request.text();
         if (!verifyHmac(rawBody, sig, secret)) {

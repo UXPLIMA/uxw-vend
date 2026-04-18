@@ -12,6 +12,7 @@ import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
+import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const RESERVED_IDS = new Set([
@@ -122,6 +123,19 @@ export async function POST(request: NextRequest) {
 
         if (RESERVED_IDS.has(manifest.id)) {
             return NextResponse.json({ error: "Module ID is reserved" }, { status: 400 });
+        }
+
+        const depCheck = await checkModuleDependencies(manifest);
+        if (!depCheck.ok) {
+            return NextResponse.json(
+                {
+                    error: `Module ${manifest.id} ${dependencyErrorMessage(depCheck)}`,
+                    missingDependencies: depCheck.missingDependencies,
+                    disabledDependencies: depCheck.disabledDependencies,
+                    activeConflicts: depCheck.activeConflicts,
+                },
+                { status: 409 },
+            );
         }
 
         const manifestRoot = path.resolve(manifestDir);

@@ -154,6 +154,14 @@ const webhookReceiver = z
          * silently ship an unauthenticated webhook to production.
          */
         verifiesInHandler: z.boolean().optional(),
+        /**
+         * Header name that carries the sender's timestamp (Unix seconds,
+         * Unix ms, or ISO-8601). When set, the dispatcher refuses any
+         * request older than WEBHOOK_REPLAY_WINDOW_MS so a captured,
+         * still-signed webhook can't be replayed forever. Pairs with HMAC
+         * verification; meaningless without it.
+         */
+        timestampHeader: z.string().max(128).optional(),
     })
     .refine(
         (r) => Boolean(r.signatureHeader && r.secretEnv) || r.verifiesInHandler === true,
