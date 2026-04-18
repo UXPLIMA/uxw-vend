@@ -96,8 +96,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (!isPasswordValid) {
                     // Bump the failure counter; when it crosses the
                     // threshold the account is automatically locked for
-                    // ACCOUNT_LOCKOUT_MS (default 15m).
-                    await registerFailedLogin(user.id);
+                    // ACCOUNT_LOCKOUT_MS (default 15m) and the user gets
+                    // an early-warning email with the attacker's IP.
+                    const reqHeaders = (request as Request | undefined)?.headers;
+                    const ip =
+                        reqHeaders?.get("x-forwarded-for")?.split(",")[0].trim() ||
+                        reqHeaders?.get("x-real-ip") ||
+                        undefined;
+                    await registerFailedLogin(user.id, { ip });
                     return null;
                 }
 

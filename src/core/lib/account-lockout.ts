@@ -56,13 +56,19 @@ export function getLockoutStatus(user: {
  * than MAX_WINDOW_MS resets the counter before incrementing so a user
  * with three fumbled logins a month apart never gets locked.
  */
-export async function registerFailedLogin(userId: string): Promise<void> {
+export async function registerFailedLogin(
+    userId: string,
+    context?: { ip?: string },
+): Promise<void> {
     try {
         const existing = await prisma.user.findUnique({
             where: { id: userId },
             select: {
                 failedLoginAttempts: true,
                 lastFailedLoginAt: true,
+                lockedUntil: true,
+                email: true,
+                username: true,
             },
         });
         if (!existing) return;
@@ -71,8 +77,9 @@ export async function registerFailedLogin(userId: string): Promise<void> {
         const lastAt = existing.lastFailedLoginAt?.getTime() ?? 0;
         const withinWindow = now - lastAt <= MAX_WINDOW_MS;
         const nextAttempts = (withinWindow ? existing.failedLoginAttempts : 0) + 1;
-        const lockedUntil =
-            nextAttempts >= MAX_ATTEMPTS ? new Date(now + LOCKOUT_MS) : null;
+        const shouldLock = nextAttempts >= MAX_ATTEMPTS;
+        const alreadyLocked = (existing.lockedUntil?.getTime() ?? 0) > now;
+        const lockedUntil = shouldLock ? new Date(now + LOCKOUT_MS) : existing.lockedUntil;
 
         await prisma.user.update({
             where: { id: userId },
@@ -82,6 +89,23 @@ export async function registerFailedLogin(userId: string): Promise<void> {
                 lockedUntil,
             },
         });
+
+        // Fire an early-warning email the first time we cross the threshold
+        // within a window. Subsequent attempts while already locked don't
+        // re-send — that would turn a slow brute-force into an email bomb.
+        if (shouldLock && !alreadyLocked && existing.email) {
+            try {
+                const { sendAccountLockoutEmail } = await import("./email");
+                await sendAccountLockoutEmail({
+                    to: existing.email,
+                    username: existing.username,
+                    unlocksAt: lockedUntil!,
+                    ip: context?.ip,
+                });
+            } catch (err) {
+                console.error("[account-lockout] lockout notification failed:", err);
+            }
+        }
     } catch (err) {
         console.error("[account-lockout] registerFailedLogin failed:", err);
     }

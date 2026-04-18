@@ -1,0 +1,12 @@
+# RFC 9116 security disclosure.
+#
+# Operators: replace the placeholder Contact + Expires before deploying.
+# Keep Expires in the future (rotate yearly). The spec requires a fresh
+# Expires date; search engines that index security.txt will mark the
+# policy as stale once the date passes.
+
+Contact: mailto:security@example.com
+Expires: 2027-04-18T00:00:00Z
+Preferred-Languages: en, tr
+# Policy: https://example.com/security-policy
+# Acknowledgments: https://example.com/security-hall-of-fame

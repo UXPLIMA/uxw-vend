@@ -377,3 +377,42 @@ export async function sendVerificationEmail(email: string, verifyUrl: string) {
         `,
     });
 }
+
+/**
+ * Sent when an account gets auto-locked after too many failed password
+ * attempts. Gives the legitimate owner an early-warning signal that
+ * someone is trying to sign in as them — critical for catching slow
+ * credential-stuffing campaigns that don't trip IP rate limits.
+ */
+export async function sendAccountLockoutEmail(opts: {
+    to: string;
+    username: string;
+    unlocksAt: Date;
+    ip?: string;
+}): Promise<void> {
+    const unlocks = opts.unlocksAt.toUTCString();
+    const ipLine = opts.ip
+        ? `<p style="color: #6b7280;">Attempts came from IP <code>${escapeHtml(opts.ip)}</code>.</p>`
+        : "";
+
+    // Queue rather than send — this is informational. If the email system
+    // is down, nothing is lost; the lock itself has already been armed.
+    await queueEmail({
+        to: opts.to,
+        subject: `${APP_NAME}: too many failed sign-in attempts`,
+        body: `Someone made too many failed sign-in attempts on your ${APP_NAME} account. The account is temporarily locked until ${unlocks}.`,
+        html: `
+            <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #b91c1c;">Unusual sign-in activity</h2>
+                <p style="color: #374151;">Hi ${escapeHtml(opts.username)},</p>
+                <p style="color: #6b7280;">Someone made too many failed sign-in attempts on your ${APP_NAME} account. We've temporarily locked it as a safety measure.</p>
+                <p style="color: #6b7280;"><strong>The account unlocks at:</strong> ${escapeHtml(unlocks)}</p>
+                ${ipLine}
+                <p style="color: #6b7280;">If this was you, wait until the lock lifts and try again.</p>
+                <p style="color: #6b7280;">If this was NOT you, change your password as soon as the account unlocks — someone knows (or is guessing) part of your credentials.</p>
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+                <p style="color: #9ca3af; font-size: 12px;">${APP_NAME} security notification.</p>
+            </div>
+        `,
+    });
+}
