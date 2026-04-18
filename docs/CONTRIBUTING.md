@@ -125,3 +125,58 @@ Types:
 - If adding a module, include the complete module directory with `module.json`.
 - If modifying `module.json` or adding routes, confirm that `npx tsx scripts/generate-registry.ts` succeeds.
 - Do not include generated files (`src/core/generated/*`) in the PR if only module source changed -- the CI will regenerate them.
+
+## Authoring a Theme
+
+Themes live in `src/themes/<id>/`. Each theme is a `theme.json` manifest plus optional React templates.
+
+### Minimal manifest
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "my-theme",
+  "name": "My Theme",
+  "description": "Short one-line description",
+  "version": "1.0.0",
+  "author": "You",
+  "type": "light",
+  "tokens": {
+    "colors": {
+      "primary":    { "type": "color", "default": "#2563eb" },
+      "background": { "type": "color", "default": "#ffffff" }
+    }
+  },
+  "config": {
+    "hero": {
+      "label": "Hero",
+      "fields": {
+        "headline": { "type": "text", "default": "Welcome", "max": 100 }
+      }
+    }
+  }
+}
+```
+
+### Reading config at runtime
+
+```tsx
+import { useThemeConfig } from "@/core/lib/theme-config-client";
+
+const cfg = useThemeConfig();
+<h1>{cfg("hero.headline", "Welcome")}</h1>
+```
+
+### Inheriting from a parent theme
+
+Set `parent: "flat"` in `theme.json`. Tokens and config groups your theme omits fall through to the parent. Two levels max — grandchildren are rejected at schema validation.
+
+### Named slots
+
+Use `<Slot name="home.afterHero">` to render whatever modules have contributed there. See `CANONICAL_SLOTS` in `src/core/lib/slot-registry.ts` for the reserved names.
+
+### Distribution
+
+Zip the `<id>/` folder and upload via Admin → Appearance → Themes → Upload. The upload route validates the manifest, runs the ZIP integrity check, computes a SHA-256 of the manifest (audit trail), and regenerates the theme registry.
+
+The active theme is picked by the `active_theme` setting. Customization (admin overrides) lives in the `ThemeCustomization` table, one row per theme, stored as a diff against the manifest defaults.
