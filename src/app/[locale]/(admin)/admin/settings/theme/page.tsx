@@ -78,7 +78,8 @@ export default function ThemeSettingsPage() {
     };
 
     const renderPreview = (themeId: string) => {
-        const theme = themeRegistry[themeId];
+        // TODO(T15/T18): rewrite against new ThemeManifest shape (tokens.colors[name].default)
+        const theme = themeRegistry[themeId] as unknown as { config: { colors: Record<string, string>; fonts?: Record<string, string>; schema?: unknown } } | undefined;
         if (!theme) return null;
 
         const { colors } = theme.config;
@@ -183,7 +184,7 @@ export default function ThemeSettingsPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.entries(themeRegistry).map(([id, theme]) => {
+                {(Object.entries(themeRegistry) as unknown as [string, { config: { name: string; description: string; version?: string; type: string } }][]).map(([id, theme]) => {
                     const isActive = currentThemeId === id;
                     const isBuiltIn = builtInThemes.includes(id);
 

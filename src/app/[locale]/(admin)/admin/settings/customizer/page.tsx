@@ -72,7 +72,8 @@ export default function ThemeCustomizerPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const theme = themeRegistry[activeThemeId];
+    // TODO(T15/T17): rewrite against new ThemeManifest shape (tokens.colors[name].default)
+    const theme = themeRegistry[activeThemeId] as unknown as { config: { name: string; colors: Record<string, string>; fonts?: Record<string, string>; schema: ThemeProperty[] } } | undefined;
     // `schema` was a plain `||` expression, which produced a fresh empty
     // array on every render and re-triggered the memo below. Memo the
     // resolution itself so `grouped` only recomputes when the underlying

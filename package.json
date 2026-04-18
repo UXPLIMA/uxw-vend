@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "generate:themes": "npx tsx scripts/generate-themes.ts",
+    "generate:themes": "npx tsx scripts/generate-theme-registry.ts",
     "build:marketplace": "bash scripts/build-marketplace.sh",
     "db:merge": "npx tsx scripts/merge-schemas.ts",
     "postinstall": "npx tsx scripts/postinstall.ts",

@@ -63,7 +63,8 @@ function ThemeContent({
 
     // Determine the actual theme object
     const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
-    const baseTheme = themeRegistry[activeThemeId] || themeRegistry[defaultTheme];
+    // TODO(T10): rewrite this provider against the new ThemeManifest shape.
+    const baseTheme = (themeRegistry[activeThemeId] || themeRegistry[defaultTheme]) as unknown as Theme | undefined;
 
     // Merge user overrides from Setting.theme_overrides. Memoised so the
     // downstream useMemo doesn't pick up a fresh empty object every render.
