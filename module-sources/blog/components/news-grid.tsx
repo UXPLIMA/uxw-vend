@@ -1,7 +1,5 @@
 
 "use client";
-
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { NewsCard } from "./news-card";
 
 interface BlogPost {
@@ -25,12 +23,7 @@ export function NewsGrid({ posts }: NewsGridProps) {
     return (
         <div className="grid md:grid-cols-2 gap-4">
             {posts.map((post) => (
-                <ThemeSlot
-                    key={post.id}
-                    name="NewsCard"
-                    defaultComponent={<NewsCard post={post} />}
-                    props={{ post }}
-                />
+                <NewsCard key={post.id} post={post} />
             ))}
         </div>
     );

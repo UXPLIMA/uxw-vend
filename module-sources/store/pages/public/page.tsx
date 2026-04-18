@@ -8,8 +8,6 @@ import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "../../lib/currency-context";
-import { ThemeSlot } from "@/core/components/theme-slot";
-
 interface Category {
     id: string;
     name: string;
@@ -127,10 +125,10 @@ export default function StorePage() {
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             {/* Shared Hero Banner */}
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
+            <HeroBanner />
 
             {/* Shared Navbar */}
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <Navbar />
 
             {/* Main Content */}
             <main className="container mx-auto px-4 py-6 flex-1">
@@ -369,7 +367,7 @@ export default function StorePage() {
             </main>
 
             {/* Shared Footer */}
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

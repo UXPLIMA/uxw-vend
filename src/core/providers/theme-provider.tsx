@@ -1,21 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode, type ComponentType } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 import { themeRegistry, defaultThemeId as REGISTRY_DEFAULT } from "@/core/generated/theme-registry";
 import { ThemeConfigProvider } from "@/core/lib/theme-config-client";
 import type { ThemeManifest } from "@/core/lib/theme-manifest-schema";
 
-// Until T14 migrates legacy consumers (page.tsx, theme-slot.tsx) off the old
-// `activeTheme.components` accessor, we expose a widened shape so tsc stays
-// green. The generated manifests never populate `components`, so consumers
-// fall through to their default at runtime.
-type LegacyActiveTheme = ThemeManifest & {
-    components?: Record<string, ComponentType<Record<string, unknown>> | undefined>;
-};
-
 interface ThemeContextType {
-    activeTheme: LegacyActiveTheme | null;
+    activeTheme: ThemeManifest | null;
     currentThemeId: string;
 }
 
@@ -41,7 +33,7 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
 
     const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
 
-    const activeTheme = useMemo<LegacyActiveTheme>(() => {
+    const activeTheme = useMemo<ThemeManifest>(() => {
         return pickFallback(themeRegistry[activeThemeId], defaultTheme);
     }, [activeThemeId, defaultTheme]);
 

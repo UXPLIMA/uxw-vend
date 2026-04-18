@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTranslations } from "next-intl";
 
@@ -64,8 +63,8 @@ export default function HelpCenterPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
@@ -121,11 +120,36 @@ export default function HelpCenterPage() {
                         <p className="text-muted-foreground">{t('loading')}</p>
                     </div>
                 ) : (
-                    <ThemeSlot
-                        name="SidebarLayout"
-                        defaultComponent={<StandardSidebarLayout sidebar={null as unknown as React.ReactNode}>{null}</StandardSidebarLayout>}
-                        props={{
-                            children: (
+                    <StandardSidebarLayout sidebar={(
+                                <div>
+                                    <div className="bg-card rounded-xl border border-border p-6">
+                                        <h3 className="font-bold text-foreground mb-4">{t('popularArticles')}</h3>
+                                        {popularArticles.length > 0 ? (
+                                            <ul className="space-y-3">
+                                                {popularArticles.map((article) => (
+                                                    <li key={article.id}>
+                                                        <Link href={`/help/${article.slug}`} className="text-blue-600 hover:underline text-sm">
+                                                            {article.title}
+                                                        </Link>
+                                                        <p className="text-xs text-muted-foreground">{t('views', { count: article.views })}</p>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">{t('noArticlesYet')}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-card rounded-xl border border-border p-6 mt-4">
+                                        <h3 className="font-bold text-foreground mb-2">{t('needHelp')}</h3>
+                                        <p className="text-sm text-muted-foreground mb-4">{t('cantFind')}</p>
+                                        <Link href="/support/new" className="text-blue-600 hover:underline text-sm font-medium">
+                                            {t('createTicket')} →
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}>
+                        {(
                                 <div>
                                     <h2 className="text-xl font-bold text-foreground mb-4">{t('browseCategories')}</h2>
                                     <div className="grid md:grid-cols-2 gap-4">
@@ -157,42 +181,12 @@ export default function HelpCenterPage() {
                                         </div>
                                     )}
                                 </div>
-                            ),
-                            sidebar: (
-                                <div>
-                                    <div className="bg-card rounded-xl border border-border p-6">
-                                        <h3 className="font-bold text-foreground mb-4">{t('popularArticles')}</h3>
-                                        {popularArticles.length > 0 ? (
-                                            <ul className="space-y-3">
-                                                {popularArticles.map((article) => (
-                                                    <li key={article.id}>
-                                                        <Link href={`/help/${article.slug}`} className="text-blue-600 hover:underline text-sm">
-                                                            {article.title}
-                                                        </Link>
-                                                        <p className="text-xs text-muted-foreground">{t('views', { count: article.views })}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground">{t('noArticlesYet')}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="bg-card rounded-xl border border-border p-6 mt-4">
-                                        <h3 className="font-bold text-foreground mb-2">{t('needHelp')}</h3>
-                                        <p className="text-sm text-muted-foreground mb-4">{t('cantFind')}</p>
-                                        <Link href="/support/new" className="text-blue-600 hover:underline text-sm font-medium">
-                                            {t('createTicket')} →
-                                        </Link>
-                                    </div>
-                                </div>
-                            )
-                        }}
-                    />
+                            )}
+                    </StandardSidebarLayout>
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

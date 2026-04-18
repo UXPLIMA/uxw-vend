@@ -1,5 +1,4 @@
 import { SkeletonHeroBanner, SkeletonNavbar, SkeletonCard, SkeletonSidebar } from "@/core/components/ui/skeleton";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { Footer } from "@/core/components/layout";
 
@@ -24,7 +23,7 @@ export default function Loading() {
             </main>
 
             {/* Shared Footer */}
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

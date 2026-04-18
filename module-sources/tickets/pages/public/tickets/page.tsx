@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { formatRelativeTime } from "@/core/lib/utils";
 import { useTranslations } from "next-intl";
 
@@ -59,8 +58,8 @@ export default function SupportPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
@@ -145,7 +144,7 @@ export default function SupportPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

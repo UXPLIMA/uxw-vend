@@ -4,9 +4,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
-import { useTheme } from "@/core/providers/theme-provider";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { ModuleWidgets, WidgetComponentRegistry, ModuleHomepageSections, HomepageSectionRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
@@ -15,7 +13,6 @@ export default function HomePage() {
   const commonT = useTranslations('common');
   const modules = useAllModules();
   const { settings } = useSiteSettings();
-  const { activeTheme } = useTheme();
 
   // Get enabled widgets from registry
   const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
@@ -31,8 +28,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-      <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+      <HeroBanner />
+      <Navbar />
 
       <main className="container mx-auto px-4 py-6 flex-1">
         {/* Breadcrumb */}
@@ -41,7 +38,7 @@ export default function HomePage() {
         </div>
 
         {(() => {
-          const SidebarLayout = activeTheme?.components?.SidebarLayout || StandardSidebarLayout;
+          const SidebarLayout = StandardSidebarLayout;
 
           // Main content: render all enabled homepage sections from modules
           const mainContent = enabledSections.length > 0 ? (
@@ -83,7 +80,7 @@ export default function HomePage() {
         })()}
       </main>
 
-      <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+      <Footer />
     </div>
   );
 }

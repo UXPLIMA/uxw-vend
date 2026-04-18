@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { Slot } from "@/core/components/Slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { buildArticleJsonLd } from "@/core/lib/seo";
@@ -96,15 +95,62 @@ export default async function BlogArticlePage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: articleJsonLd }}
             />
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
-                <ThemeSlot
-                    name="SidebarLayout"
-                    defaultComponent={<StandardSidebarLayout sidebar={null as unknown as React.ReactNode}>{null}</StandardSidebarLayout>}
-                    props={{
-                        children: (
+                <StandardSidebarLayout sidebar={(
+                            <aside className="space-y-6">
+                                {/* Related Articles */}
+                                {relatedArticles.length > 0 && (
+                                    <div className="bg-card rounded-xl border border-border p-5">
+                                        <h3 className="font-bold text-foreground mb-4">Related Articles</h3>
+                                        <div className="space-y-4">
+                                            {relatedArticles.map((related) => (
+                                                <Link
+                                                    key={related.id}
+                                                    href={`/blog/${related.number}/${related.slug}`}
+                                                    className="block group"
+                                                >
+                                                    {related.coverImage && (
+                                                        <div className="h-24 rounded-lg overflow-hidden mb-2">
+                                                            <Image
+                                                                src={related.coverImage}
+                                                                alt={related.title}
+                                                                width={0}
+                                                                height={0}
+                                                                sizes="100vw"
+                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <h4 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
+                                                        {related.title}
+                                                    </h4>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        {formatDate(related.publishedAt || new Date())}
+                                                    </p>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Share */}
+                                <div className="bg-card rounded-xl border border-border p-5">
+                                    <h3 className="font-bold text-foreground mb-4">Share</h3>
+                                    <div className="flex gap-2">
+                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors">
+                                            Twitter
+                                        </button>
+                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 transition-colors">
+                                            Facebook
+                                        </button>
+                                    </div>
+                                </div>
+                            </aside>
+                        )}>
+                    {(
                             <div className="lg:col-span-3">
                                 {/* Breadcrumb */}
                                 <div className="text-sm text-muted-foreground mb-6">
@@ -211,63 +257,11 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                     </div>
                                 </article>
                             </div>
-                        ),
-                        sidebar: (
-                            <aside className="space-y-6">
-                                {/* Related Articles */}
-                                {relatedArticles.length > 0 && (
-                                    <div className="bg-card rounded-xl border border-border p-5">
-                                        <h3 className="font-bold text-foreground mb-4">Related Articles</h3>
-                                        <div className="space-y-4">
-                                            {relatedArticles.map((related) => (
-                                                <Link
-                                                    key={related.id}
-                                                    href={`/blog/${related.number}/${related.slug}`}
-                                                    className="block group"
-                                                >
-                                                    {related.coverImage && (
-                                                        <div className="h-24 rounded-lg overflow-hidden mb-2">
-                                                            <Image
-                                                                src={related.coverImage}
-                                                                alt={related.title}
-                                                                width={0}
-                                                                height={0}
-                                                                sizes="100vw"
-                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <h4 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
-                                                        {related.title}
-                                                    </h4>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {formatDate(related.publishedAt || new Date())}
-                                                    </p>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Share */}
-                                <div className="bg-card rounded-xl border border-border p-5">
-                                    <h3 className="font-bold text-foreground mb-4">Share</h3>
-                                    <div className="flex gap-2">
-                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors">
-                                            Twitter
-                                        </button>
-                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 transition-colors">
-                                            Facebook
-                                        </button>
-                                    </div>
-                                </div>
-                            </aside>
-                        )
-                    }}
-                />
+                        )}
+                </StandardSidebarLayout>
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

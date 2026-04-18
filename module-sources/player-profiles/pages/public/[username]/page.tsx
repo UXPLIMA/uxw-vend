@@ -4,7 +4,6 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
@@ -40,8 +39,8 @@ export default function PlayerProfilePage({ params }: PageProps) {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
                 {loading ? (
@@ -134,7 +133,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

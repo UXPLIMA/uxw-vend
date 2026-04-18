@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Award, Check, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
@@ -68,8 +67,8 @@ export default async function PublicTrophiesPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-5xl">
                 <div className="mb-6">
@@ -137,7 +136,7 @@ export default async function PublicTrophiesPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

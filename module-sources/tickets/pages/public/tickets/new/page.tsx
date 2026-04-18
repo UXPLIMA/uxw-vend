@@ -8,7 +8,6 @@ import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import { useTranslations } from "next-intl";
 
 interface Department {
@@ -69,8 +68,8 @@ export default function NewTicketPage() {
     if (!session?.user) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-                <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+                <HeroBanner />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">{t('loginToCreate')}</p>
@@ -79,15 +78,15 @@ export default function NewTicketPage() {
                         </Link>
                     </div>
                 </main>
-                <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+                <Footer />
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
@@ -179,7 +178,7 @@ export default function NewTicketPage() {
                 </div>
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
 import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { NewsGrid } from "../components/news-grid";
 import { getTranslations } from "next-intl/server";
@@ -38,39 +37,11 @@ export default async function BlogPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <HeroBanner />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
-                <ThemeSlot
-                    name="SidebarLayout"
-                    defaultComponent={<StandardSidebarLayout sidebar={null as unknown as React.ReactNode}>{null}</StandardSidebarLayout>}
-                    props={{
-                        children: (
-                            <div className="lg:col-span-3">
-                                {/* Breadcrumb */}
-                                <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
-                                    <span className="mx-2">/</span>
-                                    <span className="text-foreground">{t('title')}</span>
-                                </div>
-
-                                <h1 className="text-3xl font-bold text-foreground mb-8">{t('title')}</h1>
-
-                                {articles.length === 0 ? (
-                                    <div className="bg-card rounded-xl p-12 text-center">
-                                        <p className="text-muted-foreground">{t('noArticles')}</p>
-                                    </div>
-                                ) : (
-                                    <ThemeSlot
-                                        name="NewsGrid"
-                                        defaultComponent={<NewsGrid posts={articles} />}
-                                        props={{ posts: articles }}
-                                    />
-                                )}
-                            </div>
-                        ),
-                        sidebar: (
+                <StandardSidebarLayout sidebar={(
                             <aside className="space-y-6">
                                 {/* Categories */}
                                 <div className="bg-card rounded-xl border border-border p-5">
@@ -112,12 +83,31 @@ export default async function BlogPage() {
                                     </div>
                                 </div>
                             </aside>
-                        )
-                    }}
-                />
+                        )}>
+                    {(
+                            <div className="lg:col-span-3">
+                                {/* Breadcrumb */}
+                                <div className="text-sm text-muted-foreground mb-6">
+                                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+                                    <span className="mx-2">/</span>
+                                    <span className="text-foreground">{t('title')}</span>
+                                </div>
+
+                                <h1 className="text-3xl font-bold text-foreground mb-8">{t('title')}</h1>
+
+                                {articles.length === 0 ? (
+                                    <div className="bg-card rounded-xl p-12 text-center">
+                                        <p className="text-muted-foreground">{t('noArticles')}</p>
+                                    </div>
+                                ) : (
+                                    <NewsGrid posts={articles} />
+                                )}
+                            </div>
+                        )}
+                </StandardSidebarLayout>
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }
