@@ -1,185 +1,102 @@
-
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, type ReactNode, type ComponentType } from "react";
 import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
+import { themeRegistry, defaultThemeId as REGISTRY_DEFAULT } from "@/core/generated/theme-registry";
+import { ThemeConfigProvider } from "@/core/lib/theme-config-client";
+import type { ThemeManifest } from "@/core/lib/theme-manifest-schema";
 
-import { themeRegistry } from "@/core/generated/theme-registry";
-import { useSiteSettings } from "@/core/hooks/useSiteSettings";
-
-import { Theme, ThemeConfig, ThemeOverrides } from "@/core/types/theme";
+// Until T14 migrates legacy consumers (page.tsx, theme-slot.tsx) off the old
+// `activeTheme.components` accessor, we expose a widened shape so tsc stays
+// green. The generated manifests never populate `components`, so consumers
+// fall through to their default at runtime.
+type LegacyActiveTheme = ThemeManifest & {
+    components?: Record<string, ComponentType<Record<string, unknown>> | undefined>;
+};
 
 interface ThemeContextType {
-    activeTheme: Theme | null;
+    activeTheme: LegacyActiveTheme | null;
     currentThemeId: string;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-    activeTheme: null,
-    currentThemeId: "flat",
-});
+const ThemeContext = createContext<ThemeContextType>({ activeTheme: null, currentThemeId: REGISTRY_DEFAULT });
 
 export const useTheme = () => useContext(ThemeContext);
 
-/**
- * Apply user overrides on top of the base theme config.
- * Overrides are dot-paths like "colors.primary" → "#ff0000".
- */
-function applyOverrides(config: ThemeConfig, overrides: Record<string, string>): ThemeConfig {
-    if (!overrides || Object.keys(overrides).length === 0) return config;
-
-    const result: ThemeConfig = JSON.parse(JSON.stringify(config));
-    for (const [path, value] of Object.entries(overrides)) {
-        if (!value) continue;
-        const parts = path.split(".");
-        let target: Record<string, unknown> = result as unknown as Record<string, unknown>;
-        for (let i = 0; i < parts.length - 1; i++) {
-            const next = target[parts[i]];
-            if (typeof next !== "object" || next === null) break;
-            target = next as Record<string, unknown>;
-        }
-        target[parts[parts.length - 1]] = value;
-    }
-    return result;
+function pickFallback(manifest: ThemeManifest | undefined, want: string): ThemeManifest {
+    if (manifest) return manifest;
+    return themeRegistry[want] ?? themeRegistry[REGISTRY_DEFAULT] ?? Object.values(themeRegistry)[0];
 }
 
 interface AppThemeProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
     defaultTheme: string;
+    serverConfig?: Record<string, unknown>;
 }
 
-function ThemeContent({
-    children,
-    defaultTheme
-}: AppThemeProviderProps) {
+function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProviderProps) {
     const { theme: currentThemeId } = useNextTheme();
     const [mounted, setMounted] = useState(false);
-    const { settings } = useSiteSettings();
+    useEffect(() => { setMounted(true); }, []);
 
-    useEffect(() => {
-         
-        setMounted(true);
-    }, []);
-
-    // Determine the actual theme object
     const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
-    // TODO(T10): rewrite this provider against the new ThemeManifest shape.
-    const baseTheme = (themeRegistry[activeThemeId] || themeRegistry[defaultTheme]) as unknown as Theme | undefined;
 
-    // Merge user overrides from Setting.theme_overrides. Memoised so the
-    // downstream useMemo doesn't pick up a fresh empty object every render.
-    const themeOverrides = useMemo(() => {
-        const overrides = (settings.theme_overrides as ThemeOverrides) || {};
-        return overrides[activeThemeId] || {};
-    }, [settings.theme_overrides, activeThemeId]);
+    const activeTheme = useMemo<LegacyActiveTheme>(() => {
+        return pickFallback(themeRegistry[activeThemeId], defaultTheme);
+    }, [activeThemeId, defaultTheme]);
 
-    // Live preview overrides — when this page is loaded inside the customizer
-    // iframe, the parent posts in-progress edits via postMessage. We track them
-    // in state and merge ON TOP of saved overrides without persisting.
-    const [previewOverrides, setPreviewOverrides] = useState<Record<string, string>>({});
+    // Sync data-theme / data-mode attributes. The generated theme-tokens.css
+    // keys off data-theme (per-theme --uxw-* variables); data-mode drives
+    // next-themes light/dark overrides used by some Tailwind utilities.
+    useEffect(() => {
+        if (typeof document === "undefined") return;
+        document.documentElement.setAttribute("data-theme", activeTheme.id);
+        document.documentElement.setAttribute("data-mode", activeTheme.type);
+    }, [activeTheme]);
+
+    // Live preview channel — when this page is rendered inside the customizer
+    // iframe, the parent posts in-progress edits via postMessage. These
+    // overrides are layered on top of serverConfig ONLY for preview.
+    const [previewOverrides, setPreviewOverrides] = useState<Record<string, unknown> | null>(null);
     useEffect(() => {
         if (typeof window === "undefined") return;
-        if (window.parent === window) return; // Not iframed
+        if (window.parent === window) return;
         const handler = (event: MessageEvent) => {
             if (event.data?.type === "uxwvend:theme-preview" && typeof event.data.overrides === "object") {
-                setPreviewOverrides(event.data.overrides as Record<string, string>);
+                setPreviewOverrides(event.data.overrides as Record<string, unknown>);
             }
         };
         window.addEventListener("message", handler);
-        // Tell the parent we're ready to receive previews
-        try {
-            window.parent.postMessage({ type: "uxwvend:preview-ready" }, "*");
-        } catch { /* cross-origin — ignore */ }
+        try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, "*"); }
+        catch { /* cross-origin — ignore */ }
         return () => window.removeEventListener("message", handler);
     }, []);
 
-    // Both `mergedOverrides` and `activeTheme` were fresh objects on every
-    // render, which meant the CSS-variable effect below re-fired every
-    // render even when nothing material changed. Memoise both so the
-    // effect only runs when the inputs actually change.
-    const mergedOverrides = useMemo(
-        () => ({ ...themeOverrides, ...previewOverrides }),
-        [themeOverrides, previewOverrides],
-    );
-    const activeTheme = useMemo<Theme | null>(
-        () =>
-            baseTheme
-                ? { ...baseTheme, config: applyOverrides(baseTheme.config, mergedOverrides) }
-                : null,
-        [baseTheme, mergedOverrides],
+    const effectiveConfig = useMemo<Record<string, unknown>>(
+        () => previewOverrides ? { ...(serverConfig ?? {}), ...previewOverrides } : (serverConfig ?? {}),
+        [serverConfig, previewOverrides],
     );
 
-    // CSS Variable Injection
-    useEffect(() => {
-        if (!activeTheme) return;
-
-        const root = document.documentElement;
-        const colors = activeTheme.config.colors;
-        const fonts = activeTheme.config.fonts;
-
-        // Inject Colors
-        root.style.setProperty("--color-primary", colors.primary);
-        root.style.setProperty("--color-secondary", colors.secondary);
-        root.style.setProperty("--color-accent", colors.accent);
-        root.style.setProperty("--color-background", colors.background);
-        root.style.setProperty("--color-foreground", colors.foreground);
-        root.style.setProperty("--color-muted", colors.muted);
-        root.style.setProperty("--color-muted-foreground", colors.mutedForeground);
-        root.style.setProperty("--color-border", colors.border);
-        root.style.setProperty("--color-card", colors.card);
-        root.style.setProperty("--color-card-foreground", colors.cardForeground);
-        root.style.setProperty("--color-destructive", colors.destructive);
-        root.style.setProperty("--color-success", colors.success);
-        root.style.setProperty("--color-warning", colors.warning);
-
-        // Inject Fonts
-        root.style.setProperty("--font-heading", fonts.heading);
-        root.style.setProperty("--font-body", fonts.body);
-        root.style.setProperty("--font-mono", fonts.mono);
-
-        // Inject Radius
-        root.style.setProperty("--radius", activeTheme.config.radius);
-
-        // Inject Custom CSS
-        // Remove old style tag if exists
-        const oldStyle = document.getElementById("theme-custom-css");
-        if (oldStyle) oldStyle.remove();
-
-        if (activeTheme.config.css) {
-            const style = document.createElement("style");
-            style.id = "theme-custom-css";
-            style.innerHTML = activeTheme.config.css;
-            document.head.appendChild(style);
-        }
-
-    }, [activeTheme]);
-
-    // Pre-mount: use theme config colors directly for loader
-    const loaderBg = activeTheme?.config.colors.background || "#f3f4f6";
-    const loaderColor = activeTheme?.config.colors.primary || "#2563eb";
-
+    // Pre-mount: flash of neutral background avoided by reading
+    // generated tokens synchronously on mount (globals.css fallback :root).
     return (
         <ThemeContext.Provider value={{ activeTheme, currentThemeId: activeThemeId }}>
-            {!mounted && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ backgroundColor: loaderBg }}>
-                    <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: `${loaderColor}20`, borderTopColor: loaderColor }} />
-                </div>
-            )}
-            {children}
+            <ThemeConfigProvider value={effectiveConfig}>{children}</ThemeConfigProvider>
         </ThemeContext.Provider>
     );
 }
 
-export function AppThemeProvider({ children, defaultTheme }: AppThemeProviderProps) {
+export function AppThemeProvider({ children, defaultTheme, serverConfig }: AppThemeProviderProps) {
+    const themeIds = Object.keys(themeRegistry);
     return (
         <NextThemesProvider
-            attribute="class"
+            attribute="data-mode"
             defaultTheme={defaultTheme}
-            themes={Object.keys(themeRegistry)}
+            themes={themeIds}
             enableSystem={false}
             disableTransitionOnChange
         >
-            <ThemeContent defaultTheme={defaultTheme}>
+            <ThemeContent defaultTheme={defaultTheme} serverConfig={serverConfig}>
                 {children}
             </ThemeContent>
         </NextThemesProvider>
