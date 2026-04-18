@@ -33,6 +33,32 @@ function escapeHtml(str: string): string {
         .replace(/'/g, "&#39;");
 }
 
+/**
+ * Strip CR / LF / NUL from a value before it can reach an SMTP header.
+ * Without this, a malicious `subject` field like "Hi\r\nBcc: me@example.com"
+ * lets an attacker inject arbitrary recipients — the classic SMTP header
+ * injection. The Resend SDK normalizes most of this, but we defend at the
+ * edge so the invariant holds regardless of the provider in use.
+ */
+function stripHeaderInjection(value: string, maxLen = 998): string {
+    if (typeof value !== "string") return "";
+    return value
+        // Any bare CR, LF, or NUL byte is rejected outright.
+        .replace(/[\r\n\0]+/g, " ")
+        // Long header fields may be folded by the provider in ways that
+        // re-introduce control chars; clamp length to the RFC 5322 limit.
+        .slice(0, maxLen)
+        .trim();
+}
+
+function validateEmailAddress(addr: string): boolean {
+    if (!addr || typeof addr !== "string") return false;
+    if (/[\r\n\0,<>"]/.test(addr)) return false;
+    if (addr.length > 254) return false;
+    // Minimal shape check — provider does the heavy lifting.
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr);
+}
+
 // ---------------------------------------------------------------------------
 // Provider (Resend)
 // ---------------------------------------------------------------------------
@@ -61,17 +87,28 @@ async function deliverViaProvider(opts: {
     subject: string;
     html: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
+    // Refuse malformed/malicious recipient and subject fields BEFORE they
+    // reach the provider so a user-derived value can't turn into an SMTP
+    // header injection.
+    if (!validateEmailAddress(opts.to)) {
+        return { ok: false, error: "Invalid recipient address" };
+    }
+    const safeSubject = stripHeaderInjection(opts.subject);
+    if (!safeSubject) {
+        return { ok: false, error: "Empty subject after sanitization" };
+    }
+
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] To ${opts.to}: ${opts.subject}`);
+        console.log(`[Email Disabled] To ${opts.to}: ${safeSubject}`);
         return { ok: true }; // Treat as delivered (dev/test mode)
     }
     const resend = await getResend();
     if (!resend) return { ok: false, error: "Resend client unavailable" };
     try {
         await resend.emails.send({
-            from: `${APP_NAME} <${FROM_EMAIL}>`,
+            from: `${stripHeaderInjection(APP_NAME)} <${stripHeaderInjection(FROM_EMAIL)}>`,
             to: opts.to,
-            subject: opts.subject,
+            subject: safeSubject,
             html: opts.html,
         });
         return { ok: true };

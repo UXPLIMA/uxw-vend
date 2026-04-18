@@ -225,11 +225,11 @@ export async function POST(request: NextRequest) {
                     action: "setup.complete",
                     entity: "system",
                     entityId: null,
-                    metadata: JSON.stringify({
+                    metadata: {
                         installedModules,
                         failedModules,
                         theme: data.theme,
-                    }),
+                    },
                 },
             });
         } catch {

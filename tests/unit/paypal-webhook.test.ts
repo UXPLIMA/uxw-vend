@@ -83,7 +83,7 @@ async function loadHandler(): Promise<HandlerModule["default"]> {
 }
 
 describe("paypal webhook handler: dev fallback", () => {
-    it("accepts the webhook without calling PayPal when env vars are missing", async () => {
+    it("refuses the webhook when env vars are missing and no opt-in flag", async () => {
         const fetchMock = vi.fn();
         vi.stubGlobal("fetch", fetchMock);
 
@@ -96,13 +96,43 @@ describe("paypal webhook handler: dev fallback", () => {
 
         const res = await handler(req);
 
-        expect(res.status).toBe(200);
-        expect(res.body).toEqual({
-            received: true,
-            event: "PAYMENT.CAPTURE.COMPLETED",
-        });
+        expect(res.status).toBe(503);
         expect(fetchMock).not.toHaveBeenCalled();
-        expect(mockWebhookLogCreate).toHaveBeenCalledTimes(1);
+        expect(mockWebhookLogCreate).not.toHaveBeenCalled();
+    });
+
+    it("accepts the webhook only when PAYPAL_ALLOW_UNVERIFIED=1 AND not prod", async () => {
+        process.env.PAYPAL_ALLOW_UNVERIFIED = "1";
+        (process.env as Record<string, string>).NODE_ENV = "development";
+
+        const fetchMock = vi.fn();
+        vi.stubGlobal("fetch", fetchMock);
+
+        const handler = await loadHandler();
+        const req = mockPayPalRequest({
+            id: "EVT-2",
+            event_type: "PAYMENT.CAPTURE.COMPLETED",
+            resource: { id: "CAP-2" },
+        });
+
+        const res = await handler(req);
+
+        expect(res.status).toBe(200);
+        expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("refuses even with opt-in flag when NODE_ENV=production", async () => {
+        process.env.PAYPAL_ALLOW_UNVERIFIED = "1";
+        (process.env as Record<string, string>).NODE_ENV = "production";
+
+        const fetchMock = vi.fn();
+        vi.stubGlobal("fetch", fetchMock);
+
+        const handler = await loadHandler();
+        const res = await handler(mockPayPalRequest({ id: "X" }));
+
+        expect(res.status).toBe(503);
+        expect(fetchMock).not.toHaveBeenCalled();
     });
 });
 
@@ -248,8 +278,11 @@ describe("paypal webhook handler: production verification path", () => {
 
 describe("paypal webhook handler: request body handling", () => {
     it("reads the body once without re-consuming the Request stream", async () => {
-        // Dev-fallback path: no fetch required, just verify no body double-read
-        // errors surface. Request.text() can only be called once per Request.
+        // Dev-opt-in path: ensure body.text() isn't called twice. Request.text()
+        // is single-use and a double-read would throw.
+        process.env.PAYPAL_ALLOW_UNVERIFIED = "1";
+        (process.env as Record<string, string>).NODE_ENV = "development";
+
         const handler = await loadHandler();
         const req = mockPayPalRequest({
             id: "EVT-6",

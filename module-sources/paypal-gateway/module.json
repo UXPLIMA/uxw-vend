@@ -275,7 +275,8 @@
   "webhookReceivers": [
     {
       "provider": "paypal",
-      "handler": "hooks/webhook.ts"
+      "handler": "hooks/webhook.ts",
+      "verifiesInHandler": true
     }
   ]
 }

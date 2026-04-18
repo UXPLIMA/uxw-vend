@@ -198,20 +198,33 @@ export default async function handleWebhook(
     const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
 
-    // Real verification path — only when all three credentials are set.
-    if (clientId && clientSecret && webhookId) {
-        const token = await getPayPalAccessToken(clientId, clientSecret);
+    // Verification is MANDATORY in production. Without all three credentials
+    // an attacker who knows the webhook URL can forge PAYMENT.CAPTURE.COMPLETED
+    // events and credit orders that were never paid for. Dev-mode opt-out
+    // only works when NODE_ENV !== production AND PAYPAL_ALLOW_UNVERIFIED=1
+    // is set explicitly — it is never implicit.
+    const hasCredentials = Boolean(clientId && clientSecret && webhookId);
+    if (!hasCredentials) {
+        const isProd = process.env.NODE_ENV === "production";
+        const devOptIn = process.env.PAYPAL_ALLOW_UNVERIFIED === "1";
+        if (isProd || !devOptIn) {
+            console.error(
+                "[paypal-gateway] refusing webhook: PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET / PAYPAL_WEBHOOK_ID must be set. Set PAYPAL_ALLOW_UNVERIFIED=1 in dev to bypass.",
+            );
+            return { status: 503, body: { error: "PayPal webhook verification not configured" } };
+        }
+        console.warn(
+            "[paypal-gateway] DEV MODE — accepting webhook without signature verification. Never enable PAYPAL_ALLOW_UNVERIFIED in production.",
+        );
+    } else {
+        const token = await getPayPalAccessToken(clientId!, clientSecret!);
         if (!token) {
             return { status: 401, body: { error: "Invalid signature" } };
         }
-        const ok = await verifyPayPalSignature(token, webhookId, request.headers, event);
+        const ok = await verifyPayPalSignature(token, webhookId!, request.headers, event);
         if (!ok) {
             return { status: 401, body: { error: "Invalid signature" } };
         }
-    } else {
-        console.warn(
-            "[paypal-gateway] PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET / PAYPAL_WEBHOOK_ID not set — accepting webhook without signature verification (dev fallback). Set these env vars in production."
-        );
     }
 
     const eventType =

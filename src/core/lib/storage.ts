@@ -2,6 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { prisma } from "@/core/lib/db";
+import { detectFileType } from "@/core/lib/file-type-detection";
+import { sanitizeSvgBuffer } from "@/core/lib/svg-sanitizer";
 
 /**
  * Generic storage provider interface.
@@ -141,8 +143,30 @@ export async function uploadFile(
         throw new Error("Invalid file type");
     }
 
+    // The caller-supplied MIME header is a hint — sniff the actual bytes so
+    // a `.exe` renamed to `image/png` cannot slip through the allowlist.
+    // Text types (svg, json) are detected by content shape.
+    const detected = detectFileType(buffer);
+    if (!detected || !ALLOWED_MIME_TYPES.has(detected.mime)) {
+        throw new Error("Invalid file type");
+    }
+    // Claimed and actual must agree. `image/jpg` is a common user typo for
+    // `image/jpeg`; treat them as equivalent. Plain text isn't sniffable so
+    // we trust the caller there (callers are admin-authenticated anyway).
+    const normalizedClaim = mimeType === "image/jpg" ? "image/jpeg" : mimeType;
+    if (normalizedClaim !== detected.mime && normalizedClaim !== "text/plain") {
+        throw new Error("Invalid file type");
+    }
+
+    // SVGs can carry <script>, event handlers, and javascript: hrefs —
+    // scrub before anyone serves the bytes back to a browser.
+    let safeBuffer = buffer;
+    if (detected.mime === "image/svg+xml") {
+        safeBuffer = sanitizeSvgBuffer(buffer);
+    }
+
     const provider = await resolveActiveProvider();
-    return provider.upload(buffer, filename, mimeType);
+    return provider.upload(safeBuffer, filename, detected.mime);
 }
 
 export const UPLOAD_MAX_SIZE = MAX_FILE_SIZE;

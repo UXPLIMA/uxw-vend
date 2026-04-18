@@ -140,12 +140,29 @@ const searchProvider = z.object({
     handler: relativePath("handler"),
 });
 
-const webhookReceiver = z.object({
-    provider: z.string().min(1).max(64).regex(SAFE_SLUG),
-    handler: relativePath("handler"),
-    signatureHeader: z.string().max(128).optional(),
-    secretEnv: z.string().max(128).regex(/^[A-Z0-9_]+$/).optional(),
-});
+const webhookReceiver = z
+    .object({
+        provider: z.string().min(1).max(64).regex(SAFE_SLUG),
+        handler: relativePath("handler"),
+        signatureHeader: z.string().max(128).optional(),
+        secretEnv: z.string().max(128).regex(/^[A-Z0-9_]+$/).optional(),
+        /**
+         * Signals that the handler itself performs signature verification
+         * (e.g. PayPal via REST API, Stripe via SDK). When false/omitted
+         * and no signatureHeader/secretEnv pair is supplied, the dispatcher
+         * refuses the request so a forgotten manifest field cannot
+         * silently ship an unauthenticated webhook to production.
+         */
+        verifiesInHandler: z.boolean().optional(),
+    })
+    .refine(
+        (r) => Boolean(r.signatureHeader && r.secretEnv) || r.verifiesInHandler === true,
+        {
+            message:
+                "webhookReceivers entry must either provide both signatureHeader+secretEnv for HMAC verification or set verifiesInHandler:true to take responsibility for its own signature check",
+            path: ["signatureHeader"],
+        },
+    );
 
 const notificationType = z.object({
     eventType: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),

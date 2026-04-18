@@ -126,7 +126,7 @@ function generateRegistry() {
     const allPageBlocks: ({ id: string; category?: string; component: string; module: string })[] = [];
     const allCronJobs: ({ id: string; schedule: string; handler: string; module: string })[] = [];
     const allSearchProviders: ({ id: string; label: string; handler: string; module: string })[] = [];
-    const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; module: string })[] = [];
+    const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; module: string })[] = [];
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
 
@@ -289,13 +289,14 @@ function generateRegistry() {
 
     const WEBHOOKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-webhooks.ts');
     let webhooksContent = '// Auto-generated inbound webhook receivers registry\n\n';
-    webhooksContent += 'export const ModuleWebhookReceivers: { provider: string; module: string; signatureHeader?: string; secretEnv?: string; loader: () => Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> }[] = [\n';
+    webhooksContent += 'export const ModuleWebhookReceivers: { provider: string; module: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; loader: () => Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> }[] = [\n';
     for (const wr of allWebhookReceivers) {
         const handlerPath = wr.handler.replace(/\.tsx?$/, '');
         const importPath = `@/modules/${wr.module}/${handlerPath}`;
         const sigHeader = wr.signatureHeader ? JSON.stringify(wr.signatureHeader) : 'undefined';
         const secretEnv = wr.secretEnv ? JSON.stringify(wr.secretEnv) : 'undefined';
-        webhooksContent += `  { provider: ${JSON.stringify(wr.provider)}, module: ${JSON.stringify(wr.module)}, signatureHeader: ${sigHeader}, secretEnv: ${secretEnv}, loader: () => import('${importPath}') as Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> },\n`;
+        const verifiesInHandler = wr.verifiesInHandler === true ? 'true' : 'false';
+        webhooksContent += `  { provider: ${JSON.stringify(wr.provider)}, module: ${JSON.stringify(wr.module)}, signatureHeader: ${sigHeader}, secretEnv: ${secretEnv}, verifiesInHandler: ${verifiesInHandler}, loader: () => import('${importPath}') as Promise<{ default: (request: Request) => Promise<{ status: number; body?: unknown }> }> },\n`;
     }
     webhooksContent += '];\n';
     fs.writeFileSync(WEBHOOKS_FILE, webhooksContent);

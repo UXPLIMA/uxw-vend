@@ -22,10 +22,11 @@ import { prisma } from "@/core/lib/db";
  *   - Core (built-in: revision pruning, etc.) — registered in this file
  *   - Modules — picked up from manifest.cronJobs at server bootstrap
  *
- * Multi-process safety: not strictly safe across PM2 cluster mode. The
- * `lastRunAt` row provides eventual single-execution but two workers can
- * race within the same minute. Acceptable for this app's scale; future
- * upgrade can use Redis SET NX for distributed locking.
+ * Multi-process safety: each tick first tries to atomically claim the job
+ * slot via an INSERT ... ON CONFLICT DO UPDATE WHERE "lastRunAt" is stale.
+ * Postgres guarantees exactly one worker wins that row write, so a PM2
+ * cluster (or a rolling deployment with overlap) can never execute the
+ * same job handler twice inside one interval.
  */
 
 export type CronHandler = () => Promise<void>;
@@ -57,13 +58,33 @@ export function registerCronJob(job: CronJob): void {
     registeredJobs.set(job.key, job);
 }
 
-async function isDue(key: string, schedule: string): Promise<boolean> {
+/**
+ * Try to claim a job slot atomically. Returns true when this worker just
+ * reserved the interval, false when another worker got there first or the
+ * job isn't yet due.
+ *
+ * The INSERT ... ON CONFLICT DO UPDATE ... WHERE pattern is the whole
+ * cluster-safety story: Postgres serializes the write, and our WHERE only
+ * permits the update if the row is stale (or missing). Two workers that
+ * both find the job "due" via a stale read will race here, and exactly
+ * one of them sees affected-row-count = 1.
+ */
+async function claimJob(key: string, schedule: string): Promise<boolean> {
     const intervalMs = SCHEDULE_MS[schedule];
     if (!intervalMs) return false;
-
-    const run = await prisma.cronRun.findUnique({ where: { jobKey: key } });
-    if (!run) return true; // Never run
-    return Date.now() - run.lastRunAt.getTime() >= intervalMs;
+    try {
+        const affected = await prisma.$executeRaw`
+            INSERT INTO "CronRun" ("jobKey", "lastRunAt", "lastStatus")
+            VALUES (${key}, NOW(), 'running')
+            ON CONFLICT ("jobKey") DO UPDATE
+                SET "lastRunAt" = NOW(), "lastStatus" = 'running'
+                WHERE "CronRun"."lastRunAt" < NOW() - make_interval(secs => ${intervalMs / 1000})
+        `;
+        return affected === 1;
+    } catch (err) {
+        console.error(`[scheduler] claim failed for ${key}:`, err);
+        return false;
+    }
 }
 
 async function runJob(job: CronJob): Promise<void> {
@@ -83,10 +104,9 @@ async function runJob(job: CronJob): Promise<void> {
     const nextRunAt = intervalMs ? new Date(lastRunAt.getTime() + intervalMs) : null;
 
     try {
-        await prisma.cronRun.upsert({
+        await prisma.cronRun.update({
             where: { jobKey: job.key },
-            create: { jobKey: job.key, lastRunAt, lastStatus: status, lastError: error, lastRunMs, nextRunAt },
-            update: { lastRunAt, lastStatus: status, lastError: error, lastRunMs, nextRunAt },
+            data: { lastRunAt, lastStatus: status, lastError: error, lastRunMs, nextRunAt },
         });
     } catch (err) {
         console.error(`[scheduler] Failed to record run for ${job.key}:`, err);
@@ -96,7 +116,7 @@ async function runJob(job: CronJob): Promise<void> {
 async function tick(): Promise<void> {
     for (const job of registeredJobs.values()) {
         try {
-            if (await isDue(job.key, job.schedule)) {
+            if (await claimJob(job.key, job.schedule)) {
                 await runJob(job);
             }
         } catch (err) {

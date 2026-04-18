@@ -45,15 +45,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Module disabled" }, { status: 404 });
     }
 
-    // Optional signature verification (works for simple HMAC; complex providers
-    // like Stripe verify inside their handler with the SDK)
-    if (entry.signatureHeader && entry.secretEnv) {
-        const secret = process.env[entry.secretEnv];
+    const hasHmacConfig = Boolean(entry.signatureHeader && entry.secretEnv);
+    const handlerVerifies = entry.verifiesInHandler === true;
+
+    // Fail-closed: every receiver must either use the generic HMAC path or
+    // explicitly take responsibility for verifying signatures in its handler.
+    // A manifest that sets neither would otherwise ship as an unauthenticated
+    // public endpoint.
+    if (!hasHmacConfig && !handlerVerifies) {
+        console.error(
+            `[webhook] ${provider}: refusing dispatch — manifest provides neither signatureHeader+secretEnv nor verifiesInHandler`,
+        );
+        return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+    }
+
+    if (hasHmacConfig) {
+        const secret = process.env[entry.secretEnv!];
         if (!secret) {
             console.error(`[webhook] ${provider}: ${entry.secretEnv} not set`);
             return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
         }
-        const sig = request.headers.get(entry.signatureHeader);
+        const sig = request.headers.get(entry.signatureHeader!);
         if (!sig) {
             return NextResponse.json({ error: "Missing signature" }, { status: 401 });
         }
@@ -61,7 +73,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (!verifyHmac(rawBody, sig, secret)) {
             return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
         }
-        // Re-create the request with the consumed body so the handler can re-read it
         const newRequest = new Request(request.url, {
             method: request.method,
             headers: request.headers,
@@ -77,7 +88,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
     }
 
-    // No verification — pass-through
+    // verifiesInHandler === true: the module's handler is responsible for
+    // its own signature check (e.g. PayPal verify-webhook-signature, Stripe
+    // SDK). We pass the original Request through untouched.
     try {
         const mod = await entry.loader();
         const result = await mod.default(request);

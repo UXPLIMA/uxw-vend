@@ -19,6 +19,7 @@ type ReceiverEntry = {
     module: string;
     signatureHeader?: string;
     secretEnv?: string;
+    verifiesInHandler?: boolean;
     loader: () => Promise<{ default: WebhookHandler }>;
 };
 
@@ -61,11 +62,12 @@ beforeEach(() => {
 });
 
 describe("webhook dispatcher: POST", () => {
-    it("dispatches to the handler registered for the provider", async () => {
+    it("dispatches to the handler when it opts in to self-verification", async () => {
         handlerSpy.mockResolvedValue({ status: 200, body: { received: true } });
         receivers.push({
             provider: "paypal",
             module: "paypal-gateway",
+            verifiesInHandler: true,
             loader: async () => ({ default: handlerSpy }),
         });
 
@@ -75,14 +77,28 @@ describe("webhook dispatcher: POST", () => {
         });
 
         expect(handlerSpy).toHaveBeenCalledTimes(1);
-        // Handler receives the exact same Request object (no verification rewrap
-        // path because no signatureHeader/secretEnv were configured).
+        // Handler receives the exact same Request object (no rewrap because
+        // the manifest opted into verifiesInHandler rather than HMAC).
         const [passedReq] = handlerSpy.mock.calls[0];
         expect(passedReq).toBe(req);
 
         expect(res.status).toBe(200);
         const json = (await res.json()) as { received: boolean };
         expect(json.received).toBe(true);
+    });
+
+    it("refuses dispatch when no signature config and no verifiesInHandler flag", async () => {
+        receivers.push({
+            provider: "paypal",
+            module: "paypal-gateway",
+            loader: async () => ({ default: handlerSpy }),
+        });
+
+        const req = makeReq("paypal");
+        const res = await POST(req, { params: Promise.resolve({ provider: "paypal" }) });
+
+        expect(res.status).toBe(503);
+        expect(handlerSpy).not.toHaveBeenCalled();
     });
 
     it("returns 404 for an unknown provider", async () => {
@@ -101,6 +117,7 @@ describe("webhook dispatcher: POST", () => {
         receivers.push({
             provider: "paypal",
             module: "paypal-gateway",
+            verifiesInHandler: true,
             loader: async () => ({ default: handlerSpy }),
         });
         moduleStatesHolder.value = { "paypal-gateway": false };
@@ -121,6 +138,7 @@ describe("webhook dispatcher: POST", () => {
         receivers.push({
             provider: "paypal",
             module: "paypal-gateway",
+            verifiesInHandler: true,
             loader: async () => ({ default: handlerSpy }),
         });
         const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
