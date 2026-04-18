@@ -159,13 +159,14 @@ export default function StorePage() {
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="mb-6">
                     <div className="relative max-w-lg">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('searchProducts')}
-                            className="w-full pl-10 pr-10 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
+                            className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                         {searchQuery && (
                             <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
