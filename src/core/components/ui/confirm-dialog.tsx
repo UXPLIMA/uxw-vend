@@ -91,7 +91,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                         aria-modal="true"
                         aria-labelledby="confirm-title"
                         aria-describedby="confirm-message"
-                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto animate-fade-in"
+                        className="relative bg-card border border-[var(--uxw-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto animate-fade-in"
                     >
                         <div className="flex items-start gap-4">
                             {state.options.variant === "danger" && (
