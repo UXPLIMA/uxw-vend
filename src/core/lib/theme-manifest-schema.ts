@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-const HEX = /^#(?:[0-9a-fA-F]{3}){1,2}(?:[0-9a-fA-F]{2})?$/;
+const HEX = /^#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/;
 const SAFE_ID = /^[a-z0-9][a-z0-9-]*$/;
 const SAFE_KEY = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-const SEMVER = /^\d+\.\d+\.\d+/;
+const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
 const colorDef = z.object({
     type: z.literal("color"),
@@ -107,9 +107,15 @@ export const themeManifestSchema = z.object({
     })).max(100).optional(),
 
     translations: z.record(
-        z.string(),
-        z.record(z.string(), z.record(z.string(), z.string())),
-    ).optional(),
+        z.string().max(10),
+        z.record(
+            z.string().max(64),
+            z.record(
+                z.string().max(128),
+                z.string().max(2000),
+            ).refine(r => Object.keys(r).length <= 500, "max 500 keys per namespace"),
+        ).refine(r => Object.keys(r).length <= 200, "max 200 namespaces per locale"),
+    ).refine(r => Object.keys(r).length <= 20, "max 20 locales").optional(),
 }).strict();
 
 export type ThemeManifest = z.infer<typeof themeManifestSchema>;
