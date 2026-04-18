@@ -78,11 +78,23 @@ export default function ThemeSettingsPage() {
     };
 
     const renderPreview = (themeId: string) => {
-        // TODO(T15/T18): rewrite against new ThemeManifest shape (tokens.colors[name].default)
-        const theme = themeRegistry[themeId] as unknown as { config: { colors: Record<string, string>; fonts?: Record<string, string>; schema?: unknown } } | undefined;
+        const theme = themeRegistry[themeId];
         if (!theme) return null;
-
-        const { colors } = theme.config;
+        const colorDefs = theme.tokens?.colors ?? {};
+        const colorFor = (k: string): string => {
+            const def = colorDefs[k];
+            return def && "default" in def && typeof def.default === "string" ? def.default : "#000";
+        };
+        const colors = {
+            background: colorFor("background"),
+            border: colorFor("border"),
+            muted: colorFor("muted"),
+            destructive: colorFor("destructive"),
+            warning: colorFor("warning"),
+            success: colorFor("success"),
+            primary: colorFor("primary"),
+            secondary: colorFor("secondary"),
+        };
 
         return (
             <div className="w-full h-32 rounded-md mb-4 relative overflow-hidden border border-border" style={{ background: colors.background }}>
@@ -184,7 +196,7 @@ export default function ThemeSettingsPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {(Object.entries(themeRegistry) as unknown as [string, { config: { name: string; description: string; version?: string; type: string } }][]).map(([id, theme]) => {
+                {Object.entries(themeRegistry).map(([id, theme]) => {
                     const isActive = currentThemeId === id;
                     const isBuiltIn = builtInThemes.includes(id);
 
@@ -196,7 +208,7 @@ export default function ThemeSettingsPage() {
                         >
                             <CardHeader className="p-4 pb-2">
                                 <CardTitle className="text-base flex justify-between items-center">
-                                    <span>{theme.config.name}</span>
+                                    <span>{theme.name}</span>
                                     <div className="flex items-center gap-2">
                                         {isActive && <Check className="h-4 w-4 text-primary" />}
                                         {!isBuiltIn && (
@@ -217,16 +229,16 @@ export default function ThemeSettingsPage() {
                                     </div>
                                 </CardTitle>
                                 <CardDescription className="text-xs">
-                                    {theme.config.description}
+                                    {theme.description}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="p-4 pt-2">
                                 {renderPreview(id)}
                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                    <span>v{theme.config.version || '1.0.0'}</span>
+                                    <span>v{theme.version || '1.0.0'}</span>
                                     <div className="flex items-center gap-2">
                                         {!isBuiltIn && <span className="text-blue-500">Custom</span>}
-                                        <span>{theme.config.type}</span>
+                                        <span>{theme.type}</span>
                                     </div>
                                 </div>
                             </CardContent>

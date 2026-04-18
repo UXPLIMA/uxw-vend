@@ -66,16 +66,16 @@ export async function POST(request: NextRequest) {
             await fs.writeFile(resolvedPath, entry.getData());
         }
 
-        // Verify theme.config.ts exists
-        const configPath = path.join(targetDir, "theme.config.ts");
-        if (!(await fs.access(configPath).then(() => true).catch(() => false))) {
+        // Verify theme.json exists
+        const manifestPath = path.join(targetDir, "theme.json");
+        if (!(await fs.access(manifestPath).then(() => true).catch(() => false))) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Invalid theme — no theme.config.ts" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid theme — no theme.json" }, { status: 400 });
         }
 
         // Regenerate theme registry
         try {
-            execFileSync("npx", ["tsx", "scripts/generate-themes.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+            execFileSync("npx", ["tsx", "scripts/generate-theme-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
