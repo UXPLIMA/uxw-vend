@@ -10,8 +10,8 @@ import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
+import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Stage the update in a temp dir first, validate, then swap.
-        const tmpDir = path.join(process.cwd(), "tmp");
+        const tmpDir = TMP_DIR;
         await fs.mkdir(tmpDir, { recursive: true });
         const stageDir = path.join(tmpDir, `module-stage-${moduleId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
         await fs.mkdir(stageDir, { recursive: true });
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
 
             try {
                 execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
-                    cwd: process.cwd(),
+                    cwd: PROJECT_ROOT,
                     timeout: 30000,
                     stdio: "pipe",
                 });
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
                 await fs.rm(targetDir, { recursive: true, force: true });
                 await fs.cp(backupDir, targetDir, { recursive: true });
                 try {
-                    execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+                    execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
                 } catch { /* best effort */ }
                 return NextResponse.json({
                     error: "Registry generation failed: " + String((regErr as Error)?.message || regErr).slice(0, 200),
@@ -177,8 +177,8 @@ export async function POST(request: NextRequest) {
 
             if (!process.env.NEXT_DEV) {
                 try {
-                    execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
-                    try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
+                    execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
+                    try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }
                     catch { process.kill(process.pid, "SIGUSR2"); }
                 } catch { /* will work after manual restart */ }
             }

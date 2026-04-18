@@ -10,8 +10,7 @@ import { acquireInstallLock } from "@/core/lib/install-lock";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
-
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
+import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 
 export async function DELETE(
     _request: NextRequest,
@@ -78,10 +77,10 @@ export async function DELETE(
         await invalidateModuleCache().catch(() => {});
 
         try {
-            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
             if (!process.env.NEXT_DEV) {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
-                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
+                execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
+                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }
                 catch { process.kill(process.pid, "SIGUSR2"); }
             }
         } catch {

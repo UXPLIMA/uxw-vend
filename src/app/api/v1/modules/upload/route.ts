@@ -13,8 +13,7 @@ import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
-
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
+import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 const RESERVED_IDS = new Set([
     "auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes",
 ]);
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: contentCheck.error ?? "ZIP validation failed" }, { status: 400 });
         }
 
-        const tmpDir = path.join(process.cwd(), "tmp");
+        const tmpDir = TMP_DIR;
         await fs.mkdir(tmpDir, { recursive: true });
         extractDir = path.join(tmpDir, `module-extract-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
         await fs.mkdir(extractDir, { recursive: true });
@@ -182,7 +181,7 @@ export async function POST(request: NextRequest) {
 
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
-                cwd: process.cwd(),
+                cwd: PROJECT_ROOT,
                 timeout: 30000,
                 stdio: "pipe",
             });

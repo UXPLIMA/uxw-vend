@@ -56,7 +56,9 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npm run lint --max-warnings=0
+        # The `--` separator is required — otherwise npm swallows the flag
+        # and eslint doesn't see it.
+        run: npm run lint -- --max-warnings=0
 
       - name: Security audit (fails on high/critical)
         run: npm audit --audit-level=high

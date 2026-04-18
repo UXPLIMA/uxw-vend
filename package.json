@@ -89,6 +89,17 @@
       "optional": true
     }
   },
+  "overrides": {
+    "react-copy-to-clipboard": {
+      "react": "$react"
+    },
+    "react-debounce-input": {
+      "react": "$react"
+    },
+    "react-inspector": {
+      "react": "$react"
+    }
+  },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.2",
     "@playwright/test": "^1.59.1",

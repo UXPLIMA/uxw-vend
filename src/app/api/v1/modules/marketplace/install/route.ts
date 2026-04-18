@@ -15,8 +15,7 @@ import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
-
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
+import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
@@ -190,7 +189,7 @@ export async function POST(request: NextRequest) {
         const hasSchema = await fs.access(schemaPath).then(() => true).catch(() => false);
         if (hasSchema) {
             try {
-                execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+                execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
             } catch {
                 // Non-fatal: schema will be merged during deferred build
             }
@@ -198,7 +197,7 @@ export async function POST(request: NextRequest) {
 
         // Registry generation (sync, lightweight)
         try {
-            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
+            execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
         } catch {
             // Non-fatal: registry will be regenerated during deferred build
         }
