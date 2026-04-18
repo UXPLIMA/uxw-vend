@@ -2,7 +2,11 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import { prisma } from "@/core/lib/db";
-import { detectFileType } from "@/core/lib/file-type-detection";
+import {
+    detectFileType,
+    readImageDimensions,
+    MAX_IMAGE_DIMENSION,
+} from "@/core/lib/file-type-detection";
 import { sanitizeSvgBuffer } from "@/core/lib/svg-sanitizer";
 
 /**
@@ -156,6 +160,30 @@ export async function uploadFile(
     const normalizedClaim = mimeType === "image/jpg" ? "image/jpeg" : mimeType;
     if (normalizedClaim !== detected.mime && normalizedClaim !== "text/plain") {
         throw new Error("Invalid file type");
+    }
+
+    // Refuse image decompression bombs: a modestly-sized PNG/JPEG with a
+    // wide header can expand to gigabytes of RGBA pixels the first time
+    // anything (Sharp, browsers) decodes it. We read the format header
+    // (no decompression) and cap dimensions at MAX_IMAGE_DIMENSION.
+    const isRasterImage =
+        detected.mime === "image/png" ||
+        detected.mime === "image/jpeg" ||
+        detected.mime === "image/gif" ||
+        detected.mime === "image/webp";
+    if (isRasterImage) {
+        const dims = readImageDimensions(buffer);
+        if (!dims) {
+            throw new Error("Invalid file type");
+        }
+        if (
+            dims.width <= 0 ||
+            dims.height <= 0 ||
+            dims.width > MAX_IMAGE_DIMENSION ||
+            dims.height > MAX_IMAGE_DIMENSION
+        ) {
+            throw new Error("File too large");
+        }
     }
 
     // SVGs can carry <script>, event handlers, and javascript: hrefs —

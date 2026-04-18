@@ -235,20 +235,48 @@ export async function PATCH(request: NextRequest) {
     // Execute onEnable/onDisable hooks if defined in manifest
     const hookKey = wantEnabled ? "onEnable" as const : "onDisable" as const;
     const hookRelPath = definition.hooks?.[hookKey];
+    let hookError: string | null = null;
     if (hookRelPath) {
         try {
-            const modulesDir = path.join(process.cwd(), "src/modules", moduleId);
-            const hookPath = path.join(modulesDir, hookRelPath);
-            const _require = typeof __webpack_require__ === "function"
-                ? __non_webpack_require__
-                : eval("require");
-            const hookModule = _require(hookPath);
-            if (typeof hookModule.default === "function") {
-                await hookModule.default();
+            const modulesRoot = path.resolve(process.cwd(), "src/modules");
+            const modulesDir = path.resolve(modulesRoot, moduleId);
+            const hookPath = path.resolve(modulesDir, hookRelPath);
+
+            // Belt-and-suspenders: even with the Zod relativePath guard on
+            // manifest input, verify the resolved hook path stays inside
+            // src/modules/<id>/ before require()-ing it. A compromised module
+            // with an absolute or `..`-heavy path must not be able to load
+            // arbitrary code from /etc, core/, or another module.
+            if (
+                !hookPath.startsWith(modulesDir + path.sep) ||
+                !modulesDir.startsWith(modulesRoot + path.sep)
+            ) {
+                hookError = `hook path escapes module directory: ${hookRelPath}`;
+                console.error(`[modules] ${moduleId} ${hookKey}: ${hookError}`);
+            } else {
+                const _require = typeof __webpack_require__ === "function"
+                    ? __non_webpack_require__
+                    : eval("require");
+                const hookModule = _require(hookPath);
+                if (typeof hookModule.default === "function") {
+                    await hookModule.default();
+                }
             }
-        } catch {
-            // Hook execution failed — non-fatal, state change already persisted
+        } catch (err) {
+            hookError = err instanceof Error ? err.message : String(err);
+            console.error(`[modules] ${moduleId} ${hookKey} hook failed:`, err);
         }
+    }
+
+    if (hookError) {
+        // State change is already persisted — we don't revert because
+        // that's its own class of problem (partial cleanup) — but the
+        // admin gets a clear signal that the hook didn't complete.
+        return NextResponse.json({
+            ...updated,
+            warning: "Module enabled but hook failed",
+            hookError: process.env.NODE_ENV === "production" ? undefined : hookError,
+        });
     }
 
     return NextResponse.json(updated);

@@ -1,4 +1,5 @@
 import { prisma } from "@/core/lib/db";
+import { onShutdown, installShutdownHandlers, isShuttingDown } from "@/core/lib/shutdown";
 
 /**
  * Lightweight cron-style scheduler.
@@ -49,6 +50,8 @@ const SCHEDULE_MS: Record<string, number> = {
 
 const registeredJobs = new Map<string, CronJob>();
 let tickerStarted = false;
+let tickIntervalHandle: ReturnType<typeof setInterval> | null = null;
+let tickTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
 export function registerCronJob(job: CronJob): void {
     if (!SCHEDULE_MS[job.schedule]) {
@@ -114,7 +117,9 @@ async function runJob(job: CronJob): Promise<void> {
 }
 
 async function tick(): Promise<void> {
+    if (isShuttingDown()) return;
     for (const job of registeredJobs.values()) {
+        if (isShuttingDown()) return;
         try {
             if (await claimJob(job.key, job.schedule)) {
                 await runJob(job);
@@ -336,9 +341,24 @@ export async function bootstrapScheduler(): Promise<void> {
     console.log(`[scheduler] Registered ${registeredJobs.size} cron jobs, ticking every minute`);
 
     // First tick after a short delay so the server settles
-    setTimeout(() => { void tick(); }, 5_000);
+    tickTimeoutHandle = setTimeout(() => { void tick(); }, 5_000);
     // Recurring tick
-    setInterval(() => { void tick(); }, 60_000);
+    tickIntervalHandle = setInterval(() => { void tick(); }, 60_000);
+
+    // Cooperative shutdown: stop emitting ticks so the event loop can drain.
+    // A long-running cron handler already in flight finishes; new ones are
+    // skipped via isShuttingDown() inside tick().
+    installShutdownHandlers();
+    onShutdown("scheduler", () => {
+        if (tickTimeoutHandle) {
+            clearTimeout(tickTimeoutHandle);
+            tickTimeoutHandle = null;
+        }
+        if (tickIntervalHandle) {
+            clearInterval(tickIntervalHandle);
+            tickIntervalHandle = null;
+        }
+    });
 }
 
 export function listScheduledJobs(): { key: string; schedule: string }[] {

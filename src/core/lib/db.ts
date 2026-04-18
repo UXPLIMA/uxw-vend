@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { onShutdown } from "./shutdown";
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
@@ -25,6 +26,13 @@ function createClient(): PrismaClient {
 export const prisma = globalForPrisma.prisma ?? createClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+// Drain the Postgres connection pool when the process is asked to stop so
+// in-flight queries finish cleanly and the pool doesn't leak sockets that
+// the OS would otherwise time out on its own schedule.
+onShutdown("prisma", async () => {
+    await prisma.$disconnect();
+});
 
 export default prisma;
 
