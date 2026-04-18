@@ -36,7 +36,7 @@ export default function ApiKeysPage() {
         setLoading(false);
     }, []);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+     
     useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
     const createKey = async (e: React.FormEvent) => {

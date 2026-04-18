@@ -12,7 +12,7 @@ export function useDarkMode() {
     useEffect(() => {
         // Read initial state from DOM (set by inline script in layout)
         const dark = document.documentElement.getAttribute("data-mode") === "dark";
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- reading DOM on mount
+         
         setIsDark(dark);
 
         // Listen for changes from other components/tabs

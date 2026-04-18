@@ -176,7 +176,7 @@ export default function AuditLogPage() {
             .catch(() => setLoading(false));
     }, [queryString]);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     useEffect(() => {
         fetchLogs();
     }, [fetchLogs]);

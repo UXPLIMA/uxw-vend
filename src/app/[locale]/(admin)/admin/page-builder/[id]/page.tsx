@@ -33,7 +33,7 @@ export default function PageBuilderPage(props: PageProps) {
         buildMergedBlockConfig().then(setBlockConfig).catch(() => {
             toast.error(t("pageBuilder_loadFailed"));
         });
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         if (pageId === "new") {
@@ -67,7 +67,7 @@ export default function PageBuilderPage(props: PageProps) {
                 }
             })
             .finally(() => setLoading(false));
-    }, [pageId]);
+    }, [pageId, t]);
 
     const save = async (puckData: Data) => {
         setSaving(true);

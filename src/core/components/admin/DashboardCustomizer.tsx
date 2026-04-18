@@ -41,7 +41,7 @@ export function DashboardCustomizer() {
             })
             .catch(() => toast.error(t("customizer_loadError")))
             .finally(() => setLoading(false));
-    }, [open]);
+    }, [open, t]);
 
     const toggle = (id: string) => {
         setLayout((prev) => prev.map((w) => (w.id === id ? { ...w, visible: !w.visible } : w)));

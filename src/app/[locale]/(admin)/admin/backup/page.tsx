@@ -86,7 +86,7 @@ export default function BackupAdminPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     const fetchCronInfo = useCallback(async () => {
         try {

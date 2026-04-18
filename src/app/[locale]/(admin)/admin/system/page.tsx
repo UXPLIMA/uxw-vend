@@ -33,7 +33,7 @@ export default function SystemPage() {
         setLoading(false);
     }, []);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     useEffect(() => { fetchData(); }, [fetchData]);
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

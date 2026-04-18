@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { toast } from "sonner";
@@ -557,12 +558,12 @@ function DoneStep({ completed }: { completed: boolean }) {
             </p>
             {completed && (
                 <div className="pt-2">
-                    <a
+                    <Link
                         href="/admin"
                         className="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium"
                     >
                         Go to admin panel <ArrowRight className="w-4 h-4" />
-                    </a>
+                    </Link>
                 </div>
             )}
         </div>

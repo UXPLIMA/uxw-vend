@@ -55,7 +55,7 @@ export default function ModerationSettingsPage() {
                 toast.error(t("moderationSettings_loadFailed"));
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [t]);
 
     const toggleField = (key: keyof ModerationConfig) => {
         setConfig((prev) => ({

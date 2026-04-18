@@ -31,7 +31,7 @@ export default function ActivityLogPage() {
             .catch(() => setLoading(false));
     }, [page]);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount/page change
+     
     useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
     return (

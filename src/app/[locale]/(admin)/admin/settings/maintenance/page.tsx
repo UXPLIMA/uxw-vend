@@ -44,7 +44,7 @@ export default function MaintenanceSettingsPage() {
                 toast.error(t("maintenance_loadFailed"));
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [t]);
 
     const toggleRole = (role: string) => {
         setAllowedRoles((prev) =>

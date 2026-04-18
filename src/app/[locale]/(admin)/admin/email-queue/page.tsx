@@ -93,7 +93,7 @@ export default function EmailQueueAdminPage() {
         } finally {
             setLoading(false);
         }
-    }, [filter, page]);
+    }, [filter, page, t]);
 
     useEffect(() => {
         void fetchJobs();

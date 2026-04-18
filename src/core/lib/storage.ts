@@ -53,7 +53,7 @@ export function sanitizeFilename(filename: string): string {
     let safe = filename
         .replace(/\.\.+/g, "-")
         .replace(/[/\\]/g, "-")
-        // eslint-disable-next-line no-control-regex
+         
         .replace(/[\x00-\x1f\x7f]/g, "-")
         .replace(/[^A-Za-z0-9._-]/g, "-")
         .replace(/-+/g, "-")

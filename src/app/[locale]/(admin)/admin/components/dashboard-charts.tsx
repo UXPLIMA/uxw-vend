@@ -44,7 +44,7 @@ export function DashboardCharts() {
             .catch(() => setLoading(false));
     }, [period]);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on period change
+     
     useEffect(() => { fetchStats(); }, [fetchStats]);
 
     if (loading) {

@@ -61,7 +61,7 @@ export async function GET() {
         prisma.setting.findUnique({ where: { key: ROLE_MULTIPLIER_SETTING_KEY } }),
     ]);
 
-    let multipliers: Record<string, number> = {};
+    const multipliers: Record<string, number> = {};
     if (setting?.value && typeof setting.value === "object" && !Array.isArray(setting.value)) {
         for (const [role, raw] of Object.entries(setting.value as Record<string, unknown>)) {
             const num = typeof raw === "number" ? raw : Number(raw);

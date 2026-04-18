@@ -31,7 +31,7 @@ export function Navbar() {
     const [mounted, setMounted] = useState(false);
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     useEffect(() => { setMounted(true); }, []);
 
     // Build nav links: admin-configured links take priority, fallback to module-registered links

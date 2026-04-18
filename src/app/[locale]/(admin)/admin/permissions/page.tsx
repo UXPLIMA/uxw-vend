@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, Plus, X } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -52,7 +51,7 @@ export default function PermissionsMatrixPage() {
     const [customResource, setCustomResource] = useState("");
     const [customResources, setCustomResources] = useState<string[]>([]);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const res = await fetch("/api/v1/admin/resource-permissions");
@@ -64,9 +63,9 @@ export default function PermissionsMatrixPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [t]);
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchData(); }, [fetchData]);
 
     const findGrant = (resource: string, action: string, roleId: string): Grant | undefined =>
         grants.find((g) => g.resource === resource && g.action === action && g.principalId === roleId && g.resourceId === null);

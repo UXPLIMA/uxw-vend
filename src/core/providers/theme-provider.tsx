@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
@@ -57,7 +57,7 @@ function ThemeContent({
     const { settings } = useSiteSettings();
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only mount detection
+         
         setMounted(true);
     }, []);
 
@@ -65,9 +65,12 @@ function ThemeContent({
     const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
     const baseTheme = themeRegistry[activeThemeId] || themeRegistry[defaultTheme];
 
-    // Merge user overrides from Setting.theme_overrides
-    const overrides = (settings.theme_overrides as ThemeOverrides) || {};
-    const themeOverrides = overrides[activeThemeId] || {};
+    // Merge user overrides from Setting.theme_overrides. Memoised so the
+    // downstream useMemo doesn't pick up a fresh empty object every render.
+    const themeOverrides = useMemo(() => {
+        const overrides = (settings.theme_overrides as ThemeOverrides) || {};
+        return overrides[activeThemeId] || {};
+    }, [settings.theme_overrides, activeThemeId]);
 
     // Live preview overrides — when this page is loaded inside the customizer
     // iframe, the parent posts in-progress edits via postMessage. We track them
@@ -89,13 +92,21 @@ function ThemeContent({
         return () => window.removeEventListener("message", handler);
     }, []);
 
-    const mergedOverrides = { ...themeOverrides, ...previewOverrides };
-    const activeTheme = baseTheme
-        ? {
-            ...baseTheme,
-            config: applyOverrides(baseTheme.config, mergedOverrides),
-        }
-        : null;
+    // Both `mergedOverrides` and `activeTheme` were fresh objects on every
+    // render, which meant the CSS-variable effect below re-fired every
+    // render even when nothing material changed. Memoise both so the
+    // effect only runs when the inputs actually change.
+    const mergedOverrides = useMemo(
+        () => ({ ...themeOverrides, ...previewOverrides }),
+        [themeOverrides, previewOverrides],
+    );
+    const activeTheme = useMemo<Theme | null>(
+        () =>
+            baseTheme
+                ? { ...baseTheme, config: applyOverrides(baseTheme.config, mergedOverrides) }
+                : null,
+        [baseTheme, mergedOverrides],
+    );
 
     // CSS Variable Injection
     useEffect(() => {

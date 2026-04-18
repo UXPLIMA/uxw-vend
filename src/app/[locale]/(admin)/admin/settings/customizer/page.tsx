@@ -73,7 +73,14 @@ export default function ThemeCustomizerPage() {
     }, []);
 
     const theme = themeRegistry[activeThemeId];
-    const schema = theme?.config.schema || [];
+    // `schema` was a plain `||` expression, which produced a fresh empty
+    // array on every render and re-triggered the memo below. Memo the
+    // resolution itself so `grouped` only recomputes when the underlying
+    // theme config actually changes.
+    const schema: ThemeProperty[] = useMemo(
+        () => theme?.config.schema || [],
+        [theme],
+    );
 
     // Group properties by their `group` field
     const grouped = useMemo(() => {

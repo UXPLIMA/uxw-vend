@@ -55,12 +55,8 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
-      # Lint runs in report-only mode for now. The existing codebase has
-      # React 19's new hook rules (set-state-in-effect, purity) triggering
-      # across pre-existing admin pages; migrating those is its own sweep.
-      # TypeScript + tests still hard-fail the job.
-      - name: Lint (report only)
-        run: npm run lint || true
+      - name: Lint
+        run: npm run lint --max-warnings=0
 
       - name: Security audit (fails on high/critical)
         run: npm audit --audit-level=high

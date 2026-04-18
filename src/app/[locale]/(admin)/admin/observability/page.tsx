@@ -97,12 +97,6 @@ export default function ObservabilityPage() {
         );
     }
 
-    const overallStatus = health?.status ?? "down";
-    const statusColor =
-        overallStatus === "ok" ? "text-emerald-500"
-            : overallStatus === "degraded" ? "text-amber-500"
-                : "text-rose-500";
-
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between">

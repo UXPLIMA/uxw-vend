@@ -56,7 +56,7 @@ export default function CronAdminPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         void fetchJobs();

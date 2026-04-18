@@ -23,7 +23,7 @@ export function AdminSearch() {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- debounced search, safe pattern
+         
         if (query.length < 2) { setResults([]); return; }
         const timer = setTimeout(() => {
             fetch(`/api/v1/admin/search?q=${encodeURIComponent(query)}`)
