@@ -1,15 +1,21 @@
 import { z } from "zod";
+import { checkPasswordPolicy, PASSWORD_POLICY } from "./password-policy";
 
 // ==================== AUTH SCHEMAS ====================
 
+// Login only checks presence. The strict policy runs on NEW / CHANGED
+// passwords — existing accounts whose password predates the policy bump
+// must still be able to sign in.
 export const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(100)
-        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Must contain at least one number"),
+    password: z.string().min(1, "Password is required").max(PASSWORD_POLICY.MAX_LENGTH),
+});
+
+const newPasswordSchema = z.string().superRefine((val, ctx) => {
+    const result = checkPasswordPolicy(val);
+    if (!result.ok) {
+        ctx.addIssue({ code: "custom", message: result.message ?? "Invalid password" });
+    }
 });
 
 export const registerSchema = z.object({
@@ -22,12 +28,7 @@ export const registerSchema = z.object({
             /^[a-zA-Z0-9_]+$/,
             "Username can only contain letters, numbers, and underscores"
         ),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(100)
-        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Must contain at least one number"),
+    password: newPasswordSchema,
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -51,12 +52,7 @@ export const updateUserSchema = z.object({
 
 export const updatePasswordSchema = z.object({
     currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(100)
-        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Must contain at least one number"),
+    newPassword: newPasswordSchema,
     confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",

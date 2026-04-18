@@ -13,6 +13,7 @@ import { incrementIndexDownloads } from "../_index-writer";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
+import { manifestHash } from "@/core/lib/module-install-audit";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -185,10 +186,25 @@ export async function POST(request: NextRequest) {
 
         // Create DB record
         const manifest = manifestData;
+        const installedAt = new Date();
+        const hash = manifestHash(manifest);
         await prisma.moduleConfig.upsert({
             where: { id: moduleId },
-            update: { name: manifest.name, enabled: true },
-            create: { id: moduleId, name: manifest.name, enabled: true },
+            update: {
+                name: manifest.name,
+                enabled: true,
+                manifestHash: hash,
+                installedAt,
+                installedByUserId: session.user.id,
+            },
+            create: {
+                id: moduleId,
+                name: manifest.name,
+                enabled: true,
+                manifestHash: hash,
+                installedAt,
+                installedByUserId: session.user.id,
+            },
         });
         await invalidateModuleCache();
 

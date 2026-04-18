@@ -9,8 +9,16 @@ import {
 } from '@/core/lib/validations';
 
 describe('loginSchema', () => {
+    // Login intentionally relaxed — legacy accounts whose passwords predate
+    // the current policy must still be able to sign in. Full policy applies
+    // to registration + password change + reset.
     it('accepts valid credentials', () => {
         const result = loginSchema.safeParse({ email: 'test@example.com', password: 'Password1' });
+        expect(result.success).toBe(true);
+    });
+
+    it('accepts legacy short passwords (pre-policy accounts)', () => {
+        const result = loginSchema.safeParse({ email: 'test@example.com', password: 'legacy' });
         expect(result.success).toBe(true);
     });
 
@@ -19,37 +27,28 @@ describe('loginSchema', () => {
         expect(result.success).toBe(false);
     });
 
-    it('rejects short password', () => {
-        const result = loginSchema.safeParse({ email: 'test@example.com', password: 'Ab1' });
+    it('rejects empty password', () => {
+        const result = loginSchema.safeParse({ email: 'test@example.com', password: '' });
         expect(result.success).toBe(false);
     });
 
-    it('rejects password without uppercase', () => {
-        const result = loginSchema.safeParse({ email: 'test@example.com', password: 'password1' });
-        expect(result.success).toBe(false);
-    });
-
-    it('rejects password without number', () => {
-        const result = loginSchema.safeParse({ email: 'test@example.com', password: 'Password' });
-        expect(result.success).toBe(false);
-    });
-
-    it('rejects password over 100 chars', () => {
-        const long = 'A1' + 'a'.repeat(99);
+    it('rejects password over 128 chars', () => {
+        const long = 'A1' + 'a'.repeat(129);
         const result = loginSchema.safeParse({ email: 'test@example.com', password: long });
         expect(result.success).toBe(false);
     });
 });
 
 describe('registerSchema', () => {
-    const valid = { email: 'user@test.com', username: 'player1', password: 'Secret99', confirmPassword: 'Secret99' };
+    // 10-char minimum per the updated password policy.
+    const valid = { email: 'user@test.com', username: 'player1', password: 'Secret9999', confirmPassword: 'Secret9999' };
 
     it('accepts valid registration', () => {
         expect(registerSchema.safeParse(valid).success).toBe(true);
     });
 
     it('rejects mismatched passwords', () => {
-        const result = registerSchema.safeParse({ ...valid, confirmPassword: 'Different1' });
+        const result = registerSchema.safeParse({ ...valid, confirmPassword: 'Different99' });
         expect(result.success).toBe(false);
     });
 
@@ -98,8 +97,8 @@ describe('updatePasswordSchema', () => {
     it('accepts valid password change', () => {
         const result = updatePasswordSchema.safeParse({
             currentPassword: 'old',
-            newPassword: 'NewPass99',
-            confirmPassword: 'NewPass99',
+            newPassword: 'NewPass9999',
+            confirmPassword: 'NewPass9999',
         });
         expect(result.success).toBe(true);
     });
@@ -107,8 +106,17 @@ describe('updatePasswordSchema', () => {
     it('rejects when confirm does not match', () => {
         const result = updatePasswordSchema.safeParse({
             currentPassword: 'old',
-            newPassword: 'NewPass99',
-            confirmPassword: 'Different1',
+            newPassword: 'NewPass9999',
+            confirmPassword: 'Different99',
+        });
+        expect(result.success).toBe(false);
+    });
+
+    it('rejects short new passwords via policy', () => {
+        const result = updatePasswordSchema.safeParse({
+            currentPassword: 'old',
+            newPassword: 'Short1A',
+            confirmPassword: 'Short1A',
         });
         expect(result.success).toBe(false);
     });

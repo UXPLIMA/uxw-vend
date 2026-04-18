@@ -16,6 +16,25 @@ const settingsBodySchema = z.record(settingKeySchema, z.unknown()).refine(
     { message: "Settings payload too large (max 100KB)" }
 );
 
+// Per-key max string length for public-facing settings. These values are
+// served to every visitor via /api/v1/public-settings, so a careless admin
+// (or a compromised account) could otherwise inflate the anonymous response
+// to tens of MB. Keys not listed here fall back to the 100KB overall cap.
+const PER_KEY_STRING_LIMITS: Record<string, number> = {
+    custom_css: 200_000,      // 200KB — stylesheets can be legitimately big
+    site_name: 100,
+    site_description: 500,
+    site_email: 254,
+    footer_text: 2_000,
+    hero_server_ip: 200,
+    hero_discord_url: 500,
+    hero_logo_url: 500,
+    hero_background_image: 2_000,
+    hero_logo_image: 2_000,
+    currency: 16,
+    currency_symbol: 8,
+};
+
 // GET /api/v1/settings
 export async function GET() {
     const session = await auth();
@@ -60,6 +79,18 @@ export async function PATCH(request: NextRequest) {
             { error: "Invalid settings data", issues: parsed.error.issues },
             { status: 400 }
         );
+    }
+
+    // Pre-flight per-key string length cap. Enforced BEFORE any writes so a
+    // rejection doesn't leave the DB with a mix of accepted + rejected keys.
+    for (const [key, rawValue] of Object.entries(parsed.data)) {
+        const limit = PER_KEY_STRING_LIMITS[key];
+        if (typeof rawValue === "string" && limit !== undefined && rawValue.length > limit) {
+            return NextResponse.json(
+                { error: `Setting "${key}" exceeds the ${limit}-character limit` },
+                { status: 400 },
+            );
+        }
     }
 
     // Upsert each setting. Setting.value is Json; cast through InputJsonValue.

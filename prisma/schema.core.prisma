@@ -163,6 +163,13 @@ model ModuleConfig {
   enabled   Boolean  @default(true)
   config    Json     @default("{}")
   order     Int      @default(0)
+  // Tamper-evidence for installed modules: SHA-256 of the module.json
+  // bytes at install/update time + who installed it + when. Ops can
+  // diff the on-disk manifest against `manifestHash` to detect an
+  // out-of-band edit (dev box, compromised deploy, etc.).
+  manifestHash      String?
+  installedAt       DateTime?
+  installedByUserId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

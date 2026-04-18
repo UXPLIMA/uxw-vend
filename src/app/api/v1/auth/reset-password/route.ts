@@ -5,6 +5,7 @@ import { createHash } from "crypto";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
+import { checkPasswordPolicy } from "@/core/lib/password-policy";
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
@@ -28,14 +29,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        if (password.length < 8) {
-            return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
-        }
-        if (!/[A-Z]/.test(password)) {
-            return NextResponse.json({ error: "Password must contain at least one uppercase letter" }, { status: 400 });
-        }
-        if (!/[0-9]/.test(password)) {
-            return NextResponse.json({ error: "Password must contain at least one number" }, { status: 400 });
+        const policyCheck = checkPasswordPolicy(password);
+        if (!policyCheck.ok) {
+            return NextResponse.json(
+                { error: policyCheck.message ?? "Invalid password" },
+                { status: 400 },
+            );
         }
 
         // The DB stores the SHA-256 digest of the plaintext reset token we

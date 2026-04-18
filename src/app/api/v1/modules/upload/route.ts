@@ -11,6 +11,7 @@ import { acquireInstallLock } from "@/core/lib/install-lock";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
+import { manifestHash } from "@/core/lib/module-install-audit";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const RESERVED_IDS = new Set([
@@ -178,10 +179,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Module has errors — registry generation failed" + detail }, { status: 400 });
         }
 
+        const installedAt = new Date();
+        const hash = manifestHash(manifest);
         await prisma.moduleConfig.upsert({
             where: { id: manifest.id },
-            update: { name: manifest.name },
-            create: { id: manifest.id, name: manifest.name, enabled: false },
+            update: {
+                name: manifest.name,
+                manifestHash: hash,
+                installedAt,
+                installedByUserId: session.user.id,
+            },
+            create: {
+                id: manifest.id,
+                name: manifest.name,
+                enabled: false,
+                manifestHash: hash,
+                installedAt,
+                installedByUserId: session.user.id,
+            },
         });
 
         return NextResponse.json({
