@@ -5,6 +5,7 @@ import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "n
 import { themeRegistry, defaultThemeId as REGISTRY_DEFAULT } from "@/core/generated/theme-registry";
 import { ThemeConfigProvider } from "@/core/lib/theme-config-client";
 import type { ThemeManifest } from "@/core/lib/theme-manifest-schema";
+import { applyOverrides } from "@/core/components/admin/theme-customizer/diff";
 
 interface ThemeContextType {
     activeTheme: ThemeManifest | null;
@@ -54,6 +55,7 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
         if (typeof window === "undefined") return;
         if (window.parent === window) return;
         const handler = (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) return;
             if (event.data?.type === "uxwvend:theme-preview" && typeof event.data.overrides === "object") {
                 setPreviewOverrides(event.data.overrides as Record<string, unknown>);
             }
@@ -65,7 +67,7 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
     }, []);
 
     const effectiveConfig = useMemo<Record<string, unknown>>(
-        () => previewOverrides ? { ...(serverConfig ?? {}), ...previewOverrides } : (serverConfig ?? {}),
+        () => previewOverrides ? applyOverrides(serverConfig ?? {}, previewOverrides) : (serverConfig ?? {}),
         [serverConfig, previewOverrides],
     );
 
