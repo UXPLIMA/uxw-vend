@@ -180,7 +180,7 @@ function generateRegistry() {
         return out;
     }
 
-    let widgetImports = emitDynamicRegistry('Widget component registry', 'WidgetComponentRegistry', allWidgets);
+    const widgetImports = emitDynamicRegistry('Widget component registry', 'WidgetComponentRegistry', allWidgets);
     let homepageSectionImports = emitDynamicRegistry('Homepage section component registry', 'HomepageSectionRegistry', allHomepageSections);
     homepageSectionImports += `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
 
