@@ -1,6 +1,7 @@
 node_modules
 .next
 .git
+.github
 .env
 .env.*
 !.env.example
@@ -9,3 +10,31 @@ backups/
 *.sql.gz
 coverage/
 .claude/
+.vscode/
+.idea/
+
+# Runtime state — never bake into the image.
+src/modules/*
+!src/modules/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep
+messages/
+
+# Generated output — builder regenerates them.
+prisma/schema.prisma
+src/core/generated/
+src/generated/
+
+# Test artifacts.
+tests/
+playwright-report/
+test-results/
+*.spec.ts
+*.test.ts
+
+# Docs + specs.
+docs/superpowers/
+CLAUDE.md
+COMPETITOR_ANALYSIS.md
+QUALITY_ANALYSIS.md
+ROADMAP.md

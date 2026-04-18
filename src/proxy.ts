@@ -11,6 +11,7 @@ import prisma from '@/core/lib/db';
 import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
 import { getModuleStates } from '@/core/lib/module-cache';
 import { checkCsrf } from '@/core/lib/csrf';
+import { runWithLogContext } from '@/core/lib/logger';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -120,9 +121,7 @@ async function getSessionRole(request: NextRequest): Promise<string> {
     }
 }
 
-export async function proxy(request: NextRequest) {
-    // Inject correlation ID for request tracking
-    const correlationId = request.headers.get('x-correlation-id') || randomUUID();
+async function proxyImpl(request: NextRequest, correlationId: string): Promise<NextResponse> {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-correlation-id', correlationId);
 
@@ -276,6 +275,15 @@ export async function proxy(request: NextRequest) {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     response.headers.set('x-correlation-id', correlationId);
     return response;
+}
+
+export async function proxy(request: NextRequest) {
+    // Mint the request's correlation id and bind it to an async-local
+    // context so any nested `log.info(...)` / `log.error(...)` call —
+    // including those running inside module hooks or awaited handlers —
+    // automatically tags its output with this id. See core/lib/logger.ts.
+    const correlationId = request.headers.get('x-correlation-id') || randomUUID();
+    return runWithLogContext({ correlationId }, () => proxyImpl(request, correlationId));
 }
 
 export const config = {

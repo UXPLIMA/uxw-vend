@@ -12,7 +12,7 @@ const orderUpdateSchema = z.object({
 type RouteParams = { params: Promise<{ id: string }> };
 
 // GET /api/v1/store/orders/[id] - Get single order
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(_request: NextRequest, { params }: RouteParams) {
     try {
         const session = await auth();
 
@@ -22,13 +22,35 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         const { id } = await params;
 
-        const order = await prisma.order.findFirst({
-            where: {
-                OR: [{ id }, { orderNumber: id }],
-            },
+        // First-pass fetch just enough to decide ownership. We defer the
+        // expensive include until after the permission check so an attacker
+        // who guesses another user's order id can't even elicit a latency
+        // signal from the payments join.
+        const ownership = await prisma.order.findFirst({
+            where: { OR: [{ id }, { orderNumber: id }] },
+            select: { id: true, userId: true },
+        });
+        if (!ownership) {
+            return NextResponse.json({ error: "Order not found" }, { status: 404 });
+        }
+
+        const adminCheck = await isAdmin(session.user.id);
+        const isOwner = ownership.userId === session.user.id;
+        if (!adminCheck && !isOwner) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
+        // Safe projection for the full payload. `Payment.metadata` is the
+        // raw provider webhook body (can include PANs / PII / tokens) so we
+        // never echo it to the client — only the summary fields go out.
+        // The `user.email` field is restricted to admins.
+        const order = await prisma.order.findUnique({
+            where: { id: ownership.id },
             include: {
                 user: {
-                    select: { id: true, username: true, email: true, avatar: true },
+                    select: adminCheck
+                        ? { id: true, username: true, email: true, avatar: true }
+                        : { id: true, username: true, avatar: true },
                 },
                 items: {
                     include: {
@@ -37,19 +59,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                         },
                     },
                 },
-                payments: true,
+                payments: {
+                    select: {
+                        id: true,
+                        amount: true,
+                        currency: true,
+                        status: true,
+                        provider: true,
+                        providerId: adminCheck,
+                        createdAt: true,
+                    },
+                },
             },
         });
-
-        if (!order) {
-            return NextResponse.json({ error: "Order not found" }, { status: 404 });
-        }
-
-        // Check permission
-        const adminCheck = await isAdmin(session.user.id);
-        if (!adminCheck && order.userId !== session.user.id) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-        }
 
         return NextResponse.json({ order });
     } catch (error) {

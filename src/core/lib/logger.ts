@@ -1,10 +1,16 @@
 /**
  * Structured logger with correlation ID support.
  * Outputs JSON lines in production, pretty-prints in dev.
+ *
+ * Correlation IDs propagate through an AsyncLocalStorage bound in the
+ * proxy middleware (see src/proxy.ts). Any nested log call — even from
+ * a module hook running inside doActionAsync — automatically picks up
+ * the id of the request that triggered it.
  */
 
 import { randomUUID } from "crypto";
 import { headers } from "next/headers";
+import { AsyncLocalStorage } from "async_hooks";
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -58,6 +64,28 @@ function emit(entry: LogEntry) {
     }
 }
 
+interface LogContext {
+    correlationId: string;
+    userId?: string;
+}
+
+const logContext = new AsyncLocalStorage<LogContext>();
+
+/**
+ * Run a callback inside a logger context so every nested log() call
+ * automatically tags output with the supplied correlation id. The proxy
+ * middleware wraps each request in this; route handlers and background
+ * hooks just call `log.info(...)` and get the id for free.
+ */
+export function runWithLogContext<T>(ctx: LogContext, fn: () => T): T {
+    return logContext.run(ctx, fn);
+}
+
+/** Peek at the current async-local log context, if any. */
+export function currentLogContext(): LogContext | undefined {
+    return logContext.getStore();
+}
+
 /** Get or create correlation ID from request headers */
 export async function getCorrelationId(): Promise<string> {
     try {
@@ -67,6 +95,31 @@ export async function getCorrelationId(): Promise<string> {
         return randomUUID();
     }
 }
+
+/**
+ * Module-level structured logger. Uses AsyncLocalStorage to pick up the
+ * active request's correlation id when one is set. Falls back to a fresh
+ * uuid outside a request context (e.g. scheduler ticks) — consumers can
+ * override with an explicit `correlationId` in the extras bag.
+ */
+function logWithContext(level: LogLevel, message: string, extra?: Record<string, unknown>): void {
+    const ctx = logContext.getStore();
+    emit({
+        level,
+        message,
+        timestamp: new Date().toISOString(),
+        correlationId: ctx?.correlationId,
+        userId: ctx?.userId,
+        ...extra,
+    });
+}
+
+export const log = {
+    debug: (msg: string, extra?: Record<string, unknown>) => logWithContext("debug", msg, extra),
+    info: (msg: string, extra?: Record<string, unknown>) => logWithContext("info", msg, extra),
+    warn: (msg: string, extra?: Record<string, unknown>) => logWithContext("warn", msg, extra),
+    error: (msg: string, extra?: Record<string, unknown>) => logWithContext("error", msg, extra),
+};
 
 /** Create a logger scoped to a correlation ID (sync — pass correlationId for best results) */
 export function createLogger(correlationId?: string) {
