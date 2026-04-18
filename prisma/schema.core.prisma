@@ -56,6 +56,8 @@ model User {
   conversations    ConversationParticipant[] @relation("ConversationMember")
   messages         Message[]          @relation("MessageAuthor")
   loginSessions    UserSession[]      @relation("UserSessions")
+  themesInstalled       Theme[]              @relation("ThemeInstaller")
+  themeCustomizations   ThemeCustomization[] @relation("ThemeCustomizationUpdater")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -172,6 +174,45 @@ model ModuleConfig {
   installedByUserId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ThemeType {
+  LIGHT
+  DARK
+}
+
+/// Registered theme — one row per `src/themes/<id>/theme.json` installed on this instance.
+model Theme {
+  id                String   @id
+  name              String
+  version           String
+  parent            String?
+  type              ThemeType @default(LIGHT)
+  manifestHash      String
+  installedAt       DateTime @default(now())
+  installedById     String?
+  installedBy       User?    @relation("ThemeInstaller", fields: [installedById], references: [id], onDelete: SetNull)
+  updatedAt         DateTime @updatedAt
+
+  customizations ThemeCustomization[]
+
+  @@index([parent])
+}
+
+/// Admin customization for a theme. One row per theme; `overrides` is a
+/// DIFF against the manifest defaults, not a full snapshot — resetting a
+/// field clears it from `overrides`, and deleting the row restores
+/// every default at once.
+model ThemeCustomization {
+  id        String   @id @default(cuid())
+  themeId   String
+  theme     Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  overrides Json     @default("{}")
+  updatedById String?
+  updatedBy   User?    @relation("ThemeCustomizationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedAt DateTime @updatedAt
+
+  @@unique([themeId])
 }
 
 // Tracks every module install (or update) event — used to compute the
