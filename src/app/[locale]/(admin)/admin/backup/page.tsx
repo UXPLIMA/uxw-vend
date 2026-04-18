@@ -1,0 +1,375 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Button } from "@/core/components/ui/button";
+import { Input } from "@/core/components/ui/input";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import {
+    Database,
+    Download,
+    Trash2,
+    RotateCcw,
+    Loader2,
+    RefreshCw,
+    Clock,
+    Plus,
+    AlertTriangle,
+} from "lucide-react";
+
+interface BackupRow {
+    id: string;
+    filename: string;
+    type: "manual" | "scheduled";
+    sizeBytes: number;
+    sizeHuman: string;
+    createdAt: string;
+    notes: string | null;
+}
+
+interface CronRow {
+    key: string;
+    schedule: string;
+    lastRunAt: string | null;
+    nextRunAt: string | null;
+}
+
+function formatBytes(bytes: number): string {
+    if (!bytes) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+    return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
+function formatDate(value: string | null): string {
+    if (!value) return "—";
+    return new Date(value).toLocaleString();
+}
+
+function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: string }) {
+    const cls = type === "manual"
+        ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+        : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
+    return (
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-mono ${cls}`}>
+            {label}
+        </span>
+    );
+}
+
+export default function BackupAdminPage() {
+    const t = useTranslations("admin");
+    const [backups, setBackups] = useState<BackupRow[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [creating, setCreating] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [restoringId, setRestoringId] = useState<string | null>(null);
+    const [nextScheduled, setNextScheduled] = useState<string | null>(null);
+    const [lastScheduled, setLastScheduled] = useState<string | null>(null);
+    const [restoreTarget, setRestoreTarget] = useState<BackupRow | null>(null);
+    const [restoreText, setRestoreText] = useState("");
+    const { confirm } = useConfirm();
+
+    const fetchBackups = useCallback(async () => {
+        try {
+            const res = await fetch("/api/v1/admin/backup");
+            if (!res.ok) {
+                toast.error(t("backup_loadFailed"));
+                return;
+            }
+            const data = await res.json();
+            setBackups(data.backups || []);
+        } catch {
+            toast.error(t("backup_loadFailed"));
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchCronInfo = useCallback(async () => {
+        try {
+            const res = await fetch("/api/v1/admin/cron");
+            if (!res.ok) return;
+            const data = await res.json();
+            const job = (data.jobs as CronRow[] | undefined)?.find((j) => j.key === "core:automated-backup");
+            if (job) {
+                setNextScheduled(job.nextRunAt);
+                setLastScheduled(job.lastRunAt);
+            }
+        } catch {
+            // non-fatal
+        }
+    }, []);
+
+    useEffect(() => {
+        void fetchBackups();
+        void fetchCronInfo();
+    }, [fetchBackups, fetchCronInfo]);
+
+    const lastBackupAt = backups.length > 0 ? backups[0].createdAt : null;
+
+    const handleCreate = async () => {
+        setCreating(true);
+        try {
+            const res = await fetch("/api/v1/admin/backup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(`Backup created: ${data.backup?.sizeHuman ?? ""}`);
+                await fetchBackups();
+            } else {
+                toast.error(data.error || t("backup_backupFailed"));
+            }
+        } catch {
+            toast.error(t("backup_backupFailed"));
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const handleDelete = async (row: BackupRow) => {
+        const ok = await confirm({
+            title: t("backup_deleteTitle"),
+            message: `Permanently delete "${row.filename}"? This cannot be undone.`,
+            variant: "danger",
+            confirmText: "Delete",
+        });
+        if (!ok) return;
+        setDeletingId(row.id);
+        try {
+            const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(row.id)}`, { method: "DELETE" });
+            if (res.ok) {
+                toast.success(t("backup_deleted"));
+                await fetchBackups();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.error || t("backup_deleteFailed"));
+            }
+        } catch {
+            toast.error(t("backup_deleteFailed"));
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleDownload = (row: BackupRow) => {
+        window.location.href = `/api/v1/admin/backup/${encodeURIComponent(row.id)}/download`;
+    };
+
+    const openRestoreDialog = (row: BackupRow) => {
+        setRestoreTarget(row);
+        setRestoreText("");
+    };
+
+    const closeRestoreDialog = () => {
+        setRestoreTarget(null);
+        setRestoreText("");
+    };
+
+    const handleRestore = async () => {
+        if (!restoreTarget || restoreText !== "RESTORE") return;
+        const target = restoreTarget;
+        setRestoringId(target.id);
+        closeRestoreDialog();
+        try {
+            const res = await fetch(`/api/v1/admin/backup/${encodeURIComponent(target.id)}/restore`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ confirmText: "RESTORE" }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success(t("backup_restored"));
+            } else {
+                toast.error(data.error || t("backup_restoreFailed"));
+            }
+        } catch {
+            toast.error(t("backup_restoreFailed"));
+        } finally {
+            setRestoringId(null);
+            await fetchBackups();
+        }
+    };
+
+    return (
+        <>
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <h1 className="text-xl font-semibold">
+                        {t("sidebar_backup")}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">{t("backup_description")}</p>
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => { void fetchBackups(); void fetchCronInfo(); }} disabled={loading}>
+                        <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                        {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
+                    </Button>
+                    <Button onClick={handleCreate} disabled={creating}>
+                        {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+                        {t("backup_createNow")}
+                    </Button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <Card>
+                    <CardHeader className="p-4">
+                        <CardTitle className="text-xs text-muted-foreground uppercase tracking-wide">{t("backup_totalBackups")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                        <div className="text-2xl font-bold">{backups.length}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="p-4">
+                        <CardTitle className="text-xs text-muted-foreground uppercase tracking-wide">{t("backup_lastBackup")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                        <div className="text-sm font-medium">{formatDate(lastBackupAt)}</div>
+                        {lastScheduled && (
+                            <div className="text-xs text-muted-foreground mt-1">{t("backup_lastScheduled")}: {formatDate(lastScheduled)}</div>
+                        )}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="p-4">
+                        <CardTitle className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> {t("backup_nextScheduled")}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                        <div className="text-sm font-medium">{formatDate(nextScheduled)}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{t("backup_runsDaily")}</div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {loading && backups.length === 0 ? (
+                <div className="flex justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </div>
+            ) : backups.length === 0 ? (
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <Database className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                        <p className="text-sm text-muted-foreground">{t("backup_noBackups")}</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Card>
+                    <CardContent className="p-0 overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                                <tr>
+                                    <th className="px-4 py-3 font-medium">{t("backup_filename")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("backup_type")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("backup_size")}</th>
+                                    <th className="px-4 py-3 font-medium">{t("backup_created")}</th>
+                                    <th className="px-4 py-3 font-medium text-right">{t("backup_actions")}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {backups.map((row) => (
+                                    <tr key={row.id} className="border-t border-border">
+                                        <td className="px-4 py-3 font-mono text-xs break-all">{row.filename}</td>
+                                        <td className="px-4 py-3"><TypeBadge type={row.type} label={row.type === "manual" ? t("backup_manual") : t("backup_scheduled")} /></td>
+                                        <td className="px-4 py-3 text-muted-foreground">{row.sizeHuman || formatBytes(row.sizeBytes)}</td>
+                                        <td className="px-4 py-3 text-muted-foreground">{formatDate(row.createdAt)}</td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleDownload(row)}
+                                                    title={t("backup_download")}
+                                                >
+                                                    <Download className="w-3 h-3" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => openRestoreDialog(row)}
+                                                    disabled={restoringId === row.id}
+                                                    title={t("backup_restore")}
+                                                >
+                                                    {restoringId === row.id
+                                                        ? <Loader2 className="w-3 h-3 animate-spin" />
+                                                        : <RotateCcw className="w-3 h-3" />}
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(row)}
+                                                    disabled={deletingId === row.id}
+                                                    title={t("common_delete")}
+                                                >
+                                                    {deletingId === row.id
+                                                        ? <Loader2 className="w-3 h-3 animate-spin" />
+                                                        : <Trash2 className="w-3 h-3" />}
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </CardContent>
+                </Card>
+            )}
+
+            {restoreTarget && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center" role="presentation">
+                    <div className="fixed inset-0 bg-black/60" onClick={closeRestoreDialog} aria-hidden="true" />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="restore-title"
+                        className="relative bg-card border border-[var(--ux-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
+                    >
+                        <div className="flex items-start gap-4 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 dark:bg-red-950">
+                                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" aria-hidden="true" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 id="restore-title" className="font-semibold text-foreground mb-1">{t("backup_restoreTitle")}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {t("backup_restoreWarning")}
+                                    {" "}<span className="font-mono text-xs break-all">{restoreTarget.filename}</span>.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="restore-confirm" className="block text-xs text-muted-foreground mb-1">
+                                {t("backup_restoreConfirmLabel")}
+                            </label>
+                            <Input
+                                id="restore-confirm"
+                                autoFocus
+                                value={restoreText}
+                                onChange={(e) => setRestoreText(e.target.value)}
+                                placeholder="RESTORE"
+                            />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={closeRestoreDialog}>{t("common_cancel")}</Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleRestore}
+                                disabled={restoreText !== "RESTORE"}
+                            >
+                                {t("backup_restoreTitle")}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}

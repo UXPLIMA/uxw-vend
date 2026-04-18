@@ -26,7 +26,12 @@
 !theme-marketplace/*.zip
 *.tar.gz
 *.rar
-backup*
+# Backup dump files written to the repo root (e.g. uxwvend-scheduled-*.sql.gz).
+# Keep this ANCHORED to the root so it doesn't accidentally swallow
+# src/core/lib/backup.ts and similar first-party source files.
+/backup*.sql.gz
+/backup*.tar.gz
+/backup*.zip
 
 # debug
 npm-debug.log*

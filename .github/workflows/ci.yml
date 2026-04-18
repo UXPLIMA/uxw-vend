@@ -46,8 +46,11 @@ jobs:
       - name: Merge Prisma schema + generate client
         run: npx tsx scripts/merge-schemas.ts
 
-      - name: Generate themes & registry
-        run: npm run generate:themes && npx tsx scripts/generate-registry.ts
+      - name: Generate themes & registry & openapi
+        run: |
+          npm run generate:themes
+          npx tsx scripts/generate-registry.ts
+          npx tsx scripts/generate-openapi.ts
 
       - name: TypeScript check
         run: npx tsc --noEmit
