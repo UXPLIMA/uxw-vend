@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, ExternalLink, Gift } from "lucide-react";
 import { toast } from "sonner";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface VoteSite {
     id: string;
@@ -47,7 +48,7 @@ export default function VotePage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-2xl">

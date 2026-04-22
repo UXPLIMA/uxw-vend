@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -9,6 +9,7 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface FormField {
     name: string;
@@ -93,7 +94,7 @@ export default function FormPage({ params }: PageProps) {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-2xl">

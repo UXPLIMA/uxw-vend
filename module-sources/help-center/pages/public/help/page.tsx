@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Category {
     id: string;
@@ -63,7 +64,7 @@ export default function HelpCenterPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

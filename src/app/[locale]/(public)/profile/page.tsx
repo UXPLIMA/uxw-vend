@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -22,6 +22,7 @@ import { NotificationPrefsTab } from "@/core/components/profile/NotificationPref
 import { MessagesTab } from "@/core/components/profile/MessagesTab";
 import { SessionsTab } from "@/core/components/profile/SessionsTab";
 import { ActivityTab } from "@/core/components/profile/ActivityTab";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface UserProfile {
     id: string;
@@ -211,7 +212,7 @@ export default function ProfilePage() {
     if (authStatus === "loading" || loading) {
         return (
             <div className="min-h-screen flex flex-col bg-background">
-                <HeroBanner />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
                 <Navbar />
                 <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label={t("loadingProfile")} />
@@ -237,7 +238,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-4xl">

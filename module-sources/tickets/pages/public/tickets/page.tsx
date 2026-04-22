@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { formatRelativeTime } from "@/core/lib/utils";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Ticket {
     id: string;
@@ -58,7 +59,7 @@ export default function SupportPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

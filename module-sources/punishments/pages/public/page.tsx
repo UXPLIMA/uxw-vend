@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface PunishmentItem {
     id: string;
@@ -58,7 +59,7 @@ export default function PunishmentsPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">

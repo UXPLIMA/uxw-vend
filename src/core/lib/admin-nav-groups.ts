@@ -45,7 +45,6 @@ import {
     KeyRound,
     FileJson,
     ImageIcon,
-    Paintbrush,
     Navigation,
     PanelBottom,
     LayoutGrid,
@@ -161,14 +160,13 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Palette,
         label: "Design",
         labelKey: "sidebar_design",
-        pathPrefix: ["/admin/settings/theme", "/admin/settings/customizer", "/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/hero", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
+        pathPrefix: ["/admin/settings/theme", "/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
         sections: [
             {
                 header: "Appearance",
                 headerKey: "sidebar_appearance",
                 items: [
                     { href: "/admin/settings/theme", label: "Theme", labelKey: "sidebar_theme", icon: Palette },
-                    { href: "/admin/settings/customizer", label: "Customizer", labelKey: "sidebar_customizer", icon: Paintbrush },
                     { href: "/admin/settings/css", label: "Custom CSS", labelKey: "sidebar_customCss", icon: Code },
                 ],
             },
@@ -178,7 +176,6 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 items: [
                     { href: "/admin/settings/navbar", label: "Navbar", labelKey: "sidebar_navbar", icon: Navigation },
                     { href: "/admin/settings/footer", label: "Footer", labelKey: "sidebar_footer", icon: PanelBottom },
-                    { href: "/admin/settings/hero", label: "Hero Banner", labelKey: "sidebar_heroBanner", icon: ImageIcon },
                     { href: "/admin/settings/widgets", label: "Widgets", labelKey: "sidebar_widgets", icon: LayoutGrid },
                 ],
             },

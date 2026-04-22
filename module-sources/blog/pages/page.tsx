@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { NewsGrid } from "../components/news-grid";
 import { getTranslations } from "next-intl/server";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export const revalidate = 60;
 
@@ -37,7 +38,7 @@ export default async function BlogPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

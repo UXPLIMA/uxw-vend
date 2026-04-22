@@ -1,15 +1,16 @@
 "use client";
 
 import { Link } from "@/core/lib/i18n/navigation";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export default function OrderSuccessPage() {
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-12 flex-1 flex items-center justify-center">

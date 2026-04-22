@@ -3,11 +3,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Slot } from "@/core/components/Slot";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { buildArticleJsonLd } from "@/core/lib/seo";
 import { CommentSection } from "../../components/CommentSection";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface PageProps {
     params: Promise<Record<string, unknown>>;
@@ -95,7 +96,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: articleJsonLd }}
             />
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

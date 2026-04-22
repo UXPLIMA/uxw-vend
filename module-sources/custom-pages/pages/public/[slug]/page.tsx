@@ -4,10 +4,11 @@ import { useState, useEffect, use } from "react";
 import DOMPurify from "dompurify";
 import { Render, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -38,7 +39,7 @@ export default function CustomPageView({ params }: PageProps) {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">

@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Link } from "@/core/lib/i18n/navigation";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { ArrowLeft, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { formatRelativeTime } from "@/core/lib/utils";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Post {
     id: string;
@@ -114,7 +115,7 @@ export default function TopicDetailPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">

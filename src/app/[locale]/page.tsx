@@ -1,13 +1,14 @@
 "use client";
 
 import { Link } from "@/core/lib/i18n/navigation";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { ModuleWidgets, WidgetComponentRegistry, ModuleHomepageSections, HomepageSectionRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export default function HomePage() {
   const commonT = useTranslations('common');
@@ -28,7 +29,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <HeroBanner />
+      <ThemeComponentSlot name="Hero" fallback={() => null} />
       <Navbar />
 
       <main className="container mx-auto px-4 py-6 flex-1">

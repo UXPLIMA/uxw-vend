@@ -9,9 +9,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { useCurrency } from "../../../../lib/currency-context";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Product {
     id: string;
@@ -143,7 +144,7 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <HeroBanner />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -156,7 +157,7 @@ export default function ProductDetailPage() {
     if (error || !product) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <HeroBanner />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <div className="text-center">
@@ -179,7 +180,7 @@ export default function ProductDetailPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "../../lib/currency-context";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 interface Category {
     id: string;
     name: string;
@@ -125,7 +126,7 @@ export default function StorePage() {
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             {/* Shared Hero Banner */}
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
 
             {/* Shared Navbar */}
             <Navbar />

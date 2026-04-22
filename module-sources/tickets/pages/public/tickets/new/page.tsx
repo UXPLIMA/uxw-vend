@@ -7,8 +7,9 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Department {
     id: string;
@@ -68,7 +69,7 @@ export default function NewTicketPage() {
     if (!session?.user) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <HeroBanner />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
@@ -85,7 +86,7 @@ export default function NewTicketPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

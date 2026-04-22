@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
 import { Check, X, Crown, Loader2 } from "lucide-react";
 import { useCurrency } from "../../../lib/currency-context";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Product {
     id: string;
@@ -50,7 +51,7 @@ export default function VipTablePage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <HeroBanner />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -72,7 +73,7 @@ export default function VipTablePage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <HeroBanner />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
