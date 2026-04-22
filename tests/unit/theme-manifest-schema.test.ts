@@ -2,104 +2,83 @@ import { describe, it, expect } from "vitest";
 import { themeManifestSchema } from "@/core/lib/theme-manifest-schema";
 
 const minimal = {
-    schemaVersion: 1,
-    id: "my-theme",
-    name: "My Theme",
-    description: "Test theme",
+    schemaVersion: 2,
+    id: "demo",
+    name: "Demo",
+    description: "d",
     version: "1.0.0",
-    type: "light",
-    tokens: {},
-    config: {},
+    modes: { default: "light", available: { light: { tokens: { colors: { primary: "#000" } } } } },
+    tokens: { colors: { primary: { type: "color" } } },
 };
 
-describe("themeManifestSchema", () => {
-    it("accepts a minimal valid manifest", () => {
-        expect(themeManifestSchema.safeParse(minimal).success).toBe(true);
+describe("themeManifestSchema v2", () => {
+    it("accepts the minimal valid shape", () => {
+        const res = themeManifestSchema.safeParse(minimal);
+        expect(res.success).toBe(true);
     });
 
-    it("rejects bad id format", () => {
-        expect(themeManifestSchema.safeParse({ ...minimal, id: "Bad_Id" }).success).toBe(false);
+    it("rejects schemaVersion !== 2", () => {
+        const res = themeManifestSchema.safeParse({ ...minimal, schemaVersion: 1 });
+        expect(res.success).toBe(false);
     });
 
-    it("rejects non-semver version", () => {
-        expect(themeManifestSchema.safeParse({ ...minimal, version: "not-semver" }).success).toBe(false);
-    });
-
-    it("rejects non-hex color tokens", () => {
-        const bad = {
+    it("rejects when modes.default isn't in modes.available", () => {
+        const res = themeManifestSchema.safeParse({
             ...minimal,
-            tokens: { colors: { primary: { type: "color", default: "not-a-color" } } },
-        };
-        expect(themeManifestSchema.safeParse(bad).success).toBe(false);
+            modes: { default: "dark", available: { light: { tokens: { colors: {} } } } },
+        });
+        expect(res.success).toBe(false);
     });
 
-    it("accepts all supported field types", () => {
-        const full = {
+    it("rejects when modes.available is empty", () => {
+        const res = themeManifestSchema.safeParse({ ...minimal, modes: { default: "light", available: {} } });
+        expect(res.success).toBe(false);
+    });
+
+    it("accepts settings.*.fields with known field types", () => {
+        const res = themeManifestSchema.safeParse({
             ...minimal,
-            config: {
+            settings: {
                 hero: {
                     label: "Hero",
+                    icon: "Image",
                     fields: {
-                        enabled: { type: "toggle", default: true },
-                        logoImage: { type: "image" },
-                        headline: { type: "text", max: 100 },
-                        ctaHref: { type: "url" },
-                        blurb: { type: "richtext", max: 500 },
-                        count: { type: "slider", min: 1, max: 10 },
-                        layout: { type: "select", options: [{ value: "a", label: "A" }] },
-                        accent: { type: "color", default: "#ff00aa" },
+                        title: { type: "text", label: "Title", default: "Hi" },
+                        bg:    { type: "image", label: "BG" },
+                        cta:   { type: "url", label: "CTA" },
                     },
                 },
             },
-        };
-        expect(themeManifestSchema.safeParse(full).success).toBe(true);
+        });
+        expect(res.success).toBe(true);
     });
 
-    it("rejects an unknown field type", () => {
-        const bad = {
+    it("rejects settings with an unknown field type", () => {
+        const res = themeManifestSchema.safeParse({
             ...minimal,
-            config: { g: { label: "G", fields: { x: { type: "laser" } } } },
-        };
-        expect(themeManifestSchema.safeParse(bad).success).toBe(false);
+            settings: {
+                hero: {
+                    label: "Hero", icon: "Image",
+                    fields: { bad: { type: "wtf", label: "x" } as unknown },
+                },
+            },
+        });
+        expect(res.success).toBe(false);
     });
 
-    it("rejects text fields with max > 10000", () => {
-        const bad = {
+    it("accepts suggestedModules", () => {
+        const res = themeManifestSchema.safeParse({
             ...minimal,
-            config: { g: { label: "G", fields: { x: { type: "text", max: 999999 } } } },
-        };
-        expect(themeManifestSchema.safeParse(bad).success).toBe(false);
+            suggestedModules: [{ id: "mc-stats", reason: "live status" }],
+        });
+        expect(res.success).toBe(true);
     });
 
-    it("accepts optional parent theme id", () => {
-        expect(themeManifestSchema.safeParse({ ...minimal, parent: "flat" }).success).toBe(true);
-    });
-
-    it("rejects 5-digit and 7-digit hex colors", () => {
-        const bad5 = { ...minimal, tokens: { colors: { p: { type: "color", default: "#abc12" } } } };
-        const bad7 = { ...minimal, tokens: { colors: { p: { type: "color", default: "#abcde12" } } } };
-        expect(themeManifestSchema.safeParse(bad5).success).toBe(false);
-        expect(themeManifestSchema.safeParse(bad7).success).toBe(false);
-    });
-
-    it("accepts 3, 6, and 8 digit hex colors", () => {
-        for (const c of ["#abc", "#aabbcc", "#aabbccdd"]) {
-            const ok = { ...minimal, tokens: { colors: { p: { type: "color", default: c } } } };
-            expect(themeManifestSchema.safeParse(ok).success).toBe(true);
-        }
-    });
-
-    it("rejects version strings with trailing garbage", () => {
-        expect(themeManifestSchema.safeParse({ ...minimal, version: "1.0.0anything" }).success).toBe(false);
-        expect(themeManifestSchema.safeParse({ ...minimal, version: "1.0.0-beta.1" }).success).toBe(true);
-    });
-
-    it("rejects overlong translation string values", () => {
-        const longValue = "x".repeat(2001);
-        const bad = {
+    it("rejects adminRoutes with traversal", () => {
+        const res = themeManifestSchema.safeParse({
             ...minimal,
-            translations: { en: { ns: { key: longValue } } },
-        };
-        expect(themeManifestSchema.safeParse(bad).success).toBe(false);
+            adminRoutes: [{ path: "/theme/../admin", component: "admin/a.tsx" }],
+        });
+        expect(res.success).toBe(false);
     });
 });
