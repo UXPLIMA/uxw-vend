@@ -15,6 +15,10 @@ import { prisma } from "../src/core/lib/db";
 
 async function main() {
     // 1. Backfill customization mode (rows created before mode column existed)
+    // Raw SQL: `prisma db push` adds `mode` as a NOT NULL column with no
+    // default, so existing rows land with empty string or NULL depending
+    // on Postgres behavior. Prisma's typed `updateMany` cannot target NULLs
+    // because the schema declares mode as non-optional.
     const customizationsWithoutMode = await prisma.$executeRaw`
         UPDATE "ThemeCustomization" SET "mode" = 'light' WHERE "mode" IS NULL OR "mode" = ''
     `;
@@ -41,14 +45,15 @@ async function main() {
         await prisma.setting.delete({ where: { key: "active_theme" } });
         console.log(`[state] migrated active_theme="${themeId}" → ThemeState singleton; old Setting row deleted`);
     } else {
-        // Seed singleton if none exists
-        const existing = await prisma.themeState.findFirst();
-        if (!existing) {
-            await prisma.themeState.create({ data: { id: 1, themeId: "flat", mode: "light" } });
-            console.log(`[state] seeded default (flat, light)`);
-        } else {
-            console.log(`[state] singleton already present — skipped`);
-        }
+        // Seed singleton if none exists — upsert avoids the findFirst+create
+        // race where two concurrent runs both see "no row" and the second
+        // hits a PK conflict. The empty `update` keeps an existing row as-is.
+        const result = await prisma.themeState.upsert({
+            where: { id: 1 },
+            create: { id: 1, themeId: "flat", mode: "light" },
+            update: {},
+        });
+        console.log(`[state] singleton ensured (themeId=${result.themeId}, mode=${result.mode})`);
     }
 }
 

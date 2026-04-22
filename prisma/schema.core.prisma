@@ -197,15 +197,15 @@ model ThemeCustomization {
 model ThemeSetting {
   id          String   @id @default(cuid())
   themeId     String
-  group       String
+  groupKey    String
   key         String
   value       Json
   updatedById String?
   updatedBy   User?    @relation("ThemeSettingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
   updatedAt   DateTime @updatedAt
 
-  @@unique([themeId, group, key])
-  @@index([themeId, group])
+  @@unique([themeId, groupKey, key])
+  @@index([themeId, groupKey])
 }
 
 /// Singleton (id=1) — the currently active theme + colour mode for the
