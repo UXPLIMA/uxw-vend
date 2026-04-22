@@ -6,6 +6,8 @@ const SAFE_KEY = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 const SAFE_MODE = /^[a-z][a-z0-9-]*$/;
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const ADMIN_PATH = /^\/[a-z0-9][a-z0-9/-]*$/;
+const COMPONENT_PATH = /^[a-zA-Z0-9_./-]+\.(tsx|jsx|ts|js)$/;
+const SLOT_NAME = /^[a-zA-Z0-9.-]+$/;
 
 const colorDef = z.object({
     type: z.literal("color"),
@@ -120,16 +122,16 @@ export const themeManifestSchema = z.object({
 
     components: z.record(
         z.string().regex(/^[A-Z][A-Za-z0-9]*$/),
-        z.string().regex(/^[a-zA-Z0-9_./-]+\.(tsx|jsx|ts|js)$/),
+        z.string().regex(COMPONENT_PATH),
     ).optional(),
 
     slots: z.array(z.object({
-        name: z.string().min(1).max(128).regex(/^[a-zA-Z0-9.-]+$/),
+        name: z.string().min(1).max(128).regex(SLOT_NAME),
     })).max(100).optional(),
 
     slotContents: z.array(z.object({
-        slot: z.string().min(1).max(128).regex(/^[a-zA-Z0-9.-]+$/),
-        component: z.string().regex(/^[a-zA-Z0-9_./-]+\.(tsx|jsx|ts|js)$/),
+        slot: z.string().min(1).max(128).regex(SLOT_NAME),
+        component: z.string().regex(COMPONENT_PATH),
         order: z.number().int().optional(),
     })).max(100).optional(),
 
@@ -141,7 +143,7 @@ export const themeManifestSchema = z.object({
 
     adminRoutes: z.array(z.object({
         path: z.string().regex(ADMIN_PATH),
-        component: z.string().regex(/^[a-zA-Z0-9_./-]+\.(tsx|jsx|ts|js)$/),
+        component: z.string().regex(COMPONENT_PATH),
     })).max(50).optional(),
 
     suggestedModules: z.array(z.object({
