@@ -75,7 +75,11 @@ export async function registerFailedLogin(
 
         const now = Date.now();
         const lastAt = existing.lastFailedLoginAt?.getTime() ?? 0;
-        const withinWindow = now - lastAt <= MAX_WINDOW_MS;
+        // Strictly less-than: a failure landing exactly MAX_WINDOW_MS after
+        // the last one starts a fresh window rather than straddling the
+        // boundary. Matches the semantics documented above ("older than
+        // MAX_WINDOW_MS resets the counter").
+        const withinWindow = now - lastAt < MAX_WINDOW_MS;
         const nextAttempts = (withinWindow ? existing.failedLoginAttempts : 0) + 1;
         const shouldLock = nextAttempts >= MAX_ATTEMPTS;
         const alreadyLocked = (existing.lockedUntil?.getTime() ?? 0) > now;

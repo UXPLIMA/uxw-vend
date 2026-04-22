@@ -235,10 +235,16 @@ export interface ModuleManifest {
     }[];
 }
 
+/**
+ * A module discovered on the filesystem. `enabled` is deliberately NOT
+ * part of this type — the DB (`ModuleConfig.enabled`, surfaced via
+ * `getModuleStates()` in `module-cache.ts`) is the single source of truth
+ * for whether a module is active. Past versions hardcoded `enabled: true`
+ * here and fooled consumers into treating filesystem presence as activation.
+ */
 export interface LoadedModule {
     manifest: ModuleManifest;
     path: string;
-    enabled: boolean;
 }
 
 export interface ModuleState {

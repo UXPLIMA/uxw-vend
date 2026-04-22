@@ -50,7 +50,13 @@ export async function POST(request: NextRequest) {
         // plaintext never hits Prisma (and a DB dump yields only hashes).
         const tokenHash = createHash("sha256").update(token).digest("hex");
 
-        const verificationToken = await prisma.verificationToken.findFirst({
+        // Atomically consume the token. `deleteMany` runs as a single SQL
+        // statement, so two concurrent requests racing on the same token
+        // cannot both see `count = 1` — exactly one wins, the other gets 0
+        // and is rejected as an invalid token. This replaces the previous
+        // findFirst → update → deleteMany pattern that allowed a narrow
+        // window for the same token to be used twice.
+        const { count: consumed } = await prisma.verificationToken.deleteMany({
             where: {
                 identifier: email,
                 token: tokenHash,
@@ -58,7 +64,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        if (!verificationToken) {
+        if (consumed === 0) {
             return NextResponse.json({ error: "Invalid or expired reset token" }, { status: 400 });
         }
 
@@ -74,9 +80,9 @@ export async function POST(request: NextRequest) {
             data: { password: hashedPassword },
         });
 
-        // Single-use: delete the consumed token plus any other active tokens
-        // for this account so an attacker holding a second token can't use
-        // it after the password changes.
+        // Also invalidate any *other* active reset tokens for this account
+        // so an attacker holding a second token can't use it after the
+        // password changes. The winning token is already gone.
         await prisma.verificationToken.deleteMany({ where: { identifier: email } });
 
         await logActivity({ userId: user.id, action: "password.reset", entity: "user", entityId: user.id }).catch(() => {});

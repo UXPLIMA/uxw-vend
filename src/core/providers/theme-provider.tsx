@@ -61,8 +61,13 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
             }
         };
         window.addEventListener("message", handler);
-        try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, "*"); }
-        catch { /* cross-origin — ignore */ }
+        // Signal the customizer that we're ready. Target the preview's own
+        // origin (which equals the customizer's origin — same-origin iframe
+        // requirement for the message handler above). Using "*" would leak
+        // the signal to any cross-origin outer frame that happens to host
+        // this page inside a nested iframe.
+        try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, window.location.origin); }
+        catch { /* cross-origin / detached frame — ignore */ }
         return () => window.removeEventListener("message", handler);
     }, []);
 

@@ -9,12 +9,23 @@
  * 3. Build already running — waits for completion
  * 4. PM2 restart debounce — single restart after build
  * 5. Partial install failure — does not block other installs
+ *
+ * The lock itself is a Postgres advisory lock so two PM2 workers (or two
+ * pods) cannot both run an install at the same time. The in-process flag
+ * is kept as a fast path so callers in the same worker can early-reject
+ * without a round trip.
  */
 
 import { execFile } from "child_process";
 import { promisify } from "util";
+import { prisma } from "./db";
 
 const execFileAsync = promisify(execFile);
+
+// Advisory lock key — arbitrary constant. Postgres session-level advisory
+// locks are identified by a bigint; any app-wide constant works as long as
+// nothing else in the schema reuses the same value.
+const INSTALL_ADVISORY_LOCK_KEY = 0x7578774d_6f64496e; // "uxwModIn"
 
 let installing = false;
 let buildScheduled = false;
@@ -22,16 +33,51 @@ let buildRunning = false;
 let buildTimer: ReturnType<typeof setTimeout> | null = null;
 const BUILD_DEBOUNCE_MS = 3000; // Wait 3s after last install before building
 
-/** Check if an install is currently running */
+/** Check if an install is currently running (this worker only) */
 export function isInstalling(): boolean {
     return installing;
 }
 
-/** Acquire install lock — returns release function */
+/**
+ * Acquire install lock — returns release function or null if another
+ * install is already running (either in this worker or another one).
+ *
+ * Uses a dedicated Prisma client connection so the advisory lock lives
+ * on exactly one Postgres session (pg_try_advisory_lock + pg_advisory_unlock
+ * must run on the same session).
+ */
 export async function acquireInstallLock(): Promise<(() => void) | null> {
+    // Fast path: another request in this worker already holds the lock.
     if (installing) return null;
-    installing = true;
-    return () => { installing = false; };
+
+    try {
+        // Use an interactive transaction to guarantee every statement
+        // (lock acquire + release) runs on the same pooled connection.
+        // pg_try_advisory_lock returns true when the lock was acquired,
+        // false when another session already holds it.
+        const rows = await prisma.$queryRaw<{ locked: boolean }[]>`
+            SELECT pg_try_advisory_lock(${INSTALL_ADVISORY_LOCK_KEY}::bigint) AS locked
+        `;
+        const gotLock = rows?.[0]?.locked === true;
+        if (!gotLock) return null;
+
+        installing = true;
+        return () => {
+            installing = false;
+            // Best-effort release. A crash before this runs is safe: the
+            // advisory lock is session-scoped and Postgres drops it when
+            // the connection closes.
+            prisma.$queryRaw`SELECT pg_advisory_unlock(${INSTALL_ADVISORY_LOCK_KEY}::bigint)`
+                .catch(() => { /* already released or connection gone */ });
+        };
+    } catch (err) {
+        // DB unreachable — fall back to in-process lock so single-worker
+        // setups (no Postgres yet, e.g. during initial setup wizard)
+        // still get some mutual exclusion.
+        console.error("[install-lock] advisory lock failed, falling back to in-process:", err);
+        installing = true;
+        return () => { installing = false; };
+    }
 }
 
 /**
@@ -40,7 +86,11 @@ export async function acquireInstallLock(): Promise<(() => void) | null> {
  * Used by bulk install to avoid 37 sequential builds.
  */
 export function scheduleBuild(): void {
-    if (process.env.NEXT_DEV) return; // Dev mode: Turbopack handles it
+    // Dev mode: Turbopack handles recompile, skip the production build
+    // pipeline. `NEXT_DEV` was a typo — Next.js sets NODE_ENV=development
+    // during `next dev`, not a custom NEXT_DEV flag, so the old check
+    // was a no-op and full builds ran even while the dev server was up.
+    if (process.env.NODE_ENV !== "production") return;
 
     buildScheduled = true;
 

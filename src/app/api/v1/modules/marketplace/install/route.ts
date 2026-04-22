@@ -31,6 +31,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Another install is in progress. Please try again." }, { status: 429 });
     }
 
+    // Track whether we extracted files so the outer catch can roll back.
+    // Without this, an exception anywhere after extraction leaves orphaned
+    // module files on disk that get picked up by the next filesystem scan.
+    let extractedPath: string | null = null;
+
     try {
         const { moduleId, zipFile } = await request.json();
         if (!moduleId || !zipFile) {
@@ -101,6 +106,7 @@ export async function POST(request: NextRequest) {
 
         // Extract to module directory
         await fs.mkdir(targetDir, { recursive: true });
+        extractedPath = targetDir;
         const targetRoot = path.resolve(targetDir);
         for (const entry of entries) {
             if (entry.isDirectory) continue;
@@ -195,11 +201,23 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Registry generation (sync, lightweight)
+        // Registry generation (sync, lightweight). This MUST succeed — the
+        // proxy gates module routes on the generated route-map, so a stale
+        // registry makes a freshly-installed module's pages 404. The
+        // deferred build will regenerate it too, but that can't be the
+        // primary contract: we'd return 200 to the admin while the module
+        // is silently invisible for minutes. Hard-fail + roll back the
+        // extracted files if it can't generate.
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
-        } catch {
-            // Non-fatal: registry will be regenerated during deferred build
+        } catch (err) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            extractedPath = null;
+            const detail = err instanceof Error ? err.message : String(err);
+            return NextResponse.json(
+                { error: `Registry generation failed — install rolled back: ${detail}` },
+                { status: 500 },
+            );
         }
 
         // Create DB record
@@ -263,6 +281,12 @@ export async function POST(request: NextRequest) {
             buildScheduled: true,
         });
     } catch (err: unknown) {
+        // Install failed after extraction — remove the orphan directory so
+        // the next filesystem scan doesn't discover a half-installed module
+        // that has no matching DB row.
+        if (extractedPath) {
+            await fs.rm(extractedPath, { recursive: true, force: true }).catch(() => { /* best-effort */ });
+        }
         const msg = process.env.NODE_ENV === 'production'
             ? 'Operation failed'
             : (err instanceof Error ? err.message : 'Unknown error');

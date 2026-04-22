@@ -143,7 +143,19 @@ function mergeSchemas(): string {
     for (const match of modelMatches) {
       const modelName = match[1];
       if (coreModelNames.has(modelName)) {
-        // Skip — core models are allowed to exist
+        // A module tried to redeclare a core model (e.g. User). The merger
+        // keeps the core definition and silently drops the module's copy,
+        // which means any fields the module tried to add are LOST — a
+        // subtle source of "my migration doesn't include my column"
+        // confusion. Warn loudly so the author knows to use the
+        // // @@user-relations-start / // @@user-relations-end block
+        // (or a separate model) instead.
+        console.warn(
+          `[merge-schemas] WARNING: module '${mod.name}' redeclares core model '${modelName}'. ` +
+          `The module's definition is IGNORED — only the core schema version ships. ` +
+          `If you need to add fields/relations to a core model, use the ` +
+          `// @@user-relations-start ... // @@user-relations-end block.`
+        );
         continue;
       }
       const existingOwner = modelOwners.get(modelName);

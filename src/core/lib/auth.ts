@@ -9,6 +9,7 @@ import {
     registerFailedLogin,
     resetFailedLogins,
 } from "./account-lockout";
+import { getClientIP } from "./rate-limit";
 
 import type { Provider } from "next-auth/providers";
 
@@ -63,7 +64,14 @@ if (process.env.AUTH_GOOGLE_ID) {
 // browser silently drops the cookie without TLS. Leaving the prefix
 // selection to Auth.js (__Secure- in prod, unprefixed in dev) is the
 // safe default.
-const IS_PROD_COOKIE = process.env.NODE_ENV === "production";
+// Cookie hardening (`__Secure-` / `__Host-` prefix + Secure flag) is only
+// valid when the site is served over HTTPS. In production deployments
+// that run over plain HTTP (e.g. behind a local reverse proxy, or in
+// dev/staging on an IP), setting these prefixes makes the browser drop
+// the cookie silently, which breaks CSRF verification and login.
+// Gate on the actual URL scheme instead of NODE_ENV.
+const AUTH_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
+const IS_PROD_COOKIE = AUTH_URL.startsWith("https://");
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
@@ -146,16 +154,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     user.password
                 );
 
+                // Resolve caller IP once — reused across failure paths so
+                // TRUSTED_PROXY_IPS handling lives in one place (getClientIP).
+                const reqHeaders = (request as Request | undefined)?.headers;
+                const ip = reqHeaders ? getClientIP(reqHeaders) : undefined;
+
                 if (!isPasswordValid) {
                     // Bump the failure counter; when it crosses the
                     // threshold the account is automatically locked for
                     // ACCOUNT_LOCKOUT_MS (default 15m) and the user gets
                     // an early-warning email with the attacker's IP.
-                    const reqHeaders = (request as Request | undefined)?.headers;
-                    const ip =
-                        reqHeaders?.get("x-forwarded-for")?.split(",")[0].trim() ||
-                        reqHeaders?.get("x-real-ip") ||
-                        undefined;
                     await registerFailedLogin(user.id, { ip });
                     return null;
                 }
@@ -175,11 +183,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const isValidTotp = verifyToken(userAny.twoFactorSecret as string, twoFactorCode);
 
                     if (!isValidTotp) {
-                        // Try backup code
-                        const backupCodes: string[] = userAny.backupCodes ? JSON.parse(userAny.backupCodes as string) : [];
+                        // Try backup code. Malformed JSON in backupCodes must
+                        // not short-circuit into "valid": treat as no backup
+                        // codes and fall through to the 2FA failure path so
+                        // the attempt is still counted.
+                        let backupCodes: string[] = [];
+                        if (userAny.backupCodes) {
+                            try {
+                                const parsed = JSON.parse(userAny.backupCodes as string);
+                                if (Array.isArray(parsed)) backupCodes = parsed;
+                            } catch { /* corrupt row — treat as no backup codes */ }
+                        }
                         const { valid, remaining } = verifyBackupCode(twoFactorCode, backupCodes);
 
                         if (!valid) {
+                            // 2FA is a second authentication factor, so a
+                            // wrong code must count toward the lockout just
+                            // like a wrong password. Without this an attacker
+                            // with a valid password could brute-force the
+                            // 6-digit TOTP (~10^6 combos) unconstrained.
+                            await registerFailedLogin(user.id, { ip });
                             throw new Error("INVALID_2FA");
                         }
 
