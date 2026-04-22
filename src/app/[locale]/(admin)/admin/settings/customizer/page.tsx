@@ -11,7 +11,7 @@ export default function CustomizerPage() {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
     useEffect(() => {
-        fetch("/api/v1/themes/active")
+        fetch("/api/v1/themes/state")
             .then((r) => r.json())
             .then((d: { themeId: string; overrides: Record<string, unknown> }) => {
                 if (d.themeId) setThemeId(d.themeId);
