@@ -323,7 +323,7 @@ export default function ThemeSettingsPage() {
                                     <span>v{theme.version || '1.0.0'}</span>
                                     <div className="flex items-center gap-2">
                                         {!isBuiltIn && <span className="text-blue-500">Custom</span>}
-                                        <span>{theme.type}</span>
+                                        <span>{theme.modes?.default ?? "—"}</span>
                                     </div>
                                 </div>
                             </CardContent>

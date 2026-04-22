@@ -6,6 +6,7 @@
 // Usage: npx tsx scripts/migrate-mc-hero-settings.ts
 
 import "dotenv/config";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../src/core/lib/db";
 
 const MC_KEYS = ["hero_server_ip", "hero_show_player_count", "hero_discord_url"];
@@ -20,7 +21,7 @@ async function main() {
         const existing = (mcInstalled.config ?? {}) as Record<string, unknown>;
         const next = { ...existing };
         for (const row of rows) next[row.key] = row.value;
-        await prisma.moduleConfig.update({ where: { id: "mc-stats" }, data: { config: next } });
+        await prisma.moduleConfig.update({ where: { id: "mc-stats" }, data: { config: next as Prisma.InputJsonValue } });
         console.log(`migrated ${rows.length} key(s) into mc-stats ModuleConfig.config`);
         await prisma.setting.deleteMany({ where: { key: { in: MC_KEYS } } });
     } else {

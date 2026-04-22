@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
-import { prisma } from "@/core/lib/db";
 import { rateLimit } from "@/core/lib/rate-limit";
 import fs from "fs/promises";
 import path from "path";
 import AdmZip from "adm-zip";
 import { execFileSync } from "child_process";
-import { ThemeType } from "@prisma/client";
 import { themeManifestSchema } from "@/core/lib/theme-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { manifestHash } from "@/core/lib/module-install-audit";
@@ -93,28 +91,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Theme failed regeneration", details: devOnlyDetail(e) }, { status: 400 });
         }
 
-        const hash = manifestHash(manifest);
-        const dbType: ThemeType = manifest.type === "dark" ? ThemeType.DARK : ThemeType.LIGHT;
-        await prisma.theme.upsert({
-            where: { id: manifest.id },
-            create: {
-                id: manifest.id,
-                name: manifest.name,
-                version: manifest.version,
-                parent: manifest.parent ?? null,
-                type: dbType,
-                manifestHash: hash,
-                installedById: session.user.id,
-            },
-            update: {
-                name: manifest.name,
-                version: manifest.version,
-                parent: manifest.parent ?? null,
-                type: dbType,
-                manifestHash: hash,
-                installedById: session.user.id,
-            },
-        });
+        // Filesystem + codegen is the source of truth — no DB row needed.
+        // manifestHash is kept for audit logging if needed in future.
+        void manifestHash(manifest);
 
         return NextResponse.json({ ok: true, id: manifest.id });
     } catch (err) {

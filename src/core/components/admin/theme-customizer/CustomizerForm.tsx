@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { ThemeManifest, ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
+import type { ThemeManifest, ThemeFieldDef, ThemeSettingsGroup } from "@/core/lib/theme-manifest-schema";
 import { computeOverrideDiff, applyOverrides } from "./diff";
 import * as Fields from "./fields";
 
@@ -114,9 +114,9 @@ export function CustomizerForm({
 }) {
     const defaults = useMemo(() => {
         const d: Record<string, unknown> = {};
-        for (const [g, gd] of Object.entries(manifest.config ?? {})) {
+        for (const [g, gd] of Object.entries(manifest.settings ?? {}) as [string, ThemeSettingsGroup][]) {
             d[g] = {};
-            for (const [f, def] of Object.entries(gd.fields)) {
+            for (const [f, def] of Object.entries(gd.fields) as [string, ThemeFieldDef][]) {
                 if ("default" in def && def.default !== undefined) {
                     (d[g] as Record<string, unknown>)[f] = def.default;
                 }
@@ -155,17 +155,17 @@ export function CustomizerForm({
 
     return (
         <div className="flex flex-col gap-4">
-            {Object.entries(manifest.config ?? {}).map(([group, gd]) => (
+            {(Object.entries(manifest.settings ?? {}) as [string, ThemeSettingsGroup][]).map(([group, gd]) => (
                 <section key={group} className="rounded border p-3">
                     <h3 className="mb-2 font-medium">{gd.label}</h3>
                     <div className="flex flex-col gap-3">
-                        {Object.entries(gd.fields).map(([field, def]) => {
+                        {(Object.entries(gd.fields) as [string, ThemeFieldDef][]).map(([field, def]) => {
                             const v = (current[group] as Record<string, unknown> | undefined)?.[field];
-                            const isDefault = (def as { default?: unknown }).default === v || v === undefined;
+                            const isDefault = def.default === v || v === undefined;
                             return (
                                 <div key={field}>
                                     <div className="mb-1 text-sm text-muted-foreground">
-                                        {(def as { label?: string }).label ?? field}
+                                        {def.label ?? field}
                                     </div>
                                     <Field
                                         def={def}
