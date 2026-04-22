@@ -37,6 +37,7 @@ interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
     modules?: SidebarModule[];
+    themeGroup?: NavGroup | null;
 }
 
 /**
@@ -55,7 +56,7 @@ interface AdminSidebarProps {
  *
  * Mobile: both rails collapse into a single overlay sheet.
  */
-export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
+export function AdminSidebar({ modules = [], themeGroup }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -67,8 +68,13 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
     // - Single-item modules append to a shared "Extensions" tail section
     //   (no per-module header — avoids a wall of one-item headers)
     const groups: NavGroup[] = useMemo(() => {
+        // Build base group list: core → theme → (modules extend existing groups)
+        const baseGroups = themeGroup
+            ? [...CORE_NAV_GROUPS, themeGroup]
+            : [...CORE_NAV_GROUPS];
+
         const byId = new Map(
-            CORE_NAV_GROUPS.map((g) => [
+            baseGroups.map((g) => [
                 g.id,
                 { ...g, sections: g.sections.map((s) => ({ ...s, items: [...s.items] })) },
             ]),
@@ -128,7 +134,7 @@ export function AdminSidebar({ modules = [] }: AdminSidebarProps) {
         }
 
         return Array.from(byId.values());
-    }, [modules, t]);
+    }, [modules, themeGroup, t]);
 
     // Selection state machine:
     //   - `pathDerivedId` is the group the current URL resolves to

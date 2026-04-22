@@ -20,6 +20,8 @@
  */
 
 import type { ComponentType } from "react";
+import { themeRegistry } from "@/core/generated/theme-registry";
+import { themeAdminRoutes, type ThemeAdminNavItem } from "@/core/generated/theme-admin-routes";
 import {
     LayoutDashboard,
     Users,
@@ -347,6 +349,7 @@ export function inferModuleGroup(moduleId: string): string {
  *   3. Longest-matching item `href` across all groups (covers
  *      module-contributed entries that aren't in any pathPrefix)
  */
+
 export function findActiveGroupId(pathname: string, groups: NavGroup[]): string | null {
     if (pathname === "/admin" || pathname === "/admin/") return "dashboard";
 
@@ -381,4 +384,36 @@ export function findActiveGroupId(pathname: string, groups: NavGroup[]): string 
     }
 
     return best?.id ?? null;
+}
+
+/**
+ * Build the "Theme" nav group for the currently-active theme. Returns null
+ * when the active theme id is unknown (shouldn't happen, but defensive).
+ * Called from the admin layout after resolving the active theme, then
+ * passed as a prop to AdminSidebar.
+ */
+export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
+    const manifest = themeRegistry[activeThemeId];
+    if (!manifest) return null;
+
+    const themeItems: ThemeAdminNavItem[] = themeAdminRoutes[activeThemeId] ?? [];
+
+    const items: NavItem[] = [
+        { label: "Appearance", href: "/admin/settings/theme", icon: Palette },
+        ...themeItems.map((i: ThemeAdminNavItem) => ({
+            label: i.label,
+            href: "/admin" + (i.path.startsWith("/") ? i.path : "/" + i.path),
+            icon: Palette,
+        })),
+    ];
+
+    const manifestAny = manifest as { adminNav?: { label?: string } };
+
+    return {
+        id: "theme",
+        label: manifestAny.adminNav?.label ?? manifest.name,
+        icon: Palette,
+        pathPrefix: "/admin/theme",
+        sections: [{ items }],
+    };
 }
