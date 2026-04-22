@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
-import {
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import {
     Search,
     Loader2,
     FileText,

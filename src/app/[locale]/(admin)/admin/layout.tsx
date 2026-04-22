@@ -11,7 +11,6 @@ import { UpdateNotificationBanner } from "@/core/components/admin/UpdateNotifica
 import moduleSystem from "@/core/lib/modules";
 import { prisma } from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
-import { buildThemeNavGroup } from "@/core/lib/admin-nav-groups";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -38,7 +37,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     const modules = moduleSystem.getEnabledModules();
 
     const { themeId } = await getActiveTheme();
-    const themeGroup = buildThemeNavGroup(themeId);
 
     return (
         <div className="min-h-screen bg-background" suppressHydrationWarning>
@@ -46,7 +44,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 userName={session.user.name || ""}
                 userEmail={session.user.email || ""}
                 modules={modules}
-                themeGroup={themeGroup}
+                activeThemeId={themeId}
             />
             {/* Main content — cleared 56 (icon rail) + 224 (context sidebar) = 280px */}
             <main

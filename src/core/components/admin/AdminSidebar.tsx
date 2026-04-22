@@ -9,6 +9,7 @@ import * as LucideIcons from "lucide-react";
 import { Menu, X, Sun, Moon, Package } from "lucide-react";
 import {
     CORE_NAV_GROUPS,
+    buildThemeNavGroup,
     findActiveGroupId,
     inferModuleGroup,
     type NavGroup,
@@ -37,7 +38,14 @@ interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
     modules?: SidebarModule[];
-    themeGroup?: NavGroup | null;
+    /**
+     * Active theme id — used to build the dynamic "Theme" nav group on the
+     * client. Passing the id (a string) rather than the full NavGroup keeps
+     * us on the serializable side of the RSC boundary; the built group
+     * contains icon ComponentTypes (from lucide-react) which Next rejects
+     * when passed as a prop.
+     */
+    activeThemeId?: string;
 }
 
 /**
@@ -56,7 +64,7 @@ interface AdminSidebarProps {
  *
  * Mobile: both rails collapse into a single overlay sheet.
  */
-export function AdminSidebar({ modules = [], themeGroup }: AdminSidebarProps) {
+export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -69,6 +77,7 @@ export function AdminSidebar({ modules = [], themeGroup }: AdminSidebarProps) {
     //   (no per-module header — avoids a wall of one-item headers)
     const groups: NavGroup[] = useMemo(() => {
         // Build base group list: core → theme → (modules extend existing groups)
+        const themeGroup = activeThemeId ? buildThemeNavGroup(activeThemeId) : null;
         const baseGroups = themeGroup
             ? [...CORE_NAV_GROUPS, themeGroup]
             : [...CORE_NAV_GROUPS];
@@ -134,7 +143,7 @@ export function AdminSidebar({ modules = [], themeGroup }: AdminSidebarProps) {
         }
 
         return Array.from(byId.values());
-    }, [modules, themeGroup, t]);
+    }, [modules, activeThemeId, t]);
 
     // Selection state machine:
     //   - `pathDerivedId` is the group the current URL resolves to
