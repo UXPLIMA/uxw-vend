@@ -64,8 +64,15 @@ export async function POST(request: NextRequest) {
 
         const parsed = themeManifestSchema.safeParse(raw);
         if (!parsed.success) {
+            // Rollback extracted dir if applicable (preserve existing rollback logic).
             const first = parsed.error.issues[0];
-            return NextResponse.json({ error: `theme.json invalid: ${first.path.join(".")} ${first.message}` }, { status: 400 });
+            const hint = first.path[0] === "schemaVersion"
+                ? " (this theme is v1 — upgrade its manifest to schemaVersion 2)"
+                : "";
+            return NextResponse.json(
+                { error: `Invalid theme.json: ${first.path.join(".")} — ${first.message}${hint}` },
+                { status: 400 },
+            );
         }
         const manifest = parsed.data;
         if (RESERVED_IDS.has(manifest.id)) return NextResponse.json({ error: "Theme id is reserved" }, { status: 400 });
