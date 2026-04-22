@@ -1,26 +1,42 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { useTheme as useNextTheme } from "next-themes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
 import { Check, Upload, Loader2, Trash2, AlertTriangle, Palette, Download, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
+import { useTheme } from "@/core/providers/theme-provider";
+import * as Fields from "@/core/components/admin/theme-customizer/fields";
+import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
-    const { setTheme, theme: currentThemeId } = useNextTheme();
+    const { activeTheme, currentThemeId, currentMode, setMode } = useTheme();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
     const { confirm } = useConfirm();
+
+    // Schema-driven color overrides
+    const [colorOverrides, setColorOverrides] = useState<Record<string, string | undefined>>({});
+
+    // Load persisted overrides when active theme or mode changes
+    useEffect(() => {
+        if (!activeTheme?.id) return;
+        fetch(`/api/v1/themes/${activeTheme.id}/customization`)
+            .then(r => r.json())
+            .then(data => {
+                const modeOverrides = data?.overrides?.[currentMode];
+                const colors = (modeOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors ?? {};
+                setColorOverrides(colors);
+            })
+            .catch(() => {});
+    }, [activeTheme?.id, currentMode]);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -75,6 +91,41 @@ export default function ThemeSettingsPage() {
         } finally {
             setDeleting(null);
         }
+    };
+
+    const handleThemeSwitch = async (themeId: string) => {
+        await fetch("/api/v1/themes/state", {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ themeId, mode: currentMode }),
+        });
+        location.reload();
+    };
+
+    const saveColors = async () => {
+        if (!activeTheme?.id) return;
+        const nonEmpty = Object.fromEntries(
+            Object.entries(colorOverrides).filter(([, v]) => v !== undefined)
+        ) as Record<string, string>;
+        await fetch(`/api/v1/themes/${activeTheme.id}/customization`, {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ mode: currentMode, overrides: { tokens: { colors: nonEmpty } } }),
+        });
+        toast.success(t("theme_colorsSaved") ?? "Colors saved");
+    };
+
+    const resetColors = async () => {
+        if (!activeTheme?.id) return;
+        const ok = await confirm({ title: "Reset Colors", message: "Discard all color overrides?", variant: "danger", confirmText: "Reset" });
+        if (!ok) return;
+        await fetch(`/api/v1/themes/${activeTheme.id}/customization`, {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ mode: currentMode, overrides: {} }),
+        });
+        setColorOverrides({});
+        toast.success(t("theme_resetDefault") ?? "Reset");
     };
 
     const renderPreview = (themeId: string) => {
@@ -153,6 +204,12 @@ export default function ThemeSettingsPage() {
         finally { setInstalling(null); }
     };
 
+    // Mode toggle
+    const modes = Object.keys(activeTheme?.modes?.available ?? {});
+
+    // Schema-driven color tokens from active theme
+    const colorTokens = activeTheme?.tokens?.colors ?? {};
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -184,6 +241,12 @@ export default function ThemeSettingsPage() {
                 </div>
             </div>
 
+            {/* Suggested modules banner */}
+            <SuggestedModulesBanner
+                themeName={activeTheme?.name ?? ""}
+                suggestions={activeTheme?.suggestedModules ?? []}
+            />
+
             {uploadMessage && (
                 <div className={`p-4 rounded-lg text-sm ${
                     uploadMessage.type === "success"
@@ -192,6 +255,28 @@ export default function ThemeSettingsPage() {
                 }`}>
                     {uploadMessage.type === "error" && <AlertTriangle className="w-4 h-4 inline mr-2" />}
                     {uploadMessage.text}
+                </div>
+            )}
+
+            {/* Mode toggle — only visible when there is more than one mode */}
+            {modes.length > 1 && (
+                <div className="flex gap-2">
+                    {modes.map(m => (
+                        <Button
+                            key={m}
+                            variant={m === currentMode ? "default" : "outline"}
+                            onClick={() => {
+                                setMode(m);
+                                fetch("/api/v1/themes/state", {
+                                    method: "PUT",
+                                    headers: { "content-type": "application/json" },
+                                    body: JSON.stringify({ themeId: activeTheme?.id, mode: m }),
+                                });
+                            }}
+                        >
+                            {m}
+                        </Button>
+                    ))}
                 </div>
             )}
 
@@ -204,7 +289,7 @@ export default function ThemeSettingsPage() {
                         <Card
                             key={id}
                             className={`cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 ${isActive ? 'ring-2 ring-primary border-primary' : ''}`}
-                            onClick={() => setTheme(id)}
+                            onClick={() => handleThemeSwitch(id)}
                         >
                             <CardHeader className="p-4 pb-2">
                                 <CardTitle className="text-base flex justify-between items-center">
@@ -249,7 +334,7 @@ export default function ThemeSettingsPage() {
 
             {/* Theme Marketplace */}
             {(() => {
-                const available = marketplaceThemes.filter(t => !installedThemeIds.has(t.id));
+                const available = marketplaceThemes.filter(th => !installedThemeIds.has(th.id));
                 if (loadingMarketplace || available.length === 0) return null;
                 return (
                     <div>
@@ -292,8 +377,40 @@ export default function ThemeSettingsPage() {
                 );
             })()}
 
-            {/* Color Customizer */}
-            <ColorCustomizer />
+            {/* Schema-driven color customizer */}
+            {Object.keys(colorTokens).length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Palette className="w-4 h-4" />
+                            {t("theme_colors") ?? "Color Customization"}
+                        </CardTitle>
+                        <CardDescription>{t("theme_overrideDesc")}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            {Object.entries(colorTokens).map(([name, def]) => (
+                                <Fields.ColorField
+                                    key={name}
+                                    def={{ ...def, label: def.label ?? name }}
+                                    value={colorOverrides[name]}
+                                    onChange={(v) => setColorOverrides(prev => ({ ...prev, [name]: v }))}
+                                    isDefault={colorOverrides[name] === undefined}
+                                />
+                            ))}
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                            <Button size="sm" onClick={saveColors}>
+                                <Check className="w-3 h-3 mr-1" />
+                                Save Colors
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={resetColors}>
+                                {t("theme_resetDefault") ?? "Reset to Defaults"}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
@@ -303,118 +420,5 @@ export default function ThemeSettingsPage() {
                 </p>
             </div>
         </div>
-    );
-}
-
-// Color Customizer Component
-function ColorCustomizer() {
-    const t = useTranslations("admin");
-    const colorFields = [
-        { key: "primary", label: "Primary" },
-        { key: "secondary", label: "Secondary" },
-        { key: "accent", label: "Accent" },
-        { key: "background", label: "Background" },
-        { key: "foreground", label: "Text" },
-        { key: "card", label: "Card Background" },
-        { key: "muted", label: "Muted" },
-        { key: "destructive", label: "Destructive" },
-        { key: "success", label: "Success" },
-        { key: "warning", label: "Warning" },
-    ];
-
-    const [colors, setColors] = useState<Record<string, string>>({});
-    const [saving, setSaving] = useState(false);
-
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((d) => {
-                const s = d.settings || {};
-                const c: Record<string, string> = {};
-                colorFields.forEach((f) => {
-                    c[f.key] = (s[`theme_color_${f.key}`] as string) || getComputedStyle(document.documentElement).getPropertyValue(`--color-${f.key}`).trim();
-                });
-                setColors(c);
-            })
-            .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const applyColors = () => {
-        Object.entries(colors).forEach(([key, value]) => {
-            if (value) document.documentElement.style.setProperty(`--color-${key}`, value);
-        });
-    };
-
-    const saveColors = async () => {
-        setSaving(true);
-        const payload: Record<string, string> = {};
-        Object.entries(colors).forEach(([key, value]) => {
-            payload[`theme_color_${key}`] = value;
-        });
-        await fetch("/api/v1/settings", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-        applyColors();
-        toast.success(t("theme_colorsSaved"));
-        setSaving(false);
-    };
-
-    const resetColors = () => {
-        const defaults: Record<string, string> = {
-            primary: "#2563eb", secondary: "#7c3aed", accent: "#06b6d4",
-            background: "#f3f4f6", foreground: "#111827", card: "#ffffff",
-            muted: "#f1f5f9", destructive: "#ef4444", success: "#22c55e", warning: "#f59e0b",
-        };
-        setColors(defaults);
-        Object.entries(defaults).forEach(([key, value]) => {
-            document.documentElement.style.setProperty(`--color-${key}`, value);
-        });
-    };
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <Palette className="w-4 h-4" /> Color Customization
-                </CardTitle>
-                <CardDescription>{t("theme_overrideDesc")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                    {colorFields.map((field) => (
-                        <div key={field.key}>
-                            <Label className="text-xs mb-1 block">{field.label}</Label>
-                            <div className="flex gap-1">
-                                <input
-                                    type="color"
-                                    value={colors[field.key] || "#000000"}
-                                    onChange={(e) => {
-                                        setColors({ ...colors, [field.key]: e.target.value });
-                                        document.documentElement.style.setProperty(`--color-${field.key}`, e.target.value);
-                                    }}
-                                    className="w-8 h-8 rounded cursor-pointer border-0"
-                                />
-                                <Input
-                                    value={colors[field.key] || ""}
-                                    onChange={(e) => setColors({ ...colors, [field.key]: e.target.value })}
-                                    className="text-xs h-8 font-mono"
-                                    placeholder="#000000"
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <div className="flex gap-2">
-                    <Button size="sm" onClick={saveColors} disabled={saving}>
-                        {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
-                        Save Colors
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={resetColors}>{t("theme_resetDefault")}</Button>
-                </div>
-            </CardContent>
-        </Card>
     );
 }
