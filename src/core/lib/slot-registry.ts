@@ -1,13 +1,7 @@
 export const CANONICAL_SLOTS = [
-    "home.beforeHero",
-    "home.afterHero",
-    "home.sidebar",
-    "navbar.left",
-    "navbar.right",
-    "footer.extra",
-    "product.beforeAddToCart",
-    "product.afterAddToCart",
-    "profile.tabs",
+    "layout.beforeMain",
+    "layout.afterMain",
+    "head.extra",
 ] as const;
 
 export type CanonicalSlot = typeof CANONICAL_SLOTS[number];
