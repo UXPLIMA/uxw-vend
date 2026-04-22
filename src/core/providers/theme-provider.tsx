@@ -1,55 +1,52 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useTheme as useNextTheme, ThemeProvider as NextThemesProvider } from "next-themes";
 import { themeRegistry, defaultThemeId as REGISTRY_DEFAULT } from "@/core/generated/theme-registry";
 import { ThemeConfigProvider } from "@/core/lib/theme-config-client";
 import type { ThemeManifest } from "@/core/lib/theme-manifest-schema";
 import { applyOverrides } from "@/core/components/admin/theme-customizer/diff";
+import { resolveMode } from "@/core/lib/theme-mode";
 
 interface ThemeContextType {
     activeTheme: ThemeManifest | null;
     currentThemeId: string;
+    currentMode: string;
+    setMode: (mode: string) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({ activeTheme: null, currentThemeId: REGISTRY_DEFAULT });
-
+const ThemeContext = createContext<ThemeContextType>({
+    activeTheme: null,
+    currentThemeId: REGISTRY_DEFAULT,
+    currentMode: "light",
+    setMode: () => {},
+});
 export const useTheme = () => useContext(ThemeContext);
-
-function pickFallback(manifest: ThemeManifest | undefined, want: string): ThemeManifest {
-    if (manifest) return manifest;
-    return themeRegistry[want] ?? themeRegistry[REGISTRY_DEFAULT] ?? Object.values(themeRegistry)[0];
-}
 
 interface AppThemeProviderProps {
     children: ReactNode;
-    defaultTheme: string;
+    themeId: string;
+    mode: string;
     serverConfig?: Record<string, unknown>;
 }
 
-function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProviderProps) {
-    const { theme: currentThemeId } = useNextTheme();
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
+function pickTheme(id: string): ThemeManifest {
+    return themeRegistry[id] ?? themeRegistry[REGISTRY_DEFAULT] ?? Object.values(themeRegistry)[0];
+}
 
-    const activeThemeId = (mounted && currentThemeId) ? currentThemeId : defaultTheme;
+export function AppThemeProvider({ children, themeId, mode, serverConfig }: AppThemeProviderProps) {
+    const activeTheme = useMemo(() => pickTheme(themeId), [themeId]);
+    const [currentMode, setCurrentMode] = useState<string>(() =>
+        resolveMode({ manifest: activeTheme, forced: mode })
+    );
 
-    const activeTheme = useMemo<ThemeManifest>(() => {
-        return pickFallback(themeRegistry[activeThemeId], defaultTheme);
-    }, [activeThemeId, defaultTheme]);
-
-    // Sync data-theme / data-mode attributes. The generated theme-tokens.css
-    // keys off data-theme (per-theme --uxw-* variables); data-mode drives
-    // next-themes light/dark overrides used by some Tailwind utilities.
     useEffect(() => {
         if (typeof document === "undefined") return;
         document.documentElement.setAttribute("data-theme", activeTheme.id);
-        document.documentElement.setAttribute("data-mode", activeTheme.type);
-    }, [activeTheme]);
+        document.documentElement.setAttribute("data-mode", currentMode);
+    }, [activeTheme, currentMode]);
 
-    // Live preview channel — when this page is rendered inside the customizer
-    // iframe, the parent posts in-progress edits via postMessage. These
-    // overrides are layered on top of serverConfig ONLY for preview.
+    // Live preview channel — customizer iframe gets overrides via postMessage.
+    // Same-origin check on receive; wildcard NEVER used for postMessage target.
     const [previewOverrides, setPreviewOverrides] = useState<Record<string, unknown> | null>(null);
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -61,13 +58,8 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
             }
         };
         window.addEventListener("message", handler);
-        // Signal the customizer that we're ready. Target the preview's own
-        // origin (which equals the customizer's origin — same-origin iframe
-        // requirement for the message handler above). Using "*" would leak
-        // the signal to any cross-origin outer frame that happens to host
-        // this page inside a nested iframe.
         try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, window.location.origin); }
-        catch { /* cross-origin / detached frame — ignore */ }
+        catch { /* cross-origin / detached — ignore */ }
         return () => window.removeEventListener("message", handler);
     }, []);
 
@@ -76,28 +68,16 @@ function ThemeContent({ children, defaultTheme, serverConfig }: AppThemeProvider
         [serverConfig, previewOverrides],
     );
 
-    // Pre-mount: flash of neutral background avoided by reading
-    // generated tokens synchronously on mount (globals.css fallback :root).
+    const setMode = (next: string) => {
+        if (activeTheme.modes.available[next]) {
+            setCurrentMode(next);
+            try { document.cookie = `uxw_mode=${next}; path=/; max-age=31536000; samesite=lax`; } catch { /* ignore cookie set failure */ }
+        }
+    };
+
     return (
-        <ThemeContext.Provider value={{ activeTheme, currentThemeId: activeThemeId }}>
+        <ThemeContext.Provider value={{ activeTheme, currentThemeId: activeTheme.id, currentMode, setMode }}>
             <ThemeConfigProvider value={effectiveConfig}>{children}</ThemeConfigProvider>
         </ThemeContext.Provider>
-    );
-}
-
-export function AppThemeProvider({ children, defaultTheme, serverConfig }: AppThemeProviderProps) {
-    const themeIds = Object.keys(themeRegistry);
-    return (
-        <NextThemesProvider
-            attribute="data-mode"
-            defaultTheme={defaultTheme}
-            themes={themeIds}
-            enableSystem={false}
-            disableTransitionOnChange
-        >
-            <ThemeContent defaultTheme={defaultTheme} serverConfig={serverConfig}>
-                {children}
-            </ThemeContent>
-        </NextThemesProvider>
     );
 }

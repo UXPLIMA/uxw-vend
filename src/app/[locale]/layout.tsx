@@ -8,7 +8,7 @@ import { SessionProvider } from "next-auth/react";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
 import prisma from "@/core/lib/db";
-import { getThemeConfig } from "@/core/lib/theme-config";
+import { getActiveTheme } from "@/core/lib/theme-state";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
@@ -90,7 +90,7 @@ export default async function RootLayout({
 
   // Resolve active theme + merged config on the server so the first paint
   // matches user customizations without a client round-trip.
-  const { config: serverThemeConfig, themeId: activeThemeId } = await getThemeConfig();
+  const active = await getActiveTheme();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -108,7 +108,7 @@ export default async function RootLayout({
       >
         <SessionProvider>
           <NextIntlClientProvider messages={messages}>
-              <AppThemeProvider defaultTheme={activeThemeId} serverConfig={serverThemeConfig}>
+              <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>
                 <ModuleProvider moduleStates={moduleStates}>
                 <ModuleContextProviders>
                 <ConfirmProvider>

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 
-const mockSetting = { value: { active_theme: "flat" } };
 const mockCustomization = { overrides: { hero: { headline: "custom" } } };
 
 vi.mock("@/core/lib/db", () => ({
     prisma: {
-        setting: { findUnique: vi.fn(async () => mockSetting) },
+        themeState: { findFirst: vi.fn(async () => ({ themeId: "flat", mode: "light" })) },
         themeCustomization: { findUnique: vi.fn(async () => mockCustomization) },
+        themeSetting: { findMany: vi.fn(async () => []) },
     },
 }));
 
@@ -19,6 +19,7 @@ vi.mock("@/core/generated/theme-registry", () => ({
             description: "",
             version: "1.0.0",
             type: "light" as const,
+            modes: { default: "light", available: { light: {} } },
             tokens: {},
             config: {
                 hero: {
@@ -35,11 +36,10 @@ vi.mock("@/core/generated/theme-registry", () => ({
     defaultThemeId: "flat",
 }));
 
-describe("getThemeConfig (server)", () => {
-    it("merges overrides on top of defaults", async () => {
-        const { getThemeConfig } = await import("@/core/lib/theme-config");
-        const { config } = await getThemeConfig();
-        expect((config as { hero?: { headline?: string; enabled?: boolean } }).hero?.headline).toBe("custom");
-        expect((config as { hero?: { headline?: string; enabled?: boolean } }).hero?.enabled).toBe(true);
+describe("getActiveTheme (server)", () => {
+    it("returns tokenOverrides from customization", async () => {
+        const { getActiveTheme } = await import("@/core/lib/theme-state");
+        const { tokenOverrides } = await getActiveTheme();
+        expect((tokenOverrides as { hero?: { headline?: string } }).hero?.headline).toBe("custom");
     });
 });
