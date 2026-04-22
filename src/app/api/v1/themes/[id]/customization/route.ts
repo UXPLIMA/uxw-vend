@@ -9,6 +9,12 @@ import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeManifest, ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+    const { id: themeId } = await ctx.params;
+    const rows = await prisma.themeCustomization.findMany({ where: { themeId } });
+    return NextResponse.json({ overrides: Object.fromEntries(rows.map(r => [r.mode, r.overrides])) });
+}
+
 const HEX = /^#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/;
 const SAFE_FONT = /^[A-Za-z0-9 ,._'"-]+$/;
 const SAFE_ASPECT = /^\d+(?:\.\d+)?\s*\/\s*\d+(?:\.\d+)?$|^\d+(?:\.\d+)?$/;
@@ -133,7 +139,7 @@ function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, un
     // 2. Config-group overrides (manifest.config[group].fields[field] = value).
     for (const [groupKey, rawGroupVal] of Object.entries(overrides)) {
         if (groupKey === "tokens") continue; // handled above
-        const groupDef = manifest.config?.[groupKey];
+        const groupDef = manifest.settings?.[groupKey];
         if (!groupDef) continue;
         if (!rawGroupVal || typeof rawGroupVal !== "object" || Array.isArray(rawGroupVal)) continue;
         const cleanGroup: Record<string, unknown> = {};
@@ -149,7 +155,7 @@ function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, un
     // 3. Optional top-level `custom_css` escape hatch — only allowed when
     // the manifest explicitly declares a `customCss` config group (none do
     // by default). Falls back to the CSS sanitizer for defense-in-depth.
-    if (typeof overrides.custom_css === "string" && manifest.config?.customCss) {
+    if (typeof overrides.custom_css === "string" && manifest.settings?.customCss) {
         out.custom_css = sanitizeCustomCss(overrides.custom_css);
     }
 
@@ -180,6 +186,11 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
         return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
+    const mode = typeof (body as { mode?: unknown }).mode === "string" ? (body as { mode: string }).mode : null;
+    if (!mode || !manifest.modes.available[mode]) {
+        return NextResponse.json({ error: "mode is required and must exist on the theme" }, { status: 400 });
+    }
+
     const overrides = (body as { overrides?: unknown })?.overrides;
     if (overrides === undefined || overrides === null) {
         return NextResponse.json({ error: "overrides is required" }, { status: 400 });
@@ -194,11 +205,11 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     const safe = sanitizeOverrides(manifest, overrides as Record<string, unknown>);
 
     if (Object.keys(safe).length === 0) {
-        await prisma.themeCustomization.deleteMany({ where: { themeId } });
+        await prisma.themeCustomization.deleteMany({ where: { themeId, mode } });
     } else {
         await prisma.themeCustomization.upsert({
-            where: { themeId },
-            create: { themeId, overrides: safe as Prisma.InputJsonValue, updatedById: session.user.id },
+            where: { themeId_mode: { themeId, mode } },
+            create: { themeId, mode, overrides: safe as Prisma.InputJsonValue, updatedById: session.user.id },
             update: { overrides: safe as Prisma.InputJsonValue, updatedById: session.user.id },
         });
     }
