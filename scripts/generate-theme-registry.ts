@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { themeManifestSchema, type ThemeManifest } from "../src/core/lib/theme-manifest-schema";
-import { resolveMergedTheme } from "../src/core/lib/theme-registry-loader";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 const REGISTRY_OUT = path.join(process.cwd(), "src/core/generated/theme-registry.ts");
@@ -46,7 +45,7 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
         "",
     ];
     for (const [id, raw] of Object.entries(themes)) {
-        const theme = resolveMergedTheme(raw, themes);
+        const theme = raw;
         const lines: string[] = [];
         for (const [name, def] of Object.entries(theme.tokens.colors ?? {})) {
             if (def.default) lines.push(cssVar(`color-${name}`, def.default));
@@ -68,7 +67,7 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
 function emitRegistryTs(themes: Record<string, ThemeManifest>): string {
     const merged: Record<string, ThemeManifest> = {};
     for (const [id, raw] of Object.entries(themes)) {
-        merged[id] = resolveMergedTheme(raw, themes);
+        merged[id] = raw;
     }
     const ids = Object.keys(merged);
     const defaultId = ids.includes("flat") ? "flat" : (ids[0] ?? "flat");
