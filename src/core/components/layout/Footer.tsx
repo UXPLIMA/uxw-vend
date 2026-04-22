@@ -13,7 +13,7 @@ import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 import { Slot } from "@/core/components/Slot";
 
 
-export function Footer() {
+function DefaultFooter() {
     const t = useTranslations('footer');
     const commonT = useTranslations('common');
     const locale = useLocale();
@@ -180,4 +180,10 @@ export function Footer() {
         <Slot name="layout.bottom" />
         </>
     );
+}
+
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+
+export function Footer() {
+    return <ThemeComponentSlot name="Footer" fallback={DefaultFooter} />;
 }
