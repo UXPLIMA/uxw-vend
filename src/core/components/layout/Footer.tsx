@@ -59,7 +59,7 @@ function DefaultFooter() {
 
     return (
         <>
-        <footer className="bg-[#111827] text-white mt-12">
+        <footer className="bg-card text-card-foreground border-t border-border mt-12">
             <Slot name="footer.top" />
             <div className="container mx-auto px-4 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
