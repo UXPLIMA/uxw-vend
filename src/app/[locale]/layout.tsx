@@ -92,6 +92,20 @@ export default async function RootLayout({
   // matches user customizations without a client round-trip.
   const active = await getActiveTheme();
 
+  // Build an override <style> block so admin-saved color customizations
+  // actually take effect. The generated theme-tokens.css sets
+  // [data-theme][data-mode] { --uxw-color-X: ... } with the manifest
+  // defaults; we append a same-specificity block with the admin's overrides
+  // so the later declaration wins the cascade. Values reach here only after
+  // HEX-only sanitization in the customization API — safe to interpolate.
+  const overrideColors = ((active.tokenOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors) ?? {};
+  const overrideEntries = Object.entries(overrideColors).filter(
+    ([, v]) => typeof v === "string" && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v),
+  );
+  const overrideCss = overrideEntries.length > 0
+    ? `[data-theme="${active.themeId}"][data-mode="${active.mode}"] {\n${overrideEntries.map(([k, v]) => `  --uxw-color-${k}: ${v};`).join("\n")}\n}`
+    : "";
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -102,6 +116,7 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: buildOrganizationJsonLd() }}
         />
+        {overrideCss && <style dangerouslySetInnerHTML={{ __html: overrideCss }} />}
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
