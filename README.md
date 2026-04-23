@@ -4,7 +4,7 @@
   ![CI](https://github.com/siracozmen01/uxwVend/actions/workflows/ci.yml/badge.svg)
 
   <p><strong>Open-source modular platform with a plugin marketplace</strong></p>
-  <p>Zero modules by default. Install what you need. 37 verified modules available, plus custom ZIP uploads.</p>
+  <p>Zero modules by default. Install what you need. 41 verified modules available, plus custom ZIP uploads.</p>
 
   ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?logo=next.js)
   ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)
@@ -19,9 +19,13 @@
 
 ## What is uxwVend?
 
-uxwVend is a plugin-first platform for game server websites, digital storefronts, and community portals. The core ships empty — every feature is a module you install with one click from the built-in marketplace, or upload as a ZIP.
+uxwVend is a plugin-first platform for game server websites, digital storefronts, and community portals. The core ships empty — every feature is a module installed from the built-in marketplace or uploaded as a ZIP. Themes are declarative manifest packages that handle presentation, component overrides, and schema-driven admin settings pages.
 
-Modules are fully self-contained: they register their own routes, API endpoints, navbar links, footer links, dashboard cards, homepage widgets, profile tabs, settings pages, OAuth buttons, and layout components. Enable, disable, or swap them at any time without touching code.
+**Three strict layers:**
+
+1. **Core** — site-type-agnostic infrastructure: auth, RBAC, i18n, navigation link structure, health, rate limiting (Redis + memory fallback), maintenance, upload, SEO. Zero module or theme names in core code.
+2. **Modules** — feature layer. Each module declares its own routes, API, sidebar, widgets, dashboard cards, and more via `module.json`.
+3. **Themes** — presentation + composition. Each theme declares modes (light/dark), color/font tokens, schema-driven settings groups, and optional component overrides via `theme.json`.
 
 ---
 
@@ -42,7 +46,7 @@ Modules are fully self-contained: they register their own routes, API endpoints,
 
 - **One-click install/uninstall** from the admin marketplace
 - **ZIP upload** for custom or third-party modules
-- **Dependency resolution** — modules declare what they require (e.g. Stripe Gateway requires Store)
+- **Dependency resolution** — modules declare what they require
 - **Conflict detection** — incompatible modules cannot be active simultaneously
 - **Self-registering UI** — each module declares its own:
 
@@ -51,42 +55,43 @@ Modules are fully self-contained: they register their own routes, API endpoints,
 | `navLinks` | Public navbar entries |
 | `footerLinks` | Footer link sections |
 | `menu` | Admin sidebar items |
-| `dashboardCards` | Admin dashboard stat cards |
+| `dashboardCards` / `statsApi` | Admin dashboard stat cards |
 | `widgets` / `homepageSections` | Homepage content areas |
 | `profileTabs` | User profile tabs |
 | `settingsCards` | Admin settings page entries |
 | `oauthButtons` | Login/register OAuth buttons |
-| `navbarComponents` | Navbar icons (cart, bell) |
+| `navbarComponents` | Navbar icons (cart, bell, etc.) |
 | `layoutComponents` | Global layout injections |
+| `cronJobs` | Background scheduled tasks |
+| `webhookReceivers` | Inbound webhook endpoints |
+| `slotContents` | Content contributed into named slots |
+| `hookListeners` | Cross-module event listeners |
+| `notificationTypes` | Notification type registration |
 
 ---
 
-## Theme System
+## Theme System (v2)
 
-Themes are declarative config packages in `src/themes/`. The platform ships with a flat default theme. Additional themes (e.g. PixelCraft) are available from the marketplace or uploaded as ZIPs.
+Themes live in `src/themes/<id>/` and ship with a `theme.json` manifest (`schemaVersion: 2`).
 
-- Dark mode toggle (`data-mode="dark"`)
-- Live color customization from admin panel
-- Custom CSS injection
-- Component-level overrides via `ThemeSlot`
+- **Modes** — one manifest, multiple named modes (e.g. light + dark). No separate dark-variant themes.
+- **Tokens** — `colors`, `fonts`, `radius`, `space` fields with customizer metadata.
+- **Settings** — `settings.<group>.fields.<key>` schema. Core auto-renders `/admin/theme/<group>` — theme author writes zero React for standard settings pages.
+- **Components** — optional React overrides wired via `<ThemeComponentSlot>`.
+- **Slots** — themes can declare and contribute into named content slots.
+- **Admin nav** — each theme specifies its own label and Lucide icon for the sidebar "Theme" group.
 
----
+**Shipped themes:**
 
-## Tech Stack
+| Theme | Description |
+|-------|-------------|
+| `flat` | Default baseline. Light + dark modes. No component overrides. |
+| `pixelcraft` | Gaming/Minecraft preset. Dark only. Compact Hypixel-style hero. Suggests mc-stats + store modules. |
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16.2 (App Router, Turbopack) |
-| Language | TypeScript 5.9 |
-| Database | PostgreSQL + Prisma 6.19 |
-| Validation | Zod 4 |
-| Auth | Auth.js v5 (credentials, Discord, Google OAuth) |
-| Styling | Tailwind CSS 4 |
-| Payments | Stripe + PayPal |
-| Email | Resend |
-| i18n | next-intl (EN, TR, DE) |
-| Charts | Chart.js |
-| Icons | Lucide React |
+**Data model:**
+- `ThemeState` (singleton, id=1) — active themeId + mode
+- `ThemeCustomization` — `@@unique([themeId, mode])`, mode-scoped token overrides
+- `ThemeSetting` — `@@unique([themeId, groupKey, key])` for grouped settings
 
 ---
 
@@ -102,12 +107,10 @@ npm install
 cp .env.example .env
 # Edit .env — set DATABASE_URL and AUTH_SECRET at minimum
 
-npx prisma db push
-npm run db:seed        # optional — loads demo data
-npm run dev            # starts on port 3001
+npm run db:push
+npm run db:seed         # 3 roles + admin user (admin@uxwvend.com / admin123)
+npm run dev             # starts on port 3001
 ```
-
-The first-time setup wizard will guide you through initial configuration.
 
 ---
 
@@ -119,90 +122,74 @@ src/
 │   ├── (admin)/           # Admin panel
 │   ├── (auth)/            # Auth pages
 │   └── (public)/          # Public pages
-├── core/                  # Core framework (auth, db, payments, RBAC, i18n)
+├── core/                  # Core framework (auth, db, RBAC, i18n, rate-limit, upload, SEO)
 │   ├── components/        # Shared UI components
+│   ├── generated/         # Codegen output (module-registry, theme-registry, etc.)
 │   ├── lib/               # Utilities and services
 │   ├── hooks/             # React hooks
 │   └── providers/         # Context providers
-├── modules/               # Installed modules (auto-discovered)
-├── themes/                # Theme packages
+├── modules/               # Installed modules (auto-discovered at runtime)
+├── themes/                # Installed themes (flat + pixelcraft shipped)
 └── proxy.ts               # Middleware (i18n + module route gating)
+
+module-marketplace/        # 41 installable module ZIPs + index.json catalog
+module-sources/            # Module source code (tracked in git)
+theme-marketplace/         # Installable theme ZIPs
+scripts/                   # Codegen, migration, and tooling scripts
+prisma/schema.core.prisma  # Core schema (DO NOT edit schema.prisma directly)
 ```
-
----
-
-## Module Development
-
-Create a directory in `src/modules/your-module/` with a `module.json` manifest:
-
-```json
-{
-    "id": "your-module",
-    "name": "Your Module",
-    "description": "What it does",
-    "version": "1.0.0",
-    "author": "You",
-    "icon": "Package",
-    "dependencies": ["store"],
-    "navLinks": [
-        { "label": "My Page", "href": "/my-page", "position": 5 }
-    ],
-    "routes": [
-        { "path": "/my-page", "component": "pages/public/page.tsx" }
-    ],
-    "adminRoutes": [
-        { "path": "/my-module", "component": "pages/admin/page.tsx" }
-    ],
-    "api": [
-        { "path": "/my-module/data", "handler": "api/data/route.ts" }
-    ],
-    "menu": [
-        { "label": "My Module", "path": "/my-module", "icon": "Package" }
-    ]
-}
-```
-
-Then regenerate the registry:
-
-```bash
-npx tsx scripts/generate-registry.ts
-```
-
-Modules can also declare `widgets`, `dashboardCards`, `profileTabs`, `settingsCards`, `oauthButtons`, `navbarComponents`, `layoutComponents`, and `homepageSections`. See `src/core/lib/module-types.ts` for the full manifest schema.
 
 ---
 
 ## Commands
 
 ```bash
-npm run dev              # Development server (Turbopack, port 3001)
+# Development
+npm run dev              # Dev server (Turbopack, port 3001, 0.0.0.0)
 npm run build            # Production build
-npm run start            # Start production server
-npm run lint             # ESLint
-npm run clean            # Clear .next cache
-npm run db:push          # Push Prisma schema to database
-npm run db:migrate       # Create and apply migration
-npm run db:seed          # Seed demo data
+npm run start            # Production server
+npx pm2 start npm --name uxwvend -- start -- -p 3001 -H 0.0.0.0
+
+# Database
+npm run db:merge         # Merge core + module schemas → prisma/schema.prisma
+npm run db:generate      # Run prisma generate
+npm run db:push          # Push schema to database (no migrations)
+npm run db:seed          # Seed core data: 3 roles + admin user
 npm run db:studio        # Prisma Studio GUI
 npm run db:backup        # Backup database
 npm run db:restore       # Restore from backup
-npm run generate:themes  # Regenerate theme registry
+
+# Code generation
+npm run generate:themes                    # theme-registry + theme-tokens.css + theme-admin-routes.ts
+npx tsx scripts/generate-registry.ts      # module-registry.tsx + module-routes.ts
+npx tsx scripts/seed-translations.ts      # Sync translations from messages-core + module manifests to DB
+
+# Tooling
+npm run create:module    # Scaffold new module from template
+npm run validate:module  # Validate module manifest
+npm run lint             # ESLint (--max-warnings=0)
+npm run clean            # Clear .next cache
+
+# Testing
+npm test                 # Vitest (290+ tests)
+npm run test:e2e         # Playwright
 ```
 
 ---
 
-## API
+## Module Development
 
-OpenAPI spec is available at `/api/v1/openapi` when the server is running. API key authentication is supported for external integrations.
+```bash
+npm run create:module my-module "My Module" "What it does"
+# Scaffolds module-sources/my-module/ from module-template/
 
----
+# After editing module.json and schema.prisma:
+npm run db:merge && npm run db:push
+npx tsx scripts/generate-registry.ts
+npm run dev
+```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Open a Pull Request
+See `module-template/README.md` for full authoring guide and `CLAUDE.md` for manifest reference.
 
 ---
 
