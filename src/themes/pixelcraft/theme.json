@@ -103,5 +103,60 @@
         "default": "\"JetBrains Mono\", monospace"
       }
     }
-  }
+  },
+  "settings": {
+    "hero": {
+      "label": "Hero",
+      "icon": "Image",
+      "fields": {
+        "title": {
+          "type": "text",
+          "label": "Başlık",
+          "default": "Sunucuya Hoşgeldin"
+        },
+        "subtitle": {
+          "type": "text",
+          "label": "Alt Başlık",
+          "default": "Macera seni bekliyor"
+        },
+        "backgroundImage": {
+          "type": "image",
+          "label": "Arkaplan Görseli"
+        },
+        "serverIp": {
+          "type": "text",
+          "label": "Sunucu IP",
+          "default": "play.example.com"
+        },
+        "ctaText": {
+          "type": "text",
+          "label": "Buton Metni",
+          "default": "Şimdi Oyna"
+        },
+        "ctaHref": {
+          "type": "url",
+          "label": "Buton Linki"
+        },
+        "discordUrl": {
+          "type": "url",
+          "label": "Discord Linki"
+        }
+      }
+    }
+  },
+  "components": {
+    "Hero": "components/Hero.tsx"
+  },
+  "slots": [
+    { "name": "hero.liveStats" }
+  ],
+  "adminNav": {
+    "label": "PixelCraft",
+    "icon": "Gamepad2",
+    "order": 80
+  },
+  "suggestedModules": [
+    { "id": "mc-stats", "reason": "Canlı sunucu durumu (oyuncu sayısı, ping)" },
+    { "id": "store", "reason": "VIP/rank mağazası" }
+  ]
 }

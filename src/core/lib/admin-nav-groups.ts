@@ -403,17 +403,28 @@ export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
         ...themeItems.map((i: ThemeAdminNavItem) => ({
             label: i.label,
             href: "/admin" + (i.path.startsWith("/") ? i.path : "/" + i.path),
-            icon: Palette,
+            icon: resolveLucideIcon(i.icon) ?? Palette,
         })),
     ];
 
-    const manifestAny = manifest as { adminNav?: { label?: string } };
+    const manifestAny = manifest as { adminNav?: { label?: string; icon?: string } };
+    const groupIcon = resolveLucideIcon(manifestAny.adminNav?.icon) ?? Palette;
 
     return {
         id: "theme",
         label: manifestAny.adminNav?.label ?? manifest.name,
-        icon: Palette,
+        icon: groupIcon,
         pathPrefix: "/admin/theme",
         sections: [{ items }],
     };
+}
+
+function resolveLucideIcon(name: string | undefined): ComponentType | null {
+    if (!name) return null;
+    // Typed lookup without coupling admin-nav-groups to every Lucide export
+    // shape — the icon library ships hundreds of components, any of them a
+    // valid reference for a theme manifest.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const lib = require("lucide-react") as Record<string, ComponentType>;
+    return lib[name] ?? null;
 }
