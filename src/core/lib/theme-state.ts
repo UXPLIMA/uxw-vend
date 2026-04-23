@@ -25,7 +25,22 @@ export async function getActiveTheme(): Promise<ActiveTheme> {
         prisma.themeSetting.findMany({ where: { themeId } }).catch(() => []),
     ]);
 
+    // Start every declared settings group + field at its manifest-level
+    // `default`. DB rows then override — so a theme that ships with field
+    // defaults renders them immediately on first install, before the admin
+    // has saved anything. Without this step, any component reading
+    // useThemeConfig()?.hero?.title on a freshly-switched theme sees
+    // undefined and degrades to nothing visible.
     const settings: Record<string, Record<string, unknown>> = {};
+    for (const [groupKey, groupDef] of Object.entries(manifest.settings ?? {})) {
+        const group: Record<string, unknown> = {};
+        for (const [fieldKey, fieldDef] of Object.entries(groupDef.fields)) {
+            if ("default" in fieldDef && fieldDef.default !== undefined) {
+                group[fieldKey] = fieldDef.default;
+            }
+        }
+        if (Object.keys(group).length > 0) settings[groupKey] = group;
+    }
     for (const row of settingRows) {
         if (!settings[row.groupKey]) settings[row.groupKey] = {};
         settings[row.groupKey][row.key] = row.value;
