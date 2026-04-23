@@ -123,6 +123,10 @@
           "type": "image",
           "label": "Arkaplan Görseli"
         },
+        "logoImage": {
+          "type": "image",
+          "label": "Merkez Logo"
+        },
         "serverIp": {
           "type": "text",
           "label": "Sunucu IP",

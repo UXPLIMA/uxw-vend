@@ -6,23 +6,26 @@ import { Slot } from "@/core/components/Slot";
 import { Copy, Check, Gamepad2 } from "lucide-react";
 
 /**
- * PixelCraft hero — compact horizontal banner, Hypixel-style.
+ * PixelCraft hero — three-column gaming banner.
  *
- * Two info cells flank a background image: server IP on the left, the
- * Discord community link on the right. Both cells expose a `<Slot />`
- * above their label so an analytics module (typically mc-stats) can
- * inject a live counter — "24 448 PLAYERS ONLINE", "950 MEMBERS ONLINE"
- * — without the theme knowing about the module. If nothing fills the
- * slot, the cell degrades to just the static label.
+ *   [ server IP cell ]  [ center logo ]  [ discord cell ]
  *
- * The hero deliberately stays short (~120 px) so the navbar and first
- * fold content stay visible without scrolling.
+ * Each side cell exposes a `<Slot />` above its label so an analytics
+ * module (typically mc-stats) can inject a live counter — "24 448
+ * PLAYERS ONLINE", "950 MEMBERS ONLINE" — without the theme knowing
+ * about the module. If nothing fills the slot, the cell degrades to
+ * just the static label.
+ *
+ * The center column shows the admin-uploaded logo (hero.logoImage).
+ * If no logo is set, the column collapses so the two info cells
+ * stretch evenly.
  */
 export default function Hero() {
     // useThemeConfig returns a dotted-path getter, not the raw object —
     // don't cast it to a record.
     const get = useThemeConfig();
     const bgImage = get<string>("hero.backgroundImage", "") ?? "";
+    const logoImage = get<string>("hero.logoImage", "") ?? "";
     const serverIp = get<string>("hero.serverIp", "") ?? "";
     const discordUrl = get<string>("hero.discordUrl", "") ?? "";
 
@@ -43,55 +46,67 @@ export default function Hero() {
                 background: bgImage
                     ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url(${bgImage}) center/cover no-repeat`
                     : "linear-gradient(135deg, var(--uxw-color-muted) 0%, var(--uxw-color-card) 100%)",
-                color: "var(--uxw-color-foreground)",
+                color: "#f8f8f8",
             }}
         >
-            <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
-                <div className="flex items-center justify-between gap-4">
-                    {/* Left: server info — Minecraft IP */}
-                    {serverIp ? (
-                        <button
-                            type="button"
-                            onClick={copyIp}
-                            className="group flex items-center gap-3 text-left hover:opacity-90 transition"
-                            aria-label="Copy server IP"
-                        >
-                            <Gamepad2 className="w-6 h-6 md:w-7 md:h-7 flex-shrink-0" style={{ color: "var(--uxw-color-primary)" }} />
-                            <div className="min-w-0">
-                                <div className="text-[10px] md:text-xs uppercase tracking-wider opacity-80">
-                                    <Slot name="hero.liveStats" />
+            <div className="max-w-7xl mx-auto px-4 py-10 md:py-16">
+                <div className="grid grid-cols-3 items-center gap-4">
+                    {/* Left: server IP */}
+                    <div className="justify-self-start">
+                        {serverIp ? (
+                            <button
+                                type="button"
+                                onClick={copyIp}
+                                className="group flex items-center gap-3 text-left hover:opacity-90 transition"
+                                aria-label="Copy server IP"
+                            >
+                                <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 drop-shadow" style={{ color: "var(--uxw-color-primary)" }} />
+                                <div className="min-w-0">
+                                    <div className="text-[10px] md:text-xs uppercase tracking-wider opacity-85">
+                                        <Slot name="hero.liveStats" />
+                                    </div>
+                                    <div className="flex items-center gap-1.5 font-bold text-base md:text-lg font-mono drop-shadow">
+                                        <span className="truncate">{serverIp}</span>
+                                        {copied ? <Check size={14} /> : <Copy size={14} className="opacity-60 group-hover:opacity-100" />}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 font-bold text-sm md:text-base font-mono">
-                                    <span className="truncate">{serverIp}</span>
-                                    {copied ? <Check size={12} /> : <Copy size={12} className="opacity-60 group-hover:opacity-100" />}
-                                </div>
-                            </div>
-                        </button>
-                    ) : (
-                        <div />
-                    )}
+                            </button>
+                        ) : null}
+                    </div>
+
+                    {/* Center: logo */}
+                    <div className="justify-self-center">
+                        {logoImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={logoImage}
+                                alt="logo"
+                                className="h-20 md:h-32 max-w-[260px] object-contain drop-shadow-lg"
+                            />
+                        ) : null}
+                    </div>
 
                     {/* Right: Discord */}
-                    {discordUrl ? (
-                        <a
-                            href={discordUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center gap-3 hover:opacity-90 transition"
-                        >
-                            <div className="min-w-0 text-right">
-                                <div className="text-[10px] md:text-xs uppercase tracking-wider opacity-80">
-                                    <Slot name="hero.discordStats" />
+                    <div className="justify-self-end">
+                        {discordUrl ? (
+                            <a
+                                href={discordUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-3 hover:opacity-90 transition"
+                            >
+                                <div className="min-w-0 text-right">
+                                    <div className="text-[10px] md:text-xs uppercase tracking-wider opacity-85">
+                                        <Slot name="hero.discordStats" />
+                                    </div>
+                                    <div className="font-bold text-base md:text-lg uppercase tracking-wide drop-shadow">
+                                        Discord
+                                    </div>
                                 </div>
-                                <div className="font-bold text-sm md:text-base uppercase tracking-wide">
-                                    Discord
-                                </div>
-                            </div>
-                            <DiscordMark className="w-6 h-6 md:w-7 md:h-7 flex-shrink-0" />
-                        </a>
-                    ) : (
-                        <div />
-                    )}
+                                <DiscordMark className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 drop-shadow" />
+                            </a>
+                        ) : null}
+                    </div>
                 </div>
             </div>
         </section>
