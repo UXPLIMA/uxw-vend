@@ -19,11 +19,12 @@ import { Copy, Check, Gamepad2 } from "lucide-react";
  * fold content stay visible without scrolling.
  */
 export default function Hero() {
-    const config = useThemeConfig() as { hero?: Record<string, unknown> };
-    const hero = config?.hero ?? {};
-    const bgImage = (hero.backgroundImage as string) || "";
-    const serverIp = (hero.serverIp as string) || "";
-    const discordUrl = (hero.discordUrl as string) || "";
+    // useThemeConfig returns a dotted-path getter, not the raw object —
+    // don't cast it to a record.
+    const get = useThemeConfig();
+    const bgImage = get<string>("hero.backgroundImage", "") ?? "";
+    const serverIp = get<string>("hero.serverIp", "") ?? "";
+    const discordUrl = get<string>("hero.discordUrl", "") ?? "";
 
     const [copied, setCopied] = useState(false);
     const copyIp = async () => {
