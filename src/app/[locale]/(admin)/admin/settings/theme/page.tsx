@@ -10,33 +10,19 @@ import { useTranslations } from "next-intl";
 
 import { themeRegistry } from "@/core/generated/theme-registry";
 import { useTheme } from "@/core/providers/theme-provider";
-import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
+    // currentMode is only used by handleThemeSwitch below; color customization
+    // itself moved to /admin/theme/appearance so this page no longer loads or
+    // mutates ThemeCustomization rows.
     const { activeTheme, currentThemeId, currentMode, setMode } = useTheme();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [deleting, setDeleting] = useState<string | null>(null);
     const { confirm } = useConfirm();
-
-    // Schema-driven color overrides
-    const [colorOverrides, setColorOverrides] = useState<Record<string, string | undefined>>({});
-
-    // Load persisted overrides when active theme or mode changes
-    useEffect(() => {
-        if (!activeTheme?.id) return;
-        fetch(`/api/v1/themes/${activeTheme.id}/customization`)
-            .then(r => r.json())
-            .then(data => {
-                const modeOverrides = data?.overrides?.[currentMode];
-                const colors = (modeOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors ?? {};
-                setColorOverrides(colors);
-            })
-            .catch(() => {});
-    }, [activeTheme?.id, currentMode]);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -100,32 +86,6 @@ export default function ThemeSettingsPage() {
             body: JSON.stringify({ themeId, mode: currentMode }),
         });
         location.reload();
-    };
-
-    const saveColors = async () => {
-        if (!activeTheme?.id) return;
-        const nonEmpty = Object.fromEntries(
-            Object.entries(colorOverrides).filter(([, v]) => v !== undefined)
-        ) as Record<string, string>;
-        await fetch(`/api/v1/themes/${activeTheme.id}/customization`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ mode: currentMode, overrides: { tokens: { colors: nonEmpty } } }),
-        });
-        toast.success(t("theme_colorsSaved") ?? "Colors saved");
-    };
-
-    const resetColors = async () => {
-        if (!activeTheme?.id) return;
-        const ok = await confirm({ title: "Reset Colors", message: "Discard all color overrides?", variant: "danger", confirmText: "Reset" });
-        if (!ok) return;
-        await fetch(`/api/v1/themes/${activeTheme.id}/customization`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ mode: currentMode, overrides: {} }),
-        });
-        setColorOverrides({});
-        toast.success(t("theme_resetDefault") ?? "Reset");
     };
 
     const renderPreview = (themeId: string) => {
@@ -215,9 +175,6 @@ export default function ThemeSettingsPage() {
 
     // Mode toggle
     const modes = Object.keys(activeTheme?.modes?.available ?? {});
-
-    // Schema-driven color tokens from active theme
-    const colorTokens = activeTheme?.tokens?.colors ?? {};
 
     return (
         <div className="space-y-6">

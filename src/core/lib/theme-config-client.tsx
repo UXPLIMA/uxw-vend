@@ -1,14 +1,17 @@
 "use client";
 
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
 export type ThemeConfigValue = Record<string, unknown>;
 
 const ThemeConfigContext = createContext<ThemeConfigValue>({});
 
 export function ThemeConfigProvider({ value, children }: { value: ThemeConfigValue; children: ReactNode }) {
-    const memoized = useMemo(() => value, [JSON.stringify(value)]);
-    return <ThemeConfigContext.Provider value={memoized}>{children}</ThemeConfigContext.Provider>;
+    // Callers pass a server-resolved snapshot — the reference is stable for
+    // the request lifetime, so there's no benefit to a useMemo wrapper here.
+    // Dropping it also keeps the react-hooks lint happy without introducing
+    // a JSON.stringify dependency expression.
+    return <ThemeConfigContext.Provider value={value}>{children}</ThemeConfigContext.Provider>;
 }
 
 export function useThemeConfig() {
