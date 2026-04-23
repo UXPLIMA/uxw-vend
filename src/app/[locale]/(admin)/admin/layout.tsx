@@ -10,6 +10,7 @@ import { ModuleUpdateBadge } from "@/core/components/admin/ModuleUpdateBadge";
 import { UpdateNotificationBanner } from "@/core/components/admin/UpdateNotificationBanner";
 import moduleSystem from "@/core/lib/modules";
 import { prisma } from "@/core/lib/db";
+import { getActiveTheme } from "@/core/lib/theme-state";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
@@ -35,12 +36,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
     const modules = moduleSystem.getEnabledModules();
 
+    const { themeId } = await getActiveTheme();
+
     return (
         <div className="min-h-screen bg-background" suppressHydrationWarning>
             <AdminSidebar
                 userName={session.user.name || ""}
                 userEmail={session.user.email || ""}
                 modules={modules}
+                activeThemeId={themeId}
             />
             {/* Main content — cleared 56 (icon rail) + 224 (context sidebar) = 280px */}
             <main

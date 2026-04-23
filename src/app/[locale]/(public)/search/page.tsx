@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import {
     Search,
     Loader2,
@@ -88,8 +88,8 @@ export default function SearchPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-6xl">
                 <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
@@ -187,7 +187,7 @@ export default function SearchPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

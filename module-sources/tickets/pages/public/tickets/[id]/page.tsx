@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
+import { Navbar, Footer } from "@/core/components/layout";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { formatRelativeTime } from "@/core/lib/utils";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Message {
     id: string;
@@ -103,8 +103,8 @@ export default function TicketDetailPage({ params }: PageProps) {
     if (!session?.user) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-                <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">Please login to view this ticket</p>
@@ -113,15 +113,15 @@ export default function TicketDetailPage({ params }: PageProps) {
                         </Link>
                     </div>
                 </main>
-                <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+                <Footer />
             </div>
         );
     }
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
@@ -145,11 +145,34 @@ export default function TicketDetailPage({ params }: PageProps) {
                         </Link>
                     </div>
                 ) : ticket ? (
-                    <ThemeSlot
-                        name="SidebarLayout"
-                        defaultComponent={<StandardSidebarLayout sidebar={null as unknown as React.ReactNode}>{null as unknown as React.ReactNode}</StandardSidebarLayout>}
-                        props={{
-                            children: (
+                    <StandardSidebarLayout sidebar={(
+                                <div className="space-y-4">
+                                    <div className="bg-card rounded-xl border border-border p-4">
+                                        <h3 className="font-bold text-foreground mb-3">Ticket Info</h3>
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Created</span>
+                                                <span className="text-foreground">{formatRelativeTime(ticket.createdAt)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Updated</span>
+                                                <span className="text-foreground">{formatRelativeTime(ticket.updatedAt)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Messages</span>
+                                                <span className="text-foreground">{ticket.messages.length}</span>
+                                            </div>
+                                            {ticket.assignedTo && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Assigned to</span>
+                                                    <span className="text-foreground">{ticket.assignedTo.username}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}>
+                        {(
                                 <div className="space-y-4">
                                     {/* Ticket Header */}
                                     <div className="bg-card rounded-xl border border-border p-6">
@@ -219,40 +242,12 @@ export default function TicketDetailPage({ params }: PageProps) {
                                         </div>
                                     )}
                                 </div>
-                            ),
-                            sidebar: (
-                                <div className="space-y-4">
-                                    <div className="bg-card rounded-xl border border-border p-4">
-                                        <h3 className="font-bold text-foreground mb-3">Ticket Info</h3>
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Created</span>
-                                                <span className="text-foreground">{formatRelativeTime(ticket.createdAt)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Updated</span>
-                                                <span className="text-foreground">{formatRelativeTime(ticket.updatedAt)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Messages</span>
-                                                <span className="text-foreground">{ticket.messages.length}</span>
-                                            </div>
-                                            {ticket.assignedTo && (
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">Assigned to</span>
-                                                    <span className="text-foreground">{ticket.assignedTo.username}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        }}
-                    />
+                            )}
+                    </StandardSidebarLayout>
                 ) : null}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

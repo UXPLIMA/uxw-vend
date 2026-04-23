@@ -50,7 +50,6 @@ class ModuleLoader {
             this.modules.set(manifest.id, {
                 manifest,
                 path: modulePath,
-                enabled: true,
             });
         } catch (error) {
             console.error(`Failed to load module ${dirName}:`, error);

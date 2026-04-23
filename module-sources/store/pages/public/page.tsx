@@ -4,12 +4,11 @@ import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "../../lib/currency-context";
-import { ThemeSlot } from "@/core/components/theme-slot";
-
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 interface Category {
     id: string;
     name: string;
@@ -127,10 +126,10 @@ export default function StorePage() {
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             {/* Shared Hero Banner */}
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
 
             {/* Shared Navbar */}
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <Navbar />
 
             {/* Main Content */}
             <main className="container mx-auto px-4 py-6 flex-1">
@@ -161,13 +160,14 @@ export default function StorePage() {
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="mb-6">
                     <div className="relative max-w-lg">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('searchProducts')}
-                            className="w-full pl-10 pr-10 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
+                            className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                         {searchQuery && (
                             <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -369,7 +369,7 @@ export default function StorePage() {
             </main>
 
             {/* Shared Footer */}
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

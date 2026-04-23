@@ -7,11 +7,11 @@ import { useRouter } from "@/core/lib/i18n/navigation";
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { useCurrency } from "../../../lib/currency-context";
 import { Loader2, Check, X, CreditCard, Wallet, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface CartItem {
     id: string;
@@ -236,8 +236,8 @@ export default function CartPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <h1 className="text-3xl font-bold mb-8">{t('shoppingCart')}</h1>
@@ -544,7 +544,7 @@ export default function CartPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

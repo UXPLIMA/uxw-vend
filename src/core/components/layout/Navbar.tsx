@@ -19,7 +19,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Trophy, Vote, Dices, History, Users, Shield,
 };
 
-export function Navbar() {
+function DefaultNavbar() {
     const pathname = usePathname();
     const t = useTranslations('nav');
     const commonT = useTranslations('common');
@@ -268,4 +268,10 @@ export function Navbar() {
         </header>
         </>
     );
+}
+
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+
+export function Navbar() {
+    return <ThemeComponentSlot name="Navbar" fallback={DefaultNavbar} />;
 }

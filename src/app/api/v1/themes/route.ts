@@ -25,16 +25,14 @@ export async function GET() {
     const themes = fs.readdirSync(THEMES_DIR)
         .filter((f) => fs.statSync(path.join(THEMES_DIR, f)).isDirectory())
         .map((themeId) => {
-            const configPath = path.join(THEMES_DIR, themeId, "theme.config.ts");
             const jsonPath = path.join(THEMES_DIR, themeId, "theme.json");
-            const hasConfig = fs.existsSync(configPath);
-            const hasJson = fs.existsSync(jsonPath);
+            if (!fs.existsSync(jsonPath)) return null;
 
             let meta: Record<string, unknown> = { id: themeId };
-            if (hasJson) {
-                try {
-                    meta = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-                } catch { /* ignore */ }
+            try {
+                meta = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+            } catch {
+                return null;
             }
 
             const componentsDir = path.join(THEMES_DIR, themeId, "components");
@@ -48,10 +46,10 @@ export async function GET() {
                 description: meta.description || "",
                 author: meta.author || "",
                 version: meta.version || "1.0.0",
-                hasConfig,
                 componentCount,
             };
-        });
+        })
+        .filter((t): t is NonNullable<typeof t> => t !== null);
 
     return NextResponse.json({ themes });
 }

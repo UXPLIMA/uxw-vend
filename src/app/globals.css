@@ -1,76 +1,72 @@
 @import "tailwindcss";
+@import "../core/generated/theme-tokens.css";
 @source "../../src/modules";
 
+/* Fallback root tokens so built-in styles work before a theme data-attr is applied. */
 :root {
-  --ux-primary: #2563eb;
-  --ux-secondary: #7c3aed;
-  --ux-accent: #06b6d4;
-  --ux-background: #f3f4f6;
-  --ux-foreground: #111827;
-  --ux-muted: #f1f5f9;
-  --ux-muted-foreground: #64748b;
-  --ux-card: #ffffff;
-  --ux-card-foreground: #111827;
-  --ux-border: #e5e7eb;
-  --ux-destructive: #ef4444;
-  --ux-success: #22c55e;
-  --ux-warning: #f59e0b;
-
-  --font-heading: "Outfit", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --radius: 0.625rem;
-}
-
-[data-theme="dark"],
-[data-mode="dark"],
-.dark {
-  --ux-primary: #3b82f6;
-  --ux-secondary: #8b5cf6;
-  --ux-accent: #22d3ee;
-  --ux-background: #111827;
-  --ux-foreground: #f1f5f9;
-  --ux-muted: #1e293b;
-  --ux-muted-foreground: #94a3b8;
-  --ux-card: #1e293b;
-  --ux-card-foreground: #f1f5f9;
-  --ux-border: #1f2937;
-  --ux-destructive: #f87171;
-  --ux-success: #4ade80;
-  --ux-warning: #fbbf24;
-  color-scheme: dark;
+  --uxw-color-primary: #2563eb;
+  --uxw-color-primaryForeground: #ffffff;
+  --uxw-color-secondary: #64748b;
+  --uxw-color-secondaryForeground: #ffffff;
+  --uxw-color-accent: #f59e0b;
+  --uxw-color-accentForeground: #ffffff;
+  --uxw-color-background: #ffffff;
+  --uxw-color-foreground: #0f172a;
+  --uxw-color-muted: #f1f5f9;
+  --uxw-color-mutedForeground: #64748b;
+  --uxw-color-border: #e2e8f0;
+  --uxw-color-card: #ffffff;
+  --uxw-color-cardForeground: #0f172a;
+  --uxw-color-destructive: #ef4444;
+  --uxw-color-destructiveForeground: #ffffff;
+  --uxw-color-success: #16a34a;
+  --uxw-color-successForeground: #ffffff;
+  --uxw-color-warning: #f59e0b;
+  --uxw-color-warningForeground: #0f172a;
+  --uxw-font-heading: Inter, system-ui, sans-serif;
+  --uxw-font-body: Inter, system-ui, sans-serif;
+  --uxw-font-mono: ui-monospace, SFMono-Regular, monospace;
+  --uxw-radius: 0.5rem;
 }
 
 @theme inline {
-  --color-primary: var(--ux-primary);
-  --color-secondary: var(--ux-secondary);
-  --color-accent: var(--ux-accent);
-  --color-background: var(--ux-background);
-  --color-foreground: var(--ux-foreground);
-  --color-muted: var(--ux-muted);
-  --color-muted-foreground: var(--ux-muted-foreground);
-  --color-card: var(--ux-card);
-  --color-card-foreground: var(--ux-card-foreground);
-  --color-border: var(--ux-border);
-  --color-destructive: var(--ux-destructive);
-  --color-success: var(--ux-success);
-  --color-warning: var(--ux-warning);
-  --font-sans: var(--font-body);
-  --font-mono: var(--font-mono);
+  --color-primary:                var(--uxw-color-primary);
+  --color-primary-foreground:     var(--uxw-color-primaryForeground);
+  --color-secondary:              var(--uxw-color-secondary);
+  --color-secondary-foreground:   var(--uxw-color-secondaryForeground);
+  --color-accent:                 var(--uxw-color-accent);
+  --color-accent-foreground:      var(--uxw-color-accentForeground);
+  --color-background:             var(--uxw-color-background);
+  --color-foreground:             var(--uxw-color-foreground);
+  --color-muted:                  var(--uxw-color-muted);
+  --color-muted-foreground:       var(--uxw-color-mutedForeground);
+  --color-border:                 var(--uxw-color-border);
+  --color-card:                   var(--uxw-color-card);
+  --color-card-foreground:        var(--uxw-color-cardForeground);
+  --color-destructive:            var(--uxw-color-destructive);
+  --color-destructive-foreground: var(--uxw-color-destructiveForeground);
+  --color-success:                var(--uxw-color-success);
+  --color-success-foreground:     var(--uxw-color-successForeground);
+  --color-warning:                var(--uxw-color-warning);
+  --color-warning-foreground:     var(--uxw-color-warningForeground);
+  --font-heading:                 var(--uxw-font-heading);
+  --font-body:                    var(--uxw-font-body);
+  --font-mono:                    var(--uxw-font-mono);
+  --radius:                       var(--uxw-radius);
 }
 
 body {
-  color: var(--ux-foreground);
-  font-family: var(--font-body);
-  background: var(--ux-background);
+  color: var(--uxw-color-foreground);
+  font-family: var(--uxw-font-body);
+  background: var(--uxw-color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--ux-muted-foreground); opacity: 0.5; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ux-muted-foreground); }
+::-webkit-scrollbar-thumb { background: var(--uxw-color-mutedForeground); opacity: 0.5; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--uxw-color-mutedForeground); }
 
 ::selection { background: var(--color-primary); color: white; }
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
@@ -126,30 +122,30 @@ body {
 
 /* Dark mode — only legitimate overrides that can't be fixed at component level */
 [data-mode="dark"] {
-  background-color: var(--ux-background) !important;
-  color: var(--ux-foreground) !important;
+  background-color: var(--uxw-color-background) !important;
+  color: var(--uxw-color-foreground) !important;
 }
 /* HTML elements without Tailwind classes */
-[data-mode="dark"] table { color: var(--ux-foreground); }
-[data-mode="dark"] th { color: var(--ux-muted-foreground) !important; border-color: var(--ux-border) !important; }
-[data-mode="dark"] td { border-color: var(--ux-border) !important; }
-[data-mode="dark"] tr:hover { background-color: var(--ux-muted) !important; }
-[data-mode="dark"] .divide-y > * + * { border-color: var(--ux-border) !important; }
-[data-mode="dark"] .border-b { border-color: var(--ux-border) !important; }
-[data-mode="dark"] .border-t { border-color: var(--ux-border) !important; }
+[data-mode="dark"] table { color: var(--uxw-color-foreground); }
+[data-mode="dark"] th { color: var(--uxw-color-mutedForeground) !important; border-color: var(--uxw-color-border) !important; }
+[data-mode="dark"] td { border-color: var(--uxw-color-border) !important; }
+[data-mode="dark"] tr:hover { background-color: var(--uxw-color-muted) !important; }
+[data-mode="dark"] .divide-y > * + * { border-color: var(--uxw-color-border) !important; }
+[data-mode="dark"] .border-b { border-color: var(--uxw-color-border) !important; }
+[data-mode="dark"] .border-t { border-color: var(--uxw-color-border) !important; }
 /* Native form elements */
 [data-mode="dark"] input, [data-mode="dark"] textarea, [data-mode="dark"] select {
-  background-color: var(--ux-background) !important;
-  border-color: var(--ux-border) !important;
-  color: var(--ux-foreground) !important;
+  background-color: var(--uxw-color-background) !important;
+  border-color: var(--uxw-color-border) !important;
+  color: var(--uxw-color-foreground) !important;
 }
 [data-mode="dark"] input::placeholder, [data-mode="dark"] textarea::placeholder {
-  color: var(--ux-muted-foreground) !important;
+  color: var(--uxw-color-mutedForeground) !important;
 }
 [data-mode="dark"] input[type="color"] { background-color: transparent !important; }
 /* Code blocks */
-[data-mode="dark"] code { background-color: var(--ux-muted) !important; color: var(--ux-foreground) !important; }
-[data-mode="dark"] pre { background-color: var(--ux-background) !important; color: var(--ux-foreground) !important; }
+[data-mode="dark"] code { background-color: var(--uxw-color-muted) !important; color: var(--uxw-color-foreground) !important; }
+[data-mode="dark"] pre { background-color: var(--uxw-color-background) !important; color: var(--uxw-color-foreground) !important; }
 /* Status badge backgrounds (semantic colors) */
 [data-mode="dark"] .bg-green-50 { background-color: rgba(34, 197, 94, 0.1) !important; }
 [data-mode="dark"] .bg-red-50 { background-color: rgba(239, 68, 68, 0.1) !important; }
@@ -160,27 +156,27 @@ body {
 [data-mode="dark"] .shadow-lg { box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
 /* ARIA roles */
 [data-mode="dark"] [role="menu"], [data-mode="dark"] [role="listbox"] {
-  background-color: var(--ux-card) !important;
-  border-color: var(--ux-border) !important;
+  background-color: var(--uxw-color-card) !important;
+  border-color: var(--uxw-color-border) !important;
 }
 
 .admin-sidebar {
-  background: var(--ux-card);
-  border-right: 1px solid var(--ux-border);
+  background: var(--uxw-color-card);
+  border-right: 1px solid var(--uxw-color-border);
 }
 
 .admin-sidebar-link {
   transition: all 0.15s ease;
-  color: var(--ux-muted-foreground);
+  color: var(--uxw-color-mutedForeground);
 }
 
 .admin-sidebar-link:hover {
-  color: var(--ux-foreground);
-  background: var(--ux-muted);
+  color: var(--uxw-color-foreground);
+  background: var(--uxw-color-muted);
 }
 
 .admin-sidebar-link.active {
-  color: var(--ux-primary);
-  background: color-mix(in srgb, var(--ux-primary) 10%, transparent);
+  color: var(--uxw-color-primary);
+  background: color-mix(in srgb, var(--uxw-color-primary) 10%, transparent);
   font-weight: 500;
 }

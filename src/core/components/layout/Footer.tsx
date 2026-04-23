@@ -13,7 +13,7 @@ import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 import { Slot } from "@/core/components/Slot";
 
 
-export function Footer() {
+function DefaultFooter() {
     const t = useTranslations('footer');
     const commonT = useTranslations('common');
     const locale = useLocale();
@@ -59,7 +59,7 @@ export function Footer() {
 
     return (
         <>
-        <footer className="bg-[#111827] text-white mt-12">
+        <footer className="bg-card text-card-foreground border-t border-border mt-12">
             <Slot name="footer.top" />
             <div className="container mx-auto px-4 py-12">
                 <div className="grid md:grid-cols-4 gap-8">
@@ -180,4 +180,10 @@ export function Footer() {
         <Slot name="layout.bottom" />
         </>
     );
+}
+
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+
+export function Footer() {
+    return <ThemeComponentSlot name="Footer" fallback={DefaultFooter} />;
 }

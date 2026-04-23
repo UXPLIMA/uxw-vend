@@ -36,9 +36,12 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       // Tailwind JIT + Next.js hydration need inline script/style for now.
       "script-src 'self' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // @measured/puck's CSS pulls Inter from rsms.me (external @import in
+      // its bundled stylesheet). Whitelist that origin for both the sheet
+      // itself (style-src) and the @font-face URLs it references (font-src).
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me",
       "img-src 'self' data: blob: https:",
-      "font-src 'self' https://fonts.gstatic.com data:",
+      "font-src 'self' https://fonts.gstatic.com https://rsms.me data:",
       "connect-src 'self' https: wss:",
       "frame-ancestors 'self'",
       "frame-src 'self' https://api.sandbox.paypal.com https://js.stripe.com",

@@ -9,10 +9,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { useCurrency } from "../../../../lib/currency-context";
 import { useTranslations } from "next-intl";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Product {
     id: string;
@@ -144,12 +144,12 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-                <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </main>
-                <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+                <Footer />
             </div>
         );
     }
@@ -157,8 +157,8 @@ export default function ProductDetailPage() {
     if (error || !product) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-                <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+                <ThemeComponentSlot name="Hero" fallback={() => null} />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold text-foreground mb-4">{t('productNotFound')}</h1>
@@ -169,7 +169,7 @@ export default function ProductDetailPage() {
                         </Link>
                     </div>
                 </main>
-                <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+                <Footer />
             </div>
         );
     }
@@ -180,8 +180,8 @@ export default function ProductDetailPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
@@ -401,7 +401,7 @@ export default function ProductDetailPage() {
                 </div>
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Entry {
     id: string;
@@ -29,8 +29,8 @@ export default function ChangelogPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
                 <h1 className="text-3xl font-bold text-foreground mb-2">Changelog</h1>
@@ -78,7 +78,7 @@ export default function ChangelogPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

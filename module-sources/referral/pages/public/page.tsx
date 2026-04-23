@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface ReferralData {
     referralCode: string;
@@ -106,8 +106,8 @@ export default function ReferralPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 <div className="text-center mb-8">
@@ -264,7 +264,7 @@ export default function ReferralPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Award, Check, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { buildPageMeta } from "@/core/lib/seo";
 import { cached } from "@/core/lib/cache";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 const TROPHIES_PUBLIC_CACHE_KEY = "trophies:public";
 const TROPHIES_PUBLIC_TTL_MS = 30_000;
@@ -68,8 +68,8 @@ export default async function PublicTrophiesPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-5xl">
                 <div className="mb-6">
@@ -137,7 +137,7 @@ export default async function PublicTrophiesPage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

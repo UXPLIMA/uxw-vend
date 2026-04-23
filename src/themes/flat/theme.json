@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 2,
+  "id": "flat",
+  "name": "Flat",
+  "description": "Default light theme — clean, minimal, neutral.",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "modes": {
+    "default": "light",
+    "available": {
+      "light": {
+        "tokens": {
+          "colors": {
+            "primary": "#2563eb",
+            "secondary": "#64748b",
+            "accent": "#f59e0b",
+            "background": "#ffffff",
+            "foreground": "#0f172a",
+            "muted": "#f1f5f9",
+            "mutedForeground": "#64748b",
+            "border": "#e2e8f0",
+            "card": "#ffffff",
+            "cardForeground": "#0f172a",
+            "destructive": "#ef4444",
+            "success": "#16a34a",
+            "warning": "#f59e0b"
+          },
+          "fonts": {
+            "heading": "Inter, system-ui, sans-serif",
+            "body": "Inter, system-ui, sans-serif",
+            "mono": "ui-monospace, SFMono-Regular, monospace"
+          }
+        }
+      },
+      "dark": {
+        "tokens": {
+          "colors": {
+            "primary": "#2563eb",
+            "secondary": "#64748b",
+            "accent": "#f59e0b",
+            "background": "#0f172a",
+            "foreground": "#f8fafc",
+            "muted": "#1e293b",
+            "mutedForeground": "#94a3b8",
+            "border": "#334155",
+            "card": "#1e293b",
+            "cardForeground": "#f8fafc",
+            "destructive": "#ef4444",
+            "success": "#16a34a",
+            "warning": "#f59e0b"
+          },
+          "fonts": {
+            "heading": "Inter, system-ui, sans-serif",
+            "body": "Inter, system-ui, sans-serif",
+            "mono": "ui-monospace, SFMono-Regular, monospace"
+          }
+        }
+      }
+    }
+  },
+  "tokens": {
+    "colors": {
+      "primary": {
+        "type": "color",
+        "group": "Brand"
+      },
+      "secondary": {
+        "type": "color",
+        "group": "Brand"
+      },
+      "accent": {
+        "type": "color",
+        "group": "Brand"
+      },
+      "background": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "foreground": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "muted": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "mutedForeground": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "border": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "card": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "cardForeground": {
+        "type": "color",
+        "group": "Surface"
+      },
+      "destructive": {
+        "type": "color",
+        "group": "State"
+      },
+      "success": {
+        "type": "color",
+        "group": "State"
+      },
+      "warning": {
+        "type": "color",
+        "group": "State"
+      }
+    },
+    "fonts": {
+      "heading": {
+        "type": "font",
+        "default": "Inter, system-ui, sans-serif"
+      },
+      "body": {
+        "type": "font",
+        "default": "Inter, system-ui, sans-serif"
+      },
+      "mono": {
+        "type": "font",
+        "default": "ui-monospace, SFMono-Regular, monospace"
+      }
+    },
+    "radius": {
+      "type": "select",
+      "default": "md",
+      "options": [
+        {
+          "value": "none",
+          "label": "Square (0)"
+        },
+        {
+          "value": "sm",
+          "label": "Subtle (0.25rem)"
+        },
+        {
+          "value": "md",
+          "label": "Rounded (0.5rem)"
+        },
+        {
+          "value": "lg",
+          "label": "Soft (0.75rem)"
+        }
+      ]
+    }
+  }
+}

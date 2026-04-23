@@ -20,6 +20,8 @@
  */
 
 import type { ComponentType } from "react";
+import { themeRegistry } from "@/core/generated/theme-registry";
+import { themeAdminRoutes, type ThemeAdminNavItem } from "@/core/generated/theme-admin-routes";
 import {
     LayoutDashboard,
     Users,
@@ -45,7 +47,6 @@ import {
     KeyRound,
     FileJson,
     ImageIcon,
-    Paintbrush,
     Navigation,
     PanelBottom,
     LayoutGrid,
@@ -161,14 +162,13 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Palette,
         label: "Design",
         labelKey: "sidebar_design",
-        pathPrefix: ["/admin/settings/theme", "/admin/settings/customizer", "/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/hero", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
+        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
         sections: [
             {
                 header: "Appearance",
                 headerKey: "sidebar_appearance",
                 items: [
-                    { href: "/admin/settings/theme", label: "Theme", labelKey: "sidebar_theme", icon: Palette },
-                    { href: "/admin/settings/customizer", label: "Customizer", labelKey: "sidebar_customizer", icon: Paintbrush },
+                    { href: "/admin/settings/theme", label: "Theme Library", labelKey: "sidebar_themeLibrary", icon: Palette },
                     { href: "/admin/settings/css", label: "Custom CSS", labelKey: "sidebar_customCss", icon: Code },
                 ],
             },
@@ -178,7 +178,6 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 items: [
                     { href: "/admin/settings/navbar", label: "Navbar", labelKey: "sidebar_navbar", icon: Navigation },
                     { href: "/admin/settings/footer", label: "Footer", labelKey: "sidebar_footer", icon: PanelBottom },
-                    { href: "/admin/settings/hero", label: "Hero Banner", labelKey: "sidebar_heroBanner", icon: ImageIcon },
                     { href: "/admin/settings/widgets", label: "Widgets", labelKey: "sidebar_widgets", icon: LayoutGrid },
                 ],
             },
@@ -350,6 +349,7 @@ export function inferModuleGroup(moduleId: string): string {
  *   3. Longest-matching item `href` across all groups (covers
  *      module-contributed entries that aren't in any pathPrefix)
  */
+
 export function findActiveGroupId(pathname: string, groups: NavGroup[]): string | null {
     if (pathname === "/admin" || pathname === "/admin/") return "dashboard";
 
@@ -384,4 +384,47 @@ export function findActiveGroupId(pathname: string, groups: NavGroup[]): string 
     }
 
     return best?.id ?? null;
+}
+
+/**
+ * Build the "Theme" nav group for the currently-active theme. Returns null
+ * when the active theme id is unknown (shouldn't happen, but defensive).
+ * Called from the admin layout after resolving the active theme, then
+ * passed as a prop to AdminSidebar.
+ */
+export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
+    const manifest = themeRegistry[activeThemeId];
+    if (!manifest) return null;
+
+    const themeItems: ThemeAdminNavItem[] = themeAdminRoutes[activeThemeId] ?? [];
+
+    const items: NavItem[] = [
+        { label: "Appearance", href: "/admin/theme/appearance", icon: Palette },
+        ...themeItems.map((i: ThemeAdminNavItem) => ({
+            label: i.label,
+            href: "/admin" + (i.path.startsWith("/") ? i.path : "/" + i.path),
+            icon: resolveLucideIcon(i.icon) ?? Palette,
+        })),
+    ];
+
+    const manifestAny = manifest as { adminNav?: { label?: string; icon?: string } };
+    const groupIcon = resolveLucideIcon(manifestAny.adminNav?.icon) ?? Palette;
+
+    return {
+        id: "theme",
+        label: manifestAny.adminNav?.label ?? manifest.name,
+        icon: groupIcon,
+        pathPrefix: "/admin/theme",
+        sections: [{ items }],
+    };
+}
+
+function resolveLucideIcon(name: string | undefined): ComponentType | null {
+    if (!name) return null;
+    // Typed lookup without coupling admin-nav-groups to every Lucide export
+    // shape — the icon library ships hundreds of components, any of them a
+    // valid reference for a theme manifest.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const lib = require("lucide-react") as Record<string, ComponentType>;
+    return lib[name] ?? null;
 }

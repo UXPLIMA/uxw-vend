@@ -56,6 +56,8 @@ model User {
   conversations    ConversationParticipant[] @relation("ConversationMember")
   messages         Message[]          @relation("MessageAuthor")
   loginSessions    UserSession[]      @relation("UserSessions")
+  themeCustomizations   ThemeCustomization[] @relation("ThemeCustomizationUpdater")
+  themeSettingUpdates   ThemeSetting[]       @relation("ThemeSettingUpdater")
 
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
@@ -171,6 +173,47 @@ model ModuleConfig {
   installedAt       DateTime?
   installedByUserId String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Admin customization for a theme (mode-aware). `overrides` is a DIFF
+/// against the manifest defaults — resetting a field clears it from
+/// `overrides`, and deleting the row restores every default at once.
+model ThemeCustomization {
+  id          String   @id @default(cuid())
+  themeId     String
+  mode        String
+  overrides   Json     @default("{}")
+  updatedById String?
+  updatedBy   User?    @relation("ThemeCustomizationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([themeId, mode])
+  @@index([themeId])
+}
+
+/// Per-theme key/value settings (grouped). Admin-managed; read by theme
+/// renderers to replace or extend manifest defaults.
+model ThemeSetting {
+  id          String   @id @default(cuid())
+  themeId     String
+  groupKey    String
+  key         String
+  value       Json
+  updatedById String?
+  updatedBy   User?    @relation("ThemeSettingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([themeId, groupKey, key])
+  @@index([themeId, groupKey])
+}
+
+/// Singleton (id=1) — the currently active theme + colour mode for the
+/// entire site. Use ThemeState.upsert({ where: { id: 1 }, … }) to change.
+model ThemeState {
+  id        Int      @id @default(1)
+  themeId   String
+  mode      String
   updatedAt DateTime @updatedAt
 }
 

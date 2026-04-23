@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Activity } from "lucide-react";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
+import { Navbar, Footer } from "@/core/components/layout";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
 import { prisma } from "@/core/lib/db";
 import { buildPageMeta } from "@/core/lib/seo";
+import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export const dynamic = "force-dynamic";
 
@@ -48,8 +48,8 @@ export default async function ActivityFeedPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
                 <div className="mb-6">
@@ -63,7 +63,7 @@ export default async function ActivityFeedPage() {
                 <ActivityFeedList items={items} />
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

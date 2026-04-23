@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "generate:themes": "npx tsx scripts/generate-themes.ts",
+    "generate:themes": "npx tsx scripts/generate-theme-registry.ts",
     "build:marketplace": "bash scripts/build-marketplace.sh",
     "db:merge": "npx tsx scripts/merge-schemas.ts",
     "postinstall": "npx tsx scripts/postinstall.ts",
@@ -104,6 +104,9 @@
     "@next/bundle-analyzer": "^16.2.2",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/adm-zip": "^0.5.8",
     "@types/node": "^25.5.2",
     "@types/nprogress": "^0.2.3",
@@ -114,6 +117,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.2",
+    "jsdom": "^29.0.2",
     "prisma": "^7.6.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

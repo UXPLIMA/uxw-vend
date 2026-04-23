@@ -122,6 +122,13 @@ const slotContent = z.object({
     order: z.number().int().optional(),
 });
 
+const slotContribution = z.object({
+    name: z.string().min(1).max(128).regex(/^[a-zA-Z0-9.-]+$/),
+    component: relativePath("component"),
+    order: z.number().int().optional(),
+    id: z.string().min(1).max(64).regex(SAFE_SLUG).optional(),
+});
+
 const pageBlock = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
     category: z.string().max(64).optional(),
@@ -251,6 +258,7 @@ export const moduleManifestSchema = z.object({
     contextProviders: z.array(contextProvider).max(20).optional(),
     hookListeners: z.array(hookListener).max(200).optional(),
     slotContents: z.array(slotContent).max(100).optional(),
+    slots: z.array(slotContribution).max(200).optional(),
     pageBlocks: z.array(pageBlock).max(100).optional(),
     cronJobs: z.array(cronJob).max(50).optional(),
     searchProviders: z.array(searchProvider).max(20).optional(),
@@ -285,6 +293,7 @@ export function collectManifestFileRefs(m: ValidatedModuleManifest): string[] {
     m.contextProviders?.forEach((r) => push(r.component));
     m.hookListeners?.forEach((r) => push(r.handler));
     m.slotContents?.forEach((r) => push(r.component));
+    m.slots?.forEach((s) => push(s.component));
     m.pageBlocks?.forEach((r) => push(r.component));
     m.cronJobs?.forEach((r) => push(r.handler));
     m.searchProviders?.forEach((r) => push(r.handler));

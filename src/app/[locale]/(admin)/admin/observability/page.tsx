@@ -72,7 +72,11 @@ export default function ObservabilityPage() {
                 fetch("/api/v1/admin/observability/failed-emails", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
                 fetch("/api/v1/admin/observability/stats", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
             ]);
-            if (healthRes) setHealth(healthRes as HealthData);
+            // 429/503 error responses omit `checks` — keep the last successful
+            // snapshot on screen instead of crashing downstream accessors.
+            if (healthRes && typeof healthRes === "object" && "checks" in healthRes) {
+                setHealth(healthRes as HealthData);
+            }
             if (errorsRes?.data) setErrors(errorsRes.data as CronError[]);
             if (emailsRes?.data) setEmails(emailsRes.data as FailedEmail[]);
             if (statsRes?.data) setStats(statsRes.data as StatsData);

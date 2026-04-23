@@ -1,0 +1,60 @@
+// scripts/backfill-theme-v2.ts
+//
+// One-shot data backfill for theme v2.
+//   1. existing ThemeCustomization rows get mode = 'light' (the only mode
+//      v1 effectively supported — v1 darkness was a separate theme row).
+//   2. Setting.active_theme → ThemeState singleton row. Old Setting row deleted.
+//   3. If no active_theme setting existed and no ThemeState row exists, seed
+//      with (themeId='flat', mode='light').
+//
+// Idempotent — safe to re-run.
+// Usage: npx tsx scripts/backfill-theme-v2.ts
+
+import "dotenv/config";
+import { prisma } from "../src/core/lib/db";
+
+async function main() {
+    // 1. Backfill customization mode (rows created before mode column existed)
+    // Raw SQL: `prisma db push` adds `mode` as a NOT NULL column with no
+    // default, so existing rows land with empty string or NULL depending
+    // on Postgres behavior. Prisma's typed `updateMany` cannot target NULLs
+    // because the schema declares mode as non-optional.
+    const customizationsWithoutMode = await prisma.$executeRaw`
+        UPDATE "ThemeCustomization" SET "mode" = 'light' WHERE "mode" IS NULL OR "mode" = ''
+    `;
+    if (customizationsWithoutMode > 0) {
+        console.log(`[customization] backfilled mode='light' on ${customizationsWithoutMode} row(s)`);
+    }
+
+    // 2. Migrate Setting.active_theme → ThemeState
+    const active = await prisma.setting.findUnique({ where: { key: "active_theme" } });
+    if (active) {
+        const raw = active.value;
+        let themeId = "flat";
+        if (typeof raw === "string") themeId = raw;
+        else if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+            const obj = raw as { id?: unknown; active_theme?: unknown };
+            if (typeof obj.id === "string") themeId = obj.id;
+            else if (typeof obj.active_theme === "string") themeId = obj.active_theme;
+        }
+        await prisma.themeState.upsert({
+            where: { id: 1 },
+            create: { id: 1, themeId, mode: "light" },
+            update: { themeId, mode: "light" },
+        });
+        await prisma.setting.delete({ where: { key: "active_theme" } });
+        console.log(`[state] migrated active_theme="${themeId}" → ThemeState singleton; old Setting row deleted`);
+    } else {
+        // Seed singleton if none exists — upsert avoids the findFirst+create
+        // race where two concurrent runs both see "no row" and the second
+        // hits a PK conflict. The empty `update` keeps an existing row as-is.
+        const result = await prisma.themeState.upsert({
+            where: { id: 1 },
+            create: { id: 1, themeId: "flat", mode: "light" },
+            update: {},
+        });
+        console.log(`[state] singleton ensured (themeId=${result.themeId}, mode=${result.mode})`);
+    }
+}
+
+main().catch((e) => { console.error(e); process.exit(1); }).finally(() => prisma.$disconnect());

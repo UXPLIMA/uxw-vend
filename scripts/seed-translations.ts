@@ -12,11 +12,18 @@ import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { locales } from "../src/core/lib/i18n/config";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 const CORE_DIR = path.join(process.cwd(), "messages-core");
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
+
+// Only seed translations for locales the app actually supports. A stray
+// `messages-core/zz.json` (or a module manifest declaring an unknown
+// locale) would otherwise pollute the Translation table with rows that
+// no request handler ever reads.
+const SUPPORTED_LOCALES = new Set<string>(locales);
 
 function flattenObject(
     obj: Record<string, unknown>,
@@ -87,6 +94,10 @@ async function main() {
     let coreTotal = 0;
     for (const file of coreFiles) {
         const locale = file.replace(".json", "");
+        if (!SUPPORTED_LOCALES.has(locale)) {
+            console.log(`  core/${locale}: SKIPPED (not in locales config)`);
+            continue;
+        }
         const data = JSON.parse(fs.readFileSync(path.join(CORE_DIR, file), "utf-8"));
         const count = await seedLocale(locale, data, "core");
         coreTotal += count;
@@ -116,6 +127,7 @@ async function main() {
         let modCount = 0;
         for (const [locale, data] of Object.entries(translations as Record<string, Record<string, unknown>>)) {
             if (typeof data !== "object" || data === null) continue;
+            if (!SUPPORTED_LOCALES.has(locale)) continue;
             const count = await seedLocale(locale, data, moduleId);
             modCount += count;
         }
