@@ -2,9 +2,11 @@
 
 ## Overview
 
-uxwVend uses a file-based module system. Every feature (store, blog, forum, support, payments) is a self-contained module in `/src/modules/[name]/`. The platform ships with no modules installed -- all functionality comes from modules.
+uxwVend is a plugin-based platform built on Next.js 16.2 (App Router), TypeScript 5.9, Prisma 6.19, Auth.js v5, Tailwind CSS v4, and Zod 4.
 
-Modules are auto-discovered at build time. A build script reads each module's `module.json` manifest and generates dynamic import registries. At runtime, middleware blocks routes for disabled modules.
+The platform ships with zero modules. All functionality comes from modules installed from the marketplace or uploaded as ZIPs. Core knows nothing about any module — no module names, no hardcoded paths, no module-specific code anywhere in `src/core/`. Everything is driven by `module.json` manifests processed at build time.
+
+Module sources live under `module-sources/<id>/` (tracked in git). Installed modules live under `src/modules/<id>/`. The two directories are separate: `module-sources/` is the authoring workspace; `src/modules/` is what the running platform sees.
 
 ---
 
@@ -13,23 +15,25 @@ Modules are auto-discovered at build time. A build script reads each module's `m
 ### 1. Create the directory
 
 ```
-src/modules/hello-world/
+src/modules/my-module/
 ```
+
+The directory name must match the `id` field in `module.json`.
 
 ### 2. Create `module.json`
 
-Every module needs a `module.json` manifest in its root directory. This is the only required file.
-
 ```json
 {
-    "id": "hello-world",
-    "name": "Hello World",
-    "description": "A simple greeting module",
+    "id": "my-module",
+    "name": "My Module",
+    "description": "What the module does",
     "version": "1.0.0",
     "author": "Your Name",
     "icon": "Star"
 }
 ```
+
+Only `id`, `name`, `description`, and `version` are required. `icon` must be a valid Lucide icon name.
 
 ### 3. Regenerate the registry
 
@@ -37,255 +41,274 @@ Every module needs a `module.json` manifest in its root directory. This is the o
 npx tsx scripts/generate-registry.ts
 ```
 
-This scans `/src/modules/`, reads every `module.json`, and generates:
-- `src/core/generated/module-registry.tsx` -- dynamic imports for all components and API handlers
-- `src/core/generated/module-routes.ts` -- route patterns for middleware gating
+This scans `src/modules/`, validates every `module.json` against the manifest schema, and writes:
 
-You must run this after any change to `module.json` or after adding/removing route files.
+- `src/core/generated/module-registry.tsx` — dynamic `import()` map for every component and API handler
+- `src/core/generated/module-routes.ts` — route patterns for middleware gating
+- Several additional generated files: `module-hooks.ts`, `module-crons.ts`, `module-webhooks.ts`, `module-search.ts`, `module-seo.ts`, `module-storage.ts`, `module-blocks.ts`, `module-notification-types.ts`, `slot-registry.tsx`
+
+Run this after any `module.json` change or after adding/removing files referenced in the manifest.
+
+### 4. Enable in the database
+
+Installing via the admin UI (Upload ZIP or Marketplace Install) creates the `ModuleConfig` row automatically with `enabled: true`. During development you can create the row manually or via `prisma studio`.
 
 ---
 
-## Directory Structure
+## Directory Layout
 
 ```
-src/modules/hello-world/
-├── module.json              # Required: manifest
+src/modules/my-module/
+├── module.json                       # Required — manifest
 ├── pages/
-│   ├── public/
-│   │   └── page.tsx         # Public page component
-│   └── admin/
-│       └── page.tsx         # Admin page component
+│   ├── public/page.tsx               # Public page component
+│   └── admin/page.tsx                # Admin page component
 ├── api/
-│   └── greetings/
-│       └── route.ts         # API route handler
-├── components/              # Module-specific components
-│   └── GreetingCard.tsx
-└── lib/                     # Module-specific utilities
-    └── helpers.ts
+│   └── my-module/route.ts            # API route handler
+├── components/                       # Module-scoped React components
+├── hooks/                            # Hook listener handlers
+├── cron/                             # Cron job handlers
+├── search/                           # Search provider handlers
+├── seo/                              # SEO sitemap handler
+├── slots/                            # Slot contribution components
+├── blocks/                           # Page-builder block components
+├── providers/                        # React context providers
+├── lib/                              # Module-scoped utilities
+├── schema.prisma                     # Optional — module DB models
+└── migrations/                       # Optional — SQL migration files
 ```
 
-Only `module.json` is required. Everything else is optional -- include only what your module needs.
+Only `module.json` is required. Include only what your module needs.
 
 ---
 
-## module.json Manifest Reference
+## `module.json` Full Reference
 
-### Required Fields
+### Required fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | `string` | Unique identifier. Lowercase letters, numbers, hyphens only. Must match directory name. |
+| `id` | `string` | Unique identifier. Lowercase letters, numbers, hyphens only. Must match the directory name. |
 | `name` | `string` | Human-readable display name. |
-| `description` | `string` | Short description shown in admin module manager. |
-| `version` | `string` | Semver version string (e.g. `"1.0.0"`). |
+| `description` | `string` | Short description shown in admin. |
+| `version` | `string` | Semver string, e.g. `"1.0.0"`. |
 
-### Optional Metadata
+### Optional metadata
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `author` | `string` | Author name. |
-| `icon` | `string` | Lucide icon name for admin sidebar (e.g. `"ShoppingCart"`, `"FileText"`). |
+| `icon` | `string` | Lucide icon name shown in the admin sidebar. |
 | `permissions` | `string[]` | Permission strings this module registers (e.g. `["store.view", "store.manage"]`). |
-| `defaultConfig` | `object` | Default configuration values. Merged with DB-stored config at runtime. |
-| `dependencies` | `string[]` | Module IDs that must be installed and enabled (e.g. `["store"]`). |
+| `defaultConfig` | `object` | Default configuration values merged with DB-stored config at runtime. |
+| `dependencies` | `string[]` | Module IDs that must be installed and enabled. |
 | `conflicts` | `string[]` | Module IDs that cannot be active at the same time. |
 
-### Routes
+### `routes` — Public pages
 
-**`routes`** -- Public pages (rendered at `/{locale}/{path}`):
+Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 
 ```json
 "routes": [
-    { "path": "/hello", "component": "pages/public/page.tsx" },
-    { "path": "/hello/[id]", "component": "pages/public/detail.tsx", "layout": "pages/public/layout.tsx" }
+    { "path": "/my-page", "component": "pages/public/page.tsx" },
+    { "path": "/my-page/[id]", "component": "pages/public/detail.tsx", "layout": "pages/public/layout.tsx" }
 ]
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `path` | Yes | URL path. Supports dynamic segments like `[id]`. |
-| `component` | Yes | Relative path to the component file from module root. |
-| `layout` | No | Optional layout component wrapping this route. |
+| `path` | Yes | URL path. Supports dynamic segments (`[id]`, `[...params]`). |
+| `component` | Yes | Path to the page component, relative to the module root. |
+| `layout` | No | Optional layout wrapper component. |
 
-**`adminRoutes`** -- Admin pages (rendered at `/{locale}/admin/{path}`):
+### `adminRoutes` — Admin pages
+
+Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sidebar, and header are provided automatically).
 
 ```json
 "adminRoutes": [
-    { "path": "/hello", "component": "pages/admin/page.tsx" },
-    { "path": "/hello/settings", "component": "pages/admin/settings.tsx" }
+    { "path": "/my-module", "component": "pages/admin/page.tsx" },
+    { "path": "/my-module/settings", "component": "pages/admin/settings.tsx" }
 ]
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `path` | Yes | Path relative to `/admin`. e.g. `"/hello"` becomes `/admin/hello`. |
-| `component` | Yes | Relative path to the component file from module root. |
+| `path` | Yes | Path relative to `/admin`. |
+| `component` | Yes | Path to the component, relative to the module root. |
 
-**`api`** -- API endpoints (mounted at `/api/v1/{path}`):
+### `api` — API endpoints
+
+Mounted at `/api/v1/{path}` via the `[...path]` catch-all that reads `ModuleApiRegistry`.
 
 ```json
 "api": [
-    { "path": "/hello/greetings", "handler": "api/greetings/route.ts" },
-    { "path": "/hello/greetings", "handler": "api/greetings/route.ts", "method": "POST" }
+    {
+        "path": "/my-module/items",
+        "handler": "api/items/route.ts",
+        "method": "ALL",
+        "description": "List and create items"
+    }
 ]
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `path` | Yes | API path under `/api/v1/`. |
-| `handler` | Yes | Relative path to the route handler file. |
-| `method` | No | HTTP method (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `ALL`). Defaults to `"ALL"`. |
+| `path` | Yes | Path under `/api/v1/`. |
+| `handler` | Yes | Path to the handler file, relative to the module root. |
+| `method` | No | `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, or `ALL`. Defaults to `ALL`. |
+| `description` | No | OpenAPI summary — appears in the generated spec at `/api/v1/openapi`. |
 
-### Admin Sidebar Menu
+### `menu` — Admin sidebar
 
 ```json
 "menu": [
-    { "label": "Hello World", "path": "/hello", "icon": "Star" },
-    { "label": "Hello Settings", "path": "/hello/settings", "icon": "Settings" }
+    { "label": "My Items", "path": "/my-module/items", "icon": "Package" },
+    { "label": "Settings", "path": "/my-module/settings", "icon": "Settings" }
 ]
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `label` | Yes | Menu item text. |
-| `path` | Yes | Path relative to `/admin`. |
-| `icon` | No | Lucide icon name. |
-
-### Navbar and Layout Integration
-
-**`navLinks`** -- Links added to the public navbar:
+### `navLinks` — Public navbar links
 
 ```json
 "navLinks": [
-    { "label": "Hello", "href": "/hello", "icon": "Star", "position": 5 }
+    { "label": "My Page", "href": "/my-page", "icon": "Star", "position": 50 }
 ]
 ```
 
-**`footerLinks`** -- Links added to the footer:
+Lower `position` values render further left.
+
+### `footerLinks` — Footer links
 
 ```json
 "footerLinks": [
-    { "label": "Hello", "href": "/hello", "section": "quick" }
+    { "label": "My Page", "href": "/my-page", "section": "quick" }
 ]
 ```
 
-`section` can be `"quick"` or `"legal"`.
+`section` is `"quick"` or `"legal"`.
 
-**`navbarComponents`** -- Components rendered in the navbar's right side (e.g. cart icon, notification bell):
+### `navbarComponents` — Navbar icons
+
+Components rendered in the navbar's right-hand area (e.g. cart icon, notification bell).
 
 ```json
 "navbarComponents": [
-    { "id": "HelloBell", "component": "components/HelloBell.tsx", "order": 10 }
+    { "id": "CartIcon", "component": "components/CartIcon", "order": 20 }
 ]
 ```
 
-Lower `order` values render further left.
+Lower `order` renders further left.
 
-**`layoutComponents`** -- Components rendered on every page when the module is enabled (e.g. toast notifications, floating widgets):
+### `footerComponents` — Footer components
+
+Components rendered in the footer alongside the language selector (e.g. currency selector).
+
+```json
+"footerComponents": [
+    { "id": "CurrencySelector", "component": "components/CurrencySelector", "order": 10 }
+]
+```
+
+### `layoutComponents` — Per-page components
+
+Components rendered on every page when the module is enabled (toasts, banners, floating widgets). Support URL pattern filtering.
 
 ```json
 "layoutComponents": [
-    { "id": "HelloToast", "component": "components/HelloToast.tsx" }
+    {
+        "id": "AnnouncementBanner",
+        "component": "components/AnnouncementBanner",
+        "include": ["/*"],
+        "exclude": ["/admin/*"]
+    }
 ]
 ```
 
-Components can also reference core components using the `@core/` prefix:
+`include` and `exclude` are glob-style URL patterns. Omit both to render everywhere.
 
-```json
-{ "id": "LivePurchaseToast", "component": "@core/layout/LivePurchaseToast" }
-```
-
-### Widgets
-
-Sidebar widgets for the homepage:
+### `widgets` — Homepage sidebar widgets
 
 ```json
 "widgets": [
     {
-        "id": "HelloWidget",
-        "component": "components/HelloWidget.tsx",
+        "id": "MyWidget",
+        "component": "widgets/MyWidget",
         "defaultOrder": 5,
         "defaultVisible": true
     }
 ]
 ```
 
-### Homepage Sections
-
-Content sections rendered on the homepage:
+### `homepageSections` — Homepage content sections
 
 ```json
 "homepageSections": [
     {
-        "id": "HelloSection",
+        "id": "MySection",
         "type": "content",
-        "component": "components/HelloSection.tsx",
-        "order": 3
+        "component": "components/MySection",
+        "order": 10
     }
 ]
 ```
 
 `type` is `"content"` (main area) or `"widget"` (sidebar).
 
-### Dashboard Cards
-
-Stat cards shown on the admin dashboard:
+### `dashboardCards` — Admin dashboard stats
 
 ```json
 "dashboardCards": [
     {
-        "id": "hello-count",
-        "label": "Greetings",
-        "icon": "Star",
-        "href": "/admin/hello",
-        "color": "text-yellow-500",
-        "statKey": "greetingsCount"
+        "id": "my-stat",
+        "label": "Items",
+        "labelKey": "dashboard_items",
+        "icon": "Package",
+        "href": "/admin/my-module/items",
+        "color": "text-blue-500",
+        "statKey": "itemCount"
     }
 ]
 ```
 
-**`statsApi`** -- Endpoint that returns dashboard statistics for this module:
+`labelKey` is an i18n key in the `admin` namespace — preferred over `label` when present.
+
+### `statsApi` — Dashboard stats endpoint
 
 ```json
-"statsApi": "/hello/stats"
+"statsApi": "/my-module/stats"
 ```
 
-The endpoint (`GET /api/v1/hello/stats`) should return `{ cards: [...], sections: [...] }`.
+`GET /api/v1/my-module/stats` must return `{ cards: [...], sections: [...] }`. The dashboard reads this to populate `statKey` values.
 
-### Settings Cards
-
-Buttons added to the admin settings page:
+### `settingsCards` — Admin settings page cards
 
 ```json
 "settingsCards": [
     {
-        "title": "Hello Settings",
-        "description": "Configure greeting behavior.",
-        "href": "/settings/hello",
-        "icon": "Star",
-        "color": "text-yellow-500"
+        "title": "My Settings",
+        "description": "Configure the module",
+        "href": "/settings/my-module",
+        "icon": "Settings",
+        "color": "text-gray-500"
     }
 ]
 ```
 
-### Profile Tabs
-
-Tabs added to user profile pages:
+### `profileTabs` — User profile tabs
 
 ```json
 "profileTabs": [
     {
-        "id": "hello-history",
-        "label": "Greetings",
-        "component": "components/ProfileGreetings.tsx",
+        "id": "my-history",
+        "label": "History",
+        "component": "components/ProfileHistory",
         "order": 5
     }
 ]
 ```
 
-### OAuth Buttons
-
-Login/register buttons for OAuth providers:
+### `oauthButtons` — Login/register OAuth buttons
 
 ```json
 "oauthButtons": [
@@ -294,62 +317,309 @@ Login/register buttons for OAuth providers:
         "provider": "discord",
         "label": "Discord",
         "color": "#5865F2",
-        "svgIcon": "M20.3 ..."
+        "svgIcon": "M19.27 5.33..."
     }
 ]
 ```
 
-### Lifecycle Hooks
+`svgIcon` is raw SVG path data (`d` attribute value). `provider` must match a NextAuth provider ID.
+
+### `contextProviders` — React context providers
+
+Components that wrap the entire app tree. Use for global context (e.g. `CurrencyProvider`). Unlike `layoutComponents` (siblings), context providers wrap `children`.
 
 ```json
-"hooks": {
-    "onEnable": "lib/on-enable.ts",
-    "onDisable": "lib/on-disable.ts"
+"contextProviders": [
+    { "id": "CurrencyProvider", "component": "lib/context", "order": 10 }
+]
+```
+
+Lower `order` = outer wrapper.
+
+### `hookListeners` — Action/filter listeners
+
+WordPress-style hooks. Declare listeners here; the registry auto-wires them when the module is enabled and removes them on disable.
+
+```json
+"hookListeners": [
+    {
+        "hook": "user.registered",
+        "type": "action",
+        "handler": "hooks/on-user-registered.ts",
+        "priority": 10
+    },
+    {
+        "hook": "post.content",
+        "type": "filter",
+        "handler": "hooks/filter-content.ts",
+        "priority": 20
+    }
+]
+```
+
+- `type: "action"` — fire and forget. Handler exports `default (payload) => void | Promise<void>`.
+- `type: "filter"` — value transformation. Handler exports `default (value, context?) => value`.
+- `priority` — lower runs earlier. Default is 10.
+- Async listeners have a per-listener timeout (default 5 s, overridable via `HOOK_LISTENER_TIMEOUT_MS` env).
+
+Core-fired action hooks include `user.registered`, `module.enabled`, `module.disabled`. Modules can fire their own hooks via `doAction` / `applyFilters` from `@/core/lib/hooks`.
+
+### `slotContents` — Slot contributions
+
+Render components into named `<Slot>` points declared by themes or other modules.
+
+```json
+"slotContents": [
+    {
+        "id": "popup-renderer",
+        "slot": "layout.overlay",
+        "component": "slots/PopupRenderer",
+        "order": 20
+    }
+]
+```
+
+The `slot` value must match a slot name declared by a theme's `slots[]` array or by another module's `<Slot name="...">` usage.
+
+### `pageBlocks` — Page-builder blocks
+
+Module-contributed blocks available in the page editor.
+
+```json
+"pageBlocks": [
+    {
+        "id": "SliderHero",
+        "category": "Slider",
+        "component": "blocks/SliderHero.tsx"
+    }
+]
+```
+
+### `cronJobs` — Scheduled tasks
+
+Periodic tasks run by the core scheduler.
+
+```json
+"cronJobs": [
+    {
+        "id": "currency-rate-refresh",
+        "schedule": "every-hour",
+        "handler": "cron/refresh.ts"
+    }
+]
+```
+
+Valid `schedule` keywords: `every-minute`, `every-5-minutes`, `every-15-minutes`, `every-hour`, `every-day`, `every-week`, `every-month`.
+
+Handler file exports `default async function (): Promise<void>`.
+
+### `searchProviders` — Site search
+
+```json
+"searchProviders": [
+    {
+        "id": "blog-search",
+        "label": "Blog",
+        "handler": "search/handler.ts"
+    }
+]
+```
+
+Handler exports `default async (query: string) => Promise<SearchResult[]>`. Results are dispatched by `GET /api/v1/search`.
+
+### `webhookReceivers` — Inbound webhooks
+
+```json
+"webhookReceivers": [
+    {
+        "provider": "stripe",
+        "handler": "hooks/webhook.ts",
+        "signatureHeader": "stripe-signature",
+        "secretEnv": "STRIPE_WEBHOOK_SECRET"
+    }
+]
+```
+
+Requests to `POST /api/v1/webhook/{provider}` are routed to the matching handler. When `signatureHeader` and `secretEnv` are set, HMAC verification runs automatically before the handler is called.
+
+Handler exports `default async (request: Request) => Promise<{ status: number; body?: unknown }>`.
+
+### `notificationTypes` — User notification preferences
+
+Surfaces in the user preferences grid so users can opt out per channel.
+
+```json
+"notificationTypes": [
+    {
+        "eventType": "blog.article.created",
+        "label": "New blog post",
+        "channels": ["email", "inapp"]
+    }
+]
+```
+
+### `storageProviders` — File storage backends
+
+Implement the `StorageProvider` interface from `@/core/lib/storage`. The active provider is selected via the `storage_active_provider` Setting key or `STORAGE_PROVIDER` env var.
+
+```json
+"storageProviders": [
+    {
+        "id": "cloudflare-r2",
+        "name": "Cloudflare R2",
+        "handler": "lib/provider.ts"
+    }
+]
+```
+
+Handler file exports `default: StorageProvider`.
+
+### `seoRoutes` — Sitemap contributions
+
+```json
+"seoRoutes": {
+    "handler": "seo/sitemap.ts"
 }
 ```
 
-Scripts executed when the module is enabled or disabled.
+Handler exports `default async () => Promise<SitemapEntry[]>`.
+
+### `translations` — Bundled i18n strings
+
+Translations merged into the `Translation` DB table on install and removed on uninstall. Admin-overridden rows survive uninstall.
+
+```json
+"translations": {
+    "en": {
+        "blog": {
+            "title": "Blog",
+            "readMore": "Read More"
+        }
+    },
+    "tr": {
+        "blog": {
+            "title": "Blog",
+            "readMore": "Devamını Oku"
+        }
+    }
+}
+```
+
+Sync translations to the DB manually: `npx tsx scripts/seed-translations.ts`.
+
+---
+
+## Database Schema
+
+### Adding models
+
+Create `schema.prisma` in the module source directory:
+
+```prisma
+model MyItem {
+    id        String   @id @default(cuid())
+    name      String
+    createdAt DateTime @default(now())
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
+}
+```
+
+To add fields to the `User` model, use the comment-block mechanism:
+
+```prisma
+// @@user-relations-start
+myItems MyItem[]
+// @@user-relations-end
+```
+
+`scripts/merge-schemas.ts` injects these blocks into the core `User` model when building the merged `prisma/schema.prisma`. Do not redeclare core models.
+
+After adding or changing `schema.prisma`:
+
+```bash
+npm run db:merge      # merge core + module schemas
+npm run db:generate   # generate Prisma client
+npm run db:push       # push to DB (dev) or migrate (prod)
+```
+
+### SQL migrations
+
+Place migration files at `module-sources/<id>/migrations/*.sql`. `scripts/apply-migrations.ts` runs pending migrations (tracked in the `ModuleMigration` table, checksum-verified).
+
+```bash
+npx tsx scripts/apply-migrations.ts
+```
 
 ---
 
 ## Writing Pages
 
-### Public Page
+### Public page
+
+Server components are the default. Add `"use client"` only for hooks, event handlers, or browser APIs.
 
 ```tsx
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/core/lib/i18n/navigation";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
 
-export default function HelloPage() {
-    const t = useTranslations();
+export default async function MyPage() {
+    const t = await getTranslations("my-module");
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <h1 className="text-2xl font-bold">Hello World</h1>
-                <Link href="/hello/about">About</Link>
-            </main>
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
-        </div>
+        <main className="container mx-auto px-4 py-6">
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
+            <Link href="/my-page/about">{t("about")}</Link>
+        </main>
     );
 }
 ```
 
 Key rules:
-- Use `"use client"` only when the component needs hooks, event handlers, or browser APIs. Server components are the default.
 - Use `Link` and `usePathname` from `@/core/lib/i18n/navigation` (not `next/link`) for locale-aware routing.
-- Use `useTranslations()` from `next-intl` for all UI text. No hardcoded strings.
-- Use `ThemeSlot` to allow themes to override layout components.
+- No hardcoded UI strings — use `useTranslations` (client) or `getTranslations` (server) from `next-intl`.
+- No emojis in UI — use Lucide icons.
+- No `confirm()` / `alert()` — use `useConfirm()` hook and `toast` from `sonner`.
 
-### Admin Page
+### Public page with data fetching (client component)
 
-Admin pages render inside the admin layout (which provides its own auth guard, sidebar, and header). Just export your content:
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { Card, CardContent } from "@/core/components/ui/card";
+
+interface Item {
+    id: string;
+    name: string;
+}
+
+export default function MyPage() {
+    const [items, setItems] = useState<Item[]>([]);
+
+    useEffect(() => {
+        fetch("/api/v1/my-module/items")
+            .then(res => res.json())
+            .then(data => setItems(data.items ?? []));
+    }, []);
+
+    return (
+        <main className="container mx-auto px-4 py-6">
+            <div className="grid gap-4">
+                {items.map(item => (
+                    <Card key={item.id}>
+                        <CardContent className="p-4">{item.name}</CardContent>
+                    </Card>
+                ))}
+            </div>
+        </main>
+    );
+}
+```
+
+### Admin page
+
+Admin pages render inside the admin layout (auth guard, sidebar, header already provided). Export your content directly:
 
 ```tsx
 "use client";
@@ -357,17 +627,16 @@ Admin pages render inside the admin layout (which provides its own auth guard, s
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 
-export default function HelloAdminPage() {
+export default function MyAdminPage() {
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Hello Management</h1>
+            <h1 className="text-2xl font-bold">My Module Management</h1>
             <Card>
                 <CardHeader>
-                    <CardTitle>Greetings</CardTitle>
+                    <CardTitle>Items</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>Manage your greetings here.</p>
-                    <Button>Create Greeting</Button>
+                    <Button>Create Item</Button>
                 </CardContent>
             </Card>
         </div>
@@ -379,44 +648,56 @@ export default function HelloAdminPage() {
 
 ## Writing API Routes
 
-API handlers follow the Next.js App Router convention. Export named functions for each HTTP method:
+API handlers follow Next.js App Router conventions. Export a named function per HTTP method:
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, hasPermission } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
+import { z } from "zod";
 
-// GET /api/v1/hello/greetings
+// GET /api/v1/my-module/items
 export async function GET() {
-    const greetings = await prisma.greeting.findMany({
+    const items = await prisma.myItem.findMany({
         orderBy: { createdAt: "desc" },
         take: 50,
     });
-    return NextResponse.json({ greetings });
+    return NextResponse.json({ items });
 }
 
-// POST /api/v1/hello/greetings
+// POST /api/v1/my-module/items
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    // Validate with Zod (use .issues not .errors for Zod 4)
+    const canManage = await hasPermission(session.user.id, "my-module.manage");
+    if (!canManage) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
-    const greeting = await prisma.greeting.create({
-        data: { message: body.message, userId: session.user.id },
+    const body = await request.json();
+
+    const schema = z.object({ name: z.string().min(1).max(255) });
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+        // Zod 4: use .issues not .errors
+        return NextResponse.json({ error: "Validation failed", issues: parsed.error.issues }, { status: 400 });
+    }
+
+    const item = await prisma.myItem.create({
+        data: { name: parsed.data.name, userId: session.user.id },
     });
 
-    await logActivity(session.user.id, "greeting.create", { greetingId: greeting.id });
+    await logActivity({ userId: session.user.id, action: "my-module.item.create", entityId: item.id });
 
-    return NextResponse.json({ greeting }, { status: 201 });
+    return NextResponse.json({ item }, { status: 201 });
 }
 
-// DELETE /api/v1/hello/greetings (admin only)
+// DELETE /api/v1/my-module/items/:id (admin only)
 export async function DELETE(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
@@ -427,11 +708,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { id } = await request.json();
-    await prisma.greeting.delete({ where: { id } });
-
-    return NextResponse.json({ message: "Deleted" });
+    await prisma.myItem.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
 }
 ```
+
+API responses follow `{ data }` or `{ error, status }` conventions. Validation errors additionally include `issues`.
 
 ---
 
@@ -441,234 +723,215 @@ export async function DELETE(request: NextRequest) {
 // Database
 import { prisma } from "@/core/lib/db";
 
-// Auth & Permissions
+// Auth & permissions
 import { auth } from "@/core/lib/auth";
-import { isAdmin, isStaff, hasPermission } from "@/core/lib/permissions";
+import { isAdmin, isStaff, hasPermission, hasAnyPermission } from "@/core/lib/permissions";
 
-// Validation (Zod 4 -- use .issues not .errors)
+// Zod 4 — use .issues not .errors
 import { z } from "zod";
-
-// Email
-import { sendOrderConfirmationEmail } from "@/core/lib/email";
-
-// Discord webhooks
-import { sendDiscordWebhook } from "@/core/lib/discord";
-
-// RCON game server commands
-import { sendRconCommand } from "@/core/lib/rcon";
 
 // Activity logging
 import { logActivity } from "@/core/lib/activity-log";
 
-// Notifications
-import { createNotification } from "@/core/lib/notifications";
+// Discord webhooks
+import { sendDiscordWebhook } from "@/core/lib/discord";
+
+// Email
+import { sendEmail } from "@/core/lib/email";
 
 // Rate limiting
-import { rateLimit } from "@/core/lib/rate-limit";
+import { rateLimit, rateLimitForRole } from "@/core/lib/rate-limit";
 
-// i18n
-import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/core/lib/i18n/navigation";
+// Hooks (action/filter system)
+import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, addFilter } from "@/core/lib/hooks";
 
-// Currency
-import { useCurrency } from "@/core/lib/currency/context";
+// i18n — navigation
+import { Link, usePathname, redirect } from "@/core/lib/i18n/navigation";
 
-// Theme integration
-import { ThemeSlot } from "@/core/components/theme-slot";
+// i18n — translations
+import { useTranslations } from "next-intl";                    // client
+import { getTranslations } from "next-intl/server";             // server
+
+// Theme config
+import { useThemeConfig } from "@/core/lib/theme-config-client"; // client only
 
 // UI components
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { toast } from "sonner";
 ```
 
 ---
 
-## Available Icons
+## Hook System
 
-These Lucide icon names can be used in `module.json` for `icon`, `menu[].icon`, `navLinks[].icon`, `dashboardCards[].icon`, and `settingsCards[].icon`:
+The hook system in `src/core/lib/hooks.ts` is WordPress-style, type-safe, and ESM-first.
 
-`LayoutDashboard`, `Package`, `ShoppingCart`, `FileText`, `FolderOpen`, `Users`, `Settings`, `Puzzle`, `Ticket`, `HelpCircle`, `Shield`, `Tag`, `Star`, `Download`, `Gift`, `Crown`, `MessageSquare`, `CreditCard`
+**Actions** — fire and forget:
 
----
+```typescript
+import { doAction, doActionAsync } from "@/core/lib/hooks";
 
-## Dependencies and Conflicts
-
-```json
-{
-    "dependencies": ["store"],
-    "conflicts": ["legacy-payments"]
-}
+doAction("my-module.item.created", { itemId: item.id, userId });
+await doActionAsync("my-module.order.completed", { orderId });
 ```
 
-- **dependencies**: The listed modules must be installed and enabled. If a dependency is missing or disabled, the platform will warn the admin.
-- **conflicts**: The listed modules cannot be active at the same time. Enabling this module requires disabling conflicting ones.
+**Filters** — value transformation:
 
-Example: a `stripe-gateway` module depends on `store` because it provides payment processing for store checkout.
+```typescript
+import { applyFilters, applyFiltersAsync } from "@/core/lib/hooks";
+
+const processed = applyFilters("post.content", rawHtml, { postId });
+const result = await applyFiltersAsync("checkout.total", baseTotal, { cart });
+```
+
+**Registering listeners imperatively** (rarely needed — prefer `hookListeners` in the manifest):
+
+```typescript
+import { addAction, addFilter } from "@/core/lib/hooks";
+
+addAction("user.registered", (payload) => { /* ... */ }, 10, "my-module");
+addFilter("post.content", (html) => html.replace(/badword/g, "***"), 20, "my-module");
+```
+
+Listeners declared in `hookListeners` are wired at build time and automatically removed when the module is disabled or uninstalled.
 
 ---
 
 ## Packaging as ZIP
 
-To distribute your module:
-
-1. ZIP the module directory contents (not the parent directory):
-
 ```bash
-cd src/modules/hello-world
-zip -r hello-world.zip .
+cd src/modules/my-module
+zip -r my-module.zip .
 ```
 
-The ZIP should contain `module.json` at the root level (or inside a single subdirectory).
+The ZIP must contain `module.json` at its root level (or inside a single subdirectory).
 
-2. The admin can install it via **Admin > Modules > Upload ZIP**.
+Install via **Admin > Modules > Upload ZIP**.
 
 The upload handler:
-- Extracts the ZIP to a temp directory
-- Finds and validates `module.json` (requires `id`, `name`, `version`)
-- Validates the ID format (lowercase, numbers, hyphens only)
-- Copies files to `src/modules/{id}/`
-- Runs `npx tsx scripts/generate-registry.ts`
-- Creates a database record (disabled by default)
-- Rolls back if registry generation fails
+1. Extracts to a temp directory.
+2. Validates `module.json` (schema + ID format).
+3. Copies files to `src/modules/{id}/`.
+4. Runs `scripts/generate-registry.ts`.
+5. Creates the `ModuleConfig` DB record (enabled by default).
+6. Rolls back on registry generation failure.
 
 ---
 
-## Publishing to the Marketplace
+## Marketplace
 
-The uxwVend marketplace is hosted on GitHub. To publish:
+The marketplace is hosted on GitHub. Admins install directly from **Admin > Modules > Marketplace**.
 
-1. Ensure your module has a valid `module.json` with all required fields.
-2. Package as a ZIP file.
-3. Submit your module ZIP to the marketplace repository.
-
-Admins can install marketplace modules directly from the **Admin > Modules > Marketplace** tab. Marketplace installs are enabled by default.
+Marketplace installs are enabled by default. Bulk install is available at `POST /api/v1/modules/marketplace/bulk-install`.
 
 ---
 
-## Complete Example: Hello World Module
+## Module Lifecycle
 
-### `src/modules/hello-world/module.json`
+| Event | What happens |
+|-------|-------------|
+| Install | Files extracted to `src/modules/<id>/`, registry regenerated, `ModuleConfig` row created (`enabled: true`). |
+| Enable | Module appears in every UI surface: sidebar menu, navbar, homepage, dashboard, settings. Hook listeners, cron jobs, search providers, webhook receivers, slot contents — all active. |
+| Disable | Module vanishes from all UI surfaces. Listeners, crons, and other runtime contributions removed. DB data preserved. |
+| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated. Module translations removed (admin-overridden rows preserved). |
+
+The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled.
+
+---
+
+## Complete Example: Blog Module (abbreviated)
+
+### `module.json`
 
 ```json
 {
-    "id": "hello-world",
-    "name": "Hello World",
-    "description": "A simple greeting page with admin management",
+    "id": "blog",
+    "name": "Blog Module",
+    "description": "News and announcements system",
     "version": "1.0.0",
-    "author": "Your Name",
-    "icon": "Star",
-    "permissions": ["hello.view", "hello.manage"],
+    "icon": "FileText",
+    "permissions": ["blog.view", "blog.manage"],
     "routes": [
-        { "path": "/hello", "component": "pages/public/page.tsx" }
+        { "path": "/blog", "component": "pages/page.tsx" },
+        { "path": "/blog/[...params]", "component": "pages/[...params]/page.tsx" }
     ],
     "adminRoutes": [
-        { "path": "/hello", "component": "pages/admin/page.tsx" }
+        { "path": "/blog/articles", "component": "pages/admin/articles/page.tsx" },
+        { "path": "/blog/articles/new", "component": "pages/admin/articles/new/page.tsx" }
     ],
     "api": [
-        { "path": "/hello/greetings", "handler": "api/greetings/route.ts" }
+        { "path": "/blog/articles", "handler": "api/articles/route.ts", "description": "List and create articles" },
+        { "path": "/blog/articles/[id]", "handler": "api/articles/[id]/route.ts", "description": "Get, update, or delete an article" },
+        { "path": "/blog/stats", "handler": "api/stats/route.ts", "description": "Dashboard statistics" }
     ],
     "menu": [
-        { "label": "Hello World", "path": "/hello", "icon": "Star" }
-    ],
-    "navLinks": [
-        { "label": "Hello", "href": "/hello", "icon": "Star", "position": 10 }
+        { "label": "Articles", "path": "/blog/articles", "icon": "FileText" },
+        { "label": "Categories", "path": "/blog/categories", "icon": "FolderOpen" }
     ],
     "dashboardCards": [
         {
-            "id": "hello-count",
-            "label": "Greetings",
-            "icon": "Star",
-            "href": "/admin/hello",
-            "color": "text-yellow-500",
-            "statKey": "greetingsCount"
+            "id": "articles",
+            "label": "Articles",
+            "labelKey": "dashboard_articles",
+            "icon": "FileText",
+            "href": "/admin/blog/articles",
+            "color": "text-indigo-600",
+            "statKey": "articles"
         }
-    ]
+    ],
+    "statsApi": "/blog/stats",
+    "homepageSections": [
+        { "id": "BlogNewsSection", "type": "content", "component": "components/BlogNewsSection", "order": 10 }
+    ],
+    "searchProviders": [
+        { "id": "blog-search", "label": "Blog", "handler": "search/handler.ts" }
+    ],
+    "notificationTypes": [
+        { "eventType": "blog.article.created", "label": "New blog post", "channels": ["email", "inapp"] }
+    ],
+    "pageBlocks": [
+        { "id": "BlogLatestPosts", "category": "Blog", "component": "blocks/BlogLatestPosts.tsx" }
+    ],
+    "seoRoutes": { "handler": "seo/sitemap.ts" },
+    "translations": {
+        "en": { "blog": { "title": "Blog", "readMore": "Read More" } },
+        "tr": { "blog": { "title": "Blog", "readMore": "Devamını Oku" } }
+    }
 }
 ```
 
-### `src/modules/hello-world/pages/public/page.tsx`
-
-```tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import { ThemeSlot } from "@/core/components/theme-slot";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent } from "@/core/components/ui/card";
-
-interface Greeting {
-    id: string;
-    message: string;
-    createdAt: string;
-}
-
-export default function HelloPage() {
-    const [greetings, setGreetings] = useState<Greeting[]>([]);
-
-    useEffect(() => {
-        fetch("/api/v1/hello/greetings")
-            .then(res => res.json())
-            .then(data => setGreetings(data.greetings || []));
-    }, []);
-
-    return (
-        <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <h1 className="text-2xl font-bold mb-4">Hello World</h1>
-                <div className="grid gap-4">
-                    {greetings.map(g => (
-                        <Card key={g.id}>
-                            <CardContent className="p-4">{g.message}</CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </main>
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
-        </div>
-    );
-}
-```
-
-### `src/modules/hello-world/pages/admin/page.tsx`
-
-```tsx
-"use client";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-
-export default function HelloAdminPage() {
-    return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Hello World Management</h1>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Greetings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>Manage greetings from here.</p>
-                    <Button className="mt-4">Add Greeting</Button>
-                </CardContent>
-            </Card>
-        </div>
-    );
-}
-```
-
-### `src/modules/hello-world/api/greetings/route.ts`
+### `api/articles/route.ts`
 
 ```typescript
-import { NextResponse } from "next/server";
-
-const greetings = [
-    { id: "1", message: "Hello from uxwVend!", createdAt: new Date().toISOString() },
-];
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/core/lib/auth";
+import { prisma } from "@/core/lib/db";
+import { hasPermission } from "@/core/lib/permissions";
 
 export async function GET() {
-    return NextResponse.json({ greetings });
+    const articles = await prisma.blogArticle.findMany({
+        where: { status: "published" },
+        orderBy: { publishedAt: "desc" },
+        take: 20,
+    });
+    return NextResponse.json({ articles });
+}
+
+export async function POST(request: NextRequest) {
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await hasPermission(session.user.id, "blog.manage"))) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const article = await prisma.blogArticle.create({
+        data: { title: body.title, content: body.content, authorId: session.user.id, status: "draft" },
+    });
+    return NextResponse.json({ article }, { status: 201 });
 }
 ```
 
@@ -679,4 +942,19 @@ npx tsx scripts/generate-registry.ts
 npm run dev
 ```
 
-Visit `http://localhost:3000/en/hello` to see the public page and `http://localhost:3000/en/admin/hello` to see the admin page.
+Visit `http://localhost:3001/en/blog` for the public page and `http://localhost:3001/en/admin/blog/articles` for the admin page.
+
+---
+
+## Conventions Checklist
+
+- No `any` types — use proper TypeScript types.
+- Zod 4: use `.issues` not `.errors` on `SafeParseError`.
+- ES imports only — no `require()`.
+- Path alias `@/*` resolves to `src/*`.
+- `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — not `next/link`.
+- `"use client"` only when the component needs browser APIs, hooks, or event handlers.
+- Lucide icons only in UI — no emoji.
+- `useConfirm()` + `toast` from `sonner` — no `confirm()` or `alert()`.
+- API responses: `{ data }` on success, `{ error }` on failure, `{ error, issues }` on validation failure.
+- Dark mode: `data-mode="dark"` attribute on a container element, CSS variables for theming.
