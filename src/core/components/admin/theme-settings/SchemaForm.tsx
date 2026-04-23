@@ -43,6 +43,21 @@ export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
 
 function FieldRow({ fieldKey, def, value, onChange }: { fieldKey: string; def: ThemeFieldDef; value: unknown; onChange: (v: unknown) => void }) {
     const isDefault = value === undefined;
+    // ColorField renders its own label inline (color swatch + label side by
+    // side); every other field component only renders the input, so we
+    // stack a label header above.
+    const label = def.label ?? fieldKey;
+    const inner = renderField(def, value, onChange, isDefault);
+    if (def.type === "color") return inner;
+    return (
+        <div className="space-y-1.5">
+            <div className="text-sm font-medium">{label}</div>
+            {inner}
+        </div>
+    );
+}
+
+function renderField(def: ThemeFieldDef, value: unknown, onChange: (v: unknown) => void, isDefault: boolean) {
     switch (def.type) {
         case "color":    return <Fields.ColorField def={def} value={value as string} onChange={onChange as (v: string | undefined) => void} isDefault={isDefault} />;
         case "font":     return <Fields.FontField  def={def} value={value as string} onChange={onChange as (v: string | undefined) => void} isDefault={isDefault} />;
