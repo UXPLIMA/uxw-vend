@@ -1,182 +1,385 @@
 # Contributing to uxwVend
 
+## Core Principle
+
+**Core knows nothing about any module.** No module names, no module paths, no module-specific code belongs in `src/core/` or `src/app/`. Everything is registry-driven from module manifests. When a module is not installed, zero traces exist anywhere in the codebase.
+
+If you are adding a domain feature (store, forum, blog, support tickets, analytics), it belongs in a module, not in core.
+
+---
+
 ## Development Setup
 
-1. Fork and clone the repository.
-2. Install dependencies: `npm install`
-3. Copy `.env.example` to `.env` and configure database credentials.
-4. Push the database schema: `npx prisma db push`
-5. Optionally seed demo data: `npm run db:seed`
-6. Start the dev server: `npm run dev`
+### Prerequisites
 
-The dev server runs with Turbopack and automatically runs the `predev` script to regenerate theme and module registries.
+- Node.js 24+ (enforced by `engines` in `package.json`)
+- PostgreSQL 14+
+- Git
+
+### First-time setup
+
+```bash
+git clone https://github.com/siracozmen01/uxwVend.git
+cd uxwVend
+npm install
+cp .env.example .env
+# Edit .env — at minimum set DATABASE_URL, AUTH_SECRET, AUTH_URL
+```
+
+Push the schema and seed core data:
+
+```bash
+npm run db:merge     # merge core + module schemas into prisma/schema.prisma
+npm run db:push      # push merged schema to the database
+npm run db:seed      # creates 3 roles + core permissions + admin user
+```
+
+Start the dev server:
+
+```bash
+npm run dev
+```
+
+Turbopack starts on `http://localhost:3001`. The `predev` hook runs automatically and runs `merge-schemas → generate-themes → generate-registry` before the server starts. You do not need to run these manually on startup.
+
+Seed default locale data:
+
+```bash
+npx tsx scripts/seed-translations.ts
+```
+
+Default admin credentials (change immediately): `admin@example.com` / `password123`.
+
+---
+
+## Directory Structure
+
+```
+src/
+  core/           — platform framework (auth, RBAC, i18n, DB, rate limiting, module system)
+  app/            — Next.js App Router pages (all under [locale]/)
+  modules/        — RUNTIME install state (gitignored; populated by the admin UI or dev workflow)
+  themes/         — installed themes (flat/ and pixelcraft/ ship in-tree)
+
+module-sources/   — authoritative source for 41 first-party modules (tracked in git)
+module-marketplace/ — distributable ZIPs (tracked in git)
+scripts/          — code-gen, migrations, backup, marketplace tooling
+prisma/           — schema.core.prisma (core models) + seed.ts
+```
+
+`src/modules/` is gitignored. It is the runtime install state. Fresh clones start empty. The CI seeds it from `module-sources/` so the type-checker sees all module-contributed Prisma models.
 
 ---
 
 ## Module Development Workflow
 
-All new features must be built as modules. See [PLUGIN_SDK.md](PLUGIN_SDK.md) for the full guide.
+All feature work goes into a module, never into core. See [PLUGIN_SDK.md](PLUGIN_SDK.md) for the full SDK reference.
 
-Three directories work together:
+### Directory trio
 
-| Directory                    | Role                                                           | Git status |
-|------------------------------|----------------------------------------------------------------|------------|
-| `module-sources/<id>/`       | Authoritative source for first-party modules                   | Tracked    |
-| `module-marketplace/<id>.zip`| Distributable artifact the admin marketplace installs from     | Tracked    |
-| `src/modules/<id>/`          | Runtime install state — what's currently installed locally     | Ignored    |
+| Directory | Role | Git status |
+|---|---|---|
+| `module-sources/<id>/` | Authoritative source for first-party modules | Tracked |
+| `module-marketplace/<id>.zip` | Distributable artifact installed by the marketplace UI | Tracked |
+| `src/modules/<id>/` | Runtime install state — what is live locally right now | **Gitignored** |
 
-Steps for a new first-party module:
+### Creating a new module
 
-1. Create `module-sources/your-module/` with a `module.json` manifest, pages, API routes, and components.
-2. Run `npm run build:marketplace` to build `module-marketplace/your-module.zip` and update `module-marketplace/index.json`.
-3. Install it locally through the admin marketplace UI (or copy it into `src/modules/` for quick testing).
-4. Run `npx tsx scripts/generate-registry.ts` to regenerate the module registry.
-5. Commit both `module-sources/your-module/` and `module-marketplace/your-module.zip` (+ `index.json`) in the same commit. Never commit anything under `src/modules/`.
-6. Ensure `npm run build`, `npx tsc --noEmit`, and `npm test` pass before submitting.
+1. Create `module-sources/your-module/` with a `module.json` manifest and your pages, API routes, and components. Run `npm run create:module` for a guided scaffold.
+2. Build the marketplace artifact:
+   ```bash
+   npm run build:marketplace
+   ```
+   This creates `module-marketplace/your-module.zip` and updates `module-marketplace/index.json`.
+3. Install the module through the admin marketplace UI, or copy `module-sources/your-module/` to `src/modules/your-module/` for quick local testing.
+4. Regenerate the registry:
+   ```bash
+   npx tsx scripts/generate-registry.ts
+   ```
+5. Validate the manifest:
+   ```bash
+   npm run validate:module -- your-module
+   ```
+6. Commit both `module-sources/your-module/` and `module-marketplace/your-module.zip` plus the updated `module-marketplace/index.json` in the same commit. Never commit anything under `src/modules/`.
 
-Editing an existing first-party module follows the same flow: change `module-sources/<id>/`, rebuild ZIPs, commit source + ZIP together.
+### Editing an existing module
 
----
+Same flow: change `module-sources/<id>/`, rebuild the ZIP with `npm run build:marketplace`, then commit source and ZIP together. Always regenerate the registry after manifest changes.
 
-## Core Contribution Rules
+### Adding a database schema to a module
 
-The core (`src/core/`, `src/app/`) is the platform framework. It provides auth, database, permissions, theming, i18n, and the module system itself.
+Create `module-sources/<id>/schema.prisma` with your Prisma models. If you need a relation on the `User` model, use the `// @@user-relations-start` / `// @@user-relations-end` comment block — `merge-schemas.ts` injects the fields into the merged schema automatically.
 
-**NEVER add module-specific code to core.** If a feature is specific to one domain (store, blog, forum, support), it belongs in a module. Core should only contain functionality that all modules need.
+Then run:
 
-Examples of what belongs in core:
-- Auth system, session management
-- Permission checking utilities
-- Database client singleton
-- UI component library (Button, Card, Input, etc.)
-- Theme system, ThemeSlot component
-- i18n configuration and navigation helpers
-- Module loader, registry generator
-- Rate limiting, activity logging
+```bash
+npm run db:merge    # regenerate prisma/schema.prisma
+npm run db:push     # apply to the database
+```
 
-Examples of what belongs in a module:
-- Store product pages and checkout flow
-- Blog article editor and categories
-- Forum topics and replies
-- Support ticket system
-- Payment gateway integrations
-
----
-
-## Coding Conventions
-
-### TypeScript
-- Strict mode is enabled. No `any` types -- use proper types or `unknown`.
-- Use the `@/` path alias for all imports (resolves to `src/`).
-- Validate API inputs with Zod 4. Use `.issues` (not `.errors`) for validation error messages.
-
-### React
-- Server components by default. Add `"use client"` only when the component needs hooks, event handlers, or browser APIs.
-- Functional components with hooks only (no class components).
-- No `confirm()` or `alert()` calls -- use proper UI modals.
-- No emoji in code or UI strings.
-- Sanitize HTML with DOMPurify before using `dangerouslySetInnerHTML`.
-
-### Routing and i18n
-- Use `Link` and `usePathname` from `@/core/lib/i18n/navigation` (not `next/link`) for locale-aware routing in public pages.
-- Use `useTranslations()` from `next-intl` for all UI text. No hardcoded strings.
-- Active locales: `en` and `tr`. Translations live in the `Translation` DB table; the seed source is `messages-core/<locale>.json`.
-
-### API Routes
-- REST conventions under `/api/v1/`.
-- Auth check: `const session = await auth()`
-- Admin check: `await isAdmin(session.user.id)`
-- New endpoints: use `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils` — the canonical envelope is `{ ok: true, data }` or `{ ok: false, error, code? }`. Legacy `{ error }` shapes still exist and are being migrated.
-- State-changing endpoints (`POST/PUT/DELETE/PATCH`) must pass the proxy-level CSRF check; they do automatically as long as the browser sends the request. Server-to-server callers set `x-internal-request: $CSRF_INTERNAL_SECRET`.
-- Admin mutations should log to `ActivityLog` via `logActivity({ userId, action, entity, entityId, metadata })`.
-- Session cookies (configured in `src/core/lib/auth.ts`): `httpOnly: true`, `sameSite: "lax"`, `path: "/"`, `secure` only in production. Production uses the `__Secure-` prefix for the session/callback cookies and the stricter `__Host-` prefix for the CSRF cookie. Do not weaken these attributes without a code-review note.
-- JWT `updateAge` is 1 hour — role, ban, and revocation changes reach dormant sessions within that window.
-- Use `rateLimit()` on auth-related endpoints.
-- Soft delete for products (`isActive = false`), not hard delete.
-
-### CSS
-- Tailwind CSS v4 for styling.
-- Dark mode uses `data-mode="dark"` attribute on `<html>`.
-- Custom CSS overrides go in `globals.css`.
+If your module needs SQL migrations (schema changes to an already-deployed database), see [MIGRATIONS.md](MIGRATIONS.md).
 
 ---
 
-## Commit Messages
+## Theme Development
 
-Format: `<type>: <description>`
+Themes live in `src/themes/<id>/`. The manifest is `theme.json` with `schemaVersion: 2`.
 
-Types:
-- `feat` -- new feature
-- `fix` -- bug fix
-- `refactor` -- code restructuring without behavior change
-- `docs` -- documentation only
-- `style` -- formatting, whitespace, etc.
-- `test` -- adding or updating tests
-- `chore` -- build scripts, dependencies, config
-
----
-
-## Pull Request Guidelines
-
-- One feature or fix per PR.
-- Include a clear description of what changed and why.
-- Ensure `npm run build` passes.
-- Ensure `npx tsc --noEmit` passes with no errors.
-- If adding a module, include the complete module directory with `module.json`.
-- If modifying `module.json` or adding routes, confirm that `npx tsx scripts/generate-registry.ts` succeeds.
-- Do not include generated files (`src/core/generated/*`) in the PR if only module source changed -- the CI will regenerate them.
-
-## Authoring a Theme
-
-Themes live in `src/themes/<id>/`. Each theme is a `theme.json` manifest plus optional React templates.
-
-### Minimal manifest
+### Minimal manifest structure
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "my-theme",
   "name": "My Theme",
-  "description": "Short one-line description",
+  "description": "Short description",
   "version": "1.0.0",
   "author": "You",
-  "type": "light",
-  "tokens": {
-    "colors": {
-      "primary":    { "type": "color", "default": "#2563eb" },
-      "background": { "type": "color", "default": "#ffffff" }
-    }
-  },
-  "config": {
-    "hero": {
-      "label": "Hero",
-      "fields": {
-        "headline": { "type": "text", "default": "Welcome", "max": 100 }
+  "modes": {
+    "default": "light",
+    "available": {
+      "light": {
+        "tokens": {
+          "colors": { "primary": "#2563eb", "background": "#ffffff" },
+          "fonts": { "heading": "Inter, sans-serif", "body": "Inter, sans-serif" }
+        }
       }
     }
   }
 }
 ```
 
-### Reading config at runtime
+A manifest may also declare `settings` (schema-driven settings groups), `adminRoutes` (theme-owned admin pages), `adminNav` (label/icon for the sidebar Theme group), `suggestedModules`, `slots`, `slotContents`, and `components`.
 
-```tsx
-import { useThemeConfig } from "@/core/lib/theme-config-client";
+After editing `theme.json`, regenerate the theme registry:
 
-const cfg = useThemeConfig();
-<h1>{cfg("hero.headline", "Welcome")}</h1>
+```bash
+npm run generate:themes
 ```
 
-### Inheriting from a parent theme
+To distribute a theme, zip the `<id>/` folder and upload via Admin > Settings > Theme. The upload route validates the manifest, regenerates the registry, and activates the theme if requested.
 
-Set `parent: "flat"` in `theme.json`. Tokens and config groups your theme omits fall through to the parent. Two levels max — grandchildren are rejected at schema validation.
+Two themes ship in-tree:
+- `flat` — minimal baseline, light and dark modes
+- `pixelcraft` — gaming dark theme with MC hero section; suggests mc-stats module
 
-### Named slots
+---
 
-Use `<Slot name="home.afterHero">` to render whatever modules have contributed there. See `CANONICAL_SLOTS` in `src/core/lib/slot-registry.ts` for the reserved names.
+## Core Contribution Rules
 
-### Distribution
+`src/core/` is the platform framework. It provides auth, database, permissions, theming, i18n, navigation, footer link structure, health, rate-limiting, maintenance mode, upload, SEO, and the module system itself.
 
-Zip the `<id>/` folder and upload via Admin → Appearance → Themes → Upload. The upload route validates the manifest, runs the ZIP integrity check, computes a SHA-256 of the manifest (audit trail), and regenerates the theme registry.
+**Never add module-specific or theme-specific code to core.** The only layout injection points core exposes are three canonical slots:
 
-The active theme is picked by the `active_theme` setting. Customization (admin overrides) lives in the `ThemeCustomization` table, one row per theme, stored as a diff against the manifest defaults.
+- `layout.beforeMain`
+- `layout.afterMain`
+- `head.extra`
+
+Modules and themes inject into these via the slot system. No additional hardcoded slots belong in core.
+
+### What belongs in core
+
+- Auth system, session management, 2FA
+- Permission checking utilities (RBAC)
+- Database client singleton (`lib/db.ts`)
+- UI component library (`components/ui/`)
+- Theme system and `ThemeSlot` component
+- i18n configuration and navigation helpers
+- Module loader and registry generator
+- Rate limiting, activity logging, maintenance mode
+- Upload handler (storage provider is module-selectable)
+
+### What belongs in a module
+
+- Store product pages and checkout flow
+- Blog article editor and categories
+- Forum topics and replies
+- Support ticket system
+- Payment gateway integrations
+- Game server integrations
+- Social/auth provider buttons
+- Any domain-specific admin settings page
+
+---
+
+## Coding Conventions
+
+### TypeScript
+
+- Strict mode is enabled. No `any` — use proper types or `unknown`.
+- Use the `@/` path alias for all imports (resolves to `src/`).
+- Validate all API inputs with Zod 4. Use `.issues` (not `.errors`) to read validation error messages.
+
+### React
+
+- Server components by default. Add `"use client"` only when the component needs hooks, event handlers, or browser APIs.
+- Functional components with hooks only.
+- No `confirm()` or `alert()` calls — use `useConfirm()` and `toast` from sonner.
+- No emoji in code or UI strings — use Lucide icons exclusively.
+- Sanitize HTML with DOMPurify before using `dangerouslySetInnerHTML`.
+
+### Routing and i18n
+
+- Use `Link` and `usePathname` from `@/core/lib/i18n/navigation` (not `next/link`) for locale-aware links.
+- Use `useTranslations()` from `next-intl` for all UI text. No hardcoded strings.
+- Active locales: `en` and `tr`. Translations are stored in the `Translation` DB table; seed sources are `messages-core/{en,tr}.json`.
+
+### API Routes
+
+- REST conventions under `/api/v1/`.
+- Authenticate: `const session = await auth()`
+- Check admin: `await isAdmin(session.user.id)`
+- Response envelope: `{ ok: true, data }` or `{ ok: false, error, code? }` via `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils`.
+- State-changing endpoints (`POST/PUT/DELETE/PATCH`) are CSRF-protected automatically through the proxy middleware. Server-to-server callers set `x-internal-request: $CSRF_INTERNAL_SECRET`.
+- Admin mutations must log to `ActivityLog` via `logActivity({ userId, action, entity, entityId, metadata })`.
+- Apply `rateLimit()` on all auth-related and public-facing endpoints.
+
+### CSS
+
+- Tailwind CSS v4.
+- Dark mode uses the `data-mode="dark"` attribute on `<html>`. Do not use `.dark` class selectors.
+- Custom CSS overrides go in `globals.css`.
+
+---
+
+## Commit Conventions
+
+Format: `<type>(<scope>): <description>`
+
+Types:
+
+| Type | When to use |
+|---|---|
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `refactor` | Code restructuring with no behavior change |
+| `docs` | Documentation only |
+| `style` | Formatting, whitespace |
+| `test` | Adding or updating tests |
+| `chore` | Build scripts, dependencies, config |
+
+Examples:
+
+```
+feat(forum): add thread locking for moderators
+fix(auth): reset failed-login counter on successful 2FA
+docs(migrations): document --bootstrap flag
+chore(deps): bump next to 16.2.4
+```
+
+- Descriptive imperative-mood summaries. "add thread locking" not "added thread locking" or "adds thread locking".
+- No `Co-Authored-By` lines in commits to this public repository.
+- One logical change per commit. Do not bundle unrelated fixes.
+
+---
+
+## CI Checklist
+
+The CI pipeline (`.github/workflows/ci.yml`) runs on every push and pull request to `main`. All steps must pass:
+
+1. `npm ci` — clean dependency install
+2. Seed `src/modules/` from `module-sources/` (CI only; simulates a fully-installed state)
+3. `npx tsx scripts/merge-schemas.ts` — merge Prisma schema + generate client
+4. `npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/generate-openapi.ts`
+5. `npx tsc --noEmit` — TypeScript check with zero errors
+6. `npm run lint -- --max-warnings=0` — ESLint with zero warnings
+7. `npm audit --audit-level=high` — fails on high or critical CVEs
+8. `npm test` — unit tests via Vitest
+9. `npm run build` — full production build
+
+Before opening a PR, run locally:
+
+```bash
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm test
+npm run build
+```
+
+If you changed the module manifest or added routes, also run:
+
+```bash
+npx tsx scripts/generate-registry.ts
+```
+
+---
+
+## First PR Walkthrough
+
+This is a concrete example of adding a new first-party module called `announcements-banner`.
+
+### 1. Scaffold the module
+
+```bash
+npm run create:module
+# Follow the prompts: id=announcements-banner, name="Announcements Banner", ...
+```
+
+Or create `module-sources/announcements-banner/` manually with:
+- `module.json` — manifest
+- `pages/public/page.tsx` — public-facing page
+- `api/route.ts` — API handler
+- `components/AnnouncementsBanner.tsx` — widget component
+
+### 2. Write the manifest
+
+```json
+{
+  "id": "announcements-banner",
+  "name": "Announcements Banner",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "icon": "Megaphone",
+  "routes": [{ "path": "/announcements", "component": "pages/public/page.tsx" }],
+  "adminRoutes": [{ "path": "/announcements", "component": "pages/admin/page.tsx" }],
+  "api": [{ "path": "/announcements", "handler": "api/route.ts" }],
+  "menu": [{ "label": "Announcements", "path": "/announcements", "icon": "Megaphone" }],
+  "navbarComponents": [{ "id": "AnnouncementsBanner", "component": "components/AnnouncementsBanner", "order": 10 }]
+}
+```
+
+### 3. Validate and build
+
+```bash
+npm run validate:module -- announcements-banner
+npm run build:marketplace
+```
+
+### 4. Test locally
+
+Install via the admin marketplace UI or copy the source folder directly:
+
+```bash
+cp -r module-sources/announcements-banner src/modules/announcements-banner
+npx tsx scripts/generate-registry.ts
+npm run dev
+```
+
+Navigate to `/admin/modules` and enable the module.
+
+### 5. Run the full CI suite locally
+
+```bash
+npx tsc --noEmit
+npm run lint -- --max-warnings=0
+npm test
+npm run build
+```
+
+### 6. Open the PR
+
+- Branch name: `feat/announcements-banner`
+- PR title: `feat(announcements-banner): add announcements banner module`
+- Description: what the module does, screenshots if UI-heavy, note any new permissions it registers.
+- Ensure `module-sources/announcements-banner/` and `module-marketplace/announcements-banner.zip` plus updated `module-marketplace/index.json` are all committed together.
+- Never include anything under `src/modules/` or `src/core/generated/` unless you intentionally changed the core generator scripts.
+
+---
+
+## Review Process
+
+1. A maintainer reviews the PR for adherence to the core-knows-nothing principle.
+2. CI must be green (all 9 steps above).
+3. Module manifests are checked for correct permission declarations and correct icon names (Lucide only).
+4. New core changes require two maintainer approvals. Module-only changes require one.
+5. Once approved and merged to `main`, the CI build runs and the marketplace artifacts are published automatically.
