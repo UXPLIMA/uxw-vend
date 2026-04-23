@@ -168,6 +168,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 header: "Appearance",
                 headerKey: "sidebar_appearance",
                 items: [
+                    { href: "/admin/settings/theme", label: "Theme Library", labelKey: "sidebar_themeLibrary", icon: Palette },
                     { href: "/admin/settings/css", label: "Custom CSS", labelKey: "sidebar_customCss", icon: Code },
                 ],
             },
@@ -398,7 +399,7 @@ export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
     const themeItems: ThemeAdminNavItem[] = themeAdminRoutes[activeThemeId] ?? [];
 
     const items: NavItem[] = [
-        { label: "Appearance", href: "/admin/settings/theme", icon: Palette },
+        { label: "Appearance", href: "/admin/theme/appearance", icon: Palette },
         ...themeItems.map((i: ThemeAdminNavItem) => ({
             label: i.label,
             href: "/admin" + (i.path.startsWith("/") ? i.path : "/" + i.path),

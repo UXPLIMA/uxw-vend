@@ -386,51 +386,13 @@ export default function ThemeSettingsPage() {
                 );
             })()}
 
-            {/* Schema-driven color customizer */}
-            {Object.keys(colorTokens).length > 0 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Palette className="w-4 h-4" />
-                            Color Customization
-                        </CardTitle>
-                        <CardDescription>Override this theme&apos;s colors. Changes apply immediately.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            {Object.entries(colorTokens).map(([name, def]) => {
-                                // v2 moved per-mode defaults into modes.available[mode].tokens.colors.
-                                // Inject the default for the currently-active mode so the ColorField
-                                // has a meaningful starting value instead of falling through to black.
-                                const modeDefault = activeTheme?.modes?.available?.[currentMode]?.tokens?.colors?.[name];
-                                const effectiveDef = {
-                                    ...def,
-                                    label: def.label ?? name,
-                                    default: modeDefault ?? def.default,
-                                };
-                                return (
-                                    <Fields.ColorField
-                                        key={name}
-                                        def={effectiveDef}
-                                        value={colorOverrides[name]}
-                                        onChange={(v) => setColorOverrides(prev => ({ ...prev, [name]: v }))}
-                                        isDefault={colorOverrides[name] === undefined}
-                                    />
-                                );
-                            })}
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                            <Button size="sm" onClick={saveColors}>
-                                <Check className="w-3 h-3 mr-1" />
-                                Save Colors
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={resetColors}>
-                                {t("theme_resetDefault") ?? "Reset to Defaults"}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
+            <div className="rounded-md border border-blue-300 bg-blue-50 p-4 text-sm text-blue-900">
+                <strong>Looking for color customization?</strong>{" "}
+                Per-theme colors + mode overrides moved to the dedicated appearance page
+                for whichever theme is active — in the sidebar under the theme&apos;s own
+                group, or directly at <code className="font-mono text-xs">/admin/theme/appearance</code>.
+                This page is the theme library (install / switch / delete).
+            </div>
 
             <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
