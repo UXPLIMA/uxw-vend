@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Palette, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
@@ -20,6 +21,7 @@ import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedM
  * your own.
  */
 export default function ActiveThemeAppearancePage() {
+    const t = useTranslations("admin");
     const { activeTheme, currentMode, setMode } = useTheme();
     const { confirm } = useConfirm();
     const [colorOverrides, setColorOverrides] = useState<Record<string, string | undefined>>({});
@@ -51,17 +53,17 @@ export default function ActiveThemeAppearancePage() {
             body: JSON.stringify({ mode: currentMode, overrides: { tokens: { colors: nonEmpty } } }),
         });
         setSaving(false);
-        if (!res.ok) { toast.error("Save failed"); return; }
-        toast.success("Colors saved");
+        if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
+        toast.success(t("theme_colorsSaved"));
     };
 
     const resetColors = async () => {
         if (!themeId) return;
         const ok = await confirm({
-            title: "Reset Colors",
-            message: `Discard all color overrides for ${activeTheme?.name} (${currentMode} mode)?`,
+            title: t("theme_resetTitle"),
+            message: t("theme_resetConfirm", { name: activeTheme?.name ?? "", mode: currentMode }),
             variant: "danger",
-            confirmText: "Reset",
+            confirmText: t("theme_reset"),
         });
         if (!ok) return;
         await fetch(`/api/v1/themes/${themeId}/customization`, {
@@ -70,7 +72,7 @@ export default function ActiveThemeAppearancePage() {
             body: JSON.stringify({ mode: currentMode, overrides: {} }),
         });
         setColorOverrides({});
-        toast.success("Reset to defaults");
+        toast.success(t("theme_resetDone"));
     };
 
     const switchMode = async (m: string) => {
@@ -84,7 +86,7 @@ export default function ActiveThemeAppearancePage() {
     };
 
     if (!activeTheme) {
-        return <div className="p-6 text-sm text-muted-foreground">No active theme.</div>;
+        return <div className="p-6 text-sm text-muted-foreground">{t("theme_noActive")}</div>;
     }
 
     return (
@@ -92,11 +94,10 @@ export default function ActiveThemeAppearancePage() {
             <div>
                 <h1 className="text-2xl font-semibold flex items-center gap-2">
                     <Palette className="w-5 h-5" />
-                    {activeTheme.name} — Appearance
+                    {activeTheme.name} — {t("theme_appearanceTitle")}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                    Customize the active theme. Other themes are managed in the
-                    <a href="/tr/admin/settings/theme" className="underline ml-1">theme library</a>.
+                    {t("theme_appearanceSubtitle")}
                 </p>
             </div>
 
@@ -108,8 +109,8 @@ export default function ActiveThemeAppearancePage() {
             {modes.length > 1 && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Mode</CardTitle>
-                        <CardDescription>Editing colors for the selected mode only.</CardDescription>
+                        <CardTitle className="text-base">{t("theme_mode")}</CardTitle>
+                        <CardDescription>{t("theme_modeDesc")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex gap-2">
@@ -131,10 +132,8 @@ export default function ActiveThemeAppearancePage() {
             {Object.keys(colorTokens).length > 0 && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Color Customization</CardTitle>
-                        <CardDescription>
-                            Override this theme&apos;s colors. Changes apply immediately after saving.
-                        </CardDescription>
+                        <CardTitle className="text-base">{t("theme_colors")}</CardTitle>
+                        <CardDescription>{t("theme_overrideDesc")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -159,10 +158,10 @@ export default function ActiveThemeAppearancePage() {
                         <div className="flex gap-2 mt-6">
                             <Button size="sm" onClick={saveColors} disabled={saving}>
                                 <Check className="w-3 h-3 mr-1" />
-                                {saving ? "Saving…" : "Save Colors"}
+                                {saving ? t("theme_saving") : t("theme_saveColors")}
                             </Button>
                             <Button size="sm" variant="outline" onClick={resetColors}>
-                                Reset to Defaults
+                                {t("theme_resetDefault")}
                             </Button>
                         </div>
                     </CardContent>

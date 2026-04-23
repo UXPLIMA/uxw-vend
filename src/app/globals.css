@@ -5,8 +5,11 @@
 /* Fallback root tokens so built-in styles work before a theme data-attr is applied. */
 :root {
   --uxw-color-primary: #2563eb;
+  --uxw-color-primaryForeground: #ffffff;
   --uxw-color-secondary: #64748b;
+  --uxw-color-secondaryForeground: #ffffff;
   --uxw-color-accent: #f59e0b;
+  --uxw-color-accentForeground: #ffffff;
   --uxw-color-background: #ffffff;
   --uxw-color-foreground: #0f172a;
   --uxw-color-muted: #f1f5f9;
@@ -15,8 +18,11 @@
   --uxw-color-card: #ffffff;
   --uxw-color-cardForeground: #0f172a;
   --uxw-color-destructive: #ef4444;
+  --uxw-color-destructiveForeground: #ffffff;
   --uxw-color-success: #16a34a;
+  --uxw-color-successForeground: #ffffff;
   --uxw-color-warning: #f59e0b;
+  --uxw-color-warningForeground: #0f172a;
   --uxw-font-heading: Inter, system-ui, sans-serif;
   --uxw-font-body: Inter, system-ui, sans-serif;
   --uxw-font-mono: ui-monospace, SFMono-Regular, monospace;
@@ -24,23 +30,29 @@
 }
 
 @theme inline {
-  --color-primary:            var(--uxw-color-primary);
-  --color-secondary:          var(--uxw-color-secondary);
-  --color-accent:             var(--uxw-color-accent);
-  --color-background:         var(--uxw-color-background);
-  --color-foreground:         var(--uxw-color-foreground);
-  --color-muted:              var(--uxw-color-muted);
-  --color-muted-foreground:   var(--uxw-color-mutedForeground);
-  --color-border:             var(--uxw-color-border);
-  --color-card:               var(--uxw-color-card);
-  --color-card-foreground:    var(--uxw-color-cardForeground);
-  --color-destructive:        var(--uxw-color-destructive);
-  --color-success:            var(--uxw-color-success);
-  --color-warning:            var(--uxw-color-warning);
-  --font-heading:             var(--uxw-font-heading);
-  --font-body:                var(--uxw-font-body);
-  --font-mono:                var(--uxw-font-mono);
-  --radius:                   var(--uxw-radius);
+  --color-primary:                var(--uxw-color-primary);
+  --color-primary-foreground:     var(--uxw-color-primaryForeground);
+  --color-secondary:              var(--uxw-color-secondary);
+  --color-secondary-foreground:   var(--uxw-color-secondaryForeground);
+  --color-accent:                 var(--uxw-color-accent);
+  --color-accent-foreground:      var(--uxw-color-accentForeground);
+  --color-background:             var(--uxw-color-background);
+  --color-foreground:             var(--uxw-color-foreground);
+  --color-muted:                  var(--uxw-color-muted);
+  --color-muted-foreground:       var(--uxw-color-mutedForeground);
+  --color-border:                 var(--uxw-color-border);
+  --color-card:                   var(--uxw-color-card);
+  --color-card-foreground:        var(--uxw-color-cardForeground);
+  --color-destructive:            var(--uxw-color-destructive);
+  --color-destructive-foreground: var(--uxw-color-destructiveForeground);
+  --color-success:                var(--uxw-color-success);
+  --color-success-foreground:     var(--uxw-color-successForeground);
+  --color-warning:                var(--uxw-color-warning);
+  --color-warning-foreground:     var(--uxw-color-warningForeground);
+  --font-heading:                 var(--uxw-font-heading);
+  --font-body:                    var(--uxw-font-body);
+  --font-mono:                    var(--uxw-font-mono);
+  --radius:                       var(--uxw-radius);
 }
 
 body {

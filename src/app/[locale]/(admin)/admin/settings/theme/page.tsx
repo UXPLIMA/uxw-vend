@@ -387,11 +387,10 @@ export default function ThemeSettingsPage() {
             })()}
 
             <div className="rounded-md border border-blue-300 bg-blue-50 p-4 text-sm text-blue-900">
-                <strong>Looking for color customization?</strong>{" "}
-                Per-theme colors + mode overrides moved to the dedicated appearance page
-                for whichever theme is active — in the sidebar under the theme&apos;s own
-                group, or directly at <code className="font-mono text-xs">/admin/theme/appearance</code>.
-                This page is the theme library (install / switch / delete).
+                <strong>{t("theme_libraryNoticeTitle")}</strong>{" "}
+                {t.rich("theme_libraryNoticeBody", {
+                    path: () => <code className="font-mono text-xs">/admin/theme/appearance</code>,
+                })}
             </div>
 
             <div className="p-4 bg-muted rounded-lg">
