@@ -162,13 +162,12 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Palette,
         label: "Design",
         labelKey: "sidebar_design",
-        pathPrefix: ["/admin/settings/theme", "/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
+        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
         sections: [
             {
                 header: "Appearance",
                 headerKey: "sidebar_appearance",
                 items: [
-                    { href: "/admin/settings/theme", label: "Theme", labelKey: "sidebar_theme", icon: Palette },
                     { href: "/admin/settings/css", label: "Custom CSS", labelKey: "sidebar_customCss", icon: Code },
                 ],
             },
