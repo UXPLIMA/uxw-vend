@@ -131,9 +131,18 @@ export default function ThemeSettingsPage() {
     const renderPreview = (themeId: string) => {
         const theme = themeRegistry[themeId];
         if (!theme) return null;
-        const colorDefs = theme.tokens?.colors ?? {};
+        // v2: per-mode color defaults live in modes.available[mode].tokens.colors.
+        // Pick the theme's default mode so each card shows its intended palette.
+        const modeKey = theme.modes?.default;
+        const modeColorsRaw = modeKey ? theme.modes?.available?.[modeKey]?.tokens?.colors : undefined;
+        const modeColors: Record<string, string> = modeColorsRaw && typeof modeColorsRaw === "object"
+            ? (modeColorsRaw as Record<string, string>)
+            : {};
+        const tokenDefs = theme.tokens?.colors ?? {};
         const colorFor = (k: string): string => {
-            const def = colorDefs[k];
+            const fromMode = modeColors[k];
+            if (typeof fromMode === "string") return fromMode;
+            const def = tokenDefs[k];
             return def && "default" in def && typeof def.default === "string" ? def.default : "#000";
         };
         const colors = {
@@ -383,21 +392,32 @@ export default function ThemeSettingsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
                             <Palette className="w-4 h-4" />
-                            {t("theme_colors") ?? "Color Customization"}
+                            Color Customization
                         </CardTitle>
-                        <CardDescription>{t("theme_overrideDesc")}</CardDescription>
+                        <CardDescription>Override this theme&apos;s colors. Changes apply immediately.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4 md:grid-cols-2">
-                            {Object.entries(colorTokens).map(([name, def]) => (
-                                <Fields.ColorField
-                                    key={name}
-                                    def={{ ...def, label: def.label ?? name }}
-                                    value={colorOverrides[name]}
-                                    onChange={(v) => setColorOverrides(prev => ({ ...prev, [name]: v }))}
-                                    isDefault={colorOverrides[name] === undefined}
-                                />
-                            ))}
+                            {Object.entries(colorTokens).map(([name, def]) => {
+                                // v2 moved per-mode defaults into modes.available[mode].tokens.colors.
+                                // Inject the default for the currently-active mode so the ColorField
+                                // has a meaningful starting value instead of falling through to black.
+                                const modeDefault = activeTheme?.modes?.available?.[currentMode]?.tokens?.colors?.[name];
+                                const effectiveDef = {
+                                    ...def,
+                                    label: def.label ?? name,
+                                    default: modeDefault ?? def.default,
+                                };
+                                return (
+                                    <Fields.ColorField
+                                        key={name}
+                                        def={effectiveDef}
+                                        value={colorOverrides[name]}
+                                        onChange={(v) => setColorOverrides(prev => ({ ...prev, [name]: v }))}
+                                        isDefault={colorOverrides[name] === undefined}
+                                    />
+                                );
+                            })}
                         </div>
                         <div className="flex gap-2 mt-4">
                             <Button size="sm" onClick={saveColors}>
