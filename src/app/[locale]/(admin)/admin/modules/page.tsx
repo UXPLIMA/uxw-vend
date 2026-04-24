@@ -7,7 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import {
     Package, Upload, Loader2, Trash2, Download, CheckCircle, ShoppingCart,
     MessageSquare, FileText, Ticket, HelpCircle, Shield, History, Users,
-    Vote, Dices, Trophy, Star, Bell, Server, FileEdit, ImageIcon, Crown,
+    Vote, Dices, Trophy, Bell, Server, FileEdit, ImageIcon, Crown,
     Megaphone, Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -37,9 +37,6 @@ interface MarketplaceModule {
     icon: string;
     category: string;
     verified: boolean;
-    downloads: number;
-    rating: number | null;
-    ratingCount: number;
     updatedAt: string;
     screenshots: string[];
     tags: string[];
@@ -48,21 +45,7 @@ interface MarketplaceModule {
     stats: { publicRoutes: number; adminRoutes: number; apiRoutes: number; widgets: number };
 }
 
-interface RatingEntry {
-    id: string;
-    rating: number;
-    review: string | null;
-    createdAt: string;
-    updatedAt: string;
-    user: { id: string; username: string; avatar: string | null } | null;
-}
-
-interface RatingsResponse {
-    ratings: RatingEntry[];
-    aggregate: { average: number | null; count: number };
-}
-
-type SortKey = "popular" | "newest" | "rating" | "alphabetical";
+type SortKey = "newest" | "alphabetical";
 
 const iconMap: Record<string, React.ReactNode> = {
     ShoppingCart: <ShoppingCart size={22} />,
@@ -76,7 +59,6 @@ const iconMap: Record<string, React.ReactNode> = {
     Vote: <Vote size={22} />,
     Dices: <Dices size={22} />,
     Trophy: <Trophy size={22} />,
-    Star: <Star size={22} />,
     Bell: <Bell size={22} />,
     Server: <Server size={22} />,
     FileEdit: <FileEdit size={22} />,
@@ -108,27 +90,6 @@ function compareVersions(a: string, b: string): number {
     return 0;
 }
 
-function formatDownloads(n: number): string {
-    if (n < 1000) return String(n);
-    if (n < 1_000_000) return `${(n / 1000).toFixed(n >= 10_000 ? 0 : 1)}k`;
-    return `${(n / 1_000_000).toFixed(1)}m`;
-}
-
-function Stars({ rating, size = 12 }: { rating: number; size?: number }) {
-    const rounded = Math.round(rating);
-    return (
-        <span className="inline-flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
-            {[1, 2, 3, 4, 5].map((i) => (
-                <Star
-                    key={i}
-                    size={size}
-                    className={i <= rounded ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"}
-                />
-            ))}
-        </span>
-    );
-}
-
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
     const searchParams = useSearchParams();
@@ -150,7 +111,7 @@ export default function AdminModulesPage() {
     const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
     const [bulkInstalling, setBulkInstalling] = useState(false);
     const [bulkProgress, setBulkProgress] = useState<{ current: number; total: number; name: string } | null>(null);
-    const [sortKey, setSortKey] = useState<SortKey>("popular");
+    const [sortKey, setSortKey] = useState<SortKey>("newest");
     const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
     const [updatesOnly, setUpdatesOnly] = useState<boolean>(initialFilterParam === "updates");
     const [detailModule, setDetailModule] = useState<MarketplaceModule | null>(null);
@@ -363,18 +324,12 @@ export default function AdminModulesPage() {
 
         const sorted = [...list];
         switch (sortKey) {
-            case "popular":
-                sorted.sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0));
-                break;
             case "newest":
                 sorted.sort((a, b) => {
                     const ad = a.updatedAt ? Date.parse(a.updatedAt) : 0;
                     const bd = b.updatedAt ? Date.parse(b.updatedAt) : 0;
                     return bd - ad;
                 });
-                break;
-            case "rating":
-                sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
                 break;
             case "alphabetical":
                 sorted.sort((a, b) => a.name.localeCompare(b.name));
@@ -631,9 +586,7 @@ export default function AdminModulesPage() {
                                 onChange={(e) => setSortKey(e.target.value as SortKey)}
                                 className="text-xs border rounded-md px-2 py-1.5 bg-background"
                             >
-                                <option value="popular">{t("modules_popular")}</option>
                                 <option value="newest">{t("modules_newest")}</option>
-                                <option value="rating">{t("modules_rating")}</option>
                                 <option value="alphabetical">{t("modules_alphabetical")}</option>
                             </select>
                         </div>
@@ -732,27 +685,6 @@ export default function AdminModulesPage() {
 
                                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
 
-                                    <div className="flex items-center gap-2 mb-3 flex-wrap">
-                                        <span
-                                            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-muted/60 text-muted-foreground"
-                                            title={`${mod.downloads} downloads`}
-                                        >
-                                            <Download className="w-2.5 h-2.5" />
-                                            {formatDownloads(mod.downloads ?? 0)} downloads
-                                        </span>
-                                        {mod.rating !== null && mod.ratingCount > 0 ? (
-                                            <span
-                                                className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"
-                                                title={`Average rating ${mod.rating}`}
-                                            >
-                                                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                                                {mod.rating.toFixed(1)} ({mod.ratingCount})
-                                            </span>
-                                        ) : (
-                                            <span className="text-[10px] text-muted-foreground">{t("modules_unrated")}</span>
-                                        )}
-                                    </div>
-
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                                         {mod.stats.publicRoutes > 0 && <span>{t("modules_pages", { count: mod.stats.publicRoutes })}</span>}
                                         {mod.stats.adminRoutes > 0 && <span>{t("modules_admin", { count: mod.stats.adminRoutes })}</span>}
@@ -798,11 +730,7 @@ export default function AdminModulesPage() {
             {detailModule && (
                 <ModuleDetailModal
                     module={detailModule}
-                    installed={installedIds.has(detailModule.id)}
                     onClose={() => setDetailModule(null)}
-                    onRated={() => {
-                        fetchMarketplace();
-                    }}
                 />
             )}
         </>
@@ -811,29 +739,11 @@ export default function AdminModulesPage() {
 
 interface DetailProps {
     module: MarketplaceModule;
-    installed: boolean;
     onClose: () => void;
-    onRated: () => void;
 }
 
-function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailProps) {
+function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
     const t = useTranslations("admin");
-    const [ratings, setRatings] = useState<RatingsResponse | null>(null);
-    const [loadingRatings, setLoadingRatings] = useState(true);
-    const [reviewRating, setReviewRating] = useState<number>(5);
-    const [reviewText, setReviewText] = useState<string>("");
-    const [submitting, setSubmitting] = useState(false);
-
-    useEffect(() => {
-        let cancelled = false;
-        setLoadingRatings(true);
-        fetch(`/api/v1/modules/marketplace/${mod.id}/ratings`)
-            .then((r) => r.json())
-            .then((data: RatingsResponse) => { if (!cancelled) setRatings(data); })
-            .catch(() => { if (!cancelled) setRatings({ ratings: [], aggregate: { average: null, count: 0 } }); })
-            .finally(() => { if (!cancelled) setLoadingRatings(false); });
-        return () => { cancelled = true; };
-    }, [mod.id]);
 
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -842,37 +752,6 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [onClose]);
-
-    const submitReview = async () => {
-        if (reviewRating < 1 || reviewRating > 5) {
-            toast.error(t("modules_ratingRange"));
-            return;
-        }
-        setSubmitting(true);
-        try {
-            const res = await fetch(`/api/v1/modules/marketplace/${mod.id}/rate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ rating: reviewRating, review: reviewText.trim() || undefined }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                toast.success(t("modules_reviewSaved"));
-                setReviewText("");
-                // Refetch ratings list
-                const r = await fetch(`/api/v1/modules/marketplace/${mod.id}/ratings`);
-                const fresh = (await r.json()) as RatingsResponse;
-                setRatings(fresh);
-                onRated();
-            } else {
-                toast.error(data.error || "Failed to save review");
-            }
-        } catch {
-            toast.error(t("modules_networkError"));
-        } finally {
-            setSubmitting(false);
-        }
-    };
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
@@ -901,20 +780,6 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                         <p className="text-sm">{mod.description}</p>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs">
-                        <span className="inline-flex items-center gap-1 text-muted-foreground">
-                            <Download className="w-3 h-3" />
-                            {formatDownloads(mod.downloads ?? 0)} downloads
-                        </span>
-                        {mod.rating !== null && mod.ratingCount > 0 && (
-                            <span className="inline-flex items-center gap-1.5">
-                                <Stars rating={mod.rating} size={14} />
-                                <span className="font-medium">{mod.rating.toFixed(1)}</span>
-                                <span className="text-muted-foreground">({mod.ratingCount})</span>
-                            </span>
-                        )}
-                    </div>
-
                     {mod.tags && mod.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                             {mod.tags.map((tag) => (
@@ -936,82 +801,6 @@ function ModuleDetailModal({ module: mod, installed, onClose, onRated }: DetailP
                         </div>
                     )}
 
-                    <div>
-                        <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">{t("modules_reviews")}</h4>
-                        {loadingRatings ? (
-                            <div className="flex justify-center py-4">
-                                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                            </div>
-                        ) : !ratings || ratings.ratings.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">{t("modules_noReviews")}</p>
-                        ) : (
-                            <ul className="space-y-3">
-                                {ratings.ratings.map((r) => (
-                                    <li key={r.id} className="border rounded-lg p-3">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs font-medium">
-                                                    {r.user?.username ?? "Unknown"}
-                                                </span>
-                                                <Stars rating={r.rating} size={10} />
-                                            </div>
-                                            <span className="text-[10px] text-muted-foreground">
-                                                {new Date(r.updatedAt).toLocaleDateString()}
-                                            </span>
-                                        </div>
-                                        {r.review && (
-                                            <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-                                                {r.review}
-                                            </p>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-
-                    {installed ? (
-                        <div className="border rounded-lg p-3 bg-muted/30">
-                            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
-                                {t("modules_leaveReview")}
-                            </h4>
-                            <div className="flex items-center gap-1 mb-2">
-                                {[1, 2, 3, 4, 5].map((n) => (
-                                    <button
-                                        key={n}
-                                        type="button"
-                                        onClick={() => setReviewRating(n)}
-                                        aria-label={`Rate ${n}`}
-                                        className="p-0.5"
-                                    >
-                                        <Star
-                                            size={18}
-                                            className={n <= reviewRating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"}
-                                        />
-                                    </button>
-                                ))}
-                                <span className="ml-2 text-xs text-muted-foreground">{reviewRating}/5</span>
-                            </div>
-                            <textarea
-                                value={reviewText}
-                                onChange={(e) => setReviewText(e.target.value)}
-                                rows={3}
-                                maxLength={2000}
-                                placeholder={t("modules_reviewPlaceholder")}
-                                className="w-full text-xs border rounded-md px-2 py-1.5 bg-background"
-                            />
-                            <div className="mt-2 flex justify-end">
-                                <Button size="sm" onClick={submitReview} disabled={submitting}>
-                                    {submitting ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : null}
-                                    {t("modules_submitReview")}
-                                </Button>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="text-xs text-muted-foreground italic">
-                            {t("modules_installToReview")}
-                        </p>
-                    )}
                 </div>
             </div>
         </div>

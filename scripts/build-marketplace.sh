@@ -1,9 +1,6 @@
 #!/bin/bash
 # Build marketplace ZIPs from module-sources/
 # Usage: bash scripts/build-marketplace.sh
-#
-# Preserves runtime metadata (downloads, rating, ratingCount) across rebuilds
-# by reading the existing index.json first and merging.
 
 set -e
 
@@ -35,18 +32,6 @@ import json, os, datetime
 SOURCES_DIR = "$SOURCES_DIR"
 OUTPUT_DIR = "$OUTPUT_DIR"
 UPDATED_AT = "$UPDATED_AT"
-
-# Load existing index.json (if any) to preserve downloads / ratings
-existing_by_id = {}
-existing_path = os.path.join(OUTPUT_DIR, "index.json")
-if os.path.isfile(existing_path):
-    try:
-        with open(existing_path) as f:
-            existing = json.load(f)
-            for m in existing.get("modules", []):
-                existing_by_id[m["id"]] = m
-    except Exception:
-        existing_by_id = {}
 
 CATEGORY_MAP = {
     "store": "commerce", "stripe-gateway": "commerce", "paypal-gateway": "commerce",
@@ -84,8 +69,19 @@ for name in sorted(os.listdir(SOURCES_DIR)):
     else:
         tags = [cat] if cat else ["uncategorized"]
 
-    # Preserve runtime metadata across rebuilds
-    prev = existing_by_id.get(m["id"], {})
+    # Load existing screenshots (non-generated content) to preserve across rebuilds
+    existing_path = os.path.join(OUTPUT_DIR, "index.json")
+    screenshots = []
+    if os.path.isfile(existing_path):
+        try:
+            with open(existing_path) as f:
+                existing = json.load(f)
+                for em in existing.get("modules", []):
+                    if em["id"] == m["id"]:
+                        screenshots = em.get("screenshots", []) or []
+                        break
+        except Exception:
+            pass
 
     modules.append({
         "id": m["id"],
@@ -96,11 +92,8 @@ for name in sorted(os.listdir(SOURCES_DIR)):
         "icon": m.get("icon", "Package"),
         "category": cat,
         "verified": True,
-        "downloads": int(prev.get("downloads", 0) or 0),
-        "rating": prev.get("rating") if prev.get("rating") is not None else None,
-        "ratingCount": int(prev.get("ratingCount", 0) or 0),
         "updatedAt": UPDATED_AT,
-        "screenshots": prev.get("screenshots", []) or [],
+        "screenshots": screenshots,
         "tags": tags,
         "zip": f"{name}.zip",
         "dependencies": m.get("dependencies", []),

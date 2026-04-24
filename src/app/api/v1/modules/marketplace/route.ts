@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-import { prisma } from "@/core/lib/db";
 import type { MarketplaceIndex, MarketplaceModule } from "./_types";
 import {
     MARKETPLACE_CACHE_TTL_MS,
@@ -38,9 +37,6 @@ function ensureDefaults(
         icon: m.icon ?? "Package",
         category: m.category ?? "content",
         verified: m.verified ?? true,
-        downloads: m.downloads ?? 0,
-        rating: m.rating ?? null,
-        ratingCount: m.ratingCount ?? 0,
         updatedAt: m.updatedAt ?? new Date().toISOString(),
         screenshots: m.screenshots ?? [],
         tags: m.tags ?? [m.category ?? "uncategorized"],
@@ -50,49 +46,7 @@ function ensureDefaults(
     };
 }
 
-async function overlayRuntimeStats(index: MarketplaceIndex): Promise<MarketplaceIndex> {
-    // Cumulative installs per module (writes go through marketplace/install).
-    const installCounts = await prisma.moduleInstallEvent.groupBy({
-        by: ["moduleId"],
-        _count: { _all: true },
-    });
-    const installMap = new Map<string, number>();
-    for (const row of installCounts) installMap.set(row.moduleId, row._count._all);
-
-    // Average rating + count.
-    const ratingAgg = await prisma.moduleRating.groupBy({
-        by: ["moduleId"],
-        _avg: { rating: true },
-        _count: { _all: true },
-    });
-    const ratingMap = new Map<string, { avg: number | null; count: number }>();
-    for (const row of ratingAgg) {
-        ratingMap.set(row.moduleId, {
-            avg: row._avg.rating !== null ? Number(row._avg.rating) : null,
-            count: row._count._all,
-        });
-    }
-
-    const merged = index.modules.map((raw) => {
-        const m = ensureDefaults(raw);
-        const extraInstalls = installMap.get(m.id) ?? 0;
-        const rating = ratingMap.get(m.id);
-        return {
-            ...m,
-            downloads: m.downloads + extraInstalls,
-            rating: rating
-                ? rating.avg !== null
-                    ? Math.round(rating.avg * 10) / 10
-                    : m.rating
-                : m.rating,
-            ratingCount: rating ? rating.count : m.ratingCount,
-        };
-    });
-
-    return { ...index, modules: merged };
-}
-
-// GET /api/v1/modules/marketplace — list modules with live runtime stats
+// GET /api/v1/modules/marketplace — list modules from the local index
 export async function GET() {
     const cache = getCachedMarketplace();
     if (cache.index && Date.now() - cache.time < MARKETPLACE_CACHE_TTL_MS) {
@@ -101,9 +55,12 @@ export async function GET() {
 
     try {
         const base = await loadBaseIndex();
-        const enriched = await overlayRuntimeStats(base);
-        setCachedMarketplace(enriched);
-        return NextResponse.json(enriched);
+        const normalized: MarketplaceIndex = {
+            ...base,
+            modules: base.modules.map((m) => ensureDefaults(m)),
+        };
+        setCachedMarketplace(normalized);
+        return NextResponse.json(normalized);
     } catch {
         if (cache.index) return NextResponse.json(cache.index);
         return NextResponse.json(

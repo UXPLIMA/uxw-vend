@@ -1,5 +1,4 @@
-// Shared types for the marketplace route + rating sub-routes. Not a route
-// file — safe to export plain types/helpers.
+// Shared types for the marketplace routes. Not a route file — safe to export plain types/helpers.
 
 export interface MarketplaceModuleStats {
     publicRoutes: number;
@@ -17,9 +16,6 @@ export interface MarketplaceModule {
     icon: string;
     category: string;
     verified: boolean;
-    downloads: number;
-    rating: number | null;
-    ratingCount: number;
     updatedAt: string;
     screenshots: string[];
     tags: string[];

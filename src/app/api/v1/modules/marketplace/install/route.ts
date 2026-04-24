@@ -9,7 +9,6 @@ import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { logActivity } from "@/core/lib/activity-log";
-import { incrementIndexDownloads } from "../_index-writer";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
@@ -261,19 +260,6 @@ export async function POST(request: NextRequest) {
             entityId: moduleId,
             metadata: { name: manifest.name, version: manifest.version },
         }).catch(() => {});
-
-        // Track the install as a marketplace download. Best-effort — we never
-        // fail the install just because the counter couldn't be persisted.
-        try {
-            await prisma.moduleInstallEvent.create({
-                data: {
-                    moduleId,
-                    version: String(manifest.version ?? "unknown"),
-                    installedById: session.user.id,
-                },
-            });
-        } catch { /* non-fatal */ }
-        incrementIndexDownloads(moduleId).catch(() => { /* non-fatal */ });
 
         return NextResponse.json({
             message: "Module installed and enabled",

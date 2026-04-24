@@ -217,34 +217,6 @@ model ThemeState {
   updatedAt DateTime @updatedAt
 }
 
-// Tracks every module install (or update) event — used to compute the
-// cumulative downloads counter displayed in the marketplace.
-model ModuleInstallEvent {
-  id            String   @id @default(cuid())
-  moduleId      String
-  version       String
-  installedById String?
-  createdAt     DateTime @default(now())
-
-  @@index([moduleId])
-}
-
-// Per-user module ratings (1-5) with optional review text. The unique
-// constraint enforces one rating per (module, user) — subsequent writes
-// upsert the existing row.
-model ModuleRating {
-  id        String   @id @default(cuid())
-  moduleId  String
-  userId    String
-  rating    Int
-  review    String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([moduleId, userId])
-  @@index([moduleId])
-}
-
 // Central media library. Every file uploaded via /api/v1/upload is recorded
 // here so it can be browsed, searched, reused, and deleted from one place.
 model MediaItem {

@@ -8,7 +8,6 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock } from "@/core/lib/install-lock";
-import { incrementIndexDownloads } from "../_index-writer";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
@@ -100,18 +99,6 @@ export async function POST(request: NextRequest) {
                 update: { name: manifest.name, enabled: true },
                 create: { id, name: manifest.name, enabled: true },
             });
-
-            // Track as marketplace install — drives the downloads counter.
-            try {
-                await prisma.moduleInstallEvent.create({
-                    data: {
-                        moduleId: id,
-                        version: String(manifest.version ?? "unknown"),
-                        installedById: session.user.id,
-                    },
-                });
-            } catch { /* non-fatal */ }
-            incrementIndexDownloads(id).catch(() => { /* non-fatal */ });
 
             results.push({ id, name: manifest.name, status: "installed" });
         } catch (err) {
