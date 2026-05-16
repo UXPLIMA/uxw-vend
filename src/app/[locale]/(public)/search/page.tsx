@@ -88,7 +88,7 @@ export default function SearchPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <ThemeComponentSlot name="Hero" />
             <Navbar />
 
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-6xl">

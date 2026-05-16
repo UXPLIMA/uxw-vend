@@ -69,7 +69,7 @@ export default function NewTicketPage() {
     if (!session?.user) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeComponentSlot name="Hero" fallback={() => null} />
+                <ThemeComponentSlot name="Hero" />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
@@ -86,7 +86,7 @@ export default function NewTicketPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <ThemeComponentSlot name="Hero" />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

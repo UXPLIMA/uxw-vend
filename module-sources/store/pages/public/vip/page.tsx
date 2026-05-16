@@ -51,7 +51,7 @@ export default function VipTablePage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeComponentSlot name="Hero" fallback={() => null} />
+                <ThemeComponentSlot name="Hero" />
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -73,7 +73,7 @@ export default function VipTablePage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <ThemeComponentSlot name="Hero" />
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">

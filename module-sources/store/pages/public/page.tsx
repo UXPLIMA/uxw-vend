@@ -126,7 +126,7 @@ export default function StorePage() {
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             {/* Shared Hero Banner */}
-            <ThemeComponentSlot name="Hero" fallback={() => null} />
+            <ThemeComponentSlot name="Hero" />
 
             {/* Shared Navbar */}
             <Navbar />
