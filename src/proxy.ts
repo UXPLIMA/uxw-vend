@@ -12,6 +12,7 @@ import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
 import { getModuleStates } from '@/core/lib/module-cache';
 import { checkCsrf } from '@/core/lib/csrf';
 import { runWithLogContext } from '@/core/lib/logger';
+import { getClientIP } from '@/core/lib/rate-limit';
 
 // Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
@@ -60,19 +61,13 @@ function extractLocale(pathname: string): string {
 }
 
 /**
- * Extract the caller's IP using the same header precedence as
- * core/lib/rate-limit.ts (x-forwarded-for → x-real-ip → "unknown").
- * Kept inline here so the middleware can stay self-contained.
+ * Use the shared trust-aware client IP helper from rate-limit.ts so
+ * TRUSTED_PROXY_IPS is honored uniformly. A prior inline version trusted
+ * x-forwarded-for unconditionally, which let attackers behind any proxy
+ * spoof their IP to bypass /admin/ip-blocks rules.
  */
 function getClientIpFromRequest(request: NextRequest): string {
-    const xff = request.headers.get('x-forwarded-for');
-    if (xff) {
-        const first = xff.split(',')[0]?.trim();
-        if (first) return first;
-    }
-    const real = request.headers.get('x-real-ip');
-    if (real) return real.trim();
-    return 'unknown';
+    return getClientIP(request.headers);
 }
 
 function resolveIpScope(pathname: string): IpBlockScope {

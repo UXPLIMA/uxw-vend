@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
                 }, { status: 400 });
             }
 
-            if (!process.env.NEXT_DEV) {
+            if (process.env.NODE_ENV === "production") {
                 try {
                     execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
                     try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }

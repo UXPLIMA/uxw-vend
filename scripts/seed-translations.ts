@@ -57,9 +57,26 @@ async function seedLocale(
         }
     }
 
+    // Two-pass write so admin-customized rows (isCustom = true) survive
+    // re-seeding. updateMany refreshes only non-custom rows; upsert with
+    // an empty update fills in missing rows without touching customs.
     const CHUNK = 200;
     for (let i = 0; i < rows.length; i += CHUNK) {
         const chunk = rows.slice(i, i + CHUNK);
+        await Promise.all(
+            chunk.map((r) =>
+                prisma.translation.updateMany({
+                    where: {
+                        locale: r.locale,
+                        namespace: r.namespace,
+                        key: r.key,
+                        module: r.module,
+                        isCustom: false,
+                    },
+                    data: { value: r.value },
+                }),
+            ),
+        );
         await Promise.all(
             chunk.map((r) =>
                 prisma.translation.upsert({
@@ -71,7 +88,7 @@ async function seedLocale(
                             module: r.module,
                         },
                     },
-                    update: { value: r.value },
+                    update: {},
                     create: r,
                 }),
             ),

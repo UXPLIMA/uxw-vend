@@ -1,6 +1,7 @@
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
 import { randomBytes, createHash, timingSafeEqual } from "crypto";
+import { cacheGet, cacheSet } from "./redis";
 
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
 
@@ -30,6 +31,32 @@ export function verifyToken(secret: string, token: string): boolean {
 
     const delta = totp.validate({ token, window: 1 });
     return delta !== null;
+}
+
+/**
+ * Verify a TOTP and atomically mark it consumed so the same code cannot
+ * be replayed within the validity window. RFC 6238 requires used codes
+ * be rejected — without this, an intercepted code is reusable for up to
+ * the configured window (here ~90s with window=1).
+ *
+ * Falls back to the in-memory cache backend when Redis is unavailable
+ * (single-worker dev), so the replay guard still works locally.
+ */
+export async function verifyTokenWithReplayProtection(
+    userId: string,
+    secret: string,
+    token: string,
+): Promise<boolean> {
+    if (!/^\d{6,8}$/.test(token)) return false;
+    const cacheKey = `totp:used:${userId}:${token}`;
+    const used = await cacheGet(cacheKey);
+    if (used) return false;
+    if (!verifyToken(secret, token)) return false;
+    // TTL covers the full window (prev/curr/next 30s slots) plus a small
+    // buffer so a code accepted at the edge of one slot can't be replayed
+    // when the next slot starts.
+    await cacheSet(cacheKey, "1", 120);
+    return true;
 }
 
 export async function generateQRCode(uri: string): Promise<string> {

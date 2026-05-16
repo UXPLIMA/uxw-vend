@@ -125,8 +125,9 @@ export async function POST(request: NextRequest) {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
         } catch { /* will need manual: npx tsx scripts/generate-registry.ts */ }
 
-        // Single build + restart
-        if (!process.env.NEXT_DEV) {
+        // Single build + restart. NEXT_DEV was a typo (Next.js sets
+        // NODE_ENV=development), so this branch used to fire even in dev.
+        if (process.env.NODE_ENV === "production") {
             try {
                 execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 300000, stdio: "pipe" });
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }

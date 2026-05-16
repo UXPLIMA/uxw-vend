@@ -1,14 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
 import { sendVerificationEmail } from "@/core/lib/email";
+import { rateLimit } from "@/core/lib/rate-limit";
+
+function hashToken(token: string): string {
+    return createHash("sha256").update(token).digest("hex");
+}
 
 // POST /api/v1/auth/verify-email - Send verification email
- 
+
 export async function POST(_request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Per-user cap stops an authenticated user from generating unlimited
+    // verification email sends (and DB rows). 3 per hour matches the
+    // forgot-password limit and is plenty for a legitimate user.
+    const rl = await rateLimit(`verify-email:user:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
+    if (!rl.success) {
+        return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+    }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -20,12 +33,14 @@ export async function POST(_request: NextRequest) {
     // Delete existing tokens
     await prisma.verificationToken.deleteMany({ where: { identifier: user.email } });
 
-    // Create token (24h)
+    // Create token (24h). Store only the SHA-256 digest — a DB dump
+    // exposes hashes, not usable verification tokens. The plaintext token
+    // is only ever in the outbound email URL. Same pattern as forgot-password.
     const token = randomBytes(32).toString("hex");
     await prisma.verificationToken.create({
         data: {
             identifier: user.email,
-            token,
+            token: hashToken(token),
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },
     });
@@ -47,8 +62,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Missing token or email" }, { status: 400 });
     }
 
+    const tokenHash = hashToken(token);
     const verificationToken = await prisma.verificationToken.findFirst({
-        where: { identifier: email, token, expires: { gt: new Date() } },
+        where: { identifier: email, token: tokenHash, expires: { gt: new Date() } },
     });
 
     if (!verificationToken) {
@@ -63,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     // Delete token
     await prisma.verificationToken.delete({
-        where: { identifier_token: { identifier: email, token } },
+        where: { identifier_token: { identifier: email, token: tokenHash } },
     });
 
     // Fire user.email.verified hook — look up user id for payload

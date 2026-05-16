@@ -76,17 +76,22 @@ export async function DELETE(
         await prisma.moduleConfig.deleteMany({ where: { id: moduleId } });
         await invalidateModuleCache().catch(() => {});
 
+        let registryNeedsRebuild = false;
         try {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
-            if (!process.env.NEXT_DEV) {
+            if (process.env.NODE_ENV === "production") {
                 execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }
                 catch { process.kill(process.pid, "SIGUSR2"); }
             }
-        } catch {
+        } catch (err) {
             // Registry/build failure is non-fatal for uninstall — the module
-            // files are already gone and the DB row is cleared. Operator may
-            // need to restart the dev server to see the UI reflect it.
+            // files are already gone and the DB row is cleared. But the
+            // generated registry may still reference the deleted module's
+            // imports, which would brick the next build. Log loudly and
+            // surface the warning so the operator knows to rebuild manually.
+            registryNeedsRebuild = true;
+            console.error("[module:uninstall] registry regeneration failed for", moduleId, err);
         }
 
         logActivity({
@@ -96,7 +101,10 @@ export async function DELETE(
             userId: session.user.id,
         }).catch(() => {});
 
-        return NextResponse.json({ message: "Module deleted successfully" });
+        return NextResponse.json({
+            message: "Module deleted successfully",
+            ...(registryNeedsRebuild ? { warning: "Module files removed but registry regeneration failed — run `npm run build` to clean up generated imports." } : {}),
+        });
     } catch (err: unknown) {
         return NextResponse.json(
             { error: "Delete failed", details: devOnlyDetail(err) },

@@ -172,15 +172,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const userAny = user as Record<string, unknown>;
                 if (userAny.twoFactorEnabled && userAny.twoFactorSecret) {
                     // Dynamic import to avoid hard dependency on two-factor module
-                    const { verifyToken, verifyBackupCode } = await import("./two-factor");
+                    const { verifyTokenWithReplayProtection, verifyBackupCode } = await import("./two-factor");
                     const twoFactorCode = credentials.twoFactorCode as string;
 
                     if (!twoFactorCode) {
                         throw new Error("2FA_REQUIRED");
                     }
 
-                    // Try TOTP first, then backup code
-                    const isValidTotp = verifyToken(userAny.twoFactorSecret as string, twoFactorCode);
+                    // Try TOTP first, then backup code. Replay-protected so
+                    // an intercepted code can't be reused inside the
+                    // ~90-second validity window.
+                    const isValidTotp = await verifyTokenWithReplayProtection(
+                        user.id,
+                        userAny.twoFactorSecret as string,
+                        twoFactorCode,
+                    );
 
                     if (!isValidTotp) {
                         // Try backup code. Malformed JSON in backupCodes must

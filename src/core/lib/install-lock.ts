@@ -18,20 +18,46 @@
 
 import { execFile } from "child_process";
 import { promisify } from "util";
-import { prisma } from "./db";
 
 const execFileAsync = promisify(execFile);
 
 // Advisory lock key — arbitrary constant. Postgres session-level advisory
 // locks are identified by a bigint; any app-wide constant works as long as
-// nothing else in the schema reuses the same value.
-const INSTALL_ADVISORY_LOCK_KEY = 0x7578774d_6f64496e; // "uxwModIn"
+// nothing else in the schema reuses the same value. Use a BigInt literal:
+// the hex value exceeds Number.MAX_SAFE_INTEGER, so a plain `number` would
+// round, and two PM2 workers could compute different float approximations
+// and acquire technically different locks (mutual exclusion would silently
+// break).
+const INSTALL_ADVISORY_LOCK_KEY = BigInt("0x7578774d6f64496e"); // "uxwModIn"
 
 let installing = false;
 let buildScheduled = false;
 let buildRunning = false;
 let buildTimer: ReturnType<typeof setTimeout> | null = null;
 const BUILD_DEBOUNCE_MS = 3000; // Wait 3s after last install before building
+
+// Dedicated pg pool with a single connection so the advisory lock acquire
+// and release are guaranteed to execute on the same Postgres session.
+// Prisma's own connection pool can recycle connections between calls, which
+// makes pg_advisory_unlock a no-op when the release lands on a different
+// connection — the lock then leaks until the original session is closed.
+// Lazily required via eval("require") to keep Turbopack from bundling pg.
+type LockClient = {
+    query<T>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
+    release(): void;
+};
+type LockPool = { connect(): Promise<LockClient>; end(): Promise<void> };
+let lockPool: LockPool | null = null;
+function getLockPool(): LockPool {
+    if (!lockPool) {
+        const _require = typeof __webpack_require__ === "function"
+            ? __non_webpack_require__
+            : eval("require");
+        const { Pool } = _require("pg");
+        lockPool = new Pool({ connectionString: process.env.DATABASE_URL, max: 2 }) as LockPool;
+    }
+    return lockPool;
+}
 
 /** Check if an install is currently running (this worker only) */
 export function isInstalling(): boolean {
@@ -42,35 +68,40 @@ export function isInstalling(): boolean {
  * Acquire install lock — returns release function or null if another
  * install is already running (either in this worker or another one).
  *
- * Uses a dedicated Prisma client connection so the advisory lock lives
- * on exactly one Postgres session (pg_try_advisory_lock + pg_advisory_unlock
- * must run on the same session).
+ * Holds a dedicated pg client checked out from a single-purpose pool so
+ * pg_try_advisory_lock and pg_advisory_unlock run on the same Postgres
+ * session. Without this, Prisma's pool may release the unlock on a
+ * different physical connection — making it a silent no-op while the
+ * lock continues to be held by the original session.
  */
 export async function acquireInstallLock(): Promise<(() => void) | null> {
     // Fast path: another request in this worker already holds the lock.
     if (installing) return null;
 
+    let client: LockClient | null = null;
     try {
-        // Use an interactive transaction to guarantee every statement
-        // (lock acquire + release) runs on the same pooled connection.
-        // pg_try_advisory_lock returns true when the lock was acquired,
-        // false when another session already holds it.
-        const rows = await prisma.$queryRaw<{ locked: boolean }[]>`
-            SELECT pg_try_advisory_lock(${INSTALL_ADVISORY_LOCK_KEY}::bigint) AS locked
-        `;
-        const gotLock = rows?.[0]?.locked === true;
-        if (!gotLock) return null;
+        client = await getLockPool().connect();
+        const result = await client.query<{ locked: boolean }>(
+            "SELECT pg_try_advisory_lock($1::bigint) AS locked",
+            [INSTALL_ADVISORY_LOCK_KEY.toString()],
+        );
+        const gotLock = result.rows?.[0]?.locked === true;
+        if (!gotLock) {
+            client.release();
+            return null;
+        }
 
         installing = true;
+        const heldClient = client;
         return () => {
             installing = false;
-            // Best-effort release. A crash before this runs is safe: the
-            // advisory lock is session-scoped and Postgres drops it when
-            // the connection closes.
-            prisma.$queryRaw`SELECT pg_advisory_unlock(${INSTALL_ADVISORY_LOCK_KEY}::bigint)`
-                .catch(() => { /* already released or connection gone */ });
+            heldClient
+                .query("SELECT pg_advisory_unlock($1::bigint)", [INSTALL_ADVISORY_LOCK_KEY.toString()])
+                .catch(() => { /* already released or connection gone */ })
+                .finally(() => { try { heldClient.release(); } catch { /* noop */ } });
         };
     } catch (err) {
+        if (client) { try { client.release(); } catch { /* noop */ } }
         // DB unreachable — fall back to in-process lock so single-worker
         // setups (no Postgres yet, e.g. during initial setup wizard)
         // still get some mutual exclusion.
@@ -79,6 +110,9 @@ export async function acquireInstallLock(): Promise<(() => void) | null> {
         return () => { installing = false; };
     }
 }
+
+declare const __webpack_require__: unknown;
+declare const __non_webpack_require__: NodeRequire;
 
 /**
  * Schedule a deferred build + restart.

@@ -29,7 +29,7 @@ interface LogEntry {
     [key: string]: unknown;
 }
 
-const isDev = !!process.env.NEXT_DEV;
+const isDev = process.env.NODE_ENV !== "production";
 const LOG_LEVEL_ORDER: Record<LogLevel, number> = { debug: 0, info: 1, warn: 2, error: 3 };
 const MIN_LEVEL: LogLevel = (process.env.LOG_LEVEL as LogLevel) || (isDev ? "debug" : "info");
 

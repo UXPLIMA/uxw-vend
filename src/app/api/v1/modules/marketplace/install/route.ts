@@ -41,6 +41,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }
 
+        // Validate format BEFORE using moduleId in path.join — without
+        // this, a value like "../../../tmp/x" would let a crafted ZIP whose
+        // manifest declared the same id break out of MODULES_DIR. Every
+        // other module route enforces /^[a-z0-9-]+$/; the marketplace
+        // install path was the only one missing the check.
+        if (typeof moduleId !== "string" || !/^[a-z0-9-]+$/.test(moduleId)) {
+            return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+        }
+
         // Validate zipFile to prevent SSRF / path traversal
         if (!/^[a-z0-9-]+\.zip$/.test(zipFile)) {
             return NextResponse.json({ error: "Invalid file name" }, { status: 400 });

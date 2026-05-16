@@ -6,6 +6,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { logActivity } from "@/core/lib/activity-log";
+import { validateZipEntries } from "@/core/lib/module-zip-validator";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/theme-marketplace";
@@ -53,12 +54,23 @@ export async function POST(request: NextRequest) {
         }
 
         // Extract using adm-zip (no shell, path traversal protected)
-        await fs.mkdir(targetDir, { recursive: true });
         const zip = new AdmZip(buffer);
         const entries = zip.getEntries();
+
+        // Same defense in depth as the module marketplace install: enforce
+        // symlink rejection, extension allowlist, max entry count, max
+        // uncompressed size, and zip-bomb compression-ratio limits before
+        // touching the filesystem. Without this, a crafted theme ZIP can
+        // ship symlinks pointing outside the theme dir or balloon to
+        // hundreds of GB on disk.
+        const contentCheck = validateZipEntries(entries);
+        if (!contentCheck.ok) {
+            return NextResponse.json({ error: contentCheck.error ?? "ZIP validation failed" }, { status: 400 });
+        }
+
+        await fs.mkdir(targetDir, { recursive: true });
         for (const entry of entries) {
             if (entry.isDirectory) continue;
-            if (entry.entryName.includes("../")) continue;
             const resolvedPath = path.resolve(targetDir, entry.entryName);
             if (!resolvedPath.startsWith(path.resolve(targetDir) + path.sep)) continue;
             const dir = path.dirname(resolvedPath);
@@ -81,8 +93,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
         }
 
-        // Rebuild + restart production
-        if (!process.env.NEXT_DEV) {
+        // Rebuild + restart production. Next.js sets NODE_ENV=development
+        // during `next dev`; there is no NEXT_DEV variable, so the previous
+        // check was always false and every theme install ran a 3-minute
+        // blocking build on the HTTP thread (self-DoS for the admin).
+        if (process.env.NODE_ENV === "production") {
             try {
                 execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
                 try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }

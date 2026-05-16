@@ -52,14 +52,20 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
             module: true,
             isCustom: true,
         },
-        orderBy: [
-            { isCustom: "asc" },   // false first, true last (overwrites)
-            { module: "asc" },     // core first, then modules
-        ],
     });
 
-    // 3. Build nested object with override priority:
-    //    core < module < custom override
+    // 3. Sort with explicit priority then merge: later writes win.
+    //    Priority (lowest first): core non-custom, module non-custom, any custom.
+    //    Plain alphabetical `module ASC` would put "blog" before "core" and
+    //    let blog overwrite core, which is the opposite of the intent.
+    rows.sort((a, b) => {
+        if (a.isCustom !== b.isCustom) return a.isCustom ? 1 : -1;
+        const aIsCore = a.module === "core";
+        const bIsCore = b.module === "core";
+        if (aIsCore !== bIsCore) return aIsCore ? -1 : 1;
+        return a.module.localeCompare(b.module);
+    });
+
     const messages: Record<string, Record<string, unknown>> = {};
 
     for (const row of rows) {
@@ -88,10 +94,26 @@ export async function syncModuleTranslations(
     const rows = flattenTranslations(moduleId, translations);
     if (rows.length === 0) return;
 
-    // Upsert in chunks to avoid huge queries
+    // Two-pass write: first updateMany to refresh existing non-custom rows
+    // only, then upsert to create any missing rows. Admin-customized rows
+    // (isCustom = true) keep the operator's value across reinstalls.
     const CHUNK_SIZE = 200;
     for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const chunk = rows.slice(i, i + CHUNK_SIZE);
+        await Promise.all(
+            chunk.map((r) =>
+                prisma.translation.updateMany({
+                    where: {
+                        locale: r.locale,
+                        namespace: r.namespace,
+                        key: r.key,
+                        module: r.module,
+                        isCustom: false,
+                    },
+                    data: { value: r.value },
+                }),
+            ),
+        );
         await Promise.all(
             chunk.map((r) =>
                 prisma.translation.upsert({
@@ -103,7 +125,7 @@ export async function syncModuleTranslations(
                             module: r.module,
                         },
                     },
-                    update: { value: r.value },
+                    update: {},
                     create: r,
                 }),
             ),

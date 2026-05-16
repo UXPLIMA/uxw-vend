@@ -8,6 +8,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { acquireInstallLock } from "@/core/lib/install-lock";
+import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
@@ -188,7 +189,7 @@ export async function POST(request: NextRequest) {
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
             createdTargetDir = null;
-            const detail = process.env.NEXT_DEV ? ": " + (err instanceof Error ? err.message : "Unknown error") : "";
+            const detail = process.env.NODE_ENV !== "production" ? ": " + (err instanceof Error ? err.message : "Unknown error") : "";
             return NextResponse.json({ error: "Module has errors — registry generation failed" + detail }, { status: 400 });
         }
 
@@ -211,6 +212,20 @@ export async function POST(request: NextRequest) {
                 installedByUserId: session.user.id,
             },
         });
+
+        // Invalidate the module-state cache so the proxy and request handlers
+        // see the freshly-installed module immediately. Without this, the
+        // 30-second cache TTL leaves the new module's routes 404-ing until
+        // the next refresh — surprising for a synchronous "install" response.
+        await invalidateModuleCache().catch(() => {});
+
+        // Sync the module's declared translations so admin/UI strings are
+        // available right after install rather than after the next deferred
+        // build cycle. Matches the marketplace install behavior.
+        if (manifest.translations) {
+            const { syncModuleTranslations } = await import("@/core/lib/i18n/translation-service");
+            await syncModuleTranslations(manifest.id, manifest.translations as Record<string, Record<string, unknown>>).catch(() => {});
+        }
 
         return NextResponse.json({
             message: "Module installed successfully",

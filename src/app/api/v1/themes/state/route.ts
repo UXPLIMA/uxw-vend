@@ -2,13 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
-import { themeRegistry } from "@/core/generated/theme-registry";
+import { themeRegistry, defaultThemeId } from "@/core/generated/theme-registry";
 import { setActiveTheme } from "@/core/lib/theme-state";
 import { logActivity } from "@/core/lib/activity-log";
 
 export async function GET() {
     const row = await prisma.themeState.findFirst();
-    return NextResponse.json(row ?? { themeId: "flat", mode: "light" });
+    if (row) return NextResponse.json(row);
+
+    // Fall back to the codegen-derived defaults so the response never
+    // references a theme id that isn't actually installed. Hardcoding
+    // "flat" violated the motto and broke clients on installations where
+    // flat isn't present.
+    const manifest = themeRegistry[defaultThemeId];
+    return NextResponse.json({
+        themeId: defaultThemeId,
+        mode: manifest?.modes.default ?? "light",
+    });
 }
 
 export async function PUT(req: NextRequest) {
