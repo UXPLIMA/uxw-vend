@@ -199,9 +199,7 @@ function DefaultNavbar() {
                             </button>
                         )}
 
-                        {status === "loading" ? (
-                            <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-                        ) : session?.user ? (
+                        {session?.user ? (
                             <>
                                 {/* Module navbar components (bell, cart, etc.) — from registry */}
                                 {enabledNavbarComponents.map(nc => {
