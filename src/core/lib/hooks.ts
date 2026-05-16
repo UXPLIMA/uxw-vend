@@ -1,28 +1,19 @@
 /**
- * Hook/Filter/Action API — the foundational extension mechanism.
+ * Action/Filter hook API — the foundational extension mechanism.
  *
- * Inspired by WordPress but type-safe and ESM-first.
+ * Actions: fire-and-forget notifications. `doAction("user.registered", payload)`
+ * runs every listener in priority order; if one throws the rest still run.
  *
- * Two primitives:
+ * Filters: value-transformation chains. Each listener receives the running
+ * value and returns the new one. Errors keep the previous value (fail-safe).
  *
- *   Actions — "fire and forget" notifications.
- *     doAction("user.registered", { userId }) — nothing is returned.
- *     Listeners run in priority order; if one throws, the others still run.
+ * Sync by default for hot paths; `doActionAsync` / `applyFiltersAsync` are
+ * available for I/O-bound listeners and enforce a per-listener timeout so a
+ * stalled module hook never blocks a user-facing request indefinitely.
  *
- *   Filters — value transformation chains.
- *     const final = applyFilters("post.content", rawHtml, { post });
- *     Each listener receives the current value and returns the new value.
- *
- * Both are synchronous by default (performance) with async variants
- * (doActionAsync, applyFiltersAsync) for I/O-bound listeners.
- *
- * Modules register listeners either:
- *   1. Declaratively via module.json "hooks" field (build-time wired into
- *      the registry generator so they're bundled as static imports).
- *   2. Imperatively via addAction/addFilter at runtime.
- *
- * All listeners are removed when a module is disabled or uninstalled —
- * the module-cache invalidation calls removeModuleHooks(moduleId).
+ * Modules register listeners declaratively via `module.json` hookListeners
+ * (wired into the codegen registry as static imports) or imperatively via
+ * addAction/addFilter. Listeners are removed on module disable/uninstall.
  */
 
 export type ActionListener<T = unknown> = (payload: T) => void;
@@ -39,16 +30,14 @@ interface Registration {
 const actionRegistry = new Map<string, Registration[]>();
 const filterRegistry = new Map<string, Registration[]>();
 
-/** Lower priority = runs earlier. Default 10 (WordPress convention). */
+/** Lower priority runs earlier. 10 is the conventional default. */
 const DEFAULT_PRIORITY = 10;
 
 /**
- * Per-listener timeout for async hook dispatch. A misbehaving module hook
- * listener should NEVER be able to stall a user-facing request forever —
- * login, registration, and checkout all await async hook chains. Listeners
- * that don't resolve in this many milliseconds are abandoned (the dispatch
- * moves on) and logged as errors. Override via HOOK_LISTENER_TIMEOUT_MS env
- * (resolved lazily so tests can tweak the threshold per-run).
+ * Per-listener timeout for async dispatch. A stalled module listener must
+ * never freeze a user-facing flow (login, registration, checkout all await
+ * hook chains). Listeners exceeding the limit are abandoned and logged.
+ * Override via HOOK_LISTENER_TIMEOUT_MS env (resolved lazily for tests).
  */
 const DEFAULT_HOOK_TIMEOUT_MS = 5000;
 
@@ -283,7 +272,7 @@ export async function bootstrapHooks(): Promise<void> {
 
         for (const entry of ModuleHookListeners) {
             // Skip disabled modules
-            if (states[entry.module] === false) continue;
+            if (states[entry.module] === false) continue; // skip disabled
 
             try {
                 const mod = await entry.loader();
@@ -310,7 +299,7 @@ export async function bootstrapHooks(): Promise<void> {
 
         console.log(`[hooks] Registered ${ModuleHookListeners.length} module hook listeners`);
     } catch (err) {
-        // module-hooks.ts may not exist on first build — fail silently
+        // The generated registry may not exist on first build.
         console.warn("[hooks] Could not load module-hooks registry:", (err as Error).message);
     }
 }
@@ -322,23 +311,16 @@ export function resetHooks(): void {
     bootstrapped = false;
 }
 
-/* ───────────────────────── Standard hook names ──────────────────────── */
-
-/**
- * Conventional hook names. Not enforced — modules can use any string.
- * Documented here so consumers have a shared vocabulary.
- *
- * Naming convention: `<noun>.<verb>` for actions, `<noun>.<adjective>` for filters.
- * Tense: present for "happening now", past for "already done".
- */
+// ===== Standard hook names =====
+// Convention only — modules may use any string. Format: `<noun>.<verb>` for
+// actions, `<noun>.<adjective>` for filters; resource events like
+// "store.product.created" / "blog.article.updated" are emitted by modules.
 export const HookNames = {
-    // Lifecycle
     MODULE_ENABLED: "module.enabled",
     MODULE_DISABLED: "module.disabled",
     MODULE_INSTALLED: "module.installed",
     MODULE_UNINSTALLED: "module.uninstalled",
 
-    // User
     USER_REGISTERED: "user.registered",
     USER_LOGGED_IN: "user.loggedIn",
     USER_LOGGED_OUT: "user.loggedOut",
@@ -346,10 +328,6 @@ export const HookNames = {
     USER_DELETED: "user.deleted",
     USER_BANNED: "user.banned",
 
-    // Generic CRUD (modules emit <resource>.created/updated/deleted)
-    // e.g. "store.product.created", "blog.article.updated"
-
-    // Filters — transform output
     PAGE_TITLE: "page.title",
     PAGE_META: "page.meta",
     NAVBAR_LINKS: "navbar.links",

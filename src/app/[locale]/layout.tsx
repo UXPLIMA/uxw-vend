@@ -44,8 +44,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Pull site_name/description from Settings via buildPageMeta, then layer
-  // root-layout-only fields (title template, manifest) on top.
+  // Pull site_name/description from Settings, then layer root-layout-only
+  // fields (title template, manifest) on top.
   const base = await buildPageMeta({
     title: serverConfig.name,
     type: "website",
@@ -73,13 +73,12 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
-  // Initialize module hook listeners (idempotent — runs once per process)
+  // All bootstrap calls below are idempotent — safe to invoke on every render,
+  // run their setup once per process.
   await bootstrapHooks();
-  // Register the DB-driven trophy auto-award engine (idempotent)
   await registerTrophyListeners();
-  // Start the cron scheduler (idempotent)
   await bootstrapScheduler();
-  // Ensure full-text search GIN indexes exist (fire-and-forget, idempotent)
+  // Fire-and-forget: search index creation must not block first paint.
   ensureSearchIndexes().catch((err: unknown) => {
     console.warn("[search-indexes] bootstrap failed:", err instanceof Error ? err.message : String(err));
   });

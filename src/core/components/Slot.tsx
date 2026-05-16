@@ -23,9 +23,9 @@ import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
  *     { "slot": "blog.article.belowContent", "component": "components/RelatedProducts", "order": 10 }
  *   ]
  *
- * This is a forum engine's template modifications pattern — modules extend other
- * modules' output without either module knowing about the other. Slot
- * consumers don't care who injects; injectors don't care who provides the slot.
+ * This is the template-extension pattern: modules contribute output into
+ * another module's render tree without either side knowing about the other.
+ * Slot consumers don't know who injects; injectors don't know who exposes.
  *
  * Naming convention: `<module>.<view>.<position>`
  *   blog.article.aboveContent

@@ -15,14 +15,12 @@ export default function HomePage() {
   const modules = useAllModules();
   const { settings } = useSiteSettings();
 
-  // Get enabled widgets from registry
   const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
   const enabledWidgets = ModuleWidgets
     .filter(w => modules[w.module] === true)
     .filter(w => widgetVisibility[w.id] !== false)
     .filter(w => WidgetComponentRegistry[w.id]);
 
-  // Get enabled homepage sections from registry
   const enabledSections = ModuleHomepageSections
     .filter(s => modules[s.module] === true)
     .filter(s => HomepageSectionRegistry[s.id]);
@@ -33,7 +31,6 @@ export default function HomePage() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-6 flex-1">
-        {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-4">
           <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
         </div>
@@ -41,7 +38,6 @@ export default function HomePage() {
         {(() => {
           const SidebarLayout = StandardSidebarLayout;
 
-          // Main content: render all enabled homepage sections from modules
           const mainContent = enabledSections.length > 0 ? (
             <div className="space-y-8">
               {enabledSections.map((section) => {
@@ -59,7 +55,6 @@ export default function HomePage() {
             </div>
           );
 
-          // Sidebar: render widgets dynamically from registry
           const sidebarContent = enabledWidgets.length > 0 ? (
             <div className="space-y-5">
               {enabledWidgets.map((w) => {

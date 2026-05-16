@@ -1,24 +1,17 @@
 import { prisma } from "./db";
 
 /**
- * Permission System for uxwVend
+ * Permission system.
  *
- * Two layers:
+ * Two layers, both bypassed by the admin role:
+ *   1. Role-level permissions (Permission table joined via Role) for
+ *      module-wide access, e.g. hasPermission(userId, "blog.manage").
+ *   2. ResourcePermission grants for per-resource or per-entity allow/deny,
+ *      e.g. hasResourcePermission(userId, "blog.article", "edit", articleId).
  *
- *  1. Role-level permissions (legacy) — Permission table linked to Role.
- *     Used by hasPermission(userId, "blog.manage") for module-level access.
- *
- *  2. Granular ResourcePermission grants — per-resource and optionally
- *     per-entity allow/deny rules. Used by hasResourcePermission(userId,
- *     "blog.article", "edit", articleId) when fine-grained control is needed.
- *
- * Resolution order (most specific wins; admin role bypasses everything):
- *   1. user-specific grant for the exact resourceId
- *   2. user-specific grant for resource (any id)
- *   3. role grant for the exact resourceId
- *   4. role grant for resource (any id)
- *   5. role's static permissions table (legacy)
- * At each step, allow=false (deny) is final and short-circuits.
+ * Resource grants resolve most-specific-first: user+resourceId → user+resource
+ * → role+resourceId → role+resource → legacy role permissions. Any matching
+ * deny short-circuits.
  */
 
 export interface PermissionCheck {
@@ -26,9 +19,6 @@ export interface PermissionCheck {
     permission: string;
 }
 
-/**
- * Check if user has a specific permission
- */
 export async function hasPermission(
     userId: string,
     permission: string
@@ -45,16 +35,11 @@ export async function hasPermission(
     });
 
     if (!user || !user.role) return false;
-
-    // Admin role has all permissions
     if (user.role.name === "admin") return true;
-
     return user.role.permissions.some((p: { name: string }) => p.name === permission);
 }
 
-/**
- * Check multiple permissions (returns true if user has ANY of them)
- */
+/** True when the user has at least one of the listed permissions. */
 export async function hasAnyPermission(
     userId: string,
     permissions: string[]
@@ -68,9 +53,7 @@ export async function hasAnyPermission(
     return user.role.permissions.some((p: { name: string }) => permissions.includes(p.name));
 }
 
-/**
- * Check multiple permissions (returns true if user has ALL of them)
- */
+/** True only when the user has every listed permission. */
 export async function hasAllPermissions(
     userId: string,
     permissions: string[]
@@ -85,9 +68,7 @@ export async function hasAllPermissions(
     return permissions.every((perm) => userPerms.includes(perm));
 }
 
-/**
- * Get all permissions for a user
- */
+/** Returns `["*"]` for admin (matches all permissions). */
 export async function getUserPermissions(userId: string): Promise<string[]> {
     const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -101,18 +82,11 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
     });
 
     if (!user || !user.role) return [];
-
-    // Admin role has all permissions
-    if (user.role.name === "admin") {
-        return ["*"];
-    }
-
+    if (user.role.name === "admin") return ["*"];
     return user.role.permissions.map((p: { name: string }) => p.name);
 }
 
-/**
- * Require permission middleware for API routes
- */
+/** Adapter for API routes that gate on a single permission. */
 export function requirePermission(permission: string) {
     return async (userId: string): Promise<{ allowed: boolean; error?: string }> => {
         const allowed = await hasPermission(userId, permission);
@@ -126,10 +100,7 @@ export function requirePermission(permission: string) {
     };
 }
 
-/**
- * Check if user is admin.
- * Pass sessionRole from JWT to skip the DB query when possible.
- */
+/** Pass sessionRole from JWT to skip the DB query. */
 export async function isAdmin(userId: string, sessionRole?: string): Promise<boolean> {
     if (sessionRole === "admin") return true;
 
@@ -141,10 +112,7 @@ export async function isAdmin(userId: string, sessionRole?: string): Promise<boo
     return user?.role?.name === "admin";
 }
 
-/**
- * Check if user is staff (admin or moderator).
- * Pass sessionRole from JWT to skip the DB query when possible.
- */
+/** Staff = admin or moderator (role priority ≥ 50). Skip DB via sessionRole. */
 export async function isStaff(userId: string, sessionRole?: string): Promise<boolean> {
     if (sessionRole === "admin" || sessionRole === "moderator") return true;
 
@@ -161,13 +129,9 @@ export async function isStaff(userId: string, sessionRole?: string): Promise<boo
 export type ResourceAction = "view" | "create" | "edit" | "delete" | string;
 
 /**
- * Check if a user has permission to perform an action on a resource.
- * Supports per-entity (resourceId) and resource-wide (no resourceId) checks.
- *
- * Returns true if any allow rule matches, unless a deny rule (allow=false)
- * exists at a more-specific level — denies always win at the same level.
- *
- * Admin role bypasses all checks.
+ * Allow-by-rule check with most-specific-wins resolution; admins bypass.
+ * Passing `resourceId` checks per-entity grants then falls back to
+ * resource-wide. A deny at any matched level short-circuits to false.
  */
 export async function hasResourcePermission(
     userId: string,
@@ -182,7 +146,6 @@ export async function hasResourcePermission(
     if (!user || !user.role) return false;
     if (user.role.name === "admin") return true;
 
-    // Build a candidate list (most specific first)
     const candidates: { principalType: string; principalId: string; resourceId: string | null }[] = [];
 
     if (resourceId) {
@@ -195,7 +158,6 @@ export async function hasResourcePermission(
     }
     candidates.push({ principalType: "role", principalId: user.role.id, resourceId: null });
 
-    // Fetch all rules in one query
     const grants = await prisma.resourcePermission.findMany({
         where: {
             resource,
@@ -207,9 +169,8 @@ export async function hasResourcePermission(
         },
     });
 
-    if (grants.length === 0) return false; // No grant = no access for non-admin
+    if (grants.length === 0) return false;
 
-    // Walk the candidate list in priority order
     for (const c of candidates) {
         const match = grants.find(
             (g: { principalType: string; principalId: string; resourceId: string | null; allow: boolean }) =>
@@ -238,7 +199,7 @@ export async function setResourcePermission(params: {
         where: {
             resource_resourceId_action_principalType_principalId: {
                 resource,
-                resourceId: resourceId as string, // Prisma allows null in unique
+                resourceId: resourceId as string,
                 action,
                 principalType,
                 principalId,

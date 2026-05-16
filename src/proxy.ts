@@ -14,14 +14,12 @@ import { checkCsrf } from '@/core/lib/csrf';
 import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
 
-// Create the i18n middleware
 const intlMiddleware = createIntlMiddleware({
     locales: locales,
     defaultLocale: defaultLocale,
     localePrefix: 'always'
 });
 
-// Check if a path belongs to a disabled module
 function getModuleForPath(pathname: string): string | null {
     for (const [moduleId, patterns] of Object.entries(moduleRouteMap)) {
         for (const pattern of patterns) {
@@ -71,11 +69,8 @@ function getClientIpFromRequest(request: NextRequest): string {
 }
 
 function resolveIpScope(pathname: string): IpBlockScope {
-    // Admin UI under /{locale}/admin
     if (/^\/[a-z]{2}\/admin(\/|$)/.test(pathname)) return 'admin';
-    // Admin APIs
     if (pathname.startsWith('/api/v1/admin')) return 'admin';
-    // Any API route
     if (pathname.startsWith('/api/')) return 'api';
     return 'all';
 }
@@ -84,7 +79,7 @@ function isStaticAsset(pathname: string): boolean {
     return (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/_vercel') ||
-        pathname.includes('.') // files with extensions (images, css, js, etc.)
+        pathname.includes('.')
     );
 }
 
@@ -122,13 +117,10 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
 
     const { pathname } = request.nextUrl;
 
-    // ==================== CSRF GATE ====================
-    // State-changing API calls must come from an allowed origin. NextAuth's
-    // own endpoints (/api/auth/*) handle CSRF internally; inbound webhooks
-    // (/api/v1/webhook/*, /api/webhook/*) are exempt since external services
-    // POST them without a browser origin. Everything else goes through the
-    // same-origin check so an attacker's site cannot ride a victim's cookies
-    // to a mutating endpoint.
+    // ===== CSRF gate =====
+    // NextAuth handles /api/auth/* itself; inbound webhooks are exempt because
+    // external services POST them without a browser origin. Everything else
+    // gets a same-origin check to prevent cross-site cookie-riding attacks.
     if (
         pathname.startsWith('/api/') &&
         !pathname.startsWith('/api/auth/') &&
@@ -144,14 +136,12 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
         }
     }
 
-    // Check if path belongs to a module
     const moduleId = getModuleForPath(pathname);
 
     if (moduleId) {
         const isEnabled = await getModuleEnabled(moduleId);
 
         if (!isEnabled) {
-            // For API routes, return 404 JSON
             if (pathname.startsWith('/api/')) {
                 return NextResponse.json(
                     { error: 'Module not enabled', module: moduleId },
@@ -159,17 +149,15 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
                 );
             }
 
-            // For pages, return 404 response
             const locale = pathname.match(/^\/([a-z]{2})\//)?.[1] || 'en';
             const url = new URL(`/${locale}/not-found`, request.url);
             return NextResponse.rewrite(url, { status: 404 });
         }
     }
 
-    // ==================== SETUP WIZARD GATE ====================
-    // If the platform hasn't been set up yet (no users exist), force every
-    // visitor through the setup wizard. The setup API route itself remains
-    // reachable so the wizard can function.
+    // ===== Setup wizard gate =====
+    // Force every visitor through the wizard until at least one user exists.
+    // The setup API itself stays reachable so the wizard can post back.
     if (!isStaticAsset(pathname) && !pathname.startsWith('/api/setup')) {
         const setupDone = await isSetupComplete();
         if (!setupDone) {
@@ -191,11 +179,10 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
         }
     }
 
-    // ==================== MAINTENANCE MODE GATE ====================
-    // After setup is complete, enforce maintenance mode. Admins (and any
-    // explicitly allowlisted roles) can still browse. Auth endpoints remain
-    // accessible so admins can sign in. Internal API routes used by the
-    // proxy itself (module status) and auth API routes are always exempt.
+    // ===== Maintenance mode gate =====
+    // Admins (and any allowlisted roles) keep access. Auth endpoints stay open
+    // so admins can sign in; the maintenance toggle API stays open so they can
+    // turn it off; the internal module-status API is exempt to avoid a loop.
     if (!isStaticAsset(pathname)) {
         const locale = extractLocale(pathname);
         const maintenancePath = `/${locale}/maintenance`;
@@ -205,9 +192,6 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
         const isOnAuthPage = pathname.startsWith(authPrefix);
         const isSetupPath =
             pathname === `/${locale}/setup` || pathname.startsWith(`/${locale}/setup/`);
-        // Auth API routes must stay accessible so admins can sign in.
-        // Internal module-status API is used by the proxy itself (avoid circular block).
-        // Admin maintenance API must stay accessible so admins can toggle the setting.
         const isAuthApi = pathname.startsWith('/api/auth');
         const isInternalApi = pathname === '/api/v1/modules/status';
         const isMaintenanceApi = pathname === '/api/v1/admin/maintenance';
@@ -237,17 +221,11 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
         }
     }
 
-    // ==================== IP BLOCKLIST GATE ====================
-    // After setup and maintenance checks, refuse any request whose
-    // source IP is in the active IpBlock list for the request's scope.
-    // The block list is cached in-process for 60s so middleware stays
-    // fast, and `isIpBlocked` fails open on DB errors — a DB outage
-    // must never lock every visitor out.
-    //
-    // IP gating is skipped until setup is complete: during the bootstrap
-    // wizard the admin hasn't had a chance to whitelist their IP yet, and
-    // a stale DB rule from a test environment must never lock the operator
-    // out of the initial install screen.
+    // ===== IP blocklist gate =====
+    // Block list is cached in-process for 60s. `isIpBlocked` fails open on DB
+    // errors — a DB outage must never lock every visitor out. Skipped until
+    // setup completes so a stale rule can't lock the operator out of the
+    // initial install screen before they whitelist their own IP.
     if (!isStaticAsset(pathname) && (await isSetupComplete())) {
         const clientIp = getClientIpFromRequest(request);
         const ipScope = resolveIpScope(pathname);
@@ -256,11 +234,10 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
                 return new NextResponse('Access denied', { status: 403 });
             }
         } catch {
-            // Fail-open: never block due to loader errors.
+            // Fail-open: a loader error must not block visitors.
         }
     }
 
-    // Continue with i18n middleware for non-API routes
     if (!pathname.startsWith('/api/')) {
         const response = intlMiddleware(request);
         response.headers.set('x-correlation-id', correlationId);
@@ -273,19 +250,15 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
 }
 
 export async function proxy(request: NextRequest) {
-    // Mint the request's correlation id and bind it to an async-local
-    // context so any nested `log.info(...)` / `log.error(...)` call —
-    // including those running inside module hooks or awaited handlers —
-    // automatically tags its output with this id. See core/lib/logger.ts.
+    // Bind the correlation id to async-local context so every nested log call
+    // (including those inside module hooks and awaited handlers) auto-tags
+    // its output with this id. See core/lib/logger.ts.
     const correlationId = request.headers.get('x-correlation-id') || randomUUID();
     return runWithLogContext({ correlationId }, () => proxyImpl(request, correlationId));
 }
 
 export const config = {
     matcher: [
-        // Match all pathnames except for
-        // - static files
-        // - _next internal routes
         '/((?!_next|_vercel|.*\\..*).*)'
     ]
 };
