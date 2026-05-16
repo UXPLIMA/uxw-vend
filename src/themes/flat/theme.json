@@ -149,5 +149,44 @@
         }
       ]
     }
+  },
+  "settings": {
+    "hero": {
+      "label": "Hero",
+      "icon": "Image",
+      "fields": {
+        "enabled": {
+          "type": "toggle",
+          "label": "Show hero on homepage",
+          "default": false
+        },
+        "title": {
+          "type": "text",
+          "label": "Title",
+          "default": "Welcome"
+        },
+        "subtitle": {
+          "type": "text",
+          "label": "Subtitle",
+          "default": "A clean starting point for your community."
+        },
+        "ctaText": {
+          "type": "text",
+          "label": "Button text",
+          "default": "Get started"
+        },
+        "ctaHref": {
+          "type": "url",
+          "label": "Button link"
+        },
+        "backgroundImage": {
+          "type": "image",
+          "label": "Background image (optional)"
+        }
+      }
+    }
+  },
+  "components": {
+    "Hero": "components/Hero.tsx"
   }
 }
