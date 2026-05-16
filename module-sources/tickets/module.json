@@ -1055,7 +1055,7 @@
   "navLinks": [
     {
       "label": "Support",
-      "href": "/tickets",
+      "href": "/support",
       "icon": "LifeBuoy",
       "position": 40
     }

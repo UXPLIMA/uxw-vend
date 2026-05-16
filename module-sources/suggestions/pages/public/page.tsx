@@ -11,6 +11,12 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
+// Suggestion bodies are stored as rich-text HTML; the list view shows a
+// short preview, so strip tags rather than rendering them clamped.
+function plainText(html: string): string {
+    return html.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+}
+
 interface Suggestion {
     id: string;
     title: string;
@@ -179,9 +185,9 @@ export default function SuggestionsPage() {
                                                     {t(statusKeys[s.status] || "open")}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-muted-foreground line-clamp-2">{s.content}</p>
+                                            <p className="text-sm text-muted-foreground line-clamp-2">{plainText(s.content)}</p>
                                             <p className="text-xs text-muted-foreground mt-2">
-                                                {t("submittedBy")} {s.author.username} · {new Date(s.createdAt).toLocaleDateString()}
+                                                {t("submittedBy")} {s.author?.username ?? t("deletedUser")} · {new Date(s.createdAt).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
