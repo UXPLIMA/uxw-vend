@@ -34,8 +34,11 @@ const nextConfig: NextConfig = {
 
     const baseCsp = [
       "default-src 'self'",
-      // Tailwind JIT + Next.js hydration need inline script/style for now.
-      "script-src 'self' 'unsafe-inline'",
+      // Tailwind JIT + Next.js hydration need inline script/style.
+      // static.cloudflareinsights.com hosts the beacon Cloudflare auto-
+      // injects when Web Analytics is enabled for the zone; without it
+      // the browser logs a CSP violation on every page load.
+      "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
       // @measured/puck's CSS pulls Inter from rsms.me (external @import in
       // its bundled stylesheet). Whitelist that origin for both the sheet
       // itself (style-src) and the @font-face URLs it references (font-src).
@@ -54,8 +57,8 @@ const nextConfig: NextConfig = {
     // its own spec loader; we narrow the looser policy to that path instead
     // of applying unsafe-eval to the entire site.
     const swaggerCsp = baseCsp.replace(
-      "script-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
     );
 
     const commonHeaders = [
