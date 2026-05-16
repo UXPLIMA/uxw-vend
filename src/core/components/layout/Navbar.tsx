@@ -128,7 +128,6 @@ function DefaultNavbar() {
 
     return (
         <>
-        <Slot name="layout.top" />
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12 gap-2">

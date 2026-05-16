@@ -144,8 +144,8 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <Navbar />
                 <ThemeComponentSlot name="Hero" />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </main>
@@ -157,8 +157,8 @@ export default function ProductDetailPage() {
     if (error || !product) {
         return (
             <div className="min-h-screen flex flex-col bg-muted">
-                <Navbar />
                 <ThemeComponentSlot name="Hero" />
+                <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold text-foreground mb-4">{t('productNotFound')}</h1>
@@ -180,8 +180,8 @@ export default function ProductDetailPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}

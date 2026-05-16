@@ -30,8 +30,8 @@ export default function ChangelogPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
                 <h1 className="text-3xl font-bold text-foreground mb-2">Changelog</h1>

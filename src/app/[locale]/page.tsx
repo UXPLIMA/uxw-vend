@@ -27,8 +27,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
       <ThemeComponentSlot name="Hero" />
+      <Navbar />
 
       <main className="container mx-auto px-4 py-6 flex-1">
         <div className="text-sm text-muted-foreground mb-4">

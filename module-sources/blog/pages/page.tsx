@@ -38,8 +38,8 @@ export default async function BlogPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <StandardSidebarLayout sidebar={(

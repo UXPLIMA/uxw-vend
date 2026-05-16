@@ -236,8 +236,8 @@ export default function CartPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <h1 className="text-3xl font-bold mb-8">{t('shoppingCart')}</h1>

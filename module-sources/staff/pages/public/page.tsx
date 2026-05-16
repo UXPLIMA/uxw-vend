@@ -28,8 +28,8 @@ export default function StaffPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <div className="text-center mb-8">

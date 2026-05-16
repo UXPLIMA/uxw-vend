@@ -116,8 +116,8 @@ export default function TopicDetailPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <Navbar />
             <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-600 mb-4">

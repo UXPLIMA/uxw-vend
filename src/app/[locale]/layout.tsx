@@ -137,6 +137,7 @@ export default async function RootLayout({
                   <ProgressBar />
                   <CustomCssInjector />
                   <ModuleLayoutComponents />
+                  <Slot name="layout.top" />
                   {children}
                   <MobileBottomNav />
                   </ErrorBoundary>
