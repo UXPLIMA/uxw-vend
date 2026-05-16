@@ -3225,5 +3225,13 @@
       "defaultOrder": 30,
       "defaultVisible": true
     }
+  ],
+  "navLinks": [
+    {
+      "label": "Store",
+      "href": "/store",
+      "icon": "ShoppingBag",
+      "position": 30
+    }
   ]
 }
