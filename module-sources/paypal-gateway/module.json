@@ -271,12 +271,5 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  },
-  "webhookReceivers": [
-    {
-      "provider": "paypal",
-      "handler": "hooks/webhook.ts",
-      "verifiesInHandler": true
-    }
-  ]
+  }
 }

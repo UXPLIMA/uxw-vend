@@ -30,14 +30,6 @@
       "component": "pages/admin/page.tsx"
     }
   ],
-  "webhookReceivers": [
-    {
-      "provider": "stripe",
-      "handler": "hooks/webhook.ts",
-      "signatureHeader": "stripe-signature",
-      "secretEnv": "STRIPE_WEBHOOK_SECRET"
-    }
-  ],
   "translations": {
     "en": {
       "stripeGateway": {

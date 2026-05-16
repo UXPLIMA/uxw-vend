@@ -1,4 +1,5 @@
-import { ModuleManifest, LoadedModule } from "./module-types";
+import { LoadedModule, ModuleManifest } from "./module-types";
+import { moduleManifestSchema } from "./module-manifest-schema";
 
 class ModuleLoader {
     private modules: Map<string, LoadedModule> = new Map();
@@ -45,10 +46,26 @@ class ModuleLoader {
             if (!fs.existsSync(manifestPath)) return;
 
             const manifestContent = fs.readFileSync(manifestPath, "utf-8");
-            const manifest = JSON.parse(manifestContent) as ModuleManifest;
+            let parsedJson: unknown;
+            try {
+                parsedJson = JSON.parse(manifestContent);
+            } catch (err) {
+                console.warn(`[module-loader] ${dirName}: invalid JSON in module.json — skipping`, err);
+                return;
+            }
 
-            this.modules.set(manifest.id, {
-                manifest,
+            const result = moduleManifestSchema.safeParse(parsedJson);
+            if (!result.success) {
+                const first = result.error.issues[0];
+                const where = first.path.join(".");
+                console.warn(
+                    `[module-loader] ${dirName}: manifest schema invalid${where ? ` at ${where}` : ""} — ${first.message} — skipping`,
+                );
+                return;
+            }
+
+            this.modules.set(result.data.id, {
+                manifest: result.data as unknown as ModuleManifest,
                 path: modulePath,
             });
         } catch (error) {
