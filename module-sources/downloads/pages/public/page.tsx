@@ -47,8 +47,8 @@ export default function DownloadsPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
             <Navbar />
+            <ThemeComponentSlot name="Hero" />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 <h1 className="text-3xl font-bold text-foreground mb-2">Downloads</h1>

@@ -211,8 +211,8 @@ export default function ProfilePage() {
     if (authStatus === "loading" || loading) {
         return (
             <div className="min-h-screen flex flex-col bg-background">
-                <ThemeComponentSlot name="Hero" />
                 <Navbar />
+                <ThemeComponentSlot name="Hero" />
                 <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" aria-label={t("loadingProfile")} />
                 </main>
@@ -237,8 +237,8 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <ThemeComponentSlot name="Hero" />
             <Navbar />
+            <ThemeComponentSlot name="Hero" />
 
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 {/* Header */}

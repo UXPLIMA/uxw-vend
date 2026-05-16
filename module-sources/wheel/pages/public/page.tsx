@@ -126,8 +126,8 @@ export default function WheelPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
             <Navbar />
+            <ThemeComponentSlot name="Hero" />
 
             <main className="container mx-auto px-4 py-6 flex-1 flex flex-col items-center">
                 <h1 className="text-3xl font-bold text-foreground mb-2">Wheel of Fortune</h1>

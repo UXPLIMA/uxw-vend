@@ -97,8 +97,8 @@ export default async function BlogArticlePage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: articleJsonLd }}
             />
-            <ThemeComponentSlot name="Hero" />
             <Navbar />
+            <ThemeComponentSlot name="Hero" />
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <StandardSidebarLayout sidebar={(
