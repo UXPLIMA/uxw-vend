@@ -131,7 +131,7 @@ export default async function AdminBlogArticlesPage() {
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4">
-                                                <span className="text-sm">{article.author.username}</span>
+                                                <span className="text-sm">{article.author?.username ?? "—"}</span>
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span

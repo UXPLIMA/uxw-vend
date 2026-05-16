@@ -32,8 +32,11 @@ export async function GET() {
         take: 10,
     });
 
-    // Get user details for top referrers
-    const referrerIds = topReferrers.map(r => r.referrerId);
+    // Filter nulls: referrerId becomes null on user delete (SetNull cascade)
+    // and Prisma's `in` filter rejects null in a string[] column.
+    const referrerIds = topReferrers
+        .map(r => r.referrerId)
+        .filter((id): id is string => id !== null);
     const referrerUsers = await prisma.user.findMany({
         where: { id: { in: referrerIds } },
         select: { id: true, username: true, avatar: true },

@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             color: 0x6366f1,
             fields: [
                 { name: "Title", value: topic.title, inline: true },
-                { name: "Author", value: topic.author.username, inline: true },
+                { name: "Author", value: topic.author?.username ?? "Deleted user", inline: true },
                 { name: "Category", value: topic.category?.name || "General", inline: true },
             ],
             timestamp: new Date().toISOString(),

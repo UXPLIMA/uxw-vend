@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
                 id: t.id,
                 href: "/admin/tickets/" + t.id,
                 primary: t.subject,
-                secondary: t.user.username + " · " + (t.department?.name || ""),
+                secondary: (t.user?.username ?? "Deleted user") + " · " + (t.department?.name || ""),
                 badge: t.status,
                 badgeColor: "blue",
             }))

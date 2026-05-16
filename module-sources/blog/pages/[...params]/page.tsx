@@ -87,7 +87,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
         url: `/blog/${article.slug}`,
         datePublished: article.publishedAt?.toISOString(),
         dateModified: article.updatedAt?.toISOString(),
-        authorName: article.author.username,
+        authorName: article.author?.username ?? "Unknown",
     });
 
     return (
@@ -208,20 +208,22 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             {article.title}
                                         </h1>
 
-                                        {/* Author */}
-                                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-border">
-                                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                                                {article.author.avatar ? (
-                                                    <Image src={article.author.avatar} alt={article.author.username} width={40} height={40} className="w-full h-full rounded-full object-cover" />
-                                                ) : (
-                                                    article.author.username.charAt(0).toUpperCase()
-                                                )}
+                                        {/* Author (may be null when account was deleted) */}
+                                        {article.author && (
+                                            <div className="flex items-center gap-3 mb-8 pb-8 border-b border-border">
+                                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                                                    {article.author.avatar ? (
+                                                        <Image src={article.author.avatar} alt={article.author.username} width={40} height={40} className="w-full h-full rounded-full object-cover" />
+                                                    ) : (
+                                                        article.author.username.charAt(0).toUpperCase()
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-foreground">{article.author.username}</p>
+                                                    <p className="text-sm text-muted-foreground">Author</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-medium text-foreground">{article.author.username}</p>
-                                                <p className="text-sm text-muted-foreground">Author</p>
-                                            </div>
-                                        </div>
+                                        )}
 
                                         {/* Slot: above article content — e.g. related products, author box, ad */}
                                         <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />

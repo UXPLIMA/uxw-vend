@@ -54,8 +54,8 @@ export async function GET() {
         },
         referrals: referrals.map(r => ({
             id: r.id,
-            username: r.referred.username,
-            avatar: r.referred.avatar,
+            username: r.referred?.username ?? "Deleted user",
+            avatar: r.referred?.avatar ?? null,
             status: r.status,
             rewardAmount: Number(r.rewardAmount),
             createdAt: r.createdAt,

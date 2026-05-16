@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
                     id: o.id,
                     href: "/admin/store/orders/" + o.id,
                     primary: o.orderNumber,
-                    secondary: o.user.username + " · " + o.createdAt.toISOString().split("T")[0],
+                    secondary: (o.user?.username ?? "Deleted user") + " · " + o.createdAt.toISOString().split("T")[0],
                     badge: o.status,
                     badgeColor: o.status === "COMPLETED" ? "green" : o.status === "PENDING" ? "yellow" : "blue",
                     value: formatCurrency(Number(o.total)),

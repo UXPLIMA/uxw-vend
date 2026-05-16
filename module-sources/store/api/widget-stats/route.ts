@@ -20,7 +20,7 @@ export async function GET() {
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-        const recentOrders = await prisma.order.findMany({
+        const rawOrders = await prisma.order.findMany({
             where: { status: "COMPLETED" },
             select: {
                 userId: true,
@@ -33,7 +33,13 @@ export async function GET() {
             take: 100,
         });
 
-        // Recent purchases (last 4)
+        // Drop orders whose user was deleted (SetNull cascade). Widgets
+        // surface usernames/avatars, so anonymous rows have nothing to show.
+        const recentOrders = rawOrders.filter(
+            (o): o is typeof o & { userId: string; user: NonNullable<typeof o.user> } =>
+                o.userId !== null && o.user !== null,
+        );
+
         const recentPurchases = recentOrders.slice(0, 4).map((o) => ({
             username: o.user.username,
             avatar: o.user.avatar,
@@ -42,7 +48,6 @@ export async function GET() {
             time: o.createdAt,
         }));
 
-        // Top customer (highest total spend)
         const customerSpend: Record<string, { username: string; avatar: string | null; total: number }> = {};
         for (const o of recentOrders) {
             const key = o.userId;
@@ -53,7 +58,6 @@ export async function GET() {
         }
         const topCustomer = Object.values(customerSpend).sort((a, b) => b.total - a.total)[0] || null;
 
-        // Top buyers this week
         const weeklyOrders = recentOrders.filter((o) => o.createdAt >= weekAgo);
         const weeklySpend: Record<string, { username: string; avatar: string | null; total: number }> = {};
         for (const o of weeklyOrders) {

@@ -168,8 +168,16 @@ export async function POST(request: NextRequest) {
             const code = await prisma.creatorCode.findUnique({
                 where: { code: creatorCode.toUpperCase() },
             });
-            if (code && code.isActive && code.creatorId !== session.user.id) {
-                creatorCodeRecord = code;
+            // Skip codes whose creator was deleted (creatorId becomes null on
+            // user delete via SetNull); the discount + commission both require
+            // a payable creator.
+            if (code && code.isActive && code.creatorId && code.creatorId !== session.user.id) {
+                creatorCodeRecord = {
+                    id: code.id,
+                    code: code.code,
+                    creatorId: code.creatorId,
+                    commissionPercent: code.commissionPercent,
+                };
                 const afterCoupon = subtotal - couponDiscount;
                 creatorDiscount = afterCoupon * (code.discountPercent / 100);
             }

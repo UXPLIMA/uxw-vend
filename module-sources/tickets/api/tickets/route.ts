@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
             color: 0xf59e0b,
             fields: [
                 { name: "Subject", value: subject, inline: true },
-                { name: "User", value: ticket.user.username, inline: true },
+                { name: "User", value: ticket.user?.username ?? "Deleted user", inline: true },
                 { name: "Department", value: ticket.department.name, inline: true },
                 { name: "Priority", value: ticket.priority, inline: true },
             ],

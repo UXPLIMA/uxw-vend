@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
             items: recentTopics.map(t => ({
                 id: t.id,
                 primary: t.title,
-                secondary: t.author.username + " · " + t.category.name,
+                secondary: (t.author?.username ?? "Deleted user") + " · " + t.category.name,
             }))
         }]
     });

@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
         select: { code: true, discountPercent: true, isActive: true, creator: { select: { username: true } } },
     });
 
-    if (!creatorCode || !creatorCode.isActive) {
+    // creator becomes null when the creator's user account is deleted
+    // (SetNull cascade); treat that as an invalid code.
+    if (!creatorCode || !creatorCode.isActive || !creatorCode.creator) {
         return NextResponse.json({ valid: false });
     }
 
