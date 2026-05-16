@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/core/lib/i18n/navigation";
 import { useAllModules } from "@/core/providers/module-provider";
 import {
     ModuleLayoutComponents as LayoutComponentList,

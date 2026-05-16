@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Button } from "@/core/components/ui/button";
 import { Home } from "lucide-react";
 

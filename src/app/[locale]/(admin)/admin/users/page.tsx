@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";

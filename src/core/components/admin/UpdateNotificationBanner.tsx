@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";

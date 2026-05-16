@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Home, CheckCircle } from "lucide-react";
 import { Button } from "@/core/components/ui/button";

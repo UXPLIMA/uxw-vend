@@ -3,6 +3,7 @@
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { Home, User, Package } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { Slot } from "@/core/components/Slot";
@@ -18,6 +19,7 @@ export function MobileBottomNav() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const moduleStatus = useAllModules();
+    const t = useTranslations("common");
 
     if (pathname.startsWith("/admin")) return null;
 
@@ -32,9 +34,9 @@ export function MobileBottomNav() {
         }));
 
     const items = [
-        { href: "/", icon: Home, label: "Home" },
+        { href: "/", icon: Home, label: t("home") },
         ...moduleLinks,
-        ...(session?.user ? [{ href: "/profile", icon: User, label: "Profile" }] : []),
+        ...(session?.user ? [{ href: "/profile", icon: User, label: t("profile") }] : []),
     ];
 
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);

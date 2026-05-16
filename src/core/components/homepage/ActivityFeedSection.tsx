@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Activity, ChevronRight } from "lucide-react";
 import { prisma } from "@/core/lib/db";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";

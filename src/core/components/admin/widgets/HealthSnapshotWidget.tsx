@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Activity as ActivityIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 interface CheckState { ok: boolean; enabled?: boolean }

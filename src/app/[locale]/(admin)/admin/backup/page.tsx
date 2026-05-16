@@ -135,9 +135,9 @@ export default function BackupAdminPage() {
     const handleDelete = async (row: BackupRow) => {
         const ok = await confirm({
             title: t("backup_deleteTitle"),
-            message: `Permanently delete "${row.filename}"? This cannot be undone.`,
+            message: t("backup_deleteConfirm", { filename: row.filename }),
             variant: "danger",
-            confirmText: "Delete",
+            confirmText: t("common_delete"),
         });
         if (!ok) return;
         setDeletingId(row.id);

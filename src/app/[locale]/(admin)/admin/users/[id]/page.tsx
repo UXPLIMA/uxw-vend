@@ -3,7 +3,7 @@
 import { useState, useEffect, useId } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";

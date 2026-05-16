@@ -139,7 +139,7 @@ export default function AdminRolesPage() {
     };
 
     const deleteRole = async (roleId: string) => {
-        const ok = await confirm({ title: t("roles_deleteTitle"), message: t("roles_deleteMessage"), variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("roles_deleteTitle"), message: t("roles_deleteMessage"), variant: "danger", confirmText: t("common_delete") });
         if (!ok) return;
 
         try {

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Activity } from "lucide-react";
 import { prisma } from "@/core/lib/db";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 
 /**

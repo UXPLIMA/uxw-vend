@@ -1,5 +1,5 @@
 import { Award, Users, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { prisma } from "@/core/lib/db";
 
 /**

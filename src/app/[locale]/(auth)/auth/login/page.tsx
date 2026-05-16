@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { signIn } from "next-auth/react";
 import { Home } from "lucide-react";
 import { toast } from "sonner";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Wrench, LogIn } from "lucide-react";
 import { getMaintenanceConfig } from "@/core/lib/maintenance";
 

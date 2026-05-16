@@ -194,7 +194,7 @@ export default function AdminModulesPage() {
 
     const handleDelete = async (moduleId: string, moduleName: string) => {
         if (isBusy) { toast.error(t("modules_pleaseWait")); return; }
-        const ok = await confirm({ title: "Delete Module", message: `Delete "${moduleName}"? This removes all module files.`, variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("modules_deleteTitle"), message: t("modules_deleteConfirm", { name: moduleName }), variant: "danger", confirmText: t("common_delete") });
         if (!ok) return;
         setDeleting(moduleId);
         try {
@@ -233,7 +233,7 @@ export default function AdminModulesPage() {
             toast.error(t("modules_pleaseWait"));
             return;
         }
-        const ok = await confirm({ title: "Install Module", message: `Install "${mod.name}" (v${mod.version})?`, confirmText: "Install" });
+        const ok = await confirm({ title: t("modules_installTitle"), message: t("modules_installConfirm", { name: mod.name, version: mod.version }), confirmText: t("common_install") });
         if (!ok) return;
         setInstalling(mod.id);
         setInstallProgress({ name: mod.name, step: "Downloading..." });

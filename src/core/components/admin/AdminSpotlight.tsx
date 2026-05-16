@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/core/lib/i18n/navigation";
 import { Search, X, FileText, User, Settings as SettingsIcon, Package, Layers } from "lucide-react";
 
 interface SearchResult {

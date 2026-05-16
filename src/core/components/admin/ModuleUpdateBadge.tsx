@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Bell } from "lucide-react";
 
 /**

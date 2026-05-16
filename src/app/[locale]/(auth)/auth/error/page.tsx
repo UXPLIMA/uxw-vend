@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Button } from "@/core/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 

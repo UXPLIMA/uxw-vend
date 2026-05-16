@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Download, Check, AlertCircle, RefreshCw } from "lucide-react";

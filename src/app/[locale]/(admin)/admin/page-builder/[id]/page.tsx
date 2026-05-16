@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { Puck, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
 import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";

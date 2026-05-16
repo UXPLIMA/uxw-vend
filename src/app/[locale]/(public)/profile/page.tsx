@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useId } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Navbar, Footer } from "@/core/components/layout";
@@ -13,7 +13,6 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, Award, Download, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { signOut } from "next-auth/react";
-import Link from "next/link";
 import { formatDate } from "@/core/lib/utils";
 import { ModuleProfileTabs, ProfileTabRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";

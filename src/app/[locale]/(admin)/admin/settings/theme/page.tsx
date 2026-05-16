@@ -60,7 +60,7 @@ export default function ThemeSettingsPage() {
     };
 
     const handleDelete = async (themeId: string) => {
-        const ok = await confirm({ title: "Delete Theme", message: `Delete theme "${themeId}"? This cannot be undone.`, variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("theme_deleteTitle"), message: t("theme_deleteConfirm", { name: themeId }), variant: "danger", confirmText: t("common_delete") });
         if (!ok) return;
 
         setDeleting(themeId);

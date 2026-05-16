@@ -59,7 +59,7 @@ export default function ApiKeysPage() {
     };
 
     const deleteKey = async (id: string) => {
-        const ok = await confirm({ title: t("apiKeys_deleteTitle"), message: t("apiKeys_deleteMessage"), variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("apiKeys_deleteTitle"), message: t("apiKeys_deleteMessage"), variant: "danger", confirmText: t("common_delete") });
         if (!ok) return;
         await fetch(`/api/v1/api-keys/${id}`, { method: "DELETE" });
         fetchKeys();
