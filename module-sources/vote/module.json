@@ -402,5 +402,14 @@
       "key": "vote.logs",
       "column": "userId"
     }
+  ],
+  "navLinks": [
+    {
+      "label": "Vote",
+      "href": "/vote",
+      "icon": "Vote",
+      "position": 130,
+      "group": "more"
+    }
   ]
 }

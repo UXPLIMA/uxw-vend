@@ -27,7 +27,7 @@ export default function VotePage() {
     const [claiming, setClaiming] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch("/api/v1/vote")
+        fetch("/api/v1/vote/sites")
             .then((r) => r.json())
             .then((d) => { setSites(d.sites || []); setLoading(false); })
             .catch(() => setLoading(false));

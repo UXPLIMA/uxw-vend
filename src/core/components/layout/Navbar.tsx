@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, ChevronDown, Trophy, Vote, Dices, History, Users } from "lucide-react";
+import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, ChevronDown, Trophy, Vote, Dices, History, Users, MoreHorizontal, Newspaper, GitCommit, ShoppingBag, Lightbulb, LifeBuoy, Package } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -16,7 +16,8 @@ import { Slot } from "@/core/components/Slot";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
-    Trophy, Vote, Dices, History, Users, Shield,
+    Trophy, Vote, Dices, History, Users, Shield, MoreHorizontal,
+    Newspaper, GitCommit, ShoppingBag, Lightbulb, LifeBuoy, Package,
 };
 
 function DefaultNavbar() {
@@ -83,12 +84,23 @@ function DefaultNavbar() {
         return false;
     };
 
-    // Default links: Home + enabled module navLinks from registry
-    const registryLinks = [
+    // Default links: Home + top-level module navLinks + a "More" dropdown
+    // bundling everything tagged with `group: "more"` (sorted by position).
+    // Modules opt in by declaring `"group": "more"` on their navLink — keeps
+    // the top row clean while still surfacing every page.
+    const enabledModuleLinks = ModuleNavLinks.filter(nl => moduleStatus[nl.module] === true);
+    const topLevelLinks = enabledModuleLinks
+        .filter(nl => nl.group !== "more")
+        .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "Package" }));
+    const moreChildren = enabledModuleLinks
+        .filter(nl => nl.group === "more")
+        .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "Package" }));
+    const registryLinks: { label: string; href: string; icon?: string; children?: { label: string; href: string; icon?: string }[] }[] = [
         { label: t('home'), href: "/", icon: "Home" },
-        ...ModuleNavLinks
-            .filter(nl => moduleStatus[nl.module] === true)
-            .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "Package" })),
+        ...topLevelLinks,
+        ...(moreChildren.length > 0
+            ? [{ label: t('more'), href: "#more", icon: "MoreHorizontal", children: moreChildren }]
+            : []),
     ];
 
     const rawNavLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : registryLinks) as { label: string; href: string; icon?: string; children?: { label: string; href: string }[] }[];

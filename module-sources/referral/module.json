@@ -543,5 +543,14 @@
       "key": "referral.records",
       "column": "referrerId"
     }
+  ],
+  "navLinks": [
+    {
+      "label": "Referrals",
+      "href": "/referral",
+      "icon": "Users",
+      "position": 140,
+      "group": "more"
+    }
   ]
 }

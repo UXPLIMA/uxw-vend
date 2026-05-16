@@ -667,5 +667,14 @@
       "key": "staff.profile",
       "column": "userId"
     }
+  ],
+  "navLinks": [
+    {
+      "label": "Staff",
+      "href": "/staff",
+      "icon": "Crown",
+      "position": 160,
+      "group": "more"
+    }
   ]
 }
