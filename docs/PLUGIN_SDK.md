@@ -1,57 +1,30 @@
-# uxwVend Plugin SDK
+# Plugin SDK
 
-## Overview
+The reference for module authors. Every behavior a module contributes is declared in `module.json` and wired by code generation — there are no decorators, no runtime registrations, and no entries in core that name a specific module.
 
-uxwVend is a plugin-based platform built on Next.js 16.2 (App Router), TypeScript 5.9, Prisma 6.19, Auth.js v5, Tailwind CSS v4, and Zod 4.
+uxwVend ships with **zero modules**. The 41 first-party modules in `module-marketplace/` are installed at runtime through the admin panel just like any third-party module. Core knows nothing about any of them.
 
-The platform ships with zero modules. All functionality comes from modules installed from the marketplace or uploaded as ZIPs. Core knows nothing about any module — no module names, no hardcoded paths, no module-specific code anywhere in `src/core/`. Everything is driven by `module.json` manifests processed at build time.
-
-Module sources live under `module-sources/<id>/` (tracked in git). Installed modules live under `src/modules/<id>/`. The two directories are separate: `module-sources/` is the authoring workspace; `src/modules/` is what the running platform sees.
+Module sources live under `module-sources/<id>/` (tracked in git, authoritative for first-party modules). Installed modules live under `src/modules/<id>/` (gitignored, runtime install state). The two directories are separate: `module-sources/` is the authoring workspace; `src/modules/` is what the running platform sees.
 
 ---
 
-## Creating a Module
-
-### 1. Create the directory
-
-```
-src/modules/my-module/
-```
-
-The directory name must match the `id` field in `module.json`.
-
-### 2. Create `module.json`
-
-```json
-{
-    "id": "my-module",
-    "name": "My Module",
-    "description": "What the module does",
-    "version": "1.0.0",
-    "author": "Your Name",
-    "icon": "Star"
-}
-```
-
-Only `id`, `name`, `description`, and `version` are required. `icon` must be a valid Lucide icon name.
-
-### 3. Regenerate the registry
+## Quick Start
 
 ```bash
+npm run create:module my-module "My Module" "Short description"
+# Creates module-sources/my-module/ from module-template/ with placeholders replaced.
+
+# Edit module.json, optionally schema.prisma, write pages/api/components
+npm run validate:module module-sources/my-module
+npm run build:marketplace                                       # rebuild every ZIP + index.json
+
+# Fast local install (skip the marketplace UI):
+cp -r module-sources/my-module src/modules/my-module
 npx tsx scripts/generate-registry.ts
+npm run dev
 ```
 
-This scans `src/modules/`, validates every `module.json` against the manifest schema, and writes:
-
-- `src/core/generated/module-registry.tsx` — dynamic `import()` map for every component and API handler
-- `src/core/generated/module-routes.ts` — route patterns for middleware gating
-- Several additional generated files: `module-hooks.ts`, `module-crons.ts`, `module-webhooks.ts`, `module-search.ts`, `module-seo.ts`, `module-storage.ts`, `module-blocks.ts`, `module-notification-types.ts`, `slot-registry.tsx`
-
-Run this after any `module.json` change or after adding/removing files referenced in the manifest.
-
-### 4. Enable in the database
-
-Installing via the admin UI (Upload ZIP or Marketplace Install) creates the `ModuleConfig` row automatically with `enabled: true`. During development you can create the row manually or via `prisma studio`.
+Install via **Admin > Modules > Upload ZIP** or **Marketplace** for production-style flow.
 
 ---
 
@@ -59,38 +32,40 @@ Installing via the admin UI (Upload ZIP or Marketplace Install) creates the `Mod
 
 ```
 src/modules/my-module/
-├── module.json                       # Required — manifest
+├── module.json                  Required — manifest
+├── schema.prisma                Optional — Prisma models merged at db:merge time
+├── migrations/                  Optional — per-module SQL migrations (NNN_description.sql)
 ├── pages/
-│   ├── public/page.tsx               # Public page component
-│   └── admin/page.tsx                # Admin page component
+│   ├── public/page.tsx          Public page component
+│   └── admin/page.tsx           Admin page component
 ├── api/
-│   └── my-module/route.ts            # API route handler
-├── components/                       # Module-scoped React components
-├── hooks/                            # Hook listener handlers
-├── cron/                             # Cron job handlers
-├── search/                           # Search provider handlers
-├── seo/                              # SEO sitemap handler
-├── slots/                            # Slot contribution components
-├── blocks/                           # Page-builder block components
-├── providers/                        # React context providers
-├── lib/                              # Module-scoped utilities
-├── schema.prisma                     # Optional — module DB models
-└── migrations/                       # Optional — SQL migration files
+│   └── route.ts                 API route handler (named GET/POST/PUT/DELETE/PATCH exports)
+├── components/                  Module-scoped React components
+├── widgets/                     Homepage sidebar widget components
+├── hooks/                       hookListeners handlers + webhook handlers
+├── cron/                        cron job handlers
+├── search/                      searchProviders handlers
+├── seo/                         seoRoutes sitemap handler
+├── slots/                       slotContents components
+├── blocks/                      pageBlocks components
+├── providers/                   contextProviders components
+├── lib/                         Module-scoped utilities (incl. storageProviders handler)
+└── messages/                    Optional locale JSON (translations also inline-able in manifest)
 ```
 
-Only `module.json` is required. Include only what your module needs.
+Only `module.json` is required. Include only the directories your module needs.
 
 ---
 
-## `module.json` Full Reference
+## `module.json` Reference
 
-### Required fields
+### Required
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | `string` | Unique identifier. Lowercase letters, numbers, hyphens only. Must match the directory name. |
+| `id` | `string` | Unique lowercase ID. Letters, digits, hyphens. Must start with a letter, no double hyphens. Must match the directory name. |
 | `name` | `string` | Human-readable display name. |
-| `description` | `string` | Short description shown in admin. |
+| `description` | `string` | Short description shown in admin and marketplace. |
 | `version` | `string` | Semver string, e.g. `"1.0.0"`. |
 
 ### Optional metadata
@@ -99,10 +74,11 @@ Only `module.json` is required. Include only what your module needs.
 |-------|------|-------------|
 | `author` | `string` | Author name. |
 | `icon` | `string` | Lucide icon name shown in the admin sidebar. |
-| `permissions` | `string[]` | Permission strings this module registers (e.g. `["store.view", "store.manage"]`). |
-| `defaultConfig` | `object` | Default configuration values merged with DB-stored config at runtime. |
-| `dependencies` | `string[]` | Module IDs that must be installed and enabled. |
-| `conflicts` | `string[]` | Module IDs that cannot be active at the same time. |
+| `permissions` | `string[]` | RBAC permission strings the module registers (e.g. `["store.view", "store.manage"]`). |
+| `defaultConfig` | `object` | Default config values merged with the DB-stored `ModuleConfig.config` at runtime. |
+| `dependencies` | `string[]` | Module IDs that must be installed and enabled. Enable fails when a dependency is missing. |
+| `conflicts` | `string[]` | Module IDs that cannot be active simultaneously. |
+| `seedOnInstall` | `boolean` | If `true`, the install pipeline runs the module's seed routine. Default `false`. |
 
 ### `routes` — Public pages
 
@@ -117,13 +93,13 @@ Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `path` | Yes | URL path. Supports dynamic segments (`[id]`, `[...params]`). |
+| `path` | Yes | URL path under `/[locale]`. Supports dynamic segments (`[id]`, `[...params]`). |
 | `component` | Yes | Path to the page component, relative to the module root. |
 | `layout` | No | Optional layout wrapper component. |
 
 ### `adminRoutes` — Admin pages
 
-Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sidebar, and header are provided automatically).
+Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sidebar, and header are provided automatically — never re-implement them).
 
 ```json
 "adminRoutes": [
@@ -132,14 +108,9 @@ Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sideba
 ]
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `path` | Yes | Path relative to `/admin`. |
-| `component` | Yes | Path to the component, relative to the module root. |
-
 ### `api` — API endpoints
 
-Mounted at `/api/v1/{path}` via the `[...path]` catch-all that reads `ModuleApiRegistry`.
+Mounted at `/api/v1/{path}` via the `[...path]` catch-all that resolves `ModuleApiRegistry`.
 
 ```json
 "api": [
@@ -154,10 +125,10 @@ Mounted at `/api/v1/{path}` via the `[...path]` catch-all that reads `ModuleApiR
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `path` | Yes | Path under `/api/v1/`. |
-| `handler` | Yes | Path to the handler file, relative to the module root. |
-| `method` | No | `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, or `ALL`. Defaults to `ALL`. |
-| `description` | No | OpenAPI summary — appears in the generated spec at `/api/v1/openapi`. |
+| `path` | Yes | Path under `/api/v1/`. Dynamic segments OK. |
+| `handler` | Yes | Path to the handler file, relative to the module root. Export named `GET` / `POST` / `PUT` / `DELETE` / `PATCH` functions. |
+| `method` | No | `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, or `ALL`. Defaults to `ALL`. The dispatcher returns 405 if the request method doesn't match. |
+| `description` | No | OpenAPI summary surfaced in the generated spec at `/api/v1/openapi`. |
 
 ### `menu` — Admin sidebar
 
@@ -168,7 +139,9 @@ Mounted at `/api/v1/{path}` via the `[...path]` catch-all that reads `ModuleApiR
 ]
 ```
 
-### `navLinks` — Public navbar links
+`path` is relative to `/admin`. `icon` is a Lucide icon name.
+
+### `navLinks` — Public navbar entries
 
 ```json
 "navLinks": [
@@ -176,7 +149,7 @@ Mounted at `/api/v1/{path}` via the `[...path]` catch-all that reads `ModuleApiR
 ]
 ```
 
-Lower `position` values render further left.
+Lower `position` renders further left.
 
 ### `footerLinks` — Footer links
 
@@ -188,9 +161,9 @@ Lower `position` values render further left.
 
 `section` is `"quick"` or `"legal"`.
 
-### `navbarComponents` — Navbar icons
+### `navbarComponents` — Navbar right-side widgets
 
-Components rendered in the navbar's right-hand area (e.g. cart icon, notification bell).
+Icons or controls rendered in the navbar's right-hand area (cart icon, notification bell, currency selector, etc.).
 
 ```json
 "navbarComponents": [
@@ -200,19 +173,19 @@ Components rendered in the navbar's right-hand area (e.g. cart icon, notificatio
 
 Lower `order` renders further left.
 
-### `footerComponents` — Footer components
+### `footerComponents` — Footer widgets
 
-Components rendered in the footer alongside the language selector (e.g. currency selector).
+Components rendered next to the language selector in the footer.
 
 ```json
 "footerComponents": [
-    { "id": "CurrencySelector", "component": "components/CurrencySelector", "order": 10 }
+    { "id": "CurrencySelector", "component": "components/CurrencySelector", "order": 10, "section": "settings" }
 ]
 ```
 
 ### `layoutComponents` — Per-page components
 
-Components rendered on every page when the module is enabled (toasts, banners, floating widgets). Support URL pattern filtering.
+Components rendered on every matching page when the module is enabled (toasts, banners, popups, floating widgets). Use the URL filter to scope.
 
 ```json
 "layoutComponents": [
@@ -225,7 +198,7 @@ Components rendered on every page when the module is enabled (toasts, banners, f
 ]
 ```
 
-`include` and `exclude` are glob-style URL patterns. Omit both to render everywhere.
+`include` / `exclude` are glob-style URL patterns. Omit both to render on every route.
 
 ### `widgets` — Homepage sidebar widgets
 
@@ -255,7 +228,15 @@ Components rendered on every page when the module is enabled (toasts, banners, f
 
 `type` is `"content"` (main area) or `"widget"` (sidebar).
 
-### `dashboardCards` — Admin dashboard stats
+### `profileTabs` — User profile tabs
+
+```json
+"profileTabs": [
+    { "id": "my-history", "label": "History", "component": "components/ProfileHistory", "order": 5 }
+]
+```
+
+### `dashboardCards` — Admin dashboard stat cards
 
 ```json
 "dashboardCards": [
@@ -271,15 +252,15 @@ Components rendered on every page when the module is enabled (toasts, banners, f
 ]
 ```
 
-`labelKey` is an i18n key in the `admin` namespace — preferred over `label` when present.
+`labelKey` is an i18n key in the `admin` namespace — preferred over `label` when present. `statKey` is the property the dashboard reads from your `statsApi` response to populate the value.
 
-### `statsApi` — Dashboard stats endpoint
+### `statsApi` — Dashboard data endpoint
 
 ```json
 "statsApi": "/my-module/stats"
 ```
 
-`GET /api/v1/my-module/stats` must return `{ cards: [...], sections: [...] }`. The dashboard reads this to populate `statKey` values.
+The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [statKey: string]: number | string }, sections?: [...] }`. Permission gating is the handler's responsibility.
 
 ### `settingsCards` — Admin settings page cards
 
@@ -291,19 +272,6 @@ Components rendered on every page when the module is enabled (toasts, banners, f
         "href": "/settings/my-module",
         "icon": "Settings",
         "color": "text-gray-500"
-    }
-]
-```
-
-### `profileTabs` — User profile tabs
-
-```json
-"profileTabs": [
-    {
-        "id": "my-history",
-        "label": "History",
-        "component": "components/ProfileHistory",
-        "order": 5
     }
 ]
 ```
@@ -322,15 +290,15 @@ Components rendered on every page when the module is enabled (toasts, banners, f
 ]
 ```
 
-`svgIcon` is raw SVG path data (`d` attribute value). `provider` must match a NextAuth provider ID.
+`svgIcon` is raw SVG `d` path data (no `<svg>` wrapper). `provider` must match a NextAuth provider ID configured by the module.
 
-### `contextProviders` — React context providers
+### `contextProviders` — React context wrappers
 
-Components that wrap the entire app tree. Use for global context (e.g. `CurrencyProvider`). Unlike `layoutComponents` (siblings), context providers wrap `children`.
+Components that wrap the entire app tree. Unlike `layoutComponents` (rendered as siblings), context providers receive `children` and wrap them.
 
 ```json
 "contextProviders": [
-    { "id": "CurrencyProvider", "component": "lib/context", "order": 10 }
+    { "id": "CurrencyProvider", "component": "providers/currency", "order": 10 }
 ]
 ```
 
@@ -338,31 +306,21 @@ Lower `order` = outer wrapper.
 
 ### `hookListeners` — Action/filter listeners
 
-WordPress-style hooks. Declare listeners here; the registry auto-wires them when the module is enabled and removes them on disable.
+WordPress-style hooks wired at build time. Listeners are auto-registered when the module is enabled and removed on disable.
 
 ```json
 "hookListeners": [
-    {
-        "hook": "user.registered",
-        "type": "action",
-        "handler": "hooks/on-user-registered.ts",
-        "priority": 10
-    },
-    {
-        "hook": "post.content",
-        "type": "filter",
-        "handler": "hooks/filter-content.ts",
-        "priority": 20
-    }
+    { "hook": "user.registered", "type": "action", "handler": "hooks/on-user-registered.ts", "priority": 10 },
+    { "hook": "post.content",    "type": "filter", "handler": "hooks/filter-content.ts",     "priority": 20 }
 ]
 ```
 
-- `type: "action"` — fire and forget. Handler exports `default (payload) => void | Promise<void>`.
-- `type: "filter"` — value transformation. Handler exports `default (value, context?) => value`.
-- `priority` — lower runs earlier. Default is 10.
-- Async listeners have a per-listener timeout (default 5 s, overridable via `HOOK_LISTENER_TIMEOUT_MS` env).
+- `type: "action"` — fire and forget. Handler: `(payload, context?) => void | Promise<void>`.
+- `type: "filter"` — value transformation. Handler: `(value, context?) => value | Promise<value>`.
+- `priority` — lower runs earlier. Default 10.
+- Async listeners have a per-listener timeout (default 5 s, override with `HOOK_LISTENER_TIMEOUT_MS`).
 
-Core-fired action hooks include `user.registered`, `module.enabled`, `module.disabled`. Modules can fire their own hooks via `doAction` / `applyFilters` from `@/core/lib/hooks`.
+Core-fired actions include `user.registered`, `module.enabled`, `module.disabled`. Modules fire their own hooks via `doAction` / `applyFilters` from `@/core/lib/hooks`.
 
 ### `slotContents` — Slot contributions
 
@@ -379,7 +337,7 @@ Render components into named `<Slot>` points declared by themes or other modules
 ]
 ```
 
-The `slot` value must match a slot name declared by a theme's `slots[]` array or by another module's `<Slot name="...">` usage.
+Core declares only three canonical slots: `layout.beforeMain`, `layout.afterMain`, `head.extra`. Themes can declare additional slots through their `slots[]` array (e.g. `pixelcraft` exposes `hero.liveStats` and `hero.discordStats`).
 
 ### `pageBlocks` — Page-builder blocks
 
@@ -387,11 +345,7 @@ Module-contributed blocks available in the page editor.
 
 ```json
 "pageBlocks": [
-    {
-        "id": "SliderHero",
-        "category": "Slider",
-        "component": "blocks/SliderHero.tsx"
-    }
+    { "id": "SliderHero", "category": "Slider", "component": "blocks/SliderHero.tsx" }
 ]
 ```
 
@@ -401,33 +355,27 @@ Periodic tasks run by the core scheduler.
 
 ```json
 "cronJobs": [
-    {
-        "id": "currency-rate-refresh",
-        "schedule": "every-hour",
-        "handler": "cron/refresh.ts"
-    }
+    { "id": "currency-rate-refresh", "schedule": "every-hour", "handler": "cron/refresh.ts" }
 ]
 ```
 
 Valid `schedule` keywords: `every-minute`, `every-5-minutes`, `every-15-minutes`, `every-hour`, `every-day`, `every-week`, `every-month`.
 
-Handler file exports `default async function (): Promise<void>`.
+Handler file: `export default async function (): Promise<void>`. Last-run state is recorded in the `CronRun` table.
 
 ### `searchProviders` — Site search
 
 ```json
 "searchProviders": [
-    {
-        "id": "blog-search",
-        "label": "Blog",
-        "handler": "search/handler.ts"
-    }
+    { "id": "blog-search", "label": "Blog", "handler": "search/handler.ts" }
 ]
 ```
 
-Handler exports `default async (query: string) => Promise<SearchResult[]>`. Results are dispatched by `GET /api/v1/search`.
+Handler: `export default async (query: string) => Promise<SearchResult[]>`. `GET /api/v1/search` merges results from every enabled provider.
 
 ### `webhookReceivers` — Inbound webhooks
+
+Routed by `POST /api/v1/webhook/{provider}`.
 
 ```json
 "webhookReceivers": [
@@ -440,124 +388,106 @@ Handler exports `default async (query: string) => Promise<SearchResult[]>`. Resu
 ]
 ```
 
-Requests to `POST /api/v1/webhook/{provider}` are routed to the matching handler. When `signatureHeader` and `secretEnv` are set, HMAC verification runs automatically before the handler is called.
+When `signatureHeader` + `secretEnv` are set, HMAC-SHA256 verification runs against the raw body using a constant-time comparator. Deliveries older than `WEBHOOK_REPLAY_WINDOW_MS` (default 5 minutes) are rejected.
 
-Handler exports `default async (request: Request) => Promise<{ status: number; body?: unknown }>`.
+Handler: `export default async (request: Request) => Promise<{ status: number; body?: unknown }>`.
 
 ### `notificationTypes` — User notification preferences
 
-Surfaces in the user preferences grid so users can opt out per channel.
+Surfaces in the profile preferences grid so users can opt out per channel.
 
 ```json
 "notificationTypes": [
-    {
-        "eventType": "blog.article.created",
-        "label": "New blog post",
-        "channels": ["email", "inapp"]
-    }
+    { "eventType": "blog.article.created", "label": "New blog post", "description": "Sent when a new article is published.", "channels": ["email", "inapp"] }
 ]
 ```
 
-### `storageProviders` — File storage backends
+### `storageProviders` — File-storage backends
 
-Implement the `StorageProvider` interface from `@/core/lib/storage`. The active provider is selected via the `storage_active_provider` Setting key or `STORAGE_PROVIDER` env var.
+Implement the `StorageProvider` interface from `@/core/lib/storage`. The active provider is selected at runtime via the `storage_active_provider` Setting key (or the `STORAGE_PROVIDER` env var).
 
 ```json
 "storageProviders": [
-    {
-        "id": "cloudflare-r2",
-        "name": "Cloudflare R2",
-        "handler": "lib/provider.ts"
-    }
+    { "id": "cloudflare-r2", "name": "Cloudflare R2", "handler": "lib/provider.ts" }
 ]
 ```
 
-Handler file exports `default: StorageProvider`.
+Handler: `export default: StorageProvider`.
 
-### `seoRoutes` — Sitemap contributions
+### `seoRoutes` — Sitemap contribution
 
 ```json
-"seoRoutes": {
-    "handler": "seo/sitemap.ts"
-}
+"seoRoutes": { "handler": "seo/sitemap.ts" }
 ```
 
-Handler exports `default async () => Promise<SitemapEntry[]>`.
+Handler: `export default async () => Promise<SitemapEntry[]>`.
 
 ### `translations` — Bundled i18n strings
 
-Translations merged into the `Translation` DB table on install and removed on uninstall. Admin-overridden rows survive uninstall.
+Synced into the `Translation` DB table on install and removed on uninstall. **Admin-overridden rows survive uninstall** — the sync never overwrites a row that has been manually edited.
 
 ```json
 "translations": {
     "en": {
-        "blog": {
-            "title": "Blog",
-            "readMore": "Read More"
-        }
+        "blog": { "title": "Blog", "readMore": "Read more" }
     },
     "tr": {
-        "blog": {
-            "title": "Blog",
-            "readMore": "Devamını Oku"
-        }
+        "blog": { "title": "Blog", "readMore": "Devamını oku" }
     }
 }
 ```
 
-Sync translations to the DB manually: `npx tsx scripts/seed-translations.ts`.
+Sync manually with `npx tsx scripts/seed-translations.ts`.
 
 ---
 
-## Database Schema
+## Database
 
 ### Adding models
 
-Create `schema.prisma` in the module source directory:
+Create `schema.prisma` in the module source directory. Prefix model names with the module ID to avoid collisions:
 
 ```prisma
-model MyItem {
+model MyModuleItem {
     id        String   @id @default(cuid())
-    name      String
+    title     String
+    status    String   @default("ACTIVE")
     createdAt DateTime @default(now())
-    user      User     @relation(fields: [userId], references: [id])
+    updatedAt DateTime @updatedAt
     userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([status])
 }
 ```
 
-To add fields to the `User` model, use the comment-block mechanism:
+To add fields on the core `User` model, use the marker block:
 
 ```prisma
 // @@user-relations-start
-myItems MyItem[]
+items MyModuleItem[]
 // @@user-relations-end
 ```
 
-`scripts/merge-schemas.ts` injects these blocks into the core `User` model when building the merged `prisma/schema.prisma`. Do not redeclare core models.
+`scripts/merge-schemas.ts` injects these lines into the core `User` model at the `// @@MODULE_RELATIONS` marker. Do not redeclare core models — the merger warns on core-model redeclaration.
 
-After adding or changing `schema.prisma`:
+After editing the schema:
 
 ```bash
-npm run db:merge      # merge core + module schemas
-npm run db:generate   # generate Prisma client
-npm run db:push       # push to DB (dev) or migrate (prod)
+npm run db:merge      # regenerates prisma/schema.prisma + runs prisma generate
+npm run db:push       # applies the diff to the database
 ```
 
 ### SQL migrations
 
-Place migration files at `module-sources/<id>/migrations/*.sql`. `scripts/apply-migrations.ts` runs pending migrations (tracked in the `ModuleMigration` table, checksum-verified).
-
-```bash
-npx tsx scripts/apply-migrations.ts
-```
+Schema changes against an already-deployed database go through `module-sources/<id>/migrations/NNN_description.sql`. The runner (`scripts/apply-migrations.ts`) tracks applied files in `ModuleMigration` with SHA-256 checksums, wraps every file in a transaction, and aborts on checksum mismatch. See [MIGRATIONS.md](MIGRATIONS.md) for the full system.
 
 ---
 
 ## Writing Pages
 
-### Public page
-
-Server components are the default. Add `"use client"` only for hooks, event handlers, or browser APIs.
+### Public page (server component, default)
 
 ```tsx
 import { getTranslations } from "next-intl/server";
@@ -575,13 +505,14 @@ export default async function MyPage() {
 }
 ```
 
-Key rules:
-- Use `Link` and `usePathname` from `@/core/lib/i18n/navigation` (not `next/link`) for locale-aware routing.
+Rules:
+
+- Use `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — never `next/link`.
 - No hardcoded UI strings — use `useTranslations` (client) or `getTranslations` (server) from `next-intl`.
 - No emojis in UI — use Lucide icons.
-- No `confirm()` / `alert()` — use `useConfirm()` hook and `toast` from `sonner`.
+- No `confirm()` / `alert()` — use `useConfirm()` and `toast` from `sonner`.
 
-### Public page with data fetching (client component)
+### Client page with data fetching
 
 ```tsx
 "use client";
@@ -589,27 +520,22 @@ Key rules:
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 
-interface Item {
-    id: string;
-    name: string;
-}
+interface Item { id: string; name: string }
 
 export default function MyPage() {
     const [items, setItems] = useState<Item[]>([]);
 
     useEffect(() => {
         fetch("/api/v1/my-module/items")
-            .then(res => res.json())
-            .then(data => setItems(data.items ?? []));
+            .then((res) => res.json())
+            .then((res) => setItems(res.items ?? []));
     }, []);
 
     return (
         <main className="container mx-auto px-4 py-6">
             <div className="grid gap-4">
-                {items.map(item => (
-                    <Card key={item.id}>
-                        <CardContent className="p-4">{item.name}</CardContent>
-                    </Card>
+                {items.map((item) => (
+                    <Card key={item.id}><CardContent className="p-4">{item.name}</CardContent></Card>
                 ))}
             </div>
         </main>
@@ -619,7 +545,7 @@ export default function MyPage() {
 
 ### Admin page
 
-Admin pages render inside the admin layout (auth guard, sidebar, header already provided). Export your content directly:
+Admin pages render inside the admin layout — sidebar, header, and auth guard are already provided. Export your content directly:
 
 ```tsx
 "use client";
@@ -632,12 +558,8 @@ export default function MyAdminPage() {
         <div className="space-y-6">
             <h1 className="text-2xl font-bold">My Module Management</h1>
             <Card>
-                <CardHeader>
-                    <CardTitle>Items</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button>Create Item</Button>
-                </CardContent>
+                <CardHeader><CardTitle>Items</CardTitle></CardHeader>
+                <CardContent><Button>Create item</Button></CardContent>
             </Card>
         </div>
     );
@@ -652,72 +574,65 @@ API handlers follow Next.js App Router conventions. Export a named function per 
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin, hasPermission } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
-import { z } from "zod";
+import { apiSuccess, apiError, apiPaginated } from "@/core/lib/api-utils";
 
 // GET /api/v1/my-module/items
-export async function GET() {
-    const items = await prisma.myItem.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 50,
-    });
-    return NextResponse.json({ items });
+export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+    const page  = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20") || 20));
+
+    const [items, total] = await Promise.all([
+        prisma.myModuleItem.findMany({ skip: (page - 1) * limit, take: limit, orderBy: { createdAt: "desc" } }),
+        prisma.myModuleItem.count(),
+    ]);
+    return apiPaginated(items, total, page, limit);
 }
 
 // POST /api/v1/my-module/items
 export async function POST(request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) return apiError("Unauthorized", 401);
+    if (!(await hasPermission(session.user.id, "my-module.manage"))) {
+        return apiError("Forbidden", 403);
     }
 
-    const canManage = await hasPermission(session.user.id, "my-module.manage");
-    if (!canManage) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const body = await request.json();
-
-    const schema = z.object({ name: z.string().min(1).max(255) });
-    const parsed = schema.safeParse(body);
+    const schema = z.object({ title: z.string().min(1).max(255) });
+    const parsed = schema.safeParse(await request.json());
     if (!parsed.success) {
         // Zod 4: use .issues not .errors
-        return NextResponse.json({ error: "Validation failed", issues: parsed.error.issues }, { status: 400 });
+        return apiError("Validation failed", 400, { code: "invalid_input", details: parsed.error.issues });
     }
 
-    const item = await prisma.myItem.create({
-        data: { name: parsed.data.name, userId: session.user.id },
+    const item = await prisma.myModuleItem.create({
+        data: { title: parsed.data.title, userId: session.user.id },
     });
-
-    await logActivity({ userId: session.user.id, action: "my-module.item.create", entityId: item.id });
-
-    return NextResponse.json({ item }, { status: 201 });
+    await logActivity({ userId: session.user.id, action: "my-module.item.create", entity: "my-module.item", entityId: item.id });
+    return apiSuccess({ item }, 201);
 }
 
-// DELETE /api/v1/my-module/items/:id (admin only)
-export async function DELETE(request: NextRequest) {
+// DELETE /api/v1/my-module/items/[id] — admin only
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    if (!(await isAdmin(session.user.id))) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (!session?.user?.id) return apiError("Unauthorized", 401);
+    if (!(await isAdmin(session.user.id))) return apiError("Forbidden", 403);
 
-    const { id } = await request.json();
-    await prisma.myItem.delete({ where: { id } });
-    return NextResponse.json({ ok: true });
+    const { id } = await params;
+    await prisma.myModuleItem.delete({ where: { id } });
+    return apiSuccess({ ok: true });
 }
 ```
 
-API responses follow `{ data }` or `{ error, status }` conventions. Validation errors additionally include `issues`.
+The canonical envelope is `{ ok: true, data }` / `{ ok: false, error, code?, details? }` from `@/core/lib/api-utils`. Legacy `{ error }` / `{ data }` shapes still work but new code should standardize.
 
 ---
 
-## Available Core Imports
+## Core Imports
 
 ```typescript
 // Database
@@ -727,20 +642,23 @@ import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { isAdmin, isStaff, hasPermission, hasAnyPermission } from "@/core/lib/permissions";
 
-// Zod 4 — use .issues not .errors
+// Validation (Zod 4 — read .issues, not .errors)
 import { z } from "zod";
 
 // Activity logging
 import { logActivity } from "@/core/lib/activity-log";
 
-// Discord webhooks
+// Discord webhooks (generic sender)
 import { sendDiscordWebhook } from "@/core/lib/discord";
 
-// Email
+// Email (Resend backend, falls back to console in dev)
 import { sendEmail } from "@/core/lib/email";
 
-// Rate limiting
-import { rateLimit, rateLimitForRole } from "@/core/lib/rate-limit";
+// Rate limiting (Redis + memory fallback, trust-proxy aware)
+import { rateLimit, rateLimitForRole, getClientIP } from "@/core/lib/rate-limit";
+
+// API envelope helpers
+import { apiSuccess, apiError, apiPaginated, devOnlyDetail } from "@/core/lib/api-utils";
 
 // Hooks (action/filter system)
 import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, addFilter } from "@/core/lib/hooks";
@@ -749,13 +667,13 @@ import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, ad
 import { Link, usePathname, redirect } from "@/core/lib/i18n/navigation";
 
 // i18n — translations
-import { useTranslations } from "next-intl";                    // client
-import { getTranslations } from "next-intl/server";             // server
+import { useTranslations } from "next-intl";                       // client
+import { getTranslations } from "next-intl/server";                // server
 
-// Theme config
-import { useThemeConfig } from "@/core/lib/theme-config-client"; // client only
+// Theme config (client only — server reads ThemeState directly)
+import { useThemeConfig } from "@/core/lib/theme-config-client";
 
-// UI components
+// UI primitives
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Input } from "@/core/components/ui/input";
@@ -784,10 +702,10 @@ await doActionAsync("my-module.order.completed", { orderId });
 import { applyFilters, applyFiltersAsync } from "@/core/lib/hooks";
 
 const processed = applyFilters("post.content", rawHtml, { postId });
-const result = await applyFiltersAsync("checkout.total", baseTotal, { cart });
+const result    = await applyFiltersAsync("checkout.total", baseTotal, { cart });
 ```
 
-**Registering listeners imperatively** (rarely needed — prefer `hookListeners` in the manifest):
+**Registering listeners imperatively** (rarely needed — prefer declaring `hookListeners` in the manifest so the build-time registry can manage them):
 
 ```typescript
 import { addAction, addFilter } from "@/core/lib/hooks";
@@ -800,161 +718,133 @@ Listeners declared in `hookListeners` are wired at build time and automatically 
 
 ---
 
-## Packaging as ZIP
+## Cheat Sheet — Full Manifest
 
-```bash
-cd src/modules/my-module
-zip -r my-module.zip .
+```json
+{
+    "id": "my-module",
+    "name": "My Module",
+    "description": "What it does",
+    "version": "1.0.0",
+    "author": "Your Name",
+    "icon": "Star",
+
+    "dependencies": ["other-module"],
+    "conflicts": ["incompatible-module"],
+    "permissions": ["mymod.view", "mymod.manage"],
+    "defaultConfig": { "exampleSetting": true },
+    "seedOnInstall": false,
+
+    "routes":            [{ "path": "/my-page", "component": "pages/public/page.tsx" }],
+    "adminRoutes":       [{ "path": "/my-feature", "component": "pages/admin/page.tsx" }],
+    "api":               [{ "path": "/my-api", "handler": "api/route.ts", "method": "ALL", "description": "..." }],
+    "menu":              [{ "label": "My Feature", "path": "/my-feature", "icon": "Star" }],
+    "navLinks":          [{ "label": "My Page", "href": "/my-page", "icon": "Star", "position": 50 }],
+    "footerLinks":       [{ "label": "My Page", "href": "/my-page", "section": "quick" }],
+    "navbarComponents":  [{ "id": "MyIcon", "component": "components/MyIcon", "order": 30 }],
+    "footerComponents":  [{ "id": "MyFooter", "component": "components/MyFooter", "order": 10 }],
+    "layoutComponents":  [{ "id": "MyBanner", "component": "components/MyBanner", "include": ["/*"], "exclude": ["/admin/*"] }],
+    "widgets":           [{ "id": "MyWidget", "component": "widgets/MyWidget", "defaultOrder": 10, "defaultVisible": true }],
+    "homepageSections":  [{ "id": "MySection", "type": "content", "component": "components/MySection", "order": 20 }],
+    "profileTabs":       [{ "id": "MyTab", "label": "My Tab", "component": "components/MyTab", "order": 30 }],
+    "dashboardCards":    [{ "id": "my-stat", "label": "My Stat", "labelKey": "dashboard_my_stat", "icon": "Star", "href": "/admin/my-feature", "color": "text-blue-500", "statKey": "myCount" }],
+    "statsApi":          "/my-api/stats",
+    "settingsCards":     [{ "title": "My Settings", "description": "...", "href": "/my-settings", "icon": "Settings", "color": "text-gray-500" }],
+    "oauthButtons":      [{ "id": "my-login", "provider": "my-provider", "label": "My Login", "color": "#000000", "svgIcon": "M12..." }],
+    "contextProviders":  [{ "id": "MyProvider", "component": "providers/MyProvider", "order": 10 }],
+    "hookListeners":     [{ "hook": "user.registered", "type": "action", "handler": "hooks/on-user.ts", "priority": 10 }],
+    "slotContents":      [{ "id": "MySlot", "slot": "layout.beforeMain", "component": "slots/MyBanner", "order": 10 }],
+    "pageBlocks":        [{ "id": "MyBlock", "category": "My Category", "component": "blocks/MyBlock.tsx" }],
+    "cronJobs":          [{ "id": "my-job", "schedule": "every-hour", "handler": "cron/hourly.ts" }],
+    "searchProviders":   [{ "id": "my-search", "label": "My Search", "handler": "search/handler.ts" }],
+    "webhookReceivers":  [{ "provider": "stripe", "handler": "hooks/webhook.ts", "signatureHeader": "stripe-signature", "secretEnv": "STRIPE_WEBHOOK_SECRET" }],
+    "notificationTypes": [{ "eventType": "my.event", "label": "My Event", "channels": ["email", "inapp"] }],
+    "storageProviders":  [{ "id": "my-storage", "name": "My Storage", "handler": "lib/provider.ts" }],
+    "seoRoutes":         { "handler": "seo/sitemap.ts" },
+    "translations": {
+        "en": { "my-module": { "title": "My Module" } },
+        "tr": { "my-module": { "title": "Modülüm" } }
+    }
+}
 ```
 
-The ZIP must contain `module.json` at its root level (or inside a single subdirectory).
-
-Install via **Admin > Modules > Upload ZIP**.
-
-The upload handler:
-1. Extracts to a temp directory.
-2. Validates `module.json` (schema + ID format).
-3. Copies files to `src/modules/{id}/`.
-4. Runs `scripts/generate-registry.ts`.
-5. Creates the `ModuleConfig` DB record (enabled by default).
-6. Rolls back on registry generation failure.
+Delete any field you don't use — every UI registration field is optional.
 
 ---
 
-## Marketplace
+## Packaging and Distribution
 
-The marketplace is hosted on GitHub. Admins install directly from **Admin > Modules > Marketplace**.
+### Build the marketplace ZIP
 
-Marketplace installs are enabled by default. Bulk install is available at `POST /api/v1/modules/marketplace/bulk-install`.
+```bash
+npm run build:marketplace
+```
+
+This rebuilds every ZIP in `module-marketplace/` from `module-sources/` and regenerates `module-marketplace/index.json` (the catalog the admin UI reads).
+
+### Manual zip (single module)
+
+```bash
+cd module-sources/my-module
+zip -r ../../module-marketplace/my-module.zip . -x "*.DS_Store" -x "__MACOSX/*"
+```
+
+The ZIP must contain `module.json` at its root.
+
+### Install paths
+
+- **Admin > Modules > Marketplace** — installs from the bundled catalog (or the configured remote source).
+- **Admin > Modules > Upload ZIP** — uploads an arbitrary `.zip` file.
+- **Local copy** — `cp -r module-sources/my-module src/modules/` then `npx tsx scripts/generate-registry.ts`.
+
+The install handler (whichever route fires) follows the same pipeline:
+
+1. Extract to a temp directory and validate `module.json`.
+2. Acquire a Postgres advisory lock (serializes installs in PM2 cluster).
+3. Copy files to `src/modules/{id}/`.
+4. Run `db:merge` if the module declares a schema.
+5. Apply pending SQL migrations (`apply-migrations` scoped to this module).
+6. Run `scripts/generate-registry.ts` synchronously.
+7. Create the `ModuleConfig` DB row (`enabled: true`).
+8. Sync `translations` into the `Translation` table.
+9. On any failure: roll back the filesystem and abort. No silent partial installs.
+
+`scheduleBuild()` then fires a debounced background `npm run build && pm2 restart` so the new module's bundled code is available — bulk installs in quick succession trigger only one rebuild.
 
 ---
 
 ## Module Lifecycle
 
 | Event | What happens |
-|-------|-------------|
-| Install | Files extracted to `src/modules/<id>/`, registry regenerated, `ModuleConfig` row created (`enabled: true`). |
-| Enable | Module appears in every UI surface: sidebar menu, navbar, homepage, dashboard, settings. Hook listeners, cron jobs, search providers, webhook receivers, slot contents — all active. |
+|-------|--------------|
+| Install | Files extracted to `src/modules/<id>/`, schema merged, SQL migrations applied, registry regenerated, `ModuleConfig` row created (`enabled: true`), translations synced. |
+| Enable | Module appears in every UI surface — sidebar, navbar, homepage, dashboard, settings, profile. Hook listeners, cron jobs, search providers, webhook receivers, slot contents — all active. |
 | Disable | Module vanishes from all UI surfaces. Listeners, crons, and other runtime contributions removed. DB data preserved. |
-| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated. Module translations removed (admin-overridden rows preserved). |
+| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated. Module translations removed (admin-overridden rows preserved). Module-owned tables are NOT dropped — a maintainer must run the SQL manually if they want a clean wipe. |
 
-The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled.
-
----
-
-## Complete Example: Blog Module (abbreviated)
-
-### `module.json`
-
-```json
-{
-    "id": "blog",
-    "name": "Blog Module",
-    "description": "News and announcements system",
-    "version": "1.0.0",
-    "icon": "FileText",
-    "permissions": ["blog.view", "blog.manage"],
-    "routes": [
-        { "path": "/blog", "component": "pages/page.tsx" },
-        { "path": "/blog/[...params]", "component": "pages/[...params]/page.tsx" }
-    ],
-    "adminRoutes": [
-        { "path": "/blog/articles", "component": "pages/admin/articles/page.tsx" },
-        { "path": "/blog/articles/new", "component": "pages/admin/articles/new/page.tsx" }
-    ],
-    "api": [
-        { "path": "/blog/articles", "handler": "api/articles/route.ts", "description": "List and create articles" },
-        { "path": "/blog/articles/[id]", "handler": "api/articles/[id]/route.ts", "description": "Get, update, or delete an article" },
-        { "path": "/blog/stats", "handler": "api/stats/route.ts", "description": "Dashboard statistics" }
-    ],
-    "menu": [
-        { "label": "Articles", "path": "/blog/articles", "icon": "FileText" },
-        { "label": "Categories", "path": "/blog/categories", "icon": "FolderOpen" }
-    ],
-    "dashboardCards": [
-        {
-            "id": "articles",
-            "label": "Articles",
-            "labelKey": "dashboard_articles",
-            "icon": "FileText",
-            "href": "/admin/blog/articles",
-            "color": "text-indigo-600",
-            "statKey": "articles"
-        }
-    ],
-    "statsApi": "/blog/stats",
-    "homepageSections": [
-        { "id": "BlogNewsSection", "type": "content", "component": "components/BlogNewsSection", "order": 10 }
-    ],
-    "searchProviders": [
-        { "id": "blog-search", "label": "Blog", "handler": "search/handler.ts" }
-    ],
-    "notificationTypes": [
-        { "eventType": "blog.article.created", "label": "New blog post", "channels": ["email", "inapp"] }
-    ],
-    "pageBlocks": [
-        { "id": "BlogLatestPosts", "category": "Blog", "component": "blocks/BlogLatestPosts.tsx" }
-    ],
-    "seoRoutes": { "handler": "seo/sitemap.ts" },
-    "translations": {
-        "en": { "blog": { "title": "Blog", "readMore": "Read More" } },
-        "tr": { "blog": { "title": "Blog", "readMore": "Devamını Oku" } }
-    }
-}
-```
-
-### `api/articles/route.ts`
-
-```typescript
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { hasPermission } from "@/core/lib/permissions";
-
-export async function GET() {
-    const articles = await prisma.blogArticle.findMany({
-        where: { status: "published" },
-        orderBy: { publishedAt: "desc" },
-        take: 20,
-    });
-    return NextResponse.json({ articles });
-}
-
-export async function POST(request: NextRequest) {
-    const session = await auth();
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!(await hasPermission(session.user.id, "blog.manage"))) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const body = await request.json();
-    const article = await prisma.blogArticle.create({
-        data: { title: body.title, content: body.content, authorId: session.user.id, status: "draft" },
-    });
-    return NextResponse.json({ article }, { status: 201 });
-}
-```
-
-### Activate
-
-```bash
-npx tsx scripts/generate-registry.ts
-npm run dev
-```
-
-Visit `http://localhost:3001/en/blog` for the public page and `http://localhost:3001/en/admin/blog/articles` for the admin page.
+The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled — this was a past footgun and is no longer the case.
 
 ---
 
 ## Conventions Checklist
 
-- No `any` types — use proper TypeScript types.
-- Zod 4: use `.issues` not `.errors` on `SafeParseError`.
+- No `any` types — proper types or `unknown`.
+- Zod 4: use `.issues`, not `.errors`, on `SafeParseError`.
 - ES imports only — no `require()`.
 - Path alias `@/*` resolves to `src/*`.
-- `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — not `next/link`.
+- `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — never `next/link`.
 - `"use client"` only when the component needs browser APIs, hooks, or event handlers.
-- Lucide icons only in UI — no emoji.
-- `useConfirm()` + `toast` from `sonner` — no `confirm()` or `alert()`.
-- API responses: `{ data }` on success, `{ error }` on failure, `{ error, issues }` on validation failure.
-- Dark mode: `data-mode="dark"` attribute on a container element, CSS variables for theming.
+- Lucide icons only — no emoji.
+- `useConfirm()` + `toast` from `sonner` — no `confirm()` / `alert()`.
+- API responses: `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils`.
+- Dark mode: `data-mode="dark"` attribute, CSS variables — no `.dark` class selector.
+
+---
+
+## Cross-references
+
+- [API.md](API.md) — REST API conventions, error envelope, rate limiting, webhook + cron dispatch
+- [MIGRATIONS.md](MIGRATIONS.md) — per-module SQL migration system
+- [CONTRIBUTING.md](CONTRIBUTING.md) — development workflow, coding conventions, CI checks
+- [ADMIN_GUIDE.md](ADMIN_GUIDE.md) — admin panel walkthrough
+- [../module-template/README.md](../module-template/README.md) — starter template
