@@ -15,7 +15,13 @@ function createClient(): PrismaClient {
 
     const { PrismaPg } = _require("@prisma/adapter-pg");
     const { Pool } = _require("pg");
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    // Pool size matters in a PM2 cluster: total Postgres connections used
+    // by the app is `PGPOOL_MAX * cluster_workers`. The pg library default
+    // is 10, which combined with N workers easily exceeds the typical
+    // `max_connections = 100` Postgres ceiling. Tune via PGPOOL_MAX env var.
+    const parsedMax = Number.parseInt(process.env.PGPOOL_MAX ?? "", 10);
+    const poolMax = Number.isFinite(parsedMax) && parsedMax > 0 ? parsedMax : 10;
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: poolMax });
 
     return new PrismaClient({
         adapter: new PrismaPg(pool),

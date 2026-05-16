@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { encryptSecret } from "@/core/lib/secret-storage";
 
 export async function GET() {
     const servers = await prisma.gameServer.findMany({
@@ -25,7 +26,9 @@ export async function POST(request: NextRequest) {
             host: body.host,
             port: body.port || 25565,
             rconPort: body.rconPort || null,
-            rconPassword: body.rconPassword || null,
+            // RCON password is stored encrypted at rest (AES-256-GCM).
+            // Read back via decryptSecret() when the connection is opened.
+            rconPassword: body.rconPassword ? encryptSecret(body.rconPassword) : null,
             queryPort: body.queryPort || null,
             isDefault: body.isDefault || false,
             order: body.order || 0,

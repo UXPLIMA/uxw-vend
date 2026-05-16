@@ -16,8 +16,8 @@ model Suggestion {
   visibility      String   @default("public")
   moderationState String   @default("APPROVED")
   upvotes         Int      @default(0)
-  authorId  String
-  author    User     @relation("Suggestions", fields: [authorId], references: [id])
+  authorId  String?
+  author    User?    @relation("Suggestions", fields: [authorId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -32,8 +32,9 @@ model SuggestionVote {
   suggestionId String
   suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
   userId       String
-  user         User       @relation("SuggestionVotes", fields: [userId], references: [id])
+  user         User       @relation("SuggestionVotes", fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
 
   @@unique([suggestionId, userId])
+  @@index([userId])
 }

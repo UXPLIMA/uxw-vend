@@ -21,7 +21,9 @@ async function buildBuyers(limit: number): Promise<LeaderboardEntry[]> {
         take: limit,
     });
 
-    const userIds = orders.map((o) => o.userId);
+    // Order.userId is nullable (SetNull on user deletion). Filter out
+    // anonymized orders from the leaderboard — there's no user to credit.
+    const userIds = orders.map((o) => o.userId).filter((id): id is string => id !== null);
     const users = await prisma.user.findMany({
         where: { id: { in: userIds } },
         select: { id: true, username: true, avatar: true },
@@ -29,15 +31,17 @@ async function buildBuyers(limit: number): Promise<LeaderboardEntry[]> {
     // O(1) lookup Map instead of .find() per row (was O(n²)).
     const userById = new Map(users.map((u) => [u.id, u]));
 
-    return orders.map((o) => {
-        const user = userById.get(o.userId);
-        return {
-            username: user?.username || "Unknown",
-            avatar: user?.avatar ?? null,
-            value: Number(o._sum.total || 0),
-            count: o._count,
-        };
-    });
+    return orders
+        .filter((o): o is typeof o & { userId: string } => o.userId !== null)
+        .map((o) => {
+            const user = userById.get(o.userId);
+            return {
+                username: user?.username || "Unknown",
+                avatar: user?.avatar ?? null,
+                value: Number(o._sum.total || 0),
+                count: o._count,
+            };
+        });
 }
 
 async function buildVoters(limit: number): Promise<LeaderboardEntry[]> {
@@ -73,21 +77,24 @@ async function buildForum(limit: number): Promise<LeaderboardEntry[]> {
         take: limit,
     });
 
-    const userIds = posts.map((p) => p.authorId);
+    // ForumPost.authorId is nullable (SetNull on user deletion).
+    const userIds = posts.map((p) => p.authorId).filter((id): id is string => id !== null);
     const users = await prisma.user.findMany({
         where: { id: { in: userIds } },
         select: { id: true, username: true, avatar: true },
     });
     const userById = new Map(users.map((u) => [u.id, u]));
 
-    return posts.map((p) => {
-        const user = userById.get(p.authorId);
-        return {
-            username: user?.username || "Unknown",
-            avatar: user?.avatar ?? null,
-            value: p._count,
-        };
-    });
+    return posts
+        .filter((p): p is typeof p & { authorId: string } => p.authorId !== null)
+        .map((p) => {
+            const user = userById.get(p.authorId);
+            return {
+                username: user?.username || "Unknown",
+                avatar: user?.avatar ?? null,
+                value: p._count,
+            };
+        });
 }
 
 // GET /api/v1/leaderboard?type=buyers|voters|forum

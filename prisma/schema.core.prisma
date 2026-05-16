@@ -453,6 +453,7 @@ model EmailBroadcast {
 
   @@index([status])
   @@index([scheduledFor])
+  @@index([createdById])
 }
 
 // Tracks per-cron-job last-run timestamps. The scheduler reads/writes
@@ -481,15 +482,6 @@ model ModuleMigration {
 
   @@unique([moduleId, migrationName])
   @@index([moduleId])
-}
-
-model ThemeConfig {
-  id        String   @id
-  name      String
-  active    Boolean  @default(false)
-  config    Json     @default("{}")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model ExchangeRate {
@@ -533,6 +525,7 @@ model ActivityLog {
   @@index([userId, createdAt])
   @@index([action])
   @@index([createdAt])
+  @@index([entity, entityId])
 }
 
 // IP allowlist / blocklist. Supports single IPv4 addresses and
@@ -549,7 +542,7 @@ model IpBlock {
   createdAt   DateTime  @default(now())
   createdById String?
 
-  @@index([ip])
+  // No @@index([ip]) — `@unique` already creates a B-tree on `ip`.
   @@index([scope])
   @@index([expiresAt])
 }

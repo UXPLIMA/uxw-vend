@@ -33,16 +33,17 @@ model Ticket {
 
   departmentId String
   department   TicketDepartment @relation(fields: [departmentId], references: [id])
-  userId       String
-  user         User             @relation(fields: [userId], references: [id])
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   assignedToId String?
-  assignedTo   User?            @relation("AssignedTickets", fields: [assignedToId], references: [id])
+  assignedTo   User?            @relation("AssignedTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   messages TicketMessage[]
 
   @@index([userId])
   @@index([departmentId])
   @@index([status])
+  @@index([assignedToId])
 }
 
 enum TicketStatus {
@@ -69,8 +70,8 @@ model TicketMessage {
 
   ticketId String
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  userId   String?
+  user     User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([ticketId])
 }

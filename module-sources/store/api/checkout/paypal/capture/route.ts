@@ -22,6 +22,14 @@ export async function GET(request: NextRequest) {
     if (!order || order.status !== "PENDING") {
         return NextResponse.redirect(new URL("/store/cart?error=invalid_order", request.url));
     }
+    // Order.userId is nullable (SetNull on user deletion). At checkout-capture
+    // the row should always still have a buyer, but guard against the edge
+    // case where the user account vanished between authorization and capture.
+    if (!order.userId || !order.user) {
+        return NextResponse.redirect(new URL("/store/cart?error=invalid_order", request.url));
+    }
+    const buyerId = order.userId;
+    const buyer = order.user;
 
     try {
         const result = await capturePaypalOrder(token);
@@ -39,12 +47,12 @@ export async function GET(request: NextRequest) {
         for (const item of order.items) {
             if (!item.productId) continue;
             await prisma.chestItem.create({
-                data: { userId: order.userId, productId: item.productId, productName: item.name, quantity: item.quantity, orderId: order.id },
+                data: { userId: buyerId, productId: item.productId, productName: item.name, quantity: item.quantity, orderId: order.id },
             });
             await prisma.ownedProduct.upsert({
-                where: { userId_productId: { userId: order.userId, productId: item.productId } },
+                where: { userId_productId: { userId: buyerId, productId: item.productId } },
                 update: {},
-                create: { userId: order.userId, productId: item.productId, orderId: order.id },
+                create: { userId: buyerId, productId: item.productId, orderId: order.id },
             });
         }
 
@@ -57,9 +65,9 @@ export async function GET(request: NextRequest) {
         });
 
         // Email + Discord + RCON
-        sendOrderConfirmationEmail(order.user.email, order.orderNumber, Number(order.total)).catch(console.error);
+        sendOrderConfirmationEmail(buyer.email, order.orderNumber, Number(order.total)).catch(console.error);
 
-        const playerName = (order.metadata as Record<string, unknown>)?.playerName as string || order.user.username || "Player";
+        const playerName = (order.metadata as Record<string, unknown>)?.playerName as string || buyer.username || "Player";
         for (const item of order.items) {
             if (!item.productId) continue;
             const commands = await prisma.productCommand.findMany({ where: { productId: item.productId }, orderBy: { order: "asc" } });

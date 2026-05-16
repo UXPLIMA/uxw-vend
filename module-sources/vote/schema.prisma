@@ -22,11 +22,14 @@ model VoteSite {
 model VoteLog {
   id         String   @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   voteSiteId String
   voteSite   VoteSite @relation(fields: [voteSiteId], references: [id])
   createdAt  DateTime @default(now())
 
+  // No @@unique([userId, voteSiteId]) — the claim handler stores one row
+  // per vote so the 24h cooldown can be derived from the latest createdAt.
   @@index([userId])
   @@index([voteSiteId])
+  @@index([createdAt])
 }

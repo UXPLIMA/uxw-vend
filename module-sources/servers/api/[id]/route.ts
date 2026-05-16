@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { encryptSecret } from "@/core/lib/secret-storage";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (body.host !== undefined) data.host = body.host;
     if (body.port !== undefined) data.port = body.port;
     if (body.rconPort !== undefined) data.rconPort = body.rconPort;
-    if (body.rconPassword !== undefined) data.rconPassword = body.rconPassword;
+    if (body.rconPassword !== undefined) {
+        // Encrypt at rest. Empty/null clears the field; any non-empty value
+        // is wrapped via AES-256-GCM (see secret-storage.ts).
+        data.rconPassword = body.rconPassword ? encryptSecret(body.rconPassword) : null;
+    }
     if (body.queryPort !== undefined) data.queryPort = body.queryPort;
     if (body.isDefault !== undefined) data.isDefault = body.isDefault;
     if (body.isActive !== undefined) data.isActive = body.isActive;

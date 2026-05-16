@@ -11,7 +11,7 @@
 model StaffMember {
   id        String  @id @default(cuid())
   userId    String?
-  user      User?   @relation("StaffProfile", fields: [userId], references: [id])
+  user      User?   @relation("StaffProfile", fields: [userId], references: [id], onDelete: Cascade)
   name      String
   role      String
   avatar    String?
@@ -23,8 +23,8 @@ model StaffMember {
 
 model StaffApplication {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation("StaffApplications", fields: [userId], references: [id])
+  userId    String?
+  user      User?    @relation("StaffApplications", fields: [userId], references: [id], onDelete: SetNull)
   position  String
   content   String   @db.Text
   status    String   @default("pending")

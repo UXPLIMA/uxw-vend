@@ -21,7 +21,7 @@ model WheelPrize {
 model WheelSpin {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation("WheelSpins", fields: [userId], references: [id])
+  user      User     @relation("WheelSpins", fields: [userId], references: [id], onDelete: Cascade)
   prizeId   String?
   prizeName String
   prizeValue Int     @default(0)

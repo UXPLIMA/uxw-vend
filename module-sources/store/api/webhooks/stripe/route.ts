@@ -75,13 +75,22 @@ export async function POST(request: NextRequest) {
                 },
             });
             if (!order) break;
+            // Order.userId is nullable (SetNull on user deletion) but at this
+            // point in the checkout flow the row was just paid for — if the
+            // user has already been deleted there's nothing to deliver.
+            if (!order.userId || !order.user) {
+                console.warn(`[stripe] Order ${order.id} completed but user is null — skipping ownership grant`);
+                break;
+            }
+            const buyerId = order.userId;
+            const buyer = order.user;
 
             // ── Grant ownership (moved from checkout -- only after payment confirmed) ──
             for (const item of order.items) {
                 if (!item.productId) continue;
                 await prisma.chestItem.create({
                     data: {
-                        userId: order.userId,
+                        userId: buyerId,
                         productId: item.productId,
                         productName: item.name,
                         quantity: item.quantity,
@@ -89,14 +98,14 @@ export async function POST(request: NextRequest) {
                     },
                 });
                 await prisma.ownedProduct.upsert({
-                    where: { userId_productId: { userId: order.userId, productId: item.productId } },
+                    where: { userId_productId: { userId: buyerId, productId: item.productId } },
                     update: {},
-                    create: { userId: order.userId, productId: item.productId, orderId: order.id },
+                    create: { userId: buyerId, productId: item.productId, orderId: order.id },
                 });
             }
 
             // ── Send confirmation email ──
-            sendOrderConfirmationEmail(order.user.email, order.orderNumber, Number(order.total)).catch(console.error);
+            sendOrderConfirmationEmail(buyer.email, order.orderNumber, Number(order.total)).catch(console.error);
 
             // ── Discord notification ──
             sendDiscordWebhook("order_completed", {
@@ -106,7 +115,7 @@ export async function POST(request: NextRequest) {
                     fields: [
                         { name: "Order", value: order.orderNumber, inline: true },
                         { name: "Total", value: `${Number(order.total)} ${order.currency}`, inline: true },
-                        { name: "User", value: order.user.username || order.user.email, inline: true },
+                        { name: "User", value: buyer.username || buyer.email, inline: true },
                     ],
                     timestamp: new Date().toISOString(),
                 }],
@@ -115,7 +124,7 @@ export async function POST(request: NextRequest) {
             // ── RCON delivery ──
             const playerName = session.metadata?.playerName
                 || (order.metadata as Record<string, unknown>)?.playerName as string
-                || order.user.username
+                || buyer.username
                 || "Player";
 
             for (const item of order.items) {

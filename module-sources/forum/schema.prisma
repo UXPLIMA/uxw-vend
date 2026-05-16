@@ -42,8 +42,8 @@ model ForumTopic {
 
   categoryId String
   category   ForumCategory @relation(fields: [categoryId], references: [id])
-  authorId   String
-  author     User          @relation(fields: [authorId], references: [id])
+  authorId   String?
+  author     User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   posts ForumPost[]
   likes ForumTopicLike[]
@@ -62,8 +62,8 @@ model ForumPost {
 
   topicId  String
   topic    ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  authorId String
-  author   User       @relation(fields: [authorId], references: [id])
+  authorId String?
+  author   User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   likes ForumPostLike[]
 

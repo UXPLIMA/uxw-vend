@@ -38,8 +38,8 @@ model BlogArticle {
 
   categoryId String?
   category   BlogCategory? @relation(fields: [categoryId], references: [id])
-  authorId   String
-  author     User          @relation(fields: [authorId], references: [id])
+  authorId   String?
+  author     User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   comments BlogComment[]
   tags     BlogTag[]
@@ -47,6 +47,8 @@ model BlogArticle {
   @@index([slug])
   @@index([status])
   @@index([authorId])
+  @@index([categoryId])
+  @@index([publishedAt])
 }
 
 enum ArticleStatus {
@@ -66,8 +68,8 @@ model BlogComment {
 
   articleId String
   article   BlogArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  authorId  String
-  author    User        @relation(fields: [authorId], references: [id])
+  authorId  String?
+  author    User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([articleId])
   @@index([authorId])

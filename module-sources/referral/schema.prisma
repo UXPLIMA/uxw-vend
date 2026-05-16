@@ -10,10 +10,10 @@
 
 model Referral {
   id           String   @id @default(cuid())
-  referrerId   String
-  referrer     User     @relation("ReferrerReferrals", fields: [referrerId], references: [id])
-  referredId   String   @unique
-  referred     User     @relation("ReferredReferral", fields: [referredId], references: [id])
+  referrerId   String?
+  referrer     User?    @relation("ReferrerReferrals", fields: [referrerId], references: [id], onDelete: SetNull)
+  referredId   String?  @unique
+  referred     User?    @relation("ReferredReferral", fields: [referredId], references: [id], onDelete: SetNull)
   rewardAmount Decimal  @default(0) @db.Decimal(10, 2)
   status       String   @default("pending") // pending, completed, rewarded
   createdAt    DateTime @default(now())

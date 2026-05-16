@@ -13,6 +13,10 @@
 //   stripeCustomerId String?
 //   subscriptions    Subscription[]
 // @@user-relations-end
+// NOTE: User FK fields below are nullable + onDelete: SetNull so that
+// deleting a user preserves their order/credit/subscription history for
+// accounting + analytics. Cart items are per-user runtime state and
+// cascade with the user (handled in CartItem with onDelete: Cascade).
 
 // ==================== STORE MODULE ====================
 
@@ -94,8 +98,8 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   items    OrderItem[]
   payments Payment[]
@@ -196,8 +200,8 @@ enum CouponType {
 
 model OwnedProduct {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation("OwnedProducts", fields: [userId], references: [id])
+  userId    String?
+  user      User?    @relation("OwnedProducts", fields: [userId], references: [id], onDelete: SetNull)
   productId String
   orderId   String?
   createdAt DateTime @default(now())
@@ -278,8 +282,8 @@ model ChestItem {
 
 model CreditTransaction {
   id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   amount      Decimal  @db.Decimal(10, 2)
   type        String
   description String?
@@ -291,8 +295,8 @@ model CreditTransaction {
 model CreatorCode {
   id              String   @id @default(cuid())
   code            String   @unique
-  creatorId       String
-  creator         User     @relation("CreatorCodes", fields: [creatorId], references: [id])
+  creatorId       String?
+  creator         User?    @relation("CreatorCodes", fields: [creatorId], references: [id], onDelete: SetNull)
   discountPercent Int      @default(5)
   commissionPercent Int    @default(5)
   usageCount      Int      @default(0)
@@ -306,8 +310,8 @@ model CreatorCode {
 
 model Subscription {
   id                   String   @id @default(cuid())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id])
+  userId               String?
+  user                 User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   productId            String
   product              Product  @relation(fields: [productId], references: [id])
   stripeSubscriptionId String   @unique

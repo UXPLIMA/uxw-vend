@@ -10,7 +10,7 @@
 model LinkedAccount {
   id         String   @id @default(cuid())
   userId     String
-  user       User     @relation("LinkedAccounts", fields: [userId], references: [id])
+  user       User     @relation("LinkedAccounts", fields: [userId], references: [id], onDelete: Cascade)
   provider   String
   providerId String
   username   String?

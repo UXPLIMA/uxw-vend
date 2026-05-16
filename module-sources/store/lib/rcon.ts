@@ -1,4 +1,5 @@
 import { prisma } from "@/core/lib/db";
+import { decryptSecret } from "@/core/lib/secret-storage";
 
 interface RconConfig {
     host: string;
@@ -40,7 +41,10 @@ async function getServerRconConfig(serverId: string): Promise<RconConfig | null>
             select: { host: true, rconPort: true, rconPassword: true, isActive: true },
         });
         if (!server || !server.isActive || !server.rconPort || !server.rconPassword) return null;
-        return { host: server.host, port: server.rconPort, password: server.rconPassword };
+        // Stored value is AES-256-GCM ciphertext written by the servers
+        // module (see secret-storage.ts). decryptSecret() transparently
+        // returns legacy plaintext rows as-is so the migration is silent.
+        return { host: server.host, port: server.rconPort, password: decryptSecret(server.rconPassword) };
     } catch {
         return null;
     }

@@ -26,5 +26,9 @@ model CustomFormSubmission {
   status    String     @default("new")
   createdAt DateTime   @default(now())
 
+  // No User FK relation declared here — userId is a loose reference so the
+  // form module stays decoupled from the User model (anonymous submissions
+  // are valid). Stale userIds become harmless dangling pointers after the
+  // user is deleted.
   @@index([formId])
 }
