@@ -36,8 +36,6 @@ export interface ModuleManifest {
     dependencies?: string[];
     conflicts?: string[];       // Modules that can't be active at the same time
 
-    seedOnInstall?: boolean;
-
     // Module translations — merged into core messages at runtime
     translations?: {
         [locale: string]: Record<string, string | Record<string, string>>;
@@ -232,6 +230,17 @@ export interface ModuleManifest {
         href: string;
         color: string;
         statKey: string;
+    }[];
+
+    // GDPR user-data-export contributions — tables to dump into the
+    // user's personal data export. Each entry maps a Prisma delegate to
+    // the column holding the user FK and a grouping key under modules.<key>
+    // in the exported JSON. Tables whose delegate isn't on the runtime
+    // Prisma client (uninstalled module) are silently skipped by core.
+    userDataExport?: {
+        model: string;   // Prisma delegate name (e.g. "blogArticle")
+        key: string;     // grouping key in the export (e.g. "blog.articles")
+        column: string;  // FK column to user id (e.g. "authorId")
     }[];
 }
 

@@ -14,6 +14,11 @@
       "hook": "user.registered",
       "type": "action",
       "handler": "hooks/on-user-registered.ts"
+    },
+    {
+      "hook": "store.order.completed",
+      "type": "action",
+      "handler": "hooks/on-order-completed.ts"
     }
   ],
   "defaultConfig": {
@@ -3166,6 +3171,33 @@
         "email",
         "site"
       ]
+    }
+  ],
+  "userDataExport": [
+    {
+      "model": "order",
+      "key": "store.orders",
+      "column": "userId"
+    },
+    {
+      "model": "cartItem",
+      "key": "store.cart",
+      "column": "userId"
+    },
+    {
+      "model": "ownedProduct",
+      "key": "store.ownedProducts",
+      "column": "userId"
+    },
+    {
+      "model": "chestItem",
+      "key": "store.chestItems",
+      "column": "userId"
+    },
+    {
+      "model": "subscription",
+      "key": "store.subscriptions",
+      "column": "userId"
     }
   ]
 }

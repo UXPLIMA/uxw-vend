@@ -82,35 +82,7 @@ export function registerActivityFeedListeners(): void {
         } catch { /* non-fatal */ }
     });
 
-    // ─── Blog events ───
-    addAction<{ id: string; title: string; slug: string; status: string; authorId: string }>("blog.article.created", async (payload) => {
-        if (payload.status !== "PUBLISHED") return;
-        try {
-            await prisma.activityFeedItem.create({
-                data: {
-                    type: "blog.article.created",
-                    actorId: payload.authorId,
-                    title: `Published: ${payload.title}`,
-                    href: `/blog/${payload.slug}`,
-                    icon: "FileText",
-                    isPublic: true,
-                },
-            });
-        } catch { /* non-fatal */ }
-    });
-
-    // ─── Store events ───
-    addAction<{ id: string; orderNumber?: string; userId: string }>("store.order.completed", async (payload) => {
-        try {
-            await prisma.activityFeedItem.create({
-                data: {
-                    type: "store.order.completed",
-                    actorId: payload.userId,
-                    title: `Completed order #${payload.orderNumber || payload.id}`,
-                    icon: "ShoppingBag",
-                    isPublic: false, // private to user — order details shouldn't be public
-                },
-            });
-        } catch { /* non-fatal */ }
-    });
+    // Module-owned activity events (blog, store, forum, etc.) are wired
+    // up by each module's own `hookListeners` declaration. Core only owns
+    // user-lifecycle / security events here.
 }

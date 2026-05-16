@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { toast } from "sonner";
+import { defaultThemeId } from "@/core/generated/theme-registry";
 import {
     Rocket,
     UserCog,
@@ -41,14 +42,6 @@ const LOCALE_OPTIONS = [
     { code: "pt", label: "Português" },
 ];
 
-const RECOMMENDED_MODULES: ModuleOption[] = [
-    { id: "blog", name: "Blog", description: "Publish news and articles.", zipFile: "blog.zip" },
-    { id: "forum", name: "Forum", description: "Community discussion boards.", zipFile: "forum.zip" },
-    { id: "store", name: "Store", description: "Sell products and services.", zipFile: "store.zip" },
-    { id: "tickets", name: "Tickets", description: "Support ticketing system.", zipFile: "tickets.zip" },
-    { id: "announcements", name: "Announcements", description: "Broadcast important updates.", zipFile: "announcements.zip" },
-];
-
 const STEPS = [
     { id: 1, label: "Welcome", icon: Rocket },
     { id: 2, label: "Admin", icon: UserCog },
@@ -74,26 +67,51 @@ export default function SetupWizardPage() {
     const [siteDescription, setSiteDescription] = useState("");
     const [defaultLocaleCode, setDefaultLocaleCode] = useState("en");
 
-    // Step 4: Theme
-    const [themes, setThemes] = useState<ThemeOption[]>([
-        { id: "flat", name: "Flat", description: "Default light theme." },
-    ]);
-    const [activeTheme, setActiveTheme] = useState("flat");
+    // Step 4: Theme — default themeId comes from the generated theme registry
+    // so core never names a specific theme. The list itself is fetched at
+    // mount time from the setup themes endpoint.
+    const [themes, setThemes] = useState<ThemeOption[]>([]);
+    const [activeTheme, setActiveTheme] = useState<string>(defaultThemeId);
 
-    // Step 5: Modules
+    // Step 5: Modules — populated from the marketplace catalog at mount time.
+    // Core ships no hardcoded module list; the marketplace index is the source.
+    const [recommendedModules, setRecommendedModules] = useState<ModuleOption[]>([]);
     const [selectedModules, setSelectedModules] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-        // Attempt to fetch installed themes for the theme step.
+        // Fetch installed themes for the theme step.
         fetch("/api/setup/themes")
             .then((r) => (r.ok ? r.json() : null))
             .then((data: { themes?: ThemeOption[] } | null) => {
                 if (data?.themes && data.themes.length > 0) {
                     setThemes(data.themes);
+                    if (!data.themes.some((t) => t.id === defaultThemeId)) {
+                        setActiveTheme(data.themes[0].id);
+                    }
                 }
             })
             .catch(() => {
-                /* non-fatal, keep default flat */
+                /* non-fatal */
+            });
+
+        // Fetch the marketplace catalog for the modules step. The public
+        // marketplace endpoint returns every available module; we surface
+        // them all so admins can pick whatever they want during first-run.
+        fetch("/api/v1/modules/marketplace")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data: { modules?: Array<{ id: string; name: string; description?: string; zip?: string }> } | null) => {
+                if (!data?.modules) return;
+                setRecommendedModules(
+                    data.modules.map((m) => ({
+                        id: m.id,
+                        name: m.name,
+                        description: m.description ?? "",
+                        zipFile: m.zip ?? `${m.id}.zip`,
+                    })),
+                );
+            })
+            .catch(() => {
+                /* non-fatal — modules step shows an empty list */
             });
     }, []);
 
@@ -251,6 +269,7 @@ export default function SetupWizardPage() {
                     )}
                     {step === 5 && (
                         <ModulesStep
+                            modules={recommendedModules}
                             selected={selectedModules}
                             setSelected={setSelectedModules}
                         />
@@ -504,40 +523,47 @@ function ThemeStep({ themes, activeTheme, setActiveTheme }: ThemeStepProps) {
 }
 
 interface ModulesStepProps {
+    modules: ModuleOption[];
     selected: Record<string, boolean>;
     setSelected: (v: Record<string, boolean>) => void;
 }
 
-function ModulesStep({ selected, setSelected }: ModulesStepProps) {
+function ModulesStep({ modules, selected, setSelected }: ModulesStepProps) {
     const toggle = (id: string) => {
         setSelected({ ...selected, [id]: !selected[id] });
     };
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground">Recommended modules</h2>
+            <h2 className="text-xl font-bold text-foreground">Marketplace modules</h2>
             <p className="text-sm text-muted-foreground">
-                Install a few common modules to get started. You can skip this step and install
-                modules from the marketplace at any time.
+                Pick a few modules from the marketplace to install now. You can skip this step and
+                install (or uninstall) modules anytime from the admin panel.
             </p>
-            <div className="space-y-2">
-                {RECOMMENDED_MODULES.map((m) => (
-                    <label
-                        key={m.id}
-                        className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/30 cursor-pointer transition-colors"
-                    >
-                        <input
-                            type="checkbox"
-                            checked={!!selected[m.id]}
-                            onChange={() => toggle(m.id)}
-                            className="mt-1"
-                        />
-                        <div>
-                            <div className="font-medium text-foreground">{m.name}</div>
-                            <div className="text-xs text-muted-foreground">{m.description}</div>
-                        </div>
-                    </label>
-                ))}
-            </div>
+            {modules.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">
+                    No modules available yet. You can install modules from the marketplace after setup.
+                </p>
+            ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {modules.map((m) => (
+                        <label
+                            key={m.id}
+                            className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/30 cursor-pointer transition-colors"
+                        >
+                            <input
+                                type="checkbox"
+                                checked={!!selected[m.id]}
+                                onChange={() => toggle(m.id)}
+                                className="mt-1"
+                            />
+                            <div>
+                                <div className="font-medium text-foreground">{m.name}</div>
+                                <div className="text-xs text-muted-foreground">{m.description}</div>
+                            </div>
+                        </label>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

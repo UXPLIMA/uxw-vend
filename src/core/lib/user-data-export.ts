@@ -1,18 +1,19 @@
 import { prisma } from "./db";
+import { ModuleUserDataTables } from "@/core/generated/module-registry";
 
 /**
  * GDPR-compliant user data export.
  *
  * Collects everything the platform stores about a user — core tables
  * (profile, sessions, trophies, warnings, notification prefs, revisions,
- * activity feed, linked accounts) and a best-effort sweep of module-owned
- * tables that are known to carry user-foreign-keys.
+ * activity feed, linked accounts) plus a sweep of module-owned tables
+ * declared by each module's `userDataExport` manifest entry.
  *
- * Per the core motto, this file does NOT import module code or consult
- * module manifests. Instead it probes the generated Prisma client for
- * known model names and only queries a given table if the client actually
- * exposes it — so uninstalled modules simply contribute nothing to the
- * export without raising errors.
+ * Per the core motto, this file does NOT hardcode any module model names.
+ * It reads the generated `ModuleUserDataTables` registry (aggregated from
+ * every installed module's manifest at build time), then probes the
+ * runtime Prisma client for each entry — uninstalled modules simply
+ * contribute nothing to the export without raising errors.
  */
 
 export interface UserDataExport {
@@ -59,38 +60,6 @@ async function safeFindMany(
         return [];
     }
 }
-
-/**
- * Module tables that typically reference a user via a scalar FK. Each
- * entry maps the Prisma delegate name to the column holding the user id.
- * Entries whose models don't exist (uninstalled module) are silently
- * skipped by safeFindMany().
- */
-const MODULE_USER_TABLES: Array<{ model: string; key: string; column: string }> = [
-    { model: "blogArticle", key: "blog.articles", column: "authorId" },
-    { model: "blogComment", key: "blog.comments", column: "authorId" },
-    { model: "forumTopic", key: "forum.topics", column: "authorId" },
-    { model: "forumPost", key: "forum.posts", column: "authorId" },
-    { model: "forumTopicLike", key: "forum.topicLikes", column: "userId" },
-    { model: "forumPostLike", key: "forum.postLikes", column: "userId" },
-    { model: "ticket", key: "tickets.tickets", column: "userId" },
-    { model: "ticketMessage", key: "tickets.messages", column: "userId" },
-    { model: "suggestion", key: "suggestions.suggestions", column: "authorId" },
-    { model: "suggestionVote", key: "suggestions.votes", column: "userId" },
-    { model: "order", key: "store.orders", column: "userId" },
-    { model: "cartItem", key: "store.cart", column: "userId" },
-    { model: "ownedProduct", key: "store.ownedProducts", column: "userId" },
-    { model: "chestItem", key: "store.chestItems", column: "userId" },
-    { model: "subscription", key: "store.subscriptions", column: "userId" },
-    { model: "creditTransaction", key: "credits.transactions", column: "userId" },
-    { model: "voteLog", key: "vote.logs", column: "userId" },
-    { model: "wheelSpin", key: "wheel.spins", column: "userId" },
-    { model: "staffApplication", key: "staff.applications", column: "userId" },
-    { model: "notification", key: "notifications.items", column: "userId" },
-    { model: "referral", key: "referral.records", column: "referrerId" },
-    { model: "customFormSubmission", key: "customForms.submissions", column: "userId" },
-    { model: "staffMember", key: "staff.profile", column: "userId" },
-];
 
 export async function exportUserData(userId: string): Promise<UserDataExport> {
     // Core user row — strip secret fields.
@@ -143,7 +112,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     ]);
 
     const modules: Record<string, unknown> = {};
-    for (const entry of MODULE_USER_TABLES) {
+    for (const entry of ModuleUserDataTables) {
         const rows = await safeFindMany(entry.model, { [entry.column]: userId });
         if (rows.length > 0) {
             modules[entry.key] = rows;

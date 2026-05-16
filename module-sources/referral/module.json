@@ -536,5 +536,12 @@
         "saveSettings": "Save Settings"
       }
     }
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "referral",
+      "key": "referral.records",
+      "column": "referrerId"
+    }
+  ]
 }

@@ -17,8 +17,9 @@ import { addAction } from "@/core/lib/hooks";
  * whose threshold is met. Upserts are idempotent.
  *
  * If the DB query fails at bootstrap (e.g. migrations not yet applied,
- * transient DB hiccup) we fall back to a small hardcoded ruleset so
- * trophies still work out of the box. This matches the legacy behavior.
+ * transient DB hiccup) the engine returns an empty ruleset — core knows
+ * nothing about which modules' events should award trophies. Admins seed
+ * their own trophy rules through the admin UI.
  *
  * The module-scope `registered` flag keeps bootstrap idempotent across
  * duplicate layout renders in dev. Pass `force = true` from the admin
@@ -33,15 +34,6 @@ interface TrophyRule {
     /** Minimum matching event count required to award. */
     threshold: number;
 }
-
-/** Defensive fallback: used only if the DB query fails at bootstrap. */
-export const BUILTIN_TROPHY_RULES: readonly TrophyRule[] = [
-    { trophyId: "first-post",       event: "forum.topic.created",            threshold: 1  },
-    { trophyId: "commenter",        event: "forum.post.created",             threshold: 10 },
-    { trophyId: "voter",            event: "vote.vote.cast",                 threshold: 5  },
-    { trophyId: "shopaholic",       event: "store.order.completed",          threshold: 1  },
-    { trophyId: "suggestion-maker", event: "suggestions.suggestion.created", threshold: 1  },
-] as const;
 
 let registered = false;
 
@@ -77,8 +69,9 @@ async function awardIfQualified(userId: string, rule: TrophyRule): Promise<void>
 }
 
 /**
- * Load the current active ruleset from the DB. Returns the fallback
- * hardcoded rules if the query fails for any reason.
+ * Load the current active ruleset from the DB. Returns an empty list and
+ * logs a warning if the query fails — core does not ship any module-aware
+ * fallback rules.
  */
 async function loadRules(): Promise<TrophyRule[]> {
     try {
@@ -100,8 +93,8 @@ async function loadRules(): Promise<TrophyRule[]> {
         }
         return rules;
     } catch (err) {
-        console.warn("[trophy-engine] DB rule load failed, using built-in fallback:", (err as Error).message);
-        return [...BUILTIN_TROPHY_RULES];
+        console.warn("[trophy-engine] DB rule load failed; no trophy rules will be wired this boot:", (err as Error).message);
+        return [];
     }
 }
 

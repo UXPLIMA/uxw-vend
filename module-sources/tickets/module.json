@@ -1039,5 +1039,17 @@
         "site"
       ]
     }
+  ],
+  "userDataExport": [
+    {
+      "model": "ticket",
+      "key": "tickets.tickets",
+      "column": "userId"
+    },
+    {
+      "model": "ticketMessage",
+      "key": "tickets.messages",
+      "column": "userId"
+    }
   ]
 }

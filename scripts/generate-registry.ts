@@ -129,6 +129,7 @@ function generateRegistry() {
     const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; timestampHeader?: string; module: string })[] = [];
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
+    const allUserDataTables: ({ model: string; key: string; column: string; module: string })[] = [];
 
     type SlotEntry = {
         name: string;
@@ -163,6 +164,7 @@ function generateRegistry() {
         if (manifest.seoRoutes?.handler) {
             allSeoRoutes.push({ module: moduleName, handler: manifest.seoRoutes.handler });
         }
+        manifest.userDataExport?.forEach((u) => allUserDataTables.push({ ...u, module: moduleName }));
 
         // Canonical `slots` field (from T12).
         (manifest as unknown as { slots?: { name: string; component: string; order?: number; id?: string }[] }).slots?.forEach((s, i) => {
@@ -256,7 +258,9 @@ function generateRegistry() {
 
     widgetRegistry += profileTabImports;
     widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n`;
+    widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n\n`;
+    widgetRegistry += `// User-data-export registry: tables modules contribute to GDPR personal-data exports.\n`;
+    widgetRegistry += `export const ModuleUserDataTables: { model: string; key: string; column: string; module: string }[] = ${JSON.stringify(allUserDataTables, null, 2)};\n`;
 
     let layoutImports = emitDynamicRegistry('Layout component registry (rendered on every page)', 'LayoutComponentRegistry', allLayoutComponents);
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
@@ -407,6 +411,32 @@ function generateRegistry() {
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');
 
+/**
+ * Convert a declared module route path (e.g. "/blog/articles/[id]") into a
+ * precise regex source string that matches the FULL path. Dynamic segments
+ * `[name]` and catch-alls `[...name]` are replaced with non-greedy patterns
+ * so two modules that share a prefix (e.g. `/blog/...` vs `/blog/articles`)
+ * never cross-gate each other.
+ */
+function routePathToRegexSource(routePath: string): string {
+    // Split into segments and translate dynamic ones individually so we can
+    // still escape literal segments safely.
+    const segments = routePath.split('/').filter((s) => s.length > 0);
+    const parts: string[] = [];
+    for (const seg of segments) {
+        if (/^\[\.\.\..+\]$/.test(seg)) {
+            // catch-all: matches one or more path segments
+            parts.push('.+');
+        } else if (/^\[.+\]$/.test(seg)) {
+            // dynamic single segment
+            parts.push('[^/]+');
+        } else {
+            parts.push(escapeRegex(seg));
+        }
+    }
+    return parts.join('\\/');
+}
+
 function generateModuleRoutes() {
     const loaded = loadManifests();
     const modulePatterns: Record<string, Set<string>> = {};
@@ -415,23 +445,23 @@ function generateModuleRoutes() {
         const patterns = new Set<string>();
 
         for (const route of manifest.routes ?? []) {
-            const match = route.path.match(/^\/([^/[]+)/);
-            if (match) {
-                patterns.add(`/^\\\/[a-z]{2}\\/${escapeRegex(match[1])}/`);
+            const body = routePathToRegexSource(route.path);
+            if (body) {
+                patterns.add(`/^\\/[a-z]{2}\\/${body}(?:\\/|$)/`);
             }
         }
 
         for (const route of manifest.adminRoutes ?? []) {
-            const match = route.path.match(/^\/([^/[]+)/);
-            if (match) {
-                patterns.add(`/^\\\/[a-z]{2}\\\/admin\\/${escapeRegex(match[1])}/`);
+            const body = routePathToRegexSource(route.path);
+            if (body) {
+                patterns.add(`/^\\/[a-z]{2}\\/admin\\/${body}(?:\\/|$)/`);
             }
         }
 
         for (const api of manifest.api ?? []) {
-            const match = api.path.match(/^\/([^/[]+)/);
-            if (match) {
-                patterns.add(`/^\\\/api\\\/v1\\/${escapeRegex(match[1])}/`);
+            const body = routePathToRegexSource(api.path);
+            if (body) {
+                patterns.add(`/^\\/api\\/v1\\/${body}(?:\\/|$)/`);
             }
         }
 

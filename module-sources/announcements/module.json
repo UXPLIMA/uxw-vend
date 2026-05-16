@@ -447,5 +447,12 @@
       "component": "slots/AnnouncementTopBanner",
       "order": 5
     }
+  ],
+  "cronJobs": [
+    {
+      "id": "publish-scheduled",
+      "schedule": "every-5-minutes",
+      "handler": "cron/publish-scheduled.ts"
+    }
   ]
 }

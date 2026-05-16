@@ -395,5 +395,12 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "voteLog",
+      "key": "vote.logs",
+      "column": "userId"
+    }
+  ]
 }

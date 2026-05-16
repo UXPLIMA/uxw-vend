@@ -655,5 +655,17 @@
       "component": "slots/OnlineStaff",
       "order": 30
     }
+  ],
+  "userDataExport": [
+    {
+      "model": "staffApplication",
+      "key": "staff.applications",
+      "column": "userId"
+    },
+    {
+      "model": "staffMember",
+      "key": "staff.profile",
+      "column": "userId"
+    }
   ]
 }

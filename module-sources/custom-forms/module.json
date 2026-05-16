@@ -660,5 +660,12 @@
         "next": "Next"
       }
     }
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "customFormSubmission",
+      "key": "customForms.submissions",
+      "column": "userId"
+    }
+  ]
 }

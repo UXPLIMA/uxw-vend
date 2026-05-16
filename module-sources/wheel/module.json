@@ -288,5 +288,12 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "wheelSpin",
+      "key": "wheel.spins",
+      "column": "userId"
+    }
+  ]
 }

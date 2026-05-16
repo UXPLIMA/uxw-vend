@@ -39,24 +39,6 @@ beforeEach(async () => {
     engine = await import("@/core/lib/trophy-engine");
 });
 
-describe("trophy-engine: BUILTIN_TROPHY_RULES", () => {
-    it("has well-formed built-in rules", () => {
-        expect(engine.BUILTIN_TROPHY_RULES.length).toBeGreaterThan(0);
-        for (const rule of engine.BUILTIN_TROPHY_RULES) {
-            expect(typeof rule.trophyId).toBe("string");
-            expect(typeof rule.event).toBe("string");
-            expect(typeof rule.threshold).toBe("number");
-            expect(rule.threshold).toBeGreaterThan(0);
-        }
-    });
-
-    it("includes first-post and shopaholic rules", () => {
-        const ids = engine.BUILTIN_TROPHY_RULES.map((r) => r.trophyId);
-        expect(ids).toContain("first-post");
-        expect(ids).toContain("shopaholic");
-    });
-});
-
 describe("trophy-engine: registerTrophyListeners", () => {
     it("registers hook listeners for each DB rule event", async () => {
         trophyFindMany.mockResolvedValue([
@@ -114,13 +96,12 @@ describe("trophy-engine: registerTrophyListeners", () => {
         expect(trophyFindMany).toHaveBeenCalledTimes(2);
     });
 
-    it("falls back to BUILTIN_TROPHY_RULES when DB throws", async () => {
+    it("returns no rules when DB throws (no built-in fallback)", async () => {
         trophyFindMany.mockRejectedValue(new Error("db down"));
         await engine.registerTrophyListeners();
         const actions = hooks.listActions();
-        const names = actions.map((a) => a.name);
-        // Built-ins include forum.topic.created
-        expect(names).toContain("forum.topic.created");
+        // Core ships zero module-aware fallback rules — admin seeds via UI.
+        expect(actions.length).toBe(0);
     });
 
     it("does nothing when no active rules exist", async () => {

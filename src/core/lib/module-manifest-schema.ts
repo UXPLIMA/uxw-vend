@@ -218,6 +218,12 @@ const dashboardCard = z.object({
     statKey: z.string().min(1).max(64).regex(SAFE_SLUG),
 });
 
+const userDataExportEntry = z.object({
+    model: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/, "model must be a Prisma delegate identifier"),
+    key: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
+    column: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/),
+});
+
 type TranslationValue = string | { [key: string]: TranslationValue };
 const translationValue: z.ZodType<TranslationValue> = z.lazy(() =>
     z.union([z.string(), z.record(z.string(), translationValue)]),
@@ -235,7 +241,6 @@ export const moduleManifestSchema = z.object({
     defaultConfig: z.record(z.string(), z.unknown()).optional(),
     dependencies: z.array(z.string().regex(SAFE_ID)).max(50).optional(),
     conflicts: z.array(z.string().regex(SAFE_ID)).max(50).optional(),
-    seedOnInstall: z.boolean().optional(),
     translations: translations.optional(),
 
     hooks: z.object({
@@ -270,6 +275,7 @@ export const moduleManifestSchema = z.object({
     dashboardCards: z.array(dashboardCard).max(50).optional(),
     statsApi: routePath.optional(),
     seoRoutes: z.object({ handler: relativePath("handler") }).optional(),
+    userDataExport: z.array(userDataExportEntry).max(50).optional(),
 }).strict();
 
 export type ValidatedModuleManifest = z.infer<typeof moduleManifestSchema>;

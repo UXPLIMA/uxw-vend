@@ -205,6 +205,18 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         ],
     },
     {
+        // Fallback bucket for module-contributed menu items that don't declare a
+        // `group` in their manifest. Modules can opt into other groups (content,
+        // commerce, users, etc.) by setting `menu[].group` explicitly.
+        id: "modules",
+        icon: Package,
+        label: "Modules",
+        labelKey: "sidebar_modules",
+        sections: [
+            // Modules contribute here by default
+        ],
+    },
+    {
         id: "activity",
         icon: Activity,
         label: "Activity",
@@ -283,60 +295,13 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
 ];
 
 /**
- * Heuristic: figure out which nav group a module should slot into based
- * on its id. Used when a module's `menu[].group` isn't explicitly set.
+ * Default nav group for module menu items that don't declare a `group`.
+ * Core knows nothing about specific modules — modules opt into other groups
+ * (content, commerce, users, etc.) by setting `menu[].group` in their
+ * manifest. Anything else lands in the catch-all "Modules" bucket.
  */
-const MODULE_GROUP_HINTS: Record<string, string> = {
-    // Content
-    blog: "content",
-    forum: "content",
-    suggestions: "content",
-    changelog: "content",
-    announcements: "content",
-    "help-center": "content",
-    "custom-pages": "content",
-    "custom-forms": "content",
-    downloads: "content",
-    popups: "content",
-    "cookie-consent": "design",
-    slider: "design",
-    "email-templates": "design",
-    // Users
-    staff: "users",
-    punishments: "users",
-    "two-factor-auth": "users",
-    "login-protection": "users",
-    "google-auth": "users",
-    "discord-auth": "users",
-    referral: "users",
-    // Commerce
-    store: "commerce",
-    "paypal-gateway": "commerce",
-    "stripe-gateway": "commerce",
-    credits: "commerce",
-    currency: "commerce",
-    // Activity / Community
-    leaderboard: "activity",
-    vote: "activity",
-    wheel: "activity",
-    tickets: "activity",
-    "player-profiles": "activity",
-    "in-app-notifications": "activity",
-    // Advanced / Infra
-    "cloudflare-r2": "advanced",
-    "cloudflare-turnstile": "advanced",
-    "webhook-logs": "advanced",
-    "google-analytics": "advanced",
-    "resend-provider": "advanced",
-    "discord-integration": "advanced",
-    "discord-widget": "advanced",
-    "csv-import-export": "advanced",
-    seo: "advanced",
-    servers: "advanced",
-};
-
-export function inferModuleGroup(moduleId: string): string {
-    return MODULE_GROUP_HINTS[moduleId] || "content";
+export function inferModuleGroup(_moduleId: string): string {
+    return "modules";
 }
 
 /**

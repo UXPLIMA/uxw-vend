@@ -385,5 +385,12 @@
       "category": "Changelog",
       "component": "blocks/ChangelogRecentEntries.tsx"
     }
+  ],
+  "cronJobs": [
+    {
+      "id": "publish-scheduled",
+      "schedule": "every-5-minutes",
+      "handler": "cron/publish-scheduled.ts"
+    }
   ]
 }
