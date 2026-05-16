@@ -33,15 +33,6 @@
       "description": "Update or delete a single announcement (admin)."
     }
   ],
-  "layoutComponents": [
-    {
-      "id": "AnnouncementBanner",
-      "component": "components/AnnouncementBanner",
-      "exclude": [
-        "/admin/*"
-      ]
-    }
-  ],
   "translations": {
     "en": {
       "announcements": {
