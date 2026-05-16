@@ -5,7 +5,10 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'jsdom',
-        include: ['tests/unit/**/*.test.{ts,tsx}'],
+        include: [
+            'tests/unit/**/*.test.{ts,tsx}',
+            'tests/integration/**/*.test.{ts,tsx}',
+        ],
         coverage: {
             provider: 'v8',
             include: ['src/core/lib/**/*.ts'],
