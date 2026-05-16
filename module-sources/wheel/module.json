@@ -295,14 +295,5 @@
       "key": "wheel.spins",
       "column": "userId"
     }
-  ],
-  "navLinks": [
-    {
-      "label": "Wheel",
-      "href": "/wheel",
-      "icon": "Dices",
-      "position": 120,
-      "group": "more"
-    }
   ]
 }

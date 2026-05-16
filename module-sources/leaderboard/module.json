@@ -197,14 +197,5 @@
       "category": "Leaderboard",
       "component": "blocks/LeaderboardTop.tsx"
     }
-  ],
-  "navLinks": [
-    {
-      "label": "Leaderboard",
-      "href": "/leaderboard",
-      "icon": "Trophy",
-      "position": 110,
-      "group": "more"
-    }
   ]
 }

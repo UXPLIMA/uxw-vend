@@ -58,7 +58,6 @@ export interface ModuleManifest {
         href: string;
         icon?: string;
         position?: number;
-        group?: "more";
     }[];
 
     footerLinks?: {

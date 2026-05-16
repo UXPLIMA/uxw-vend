@@ -420,14 +420,5 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  },
-  "navLinks": [
-    {
-      "label": "Downloads",
-      "href": "/downloads",
-      "icon": "Download",
-      "position": 100,
-      "group": "more"
-    }
-  ]
+  }
 }

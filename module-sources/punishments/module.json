@@ -234,14 +234,5 @@
         "server": "Servidor"
       }
     }
-  },
-  "navLinks": [
-    {
-      "label": "Punishments",
-      "href": "/punishments",
-      "icon": "Shield",
-      "position": 150,
-      "group": "more"
-    }
-  ]
+  }
 }
