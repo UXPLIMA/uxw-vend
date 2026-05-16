@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
 import { Navbar, Footer } from "@/core/components/layout";
@@ -228,12 +229,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                         {/* Slot: above article content — e.g. related products, author box, ad */}
                                         <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />
 
-                                        {/* Content */}
-                                        <div className="prose prose-lg max-w-none">
-                                            {article.content.split("\n").map((paragraph, index) => (
-                                                <p key={index}>{paragraph}</p>
-                                            ))}
-                                        </div>
+                                        {/* Content — RichTextEditor stores HTML, sanitize before render */}
+                                        <div
+                                            className="prose prose-lg dark:prose-invert max-w-none"
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
+                                        />
+
 
                                         {/* Slot: below article content */}
                                         <Slot name="blog.article.belowContent" context={{ articleId: article.id, articleSlug: article.slug }} />

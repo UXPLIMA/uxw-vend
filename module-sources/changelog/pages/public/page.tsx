@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -67,7 +68,10 @@ export default function ChangelogPage() {
                                                     </span>
                                                 </div>
                                                 <h3 className="font-bold text-foreground mb-2">{entry.title}</h3>
-                                                <div className="text-sm text-muted-foreground whitespace-pre-wrap">{entry.content}</div>
+                                                <div
+                                                    className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
+                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(entry.content) }}
+                                                />
                                             </CardContent>
                                         </Card>
                                     </div>

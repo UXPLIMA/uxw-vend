@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import DOMPurify from "dompurify";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
@@ -173,7 +174,10 @@ export default function TopicDetailPage() {
                                         <p className="text-xs text-muted-foreground">{formatRelativeTime(new Date(topic.createdAt))}</p>
                                     </div>
                                 </div>
-                                <div className="text-foreground whitespace-pre-wrap">{topic.content}</div>
+                                <div
+                                    className="prose dark:prose-invert max-w-none text-foreground"
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(topic.content) }}
+                                />
                             </CardContent>
                         </Card>
 
@@ -249,7 +253,10 @@ function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { u
                         <p className="text-xs text-muted-foreground">{formatRelativeTime(new Date(post.createdAt))}</p>
                     </div>
                 </div>
-                <div className="text-foreground text-sm whitespace-pre-wrap mb-3">{post.content}</div>
+                <div
+                    className="prose prose-sm dark:prose-invert max-w-none text-foreground mb-3"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+                />
                 <button
                     onClick={togglePostLike}
                     className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${postLiked ? "bg-blue-100 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-muted-foreground"}`}
