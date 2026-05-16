@@ -2,7 +2,7 @@
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, ShieldOff, ShieldAlert, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText, Wrench } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -18,10 +18,8 @@ export default function SettingsPage() {
     const coreSettings = [
         { title: t("settings_general"), description: t("settings_generalDesc"), href: "/admin/settings/general", icon: "Settings", color: "text-slate-500" },
         { title: t("settings_appearance"), description: t("settings_appearanceDesc"), href: "/admin/settings/theme", icon: "Palette", color: "text-purple-500" },
-        { title: t.has("settings_customizer") ? t("settings_customizer") : "Theme Customizer", description: t.has("settings_customizerDesc") ? t("settings_customizerDesc") : "Edit colors, fonts, and layout properties", href: "/admin/settings/customizer", icon: "Paintbrush", color: "text-fuchsia-500" },
         { title: t("settings_navbar"), description: t("settings_navbarDesc"), href: "/admin/settings/navbar", icon: "Navigation", color: "text-blue-500" },
         { title: t("settings_footer"), description: t("settings_footerDesc"), href: "/admin/settings/footer", icon: "PanelBottom", color: "text-gray-500" },
-        { title: t("settings_heroBanner"), description: t("settings_heroBannerDesc"), href: "/admin/settings/hero", icon: "Image", color: "text-pink-500" },
         { title: t("settings_widgets"), description: t("settings_widgetsDesc"), href: "/admin/settings/widgets", icon: "LayoutGrid", color: "text-teal-500" },
         { title: t("settings_customCss"), description: t("settings_customCssDesc"), href: "/admin/settings/css", icon: "Code", color: "text-yellow-500" },
         { title: t("settings_siteConfig"), description: t("settings_siteConfigDesc"), href: "/admin/settings/site", icon: "Globe", color: "text-blue-400" },

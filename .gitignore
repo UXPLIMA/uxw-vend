@@ -82,9 +82,6 @@ ROADMAP.md
 .playwright-mcp/
 test-results/
 playwright-report/
-nabvar-dropdown.png
-wheel-new.png
-widgets-working.png
 
 backups/
 *.sql

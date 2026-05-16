@@ -66,7 +66,7 @@ function DefaultFooter() {
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="text-white font-bold text-lg">{siteName}</span>
+                            <span className="text-foreground font-bold text-lg">{siteName}</span>
                         </div>
                         <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                             {siteDescription}
@@ -102,7 +102,7 @@ function DefaultFooter() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">{t('quickLinks')}</h4>
+                        <h4 className="font-semibold text-foreground mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">{commonT('home')}</Link></li>
                             {ModuleFooterLinks
@@ -115,7 +115,7 @@ function DefaultFooter() {
 
                     {/* Legal */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">{t('legal')}</h4>
+                        <h4 className="font-semibold text-foreground mb-4">{t('legal')}</h4>
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t('termsOfService')}</Link></li>
                             <li><Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t('privacyPolicy')}</Link></li>
@@ -126,7 +126,7 @@ function DefaultFooter() {
 
                     {/* Settings */}
                     <div>
-                        <h4 className="font-semibold text-white mb-4">{commonT('settings')}</h4>
+                        <h4 className="font-semibold text-foreground mb-4">{commonT('settings')}</h4>
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Globe className="w-4 h-4 text-muted-foreground" />

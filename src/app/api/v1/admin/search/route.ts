@@ -28,8 +28,7 @@ const STATIC_ADMIN_PAGES: { title: string; href: string; keywords: string[] }[] 
     { title: "API Keys", href: "/admin/api-keys", keywords: ["api", "tokens"] },
     { title: "Media Library", href: "/admin/media", keywords: ["files", "uploads", "images"] },
     { title: "Settings", href: "/admin/settings", keywords: ["config"] },
-    { title: "Theme Customizer", href: "/admin/settings/customizer", keywords: ["theme", "colors", "fonts", "appearance"] },
-    { title: "Hero Banner", href: "/admin/settings/hero", keywords: ["banner", "logo"] },
+    { title: "Appearance", href: "/admin/settings/theme", keywords: ["theme", "library", "modes"] },
     { title: "Navbar Editor", href: "/admin/settings/navbar", keywords: ["menu", "navigation"] },
 ];
 

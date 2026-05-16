@@ -170,7 +170,11 @@
         "adm_tags": "Tags",
         "adm_tagsHelp": "Comma-separated tags",
         "adm_titleField": "Title",
-        "adm_noArticlesYet": "No articles yet. Create your first article!"
+        "adm_noArticlesYet": "No articles yet. Create your first article!",
+        "adm_deleted": "Deleted",
+        "adm_deleteFailed": "Failed to delete",
+        "adm_deleteArticleConfirm": "Are you sure you want to delete this article?",
+        "adm_deleteCategoryConfirm": "Delete this category? Articles will be unlinked."
       },
       "news": {
         "title": "News",
@@ -267,7 +271,11 @@
         "adm_tags": "Etiketler",
         "adm_tagsHelp": "Virgülle ayrılmış etiketler",
         "adm_titleField": "Başlık",
-        "adm_noArticlesYet": "Henüz makale yok. İlk makalenizi oluşturun!"
+        "adm_noArticlesYet": "Henüz makale yok. İlk makalenizi oluşturun!",
+        "adm_deleted": "Silindi",
+        "adm_deleteFailed": "Silinemedi",
+        "adm_deleteArticleConfirm": "Bu makaleyi silmek istediğinizden emin misiniz?",
+        "adm_deleteCategoryConfirm": "Bu kategoriyi sil? Makalelerin bağlantısı kaldırılacak."
       },
       "news": {
         "title": "Haberler",
@@ -807,5 +815,31 @@
   ],
   "seoRoutes": {
     "handler": "seo/sitemap.ts"
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "blogArticle",
+      "key": "blog.articles",
+      "column": "authorId"
+    },
+    {
+      "model": "blogComment",
+      "key": "blog.comments",
+      "column": "authorId"
+    }
+  ],
+  "cronJobs": [
+    {
+      "id": "publish-scheduled",
+      "schedule": "every-5-minutes",
+      "handler": "cron/publish-scheduled.ts"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "blog.article.created",
+      "type": "action",
+      "handler": "hooks/on-article-created.ts"
+    }
+  ]
 }

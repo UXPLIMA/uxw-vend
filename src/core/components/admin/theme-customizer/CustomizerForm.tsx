@@ -183,7 +183,7 @@ export function CustomizerForm({
                 type="button"
                 disabled={saving}
                 onClick={save}
-                className="rounded bg-primary px-4 py-2 text-white"
+                className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
             >
                 {saving ? "Saving…" : "Save"}
             </button>

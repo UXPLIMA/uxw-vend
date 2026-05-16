@@ -160,7 +160,11 @@
         "adm_status": "Status",
         "adm_topic": "Topic",
         "adm_pageOf": "Page {page} of {totalPages}",
-        "adm_topicsTotal": "{count} topics total"
+        "adm_topicsTotal": "{count} topics total",
+        "adm_delete": "Delete",
+        "adm_deleted": "Deleted",
+        "adm_deleteConfirm": "Are you sure you want to delete this topic?",
+        "adm_deleteFailed": "Failed to delete"
       },
       "admin": {
         "menu_forum": "Forum",
@@ -259,7 +263,11 @@
         "adm_status": "Durum",
         "adm_topic": "Konu",
         "adm_pageOf": "Sayfa {page} / {totalPages}",
-        "adm_topicsTotal": "Toplam {count} konu"
+        "adm_topicsTotal": "Toplam {count} konu",
+        "adm_delete": "Sil",
+        "adm_deleted": "Silindi",
+        "adm_deleteConfirm": "Bu konuyu silmek istediğinizden emin misiniz?",
+        "adm_deleteFailed": "Silinemedi"
       },
       "admin": {
         "menu_forum": "Forum",
@@ -804,5 +812,27 @@
   ],
   "seoRoutes": {
     "handler": "seo/sitemap.ts"
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "forumTopic",
+      "key": "forum.topics",
+      "column": "authorId"
+    },
+    {
+      "model": "forumPost",
+      "key": "forum.posts",
+      "column": "authorId"
+    },
+    {
+      "model": "forumTopicLike",
+      "key": "forum.topicLikes",
+      "column": "userId"
+    },
+    {
+      "model": "forumPostLike",
+      "key": "forum.postLikes",
+      "column": "userId"
+    }
+  ]
 }

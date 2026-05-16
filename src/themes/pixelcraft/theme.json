@@ -160,7 +160,6 @@
     "order": 80
   },
   "suggestedModules": [
-    { "id": "mc-stats", "reason": "Canlı sunucu durumu (oyuncu sayısı, ping)" },
     { "id": "store", "reason": "VIP/rank mağazası" }
   ]
 }
