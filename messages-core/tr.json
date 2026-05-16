@@ -17,7 +17,11 @@
     "create": "Oluştur",
     "back": "Geri",
     "loading": "Yükleniyor...",
-    "noResults": "Sonuç bulunamadı"
+    "noResults": "Sonuç bulunamadı",
+    "error_title": "Bir şeyler ters gitti",
+    "error_description": "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
+    "retry": "Tekrar dene",
+    "go_home": "Ana sayfa"
   },
   "nav": {
     "home": "Ana Sayfa",

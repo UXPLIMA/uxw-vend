@@ -17,7 +17,11 @@
     "create": "Create",
     "back": "Back",
     "loading": "Loading...",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "error_title": "Something went wrong",
+    "error_description": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "go_home": "Go home"
   },
   "nav": {
     "home": "Home",
