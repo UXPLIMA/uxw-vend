@@ -82,6 +82,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
     const relatedArticles = await getRelatedArticles(article.id, article.categoryId);
     const commonT = await getTranslations("common");
+    const t = await getTranslations("blog");
+
+    const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "";
+    const articleUrl = baseUrl ? `${baseUrl}/blog/${article.number}/${article.slug}` : `/blog/${article.number}/${article.slug}`;
+    const shareTwitter = `https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`;
+    const shareFacebook = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
 
     const articleJsonLd = buildArticleJsonLd({
         title: article.title,
@@ -108,7 +114,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                 {/* Related Articles */}
                                 {relatedArticles.length > 0 && (
                                     <div className="bg-card rounded-xl border border-border p-5">
-                                        <h3 className="font-bold text-foreground mb-4">Related Articles</h3>
+                                        <h3 className="font-bold text-foreground mb-4">{t.has("relatedArticles") ? t("relatedArticles") : "Related Articles"}</h3>
                                         <div className="space-y-4">
                                             {relatedArticles.map((related) => (
                                                 <Link
@@ -142,14 +148,24 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
                                 {/* Share */}
                                 <div className="bg-card rounded-xl border border-border p-5">
-                                    <h3 className="font-bold text-foreground mb-4">Share</h3>
+                                    <h3 className="font-bold text-foreground mb-4">{t.has("share") ? t("share") : "Share"}</h3>
                                     <div className="flex gap-2">
-                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors">
+                                        <a
+                                            href={shareTwitter}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors text-center"
+                                        >
                                             Twitter
-                                        </button>
-                                        <button className="flex-1 py-2 px-4 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 transition-colors">
+                                        </a>
+                                        <a
+                                            href={shareFacebook}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 py-2 px-4 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 transition-colors text-center"
+                                        >
                                             Facebook
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </aside>
@@ -160,7 +176,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                 <div className="text-sm text-muted-foreground mb-6">
                                     <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
                                     <span className="mx-2">/</span>
-                                    <Link href="/blog" className="hover:text-blue-600">Blog</Link>
+                                    <Link href="/blog" className="hover:text-blue-600">{t.has("breadcrumb") ? t("breadcrumb") : "Blog"}</Link>
                                     {article.category && (
                                         <>
                                             <span className="mx-2">/</span>
@@ -202,7 +218,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                 {formatDate(article.publishedAt || article.createdAt)}
                                             </span>
                                             <span className="text-sm text-muted-foreground">
-                                                {article.views} views
+                                                {t("views", { count: article.views })}
                                             </span>
                                         </div>
 
@@ -223,7 +239,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                 </div>
                                                 <div>
                                                     <p className="font-medium text-foreground">{article.author.username}</p>
-                                                    <p className="text-sm text-muted-foreground">Author</p>
+                                                    <p className="text-sm text-muted-foreground">{t.has("author") ? t("author") : "Author"}</p>
                                                 </div>
                                             </div>
                                         )}

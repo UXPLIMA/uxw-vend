@@ -358,7 +358,7 @@ export default function AuditLogPage() {
                                                 className="border-b last:border-0 hover:bg-muted/30"
                                             >
                                                 <td className="py-2 px-4 whitespace-nowrap text-xs text-muted-foreground">
-                                                    {new Date(log.createdAt).toLocaleString("tr-TR")}
+                                                    {new Date(log.createdAt).toLocaleString(__dateTag)}
                                                 </td>
                                                 <td className="py-2 px-4 whitespace-nowrap">
                                                     {log.user ? (

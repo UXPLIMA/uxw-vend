@@ -55,7 +55,10 @@ export default function ApiKeysPage() {
             setName("");
             setShowForm(false);
             fetchKeys();
-            toast.success("API key created");
+            toast.success(t.has("apiKeys_created") ? t("apiKeys_created") : "API key created");
+        } else {
+            const data = await res.json().catch(() => ({}));
+            toast.error(data.error || (t.has("apiKeys_createError") ? t("apiKeys_createError") : "Failed to create API key"));
         }
         setSaving(false);
     };

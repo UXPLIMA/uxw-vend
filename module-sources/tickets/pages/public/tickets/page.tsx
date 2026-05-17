@@ -40,6 +40,27 @@ export default function SupportPage() {
     const t = useTranslations('tickets');
     const relativeTime = useRelativeTime();
     const commonT = useTranslations('common');
+    const statusLabel = (status: string) => {
+        const map: Record<string, string> = {
+            OPEN: "open",
+            IN_PROGRESS: "inProgress",
+            WAITING_REPLY: "waitingReply",
+            RESOLVED: "resolved",
+            CLOSED: "closed",
+        };
+        const key = map[status];
+        return key && t.has(key) ? t(key) : status.replace(/_/g, " ");
+    };
+    const priorityLabel = (priority: string) => {
+        const map: Record<string, string> = {
+            LOW: "low",
+            MEDIUM: "medium",
+            HIGH: "high",
+            URGENT: "urgent",
+        };
+        const key = map[priority];
+        return key && t.has(key) ? t(key) : priority;
+    };
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -124,12 +145,12 @@ export default function SupportPage() {
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[ticket.status]}`}>
-                                                {ticket.status.replace(/_/g, " ")}
+                                                {statusLabel(ticket.status)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className={`text-sm font-medium ${priorityColors[ticket.priority]}`}>
-                                                {ticket.priority}
+                                                {priorityLabel(ticket.priority)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 text-sm text-muted-foreground">

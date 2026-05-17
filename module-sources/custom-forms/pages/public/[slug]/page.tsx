@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -13,11 +14,11 @@ import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface FormField {
     name: string;
-    type: string; // text, textarea, select, checkbox, email, number
+    type: string;
     label: string;
     required?: boolean;
     placeholder?: string;
-    options?: string[]; // for select
+    options?: string[];
 }
 
 interface CustomForm {
@@ -33,6 +34,7 @@ interface PageProps {
 
 export default function FormPage({ params }: PageProps) {
     const { slug } = use(params);
+    const t = useTranslations("customForms");
     const [form, setForm] = useState<CustomForm | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -59,9 +61,9 @@ export default function FormPage({ params }: PageProps) {
 
         if (res.ok) {
             setSubmitted(true);
-            toast.success("Form submitted successfully!");
+            toast.success(t("submitSuccess"));
         } else {
-            toast.error("Failed to submit form");
+            toast.error(t("submitError"));
         }
         setSubmitting(false);
     };
@@ -76,7 +78,7 @@ export default function FormPage({ params }: PageProps) {
             case "select":
                 return (
                     <select value={val} onChange={(e) => onChange(e.target.value)} required={field.required} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        <option value="">Select...</option>
+                        <option value="">{t("selectOption")}</option>
                         {field.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
                 );
@@ -101,13 +103,13 @@ export default function FormPage({ params }: PageProps) {
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
                 ) : !form ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">Form not found</CardContent></Card>
+                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("formNotFound")}</CardContent></Card>
                 ) : submitted ? (
                     <Card>
                         <CardContent className="py-12 text-center">
                             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                            <h2 className="text-xl font-bold text-foreground mb-1">Thank you!</h2>
-                            <p className="text-muted-foreground">Your response has been submitted.</p>
+                            <h2 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h2>
+                            <p className="text-muted-foreground">{t("thankYouBody")}</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -125,7 +127,7 @@ export default function FormPage({ params }: PageProps) {
                                     </div>
                                 ))}
                                 <Button type="submit" disabled={submitting}>
-                                    {submitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</> : "Submit"}
+                                    {submitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("submitting")}</> : t("submit")}
                                 </Button>
                             </form>
                         </CardContent>

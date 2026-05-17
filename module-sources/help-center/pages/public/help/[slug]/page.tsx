@@ -3,6 +3,8 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import DOMPurify from "dompurify";
+import { useTranslations } from "next-intl";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Navbar, Footer } from "@/core/components/layout";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -23,6 +25,8 @@ interface PageProps {
 
 export default function HelpArticlePage({ params }: PageProps) {
     const { slug } = use(params);
+    const t = useTranslations("helpCenter");
+    const commonT = useTranslations("common");
     const [article, setArticle] = useState<Article | null>(null);
     const [loading, setLoading] = useState(true);
     const [feedbackGiven, setFeedbackGiven] = useState(false);
@@ -59,9 +63,9 @@ export default function HelpArticlePage({ params }: PageProps) {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">Home</Link>
+                    <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/help" className="hover:text-blue-600">Help Center</Link>
+                    <Link href="/help" className="hover:text-blue-600">{t("title")}</Link>
                     {article?.category && (
                         <>
                             <span className="mx-2">/</span>
@@ -71,19 +75,19 @@ export default function HelpArticlePage({ params }: PageProps) {
                         </>
                     )}
                     <span className="mx-2">/</span>
-                    <span className="text-foreground">{article?.title || "Article"}</span>
+                    <span className="text-foreground">{article?.title || ""}</span>
                 </div>
 
                 {loading ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground">Loading...</p>
+                        <p className="text-muted-foreground">{t("loading")}</p>
                     </div>
                 ) : !article ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <h2 className="text-xl font-bold text-foreground mb-2">Article Not Found</h2>
-                        <p className="text-muted-foreground mb-4">The article you&apos;re looking for doesn&apos;t exist.</p>
+                        <h2 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h2>
+                        <p className="text-muted-foreground mb-4">{t("articleNotFoundBody")}</p>
                         <Link href="/help" className="text-blue-600 hover:underline">
-                            Back to Help Center
+                            {t("backToHelp")}
                         </Link>
                     </div>
                 ) : (
@@ -92,9 +96,9 @@ export default function HelpArticlePage({ params }: PageProps) {
                             <h1 className="text-2xl font-bold text-foreground mb-4">{article.title}</h1>
 
                             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b">
-                                <span>Category: {article.category.name}</span>
+                                <span>{t("articleCategory", { name: article.category.name })}</span>
                                 <span>•</span>
-                                <span>{article.views} views</span>
+                                <span>{t("views", { count: article.views })}</span>
                             </div>
 
                             {/* Article Content */}
@@ -105,22 +109,22 @@ export default function HelpArticlePage({ params }: PageProps) {
 
                             {/* Feedback */}
                             <div className="border-t pt-6">
-                                <p className="font-medium text-foreground mb-3">Was this article helpful?</p>
+                                <p className="font-medium text-foreground mb-3">{t("wasHelpful")}</p>
                                 {feedbackGiven ? (
-                                    <p className="text-green-600">Thank you for your feedback!</p>
+                                    <p className="text-green-600">{t("feedbackThanks")}</p>
                                 ) : (
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => submitFeedback(true)}
-                                            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors inline-flex items-center gap-2"
                                         >
-                                            👍 Yes, helpful
+                                            <ThumbsUp className="w-4 h-4" /> {t("helpfulYes")}
                                         </button>
                                         <button
                                             onClick={() => submitFeedback(false)}
-                                            className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted transition-colors"
+                                            className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted transition-colors inline-flex items-center gap-2"
                                         >
-                                            👎 No, not helpful
+                                            <ThumbsDown className="w-4 h-4" /> {t("helpfulNo")}
                                         </button>
                                     </div>
                                 )}
@@ -129,9 +133,9 @@ export default function HelpArticlePage({ params }: PageProps) {
 
                         {/* Related */}
                         <div className="mt-6 text-center">
-                            <p className="text-muted-foreground mb-2">Still need help?</p>
+                            <p className="text-muted-foreground mb-2">{t("stillNeedHelp")}</p>
                             <Link href="/support/new" className="text-blue-600 hover:underline font-medium">
-                                Create a support ticket
+                                {t("createTicket")}
                             </Link>
                         </div>
                     </div>

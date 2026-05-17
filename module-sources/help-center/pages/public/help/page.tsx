@@ -6,6 +6,8 @@ import { Navbar, Footer } from "@/core/components/layout";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { User, CreditCard, Package, Wrench, Info, BookOpen } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface Category {
     id: string;
@@ -54,12 +56,12 @@ export default function HelpCenterPage() {
         setSearchResults(data || []);
     };
 
-    const iconMap: Record<string, string> = {
-        "account": "👤",
-        "payment": "💳",
-        "order": "📦",
-        "technical": "🔧",
-        "general": "ℹ️",
+    const iconMap: Record<string, LucideIcon> = {
+        account: User,
+        payment: CreditCard,
+        order: Package,
+        technical: Wrench,
+        general: Info,
     };
 
     return (
@@ -158,9 +160,10 @@ export default function HelpCenterPage() {
                                             <Link key={category.id} href={`/help/category/${category.slug}`}>
                                                 <div className="bg-card rounded-xl border border-border p-6 hover:shadow-md transition-shadow">
                                                     <div className="flex items-start gap-4">
-                                                        <span className="text-3xl">
-                                                            {iconMap[category.icon || ""] || "📚"}
-                                                        </span>
+                                                        {(() => {
+                                                            const Icon = iconMap[category.icon || ""] || BookOpen;
+                                                            return <Icon className="w-8 h-8 text-blue-600 flex-shrink-0 mt-0.5" />;
+                                                        })()}
                                                         <div>
                                                             <h3 className="font-bold text-foreground">{category.name}</h3>
                                                             {category.description && (

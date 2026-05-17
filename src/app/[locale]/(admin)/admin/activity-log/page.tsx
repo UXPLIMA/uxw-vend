@@ -66,7 +66,7 @@ export default function ActivityLogPage() {
                                             <td className="py-3 px-4 text-sm">{log.user?.username || t("activityLog_system")}</td>
                                             <td className="py-3 px-4"><code className="text-xs bg-muted px-2 py-0.5 rounded">{log.action}</code></td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground">{log.entity ? `${log.entity}/${log.entityId}` : "-"}</td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString("tr-TR")}</td>
+                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString(__dateTag)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
