@@ -13,7 +13,7 @@ import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTri
 import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface UserDetail {
     id: string;
@@ -38,6 +38,8 @@ interface Role {
 
 export default function AdminUserDetailPage() {
     const t = useTranslations("admin");
+    const locale = useLocale();
+    const dateTag = locale === "tr" ? "tr-TR" : locale;
     const params = useParams();
     const userId = params.id as string;
     const { data: session, update: updateSession } = useSession();
@@ -360,7 +362,7 @@ export default function AdminUserDetailPage() {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">{t("users_joined")}</span>
-                                <span>{formatDate(new Date(user.createdAt))}</span>
+                                <span>{formatDate(new Date(user.createdAt), undefined, dateTag)}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -380,7 +382,7 @@ export default function AdminUserDetailPage() {
                                         <p className="text-sm text-muted-foreground mb-2">{t("users_reason")}: {user.banReason}</p>
                                     )}
                                     {user.bannedAt && (
-                                        <p className="text-xs text-muted-foreground mb-3">{t("users_since")}: {formatDate(new Date(user.bannedAt))}</p>
+                                        <p className="text-xs text-muted-foreground mb-3">{t("users_since")}: {formatDate(new Date(user.bannedAt), undefined, dateTag)}</p>
                                     )}
                                     <Button
                                         variant="outline"

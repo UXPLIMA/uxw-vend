@@ -191,7 +191,7 @@ export default function AdminForumCategoriesPage() {
                                     {cat.description || t("adm_noDescription")}
                                 </p>
                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                    <span>{cat._count.topics} topics</span>
+                                    <span>{t('topicsCount', { count: cat._count.topics })}</span>
                                     <span className={cat.isActive ? "text-green-600" : "text-muted-foreground"}>
                                         {cat.isActive ? t("adm_active") : t("adm_inactive")}
                                     </span>

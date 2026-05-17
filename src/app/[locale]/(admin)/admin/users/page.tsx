@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatDate } from "@/core/lib/utils";
 import { UserRoleSelect } from "./role-select";
@@ -41,6 +41,8 @@ export default async function AdminUsersPage() {
 
     const [{ users, total }, roles] = await Promise.all([getUsers(), getRoles()]);
     const t = await getTranslations("admin");
+    const locale = await getLocale();
+    const dateTag = locale === "tr" ? "tr-TR" : locale;
 
     return (
         <>
@@ -94,7 +96,7 @@ export default async function AdminUsersPage() {
                                                 />
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
-                                                {formatDate(user.createdAt)}
+                                                {formatDate(user.createdAt, undefined, dateTag)}
                                             </td>
                                         </tr>
                                     ))}

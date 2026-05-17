@@ -174,7 +174,8 @@
         "viewsCount": "{count, plural, one {# view} other {# views}}",
         "likesCount": "{count, plural, one {# like} other {# likes}}",
         "repliesCount": "{count, plural, one {# reply} other {# replies}}",
-        "writeYourReply": "Write your reply…"
+        "writeYourReply": "Write your reply…",
+        "topicsCount": "{count, plural, one {# topic} other {# topics}}"
       },
       "admin": {
         "menu_forum": "Forum",
@@ -287,7 +288,8 @@
         "viewsCount": "{count, plural, one {# görüntüleme} other {# görüntüleme}}",
         "likesCount": "{count, plural, one {# beğeni} other {# beğeni}}",
         "repliesCount": "{count, plural, one {# yanıt} other {# yanıt}}",
-        "writeYourReply": "Yanıtınızı yazın…"
+        "writeYourReply": "Yanıtınızı yazın…",
+        "topicsCount": "{count, plural, one {# konu} other {# konu}}"
       },
       "admin": {
         "menu_forum": "Forum",
