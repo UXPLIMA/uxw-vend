@@ -28,6 +28,11 @@
     "retry": "Try again",
     "go_home": "Go home"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you’re looking for doesn’t exist or has been moved.",
+    "goHome": "Go home"
+  },
   "nav": {
     "home": "Home",
     "blog": "Blog",

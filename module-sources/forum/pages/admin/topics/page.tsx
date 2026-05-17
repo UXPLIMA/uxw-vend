@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 interface Topic {
     id: string;
@@ -23,6 +23,7 @@ interface Topic {
 
 export default function AdminForumTopicsPage() {
     const t = useTranslations("forum");
+    const relativeTime = useRelativeTime();
     const [topics, setTopics] = useState<Topic[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -118,7 +119,7 @@ export default function AdminForumTopicsPage() {
                                                     {topic.isLocked && <Lock className="w-3 h-3 text-muted-foreground flex-shrink-0" />}
                                                     <div>
                                                         <p className="font-medium line-clamp-1">{topic.title}</p>
-                                                        <p className="text-xs text-muted-foreground">{formatRelativeTime(new Date(topic.createdAt))}</p>
+                                                        <p className="text-xs text-muted-foreground">{relativeTime(new Date(topic.createdAt))}</p>
                                                     </div>
                                                 </div>
                                             </td>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useLocalDate } from "@/core/hooks/useLocalDate";
 
 interface BlogPost {
     id: string;
@@ -17,8 +18,9 @@ interface BlogPost {
 }
 
 export function NewsCard({ post }: { post: BlogPost }) {
+    const formatLocalDate = useLocalDate();
     const date = post.publishedAt || post.createdAt;
-    const formattedDate = date ? new Date(date).toLocaleDateString() : "";
+    const formattedDate = date ? formatLocalDate(date) : "";
 
     return (
         <Link href={`/blog/${post.slug}`} className="group block">

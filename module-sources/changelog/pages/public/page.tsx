@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
+import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
@@ -20,6 +21,7 @@ interface Entry {
 
 export default function ChangelogPage() {
     const t = useTranslations('changelog');
+    const formatLocalDate = useLocalDate();
     const [entries, setEntries] = useState<Entry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,7 @@ export default function ChangelogPage() {
                                                         v{entry.version}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {new Date(entry.createdAt).toLocaleDateString()}
+                                                        {formatLocalDate(entry.createdAt)}
                                                     </span>
                                                 </div>
                                                 <h3 className="font-bold text-foreground mb-2">{entry.title}</h3>

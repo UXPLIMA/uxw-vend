@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Button } from "@/core/components/ui/button";
 import { Navbar, Footer } from "@/core/components/layout";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -38,6 +38,7 @@ const priorityColors: Record<string, string> = {
 export default function SupportPage() {
     const { data: session } = useSession();
     const t = useTranslations('tickets');
+    const relativeTime = useRelativeTime();
     const commonT = useTranslations('common');
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
@@ -132,7 +133,7 @@ export default function SupportPage() {
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 text-sm text-muted-foreground">
-                                            {formatRelativeTime(ticket.updatedAt)}
+                                            {relativeTime(ticket.updatedAt)}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-muted-foreground">
                                             {ticket._count.messages}

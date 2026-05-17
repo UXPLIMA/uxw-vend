@@ -7,7 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Navbar, Footer } from "@/core/components/layout";
 import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Message {
@@ -46,6 +46,7 @@ interface PageProps {
 export default function TicketDetailPage({ params }: PageProps) {
     const { id } = use(params);
     const { data: session } = useSession();
+    const relativeTime = useRelativeTime();
     const [ticket, setTicket] = useState<Ticket | null>(null);
     const [loading, setLoading] = useState(true);
     const [reply, setReply] = useState("");
@@ -152,11 +153,11 @@ export default function TicketDetailPage({ params }: PageProps) {
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Created</span>
-                                                <span className="text-foreground">{formatRelativeTime(ticket.createdAt)}</span>
+                                                <span className="text-foreground">{relativeTime(ticket.createdAt)}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Updated</span>
-                                                <span className="text-foreground">{formatRelativeTime(ticket.updatedAt)}</span>
+                                                <span className="text-foreground">{relativeTime(ticket.updatedAt)}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Messages</span>
@@ -216,7 +217,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">Staff</span>
                                                             )}
                                                         </div>
-                                                        <span className="text-xs text-muted-foreground">{formatRelativeTime(message.createdAt)}</span>
+                                                        <span className="text-xs text-muted-foreground">{relativeTime(message.createdAt)}</span>
                                                     </div>
                                                 </div>
                                                 <div className="text-foreground whitespace-pre-wrap">{message.content}</div>

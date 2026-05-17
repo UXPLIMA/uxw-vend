@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 
 interface Ticket {
@@ -39,6 +39,7 @@ const priorityColors: Record<string, string> = {
 
 export default function AdminTicketsPage() {
     const t = useTranslations("tickets");
+    const relativeTime = useRelativeTime();
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("");
@@ -199,7 +200,7 @@ export default function AdminTicketsPage() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-4 text-sm text-muted-foreground">
-                                        {formatRelativeTime(ticket.updatedAt)}
+                                        {relativeTime(ticket.updatedAt)}
                                     </td>
                                     <td className="px-4 py-4">
                                         <Link href={`/admin/tickets/${ticket.id}`}>

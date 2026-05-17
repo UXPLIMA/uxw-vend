@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/lib/i18n/navigation";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useLocalDate } from "@/core/hooks/useLocalDate";
+import { ChevronRight, ChevronLeft, Newspaper } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";
@@ -26,6 +27,7 @@ export function BlogNewsSection() {
   const [isLoading, setIsLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const t = useTranslations('news');
+    const formatLocalDate = useLocalDate();
   const { settings } = useSiteSettings();
 
   useEffect(() => {
@@ -40,7 +42,18 @@ export function BlogNewsSection() {
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
   if (isLoading) return <SkeletonNewsGrid count={4} />;
-  if (blogPosts.length === 0) return null;
+  // Don't return null when empty — render a visible empty state so the
+  // homepage doesn't appear blank when blog is the only enabled section
+  // and there's no published content yet.
+  if (blogPosts.length === 0) {
+    return (
+      <div className="bg-card border border-dashed border-border rounded-lg py-10 px-6 text-center">
+        <Newspaper className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+        <h2 className="font-medium text-foreground">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{t('empty')}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -58,7 +71,7 @@ export function BlogNewsSection() {
             </div>
             <div className="p-4">
               <p className="text-xs text-muted-foreground mb-1">
-                {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                {formatLocalDate(post.publishedAt || post.createdAt)}
               </p>
               <h3 className="font-semibold text-foreground mb-1 line-clamp-2">{post.title}</h3>
               {post.excerpt && <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>}

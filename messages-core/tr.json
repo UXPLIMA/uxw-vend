@@ -28,6 +28,11 @@
     "retry": "Tekrar dene",
     "go_home": "Ana sayfa"
   },
+  "notFound": {
+    "title": "Sayfa bulunamadı",
+    "description": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
+    "goHome": "Ana sayfaya dön"
+  },
   "nav": {
     "home": "Ana Sayfa",
     "blog": "Blog",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 interface RecentPurchase {
     username: string;
@@ -13,6 +13,7 @@ interface RecentPurchase {
 
 export function RecentPurchasesWidget() {
     const sidebarT = useTranslations('sidebar');
+    const relativeTime = useRelativeTime();
     const [purchases, setPurchases] = useState<RecentPurchase[]>([]);
 
     useEffect(() => {
@@ -46,7 +47,7 @@ export function RecentPurchasesWidget() {
                             <p className="text-xs text-muted-foreground truncate">{purchase.product}</p>
                         </div>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            {formatRelativeTime(new Date(purchase.time))}
+                            {relativeTime(new Date(purchase.time))}
                         </span>
                     </div>
                 ))}

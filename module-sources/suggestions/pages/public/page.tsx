@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useRouter } from "@/core/lib/i18n/navigation";
+import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { toast } from "sonner";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
@@ -52,6 +53,7 @@ export default function SuggestionsPage() {
     const router = useRouter();
     const pathname = usePathname();
     const t = useTranslations("suggestions");
+    const formatLocalDate = useLocalDate();
 
     const requireLogin = () => {
         toast.error(t.has("loginToVote") ? t("loginToVote") : "Log in to vote", {
@@ -215,7 +217,7 @@ export default function SuggestionsPage() {
                                             </div>
                                             <p className="text-sm text-muted-foreground line-clamp-2">{plainText(s.content)}</p>
                                             <p className="text-xs text-muted-foreground mt-2">
-                                                {t("submittedBy")} {s.author?.username ?? t("deletedUser")} · {new Date(s.createdAt).toLocaleDateString()}
+                                                {t("submittedBy")} {s.author?.username ?? t("deletedUser")} · {formatLocalDate(s.createdAt)}
                                             </p>
                                         </div>
                                     </div>

@@ -23,14 +23,16 @@ export function formatCurrency(
 }
 
 /**
- * Format date
+ * Format date. Accepts an optional locale for proper localization;
+ * defaults to "en-US" so existing callers keep working.
  */
 export function formatDate(
     date: Date | string,
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
+    locale: string = "en-US",
 ): string {
     const d = typeof date === "string" ? new Date(date) : date;
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString(locale, {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -39,22 +41,27 @@ export function formatDate(
 }
 
 /**
- * Format relative time (e.g., "2 hours ago")
+ * Format relative time (e.g., "2 hours ago"). Locale-aware via
+ * Intl.RelativeTimeFormat. Pass the active locale from `useLocale()`
+ * (client) or `await getLocale()` (server) — defaults to "en" so
+ * callers that don't have it handy still work.
  */
-export function formatRelativeTime(date: Date | string): string {
+export function formatRelativeTime(date: Date | string, locale: string = "en"): string {
     const d = typeof date === "string" ? new Date(date) : date;
     const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const seconds = Math.floor(diff / 1000);
+    const diffMs = now.getTime() - d.getTime();
+    const seconds = Math.floor(diffMs / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (seconds < 60) return "just now";
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return formatDate(d);
+    if (days >= 7) return formatDate(d, undefined, locale);
+
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    if (seconds < 60) return rtf.format(-seconds, "second");
+    if (minutes < 60) return rtf.format(-minutes, "minute");
+    if (hours < 24) return rtf.format(-hours, "hour");
+    return rtf.format(-days, "day");
 }
 
 /**

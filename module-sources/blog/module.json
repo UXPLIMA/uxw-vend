@@ -180,7 +180,8 @@
         "title": "News",
         "readMore": "Read More",
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "empty": "No posts yet — check back soon."
       },
       "admin": {
         "blogArticles": "Blog Articles",
@@ -281,7 +282,8 @@
         "title": "Haberler",
         "readMore": "Devamını Oku",
         "previous": "Önceki",
-        "next": "Sonraki"
+        "next": "Sonraki",
+        "empty": "Henüz gönderi yok — yakında tekrar bakın."
       },
       "admin": {
         "blogArticles": "Blog Makaleleri",

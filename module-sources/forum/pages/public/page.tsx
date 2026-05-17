@@ -8,7 +8,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -45,6 +45,7 @@ export default function ForumPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
     const t = useTranslations('forum');
+    const relativeTime = useRelativeTime();
 
     useEffect(() => {
         fetch("/api/v1/forum/categories")
@@ -170,7 +171,7 @@ export default function ForumPage() {
                                                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                             <span>{topic.author.username}</span>
                                                             <span>·</span>
-                                                            <span>{formatRelativeTime(new Date(topic.createdAt))}</span>
+                                                            <span>{relativeTime(new Date(topic.createdAt))}</span>
                                                             {topic.category && (
                                                                 <>
                                                                     <span>·</span>

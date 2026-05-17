@@ -10,7 +10,7 @@ import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { ArrowLeft, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
-import { formatRelativeTime } from "@/core/lib/utils";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -39,6 +39,7 @@ interface Topic {
 
 export default function TopicDetailPage() {
     const t = useTranslations('forum');
+    const relativeTime = useRelativeTime();
     const params = useParams();
     // Can be { slug: ["forum","topic","3","general"], params: "3/general" } etc
     const raw = params.params || params.slug;
@@ -173,7 +174,7 @@ export default function TopicDetailPage() {
                                     {renderAvatar(topic.author)}
                                     <div>
                                         <p className="font-medium text-foreground">{topic.author.username}</p>
-                                        <p className="text-xs text-muted-foreground">{formatRelativeTime(new Date(topic.createdAt))}</p>
+                                        <p className="text-xs text-muted-foreground">{relativeTime(new Date(topic.createdAt))}</p>
                                     </div>
                                 </div>
                                 <div
@@ -229,6 +230,7 @@ export default function TopicDetailPage() {
 }
 
 function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { username: string; avatar: string | null }) => React.ReactNode }) {
+    const relativeTime = useRelativeTime();
     const [postLiked, setPostLiked] = useState(false);
     const [postLikeCount, setPostLikeCount] = useState(post._count.likes);
 
@@ -252,7 +254,7 @@ function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { u
                     {renderAvatar(post.author)}
                     <div>
                         <p className="font-medium text-foreground text-sm">{post.author.username}</p>
-                        <p className="text-xs text-muted-foreground">{formatRelativeTime(new Date(post.createdAt))}</p>
+                        <p className="text-xs text-muted-foreground">{relativeTime(new Date(post.createdAt))}</p>
                     </div>
                 </div>
                 <div
