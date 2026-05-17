@@ -128,10 +128,10 @@ export default function CartPage() {
                 setCouponApplied(data.coupon.code);
                 setCouponDiscount(data.coupon.discount);
             } else {
-                setCouponError(data.error || "Invalid coupon");
+                setCouponError(data.error || (t.has("err_invalidCoupon") ? t("err_invalidCoupon") : "Invalid coupon"));
             }
         } catch {
-            setCouponError("Failed to validate coupon");
+            setCouponError(t.has("err_validateCoupon") ? t("err_validateCoupon") : "Failed to validate coupon");
         }
     };
 
@@ -152,10 +152,10 @@ export default function CartPage() {
             if (data.valid) {
                 setCreatorApplied({ code: data.code, discountPercent: data.discountPercent, creator: data.creator });
             } else {
-                setCreatorError("Invalid creator code");
+                setCreatorError(t.has("err_invalidCreatorCode") ? t("err_invalidCreatorCode") : "Invalid creator code");
             }
         } catch {
-            setCreatorError("Failed to validate");
+            setCreatorError(t.has("err_validateCreatorCode") ? t("err_validateCreatorCode") : "Failed to validate creator code");
         }
     };
 
@@ -192,7 +192,7 @@ export default function CartPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setCheckoutError(data.error || "Checkout failed");
+                setCheckoutError(data.error || (t.has("err_checkoutFailed") ? t("err_checkoutFailed") : "Checkout failed"));
                 return;
             }
 
@@ -206,14 +206,14 @@ export default function CartPage() {
                 });
                 const ppData = await ppRes.json();
                 if (!ppRes.ok) {
-                    setCheckoutError(ppData.error || "PayPal checkout failed");
+                    setCheckoutError(ppData.error || (t.has("err_paypalFailed") ? t("err_paypalFailed") : "PayPal checkout failed"));
                     return;
                 }
                 if (ppData.approveUrl) {
                     window.location.href = ppData.approveUrl;
                     return;
                 }
-                setCheckoutError("Failed to get PayPal approval URL");
+                setCheckoutError(t.has("err_paypalApprovalUrl") ? t("err_paypalApprovalUrl") : "Failed to get PayPal approval URL");
                 return;
             }
 
@@ -226,7 +226,7 @@ export default function CartPage() {
             // Free order or dev mode: redirect to success page
             router.push("/store/order-success");
         } catch {
-            setCheckoutError("Something went wrong. Please try again.");
+            setCheckoutError(t.has("err_generic") ? t("err_generic") : "Something went wrong. Please try again.");
         } finally {
             setCheckingOut(false);
         }

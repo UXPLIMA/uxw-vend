@@ -292,6 +292,11 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+                {/* Active tab panel — the various activeTab === "X" blocks below
+                    are conditionally rendered into this single tabpanel container,
+                    so screen readers see the dangling aria-controls IDs resolve. */}
+                <div role="tabpanel" id={`profile-tabpanel-${activeTab}`} aria-labelledby={`profile-tab-${activeTab}`}>
+
                 {/* Profile Tab */}
                 {activeTab === "profile" && (
                     <div className="space-y-6">
@@ -510,6 +515,7 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
                 )}
+                </div>
             </main>
 
             <Footer />

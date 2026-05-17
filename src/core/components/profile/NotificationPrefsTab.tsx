@@ -104,7 +104,9 @@ export function NotificationPrefsTab() {
                                 <tr className="border-b border-border">
                                     <th className="text-left py-2 pr-4">{t("event")}</th>
                                     {DEFAULT_CHANNELS.map((c) => (
-                                        <th key={c} className="text-center py-2 px-3 text-xs uppercase font-medium text-muted-foreground">{c}</th>
+                                        <th key={c} className="text-center py-2 px-3 text-xs uppercase font-medium text-muted-foreground">
+                                            {t.has(`channel_${c}`) ? t(`channel_${c}`) : c}
+                                        </th>
                                     ))}
                                 </tr>
                             </thead>
@@ -129,6 +131,11 @@ export function NotificationPrefsTab() {
                                                         <button
                                                             type="button"
                                                             onClick={() => toggle(type.eventType, channel)}
+                                                            role="switch"
+                                                            aria-checked={enabled}
+                                                            aria-label={t.has("toggleChannelAria")
+                                                                ? t("toggleChannelAria", { event: type.label, channel })
+                                                                : `Toggle ${type.label} via ${channel}`}
                                                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                                                                 enabled ? "bg-primary" : "bg-muted"
                                                             }`}

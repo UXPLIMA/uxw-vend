@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 export function LivePurchaseToast() {
+    const t = useTranslations("store");
     const [enabled, setEnabled] = useState(false);
 
     useEffect(() => {
@@ -33,10 +35,16 @@ export function LivePurchaseToast() {
                 if (orders.length > 0 && orders[0].id !== lastOrderId && lastOrderId !== "") {
                     const order = orders[0];
                     const item = order.items?.[0];
-                    toast.info(
-                        `${order.user?.username || "Someone"} purchased ${item?.product?.name || "an item"}`,
-                        { duration: 5000 }
-                    );
+                    const username = order.user?.username;
+                    const productName = item?.product?.name;
+                    if (username && productName) {
+                        const msg = t.has("livePurchaseDetail")
+                            ? t("livePurchaseDetail", { username, product: productName })
+                            : `${username} purchased ${productName}`;
+                        toast.info(msg, { duration: 5000 });
+                    } else {
+                        toast.info(t("livePurchase"), { duration: 5000 });
+                    }
                 }
                 if (orders.length > 0) lastOrderId = orders[0].id;
             } catch { /* ignore */ }

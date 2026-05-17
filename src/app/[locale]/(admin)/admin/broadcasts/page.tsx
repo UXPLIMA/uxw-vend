@@ -77,11 +77,17 @@ export default function BroadcastsPage() {
             });
             if (res.ok) {
                 const data = await res.json();
-                toast.success(sendNow ? `Queued for ${data.queuedRecipients} recipients` : "Draft saved");
+                toast.success(
+                    sendNow
+                        ? (t.has("broadcasts_queuedToast")
+                            ? t("broadcasts_queuedToast", { count: data.queuedRecipients })
+                            : `Queued for ${data.queuedRecipients} recipients`)
+                        : (t.has("broadcasts_draftSaved") ? t("broadcasts_draftSaved") : "Draft saved"),
+                );
                 setSubject(""); setBody(""); setComposing(false);
                 fetchBroadcasts();
             } else {
-                toast.error("Failed");
+                toast.error(t.has("broadcasts_sendFailed") ? t("broadcasts_sendFailed") : "Failed");
             }
         } finally {
             setSending(false);
@@ -91,7 +97,9 @@ export default function BroadcastsPage() {
     const deleteBroadcast = async (b: Broadcast) => {
         const ok = await confirm({
             title: t("broadcasts_deleteTitle"),
-            message: `Delete "${b.subject}"?`,
+            message: t.has("broadcasts_deleteConfirm")
+                ? t("broadcasts_deleteConfirm", { subject: b.subject })
+                : `Delete "${b.subject}"?`,
             variant: "danger",
         });
         if (!ok) return;

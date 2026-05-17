@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { X } from "lucide-react";
 
@@ -15,6 +16,7 @@ interface PopupData {
 }
 
 export function PopupModal() {
+    const t = useTranslations("popups");
     const [popup, setPopup] = useState<PopupData | null>(null);
 
     useEffect(() => {
@@ -65,10 +67,10 @@ export function PopupModal() {
                     <div className="flex gap-3">
                         {safeLink && (
                             <a href={safeLink} target="_blank" rel="noopener noreferrer">
-                                <Button>{popup.linkText || "Learn More"}</Button>
+                                <Button>{popup.linkText || t("learnMore")}</Button>
                             </a>
                         )}
-                        <Button variant="outline" onClick={dismiss}>Close</Button>
+                        <Button variant="outline" onClick={dismiss}>{t("close")}</Button>
                     </div>
                 </div>
             </div>

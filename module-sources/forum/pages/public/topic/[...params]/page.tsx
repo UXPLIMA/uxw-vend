@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DOMPurify from "dompurify";
+import { toast } from "sonner";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
@@ -39,6 +41,8 @@ interface Topic {
 
 export default function TopicDetailPage() {
     const t = useTranslations('forum');
+    const router = useRouter();
+    const { data: session } = useSession();
     const relativeTime = useRelativeTime();
     const params = useParams();
     // Can be { slug: ["forum","topic","3","general"], params: "3/general" } etc
@@ -75,15 +79,26 @@ export default function TopicDetailPage() {
 
     const toggleLike = async () => {
         if (!topic) return;
+        if (!session?.user) {
+            toast.error(t.has("loginToLike") ? t("loginToLike") : "Please log in to like");
+            router.push("/auth/login");
+            return;
+        }
         try {
             const res = await fetch(`/api/v1/forum/topics/${topic.id}/like`, { method: "POST" });
             if (res.ok) {
                 const data = await res.json();
                 setLiked(data.liked);
                 setLikeCount(data.count);
+            } else if (res.status === 401) {
+                toast.error(t.has("loginToLike") ? t("loginToLike") : "Please log in to like");
+                router.push("/auth/login");
+            } else {
+                toast.error(t.has("likeError") ? t("likeError") : "Failed to like");
             }
         } catch (err) {
             console.error("Failed to toggle like:", err);
+            toast.error(t.has("likeError") ? t("likeError") : "Failed to like");
         }
     };
 

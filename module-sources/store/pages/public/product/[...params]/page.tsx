@@ -281,7 +281,7 @@ export default function ProductDetailPage() {
                                     >
                                         <Image
                                             src={img}
-                                            alt={`Thumbnail ${index + 1}`}
+                                            alt={t.has("product_thumbnail") ? t("product_thumbnail", { n: index + 1 }) : `Thumbnail ${index + 1}`}
                                             fill
                                             className="object-cover"
                                         />
@@ -366,7 +366,7 @@ export default function ProductDetailPage() {
                                                     className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                                                     required={v.required}
                                                 >
-                                                    <option value="">Select...</option>
+                                                    <option value="">{t.has("product_selectOption") ? t("product_selectOption") : "Select…"}</option>
                                                     {v.options.split(",").map((opt) => (
                                                         <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
                                                     ))}
