@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { Link } from "@/core/lib/i18n/navigation";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useRouter } from "@/core/lib/i18n/navigation";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
@@ -35,8 +36,19 @@ interface Product {
 export default function ProductDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const pathname = usePathname();
+    const { status: authStatus } = useSession();
     const { formatPrice } = useCurrency();
     const t = useTranslations('store');
+
+    const requireLogin = () => {
+        toast.error(t.has("loginRequired") ? t("loginRequired") : "Please log in to continue", {
+            action: {
+                label: t.has("login") ? t("login") : "Log in",
+                onClick: () => router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/")}`),
+            },
+        });
+    };
 
     // URL: /store/product/5/legendary-key
     // useParams returns { slug: ["store", "product", "5", "legendary-key"], locale: "tr" } or { params: ["5", "legendary-key"] }
@@ -86,6 +98,7 @@ export default function ProductDetailPage() {
 
     const addToCart = async () => {
         if (!product) return;
+        if (authStatus !== "authenticated") { requireLogin(); return; }
         setAddingToCart(true);
         try {
             const res = await fetch("/api/v1/store/cart", {
@@ -97,11 +110,15 @@ export default function ProductDetailPage() {
                 setAddedToCart(true);
                 toast.success(`${product.name} added to cart`);
                 setTimeout(() => setAddedToCart(false), 2000);
+            } else if (res.status === 401) {
+                requireLogin();
             } else {
-                toast.error("Failed to add to cart");
+                const body = await res.json().catch(() => ({}));
+                toast.error(body.error || "Failed to add to cart");
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);
+            toast.error("Failed to add to cart");
         } finally {
             setAddingToCart(false);
         }
@@ -109,6 +126,7 @@ export default function ProductDetailPage() {
 
     const buyNow = async () => {
         if (!product) return;
+        if (authStatus !== "authenticated") { requireLogin(); return; }
         setAddingToCart(true);
         try {
             const res = await fetch("/api/v1/store/cart", {
@@ -118,9 +136,15 @@ export default function ProductDetailPage() {
             });
             if (res.ok) {
                 router.push("/store/cart");
+            } else if (res.status === 401) {
+                requireLogin();
+            } else {
+                const body = await res.json().catch(() => ({}));
+                toast.error(body.error || "Failed to add to cart");
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);
+            toast.error("Failed to add to cart");
         } finally {
             setAddingToCart(false);
         }

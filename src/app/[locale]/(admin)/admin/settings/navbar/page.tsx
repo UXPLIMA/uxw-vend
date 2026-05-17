@@ -144,17 +144,17 @@ export default function NavbarSettingsPage() {
                                             <button onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
                                             <button onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
                                         </div>
-                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder="Label" className="flex-1" />
+                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder="Label" className="flex-1 min-w-0" />
                                         {!isDropdown && (
-                                            <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1" />
+                                            <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1 min-w-0" />
                                         )}
-                                        <div className="flex items-center gap-1 w-32 rounded-md border border-input bg-background pl-2">
+                                        <div className="flex items-center gap-1.5 w-48 flex-shrink-0 rounded-md border border-input bg-background pl-2.5">
                                             <NavIcon name={link.icon} className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <Input
                                                 value={link.icon || ""}
                                                 onChange={(e) => updateLink(i, "icon", e.target.value)}
-                                                placeholder="Icon"
-                                                className="border-0 bg-transparent shadow-none focus-visible:ring-0 px-1 h-8"
+                                                placeholder="e.g. ShoppingBag"
+                                                className="border-0 bg-transparent shadow-none focus-visible:ring-0 px-1 h-8 min-w-0"
                                             />
                                         </div>
                                         {isDropdown && (
