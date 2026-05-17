@@ -839,6 +839,9 @@
       "id": "blog-comment",
       "label": "Blog comments",
       "labelKey": "moderation_blogComment",
+      "settingKey": "blog_comments",
+      "settingLabelKey": "moderationSettings_blogComments",
+      "settingDescKey": "moderationSettings_blogCommentsDesc",
       "handler": "moderation/comments.ts"
     }
   ],

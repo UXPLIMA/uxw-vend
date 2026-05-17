@@ -228,6 +228,9 @@ const moderationProvider = z.object({
     id: z.string().min(1).max(64).regex(SAFE_ID, "id must be lowercase alphanumeric + hyphens"),
     label: z.string().min(1).max(100),
     labelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
+    settingKey: z.string().min(1).max(64).regex(/^[a-z][a-z0-9_]*$/).optional(),
+    settingLabelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
+    settingDescKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
     handler: relativePath("handler"),
 });
 

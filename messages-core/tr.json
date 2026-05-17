@@ -1063,6 +1063,7 @@
     "moderationSettings_saveFailed": "Kaydedilemedi",
     "moderationSettings_saving": "Kaydediliyor...",
     "moderationSettings_saveChanges": "Değişiklikleri kaydet",
+    "moderationSettings_noProviders": "Yüklü hiçbir modül moderasyon gerektiren içerik bildirmiyor.",
     "settingsForm_saving": "Kaydediliyor...",
     "settingsForm_saved": "Kaydedildi",
     "settingsForm_saveSettings": "Ayarları Kaydet",

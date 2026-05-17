@@ -130,7 +130,7 @@ function generateRegistry() {
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
     const allUserDataTables: ({ model: string; key: string; column: string; module: string })[] = [];
-    const allModerationProviders: ({ id: string; label: string; labelKey?: string; handler: string; module: string })[] = [];
+    const allModerationProviders: ({ id: string; label: string; labelKey?: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string; handler: string; module: string })[] = [];
 
     type SlotEntry = {
         name: string;
@@ -425,12 +425,15 @@ function generateRegistry() {
     moderationContent += "    list(skip: number, take: number): Promise<{ items: ModerationItem[]; total: number }>;\n";
     moderationContent += "    bulkUpdate(ids: string[], newState: 'APPROVED' | 'REJECTED'): Promise<number>;\n";
     moderationContent += "}\n\n";
-    moderationContent += "export const ModuleModerationProviders: { id: string; label: string; labelKey?: string; module: string; loader: () => Promise<{ default: ModerationProvider }> }[] = [\n";
+    moderationContent += "export const ModuleModerationProviders: { id: string; label: string; labelKey?: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string; module: string; loader: () => Promise<{ default: ModerationProvider }> }[] = [\n";
     for (const mp of allModerationProviders) {
         const handlerPath = mp.handler.replace(/\.tsx?$/, '');
         const importPath = `@/modules/${mp.module}/${handlerPath}`;
         const meta: Record<string, string> = { id: mp.id, label: mp.label, module: mp.module };
         if (mp.labelKey) meta.labelKey = mp.labelKey;
+        if (mp.settingKey) meta.settingKey = mp.settingKey;
+        if (mp.settingLabelKey) meta.settingLabelKey = mp.settingLabelKey;
+        if (mp.settingDescKey) meta.settingDescKey = mp.settingDescKey;
         moderationContent += `  { ...${JSON.stringify(meta)}, loader: () => import('${importPath}') as Promise<{ default: ModerationProvider }> },\n`;
     }
     moderationContent += "];\n";

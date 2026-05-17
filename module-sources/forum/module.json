@@ -876,12 +876,18 @@
       "id": "forum-topic",
       "label": "Forum topics",
       "labelKey": "moderation_forumTopic",
+      "settingKey": "forum_topics",
+      "settingLabelKey": "moderationSettings_forumTopics",
+      "settingDescKey": "moderationSettings_forumTopicsDesc",
       "handler": "moderation/topics.ts"
     },
     {
       "id": "forum-post",
       "label": "Forum posts",
       "labelKey": "moderation_forumPost",
+      "settingKey": "forum_posts",
+      "settingLabelKey": "moderationSettings_forumReplies",
+      "settingDescKey": "moderationSettings_forumRepliesDesc",
       "handler": "moderation/posts.ts"
     }
   ],

@@ -10,46 +10,48 @@ import { useTranslations } from "next-intl";
 
 type ModerationMode = "auto" | "manual";
 
-interface ModerationConfig {
-    blog_comments: ModerationMode;
-    forum_topics: ModerationMode;
-    forum_posts: ModerationMode;
-    suggestions: ModerationMode;
+interface ModerationField {
+    settingKey: string;
+    label: string;
+    labelKey?: string;
+    descKey?: string;
 }
-
-const DEFAULT_CONFIG: ModerationConfig = {
-    blog_comments: "auto",
-    forum_topics: "auto",
-    forum_posts: "auto",
-    suggestions: "auto",
-};
-
-const FIELD_KEYS: { key: keyof ModerationConfig; labelKey: string; descKey: string }[] = [
-    { key: "blog_comments", labelKey: "moderationSettings_blogComments", descKey: "moderationSettings_blogCommentsDesc" },
-    { key: "forum_topics", labelKey: "moderationSettings_forumTopics", descKey: "moderationSettings_forumTopicsDesc" },
-    { key: "forum_posts", labelKey: "moderationSettings_forumReplies", descKey: "moderationSettings_forumRepliesDesc" },
-    { key: "suggestions", labelKey: "moderationSettings_suggestions", descKey: "moderationSettings_suggestionsDesc" },
-];
 
 export default function ModerationSettingsPage() {
     const t = useTranslations("admin");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [config, setConfig] = useState<ModerationConfig>(DEFAULT_CONFIG);
+    const [fields, setFields] = useState<ModerationField[]>([]);
+    const [config, setConfig] = useState<Record<string, ModerationMode>>({});
 
     useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => (r.ok ? r.json() : null))
-            .then((payload: { settings?: Record<string, unknown> } | null) => {
-                const stored = payload?.settings?.moderation as Partial<ModerationConfig> | undefined;
-                if (stored && typeof stored === "object") {
-                    setConfig({
-                        blog_comments: stored.blog_comments === "manual" ? "manual" : "auto",
-                        forum_topics: stored.forum_topics === "manual" ? "manual" : "auto",
-                        forum_posts: stored.forum_posts === "manual" ? "manual" : "auto",
-                        suggestions: stored.suggestions === "manual" ? "manual" : "auto",
+        Promise.all([
+            fetch("/api/v1/admin/moderation").then((r) => (r.ok ? r.json() : null)),
+            fetch("/api/v1/settings").then((r) => (r.ok ? r.json() : null)),
+        ])
+            .then(([modPayload, settingsPayload]) => {
+                const types = (modPayload?.types ?? {}) as Record<
+                    string,
+                    { label: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string }
+                >;
+                const builtFields: ModerationField[] = [];
+                for (const meta of Object.values(types)) {
+                    if (!meta.settingKey) continue;
+                    builtFields.push({
+                        settingKey: meta.settingKey,
+                        label: meta.label,
+                        labelKey: meta.settingLabelKey,
+                        descKey: meta.settingDescKey,
                     });
                 }
+                setFields(builtFields);
+
+                const stored = (settingsPayload?.settings?.moderation ?? {}) as Record<string, unknown>;
+                const next: Record<string, ModerationMode> = {};
+                for (const f of builtFields) {
+                    next[f.settingKey] = stored[f.settingKey] === "manual" ? "manual" : "auto";
+                }
+                setConfig(next);
             })
             .catch(() => {
                 toast.error(t("moderationSettings_loadFailed"));
@@ -57,7 +59,7 @@ export default function ModerationSettingsPage() {
             .finally(() => setLoading(false));
     }, [t]);
 
-    const toggleField = (key: keyof ModerationConfig) => {
+    const toggleField = (key: string) => {
         setConfig((prev) => ({
             ...prev,
             [key]: prev[key] === "manual" ? "auto" : "manual",
@@ -109,32 +111,41 @@ export default function ModerationSettingsPage() {
                     <CardTitle className="text-base">{t("moderationSettings_approvalRequired")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {FIELD_KEYS.map((field) => (
-                        <label
-                            key={field.key}
-                            className="flex items-start gap-3 cursor-pointer border rounded-md p-3 hover:bg-accent/40"
-                        >
-                            <input
-                                type="checkbox"
-                                checked={config[field.key] === "manual"}
-                                onChange={() => toggleField(field.key)}
-                                className="w-4 h-4 mt-1"
-                            />
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground">{t(field.labelKey)}</p>
-                                <p className="text-xs text-muted-foreground">{t(field.descKey)}</p>
-                            </div>
-                            <span
-                                className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${
-                                    config[field.key] === "manual"
+                    {fields.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            {t("moderationSettings_noProviders")}
+                        </p>
+                    ) : (
+                        fields.map((field) => (
+                            <label
+                                key={field.settingKey}
+                                className="flex items-start gap-3 cursor-pointer border rounded-md p-3 hover:bg-accent/40"
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={config[field.settingKey] === "manual"}
+                                    onChange={() => toggleField(field.settingKey)}
+                                    className="w-4 h-4 mt-1"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground">
+                                        {field.labelKey && t.has(field.labelKey) ? t(field.labelKey) : field.label}
+                                    </p>
+                                    {field.descKey && t.has(field.descKey) && (
+                                        <p className="text-xs text-muted-foreground">{t(field.descKey)}</p>
+                                    )}
+                                </div>
+                                <span
+                                    className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${config[field.settingKey] === "manual"
                                         ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
                                         : "bg-muted text-muted-foreground"
-                                }`}
-                            >
-                                {config[field.key]}
-                            </span>
-                        </label>
-                    ))}
+                                        }`}
+                                >
+                                    {config[field.settingKey]}
+                                </span>
+                            </label>
+                        ))
+                    )}
                 </CardContent>
             </Card>
 

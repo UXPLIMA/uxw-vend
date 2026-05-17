@@ -250,7 +250,10 @@ export interface ModuleManifest {
     moderationProviders?: {
         id: string;          // unique slug e.g. "blog-comment", used in URLs
         label: string;       // human-readable label e.g. "Blog comments"
-        labelKey?: string;   // optional i18n key (admin namespace)
+        labelKey?: string;   // optional i18n key (admin namespace) for the queue tab label
+        settingKey?: string; // key under Setting "moderation" controlling auto/manual mode
+        settingLabelKey?: string;  // optional i18n key for the settings-page row label
+        settingDescKey?: string;   // optional i18n key for the settings-page row description
         handler: string;     // path to handler file relative to module root
     }[];
 }

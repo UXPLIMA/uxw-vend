@@ -1063,6 +1063,7 @@
     "moderationSettings_saveFailed": "Failed to save",
     "moderationSettings_saving": "Saving...",
     "moderationSettings_saveChanges": "Save changes",
+    "moderationSettings_noProviders": "No installed module declares any moderatable content.",
     "settingsForm_saving": "Saving...",
     "settingsForm_saved": "Saved",
     "settingsForm_saveSettings": "Save Settings",

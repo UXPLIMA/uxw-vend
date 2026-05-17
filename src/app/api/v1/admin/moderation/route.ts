@@ -30,10 +30,22 @@ export async function GET(request: NextRequest) {
 
     if (!typeParam) {
         const counts: Record<string, number> = {};
-        const labels: Record<string, { label: string; labelKey?: string }> = {};
+        const labels: Record<string, {
+            label: string;
+            labelKey?: string;
+            settingKey?: string;
+            settingLabelKey?: string;
+            settingDescKey?: string;
+        }> = {};
         await Promise.all(
             providers.map(async (p) => {
-                labels[p.id] = { label: p.label, labelKey: p.labelKey };
+                labels[p.id] = {
+                    label: p.label,
+                    labelKey: p.labelKey,
+                    settingKey: p.settingKey,
+                    settingLabelKey: p.settingLabelKey,
+                    settingDescKey: p.settingDescKey,
+                };
                 try {
                     const mod = await p.loader();
                     counts[p.id] = await mod.default.count();

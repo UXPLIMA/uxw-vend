@@ -371,6 +371,9 @@
       "id": "suggestion",
       "label": "Suggestions",
       "labelKey": "moderation_suggestion",
+      "settingKey": "suggestions",
+      "settingLabelKey": "moderationSettings_suggestions",
+      "settingDescKey": "moderationSettings_suggestionsDesc",
       "handler": "moderation/provider.ts"
     }
   ],
