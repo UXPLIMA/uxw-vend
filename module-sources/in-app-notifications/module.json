@@ -12,6 +12,12 @@
       "order": 10
     }
   ],
+  "routes": [
+    {
+      "path": "/notifications",
+      "component": "pages/public/notifications/page.tsx"
+    }
+  ],
   "api": [
     {
       "path": "/notifications",
@@ -39,6 +45,9 @@
         "hoursAgo": "{count} hours ago",
         "daysAgo": "{count} days ago",
         "viewAll": "View All Notifications",
+        "unreadCount": "{count, plural, one {# unread} other {# unread}}",
+        "loginRequired": "Please log in to view your notifications.",
+        "markFailed": "Failed to update notification",
         "settings": "Notification Settings",
         "emailNotifications": "Email Notifications",
         "pushNotifications": "Push Notifications",
@@ -66,6 +75,9 @@
         "hoursAgo": "{count} saat önce",
         "daysAgo": "{count} gün önce",
         "viewAll": "Tüm Bildirimleri Gör",
+        "unreadCount": "{count, plural, one {# okunmamış} other {# okunmamış}}",
+        "loginRequired": "Bildirimlerini görmek için giriş yap.",
+        "markFailed": "Bildirim güncellenemedi",
         "settings": "Bildirim Ayarları",
         "emailNotifications": "E-posta Bildirimleri",
         "pushNotifications": "Anlık Bildirimler",

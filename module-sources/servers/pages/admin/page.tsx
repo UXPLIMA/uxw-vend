@@ -14,21 +14,28 @@ export default function Page() {
             displayField="name"
             secondaryField="host"
             fields={[
-                { key: "name", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
-                { key: "type", label: t("adm_field2Label"), type: "select", required: true, options: [
-                    { value: "minecraft", label: t("adm_field3Label") },
-                    { value: "fivem", label: t("adm_field4Label") },
-                    { value: "rust", label: t("adm_field5Label") },
-                    { value: "ark", label: t("adm_field6Label") },
-                    { value: "csgo", label: t("adm_field7Label") },
-                ], defaultValue: "minecraft" },
-                { key: "host", label: t("adm_field8Label"), required: true, placeholder: t("adm_field2Placeholder") },
-                { key: "port", label: t("adm_field9Label"), type: "number", defaultValue: "25565" },
-                { key: "queryPort", label: t("adm_field10Label"), type: "number", placeholder: t("adm_field3Placeholder") },
-                { key: "rconPort", label: t("adm_field11Label"), type: "number", placeholder: t("adm_field4Placeholder") },
-                { key: "rconPassword", label: t("adm_field12Label"), type: "text", placeholder: t("adm_field5Placeholder") },
-                { key: "isDefault", label: t("adm_field13Label"), type: "toggle", defaultValue: "false" },
-                { key: "isActive", label: t("adm_field14Label"), type: "toggle", defaultValue: "true" },
+                { key: "name", label: t("svr_name"), required: true, placeholder: t("svr_namePlaceholder") },
+                {
+                    key: "type",
+                    label: t("svr_type"),
+                    type: "select",
+                    required: true,
+                    defaultValue: "minecraft",
+                    options: [
+                        { value: "minecraft", label: t("svr_typeMinecraft") },
+                        { value: "fivem", label: t("svr_typeFivem") },
+                        { value: "rust", label: t("svr_typeRust") },
+                        { value: "ark", label: t("svr_typeArk") },
+                        { value: "csgo", label: t("svr_typeCsgo") },
+                    ],
+                },
+                { key: "host", label: t("svr_host"), required: true, placeholder: t("svr_hostPlaceholder") },
+                { key: "port", label: t("svr_port"), type: "number", defaultValue: "25565" },
+                { key: "queryPort", label: t("svr_queryPort"), type: "number", placeholder: t("svr_queryPortPlaceholder") },
+                { key: "rconPort", label: t("svr_rconPort"), type: "number", placeholder: t("svr_rconPortPlaceholder") },
+                { key: "rconPassword", label: t("svr_rconPassword"), type: "text", placeholder: t("svr_rconPasswordPlaceholder") },
+                { key: "isDefault", label: t("svr_isDefault"), type: "toggle", defaultValue: "false" },
+                { key: "isActive", label: t("svr_isActive"), type: "toggle", defaultValue: "true" },
             ]}
         />
     );
