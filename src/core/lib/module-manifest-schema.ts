@@ -28,6 +28,7 @@ const menuItem = z.object({
     label: z.string().min(1).max(100),
     path: routePath,
     icon: iconName.optional(),
+    group: z.string().min(1).max(64).regex(/^[a-z][a-z0-9-]*$/).optional(),
 });
 
 const routeEntry = z.object({

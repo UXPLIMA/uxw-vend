@@ -16,6 +16,11 @@ export interface ModuleManifest {
         label: string;
         path: string; // Relative to /admin. e.g. "/store/products"
         icon?: string; // Icon name from Lucide
+        // Which core admin nav group to attach this item to (see
+        // admin-nav-groups.ts). Omit to fall back to the generic "modules"
+        // bucket. Known core groups: commerce, content, design, activity,
+        // advanced, marketplace, settings.
+        group?: string;
     }[];
     routes?: {
         path: string;

@@ -31,42 +31,50 @@
     {
       "label": "Products",
       "path": "/store/products",
-      "icon": "Package"
+      "icon": "Package",
+      "group": "commerce"
     },
     {
       "label": "Store Categories",
       "path": "/store/categories",
-      "icon": "Layers"
+      "icon": "Layers",
+      "group": "commerce"
     },
     {
       "label": "Orders",
       "path": "/store/orders",
-      "icon": "ShoppingCart"
+      "icon": "ShoppingCart",
+      "group": "commerce"
     },
     {
       "label": "Coupons",
       "path": "/store/coupons",
-      "icon": "Tag"
+      "icon": "Tag",
+      "group": "commerce"
     },
     {
       "label": "Payment Settings",
       "path": "/settings/payments",
-      "icon": "DollarSign"
+      "icon": "DollarSign",
+      "group": "commerce"
     },
     {
       "label": "Bulk Discounts",
       "path": "/bulk-discounts",
-      "icon": "Percent"
+      "icon": "Percent",
+      "group": "commerce"
     },
     {
       "label": "Creator Codes",
       "path": "/creator-codes",
-      "icon": "UserCheck"
+      "icon": "UserCheck",
+      "group": "commerce"
     },
     {
       "label": "Gift Codes",
       "path": "/gift-codes",
-      "icon": "Gift"
+      "icon": "Gift",
+      "group": "commerce"
     }
   ],
   "routes": [
