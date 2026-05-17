@@ -20,6 +20,57 @@ const intlMiddleware = createIntlMiddleware({
     localePrefix: 'always'
 });
 
+// Routes / method combinations that are 403'd when DEMO_MODE=1.
+// Blacklist (not whitelist) because most writes are part of the demo
+// experience — login, register, vote, post, suggestion, comment, cart,
+// preferences. We only block actions that would wreck the demo for the
+// next visitor or cost money.
+function isBlockedInDemo(method: string, pathname: string): boolean {
+    const m = method.toUpperCase();
+    const write = m === 'POST' || m === 'PUT' || m === 'PATCH' || m === 'DELETE';
+    if (!write) return false;
+
+    // Self-destruct: password change / account delete / 2FA reset
+    if (pathname === '/api/v1/auth/profile/delete') return true;
+    if (pathname.startsWith('/api/v1/auth/profile/password')) return true;
+    if (pathname.startsWith('/api/v1/two-factor/')) return true;
+
+    // Admin: user mutations (delete/edit/role change/impersonate)
+    if (/^\/api\/v1\/users\/[^/]+(?:\/(?:delete|role))?$/.test(pathname)) return true;
+    if (pathname.startsWith('/api/v1/admin/impersonate/')) return true;
+    if (pathname.startsWith('/api/v1/warnings')) return true;
+
+    // Module install/uninstall/enable
+    if (/^\/api\/v1\/modules(?:\/|$)/.test(pathname)) return true;
+
+    // Theme upload/delete/activate (customizer save is fine — that's per-mode tokens)
+    if (pathname === '/api/v1/themes') return true;
+    if (pathname.startsWith('/api/v1/themes/upload')) return true;
+    if (pathname.startsWith('/api/v1/themes/marketplace/install')) return true;
+    if (/^\/api\/v1\/themes\/[^/]+$/.test(pathname) && m === 'DELETE') return true;
+    if (pathname === '/api/v1/themes/state') return true;
+
+    // Global settings save — would let a visitor change site name / SEO / CSS
+    if (pathname === '/api/v1/settings') return true;
+
+    // API keys (could be used to bypass this gate via server-to-server)
+    if (pathname.startsWith('/api/v1/api-keys')) return true;
+
+    // Background ops: cron triggers, email queue actions, IP blocks
+    if (pathname.startsWith('/api/v1/admin/cron/') && pathname.endsWith('/run')) return true;
+    if (pathname.startsWith('/api/v1/admin/email-queue/')) return true;
+    if (pathname.startsWith('/api/v1/admin/ip-blocks')) return true;
+
+    // Uploads — disk + bandwidth abuse
+    if (pathname.startsWith('/api/v1/upload')) return true;
+    if (pathname.startsWith('/api/v1/media')) return true;
+
+    // Real payments — Stripe checkout creation costs nothing but webhooks would fire
+    if (pathname.startsWith('/api/v1/store/checkout')) return true;
+
+    return false;
+}
+
 function getModuleForPath(pathname: string): string | null {
     for (const [moduleId, patterns] of Object.entries(moduleRouteMap)) {
         for (const pattern of patterns) {
@@ -116,6 +167,17 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     requestHeaders.set('x-correlation-id', correlationId);
 
     const { pathname } = request.nextUrl;
+
+    // ===== Demo write gate =====
+    // On the public demo instance (DEMO_MODE=1) any visitor can log in as
+    // the seeded admin. Block the handful of admin actions that would brick
+    // the demo for everyone else — see isBlockedInDemo() for the full list.
+    if (process.env.DEMO_MODE === '1' && isBlockedInDemo(request.method, pathname)) {
+        return NextResponse.json(
+            { error: 'This action is disabled in the demo. Spin up your own instance to try it.' },
+            { status: 403 },
+        );
+    }
 
     // ===== CSRF gate =====
     // NextAuth handles /api/auth/* itself; inbound webhooks are exempt because

@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { signIn } from "next-auth/react";
-import { Home } from "lucide-react";
+import { Home, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
+
+const DEMO_EMAIL = "admin@example.com";
+const DEMO_PASSWORD = "password123";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -19,9 +22,22 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [needs2FA, setNeeds2FA] = useState(false);
+    const [isDemo, setIsDemo] = useState(false);
     const allModules = useAllModules();
     const oauthButtons = ModuleOauthButtons.filter(b => allModules[b.module] === true);
     const [twoFactorCode, setTwoFactorCode] = useState("");
+
+    useEffect(() => {
+        fetch("/api/v1/public-settings")
+            .then((r) => r.json())
+            .then((d) => { if (d?.isDemo) setIsDemo(true); })
+            .catch(() => undefined);
+    }, []);
+
+    const fillDemo = () => {
+        setEmail(DEMO_EMAIL);
+        setPassword(DEMO_PASSWORD);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -92,6 +108,28 @@ export default function LoginPage() {
                         <span className="font-bold text-2xl text-foreground">uxwVend</span>
                     </Link>
                 </div>
+
+                {isDemo && (
+                    <div className="mb-4 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+                        <div className="flex items-start gap-3">
+                            <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                                <p className="font-medium text-foreground">Demo account</p>
+                                <p className="text-muted-foreground mt-1">
+                                    Email: <code className="text-foreground font-mono">{DEMO_EMAIL}</code>
+                                    <br />
+                                    Password: <code className="text-foreground font-mono">{DEMO_PASSWORD}</code>
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    Some destructive actions are disabled in demo mode.
+                                </p>
+                                <Button type="button" size="sm" variant="outline" className="mt-3" onClick={fillDemo}>
+                                    Fill demo credentials
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-border">

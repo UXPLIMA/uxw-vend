@@ -48,7 +48,12 @@ export async function GET() {
         },
     );
 
-    return NextResponse.json({ settings: settingsMap }, {
+    return NextResponse.json({
+        settings: settingsMap,
+        // Exposed so the login page can show its credentials banner on the
+        // demo instance without baking the flag into client code.
+        isDemo: process.env.DEMO_MODE === "1",
+    }, {
         headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
     });
 }
