@@ -48,6 +48,9 @@ afterEach(() => {
 
 describe("rate-limit failover", () => {
     it("falls back to memory when Redis throws on every hit and tracks counts locally", async () => {
+        // The backend logs a single "Redis unavailable" warning on first
+        // failure. Mute it so the test output stays clean.
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { });
         const { rateLimit } = await import("@/core/lib/rate-limit");
         const id = "failover-test-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
         const config = { maxRequests: 3, windowMs: 60_000 };
@@ -70,5 +73,6 @@ describe("rate-limit failover", () => {
         // we exercised the failover path, not just the memory backend
         // outright.
         expect(fakeRedis.set).toHaveBeenCalledTimes(4);
+        warnSpy.mockRestore();
     });
 });

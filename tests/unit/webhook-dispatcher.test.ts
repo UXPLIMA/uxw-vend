@@ -88,6 +88,7 @@ describe("webhook dispatcher: POST", () => {
     });
 
     it("refuses dispatch when no signature config and no verifiesInHandler flag", async () => {
+        const errSpy = vi.spyOn(console, "error").mockImplementation(() => { });
         receivers.push({
             provider: "paypal",
             module: "paypal-gateway",
@@ -99,6 +100,8 @@ describe("webhook dispatcher: POST", () => {
 
         expect(res.status).toBe(503);
         expect(handlerSpy).not.toHaveBeenCalled();
+        expect(errSpy).toHaveBeenCalled();
+        errSpy.mockRestore();
     });
 
     it("returns 404 for an unknown provider", async () => {

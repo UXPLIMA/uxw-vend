@@ -97,11 +97,16 @@ describe("trophy-engine: registerTrophyListeners", () => {
     });
 
     it("returns no rules when DB throws (no built-in fallback)", async () => {
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { });
         trophyFindMany.mockRejectedValue(new Error("db down"));
         await engine.registerTrophyListeners();
         const actions = hooks.listActions();
         // Core ships zero module-aware fallback rules — admin seeds via UI.
         expect(actions.length).toBe(0);
+        // The engine logs a warning on DB failure; we mute it so test stderr
+        // stays clean but assert it actually fired so the safety net is real.
+        expect(warnSpy).toHaveBeenCalledOnce();
+        warnSpy.mockRestore();
     });
 
     it("does nothing when no active rules exist", async () => {

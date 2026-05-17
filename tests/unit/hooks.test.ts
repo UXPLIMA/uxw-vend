@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
     addAction,
     doAction,
@@ -40,11 +40,14 @@ describe("hooks: actions", () => {
     });
 
     it("doAction continues if a listener throws", () => {
+        const errSpy = vi.spyOn(console, "error").mockImplementation(() => { });
         const log: string[] = [];
         addAction("test", () => { throw new Error("boom"); });
         addAction("test", () => log.push("ran"));
         doAction("test", null);
         expect(log).toEqual(["ran"]);
+        expect(errSpy).toHaveBeenCalled();
+        errSpy.mockRestore();
     });
 
     it("removeAction removes a listener", () => {
@@ -84,12 +87,15 @@ describe("hooks: filters", () => {
     });
 
     it("applyFilters keeps previous value when a listener throws", () => {
+        const errSpy = vi.spyOn(console, "error").mockImplementation(() => { });
         addFilter<number>("test", (v) => v + 1);
         addFilter<number>("test", () => { throw new Error("boom"); });
         addFilter<number>("test", (v) => v * 2);
         const r = applyFilters("test", 5);
         // 5+1=6, throw → keeps 6, *2 → 12
         expect(r).toBe(12);
+        expect(errSpy).toHaveBeenCalled();
+        errSpy.mockRestore();
     });
 
     it("removeFilter removes a listener", () => {

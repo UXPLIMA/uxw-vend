@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { listScheduledJobs, registerCronJob } from "@/core/lib/scheduler";
 
 describe("scheduler", () => {
@@ -15,13 +15,16 @@ describe("scheduler", () => {
     });
 
     it("ignores unknown schedule", () => {
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { });
         const before = listScheduledJobs().length;
         registerCronJob({
             key: "test:bad",
             schedule: "every-eternity" as never,
-            handler: async () => {},
+            handler: async () => { },
         });
         // Job not registered → list count stays the same
         expect(listScheduledJobs().length).toBe(before);
+        expect(warnSpy).toHaveBeenCalled();
+        warnSpy.mockRestore();
     });
 });

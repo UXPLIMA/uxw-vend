@@ -34,6 +34,9 @@ beforeEach(() => {
 
 describe("acquireInstallLock serialization", () => {
     it("serializes a second acquire while the first is held, and re-allows after release", async () => {
+        // The advisory-lock path warns when pg connection fails (expected in
+        // this CI-friendly fallback test). Mute the noise.
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { });
         const { acquireInstallLock } = await import("@/core/lib/install-lock");
 
         // First acquire: should return a release fn
@@ -53,6 +56,7 @@ describe("acquireInstallLock serialization", () => {
 
         // Cleanup
         release3!();
+        warnSpy.mockRestore();
     });
 });
 

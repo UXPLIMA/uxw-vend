@@ -11,7 +11,7 @@ vi.mock("@/core/lib/db", () => ({
 describe("getActiveTheme", () => {
     beforeEach(() => vi.clearAllMocks());
 
-    it("returns manifest + mode + empty settings when no overrides", async () => {
+    it("merges manifest field defaults when no saved settings exist", async () => {
         const { prisma } = await import("@/core/lib/db");
         (prisma.themeState.findFirst as ReturnType<typeof vi.fn>).mockResolvedValue({ themeId: "flat", mode: "light" });
         (prisma.themeCustomization.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
@@ -21,10 +21,18 @@ describe("getActiveTheme", () => {
         const result = await getActiveTheme();
         expect(result.themeId).toBe("flat");
         expect(result.mode).toBe("light");
-        expect(result.settings).toEqual({});
+        // Flat declares a hero group with field-level `default` values; they
+        // surface even when no admin override row exists. Groups with no
+        // declared defaults remain absent.
+        expect(result.settings.hero).toMatchObject({
+            enabled: false,
+            title: "Welcome",
+            ctaText: "Get started",
+        });
+        expect(result.settings.landing).toBeUndefined();
     });
 
-    it("groups settings rows by groupKey", async () => {
+    it("groups saved rows by groupKey and merges them on top of manifest defaults", async () => {
         const { prisma } = await import("@/core/lib/db");
         (prisma.themeState.findFirst as ReturnType<typeof vi.fn>).mockResolvedValue({ themeId: "flat", mode: "dark" });
         (prisma.themeCustomization.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
@@ -36,7 +44,10 @@ describe("getActiveTheme", () => {
 
         const { getActiveTheme } = await import("@/core/lib/theme-state");
         const result = await getActiveTheme();
-        expect(result.settings.hero).toEqual({ title: "Hi", cta: "Go" });
+        // Saved values override the manifest defaults; arbitrary admin-saved
+        // keys (cta) sit alongside the schema-declared ones.
+        expect(result.settings.hero).toMatchObject({ title: "Hi", cta: "Go" });
+        // Groups the active theme doesn't declare pass through as-is.
         expect(result.settings.landing).toEqual({ intro: "Welcome" });
     });
 
