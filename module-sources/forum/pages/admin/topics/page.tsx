@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 interface Topic {
@@ -23,6 +25,7 @@ interface Topic {
 
 export default function AdminForumTopicsPage() {
     const t = useTranslations("forum");
+    const { confirm } = useConfirm();
     const relativeTime = useRelativeTime();
     const [topics, setTopics] = useState<Topic[]>([]);
     const [loading, setLoading] = useState(true);
@@ -70,9 +73,24 @@ export default function AdminForumTopicsPage() {
     };
 
     const deleteTopic = async (topicId: string) => {
-        if (!confirm("Delete this topic and all its replies?")) return;
-        await fetch(`/api/v1/forum/topics/${topicId}`, { method: "DELETE" });
-        fetchTopics();
+        const ok = await confirm({
+            title: t.has("adm_deleteTopicTitle") ? t("adm_deleteTopicTitle") : "Delete topic?",
+            message: t.has("adm_deleteTopicConfirm") ? t("adm_deleteTopicConfirm") : "Delete this topic and all its replies? This cannot be undone.",
+            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+            variant: "danger",
+        });
+        if (!ok) return;
+        try {
+            const res = await fetch(`/api/v1/forum/topics/${topicId}`, { method: "DELETE" });
+            if (!res.ok) {
+                toast.error(t.has("adm_deleteTopicError") ? t("adm_deleteTopicError") : "Failed to delete topic");
+                return;
+            }
+            toast.success(t.has("adm_topicDeleted") ? t("adm_topicDeleted") : "Topic deleted");
+            fetchTopics();
+        } catch {
+            toast.error(t.has("adm_deleteTopicError") ? t("adm_deleteTopicError") : "Failed to delete topic");
+        }
     };
 
     if (loading) {

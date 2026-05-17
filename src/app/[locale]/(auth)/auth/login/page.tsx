@@ -57,9 +57,11 @@ export default function LoginPage() {
                     setNeeds2FA(true);
                     setError("");
                 } else if (result.error.includes("INVALID_2FA")) {
-                    setError("Invalid 2FA code");
+                    setError(t('invalidTwoFactor'));
                 } else if (result.error.includes("BANNED")) {
-                    setError("Your account has been suspended");
+                    setError(t('accountSuspended'));
+                } else if (result.error.includes("ACCOUNT_LOCKED") || result.error.includes("LOCKED")) {
+                    setError(t('accountLocked'));
                 } else {
                     setError(t('invalidCredentials'));
                 }
@@ -114,17 +116,17 @@ export default function LoginPage() {
                         <div className="flex items-start gap-3">
                             <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                                <p className="font-medium text-foreground">Demo account</p>
+                                <p className="font-medium text-foreground">{t('demoBanner')}</p>
                                 <p className="text-muted-foreground mt-1">
-                                    Email: <code className="text-foreground font-mono">{DEMO_EMAIL}</code>
+                                    {t('email')}: <code className="text-foreground font-mono">{DEMO_EMAIL}</code>
                                     <br />
-                                    Password: <code className="text-foreground font-mono">{DEMO_PASSWORD}</code>
+                                    {t('password')}: <code className="text-foreground font-mono">{DEMO_PASSWORD}</code>
                                 </p>
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    Some destructive actions are disabled in demo mode.
+                                    {t('demoBannerBody')}
                                 </p>
                                 <Button type="button" size="sm" variant="outline" className="mt-3" onClick={fillDemo}>
-                                    Fill demo credentials
+                                    {t('demoFillCreds')}
                                 </Button>
                             </div>
                         </div>
@@ -178,12 +180,12 @@ export default function LoginPage() {
                             {needs2FA && (
                                 <div className="space-y-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                                     <label htmlFor="twoFactorCode" className="text-sm font-medium text-blue-700">
-                                        Two-Factor Authentication Code
+                                        {t('twoFactorCode')}
                                     </label>
                                     <Input
                                         id="twoFactorCode"
                                         type="text"
-                                        placeholder="Enter 6-digit code or backup code"
+                                        placeholder={t('twoFactorPlaceholder')}
                                         value={twoFactorCode}
                                         onChange={(e) => setTwoFactorCode(e.target.value)}
                                         autoFocus

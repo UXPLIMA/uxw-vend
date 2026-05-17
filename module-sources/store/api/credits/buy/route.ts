@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
-import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../../lib/stripe";
+import { getStripe, getStripeEnabled } from "../../../lib/stripe";
 import { z } from "zod";
 
 const buyCreditsSchema = z.object({
@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
         }
 
         if (!await getStripeEnabled()) {
-            return NextResponse.json({ error: "Stripe is not configured" }, { status: 400 });
+            return NextResponse.json(
+                { error: "Payments are not configured. Please contact the site administrator.", code: "payment_not_configured" },
+                { status: 503 },
+            );
         }
 
         const body = await request.json();

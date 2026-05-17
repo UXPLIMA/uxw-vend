@@ -8,6 +8,8 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
+import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Category {
     id: string;
@@ -19,6 +21,7 @@ interface Category {
 
 export default function AdminBlogCategoriesPage() {
     const t = useTranslations("blog");
+    const { confirm } = useConfirm();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -90,16 +93,24 @@ export default function AdminBlogCategoriesPage() {
     };
 
     const deleteCategory = async (id: string) => {
-        if (!confirm("Delete this category? Articles will be unlinked.")) return;
+        const ok = await confirm({
+            title: t.has("adm_deleteCatTitle") ? t("adm_deleteCatTitle") : "Delete category?",
+            message: t.has("adm_deleteCatConfirm") ? t("adm_deleteCatConfirm") : "Delete this category? Articles will be unlinked from it.",
+            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+            variant: "danger",
+        });
+        if (!ok) return;
         try {
             const res = await fetch(`/api/v1/blog/categories/${id}`, { method: "DELETE" });
-            if (res.ok) fetchCategories();
-            else {
-                const data = await res.json();
-                alert(data.error || "Failed to delete");
+            if (res.ok) {
+                toast.success(t.has("adm_catDeleted") ? t("adm_catDeleted") : "Category deleted");
+                fetchCategories();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.error || (t.has("adm_deleteCatError") ? t("adm_deleteCatError") : "Failed to delete category"));
             }
         } catch {
-            alert("Failed to delete category");
+            toast.error(t.has("adm_deleteCatError") ? t("adm_deleteCatError") : "Failed to delete category");
         }
     };
 

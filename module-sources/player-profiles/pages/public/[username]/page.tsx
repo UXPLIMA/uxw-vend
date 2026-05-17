@@ -100,13 +100,13 @@ export default function PlayerProfilePage({ params }: PageProps) {
                         {/* Stats */}
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
                             {[
-                                { label: t("statistics"), value: player._count.orders, icon: ShoppingCart },
-                                { label: t("activity"), value: player._count.topics, icon: MessageSquare },
-                                { label: t("badges"), value: player._count.posts, icon: FileText },
-                                { label: t("rank"), value: player._count.comments, icon: FileText },
-                                { label: t("playtime"), value: player._count.suggestions, icon: ThumbsUp },
+                                { key: "orders", label: t.has("stat_orders") ? t("stat_orders") : "Orders", value: player._count.orders, icon: ShoppingCart },
+                                { key: "topics", label: t.has("stat_topics") ? t("stat_topics") : "Topics", value: player._count.topics, icon: MessageSquare },
+                                { key: "posts", label: t.has("stat_posts") ? t("stat_posts") : "Posts", value: player._count.posts, icon: FileText },
+                                { key: "comments", label: t.has("stat_comments") ? t("stat_comments") : "Comments", value: player._count.comments, icon: FileText },
+                                { key: "suggestions", label: t.has("stat_suggestions") ? t("stat_suggestions") : "Suggestions", value: player._count.suggestions, icon: ThumbsUp },
                             ].map((s) => (
-                                <Card key={s.label}>
+                                <Card key={s.key}>
                                     <CardContent className="p-3 text-center">
                                         <s.icon className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
                                         <p className="text-xl font-bold">{s.value}</p>

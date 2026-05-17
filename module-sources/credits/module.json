@@ -29,13 +29,6 @@
       "description": "Purchase credits via the configured payment gateway."
     }
   ],
-  "hookListeners": [
-    {
-      "hook": "referral.referral.used",
-      "type": "action",
-      "handler": "hooks/on-referral-used.ts"
-    }
-  ],
   "translations": {
     "en": {
       "credits": {

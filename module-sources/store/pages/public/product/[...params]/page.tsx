@@ -108,17 +108,20 @@ export default function ProductDetailPage() {
             });
             if (res.ok) {
                 setAddedToCart(true);
-                toast.success(`${product.name} added to cart`);
+                toast.success(t.has("addedToCartToast") ? t("addedToCartToast", { name: product.name }) : `${product.name} added to cart`);
+                if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("cart:updated"));
+                }
                 setTimeout(() => setAddedToCart(false), 2000);
             } else if (res.status === 401) {
                 requireLogin();
             } else {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || "Failed to add to cart");
+                toast.error(body.error || (t.has("addToCartError") ? t("addToCartError") : "Failed to add to cart"));
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);
-            toast.error("Failed to add to cart");
+            toast.error(t.has("addToCartError") ? t("addToCartError") : "Failed to add to cart");
         } finally {
             setAddingToCart(false);
         }

@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, MessageSquare, Send, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 interface Participant {
     id: string;
@@ -30,16 +31,9 @@ interface Message {
     author: Participant;
 }
 
-function relativeTime(date: string): string {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
-}
-
 export function MessagesTab() {
     const t = useTranslations("profile");
+    const relativeTime = useRelativeTime();
     const [conversations, setConversations] = useState<ConversationListItem[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);

@@ -7,11 +7,15 @@ import { isAdmin } from "@/core/lib/permissions";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatDate } from "@/core/lib/utils";
+import { Button } from "@/core/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { UserRoleSelect } from "./role-select";
 
 export const dynamic = "force-dynamic";
 
-async function getUsers(page: number = 1, limit: number = 50) {
+const PAGE_SIZE = 50;
+
+async function getUsers(page: number, limit: number) {
     const [users, total] = await Promise.all([
         prisma.user.findMany({
             include: {
@@ -32,17 +36,29 @@ async function getRoles() {
     return prisma.role.findMany({ orderBy: { priority: "desc" } });
 }
 
-export default async function AdminUsersPage() {
+interface PageProps {
+    searchParams: Promise<{ page?: string }>;
+}
+
+export default async function AdminUsersPage({ searchParams }: PageProps) {
     const session = await auth();
     if (!session?.user) redirect("/auth/login");
 
     const adminCheck = await isAdmin(session.user.id);
     if (!adminCheck) redirect("/");
 
-    const [{ users, total }, roles] = await Promise.all([getUsers(), getRoles()]);
+    const sp = await searchParams;
+    const requestedPage = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+
+    const [{ users, total }, roles] = await Promise.all([getUsers(requestedPage, PAGE_SIZE), getRoles()]);
     const t = await getTranslations("admin");
     const locale = await getLocale();
     const dateTag = locale === "tr" ? "tr-TR" : locale;
+
+    const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const page = Math.min(requestedPage, pageCount);
+    const prevPage = page > 1 ? page - 1 : null;
+    const nextPage = page < pageCount ? page + 1 : null;
 
     return (
         <>
@@ -102,6 +118,44 @@ export default async function AdminUsersPage() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {pageCount > 1 && (
+                        <div className="flex items-center justify-between gap-4 pt-4 mt-4 border-t">
+                            <p className="text-sm text-muted-foreground">
+                                {t.has("users_pageOf")
+                                    ? t("users_pageOf", { page, total: pageCount })
+                                    : `Page ${page} of ${pageCount}`}
+                            </p>
+                            <div className="flex gap-2">
+                                {prevPage ? (
+                                    <Link href={`/admin/users?page=${prevPage}`}>
+                                        <Button variant="outline" size="sm">
+                                            <ChevronLeft className="w-4 h-4 mr-1" />
+                                            {t.has("users_prev") ? t("users_prev") : "Previous"}
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button variant="outline" size="sm" disabled>
+                                        <ChevronLeft className="w-4 h-4 mr-1" />
+                                        {t.has("users_prev") ? t("users_prev") : "Previous"}
+                                    </Button>
+                                )}
+                                {nextPage ? (
+                                    <Link href={`/admin/users?page=${nextPage}`}>
+                                        <Button variant="outline" size="sm">
+                                            {t.has("users_next") ? t("users_next") : "Next"}
+                                            <ChevronRight className="w-4 h-4 ml-1" />
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button variant="outline" size="sm" disabled>
+                                        {t.has("users_next") ? t("users_next") : "Next"}
+                                        <ChevronRight className="w-4 h-4 ml-1" />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </CardContent>

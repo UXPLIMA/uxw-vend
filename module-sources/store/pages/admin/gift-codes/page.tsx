@@ -9,6 +9,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Gift, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { formatCurrency } from "@/core/lib/utils";
 
 interface GiftCode {
@@ -24,6 +25,7 @@ interface GiftCode {
 
 export default function GiftCodesPage() {
     const t = useTranslations("store");
+    const { confirm } = useConfirm();
     const [codes, setCodes] = useState<GiftCode[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -64,8 +66,24 @@ export default function GiftCodesPage() {
     };
 
     const deleteCode = async (id: string) => {
-        await fetch(`/api/v1/gift-codes/${id}`, { method: "DELETE" });
-        fetchCodes();
+        const ok = await confirm({
+            title: t.has("gc_deleteTitle") ? t("gc_deleteTitle") : "Delete gift code?",
+            message: t.has("gc_deleteConfirm") ? t("gc_deleteConfirm") : "Delete this gift code? If the code has been distributed but not redeemed, the holder will not be able to use it.",
+            confirmText: t.has("gc_delete") ? t("gc_delete") : "Delete",
+            variant: "danger",
+        });
+        if (!ok) return;
+        try {
+            const res = await fetch(`/api/v1/gift-codes/${id}`, { method: "DELETE" });
+            if (!res.ok) {
+                toast.error(t.has("gc_deleteError") ? t("gc_deleteError") : "Failed to delete gift code");
+                return;
+            }
+            toast.success(t.has("gc_deletedToast") ? t("gc_deletedToast") : "Gift code deleted");
+            fetchCodes();
+        } catch {
+            toast.error(t.has("gc_deleteError") ? t("gc_deleteError") : "Failed to delete gift code");
+        }
     };
 
     const copyCode = (code: string, id: string) => {

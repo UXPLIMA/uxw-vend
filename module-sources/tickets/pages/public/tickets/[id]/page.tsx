@@ -3,6 +3,8 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Navbar, Footer } from "@/core/components/layout";
@@ -46,6 +48,7 @@ interface PageProps {
 export default function TicketDetailPage({ params }: PageProps) {
     const { id } = use(params);
     const { data: session } = useSession();
+    const t = useTranslations("tickets");
     const relativeTime = useRelativeTime();
     const [ticket, setTicket] = useState<Ticket | null>(null);
     const [loading, setLoading] = useState(true);
@@ -95,7 +98,7 @@ export default function TicketDetailPage({ params }: PageProps) {
             } : null);
             setReply("");
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to send reply");
+            toast.error(err instanceof Error ? err.message : t("replyFailed"));
         } finally {
             setSending(false);
         }

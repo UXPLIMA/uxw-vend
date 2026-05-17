@@ -18,12 +18,14 @@ interface UserSession {
     expiresAt: string;
 }
 
-function formatDate(d: string): string {
-    return new Date(d).toLocaleString("tr-TR");
+function formatDate(d: string, localeTag: string): string {
+    return new Date(d).toLocaleString(localeTag);
 }
 
 export function SessionsTab() {
     const t = useTranslations("profile");
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const [sessions, setSessions] = useState<UserSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<Set<string>>(new Set());
@@ -128,7 +130,7 @@ export function SessionsTab() {
                                             {s.deviceInfo || device.label}
                                         </div>
                                         <div className="text-xs text-muted-foreground">
-                                            {s.ipAddress || t("unknownIp")} · {t("lastActive", { date: formatDate(s.lastActiveAt) })}
+                                            {s.ipAddress || t("unknownIp")} · {t("lastActive", { date: formatDate(s.lastActiveAt, __dateTag) })}
                                         </div>
                                     </div>
                                     <Button

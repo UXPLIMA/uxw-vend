@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
         }
 
         if (password.length < 6) {
-            setError("Password must be at least 6 characters");
+            setError(t('passwordMinLength'));
             return;
         }
 
@@ -62,10 +62,10 @@ export default function ResetPasswordPage() {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center px-4">
                 <div className="text-center">
-                    <h1 className="text-xl font-bold text-foreground mb-2">Invalid Reset Link</h1>
-                    <p className="text-muted-foreground mb-4">This password reset link is invalid or has expired.</p>
+                    <h1 className="text-xl font-bold text-foreground mb-2">{t('invalidResetLink')}</h1>
+                    <p className="text-muted-foreground mb-4">{t('invalidResetLinkBody')}</p>
                     <Link href="/auth/forgot-password">
-                        <Button>Request New Link</Button>
+                        <Button>{t('sendResetLink')}</Button>
                     </Link>
                 </div>
             </div>
@@ -90,17 +90,17 @@ export default function ResetPasswordPage() {
 
                 <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-border">
-                        <h1 className="text-xl font-bold text-foreground text-center">Reset Password</h1>
-                        <p className="text-muted-foreground text-sm text-center mt-1">Enter your new password</p>
+                        <h1 className="text-xl font-bold text-foreground text-center">{t('resetTitle')}</h1>
+                        <p className="text-muted-foreground text-sm text-center mt-1">{t('resetSubtitle')}</p>
                     </div>
 
                     <div className="p-6">
                         {success ? (
                             <div className="text-center py-4">
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <h2 className="font-semibold text-foreground mb-1">Password Reset!</h2>
+                                <h2 className="font-semibold text-foreground mb-1">{t('resetSuccess')}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">
-                                    Your password has been updated successfully.
+                                    {t('resetSuccessBody')}
                                 </p>
                                 <Link href="/auth/login">
                                     <Button className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                                     disabled={loading}
                                 >
-                                    {loading ? "Resetting..." : "Reset Password"}
+                                    {loading ? t('resetting') : t('resetButton')}
                                 </Button>
                             </form>
                         )}

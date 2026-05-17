@@ -201,7 +201,7 @@ export function ProfileSecurityTab() {
         setPasswordSaved(false);
 
         if (newPassword !== confirmPassword) {
-            setPasswordError(t("invalidCode"));
+            setPasswordError(t.has("passwordMismatch") ? t("passwordMismatch") : "Passwords don't match");
             setSavingPassword(false);
             return;
         }
@@ -452,11 +452,11 @@ export function ProfileSecurityTab() {
                         )}
                         {passwordSaved && (
                             <div className="p-3 bg-green-50 border border-green-100 text-green-600 text-sm rounded-lg">
-                                {t("setupSuccess")}
+                                {t.has("passwordChanged") ? t("passwordChanged") : "Password changed successfully"}
                             </div>
                         )}
                         <div>
-                            <Label>{t("enterPassword")}</Label>
+                            <Label>{t.has("currentPassword") ? t("currentPassword") : "Current password"}</Label>
                             <Input
                                 type="password"
                                 value={currentPassword}
@@ -465,7 +465,7 @@ export function ProfileSecurityTab() {
                             />
                         </div>
                         <div>
-                            <Label>{t("password")}</Label>
+                            <Label>{t.has("newPassword") ? t("newPassword") : "New password"}</Label>
                             <Input
                                 type="password"
                                 value={newPassword}
@@ -475,7 +475,7 @@ export function ProfileSecurityTab() {
                             />
                         </div>
                         <div>
-                            <Label>{t("verify")}</Label>
+                            <Label>{t.has("confirmNewPassword") ? t("confirmNewPassword") : "Confirm new password"}</Label>
                             <Input
                                 type="password"
                                 value={confirmPassword}
@@ -486,11 +486,9 @@ export function ProfileSecurityTab() {
                         </div>
                         <Button type="submit" disabled={savingPassword}>
                             {savingPassword ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />{" "}
-                                </>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
                             ) : (
-                                t("verify")
+                                t.has("changePassword") ? t("changePassword") : "Change password"
                             )}
                         </Button>
                     </form>

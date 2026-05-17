@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
                     <div className="p-6 border-b border-border">
                         <h1 className="text-xl font-bold text-foreground text-center">{t('forgotPassword')}</h1>
                         <p className="text-muted-foreground text-sm text-center mt-1">
-                            Enter your email to receive a reset link
+                            {t('forgotSubtitle')}
                         </p>
                     </div>
 
@@ -67,13 +67,13 @@ export default function ForgotPasswordPage() {
                         {sent ? (
                             <div className="text-center py-4">
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                                <h2 className="font-semibold text-foreground mb-1">Check your email</h2>
+                                <h2 className="font-semibold text-foreground mb-1">{t('checkEmail')}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">
-                                    If an account exists for {email}, we&apos;ve sent a password reset link.
+                                    {t('resetLinkSent', { email })}
                                 </p>
                                 <Link href="/auth/login">
                                     <Button variant="outline">
-                                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to login
+                                        <ArrowLeft className="w-4 h-4 mr-2" /> {t('backToLogin')}
                                     </Button>
                                 </Link>
                             </div>
@@ -105,13 +105,13 @@ export default function ForgotPasswordPage() {
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                                     disabled={loading}
                                 >
-                                    {loading ? "Sending..." : "Send Reset Link"}
+                                    {loading ? t('sending') : t('sendResetLink')}
                                 </Button>
 
                                 <p className="text-center text-sm text-muted-foreground">
                                     <Link href="/auth/login" className="text-blue-600 hover:underline">
                                         <ArrowLeft className="w-3 h-3 inline mr-1" />
-                                        Back to login
+                                        {t('backToLogin')}
                                     </Link>
                                 </p>
                             </form>

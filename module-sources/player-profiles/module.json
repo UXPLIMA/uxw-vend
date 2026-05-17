@@ -48,7 +48,12 @@
         "viewProfile": "View Profile",
         "rank": "Rank",
         "badges": "Badges",
-        "activity": "Activity"
+        "activity": "Activity",
+        "stat_orders": "Orders",
+        "stat_topics": "Topics",
+        "stat_posts": "Posts",
+        "stat_comments": "Comments",
+        "stat_suggestions": "Suggestions"
       }
     },
     "tr": {
@@ -70,7 +75,12 @@
         "viewProfile": "Profili G\u00f6r\u00fcnt\u00fcle",
         "rank": "R\u00fctbe",
         "badges": "Rozetler",
-        "activity": "Aktivite"
+        "activity": "Aktivite",
+        "stat_orders": "Sipari\u015f",
+        "stat_topics": "Konu",
+        "stat_posts": "Mesaj",
+        "stat_comments": "Yorum",
+        "stat_suggestions": "\u00d6neri"
       }
     },
     "de": {
