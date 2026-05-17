@@ -130,6 +130,7 @@ function generateRegistry() {
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
     const allUserDataTables: ({ model: string; key: string; column: string; module: string })[] = [];
+    const allModerationProviders: ({ id: string; label: string; labelKey?: string; handler: string; module: string })[] = [];
 
     type SlotEntry = {
         name: string;
@@ -165,6 +166,7 @@ function generateRegistry() {
             allSeoRoutes.push({ module: moduleName, handler: manifest.seoRoutes.handler });
         }
         manifest.userDataExport?.forEach((u) => allUserDataTables.push({ ...u, module: moduleName }));
+        manifest.moderationProviders?.forEach((mp) => allModerationProviders.push({ ...mp, module: moduleName }));
 
         // Canonical `slots` field (from T12).
         (manifest as unknown as { slots?: { name: string; component: string; order?: number; id?: string }[] }).slots?.forEach((s, i) => {
@@ -407,6 +409,32 @@ function generateRegistry() {
     let notifTypesContent = '// Auto-generated notification types registry\n\n';
     notifTypesContent += `export const ModuleNotificationTypes: { eventType: string; label: string; description?: string; channels?: string[]; module: string }[] = ${JSON.stringify(allNotificationTypes, null, 2)};\n`;
     fs.writeFileSync(NOTIFTYPES_FILE, notifTypesContent);
+
+    const MODERATION_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-moderation.ts');
+    let moderationContent = '// Auto-generated moderation provider registry — server only\n\n';
+    moderationContent += "export interface ModerationItem {\n";
+    moderationContent += "    id: string;\n";
+    moderationContent += "    author: { id: string; username: string } | null;\n";
+    moderationContent += "    preview: string;\n";
+    moderationContent += "    title?: string;\n";
+    moderationContent += "    createdAt: Date;\n";
+    moderationContent += "    href?: string;\n";
+    moderationContent += "}\n\n";
+    moderationContent += "export interface ModerationProvider {\n";
+    moderationContent += "    count(): Promise<number>;\n";
+    moderationContent += "    list(skip: number, take: number): Promise<{ items: ModerationItem[]; total: number }>;\n";
+    moderationContent += "    bulkUpdate(ids: string[], newState: 'APPROVED' | 'REJECTED'): Promise<number>;\n";
+    moderationContent += "}\n\n";
+    moderationContent += "export const ModuleModerationProviders: { id: string; label: string; labelKey?: string; module: string; loader: () => Promise<{ default: ModerationProvider }> }[] = [\n";
+    for (const mp of allModerationProviders) {
+        const handlerPath = mp.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${mp.module}/${handlerPath}`;
+        const meta: Record<string, string> = { id: mp.id, label: mp.label, module: mp.module };
+        if (mp.labelKey) meta.labelKey = mp.labelKey;
+        moderationContent += `  { ...${JSON.stringify(meta)}, loader: () => import('${importPath}') as Promise<{ default: ModerationProvider }> },\n`;
+    }
+    moderationContent += "];\n";
+    fs.writeFileSync(MODERATION_FILE, moderationContent);
 }
 
 const ROUTES_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-routes.ts');

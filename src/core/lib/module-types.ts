@@ -242,6 +242,17 @@ export interface ModuleManifest {
         key: string;     // grouping key in the export (e.g. "blog.articles")
         column: string;  // FK column to user id (e.g. "authorId")
     }[];
+
+    // Moderation queue contributors — modules that own moderatable
+    // content (comments, posts, suggestions) plug into the unified
+    // admin moderation view. Handler default-exports an object:
+    //   { list(skip, take), count(), bulkUpdate(ids, action) }
+    moderationProviders?: {
+        id: string;          // unique slug e.g. "blog-comment", used in URLs
+        label: string;       // human-readable label e.g. "Blog comments"
+        labelKey?: string;   // optional i18n key (admin namespace)
+        handler: string;     // path to handler file relative to module root
+    }[];
 }
 
 /**

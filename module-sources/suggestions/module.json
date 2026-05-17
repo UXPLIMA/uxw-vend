@@ -366,6 +366,14 @@
       "column": "userId"
     }
   ],
+  "moderationProviders": [
+    {
+      "id": "suggestion",
+      "label": "Suggestions",
+      "labelKey": "moderation_suggestion",
+      "handler": "moderation/provider.ts"
+    }
+  ],
   "navLinks": [
     {
       "label": "Suggestions",

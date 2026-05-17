@@ -871,6 +871,20 @@
       "column": "userId"
     }
   ],
+  "moderationProviders": [
+    {
+      "id": "forum-topic",
+      "label": "Forum topics",
+      "labelKey": "moderation_forumTopic",
+      "handler": "moderation/topics.ts"
+    },
+    {
+      "id": "forum-post",
+      "label": "Forum posts",
+      "labelKey": "moderation_forumPost",
+      "handler": "moderation/posts.ts"
+    }
+  ],
   "navLinks": [
     {
       "label": "Forum",

@@ -834,6 +834,14 @@
       "column": "authorId"
     }
   ],
+  "moderationProviders": [
+    {
+      "id": "blog-comment",
+      "label": "Blog comments",
+      "labelKey": "moderation_blogComment",
+      "handler": "moderation/comments.ts"
+    }
+  ],
   "cronJobs": [
     {
       "id": "publish-scheduled",

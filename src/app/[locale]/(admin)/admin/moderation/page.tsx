@@ -16,11 +16,9 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 
-type ModerationType = "blog-comment" | "forum-topic" | "forum-post" | "suggestion";
-
 interface ModerationItem {
     id: string;
-    type: ModerationType;
+    type: string;
     author: { id: string; username: string } | null;
     preview: string;
     title?: string;
@@ -29,7 +27,8 @@ interface ModerationItem {
 }
 
 interface CountsPayload {
-    counts: Record<ModerationType, number>;
+    counts: Record<string, number>;
+    types: Record<string, { label: string; labelKey?: string }>;
 }
 
 interface ListPayload {
@@ -39,25 +38,13 @@ interface ListPayload {
     pages: number;
 }
 
-const TABS: { key: "all" | ModerationType; labelKey: string }[] = [
-    { key: "all", labelKey: "moderation_all" },
-    { key: "blog-comment", labelKey: "moderation_blogComment" },
-    { key: "forum-topic", labelKey: "moderation_forumTopic" },
-    { key: "forum-post", labelKey: "moderation_forumPost" },
-    { key: "suggestion", labelKey: "moderation_suggestion" },
-];
-
 export default function ModerationPage() {
     const __locale = useLocale();
     const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
-    const [activeTab, setActiveTab] = useState<"all" | ModerationType>("all");
-    const [counts, setCounts] = useState<Record<ModerationType, number>>({
-        "blog-comment": 0,
-        "forum-topic": 0,
-        "forum-post": 0,
-        "suggestion": 0,
-    });
+    const [types, setTypes] = useState<Record<string, { label: string; labelKey?: string }>>({});
+    const [counts, setCounts] = useState<Record<string, number>>({});
+    const [activeTab, setActiveTab] = useState<string>("all");
     const [items, setItems] = useState<ModerationItem[]>([]);
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
@@ -68,31 +55,38 @@ export default function ModerationPage() {
 
     const { confirm } = useConfirm();
 
-    const effectiveTypes = useMemo<ModerationType[]>(() => {
-        if (activeTab === "all") return ["blog-comment", "forum-topic", "forum-post", "suggestion"];
-        return [activeTab];
-    }, [activeTab]);
+    const typeIds = useMemo(() => Object.keys(types), [types]);
+
+    const typeLabel = useCallback(
+        (id: string): string => {
+            const meta = types[id];
+            if (!meta) return id;
+            return meta.labelKey && t.has(meta.labelKey) ? t(meta.labelKey) : meta.label;
+        },
+        [types, t],
+    );
 
     const fetchCounts = useCallback(async () => {
         const res = await fetch("/api/v1/admin/moderation");
         if (res.ok) {
             const data: CountsPayload = await res.json();
-            setCounts(data.counts);
+            setCounts(data.counts || {});
+            setTypes(data.types || {});
         }
     }, []);
 
     const fetchItems = useCallback(async () => {
+        if (typeIds.length === 0) return;
         setLoading(true);
         setSelected(new Set());
         try {
             if (activeTab === "all") {
-                // Fetch first page of each type and concat
                 const results = await Promise.all(
-                    effectiveTypes.map((t) =>
-                        fetch(`/api/v1/admin/moderation?type=${t}&page=1`).then((r) =>
-                            r.ok ? (r.json() as Promise<ListPayload>) : null
-                        )
-                    )
+                    typeIds.map((id) =>
+                        fetch(`/api/v1/admin/moderation?type=${encodeURIComponent(id)}&page=1`).then(
+                            (r) => (r.ok ? (r.json() as Promise<ListPayload>) : null),
+                        ),
+                    ),
                 );
                 const combined: ModerationItem[] = [];
                 let sum = 0;
@@ -103,14 +97,16 @@ export default function ModerationPage() {
                     }
                 }
                 combined.sort(
-                    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
                 );
                 setItems(combined);
                 setTotal(sum);
                 setPages(1);
                 setPage(1);
             } else {
-                const res = await fetch(`/api/v1/admin/moderation?type=${activeTab}&page=${page}`);
+                const res = await fetch(
+                    `/api/v1/admin/moderation?type=${encodeURIComponent(activeTab)}&page=${page}`,
+                );
                 if (res.ok) {
                     const data: ListPayload = await res.json();
                     setItems(data.items);
@@ -121,7 +117,7 @@ export default function ModerationPage() {
         } finally {
             setLoading(false);
         }
-    }, [activeTab, page, effectiveTypes]);
+    }, [activeTab, page, typeIds]);
 
     useEffect(() => {
         fetchCounts();
@@ -149,9 +145,9 @@ export default function ModerationPage() {
     };
 
     const performAction = async (
-        type: ModerationType,
+        type: string,
         ids: string[],
-        action: "approve" | "reject"
+        action: "approve" | "reject",
     ) => {
         const res = await fetch("/api/v1/admin/moderation", {
             method: "POST",
@@ -180,7 +176,11 @@ export default function ModerationPage() {
         try {
             const ok = await performAction(item.type, [item.id], action);
             if (ok) {
-                toast.success(action === "approve" ? t("moderation_approvedSingle") : t("moderation_rejectedSingle"));
+                toast.success(
+                    action === "approve"
+                        ? t("moderation_approvedSingle")
+                        : t("moderation_rejectedSingle"),
+                );
                 await fetchCounts();
                 await fetchItems();
             }
@@ -205,8 +205,7 @@ export default function ModerationPage() {
         }
         setWorking(true);
         try {
-            // Group selected ids by type
-            const byType = new Map<ModerationType, string[]>();
+            const byType = new Map<string, string[]>();
             for (const item of items) {
                 if (!selected.has(item.id)) continue;
                 const list = byType.get(item.type) ?? [];
@@ -218,7 +217,11 @@ export default function ModerationPage() {
                 const ok = await performAction(type, ids, action);
                 if (ok) totalAffected += ids.length;
             }
-            toast.success(action === "approve" ? t("moderation_approved", { count: totalAffected }) : t("moderation_rejected", { count: totalAffected }));
+            toast.success(
+                action === "approve"
+                    ? t("moderation_approved", { count: totalAffected })
+                    : t("moderation_rejected", { count: totalAffected }),
+            );
             await fetchCounts();
             await fetchItems();
         } finally {
@@ -226,18 +229,7 @@ export default function ModerationPage() {
         }
     };
 
-    const typeLabel = (type: ModerationType): string => {
-        switch (type) {
-            case "blog-comment":
-                return t("moderation_blogComment");
-            case "forum-topic":
-                return t("moderation_forumTopic");
-            case "forum-post":
-                return t("moderation_forumPost");
-            case "suggestion":
-                return t("moderation_suggestion");
-        }
-    };
+    const totalAll = typeIds.reduce((sum, id) => sum + (counts[id] || 0), 0);
 
     return (
         <>
@@ -253,37 +245,52 @@ export default function ModerationPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 mb-4">
-                {TABS.map((tab) => {
-                    const count =
-                        tab.key === "all"
-                            ? counts["blog-comment"] +
-                              counts["forum-topic"] +
-                              counts["forum-post"] +
-                              counts["suggestion"]
-                            : counts[tab.key];
-                    const isActive = activeTab === tab.key;
+                <button
+                    type="button"
+                    onClick={() => {
+                        setActiveTab("all");
+                        setPage(1);
+                    }}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === "all"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground hover:bg-muted/80"
+                        }`}
+                >
+                    {t("moderation_all")}
+                    {totalAll > 0 && (
+                        <span
+                            className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${activeTab === "all"
+                                ? "bg-primary-foreground/20"
+                                : "bg-background text-foreground"
+                                }`}
+                        >
+                            {totalAll}
+                        </span>
+                    )}
+                </button>
+                {typeIds.map((id) => {
+                    const count = counts[id] || 0;
+                    const isActive = activeTab === id;
                     return (
                         <button
                             type="button"
-                            key={tab.key}
+                            key={id}
                             onClick={() => {
-                                setActiveTab(tab.key);
+                                setActiveTab(id);
                                 setPage(1);
                             }}
-                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted text-foreground hover:bg-muted/80"
-                            }`}
+                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-foreground hover:bg-muted/80"
+                                }`}
                         >
-                            {t(tab.labelKey)}
+                            {typeLabel(id)}
                             {count > 0 && (
                                 <span
-                                    className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${
-                                        isActive
-                                            ? "bg-primary-foreground/20"
-                                            : "bg-background text-foreground"
-                                    }`}
+                                    className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${isActive
+                                        ? "bg-primary-foreground/20"
+                                        : "bg-background text-foreground"
+                                        }`}
                                 >
                                     {count}
                                 </span>
@@ -305,8 +312,8 @@ export default function ModerationPage() {
                             />
                             <span className="text-xs text-muted-foreground flex-1">
                                 {selected.size > 0
-                                    ? `${selected.size} selected`
-                                    : `${items.length} items`}
+                                    ? t("moderation_selectedCount", { count: selected.size })
+                                    : t("moderation_itemsCount", { count: items.length })}
                             </span>
                             {selected.size > 0 && (
                                 <div className="flex gap-2">
@@ -315,7 +322,7 @@ export default function ModerationPage() {
                                         disabled={working}
                                         onClick={() => handleBulk("approve")}
                                     >
-                                        <Check className="w-3 h-3 mr-1" /> Approve
+                                        <Check className="w-3 h-3 mr-1" /> {t("moderation_approve")}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -323,7 +330,7 @@ export default function ModerationPage() {
                                         disabled={working}
                                         onClick={() => handleBulk("reject")}
                                     >
-                                        <X className="w-3 h-3 mr-1" /> Reject
+                                        <X className="w-3 h-3 mr-1" /> {t("moderation_reject")}
                                     </Button>
                                 </div>
                             )}
@@ -353,11 +360,11 @@ export default function ModerationPage() {
                                                 {typeLabel(item.type)}
                                             </span>
                                             <span className="font-medium text-sm">
-                                                {item.author?.username ?? "anonymous"}
+                                                {item.author?.username ?? t("moderation_anonymous")}
                                             </span>
                                             {item.title && (
                                                 <span className="text-xs text-muted-foreground truncate">
-                                                    on {item.title}
+                                                    {t("moderation_onTitle", { title: item.title })}
                                                 </span>
                                             )}
                                             {item.href && (
@@ -366,7 +373,7 @@ export default function ModerationPage() {
                                                     target="_blank"
                                                     className="text-xs text-primary hover:underline inline-flex items-center gap-1"
                                                 >
-                                                    <ExternalLink className="w-3 h-3" /> view
+                                                    <ExternalLink className="w-3 h-3" /> {t("moderation_view")}
                                                 </Link>
                                             )}
                                         </div>
@@ -374,7 +381,7 @@ export default function ModerationPage() {
                                             {item.preview}
                                         </p>
                                         <p className="text-[11px] text-muted-foreground mt-1">
-                                            {new Date(item.createdAt).toLocaleString("tr-TR")}
+                                            {new Date(item.createdAt).toLocaleString(__dateTag)}
                                         </p>
                                     </div>
                                     <div className="flex gap-1">
@@ -383,7 +390,7 @@ export default function ModerationPage() {
                                             size="sm"
                                             disabled={working}
                                             onClick={() => handleSingle(item, "approve")}
-                                            title="Approve"
+                                            title={t("moderation_approve")}
                                         >
                                             <Check className="w-3 h-3" />
                                         </Button>
@@ -393,7 +400,7 @@ export default function ModerationPage() {
                                             className="text-destructive"
                                             disabled={working}
                                             onClick={() => handleSingle(item, "reject")}
-                                            title="Reject"
+                                            title={t("moderation_reject")}
                                         >
                                             <X className="w-3 h-3" />
                                         </Button>
@@ -405,7 +412,7 @@ export default function ModerationPage() {
                     {pages > 1 && activeTab !== "all" && (
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">
-                                {total} · Page {page} / {pages}
+                                {t("moderation_pageOf", { total, page, pages })}
                             </span>
                             <div className="flex gap-1">
                                 <Button

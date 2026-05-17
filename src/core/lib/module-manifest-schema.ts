@@ -224,6 +224,13 @@ const userDataExportEntry = z.object({
     column: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/),
 });
 
+const moderationProvider = z.object({
+    id: z.string().min(1).max(64).regex(SAFE_ID, "id must be lowercase alphanumeric + hyphens"),
+    label: z.string().min(1).max(100),
+    labelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
+    handler: relativePath("handler"),
+});
+
 type TranslationValue = string | { [key: string]: TranslationValue };
 const translationValue: z.ZodType<TranslationValue> = z.lazy(() =>
     z.union([z.string(), z.record(z.string(), translationValue)]),
@@ -276,6 +283,7 @@ export const moduleManifestSchema = z.object({
     statsApi: routePath.optional(),
     seoRoutes: z.object({ handler: relativePath("handler") }).optional(),
     userDataExport: z.array(userDataExportEntry).max(50).optional(),
+    moderationProviders: z.array(moderationProvider).max(20).optional(),
 }).strict();
 
 export type ValidatedModuleManifest = z.infer<typeof moduleManifestSchema>;
@@ -309,6 +317,7 @@ export function collectManifestFileRefs(m: ValidatedModuleManifest): string[] {
     push(m.hooks?.onEnable);
     push(m.hooks?.onDisable);
     push(m.seoRoutes?.handler);
+    m.moderationProviders?.forEach((r) => push(r.handler));
 
     return [...new Set(refs)];
 }
