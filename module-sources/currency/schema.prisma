@@ -1,0 +1,14 @@
+// Currency Module — Database Models
+// Merged into prisma/schema.prisma by merge-schemas.ts.
+
+// ==================== CURRENCY ====================
+
+// USD-based exchange rates kept fresh by the module's cron job.
+// Decimal(20, 8) is wide enough for currencies like VND/IRR where
+// 1 USD = 25,000+ units while still preserving sub-cent precision.
+model ExchangeRate {
+  id        String   @id @default(cuid())
+  currency  String   @unique
+  rate      Decimal  @db.Decimal(20, 8)
+  updatedAt DateTime @updatedAt
+}

@@ -442,13 +442,6 @@ model ModuleMigration {
   @@index([moduleId])
 }
 
-model ExchangeRate {
-  id        String   @id @default(cuid())
-  currency  String   @unique
-  rate      Decimal  @db.Decimal(10, 6)
-  updatedAt DateTime @updatedAt
-}
-
 model ApiKey {
   id          String   @id @default(cuid())
   name        String
