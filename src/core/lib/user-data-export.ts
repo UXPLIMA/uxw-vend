@@ -5,9 +5,9 @@ import { ModuleUserDataTables } from "@/core/generated/module-registry";
  * GDPR-compliant user data export.
  *
  * Collects everything the platform stores about a user — core tables
- * (profile, sessions, trophies, warnings, notification prefs, revisions,
- * activity feed, linked accounts) plus a sweep of module-owned tables
- * declared by each module's `userDataExport` manifest entry.
+ * (profile, sessions, warnings, notification prefs, revisions, activity
+ * feed, linked accounts) plus a sweep of module-owned tables declared by
+ * each module's `userDataExport` manifest entry.
  *
  * Per the core motto, this file does NOT hardcode any module model names.
  * It reads the generated `ModuleUserDataTables` registry (aggregated from
@@ -20,7 +20,6 @@ export interface UserDataExport {
     user: unknown;
     activityFeed: unknown[];
     sessions: unknown[];
-    userTrophies: unknown[];
     warnings: unknown[];
     notificationPrefs: unknown[];
     revisions: unknown[];
@@ -87,7 +86,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     const [
         activityFeed,
         sessions,
-        userTrophies,
         warnings,
         notificationPrefs,
         revisions,
@@ -95,16 +93,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     ] = await Promise.all([
         safeFindMany("activityFeedItem", { actorId: userId }),
         safeFindMany("userSession", { userId }),
-        (async () => {
-            try {
-                return await prisma.userTrophy.findMany({
-                    where: { userId },
-                    include: { trophy: true },
-                });
-            } catch {
-                return [];
-            }
-        })(),
         safeFindMany("userWarning", { userId }),
         safeFindMany("notificationPreference", { userId }),
         safeFindMany("revision", { authorId: userId }),
@@ -123,7 +111,6 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
         user: userRow,
         activityFeed,
         sessions,
-        userTrophies,
         warnings,
         notificationPrefs,
         revisions,
@@ -152,7 +139,6 @@ Contents
                    are intentionally omitted).
   activityFeed     Public activity feed entries you generated.
   sessions         Login sessions (device, IP, last-active timestamp).
-  userTrophies     Trophies you have earned.
   warnings         Moderation warnings issued against you.
   notificationPrefs
                    Your per-channel notification preferences.

@@ -32,7 +32,6 @@ export const CORE_WIDGETS: AvailableWidget[] = [
     { id: "health-snapshot", label: "Health snapshot", description: "Database, Redis, email queue, scheduler status", source: "core" },
     { id: "recent-errors", label: "Recent errors", description: "Latest cron job failures", source: "core" },
     { id: "email-queue-status", label: "Email queue", description: "Pending and failed email counts", source: "core" },
-    { id: "top-trophies", label: "Top trophies", description: "Three rarest trophies on the platform", source: "core" },
 ];
 
 const SETTING_KEY_PREFIX = "dashboard_layout:";

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
     return buildPageMeta({
         title: "Activity Feed",
-        description: "Latest activity across the site — posts, trophies, and community events.",
+        description: "Latest activity across the site.",
         url: "/activity",
         type: "website",
     });

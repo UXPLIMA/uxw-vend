@@ -9,10 +9,9 @@ import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import {
     Loader2, Check, ArrowRight, ArrowLeft, Upload, Download, Palette,
-    Package, CheckCircle, ShoppingCart, MessageSquare, FileText, Ticket,
-    HelpCircle, Shield, History, Users, Vote, Dices, Trophy, Star, Bell,
-    Server, FileEdit, ImageIcon, Crown, Megaphone, Search as SearchIcon
+    Package, CheckCircle, ImageIcon,
 } from "lucide-react";
+import { DynamicIcon } from "lucide-react/dynamic";
 import { toast } from "sonner";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -48,29 +47,20 @@ interface ThemeInfo {
     componentCount: number;
 }
 
-const iconMap: Record<string, React.ReactNode> = {
-    ShoppingCart: <ShoppingCart size={20} />,
-    MessageSquare: <MessageSquare size={20} />,
-    FileText: <FileText size={20} />,
-    Ticket: <Ticket size={20} />,
-    HelpCircle: <HelpCircle size={20} />,
-    Shield: <Shield size={20} />,
-    History: <History size={20} />,
-    Users: <Users size={20} />,
-    Vote: <Vote size={20} />,
-    Dices: <Dices size={20} />,
-    Trophy: <Trophy size={20} />,
-    Star: <Star size={20} />,
-    Bell: <Bell size={20} />,
-    Server: <Server size={20} />,
-    FileEdit: <FileEdit size={20} />,
-    Image: <ImageIcon size={20} />,
-    Crown: <Crown size={20} />,
-    Megaphone: <Megaphone size={20} />,
-    Download: <Download size={20} />,
-    Package: <Package size={20} />,
-    Search: <SearchIcon size={20} />,
-};
+function toKebab(name: string): string {
+    return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+function ModuleIcon({ name }: { name: string }) {
+    if (!name) return <Package size={20} />;
+    return (
+        <DynamicIcon
+            name={toKebab(name) as React.ComponentProps<typeof DynamicIcon>["name"]}
+            size={20}
+            fallback={() => <Package size={20} />}
+        />
+    );
+}
 
 // Essential module categories that most setups benefit from
 const ESSENTIAL_CATEGORIES = ["commerce", "community", "management"];
@@ -315,7 +305,7 @@ export default function SetupWizardPage() {
                                     return (
                                         <div key={mod.id} className="flex items-center justify-between p-3 rounded-lg border">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-blue-500">{iconMap[mod.icon] || <Package size={20} />}</span>
+                                                <span className="text-blue-500"><ModuleIcon name={mod.icon} /></span>
                                                 <div>
                                                     <h4 className="font-medium text-sm flex items-center gap-1.5">
                                                         {mod.name}

@@ -1,0 +1,49 @@
+// Trophies Module — Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// @@user-relations-start
+//   trophies         UserTrophy[]       @relation("UserTrophies")
+// @@user-relations-end
+
+// ==================== TROPHIES ====================
+
+// User trophies / badges. Defined by admins, awarded by hook listeners
+// or manually. Shown on public profile pages.
+model Trophy {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?  // Lucide icon name
+  color       String?  // Tailwind color class or hex
+  points      Int      @default(0)
+  // Legacy string form kept for backwards compatibility. Format:
+  // "<event>:<count>" e.g. "blog.article.created:10". Prefer the
+  // structured rule* columns below, which power the DB-driven engine.
+  awardOn     String?
+  // Structured auto-award rule. `ruleType` leaves room for non-count
+  // strategies later (e.g. "streak", "sum"); today only "event-count"
+  // is implemented. `ruleEvent` is the hook name to listen to,
+  // `ruleThreshold` is how many matching ActivityFeedItem rows the
+  // user must have before the trophy is awarded.
+  ruleType      String?  @default("event-count")
+  ruleEvent     String?
+  ruleThreshold Int?     @default(1)
+  isActive      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       UserTrophy[]
+}
+
+model UserTrophy {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserTrophies")
+  trophyId  String
+  trophy    Trophy   @relation(fields: [trophyId], references: [id], onDelete: Cascade)
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, trophyId])
+  @@index([userId])
+  @@index([trophyId])
+}

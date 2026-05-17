@@ -255,12 +255,10 @@ export async function bootstrapHooks(): Promise<void> {
     if (bootstrapped) return;
     bootstrapped = true;
 
-    // Core listeners — activity feed, trophies, etc.
+    // Core listeners — activity feed, etc. (module-specific listeners live in their modules)
     try {
         const { registerActivityFeedListeners } = await import("./activity-feed");
         registerActivityFeedListeners();
-        const { registerTrophyListeners } = await import("./trophies");
-        await registerTrophyListeners();
     } catch (err) {
         console.error("[hooks] Failed to register core listeners:", err);
     }
@@ -301,6 +299,15 @@ export async function bootstrapHooks(): Promise<void> {
     } catch (err) {
         // The generated registry may not exist on first build.
         console.warn("[hooks] Could not load module-hooks registry:", (err as Error).message);
+    }
+
+    // Once every module's static listeners are wired, fire core.boot so modules
+    // that need DB-driven dynamic listener registration (e.g. the trophy
+    // engine) can hook in without core having to know about them.
+    try {
+        await doActionAsync("core.boot", {});
+    } catch (err) {
+        console.warn("[hooks] core.boot listener failed:", (err as Error).message);
     }
 }
 

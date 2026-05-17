@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check, Award, Download, AlertTriangle } from "lucide-react";
+import { Loader2, Check, Download, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { signOut } from "next-auth/react";
 import { formatDate } from "@/core/lib/utils";
@@ -53,22 +53,6 @@ export default function ProfilePage() {
     const deletePasswordId = useId();
     const deleteConfirmId = useId();
     const mcUsernameId = useId();
-
-    // Trophies earned by this user
-    interface EarnedTrophy {
-        id: string;
-        awardedAt: string;
-        trophy: {
-            id: string;
-            name: string;
-            description: string | null;
-            icon: string | null;
-            color: string | null;
-            points: number;
-        };
-    }
-    const [earnedTrophies, setEarnedTrophies] = useState<EarnedTrophy[]>([]);
-    const [totalTrophies, setTotalTrophies] = useState(0);
 
     // Linked accounts
     const [linkedAccounts, setLinkedAccounts] = useState<{ id: string; provider: string; username: string | null }[]>([]);
@@ -168,16 +152,13 @@ export default function ProfilePage() {
         Promise.all([
             fetch("/api/v1/auth/profile").then(r => r.json()),
             fetch("/api/v1/linked-accounts").then(r => r.json()).catch(() => ({ accounts: [] })),
-            fetch("/api/v1/me/trophies").then(r => r.json()).catch(() => ({ earned: [], total: 0 })),
-        ]).then(([profileData, accountsData, trophyData]) => {
+        ]).then(([profileData, accountsData]) => {
             if (profileData.user) {
                 setProfile(profileData.user);
                 setUsername(profileData.user.username);
                 setAvatar(profileData.user.avatar || "");
             }
             setLinkedAccounts(accountsData.accounts || []);
-            setEarnedTrophies(trophyData.earned || []);
-            setTotalTrophies(trophyData.total || 0);
             setLoading(false);
         }).catch(() => setLoading(false));
     }, [authStatus, router]);
@@ -331,51 +312,6 @@ export default function ProfilePage() {
                                      profileSaved ? <><Check className="w-4 h-4 mr-2" /> {t("saved")}</> : t("saveChanges")}
                                 </Button>
                             </form>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Award className="w-5 h-5 text-amber-500" />
-                                {t("trophies")}
-                                <span className="text-sm font-normal text-muted-foreground ml-2">
-                                    {t("trophiesEarnedCount", { earned: earnedTrophies.length, total: totalTrophies })}
-                                </span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {earnedTrophies.length === 0 ? (
-                                <div className="text-sm text-muted-foreground">
-                                    {t("noTrophiesYet")}{" "}
-                                    <Link href="/trophies" className="text-primary hover:underline">
-                                        {t("seeWhatYouCanEarn")}
-                                    </Link>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                    {earnedTrophies.map((et) => (
-                                        <div
-                                            key={et.id}
-                                            className="flex items-center gap-2 p-2 rounded-md border border-border"
-                                            title={et.trophy.description || et.trophy.name}
-                                        >
-                                            <div
-                                                className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0"
-                                                style={{ backgroundColor: et.trophy.color || "#6366f1" }}
-                                            >
-                                                <Award className="w-5 h-5" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <div className="font-medium text-xs truncate">{et.trophy.name}</div>
-                                                <div className="text-[10px] text-muted-foreground">
-                                                    {formatDate(new Date(et.awardedAt))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </CardContent>
                     </Card>
 

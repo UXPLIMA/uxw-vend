@@ -14,7 +14,6 @@ import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutCom
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
 import { bootstrapHooks } from "@/core/lib/hooks";
 import { bootstrapScheduler } from "@/core/lib/scheduler";
-import { registerTrophyListeners } from "@/core/lib/trophy-engine";
 import { ensureIndexes as ensureSearchIndexes } from "../../../scripts/ensure-search-indexes";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
@@ -76,7 +75,6 @@ export default async function RootLayout({
   // All bootstrap calls below are idempotent — safe to invoke on every render,
   // run their setup once per process.
   await bootstrapHooks();
-  await registerTrophyListeners();
   await bootstrapScheduler();
   // Fire-and-forget: search index creation must not block first paint.
   ensureSearchIndexes().catch((err: unknown) => {

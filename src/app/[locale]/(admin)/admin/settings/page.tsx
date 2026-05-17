@@ -87,13 +87,6 @@ export default function SettingsPage() {
             color: "text-emerald-500",
         },
         {
-            title: t.has("settings_trophies") ? t("settings_trophies") : "Trophies",
-            description: t.has("settings_trophiesDesc") ? t("settings_trophiesDesc") : "Manage achievement badges and rules",
-            href: "/admin/trophies",
-            icon: "Award",
-            color: "text-amber-500",
-        },
-        {
             title: t.has("settings_backup") ? t("settings_backup") : "Backup",
             description: t.has("settings_backupDesc") ? t("settings_backupDesc") : "Database backup & restore",
             href: "/admin/backup",

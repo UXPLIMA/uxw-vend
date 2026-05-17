@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
-import { registerTrophyListeners } from "@/core/lib/trophy-engine";
+import { registerTrophyListeners } from "../../../lib/trophy-engine";
 
 /**
- * POST /api/v1/admin/trophies/reload
+ * POST /api/v1/trophies/admin/reload
  *
  * Re-registers the trophy auto-award engine after rule edits so freshly
  * saved rule changes take effect without requiring a server restart.

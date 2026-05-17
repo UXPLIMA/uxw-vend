@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket, Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield } from "lucide-react";
+import { Package } from "lucide-react";
+import { DynamicIcon } from "lucide-react/dynamic";
 import { useAllModules } from "@/core/providers/module-provider";
 import dynamic from "next/dynamic";
 
@@ -18,10 +19,20 @@ interface ModuleManifest {
     dashboardCards?: DashboardCard[];
 }
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Package, ShoppingCart, DollarSign, FileText, MessageSquare, Ticket,
-    Trophy, Vote, Dices, History, Download, Megaphone, Users, Shield,
-};
+function toKebab(name: string): string {
+    return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+function CardIcon({ name, className }: { name: string; className?: string }) {
+    if (!name) return <Package className={className} />;
+    return (
+        <DynamicIcon
+            name={toKebab(name) as React.ComponentProps<typeof DynamicIcon>["name"]}
+            className={className}
+            fallback={() => <Package className={className} />}
+        />
+    );
+}
 
 const badgeColors: Record<string, string> = {
     green: "bg-green-100 text-green-700",
@@ -157,7 +168,6 @@ export function ModuleStatCards() {
     return (
         <>
             {cards.map((card) => {
-                const Icon = iconMap[card.icon] || Package;
                 return (
                     <Link key={card.id} href={card.href} className="block">
                         <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
@@ -166,7 +176,7 @@ export function ModuleStatCards() {
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                         {translateLabel(card.label, card.labelKey)}
                                     </span>
-                                    <Icon className={`w-4 h-4 ${card.color}`} />
+                                    <CardIcon name={card.icon} className={`w-4 h-4 ${card.color}`} />
                                 </div>
                                 <div className="text-2xl font-bold">{formatValue(card.statKey, stats[card.statKey])}</div>
                             </CardContent>

@@ -1,0 +1,213 @@
+{
+  "id": "trophies",
+  "name": "Trophies",
+  "description": "Achievement badges with rule-based auto-award engine",
+  "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Trophy",
+  "permissions": ["trophies.manage"],
+  "menu": [
+    {
+      "label": "Trophies",
+      "path": "/trophies",
+      "icon": "Trophy"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/trophies",
+      "component": "pages/public/page.tsx"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/trophies",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/trophies",
+      "handler": "api/route.ts",
+      "description": "Public list + admin create."
+    },
+    {
+      "path": "/trophies/[id]",
+      "handler": "api/[id]/route.ts",
+      "description": "Admin update + delete."
+    },
+    {
+      "path": "/me/trophies",
+      "handler": "api/me/route.ts",
+      "description": "Earned trophies for the current user."
+    },
+    {
+      "path": "/admin/trophies",
+      "handler": "api/admin/route.ts",
+      "description": "Admin trophy list + create."
+    },
+    {
+      "path": "/admin/trophies/[id]",
+      "handler": "api/admin/[id]/route.ts",
+      "description": "Admin trophy update + delete."
+    },
+    {
+      "path": "/admin/trophies/reload",
+      "handler": "api/admin/reload/route.ts",
+      "description": "Re-register trophy hook listeners after a rule change."
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Trophies",
+      "href": "/trophies",
+      "icon": "Trophy",
+      "position": 60
+    }
+  ],
+  "footerLinks": [
+    {
+      "label": "Trophies",
+      "href": "/trophies",
+      "section": "quick"
+    }
+  ],
+  "profileTabs": [
+    {
+      "id": "trophies",
+      "label": "Trophies",
+      "component": "components/TrophiesTab",
+      "order": 25
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Trophies",
+      "description": "Manage achievement badges and rules",
+      "href": "/trophies",
+      "icon": "Award",
+      "color": "text-amber-500"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "core.boot",
+      "type": "action",
+      "handler": "hooks/on-core-boot.ts"
+    }
+  ],
+  "seoRoutes": {
+    "handler": "seo/sitemap.ts"
+  },
+  "userDataExport": [
+    {
+      "model": "userTrophy",
+      "key": "trophies.earned",
+      "column": "userId"
+    }
+  ],
+  "translations": {
+    "en": {
+      "trophies": {
+        "title": "Trophies",
+        "trophy": "Trophy",
+        "pageTitle": "Trophies",
+        "pageDesc": "Achievements you can earn across the community.",
+        "noTrophiesAvailable": "No trophies have been defined yet.",
+        "earned": "Earned",
+        "earnedTitle": "You have earned this trophy",
+        "earnedCount": "{earned} of {total} earned",
+        "pointsShort": "{points} pts",
+        "noneYet": "You haven't earned any trophies yet.",
+        "browseAll": "Browse all trophies",
+        "adm_description": "Manage achievement badges and rules",
+        "points": "Points",
+        "active": "Active",
+        "actions": "Actions",
+        "manualOnly": "Manual only",
+        "lucideIcon": "Lucide icon",
+        "ruleType": "Rule type",
+        "ruleEvent": "Rule event",
+        "ruleThreshold": "Rule threshold",
+        "newTrophy": "New trophy",
+        "editTrophy": "Edit trophy",
+        "name": "Name",
+        "descriptionLabel": "Description",
+        "color": "Color (hex)",
+        "ruleEventHint": "Leave empty for manual awards only. Any hook event works.",
+        "thresholdHint": "How many matching events before the trophy is awarded.",
+        "noTrophies": "No trophies defined yet.",
+        "count": "{count} trophies",
+        "activeLabel": "Active",
+        "inactiveLabel": "Inactive",
+        "rule": "Rule",
+        "creating": "Creating…",
+        "saving": "Saving…",
+        "activated": "Trophy activated",
+        "deactivated": "Trophy deactivated",
+        "updated": "Trophy updated",
+        "created": "Trophy created",
+        "deleted": "Trophy deleted",
+        "deleteFailed": "Delete failed",
+        "saveFailed": "Save failed",
+        "loadFailed": "Failed to load trophies",
+        "nameRequired": "Name is required",
+        "deleteTitle": "Delete trophy",
+        "deleteMessage": "Delete \"{name}\"? This also removes it from every user who earned it.",
+        "toggleFailed": "Failed to toggle",
+        "saveChanges": "Save changes"
+      }
+    },
+    "tr": {
+      "trophies": {
+        "title": "Kupalar",
+        "trophy": "Kupa",
+        "pageTitle": "Kupalar",
+        "pageDesc": "Toplulukta kazanabileceğiniz başarımlar.",
+        "noTrophiesAvailable": "Henüz hiç kupa tanımlanmamış.",
+        "earned": "Kazanıldı",
+        "earnedTitle": "Bu kupayı kazandınız",
+        "earnedCount": "{total} kupadan {earned} tanesi kazanıldı",
+        "pointsShort": "{points} puan",
+        "noneYet": "Henüz hiç kupa kazanmadınız.",
+        "browseAll": "Tüm kupalara göz at",
+        "adm_description": "Başarım rozetlerini ve kurallarını yönet",
+        "points": "Puan",
+        "active": "Aktif",
+        "actions": "İşlemler",
+        "manualOnly": "Yalnızca manuel",
+        "lucideIcon": "Lucide ikonu",
+        "ruleType": "Kural tipi",
+        "ruleEvent": "Kural olayı",
+        "ruleThreshold": "Kural eşiği",
+        "newTrophy": "Yeni kupa",
+        "editTrophy": "Kupayı düzenle",
+        "name": "Ad",
+        "descriptionLabel": "Açıklama",
+        "color": "Renk (hex)",
+        "ruleEventHint": "Yalnızca manuel ödüller için boş bırakın. Herhangi bir hook olayı geçerlidir.",
+        "thresholdHint": "Kupa verilmeden önce kaç eşleşen olay gerekli.",
+        "noTrophies": "Henüz hiç kupa tanımlanmamış.",
+        "count": "{count} kupa",
+        "activeLabel": "Aktif",
+        "inactiveLabel": "Pasif",
+        "rule": "Kural",
+        "creating": "Oluşturuluyor…",
+        "saving": "Kaydediliyor…",
+        "activated": "Kupa etkinleştirildi",
+        "deactivated": "Kupa devre dışı bırakıldı",
+        "updated": "Kupa güncellendi",
+        "created": "Kupa oluşturuldu",
+        "deleted": "Kupa silindi",
+        "deleteFailed": "Silme başarısız",
+        "saveFailed": "Kaydetme başarısız",
+        "loadFailed": "Kupalar yüklenemedi",
+        "nameRequired": "Ad gereklidir",
+        "deleteTitle": "Kupayı sil",
+        "deleteMessage": "\"{name}\" kupasını silmek istiyor musunuz? Bu kupayı kazanan tüm kullanıcılardan da kaldırılır.",
+        "toggleFailed": "Durum değiştirilemedi",
+        "saveChanges": "Değişiklikleri kaydet"
+      }
+    }
+  }
+}

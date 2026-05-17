@@ -43,7 +43,6 @@ import {
     Database,
     Gauge,
     Bell,
-    Award,
     KeyRound,
     FileJson,
     ImageIcon,
@@ -221,7 +220,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Activity,
         label: "Activity",
         labelKey: "sidebar_activity",
-        pathPrefix: ["/admin/activity-log", "/admin/audit-log", "/admin/trophies"],
+        pathPrefix: ["/admin/activity-log", "/admin/audit-log"],
         sections: [
             {
                 header: "History",
@@ -229,13 +228,6 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 items: [
                     { href: "/admin/activity-log", label: "Activity Log", labelKey: "sidebar_activityLog", icon: ScrollText },
                     { href: "/admin/audit-log", label: "Audit Log", labelKey: "sidebar_auditLog", icon: ScrollText },
-                ],
-            },
-            {
-                header: "Engagement",
-                headerKey: "sidebar_engagement",
-                items: [
-                    { href: "/admin/trophies", label: "Trophies", labelKey: "sidebar_trophies", icon: Award },
                 ],
             },
         ],

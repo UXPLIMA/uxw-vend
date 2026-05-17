@@ -13,7 +13,6 @@ import ActivityFeedWidget from "@/core/components/admin/widgets/ActivityFeedWidg
 import HealthSnapshotWidget from "@/core/components/admin/widgets/HealthSnapshotWidget";
 import RecentErrorsWidget from "@/core/components/admin/widgets/RecentErrorsWidget";
 import EmailQueueStatusWidget from "@/core/components/admin/widgets/EmailQueueStatusWidget";
-import TopTrophiesWidget from "@/core/components/admin/widgets/TopTrophiesWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +26,7 @@ export const dynamic = "force-dynamic";
  *   │ [ Users ] [ Health ] [ Email ] [ Errors ]       │ <- core 1x1 cards
  *   │ + module-contributed stat cards (same row)      │
  *   ├─ Panels row ────────────────────────────────────┤
- *   │ [ Activity feed      ] [ Top trophies ]         │ <- 2-col panels
+ *   │ [ Activity feed      ]                          │ <- 2-col panels
  *   ├─ Module sections ───────────────────────────────┤
  *   │ [ Open tickets       ] [ Latest orders ]        │ <- module-contributed
  *   │ [ Recent forum topics ... ]                     │
@@ -38,7 +37,7 @@ export const dynamic = "force-dynamic";
  * Widgets are grouped by shape:
  *  - KPI:    users-count, health-snapshot, email-queue-status,
  *            recent-errors  (1x1)
- *  - Panels: activity-feed, top-trophies (1x1 but larger cards)
+ *  - Panels: activity-feed (1x1 but larger cards)
  */
 
 const KPI_WIDGET_IDS = new Set([
@@ -47,7 +46,7 @@ const KPI_WIDGET_IDS = new Set([
     "email-queue-status",
     "recent-errors",
 ]);
-const PANEL_WIDGET_IDS = new Set(["activity-feed", "top-trophies"]);
+const PANEL_WIDGET_IDS = new Set(["activity-feed"]);
 
 const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
     "users-count": () => <UsersCountWidget key="users-count" />,
@@ -55,7 +54,6 @@ const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
     "health-snapshot": () => <HealthSnapshotWidget key="health-snapshot" />,
     "recent-errors": () => <RecentErrorsWidget key="recent-errors" />,
     "email-queue-status": () => <EmailQueueStatusWidget key="email-queue-status" />,
-    "top-trophies": () => <TopTrophiesWidget key="top-trophies" />,
 };
 
 export default async function AdminDashboard() {

@@ -1,26 +1,11 @@
-import type { Metadata } from "next";
-import { Award, Check, Users } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Award, Check, Loader2, Users } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
-import { prisma } from "@/core/lib/db";
-import { auth } from "@/core/lib/auth";
-import { buildPageMeta } from "@/core/lib/seo";
-import { cached } from "@/core/lib/cache";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
-
-const TROPHIES_PUBLIC_CACHE_KEY = "trophies:public";
-const TROPHIES_PUBLIC_TTL_MS = 30_000;
-
-export const dynamic = "force-dynamic";
-
-export async function generateMetadata(): Promise<Metadata> {
-    return buildPageMeta({
-        title: "Trophies",
-        description: "Achievements you can earn across the community.",
-        url: "/trophies",
-        type: "website",
-    });
-}
 
 interface TrophyRow {
     id: string;
@@ -32,39 +17,38 @@ interface TrophyRow {
     _count: { users: number };
 }
 
-async function fetchTrophies(): Promise<TrophyRow[]> {
-    try {
-        return await cached<TrophyRow[]>(
-            TROPHIES_PUBLIC_CACHE_KEY,
-            TROPHIES_PUBLIC_TTL_MS,
-            () =>
-                prisma.trophy.findMany({
-                    where: { isActive: true },
-                    orderBy: [{ points: "desc" }, { name: "asc" }],
-                    include: { _count: { select: { users: true } } },
-                }),
-        );
-    } catch {
-        return [];
-    }
+interface EarnedRow {
+    id: string;
+    trophy: { id: string };
 }
 
-async function fetchEarnedIds(userId: string | undefined): Promise<Set<string>> {
-    if (!userId) return new Set();
-    try {
-        const rows = await prisma.userTrophy.findMany({
-            where: { userId },
-            select: { trophyId: true },
-        });
-        return new Set(rows.map((r) => r.trophyId));
-    } catch {
-        return new Set();
-    }
-}
+export default function PublicTrophiesPage() {
+    const t = useTranslations("trophies");
+    const { data: session } = useSession();
+    const [trophies, setTrophies] = useState<TrophyRow[]>([]);
+    const [earnedIds, setEarnedIds] = useState<Set<string>>(new Set());
+    const [loading, setLoading] = useState(true);
 
-export default async function PublicTrophiesPage() {
-    const [trophies, session, t] = await Promise.all([fetchTrophies(), auth(), getTranslations("profile")]);
-    const earnedIds = await fetchEarnedIds(session?.user?.id);
+    useEffect(() => {
+        const tasks: Promise<unknown>[] = [
+            fetch("/api/v1/trophies")
+                .then((r) => (r.ok ? r.json() : { trophies: [] }))
+                .then((d) => setTrophies(Array.isArray(d.trophies) ? d.trophies : [])),
+        ];
+        if (session?.user) {
+            tasks.push(
+                fetch("/api/v1/me/trophies")
+                    .then((r) => (r.ok ? r.json() : { earned: [] }))
+                    .then((d) => {
+                        const arr: EarnedRow[] = Array.isArray(d.earned) ? d.earned : [];
+                        setEarnedIds(new Set(arr.map((row) => row.trophy.id)));
+                    }),
+            );
+        }
+        Promise.all(tasks)
+            .catch(() => { })
+            .finally(() => setLoading(false));
+    }, [session]);
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
@@ -75,14 +59,16 @@ export default async function PublicTrophiesPage() {
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold flex items-center gap-2">
                         <Award className="w-7 h-7 text-amber-500" />
-                        {t("trophiesPageTitle")}
+                        {t("pageTitle")}
                     </h1>
-                    <p className="text-muted-foreground">
-                        {t("trophiesPageDesc")}
-                    </p>
+                    <p className="text-muted-foreground">{t("pageDesc")}</p>
                 </div>
 
-                {trophies.length === 0 ? (
+                {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
+                ) : trophies.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">
                         {t("noTrophiesAvailable")}
                     </div>
@@ -93,14 +79,13 @@ export default async function PublicTrophiesPage() {
                             return (
                                 <div
                                     key={tr.id}
-                                    className={`relative rounded-lg border p-4 transition-colors ${
-                                        earned ? "border-amber-500/40 bg-amber-500/5" : "border-border bg-card"
-                                    }`}
+                                    className={`relative rounded-lg border p-4 transition-colors ${earned ? "border-amber-500/40 bg-amber-500/5" : "border-border bg-card"
+                                        }`}
                                 >
                                     {earned && (
                                         <span
                                             className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-green-500/15 text-green-600 text-xs px-2 py-0.5"
-                                            title="You have earned this trophy"
+                                            title={t("earnedTitle")}
                                         >
                                             <Check className="w-3 h-3" /> {t("earned")}
                                         </span>
@@ -121,7 +106,7 @@ export default async function PublicTrophiesPage() {
                                             )}
                                             <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                                                 <span className="inline-flex items-center gap-1 font-medium text-amber-600">
-                                                    {tr.points} pts
+                                                    {t("pointsShort", { points: tr.points })}
                                                 </span>
                                                 <span className="inline-flex items-center gap-1">
                                                     <Users className="w-3 h-3" />

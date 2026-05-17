@@ -17,7 +17,6 @@ interface CoreStaticRoute {
 const CORE_STATIC_ROUTES: CoreStaticRoute[] = [
     { path: "/", changeFrequency: "daily", priority: 1.0 },
     { path: "/activity", changeFrequency: "daily", priority: 0.6 },
-    { path: "/trophies", changeFrequency: "weekly", priority: 0.5 },
     { path: "/auth/login", changeFrequency: "yearly", priority: 0.3 },
     { path: "/auth/register", changeFrequency: "yearly", priority: 0.3 },
 ];
