@@ -157,6 +157,8 @@ export default function StorePage() {
                     )}
                 </div>
 
+                <h1 className="text-3xl font-bold text-foreground mb-4">{t('title')}</h1>
+
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="mb-6">
                     <div className="relative max-w-lg">
