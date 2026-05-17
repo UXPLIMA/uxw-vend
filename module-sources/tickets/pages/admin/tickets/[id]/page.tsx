@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -56,6 +56,8 @@ interface PageProps {
 }
 
 export default function AdminTicketDetailPage(props: PageProps) {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("tickets");
     const params = use(props.params);
     const ticketId = params.id;
@@ -152,7 +154,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold">{ticket.subject}</h1>
                     <p className="text-sm text-muted-foreground">
-                        by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString()}
+                        by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString("tr-TR")}
                     </p>
                 </div>
             </div>
@@ -175,7 +177,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                                             )}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(msg.createdAt).toLocaleString()}
+                                            {new Date(msg.createdAt).toLocaleString("tr-TR")}
                                         </p>
                                     </div>
                                 </div>

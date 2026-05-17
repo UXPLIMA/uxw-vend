@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useCurrency } from "../lib/currency-context";
 import { Target } from "lucide-react";
 
@@ -56,7 +56,7 @@ export function PaymentGoalWidget() {
 
             {goal.endDate && (
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Ends {new Date(goal.endDate).toLocaleDateString()}
+                    Ends {new Date(goal.endDate).toLocaleDateString("tr-TR")}
                 </p>
             )}
 

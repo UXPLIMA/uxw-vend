@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Warning {
     id: string;
@@ -36,6 +36,8 @@ interface UserHit {
 }
 
 export default function WarningsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
@@ -335,12 +337,12 @@ export default function WarningsPage() {
                                         <p className="text-xs text-muted-foreground mt-1">
                                             {fallback("warnings_by", "by")}{" "}
                                             {w.issuedBy?.username || fallback("warnings_system", "system")}{" "}
-                                            · {new Date(w.createdAt).toLocaleString()}
+                                            · {new Date(w.createdAt).toLocaleString("tr-TR")}
                                             {w.expiresAt && (
                                                 <>
                                                     {" "}
                                                     · {fallback("warnings_expires", "expires")}{" "}
-                                                    {new Date(w.expiresAt).toLocaleDateString()}
+                                                    {new Date(w.expiresAt).toLocaleDateString("tr-TR")}
                                                 </>
                                             )}
                                         </p>

@@ -8,7 +8,7 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface IpBlock {
     id: string;
@@ -21,6 +21,8 @@ interface IpBlock {
 }
 
 export default function IpBlocksPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
@@ -246,14 +248,14 @@ export default function IpBlocksPage() {
                                                 <td className="p-3 text-muted-foreground">
                                                     {b.expiresAt ? (
                                                         <span className={expired ? "text-muted-foreground line-through" : ""}>
-                                                            {new Date(b.expiresAt).toLocaleString()}
+                                                            {new Date(b.expiresAt).toLocaleString("tr-TR")}
                                                         </span>
                                                     ) : (
                                                         fallback("ipBlocks_permanent", "Permanent")
                                                     )}
                                                 </td>
                                                 <td className="p-3 text-muted-foreground">
-                                                    {new Date(b.createdAt).toLocaleDateString()}
+                                                    {new Date(b.createdAt).toLocaleDateString("tr-TR")}
                                                 </td>
                                                 <td className="p-3 text-right">
                                                     <Button

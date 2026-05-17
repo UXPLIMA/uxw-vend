@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface LogEntry {
     id: string;
@@ -17,6 +17,8 @@ interface LogEntry {
 }
 
 export default function ActivityLogPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function ActivityLogPage() {
                                             <td className="py-3 px-4 text-sm">{log.user?.username || t("activityLog_system")}</td>
                                             <td className="py-3 px-4"><code className="text-xs bg-muted px-2 py-0.5 rounded">{log.action}</code></td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground">{log.entity ? `${log.entity}/${log.entityId}` : "-"}</td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString()}</td>
+                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString("tr-TR")}</td>
                                         </tr>
                                     ))}
                                 </tbody>

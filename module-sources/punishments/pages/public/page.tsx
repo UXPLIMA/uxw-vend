@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -32,6 +32,8 @@ const typeColors: Record<string, string> = {
 const typeKeys: Record<string, string> = { ban: "ban", mute: "mute", kick: "kick", warn: "warning" };
 
 export default function PunishmentsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("punishments");
     const [punishments, setPunishments] = useState<PunishmentItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -116,7 +118,7 @@ export default function PunishmentsPage() {
                                                 <td className="py-3 px-4 text-sm text-muted-foreground max-w-[200px] truncate">{p.reason || "-"}</td>
                                                 <td className="py-3 px-4 text-sm text-muted-foreground">{p.punishedBy || "Console"}</td>
                                                 <td className="py-3 px-4 text-sm">{p.duration || t("permanent")}</td>
-                                                <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString()}</td>
+                                                <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString("tr-TR")}</td>
                                             </tr>
                                         );
                                     })}

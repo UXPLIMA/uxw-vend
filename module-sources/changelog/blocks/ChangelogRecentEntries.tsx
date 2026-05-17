@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 
 /**
@@ -78,7 +79,7 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
                                 </span>
                                 {showDate ? (
                                     <span className="text-xs text-muted-foreground">
-                                        {new Date(entry.createdAt).toLocaleDateString()}
+                                        {new Date(entry.createdAt).toLocaleDateString("tr-TR")}
                                     </span>
                                 ) : null}
                             </div>

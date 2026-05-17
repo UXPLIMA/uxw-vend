@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent } from "@/core/components/ui/card";
+import { useTranslations } from "next-intl";
+import { localizeActivityTitle } from "@/core/lib/activity-title";
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -66,6 +68,7 @@ export function ActivityFeedList({ items, emptyMessage = "No recent activity yet
     items: ActivityItem[];
     emptyMessage?: string;
 }) {
+    const activityT = useTranslations("activity");
     if (items.length === 0) {
         return (
             <Card>
@@ -91,10 +94,10 @@ export function ActivityFeedList({ items, emptyMessage = "No recent activity yet
                                 <div className="flex items-baseline justify-between gap-2">
                                     {item.href ? (
                                         <Link href={item.href} className="text-sm text-foreground hover:text-primary truncate">
-                                            {item.title}
+                                            {localizeActivityTitle(item.type, item.title, activityT)}
                                         </Link>
                                     ) : (
-                                        <span className="text-sm text-foreground truncate">{item.title}</span>
+                                        <span className="text-sm text-foreground truncate">{localizeActivityTitle(item.type, item.title, activityT)}</span>
                                     )}
                                     <span className="text-[10px] text-muted-foreground flex-shrink-0 whitespace-nowrap">{when}</span>
                                 </div>

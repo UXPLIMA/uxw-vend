@@ -117,10 +117,10 @@ function DefaultFooter() {
                     <div>
                         <h4 className="font-semibold text-foreground mb-4">{t('legal')}</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t('termsOfService')}</Link></li>
-                            <li><Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t('privacyPolicy')}</Link></li>
-                            <li><Link href="/refund" className="text-muted-foreground hover:text-foreground transition-colors">{t('refundPolicy')}</Link></li>
-                            <li><Link href="/rules" className="text-muted-foreground hover:text-foreground transition-colors">{t('serverRules')}</Link></li>
+                            <li><Link href="/legal/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t('termsOfService')}</Link></li>
+                            <li><Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t('privacyPolicy')}</Link></li>
+                            <li><Link href="/legal/refund" className="text-muted-foreground hover:text-foreground transition-colors">{t('refundPolicy')}</Link></li>
+                            <li><Link href="/legal/rules" className="text-muted-foreground hover:text-foreground transition-colors">{t('serverRules')}</Link></li>
                         </ul>
                     </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -17,6 +17,8 @@ interface Log {
 }
 
 export default function WebhookLogsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("webhookLogs");
     const [logs, setLogs] = useState<Log[]>([]);
     const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function WebhookLogsPage() {
                                                 <code className="text-xs bg-muted px-2 py-0.5 rounded">{log.event}</code>
                                             </td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground max-w-[300px] truncate">{log.url}</td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString()}</td>
+                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString("tr-TR")}</td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -6,7 +6,7 @@ import {
     Activity, Database, Server, Mail, Clock, AlertCircle,
     CheckCircle2, XCircle, MinusCircle, Loader2, Users, Puzzle, History,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface HealthData {
     status: "ok" | "degraded" | "down";
@@ -54,6 +54,8 @@ function StatusDot({ ok, disabled = false }: { ok: boolean; disabled?: boolean }
 }
 
 export default function ObservabilityPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [health, setHealth] = useState<HealthData | null>(null);
     const [errors, setErrors] = useState<CronError[]>([]);
@@ -117,7 +119,7 @@ export default function ObservabilityPage() {
                     {refreshing && <Loader2 className="w-3 h-3 animate-spin" />}
                     {lastRefresh && (
                         <span>
-                            {t.has("observability_lastRefresh") ? t("observability_lastRefresh") : "Last refresh"}: {lastRefresh.toLocaleTimeString()}
+                            {t.has("observability_lastRefresh") ? t("observability_lastRefresh") : "Last refresh"}: {lastRefresh.toLocaleTimeString("tr-TR")}
                         </span>
                     )}
                 </div>
@@ -283,7 +285,7 @@ export default function ObservabilityPage() {
                                     <li key={e.jobKey} className="border-l-2 border-rose-500 pl-3">
                                         <div className="font-mono text-xs font-semibold">{e.jobKey}</div>
                                         <div className="text-xs text-muted-foreground">
-                                            {new Date(e.lastRunAt).toLocaleString()}
+                                            {new Date(e.lastRunAt).toLocaleString("tr-TR")}
                                         </div>
                                         {e.lastError && (
                                             <div className="text-xs text-rose-500 truncate">{e.lastError}</div>

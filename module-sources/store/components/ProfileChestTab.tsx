@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 
@@ -45,7 +46,7 @@ export function ProfileChestTab() {
                             <div key={item.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                                 <div>
                                     <p className="font-medium">{item.productName}</p>
-                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {new Date(item.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {new Date(item.createdAt).toLocaleDateString("tr-TR")}</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button size="sm" onClick={async () => {

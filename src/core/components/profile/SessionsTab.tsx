@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, Smartphone, Monitor, Trash2, Globe } from "lucide-react";
@@ -19,7 +19,7 @@ interface UserSession {
 }
 
 function formatDate(d: string): string {
-    return new Date(d).toLocaleString();
+    return new Date(d).toLocaleString("tr-TR");
 }
 
 export function SessionsTab() {

@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -24,6 +24,8 @@ interface Submission {
 }
 
 export default function SubmissionsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("customForms");
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [forms, setForms] = useState<Form[]>([]);
@@ -105,7 +107,7 @@ export default function SubmissionsPage() {
                                         <div>
                                             <span className="font-medium text-foreground">{sub.form.title}</span>
                                             <span className="text-xs text-muted-foreground ml-3">
-                                                {new Date(sub.createdAt).toLocaleString()}
+                                                {new Date(sub.createdAt).toLocaleString("tr-TR")}
                                             </span>
                                             <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
                                                 {sub.status}

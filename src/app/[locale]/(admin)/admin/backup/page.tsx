@@ -6,7 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
     Database,
     Download,
@@ -45,7 +45,7 @@ function formatBytes(bytes: number): string {
 
 function formatDate(value: string | null): string {
     if (!value) return "—";
-    return new Date(value).toLocaleString();
+    return new Date(value).toLocaleString("tr-TR");
 }
 
 function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: string }) {
@@ -60,6 +60,8 @@ function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: strin
 }
 
 export default function BackupAdminPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [backups, setBackups] = useState<BackupRow[]>([]);
     const [loading, setLoading] = useState(true);

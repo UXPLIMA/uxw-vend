@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -124,7 +125,7 @@ export function ReferralTab() {
                                     <div>
                                         <p className="text-sm font-medium">{ref.username || "Unknown"}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(ref.createdAt).toLocaleDateString()}
+                                            {new Date(ref.createdAt).toLocaleDateString("tr-TR")}
                                         </p>
                                     </div>
                                     <div className="text-right">

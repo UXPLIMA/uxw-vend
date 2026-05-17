@@ -6,7 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type EmailStatus = "pending" | "sending" | "sent" | "failed";
 type StatusFilter = "all" | EmailStatus;
@@ -55,10 +55,12 @@ const TABS: { key: StatusFilter; labelKey: string }[] = [
 
 function formatDate(value: string | null): string {
     if (!value) return "—";
-    return new Date(value).toLocaleString();
+    return new Date(value).toLocaleString("tr-TR");
 }
 
 export default function EmailQueueAdminPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [jobs, setJobs] = useState<EmailJobRow[]>([]);
     const [summary, setSummary] = useState<Record<EmailStatus, number>>({ pending: 0, sending: 0, sent: 0, failed: 0 });

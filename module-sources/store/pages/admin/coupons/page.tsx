@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -26,6 +26,8 @@ interface Coupon {
 }
 
 export default function AdminCouponsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("store");
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
@@ -323,7 +325,7 @@ export default function AdminCouponsPage() {
                                             </td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground">
                                                 {coupon.expiresAt
-                                                    ? new Date(coupon.expiresAt).toLocaleDateString()
+                                                    ? new Date(coupon.expiresAt).toLocaleDateString("tr-TR")
                                                     : t("adm_never")}
                                             </td>
                                             <td className="py-3 px-4">

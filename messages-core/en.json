@@ -33,6 +33,20 @@
     "description": "The page you’re looking for doesn’t exist or has been moved.",
     "goHome": "Go home"
   },
+  "legal": {
+    "placeholder": "This page hasn’t been filled in yet.",
+    "placeholderHint": "Admins can set this from the Settings panel by saving the {key} setting."
+  },
+  "activity": {
+    "forumTopicCreated": "started a new topic:",
+    "forumPostCreated": "replied to:",
+    "suggestionCreated": "suggested:",
+    "ticketCreated": "opened a ticket:",
+    "ticketReplyCreated": "replied to ticket:",
+    "blogArticlePublished": "published:",
+    "userRegistered": "joined the community",
+    "storeOrderCompleted": "purchased:"
+  },
   "nav": {
     "home": "Home",
     "blog": "Blog",

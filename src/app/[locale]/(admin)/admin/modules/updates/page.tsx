@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -16,6 +17,8 @@ interface UpdateInfo {
 }
 
 export default function ModuleUpdatesPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const [updates, setUpdates] = useState<UpdateInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -88,7 +91,7 @@ export default function ModuleUpdatesPage() {
                             : `${updates.length} update${updates.length === 1 ? "" : "s"} available`}
                         {checkedAt && (
                             <span className="ml-2 text-xs">
-                                · checked {new Date(checkedAt).toLocaleString()}
+                                · checked {new Date(checkedAt).toLocaleString("tr-TR")}
                             </span>
                         )}
                     </p>

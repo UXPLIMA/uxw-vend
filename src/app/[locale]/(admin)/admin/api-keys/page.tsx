@@ -7,7 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Copy, Check, Key } from "lucide-react";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface ApiKeyItem {
@@ -20,6 +20,8 @@ interface ApiKeyItem {
 }
 
 export default function ApiKeysPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [keys, setKeys] = useState<ApiKeyItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ export default function ApiKeysPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xs text-muted-foreground">{new Date(k.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-xs text-muted-foreground">{new Date(k.createdAt).toLocaleDateString("tr-TR")}</span>
                                         <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteKey(k.id)}>
                                             <Trash2 className="w-3 h-3" />
                                         </Button>

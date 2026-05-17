@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 
@@ -73,7 +74,7 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
                             <span className="font-medium">{comment.author?.username}</span>
                             <span className="text-muted-foreground">&middot;</span>
                             <span className="text-muted-foreground text-xs">
-                                {new Date(comment.createdAt).toLocaleDateString()}
+                                {new Date(comment.createdAt).toLocaleDateString("tr-TR")}
                             </span>
                         </div>
                         <p className="text-sm">{comment.content}</p>

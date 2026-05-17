@@ -6,7 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, Play, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface CronJobRow {
     key: string;
@@ -25,7 +25,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 function formatDate(value: string | null): string {
     if (!value) return "—";
-    return new Date(value).toLocaleString();
+    return new Date(value).toLocaleString("tr-TR");
 }
 
 function formatDuration(ms: number | null): string {
@@ -35,6 +35,8 @@ function formatDuration(ms: number | null): string {
 }
 
 export default function CronAdminPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [jobs, setJobs] = useState<CronJobRow[]>([]);
     const [loading, setLoading] = useState(true);

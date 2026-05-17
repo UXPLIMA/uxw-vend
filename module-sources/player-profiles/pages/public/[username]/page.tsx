@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -26,6 +26,8 @@ interface PageProps {
 }
 
 export default function PlayerProfilePage({ params }: PageProps) {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const { username } = use(params);
     const t = useTranslations("playerProfiles");
     const [player, setPlayer] = useState<Player | null>(null);
@@ -72,7 +74,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                                 )}
                                 <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                                     <Calendar className="w-3 h-3" />
-                                    {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString()}
+                                    {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString("tr-TR")}
                                 </p>
                             </div>
                         </div>

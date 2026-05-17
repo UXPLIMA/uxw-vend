@@ -11,7 +11,7 @@ import {
     Megaphone, Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Module {
@@ -91,6 +91,8 @@ function compareVersions(a: string, b: string): number {
 }
 
 export default function AdminModulesPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const searchParams = useSearchParams();
     const initialFilterParam = searchParams?.get("filter") ?? null;
@@ -767,7 +769,7 @@ function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
                             {mod.verified && <CheckCircle className="w-4 h-4 text-blue-500" />}
                         </h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                            by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString()}
+                            by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString("tr-TR")}
                         </p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("common_close")}>

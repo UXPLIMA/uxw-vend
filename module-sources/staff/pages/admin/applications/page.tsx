@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -25,6 +25,8 @@ const statusColors: Record<string, string> = {
 };
 
 export default function StaffApplicationsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("staff");
     const [apps, setApps] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
@@ -88,7 +90,7 @@ export default function StaffApplicationsPage() {
                                         </div>
                                         <div>
                                             <p className="font-medium">{app.user.username}</p>
-                                            <p className="text-xs text-muted-foreground">{app.user.email} · {new Date(app.createdAt).toLocaleDateString()}</p>
+                                            <p className="text-xs text-muted-foreground">{app.user.email} · {new Date(app.createdAt).toLocaleDateString("tr-TR")}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">

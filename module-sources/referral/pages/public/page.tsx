@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -29,6 +30,8 @@ interface ReferralData {
 }
 
 export default function ReferralPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const { data: session } = useSession();
     const [data, setData] = useState<ReferralData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -250,7 +253,7 @@ export default function ReferralPage() {
                                                         </td>
                                                         <td className="py-3 px-2">{ref.rewardAmount.toFixed(2)} credits</td>
                                                         <td className="py-3 px-2 text-muted-foreground">
-                                                            {new Date(ref.createdAt).toLocaleDateString()}
+                                                            {new Date(ref.createdAt).toLocaleDateString("tr-TR")}
                                                         </td>
                                                     </tr>
                                                 ))}

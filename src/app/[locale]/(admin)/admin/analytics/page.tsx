@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
@@ -62,13 +62,15 @@ function sum(data: number[]): number {
     return data.reduce((a, b) => a + b, 0);
 }
 
-function formatTotal(total: number, fmt?: string): string {
+function formatTotal(total: number, fmt: string | undefined, localeTag: string): string {
     if (fmt === "currency") return `$${total.toFixed(2)}`;
-    if (Number.isInteger(total)) return total.toLocaleString();
+    if (Number.isInteger(total)) return total.toLocaleString(localeTag);
     return total.toFixed(2);
 }
 
 export default function AnalyticsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const moduleStates = useAllModules();
     const [period, setPeriod] = useState<string>("30");
@@ -199,7 +201,7 @@ export default function AnalyticsPage() {
                                                 {t("analytics_total")}
                                             </div>
                                             <div className="text-lg font-bold" style={{ color }}>
-                                                {formatTotal(total, chart.format)}
+                                                {formatTotal(total, chart.format, "tr-TR")}
                                             </div>
                                         </div>
                                     </div>

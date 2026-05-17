@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 type ModerationType = "blog-comment" | "forum-topic" | "forum-post" | "suggestion";
 
@@ -48,6 +48,8 @@ const TABS: { key: "all" | ModerationType; labelKey: string }[] = [
 ];
 
 export default function ModerationPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [activeTab, setActiveTab] = useState<"all" | ModerationType>("all");
     const [counts, setCounts] = useState<Record<ModerationType, number>>({
@@ -372,7 +374,7 @@ export default function ModerationPage() {
                                             {item.preview}
                                         </p>
                                         <p className="text-[11px] text-muted-foreground mt-1">
-                                            {new Date(item.createdAt).toLocaleString()}
+                                            {new Date(item.createdAt).toLocaleString("tr-TR")}
                                         </p>
                                     </div>
                                     <div className="flex gap-1">

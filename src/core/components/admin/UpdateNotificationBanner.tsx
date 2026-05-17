@@ -100,7 +100,7 @@ export async function UpdateNotificationBanner() {
     return (
         <UpdateBannerDismiss count={count}>
             <Link
-                href="/admin/modules/marketplace?filter=updates"
+                href="/admin/modules?filter=updates"
                 className="underline font-semibold hover:no-underline"
             >
                 View

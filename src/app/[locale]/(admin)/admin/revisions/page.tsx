@@ -12,7 +12,7 @@ import {
     ChevronDown,
     ChevronRight as ChevronRightIcon,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Revision {
     id: string;
@@ -33,6 +33,8 @@ interface RevisionsResponse {
 }
 
 export default function RevisionsPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
     const [revisions, setRevisions] = useState<Revision[]>([]);
     const [resources, setResources] = useState<string[]>([]);
@@ -187,7 +189,7 @@ export default function RevisionsPage() {
                                                     {rev.author?.username || fallback("revisions_system", "system")}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground text-right md:text-left">
-                                                    {new Date(rev.createdAt).toLocaleString()}
+                                                    {new Date(rev.createdAt).toLocaleString("tr-TR")}
                                                 </span>
                                             </div>
                                         </button>

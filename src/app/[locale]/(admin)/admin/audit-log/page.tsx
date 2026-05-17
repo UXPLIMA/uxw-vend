@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -137,6 +137,8 @@ function MetadataCell({ metadata }: { metadata: unknown }) {
 }
 
 export default function AuditLogPage() {
+    const __locale = useLocale();
+    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("admin");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -356,7 +358,7 @@ export default function AuditLogPage() {
                                                 className="border-b last:border-0 hover:bg-muted/30"
                                             >
                                                 <td className="py-2 px-4 whitespace-nowrap text-xs text-muted-foreground">
-                                                    {new Date(log.createdAt).toLocaleString()}
+                                                    {new Date(log.createdAt).toLocaleString("tr-TR")}
                                                 </td>
                                                 <td className="py-2 px-4 whitespace-nowrap">
                                                     {log.user ? (

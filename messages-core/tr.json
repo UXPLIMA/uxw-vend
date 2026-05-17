@@ -33,6 +33,20 @@
     "description": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
     "goHome": "Ana sayfaya dön"
   },
+  "legal": {
+    "placeholder": "Bu sayfa henüz doldurulmamış.",
+    "placeholderHint": "Yöneticiler Ayarlar panelinden {key} anahtarını kaydederek bu sayfayı düzenleyebilir."
+  },
+  "activity": {
+    "forumTopicCreated": "yeni konu açtı:",
+    "forumPostCreated": "yanıt verdi:",
+    "suggestionCreated": "öneri gönderdi:",
+    "ticketCreated": "bilet açtı:",
+    "ticketReplyCreated": "bilete yanıt verdi:",
+    "blogArticlePublished": "yayınladı:",
+    "userRegistered": "topluluğa katıldı",
+    "storeOrderCompleted": "satın aldı:"
+  },
   "nav": {
     "home": "Ana Sayfa",
     "blog": "Blog",
@@ -961,7 +975,7 @@
     "users_loginAsUser": "Bu kullanıcı olarak giriş yap",
     "users_switching": "Değiştiriliyor",
     "users_notFound": "Kullanıcı bulunamadı",
-    "users_backToUsers": "Kullanıcılara Don",
+    "users_backToUsers": "Kullanıcılara Dön",
     "users_saving": "Kaydediliyor...",
     "users_saved": "Kaydedildi",
     "users_accountActive": "Hesap Aktif",
