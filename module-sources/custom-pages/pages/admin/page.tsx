@@ -73,26 +73,45 @@ export default function CustomPagesAdminPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ title, content, isActive, order }),
             });
-            if (res.ok) { toast.success("Page updated"); resetForm(); fetchPages(); }
-            else toast.error("Failed to update page");
+            if (res.ok) {
+                toast.success(t.has("adm_pageUpdated") ? t("adm_pageUpdated") : "Page updated");
+                resetForm();
+                fetchPages();
+            } else {
+                toast.error(t.has("adm_updateFailed") ? t("adm_updateFailed") : "Failed to update page");
+            }
         } else {
             const res = await fetch("/api/v1/custom-pages", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ title, slug: slug || undefined, content, isActive, order }),
             });
-            if (res.ok) { toast.success("Page created"); resetForm(); fetchPages(); }
-            else toast.error("Failed to create page");
+            if (res.ok) {
+                toast.success(t.has("adm_pageCreated") ? t("adm_pageCreated") : "Page created");
+                resetForm();
+                fetchPages();
+            } else {
+                toast.error(t.has("adm_createFailed") ? t("adm_createFailed") : "Failed to create page");
+            }
         }
         setSaving(false);
     };
 
     const deletePage = async (page: CustomPage) => {
-        const ok = await confirm({ title: "Delete Page", message: `Are you sure you want to delete "${page.title}"?` });
+        const ok = await confirm({
+            title: t.has("adm_deleteTitle") ? t("adm_deleteTitle") : "Delete Page",
+            message: t.has("adm_deleteConfirm") ? t("adm_deleteConfirm", { title: page.title }) : `Are you sure you want to delete "${page.title}"?`,
+            variant: "danger",
+            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+        });
         if (!ok) return;
         const res = await fetch(`/api/v1/custom-pages/${page.slug}`, { method: "DELETE" });
-        if (res.ok) { toast.success("Page deleted"); fetchPages(); }
-        else toast.error("Failed to delete page");
+        if (res.ok) {
+            toast.success(t.has("adm_pageDeleted") ? t("adm_pageDeleted") : "Page deleted");
+            fetchPages();
+        } else {
+            toast.error(t.has("adm_deleteFailed") ? t("adm_deleteFailed") : "Failed to delete page");
+        }
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

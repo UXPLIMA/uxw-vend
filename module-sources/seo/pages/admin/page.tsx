@@ -50,7 +50,7 @@ export default function SeoSettingsPage() {
                     seo_bing_verification: (s.seo_bing_verification as string) || "",
                 });
             })
-            .catch(() => toast.error("Failed to load SEO settings"))
+            .catch(() => toast.error(t.has("adm_settingsLoadFailed") ? t("adm_settingsLoadFailed") : "Failed to load SEO settings"))
             .finally(() => setLoading(false));
     }, []);
 
@@ -68,15 +68,15 @@ export default function SeoSettingsPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                toast.error(data.error || "Failed to save settings");
+                toast.error(data.error || (t.has("adm_settingsSaveFailed") ? t("adm_settingsSaveFailed") : "Failed to save settings"));
                 return;
             }
 
             setSaved(true);
-            toast.success("SEO settings saved");
+            toast.success(t.has("adm_settingsSaved") ? t("adm_settingsSaved") : "SEO settings saved");
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t.has("adm_genericError") ? t("adm_genericError") : "Something went wrong");
         } finally {
             setSaving(false);
         }

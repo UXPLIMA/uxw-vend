@@ -71,7 +71,7 @@ export default function SeoPageOverridesPage() {
             const data = await res.json();
             setPages(data.pages || []);
         } catch {
-            toast.error("Failed to load pages");
+            toast.error(t.has("adm_loadFailed") ? t("adm_loadFailed") : "Failed to load pages");
         } finally {
             setLoading(false);
         }
@@ -106,30 +106,30 @@ export default function SeoPageOverridesPage() {
 
     const handleDelete = async (page: SeoPage) => {
         const ok = await confirm({
-            title: "Delete Page SEO",
-            message: `Are you sure you want to delete the SEO configuration for "${page.path}"?`,
+            title: t.has("adm_deleteTitle") ? t("adm_deleteTitle") : "Delete Page SEO",
+            message: t.has("adm_deleteConfirm") ? t("adm_deleteConfirm", { path: page.path }) : `Are you sure you want to delete the SEO configuration for "${page.path}"?`,
             variant: "danger",
-            confirmText: "Delete",
+            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
         });
         if (!ok) return;
 
         try {
             const res = await fetch(`/api/v1/seo/pages/${page.id}`, { method: "DELETE" });
             if (!res.ok) {
-                toast.error("Failed to delete");
+                toast.error(t.has("adm_deleteFailed") ? t("adm_deleteFailed") : "Failed to delete");
                 return;
             }
-            toast.success("Page SEO deleted");
+            toast.success(t.has("adm_deletedToast") ? t("adm_deletedToast") : "Page SEO deleted");
             fetchPages();
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t.has("adm_genericError") ? t("adm_genericError") : "Something went wrong");
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.path.startsWith("/")) {
-            toast.error("Path must start with /");
+            toast.error(t.has("adm_pathInvalid") ? t("adm_pathInvalid") : "Path must start with /");
             return;
         }
 
@@ -158,15 +158,17 @@ export default function SeoPageOverridesPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                toast.error(data.error || "Failed to save");
+                toast.error(data.error || (t.has("adm_saveFailed") ? t("adm_saveFailed") : "Failed to save"));
                 return;
             }
 
-            toast.success(editingId ? "Page SEO updated" : "Page SEO created");
+            toast.success(editingId
+                ? (t.has("adm_updatedToast") ? t("adm_updatedToast") : "Page SEO updated")
+                : (t.has("adm_createdToast") ? t("adm_createdToast") : "Page SEO created"));
             setDialogOpen(false);
             fetchPages();
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t.has("adm_genericError") ? t("adm_genericError") : "Something went wrong");
         } finally {
             setSubmitting(false);
         }

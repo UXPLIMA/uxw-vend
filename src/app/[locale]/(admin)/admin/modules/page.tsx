@@ -5,14 +5,23 @@ import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import {
-    Package, Upload, Loader2, Trash2, Download, CheckCircle, ShoppingCart,
-    MessageSquare, FileText, Ticket, HelpCircle, Shield, History, Users,
-    Vote, Dices, Trophy, Bell, Server, FileEdit, ImageIcon, Crown,
-    Megaphone, Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
+    Package, Upload, Loader2, Trash2, Download, CheckCircle,
+    Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
+import { DynamicIcon } from "lucide-react/dynamic";
+import type { IconName } from "lucide-react/dynamic";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+
+// Module manifest icons come from each module's `icon` field. Render via
+// lucide's DynamicIcon so adding a new icon name in any manifest works
+// without touching this file — core stays module-agnostic.
+function ModuleIcon({ name, size = 22 }: { name?: string; size?: number }) {
+    if (!name) return <Package size={size} />;
+    const kebab = name.replace(/[A-Z]/g, (m, i) => (i === 0 ? m.toLowerCase() : `-${m.toLowerCase()}`));
+    return <DynamicIcon name={kebab as IconName} size={size} fallback={() => <Package size={size} />} />;
+}
 
 interface Module {
     id: string;
@@ -46,29 +55,6 @@ interface MarketplaceModule {
 }
 
 type SortKey = "newest" | "alphabetical";
-
-const iconMap: Record<string, React.ReactNode> = {
-    ShoppingCart: <ShoppingCart size={22} />,
-    MessageSquare: <MessageSquare size={22} />,
-    FileText: <FileText size={22} />,
-    Ticket: <Ticket size={22} />,
-    HelpCircle: <HelpCircle size={22} />,
-    Shield: <Shield size={22} />,
-    History: <History size={22} />,
-    Users: <Users size={22} />,
-    Vote: <Vote size={22} />,
-    Dices: <Dices size={22} />,
-    Trophy: <Trophy size={22} />,
-    Bell: <Bell size={22} />,
-    Server: <Server size={22} />,
-    FileEdit: <FileEdit size={22} />,
-    Image: <ImageIcon size={22} />,
-    Crown: <Crown size={22} />,
-    Megaphone: <Megaphone size={22} />,
-    Download: <Download size={22} />,
-    Package: <Package size={22} />,
-    Search: <SearchIcon size={22} />,
-};
 
 const categoryColors: Record<string, string> = {
     commerce: "bg-blue-100 text-blue-700",
@@ -172,7 +158,7 @@ export default function AdminModulesPage() {
                 setModules(modules.map(m => m.id === moduleId ? { ...m, enabled } : m));
                 toast.success(`${moduleId} ${enabled ? t("modules_enable") : t("modules_disable")}`);
             } else {
-                toast.error(data.error || "Failed");
+                toast.error(data.error || t("modules_toggleFailed"));
             }
         } catch { toast.error(t("modules_networkError")); }
         finally { setUpdating(null); }
@@ -238,9 +224,9 @@ export default function AdminModulesPage() {
         const ok = await confirm({ title: t("modules_installTitle"), message: t("modules_installConfirm", { name: mod.name, version: mod.version }), confirmText: t("common_install") });
         if (!ok) return;
         setInstalling(mod.id);
-        setInstallProgress({ name: mod.name, step: "Downloading..." });
+        setInstallProgress({ name: mod.name, step: t.has("modules_stepDownloading") ? t("modules_stepDownloading") : "Downloading…" });
         try {
-            setInstallProgress({ name: mod.name, step: "Installing..." });
+            setInstallProgress({ name: mod.name, step: t.has("modules_stepInstalling") ? t("modules_stepInstalling") : "Installing…" });
             const res = await fetch("/api/v1/modules/marketplace/install", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -248,8 +234,12 @@ export default function AdminModulesPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                setInstallProgress({ name: mod.name, step: "Done!" });
-                toast.success(`"${mod.name}" installed and enabled`);
+                setInstallProgress({ name: mod.name, step: t.has("modules_stepDone") ? t("modules_stepDone") : "Done!" });
+                toast.success(
+                    t.has("modules_installedToast")
+                        ? t("modules_installedToast", { name: mod.name })
+                        : `"${mod.name}" installed and enabled`,
+                );
                 fetchModules();
                 fetchMarketplace();
             } else {
@@ -285,7 +275,7 @@ export default function AdminModulesPage() {
         if (!ok) return;
 
         setBulkInstalling(true);
-        setBulkProgress({ current: 0, total: toInstall.length, name: "Preparing..." });
+        setBulkProgress({ current: 0, total: toInstall.length, name: t.has("modules_stepPreparing") ? t("modules_stepPreparing") : "Preparing…" });
 
         try {
             const res = await fetch("/api/v1/modules/marketplace/bulk-install", {
@@ -448,7 +438,7 @@ export default function AdminModulesPage() {
                                     <CardContent className="p-4">
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex items-center gap-2.5">
-                                                <span className="text-primary">{iconMap[mod.icon || ""] || <Package size={22} />}</span>
+                                                <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
                                                 <div>
                                                     <h3 className="font-semibold text-sm flex items-center gap-1.5 flex-wrap">
                                                         {mod.name}
@@ -664,7 +654,7 @@ export default function AdminModulesPage() {
                                                 onChange={() => toggleSelect(mod.id)}
                                                 className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                                             />
-                                            <span className="text-blue-500">{iconMap[mod.icon] || <Package size={22} />}</span>
+                                            <span className="text-blue-500"><ModuleIcon name={mod.icon} /></span>
                                             <div>
                                                 <button
                                                     type="button"

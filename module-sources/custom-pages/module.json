@@ -76,7 +76,16 @@
         "adm_published": "Published",
         "adm_slugOptional": "Slug (optional)",
         "adm_title": "Title",
-        "adm_updatePage": "Update Page"
+        "adm_updatePage": "Update Page",
+        "adm_pageUpdated": "Page updated",
+        "adm_pageCreated": "Page created",
+        "adm_pageDeleted": "Page deleted",
+        "adm_updateFailed": "Failed to update page",
+        "adm_createFailed": "Failed to create page",
+        "adm_deleteFailed": "Failed to delete page",
+        "adm_deleteTitle": "Delete Page",
+        "adm_deleteConfirm": "Delete \"{title}\"? This cannot be undone.",
+        "adm_delete": "Delete"
       },
       "admin": {
         "menu_custom-pages": "Custom Pages",
@@ -137,7 +146,16 @@
         "adm_published": "Yayınlandı",
         "adm_slugOptional": "Slug (isteğe bağlı)",
         "adm_title": "Başlık",
-        "adm_updatePage": "Sayfayı Güncelle"
+        "adm_updatePage": "Sayfayı Güncelle",
+        "adm_pageUpdated": "Sayfa güncellendi",
+        "adm_pageCreated": "Sayfa oluşturuldu",
+        "adm_pageDeleted": "Sayfa silindi",
+        "adm_updateFailed": "Sayfa güncellenemedi",
+        "adm_createFailed": "Sayfa oluşturulamadı",
+        "adm_deleteFailed": "Sayfa silinemedi",
+        "adm_deleteTitle": "Sayfayı Sil",
+        "adm_deleteConfirm": "\"{title}\" silinsin mi? Bu işlem geri alınamaz.",
+        "adm_delete": "Sil"
       },
       "admin": {
         "menu_custom-pages": "Özel Sayfalar",

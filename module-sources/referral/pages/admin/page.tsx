@@ -44,7 +44,7 @@ export default function AdminReferralPage() {
     const saveSettings = async () => {
         const amount = parseFloat(rewardAmount);
         if (isNaN(amount) || amount < 0) {
-            toast.error("Invalid reward amount");
+            toast.error(t.has("adm_invalidReward") ? t("adm_invalidReward") : "Invalid reward amount");
             return;
         }
         setSaving(true);
@@ -55,12 +55,12 @@ export default function AdminReferralPage() {
                 body: JSON.stringify({ rewardAmount: amount }),
             });
             if (res.ok) {
-                toast.success("Settings saved");
+                toast.success(t("settingsSaved"));
             } else {
-                toast.error("Failed to save settings");
+                toast.error(t("settingsError"));
             }
         } catch {
-            toast.error("Failed to save settings");
+            toast.error(t("settingsError"));
         } finally {
             setSaving(false);
         }
