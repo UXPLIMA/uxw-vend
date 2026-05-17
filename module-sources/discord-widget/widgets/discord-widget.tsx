@@ -1,15 +1,19 @@
 "use client";
 
-import { serverConfig } from "@/core/config/server";
 import { useState, useEffect } from "react";
-import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 export function DiscordWidget() {
-    const { settings } = useSiteSettings();
+    const [widgetId, setWidgetId] = useState<string | null>(null);
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetch("/api/v1/discord-widget")
+            .then(r => r.json())
+            .then(d => setWidgetId(typeof d.serverId === "string" ? d.serverId : ""))
+            .catch(() => setWidgetId(""));
+    }, []);
+
+    useEffect(() => {
         setIsDark(document.documentElement.hasAttribute("data-mode"));
         const observer = new MutationObserver(() => {
             setIsDark(document.documentElement.hasAttribute("data-mode"));
@@ -18,7 +22,6 @@ export function DiscordWidget() {
         return () => observer.disconnect();
     }, []);
 
-    const widgetId = (settings.widget_discord_server_id as string) || "";
     if (!widgetId) return null;
 
     return (

@@ -165,8 +165,7 @@ export default function DiscordSettingsPage() {
 
             <div className="mt-6 p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                    <strong>{t("adm_howToGetWebhook")}</strong> In Discord, go to Server Settings → Integrations → Webhooks → New Webhook.
-                    Copy the Webhook URL and paste it above. You can use different webhooks for different events, or set one general webhook for all events.
+                    <strong>{t("adm_howToGetWebhook")}</strong> {t("adm_howToGetWebhookBody")}
                 </p>
             </div>
         </>

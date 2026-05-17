@@ -9,6 +9,14 @@
     "credits.view",
     "credits.manage"
   ],
+  "profileTabs": [
+    {
+      "id": "credits",
+      "label": "Credits",
+      "component": "components/CreditsTab.tsx",
+      "order": 35
+    }
+  ],
   "api": [
     {
       "path": "/credits",

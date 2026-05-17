@@ -95,7 +95,7 @@
         "menu_login-protection_security": "Güvenlik"
       },
       "loginProtection": {
-        "title": "Güvenlik Ayarlari",
+        "title": "Güvenlik Ayarları",
         "description": "Güvenlik ve giriş korumasini yapilandir",
         "captcha": "CAPTCHA",
         "captchaEnabled": "CAPTCHA'yi Etkinlestir",
@@ -119,7 +119,7 @@
         "failed": "Başarısız",
         "blocked": "Engellendi",
         "userAgent": "Kullanıcı Aracisi",
-        "saveSettings": "Ayarlari Kaydet",
+        "saveSettings": "Ayarları Kaydet",
         "settingsSaved": "Güvenlik ayarlari basariyla kaydedildi",
         "settingsError": "Güvenlik ayarlari kaydedilemedi",
         "bruteForceProtection": "Kaba Kuvvet Korumasi",

@@ -95,7 +95,7 @@
       },
       "emailTemplates": {
         "title": "E-posta Sistemi",
-        "settings": "E-posta Ayarlari",
+        "settings": "E-posta Ayarları",
         "smtpHost": "SMTP Sunucusu",
         "smtpHostPlaceholder": "orn. smtp.gmail.com",
         "smtpPort": "SMTP Portu",
@@ -126,7 +126,7 @@
         "testEmailPlaceholder": "Test e-posta adresini girin",
         "testSent": "Test e-postasi basariyla gönderildi",
         "testError": "Test e-postasi gönderilemedi",
-        "save": "Ayarlari Kaydet",
+        "save": "Ayarları Kaydet",
         "saved": "E-posta ayarlari basariyla kaydedildi",
         "saveError": "E-posta ayarlari kaydedilemedi",
         "templateSaved": "Sablon basariyla kaydedildi",

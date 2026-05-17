@@ -13,11 +13,12 @@ import { useTranslations } from "next-intl";
 export interface SettingsField {
     key: string;
     label: string;
-    type?: "text" | "password" | "number" | "url" | "email" | "textarea" | "image";
+    type?: "text" | "password" | "number" | "url" | "email" | "textarea" | "image" | "select" | "date";
     placeholder?: string;
     description?: string;
     defaultValue?: string;
     accept?: string;
+    options?: { value: string; label: string }[];
 }
 
 interface SettingsFormProps {
@@ -111,6 +112,19 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         onChange={(v) => setValues({ ...values, [field.key]: v || "" })}
                                         accept={field.accept || "image/*"}
                                     />
+                                ) : field.type === "select" ? (
+                                    <select
+                                        value={values[field.key] || ""}
+                                        onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
+                                        className="w-full rounded-md border border-input bg-background px-3 h-9 text-sm"
+                                    >
+                                        {field.placeholder && !values[field.key] && (
+                                            <option value="">{field.placeholder}</option>
+                                        )}
+                                        {(field.options || []).map((opt) => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
                                 ) : (
                                     <Input
                                         type={field.type || "text"}

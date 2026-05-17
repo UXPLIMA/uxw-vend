@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -32,6 +32,7 @@ interface ReferralData {
 export default function ReferralPage() {
     const __locale = useLocale();
     const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const t = useTranslations("referral");
     const { data: session } = useSession();
     const [data, setData] = useState<ReferralData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +59,6 @@ export default function ReferralPage() {
             if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
                 await navigator.clipboard.writeText(link);
             } else {
-                // Fallback for non-HTTPS environments
                 const textArea = document.createElement("textarea");
                 textArea.value = link;
                 textArea.style.position = "fixed";
@@ -69,10 +69,10 @@ export default function ReferralPage() {
                 document.body.removeChild(textArea);
             }
             setCopied(true);
-            toast.success("Link copied to clipboard");
+            toast.success(t("linkCopied"));
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            toast.error("Failed to copy link");
+            toast.error(t("copyFailed"));
         }
     };
 
@@ -87,13 +87,13 @@ export default function ReferralPage() {
             });
             const result = await res.json();
             if (res.ok) {
-                toast.success(result.message);
+                toast.success(result.message || t("codeApplied"));
                 setReferralCodeInput("");
             } else {
-                toast.error(result.error);
+                toast.error(result.error || t("codeError"));
             }
         } catch {
-            toast.error("Something went wrong");
+            toast.error(t("somethingWrong"));
         } finally {
             setApplying(false);
         }
@@ -107,6 +107,12 @@ export default function ReferralPage() {
         }
     };
 
+    const statusLabel = (status: string) => {
+        if (status === "rewarded") return t("rewarded");
+        if (status === "completed") return t("completed");
+        return t("pending");
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             <ThemeComponentSlot name="Hero" />
@@ -114,8 +120,8 @@ export default function ReferralPage() {
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">Referral Program</h1>
-                    <p className="text-muted-foreground">Invite friends and earn credits when they join!</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">{t("title")}</h1>
+                    <p className="text-muted-foreground">{t("subtitle")}</p>
                 </div>
 
                 {loading ? (
@@ -126,13 +132,13 @@ export default function ReferralPage() {
                     <Card>
                         <CardContent className="py-12 text-center">
                             <UserPlus className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                            <p className="text-muted-foreground">Please log in to access the referral program</p>
+                            <p className="text-muted-foreground">{t("notLoggedIn")}</p>
                         </CardContent>
                     </Card>
                 ) : !data ? (
                     <Card>
                         <CardContent className="py-12 text-center text-muted-foreground">
-                            Failed to load referral data
+                            {t("failedToLoad")}
                         </CardContent>
                     </Card>
                 ) : (
@@ -142,12 +148,12 @@ export default function ReferralPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <UserPlus className="w-5 h-5" />
-                                    Your Referral Link
+                                    {t("yourLink")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-muted-foreground mb-3">
-                                    Share this link with your friends:
+                                    {t("shareMessage")}
                                 </p>
                                 <div className="flex gap-2">
                                     <Input
@@ -157,14 +163,14 @@ export default function ReferralPage() {
                                     />
                                     <Button onClick={copyLink} variant="outline">
                                         {copied ? (
-                                            <><Check className="w-4 h-4 mr-1" /> Copied!</>
+                                            <><Check className="w-4 h-4 mr-1" /> {t("copied")}</>
                                         ) : (
-                                            <><Copy className="w-4 h-4 mr-1" /> Copy</>
+                                            <><Copy className="w-4 h-4 mr-1" /> {t("copyLink")}</>
                                         )}
                                     </Button>
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    Your code: <span className="font-mono font-bold">{data.referralCode}</span>
+                                    {t("yourCode")}: <span className="font-mono font-bold">{data.referralCode}</span>
                                 </p>
                             </CardContent>
                         </Card>
@@ -172,18 +178,18 @@ export default function ReferralPage() {
                         {/* Apply Referral Code */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Have a Referral Code?</CardTitle>
+                                <CardTitle>{t("haveCode")}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="flex gap-2">
                                     <Input
-                                        placeholder="Enter referral code"
+                                        placeholder={t("codePlaceholder")}
                                         value={referralCodeInput}
                                         onChange={e => setReferralCodeInput(e.target.value)}
                                         onKeyDown={e => e.key === "Enter" && applyCode()}
                                     />
                                     <Button onClick={applyCode} disabled={applying || !referralCodeInput.trim()}>
-                                        {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                                        {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : t("applyCode")}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -195,28 +201,28 @@ export default function ReferralPage() {
                                 <CardContent className="p-4 text-center">
                                     <Users className="w-6 h-6 text-blue-500 mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.totalReferrals ?? 0}</p>
-                                    <p className="text-xs text-muted-foreground">Total Referrals</p>
+                                    <p className="text-xs text-muted-foreground">{t("totalReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
                                     <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.completedReferrals ?? 0}</p>
-                                    <p className="text-xs text-muted-foreground">Completed</p>
+                                    <p className="text-xs text-muted-foreground">{t("completedReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
                                     <Clock className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.pendingReferrals ?? 0}</p>
-                                    <p className="text-xs text-muted-foreground">Pending</p>
+                                    <p className="text-xs text-muted-foreground">{t("pendingReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
                                     <Coins className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{(data?.stats?.creditsEarned ?? 0).toFixed(2)}</p>
-                                    <p className="text-xs text-muted-foreground">Credits Earned</p>
+                                    <p className="text-xs text-muted-foreground">{t("creditsEarned")}</p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -224,36 +230,36 @@ export default function ReferralPage() {
                         {/* Referral History */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Referral History</CardTitle>
+                                <CardTitle>{t("referralHistory")}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {data.referrals.length === 0 ? (
                                     <p className="text-center text-muted-foreground py-8">
-                                        No referrals yet. Share your link to get started!
+                                        {t("noReferrals")}
                                     </p>
                                 ) : (
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
                                                 <tr className="border-b border-border">
-                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">User</th>
-                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
-                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Reward</th>
-                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">Date</th>
+                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t("user")}</th>
+                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t("status")}</th>
+                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t("reward")}</th>
+                                                    <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t("date")}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {data.referrals.map(ref => (
                                                     <tr key={ref.id} className="border-b border-border last:border-0">
-                                                        <td className="py-3 px-2 font-medium">{ref.username || "Unknown"}</td>
+                                                        <td className="py-3 px-2 font-medium">{ref.username || t("unknownUser")}</td>
                                                         <td className="py-3 px-2">
                                                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(ref.status)}`}>
-                                                                {ref.status}
+                                                                {statusLabel(ref.status)}
                                                             </span>
                                                         </td>
-                                                        <td className="py-3 px-2">{ref.rewardAmount.toFixed(2)} credits</td>
+                                                        <td className="py-3 px-2">{ref.rewardAmount.toFixed(2)} {t("creditsUnit")}</td>
                                                         <td className="py-3 px-2 text-muted-foreground">
-                                                            {new Date(ref.createdAt).toLocaleDateString("tr-TR")}
+                                                            {new Date(ref.createdAt).toLocaleDateString(__dateTag)}
                                                         </td>
                                                     </tr>
                                                 ))}

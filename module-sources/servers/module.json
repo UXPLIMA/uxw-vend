@@ -154,7 +154,7 @@
         "maxPlayers": "Maksimum Oyuncu",
         "map": "Harita",
         "version": "Surum",
-        "rconSettings": "RCON Ayarlari",
+        "rconSettings": "RCON Ayarları",
         "rconPassword": "RCON Şifresi",
         "rconPort": "RCON Portu",
         "sendCommand": "Komut Gönder",

@@ -33,12 +33,18 @@ export async function POST() {
     let paidSpin = false;
     if (todaySpin) {
         if (spinCost <= 0) {
-            return NextResponse.json({ error: "You already spun today. Come back tomorrow!" }, { status: 429 });
+            return NextResponse.json(
+                { error: "You already spun today. Come back tomorrow!", code: "wheel_already_spun" },
+                { status: 429 },
+            );
         }
         // Check if user has enough credits for a paid spin
         const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { creditBalance: true } });
         if (!user || Number(user.creditBalance) < spinCost) {
-            return NextResponse.json({ error: `Not enough credits. You need ${spinCost} credits for another spin.`, cost: spinCost }, { status: 429 });
+            return NextResponse.json(
+                { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
+                { status: 429 },
+            );
         }
         paidSpin = true;
     }

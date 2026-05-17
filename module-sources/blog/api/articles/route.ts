@@ -90,6 +90,13 @@ export async function POST(request: NextRequest) {
     const scheduleInFuture = publishAtDate !== null && publishAtDate.getTime() > Date.now();
     const effectiveStatus = scheduleInFuture ? "SCHEDULED" : (status || "DRAFT");
 
+    // Auto-stamp publishedAt when the caller marks the article PUBLISHED
+    // but didn't supply a date. The public listing filters by
+    // publishedAt <= now, so without this the article would never appear.
+    const effectivePublishedAt = publishedAt
+        ? new Date(publishedAt)
+        : (effectiveStatus === "PUBLISHED" ? new Date() : null);
+
     // Generate slug from title
     const slug = body.slug || generateSlug(title);
 
@@ -117,7 +124,7 @@ export async function POST(request: NextRequest) {
             content: sanitizeHtml(content),
             coverImage,
             status: effectiveStatus,
-            publishedAt: publishedAt ? new Date(publishedAt) : null,
+            publishedAt: effectivePublishedAt,
             publishAt: publishAtDate,
             authorId: session.user.id,
             categoryId,

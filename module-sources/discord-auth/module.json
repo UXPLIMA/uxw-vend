@@ -70,7 +70,7 @@
     "tr": {
       "discordAuth": {
         "title": "Discord ile Giriş",
-        "settings": "Discord OAuth Ayarlari",
+        "settings": "Discord OAuth Ayarları",
         "clientId": "Istemci Kimligi",
         "clientIdPlaceholder": "Discord uygulama Istemci Kimligini girin",
         "clientSecret": "Istemci Şifresi",
@@ -80,7 +80,7 @@
         "enabled": "Discord ile Giriş Etkin",
         "disabled": "Discord ile Giriş Devre Disi",
         "enable": "Discord ile Girişi Etkinlestir",
-        "save": "Ayarlari Kaydet",
+        "save": "Ayarları Kaydet",
         "saved": "Discord OAuth ayarlari basariyla kaydedildi",
         "saveError": "Discord OAuth ayarlari kaydedilemedi",
         "signInWith": "Discord ile giriş yap",

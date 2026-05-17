@@ -73,7 +73,7 @@
     },
     "tr": {
       "stripeGateway": {
-        "title": "Stripe Ayarlari",
+        "title": "Stripe Ayarları",
         "description": "Stripe odeme agirligi yapilandirmasi",
         "publishableKey": "Yayinlanabilir Anahtar",
         "secretKey": "Gizli Anahtar",
@@ -84,7 +84,7 @@
         "liveMode": "Canli Mod",
         "enabled": "Etkin",
         "disabled": "Devre Disi",
-        "saveSettings": "Ayarlari Kaydet",
+        "saveSettings": "Ayarları Kaydet",
         "settingsSaved": "Stripe ayarlari basariyla kaydedildi",
         "settingsError": "Stripe ayarlari kaydedilemedi",
         "testConnection": "Baglanti Testi",

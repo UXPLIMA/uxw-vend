@@ -7,7 +7,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { formatCurrency, formatDate } from "@/core/lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Package } from "lucide-react";
 import { OrderStatusSelect } from "./status-select";
 import { getTranslations } from "next-intl/server";
 
@@ -72,7 +72,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                                             {item.product?.image ? (
                                                 <Image src={item.product.image} alt={item.product?.name || "Product"} width={48} height={48} className="w-full h-full object-cover" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-lg">📦</div>
+                                                <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-muted-foreground" /></div>
                                             )}
                                         </div>
                                         <div className="flex-1">

@@ -33,9 +33,10 @@ interface AdminCrudPageProps {
     listKey: string; // key in response JSON for array
     displayField: string; // which field to show as title in list
     secondaryField?: string; // subtitle in list
+    secondaryRender?: (item: Record<string, unknown>) => string; // overrides secondaryField when provided
 }
 
-export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField }: AdminCrudPageProps) {
+export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
     const ct = useTranslations("admin");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(true);
@@ -250,9 +251,11 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                     />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium">{String(item[displayField] || "")}</p>
-                                        {secondaryField && (
+                                        {secondaryRender ? (
+                                            <p className="text-sm text-muted-foreground">{secondaryRender(item)}</p>
+                                        ) : secondaryField ? (
                                             <p className="text-sm text-muted-foreground">{String(item[secondaryField] || "")}</p>
-                                        )}
+                                        ) : null}
                                     </div>
                                     <div className="flex gap-1">
                                         <Button variant="ghost" size="sm" onClick={() => startEdit(item)}>

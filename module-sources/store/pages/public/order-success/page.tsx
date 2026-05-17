@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
@@ -8,6 +9,7 @@ import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export default function OrderSuccessPage() {
+    const t = useTranslations("store");
     return (
         <div className="min-h-screen flex flex-col bg-muted">
             <ThemeComponentSlot name="Hero" />
@@ -20,20 +22,20 @@ export default function OrderSuccessPage() {
                             <CheckCircle className="w-8 h-8 text-green-600" />
                         </div>
 
-                        <h1 className="text-2xl font-bold text-foreground mb-2">Order Successful!</h1>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">{t("orderSuccess_title")}</h1>
                         <p className="text-muted-foreground mb-8">
-                            Thank you for your purchase. Your order has been placed and is being processed.
+                            {t("orderSuccess_body")}
                         </p>
 
                         <div className="flex gap-3 justify-center">
                             <Link href="/profile">
                                 <Button variant="outline">
-                                    <ShoppingBag className="w-4 h-4 mr-2" /> My Orders
+                                    <ShoppingBag className="w-4 h-4 mr-2" /> {t("orderSuccess_myOrders")}
                                 </Button>
                             </Link>
                             <Link href="/store">
                                 <Button>
-                                    Continue Shopping <ArrowRight className="w-4 h-4 ml-2" />
+                                    {t("orderSuccess_continue")} <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
                             </Link>
                         </div>

@@ -16,7 +16,7 @@ export default function Page() {
             fields={[
                 { key: "version", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
                 { key: "title", label: t("adm_field2Label"), required: true, placeholder: t("adm_field2Placeholder") },
-                { key: "content", label: t("adm_field3Label"), type: "textarea", required: true, placeholder: t("adm_field3Placeholder") },
+                { key: "content", label: t("adm_field3Label"), type: "richtext", required: true, placeholder: t("adm_field3Placeholder") },
                 { key: "type", label: t("adm_field4Label"), placeholder: t("adm_field4Placeholder"), defaultValue: "update" },
                 { key: "color", label: "Color", type: "color", defaultValue: "#3b82f6" },
             ]}

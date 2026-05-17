@@ -13,7 +13,7 @@
   ],
   "adminRoutes": [
     {
-      "path": "/analytics",
+      "path": "/google-analytics",
       "component": "pages/admin/settings/analytics/page.tsx"
     }
   ],
@@ -21,7 +21,7 @@
     {
       "title": "Google Analytics",
       "description": "Google Analytics tracking.",
-      "href": "/analytics",
+      "href": "/admin/google-analytics",
       "icon": "BarChart",
       "color": "text-green-500"
     }
@@ -29,7 +29,7 @@
   "menu": [
     {
       "label": "Google Analytics",
-      "path": "/analytics",
+      "path": "/google-analytics",
       "icon": "BarChart"
     }
   ],
@@ -73,14 +73,14 @@
       },
       "googleAnalytics": {
         "title": "Google Analytics",
-        "settings": "Analitik Ayarlari",
+        "settings": "Analitik Ayarları",
         "trackingId": "Izleme Kimligi",
         "trackingIdPlaceholder": "Google Analytics izleme kimliginizi girin",
         "trackingIdHelp": "Google Analytics olcum kimliginiz (orn. G-XXXXXXXXXX)",
         "enabled": "Analitik Etkin",
         "disabled": "Analitik Devre Disi",
         "enableTracking": "Izlemeyi Etkinlestir",
-        "saveSettings": "Ayarlari Kaydet",
+        "saveSettings": "Ayarları Kaydet",
         "settingsSaved": "Analitik ayarlari basariyla kaydedildi",
         "settingsError": "Analitik ayarlari kaydedilemedi",
         "description": "Siteniz icin Google Analytics izlemesini yapilandirin",

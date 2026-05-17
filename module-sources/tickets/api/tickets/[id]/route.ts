@@ -106,11 +106,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
     });
 
-    // Update ticket status and timestamp
+    // Update ticket status and timestamp.
+    // Only adjust status when the ticket isn't already closed/resolved —
+    // a reply to a RESOLVED or CLOSED ticket previously auto-reopened
+    // it as OPEN, which surprised admins. Now resolved tickets stay
+    // resolved unless the admin explicitly reopens via PATCH.
+    const isClosed = ticket.status === "RESOLVED" || ticket.status === "CLOSED";
     await prisma.ticket.update({
         where: { id },
         data: {
-            status: isStaffReply ? "WAITING_REPLY" : "OPEN",
+            status: isClosed ? ticket.status : (isStaffReply ? "WAITING_REPLY" : "OPEN"),
             updatedAt: new Date(),
         },
     });
@@ -198,4 +203,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     return NextResponse.json(updated);
+}
+
+// DELETE /api/v1/tickets/[id] — Delete ticket (admin only).
+// Cascade-deletes the ticket's messages.
+export async function DELETE(_: NextRequest, { params }: RouteParams) {
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { id } = await params;
+    const existing = await prisma.ticket.findUnique({ where: { id } });
+    if (!existing) return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+
+    await prisma.ticket.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
 }

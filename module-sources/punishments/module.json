@@ -5,10 +5,34 @@
   "version": "1.0.0",
   "author": "uxwVend",
   "icon": "Shield",
+  "permissions": [
+    "punishments.manage"
+  ],
   "routes": [
     {
       "path": "/punishments",
       "component": "pages/public/page.tsx"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/punishments",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Punishments",
+      "path": "/punishments",
+      "icon": "Shield"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Punishments",
+      "href": "/punishments",
+      "icon": "Shield",
+      "position": 80
     }
   ],
   "api": [
@@ -25,7 +49,35 @@
   ],
   "translations": {
     "en": {
+      "admin": {
+        "menu_punishments": "Punishments",
+        "menu_punishments_punishments": "All Punishments"
+      },
       "punishments": {
+        "adm_title": "Punishments",
+        "adm_subtitle": "Issue, revoke, and review player punishments.",
+        "adm_filterAll": "All",
+        "adm_filterActive": "Active only",
+        "adm_filterRevoked": "Revoked",
+        "adm_newPunishment": "New Punishment",
+        "adm_playerName": "Player name",
+        "adm_type": "Type",
+        "adm_reason": "Reason",
+        "adm_duration": "Duration (e.g. 7d, 24h, permanent)",
+        "adm_expiresAt": "Expires at (optional)",
+        "adm_create": "Create",
+        "adm_creating": "Creating…",
+        "adm_revoke": "Revoke",
+        "adm_unrevoke": "Restore",
+        "adm_delete": "Delete",
+        "adm_deleteConfirm": "Delete this punishment permanently?",
+        "adm_revokeConfirm": "Revoke this punishment? The player will no longer be punished.",
+        "adm_empty": "No punishments yet. Create one or wait for plugin webhooks.",
+        "adm_createdToast": "Punishment issued",
+        "adm_revokedToast": "Punishment revoked",
+        "adm_restoredToast": "Punishment restored",
+        "adm_deletedToast": "Punishment deleted",
+        "adm_error": "Operation failed",
         "title": "Punishments",
         "description": "View player punishments and ban history",
         "searchPlayer": "Search by player name",
@@ -55,7 +107,35 @@
       }
     },
     "tr": {
+      "admin": {
+        "menu_punishments": "Cezalar",
+        "menu_punishments_punishments": "Tüm Cezalar"
+      },
       "punishments": {
+        "adm_title": "Cezalar",
+        "adm_subtitle": "Oyuncu cezalarını ver, iptal et, gözden geçir.",
+        "adm_filterAll": "Tümü",
+        "adm_filterActive": "Sadece aktif",
+        "adm_filterRevoked": "İptal edilmiş",
+        "adm_newPunishment": "Yeni Ceza",
+        "adm_playerName": "Oyuncu adı",
+        "adm_type": "Tür",
+        "adm_reason": "Sebep",
+        "adm_duration": "Süre (örn. 7d, 24h, permanent)",
+        "adm_expiresAt": "Bitiş tarihi (opsiyonel)",
+        "adm_create": "Oluştur",
+        "adm_creating": "Oluşturuluyor…",
+        "adm_revoke": "İptal Et",
+        "adm_unrevoke": "Geri Al",
+        "adm_delete": "Sil",
+        "adm_deleteConfirm": "Bu cezayı kalıcı olarak silmek istiyor musun?",
+        "adm_revokeConfirm": "Bu cezayı iptal etmek istiyor musun? Oyuncu artık cezalı olmayacak.",
+        "adm_empty": "Henüz ceza yok. Yeni bir tane oluştur veya plugin webhook'larını bekle.",
+        "adm_createdToast": "Ceza verildi",
+        "adm_revokedToast": "Ceza iptal edildi",
+        "adm_restoredToast": "Ceza geri yüklendi",
+        "adm_deletedToast": "Ceza silindi",
+        "adm_error": "İşlem başarısız",
         "title": "Cezalar",
         "description": "Oyuncu cezalarını ve yasaklama geçmişini görüntüle",
         "searchPlayer": "Oyuncu adına göre ara",

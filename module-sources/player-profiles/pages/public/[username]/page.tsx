@@ -54,14 +54,32 @@ export default function PlayerProfilePage({ params }: PageProps) {
                     <>
                         {/* Profile Header */}
                         <div className="flex items-center gap-5 mb-8">
-                            <Image
-                                src={player.avatar || getMinecraftAvatar(player.username, 80)}
-                                alt={player.username}
-                                width={80}
-                                height={80}
-                                className="w-20 h-20 rounded-xl object-cover shadow-sm"
-                                onError={(e) => { (e.target as HTMLImageElement).src = getMinecraftAvatar(player.username, 80); }}
-                            />
+                            {(() => {
+                                // Only call mc-heads.net when we know this user has a linked
+                                // Minecraft account — otherwise the service 301s an HTML page
+                                // that Next/Image rejects with a 400.
+                                const mcAccount = player.linkedAccounts.find(
+                                    (a) => (a.provider || "").toLowerCase() === "minecraft" && a.username,
+                                );
+                                const avatarSrc = player.avatar
+                                    || (mcAccount?.username ? getMinecraftAvatar(mcAccount.username, 80) : null);
+                                if (avatarSrc) {
+                                    return (
+                                        <Image
+                                            src={avatarSrc}
+                                            alt={player.username}
+                                            width={80}
+                                            height={80}
+                                            className="w-20 h-20 rounded-xl object-cover shadow-sm"
+                                        />
+                                    );
+                                }
+                                return (
+                                    <div className="w-20 h-20 rounded-xl shadow-sm bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                                        {player.username.charAt(0).toUpperCase()}
+                                    </div>
+                                );
+                            })()}
                             <div>
                                 <h1 className="text-2xl font-bold text-foreground">{player.username}</h1>
                                 {player.role && (
@@ -74,7 +92,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                                 )}
                                 <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                                     <Calendar className="w-3 h-3" />
-                                    {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString("tr-TR")}
+                                    {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString(__dateTag)}
                                 </p>
                             </div>
                         </div>

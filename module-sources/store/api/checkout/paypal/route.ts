@@ -7,7 +7,7 @@ import { createPaypalOrder, getPaypalEnabled } from "../../../lib/paypal";
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!getPaypalEnabled()) return NextResponse.json({ error: "PayPal not configured" }, { status: 400 });
+    if (!(await getPaypalEnabled())) return NextResponse.json({ error: "PayPal is not configured. Ask an administrator to set up PayPal before purchasing.", code: "payment_not_configured" }, { status: 503 });
 
     const { orderId } = await request.json();
     if (!orderId) return NextResponse.json({ error: "orderId required" }, { status: 400 });

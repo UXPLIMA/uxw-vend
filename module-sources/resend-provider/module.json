@@ -62,7 +62,7 @@
     },
     "tr": {
       "resendProvider": {
-        "title": "Resend Ayarlari",
+        "title": "Resend Ayarları",
         "description": "Resend e-posta saglayicisini yapilandir",
         "apiKey": "API Anahtari",
         "apiKeyPlaceholder": "Resend API anahtarinizi girin",
@@ -70,7 +70,7 @@
         "fromEmailPlaceholder": "bildirim@siteadiniz.com",
         "fromName": "Gönderen Adi",
         "fromNamePlaceholder": "Site Adiniz",
-        "saveSettings": "Ayarlari Kaydet",
+        "saveSettings": "Ayarları Kaydet",
         "settingsSaved": "Resend ayarlari basariyla kaydedildi",
         "settingsError": "Resend ayarlari kaydedilemedi",
         "testEmail": "Test E-postasi Gönder",

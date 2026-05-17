@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Button } from "@/core/components/ui/button";
@@ -33,6 +34,7 @@ function parseFeatures(product: Product): string[] {
 }
 
 export default function VipTablePage() {
+    const t = useTranslations("store");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const { formatPrice } = useCurrency();
@@ -78,14 +80,14 @@ export default function VipTablePage() {
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">VIP Ranks</h1>
-                    <p className="text-muted-foreground">Compare ranks and choose the best one for you</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">{t("vip_title")}</h1>
+                    <p className="text-muted-foreground">{t("vip_subtitle")}</p>
                 </div>
 
                 {products.length === 0 ? (
                     <div className="text-center py-12 bg-card rounded-xl border">
                         <Crown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-muted-foreground">No VIP ranks available yet</p>
+                        <p className="text-muted-foreground">{t("vip_empty")}</p>
                     </div>
                 ) : allFeatures.length > 0 ? (
                     /* Full comparison table when features are available */
@@ -93,7 +95,7 @@ export default function VipTablePage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b">
-                                    <th className="text-left py-4 px-6 font-medium text-muted-foreground min-w-[200px]">Feature</th>
+                                    <th className="text-left py-4 px-6 font-medium text-muted-foreground min-w-[200px]">{t("vip_feature")}</th>
                                     {productFeatures.map(({ product }) => (
                                         <th key={product.id} className="text-center py-4 px-4 min-w-[150px]">
                                             <div className="flex flex-col items-center gap-1">
@@ -138,7 +140,7 @@ export default function VipTablePage() {
                                         <td key={product.id} className="text-center py-4 px-4">
                                             <Link href={`/store/product/${product.number}/${product.slug}`}>
                                                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                                                    Buy Now
+                                                    {t("vip_buy")}
                                                 </Button>
                                             </Link>
                                         </td>
@@ -157,7 +159,7 @@ export default function VipTablePage() {
                             >
                                 {i === Math.floor(products.length / 2) && (
                                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-bold">
-                                        POPULAR
+                                        {t("vip_popular")}
                                     </div>
                                 )}
                                 {product.image ? (
@@ -178,7 +180,7 @@ export default function VipTablePage() {
                                 )}
                                 <Link href={`/store/product/${product.number}/${product.slug}`}>
                                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                                        Buy Now
+                                        {t("vip_buy")}
                                     </Button>
                                 </Link>
                             </div>

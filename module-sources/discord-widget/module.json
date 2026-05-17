@@ -16,9 +16,43 @@
   "dependencies": [
     "discord-integration"
   ],
+  "adminRoutes": [
+    {
+      "path": "/discord-widget",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/discord-widget",
+      "handler": "api/route.ts",
+      "description": "Public: returns the configured Discord server ID for the homepage widget."
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Discord Widget",
+      "description": "Configure the Discord server widget shown on the homepage sidebar.",
+      "href": "/admin/discord-widget",
+      "icon": "MessageSquare",
+      "color": "text-indigo-500"
+    }
+  ],
   "translations": {
     "en": {
+      "admin": {
+        "menu_discord-widget": "Discord Widget"
+      },
       "discordWidget": {
+        "adm_title": "Discord Widget Settings",
+        "adm_subtitle": "Configure the Discord widget shown on the homepage. You need the server ID with widget enabled in Discord → Server Settings → Widget.",
+        "adm_serverIdLabel": "Discord Server ID",
+        "adm_serverIdHelp": "Open Discord, right-click your server → Server Settings → Widget → enable widget → copy Server ID. Leave empty to hide the widget.",
+        "adm_serverIdPlaceholder": "e.g. 123456789012345678",
+        "adm_save": "Save",
+        "adm_saving": "Saving…",
+        "adm_saved": "Discord widget settings saved",
+        "adm_error": "Failed to save",
         "title": "Discord Server",
         "membersOnline": "Members Online",
         "totalMembers": "Total Members",
@@ -31,7 +65,19 @@
       }
     },
     "tr": {
+      "admin": {
+        "menu_discord-widget": "Discord Widget'ı"
+      },
       "discordWidget": {
+        "adm_title": "Discord Widget Ayarları",
+        "adm_subtitle": "Ana sayfada gösterilen Discord widget'ını yapılandır. Discord → Sunucu Ayarları → Widget'ten widget'i aç ve Sunucu ID'sini al.",
+        "adm_serverIdLabel": "Discord Sunucu ID",
+        "adm_serverIdHelp": "Discord'u aç, sunucuya sağ tık → Sunucu Ayarları → Widget → widget'i aktif et → Sunucu ID'sini kopyala. Boş bırakırsan widget gizlenir.",
+        "adm_serverIdPlaceholder": "Örn. 123456789012345678",
+        "adm_save": "Kaydet",
+        "adm_saving": "Kaydediliyor…",
+        "adm_saved": "Discord widget ayarları kaydedildi",
+        "adm_error": "Kaydedilemedi",
         "title": "Discord Sunucusu",
         "membersOnline": "Çevrimiçi Üyeler",
         "totalMembers": "Toplam Üye",

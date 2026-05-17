@@ -9,6 +9,8 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
 import { formatCurrency } from "@/core/lib/utils";
+import { toast } from "sonner";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Coupon {
     id: string;
@@ -29,6 +31,7 @@ export default function AdminCouponsPage() {
     const __locale = useLocale();
     const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
     const t = useTranslations("store");
+    const { confirm } = useConfirm();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -141,12 +144,24 @@ export default function AdminCouponsPage() {
     };
 
     const deleteCoupon = async (id: string) => {
-        if (!confirm("Delete this coupon?")) return;
+        const ok = await confirm({
+            title: t.has("cou_deleteTitle") ? t("cou_deleteTitle") : "Delete coupon?",
+            message: t.has("cou_deleteConfirm") ? t("cou_deleteConfirm") : "Delete this coupon? This cannot be undone.",
+            confirmText: t.has("cou_delete") ? t("cou_delete") : "Delete",
+            variant: "danger",
+        });
+        if (!ok) return;
         try {
-            await fetch(`/api/v1/store/coupons/${id}`, { method: "DELETE" });
+            const res = await fetch(`/api/v1/store/coupons/${id}`, { method: "DELETE" });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                toast.error(data.error || (t.has("cou_deleteError") ? t("cou_deleteError") : "Failed to delete coupon"));
+                return;
+            }
+            toast.success(t.has("cou_deletedToast") ? t("cou_deletedToast") : "Coupon deleted");
             fetchCoupons();
-        } catch (err) {
-            console.error(err);
+        } catch {
+            toast.error(t.has("cou_deleteError") ? t("cou_deleteError") : "Failed to delete coupon");
         }
     };
 

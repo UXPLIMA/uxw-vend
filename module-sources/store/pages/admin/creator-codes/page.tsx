@@ -7,18 +7,22 @@ export default function Page() {
     const t = useTranslations("store");
     return (
         <AdminCrudPage
-            title={t("adm_title")}
-            subtitle={t("adm_subtitle")}
+            title={t("cc_title")}
+            subtitle={t("cc_subtitle")}
             apiPath="/api/v1/creator-codes"
             listKey="codes"
             displayField="code"
-            secondaryField="creatorId"
+            secondaryRender={(item) => {
+                const discount = Number(item.discountPercent ?? 0);
+                const commission = Number(item.commissionPercent ?? 0);
+                return `${discount}% off · ${commission}% commission`;
+            }}
             fields={[
-                { key: "code", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
-                { key: "creatorId", label: t("adm_field2Label"), required: true, placeholder: t("adm_field2Placeholder") },
-                { key: "discountPercent", label: t("adm_field3Label"), type: "number", placeholder: t("adm_field3Placeholder"), defaultValue: "5" },
-                { key: "commissionPercent", label: t("adm_field4Label"), type: "number", placeholder: t("adm_field4Placeholder"), defaultValue: "5" },
-                { key: "isActive", label: t("adm_field5Label"), type: "toggle", defaultValue: "true" },
+                { key: "code", label: t("cc_codeLabel"), required: true, placeholder: t("cc_codePlaceholder") },
+                { key: "creatorId", label: t("cc_creatorIdLabel"), required: true, placeholder: t("cc_creatorIdPlaceholder") },
+                { key: "discountPercent", label: t("cc_discountPercentLabel"), type: "number", placeholder: t("cc_discountPercentPlaceholder"), defaultValue: "5" },
+                { key: "commissionPercent", label: t("cc_commissionPercentLabel"), type: "number", placeholder: t("cc_commissionPercentPlaceholder"), defaultValue: "5" },
+                { key: "isActive", label: t("cc_isActiveLabel"), type: "toggle", defaultValue: "true" },
             ]}
         />
     );

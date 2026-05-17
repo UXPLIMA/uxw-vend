@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -36,9 +37,21 @@ const statusColor = (status: string) => {
 };
 
 export function ProfileOrdersTab() {
+    const t = useTranslations("store");
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+
+    const statusLabel = (status: string) => {
+        const map: Record<string, string> = {
+            COMPLETED: "tab_orders_statusCompleted",
+            PENDING: "tab_orders_statusPending",
+            PROCESSING: "tab_orders_statusProcessing",
+            CANCELLED: "tab_orders_statusCancelled",
+        };
+        const key = map[status];
+        return key ? t(key) : status;
+    };
 
     useEffect(() => {
         fetch("/api/v1/store/orders?limit=10")
@@ -61,15 +74,15 @@ export function ProfileOrdersTab() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Order History</CardTitle>
+                <CardTitle>{t("tab_orders_title")}</CardTitle>
             </CardHeader>
             <CardContent>
                 {orders.length === 0 ? (
                     <div className="text-center py-8">
                         <ShoppingCart className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                        <p className="text-muted-foreground">No orders yet</p>
+                        <p className="text-muted-foreground">{t("tab_orders_empty")}</p>
                         <Link href="/store">
-                            <Button variant="outline" className="mt-3">Browse Store</Button>
+                            <Button variant="outline" className="mt-3">{t("tab_orders_browse")}</Button>
                         </Link>
                     </div>
                 ) : (
@@ -88,7 +101,7 @@ export function ProfileOrdersTab() {
                                         <div className="text-right">
                                             <p className="font-bold">{formatCurrency(Number(order.total))}</p>
                                             <span className={`text-xs px-2 py-0.5 rounded ${statusColor(order.status)}`}>
-                                                {order.status}
+                                                {statusLabel(order.status)}
                                             </span>
                                         </div>
                                         {expandedOrder === order.id
@@ -123,12 +136,12 @@ export function ProfileOrdersTab() {
                                         </div>
                                         {Number(order.discount) > 0 && (
                                             <div className="flex justify-between mt-3 pt-3 border-t text-sm text-green-600">
-                                                <span>Discount</span>
+                                                <span>{t("tab_orders_discount")}</span>
                                                 <span>-{formatCurrency(Number(order.discount))}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between mt-2 pt-2 border-t text-sm font-bold">
-                                            <span>Total</span>
+                                            <span>{t("tab_orders_total")}</span>
                                             <span>{formatCurrency(Number(order.total))}</span>
                                         </div>
                                     </div>

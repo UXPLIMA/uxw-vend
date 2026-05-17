@@ -198,7 +198,8 @@
         "adm_unassigned": "Unassigned",
         "adm_messages": "Messages",
         "noDepartmentsTitle": "No support departments yet",
-        "noDepartmentsHelp": "An admin needs to create at least one ticket department before support tickets can be opened."
+        "noDepartmentsHelp": "An admin needs to create at least one ticket department before support tickets can be opened.",
+        "adm_resolved": "Resolved"
       },
       "admin": {
         "menu_tickets": "Tickets",
@@ -298,7 +299,7 @@
         "createNewTicket": "Yeni Talep Oluştur",
         "adm_actions": "İşlemler",
         "adm_all": "Tümü",
-        "adm_closed": "Kapalı",
+        "adm_closed": "Kapatıldı",
         "adm_department": "Departman",
         "adm_inProgress": "İşleniyor",
         "adm_loading": "Yükleniyor...",
@@ -334,7 +335,8 @@
         "adm_unassigned": "Atanmamış",
         "adm_messages": "Mesajlar",
         "noDepartmentsTitle": "Henüz destek departmanı yok",
-        "noDepartmentsHelp": "Bilet açılabilmesi için yöneticinin en az bir destek departmanı oluşturması gerekiyor."
+        "noDepartmentsHelp": "Bilet açılabilmesi için yöneticinin en az bir destek departmanı oluşturması gerekiyor.",
+        "adm_resolved": "Çözüldü"
       },
       "admin": {
         "menu_tickets": "Destek Talepleri",

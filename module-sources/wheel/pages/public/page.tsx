@@ -99,7 +99,13 @@ export default function WheelPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setResult({ name: data.error, type: "error", value: 0 });
+                let errorMsg: string = data?.error || t("errorGeneric");
+                if (data?.code === "wheel_already_spun") {
+                    errorMsg = t("errorAlreadySpun");
+                } else if (data?.code === "wheel_not_enough_credits") {
+                    errorMsg = t("errorNotEnoughCredits", { cost: Number(data?.cost ?? 0) });
+                }
+                setResult({ name: errorMsg, type: "error", value: 0 });
                 setSpinning(false);
                 return;
             }

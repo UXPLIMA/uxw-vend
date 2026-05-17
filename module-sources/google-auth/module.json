@@ -70,7 +70,7 @@
     "tr": {
       "googleAuth": {
         "title": "Google ile Giriş",
-        "settings": "Google OAuth Ayarlari",
+        "settings": "Google OAuth Ayarları",
         "clientId": "Istemci Kimligi",
         "clientIdPlaceholder": "Google uygulama Istemci Kimligini girin",
         "clientSecret": "Istemci Şifresi",
@@ -80,7 +80,7 @@
         "enabled": "Google ile Giriş Etkin",
         "disabled": "Google ile Giriş Devre Disi",
         "enable": "Google ile Girişi Etkinlestir",
-        "save": "Ayarlari Kaydet",
+        "save": "Ayarları Kaydet",
         "saved": "Google OAuth ayarlari basariyla kaydedildi",
         "saveError": "Google OAuth ayarlari kaydedilemedi",
         "signInWith": "Google ile giriş yap",

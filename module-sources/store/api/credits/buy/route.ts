@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
-import { stripe, getStripeEnabled } from "../../../lib/stripe";
+import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../../lib/stripe";
 import { z } from "zod";
 
 const buyCreditsSchema = z.object({
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        if (!getStripeEnabled()) {
+        if (!await getStripeEnabled()) {
             return NextResponse.json({ error: "Stripe is not configured" }, { status: 400 });
         }
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
         const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3001";
 
-        const checkoutSession = await stripe.checkout.sessions.create({
+        const checkoutSession = await (await getStripe()).checkout.sessions.create({
             mode: "payment",
             payment_method_types: ["card"],
             line_items: [{

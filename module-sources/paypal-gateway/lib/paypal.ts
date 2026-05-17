@@ -1,22 +1,63 @@
 /**
- * PayPal REST API v2 Integration
- * Docs: https://developer.paypal.com/docs/api/orders/v2/
+ * PayPal REST API v2 integration.
+ *
+ * Credentials are read from the `paypal_client_id`, `paypal_client_secret`,
+ * `paypal_mode` Settings rows (admin UI source of truth) with
+ * `process.env.PAYPAL_*` as fallback. The first non-empty value wins.
+ *
+ * Settings are cached for 30s inside the request lifecycle to avoid
+ * hammering the Setting table on hot paths; PayPal call latency
+ * dominates anyway.
  */
 
-const PAYPAL_BASE = process.env.PAYPAL_MODE === "live"
-    ? "https://api-m.paypal.com"
-    : "https://api-m.sandbox.paypal.com";
+import { prisma } from "@/core/lib/db";
 
-export function getPaypalEnabled(): boolean {
-    return !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+type PaypalCreds = { clientId: string | null; clientSecret: string | null; mode: "live" | "sandbox" };
+
+let cached: PaypalCreds | null = null;
+let cachedAt = 0;
+const CACHE_TTL_MS = 30_000;
+
+async function readCreds(): Promise<PaypalCreds> {
+    const now = Date.now();
+    if (cached && now - cachedAt < CACHE_TTL_MS) return cached;
+    const rows = await prisma.setting.findMany({
+        where: { key: { in: ["paypal_client_id", "paypal_client_secret", "paypal_mode"] } },
+    });
+    const map: Record<string, string | null> = {};
+    for (const r of rows) {
+        const v = r.value;
+        map[r.key] = typeof v === "string" && v.trim().length > 0 ? v.trim() : null;
+    }
+    const mode = (map.paypal_mode ?? process.env.PAYPAL_MODE ?? "sandbox") === "live" ? "live" : "sandbox";
+    cached = {
+        clientId:     map.paypal_client_id     ?? process.env.PAYPAL_CLIENT_ID     ?? null,
+        clientSecret: map.paypal_client_secret ?? process.env.PAYPAL_CLIENT_SECRET ?? null,
+        mode,
+    };
+    cachedAt = now;
+    return cached;
+}
+
+async function paypalBase(): Promise<string> {
+    const { mode } = await readCreds();
+    return mode === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
+}
+
+export async function getPaypalEnabled(): Promise<boolean> {
+    const { clientId, clientSecret } = await readCreds();
+    return !!(clientId && clientSecret);
 }
 
 async function getAccessToken(): Promise<string> {
-    const auth = Buffer.from(
-        `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-    ).toString("base64");
+    const { clientId, clientSecret } = await readCreds();
+    if (!clientId || !clientSecret) {
+        throw new Error("PayPal is not configured. Set paypal_client_id/secret in admin settings or PAYPAL_CLIENT_ID/_SECRET in env.");
+    }
+    const base = await paypalBase();
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-    const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+    const res = await fetch(`${base}/v1/oauth2/token`, {
         method: "POST",
         headers: {
             Authorization: `Basic ${auth}`,
@@ -37,8 +78,9 @@ export async function createPaypalOrder(params: {
     cancelUrl: string;
 }): Promise<{ id: string; approveUrl: string }> {
     const token = await getAccessToken();
+    const base = await paypalBase();
 
-    const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
+    const res = await fetch(`${base}/v2/checkout/orders`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -76,8 +118,9 @@ export async function capturePaypalOrder(paypalOrderId: string): Promise<{
     amount: number;
 }> {
     const token = await getAccessToken();
+    const base = await paypalBase();
 
-    const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${paypalOrderId}/capture`, {
+    const res = await fetch(`${base}/v2/checkout/orders/${paypalOrderId}/capture`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,

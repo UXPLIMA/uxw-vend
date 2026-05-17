@@ -102,9 +102,9 @@ export default function BroadcastsPage() {
     const queueDraft = async (b: Broadcast) => {
         const ok = await confirm({
             title: t("broadcasts_sendTitle"),
-            message: `Queue "${b.subject}" for delivery?`,
+            message: t("broadcasts_queueConfirm", { subject: b.subject }),
             variant: "danger",
-            confirmText: "Send",
+            confirmText: t("broadcasts_sendButton"),
         });
         if (!ok) return;
         await fetch(`/api/v1/broadcasts/${b.id}`, { method: "POST" });
@@ -176,11 +176,11 @@ export default function BroadcastsPage() {
                                         </span>
                                     </div>
                                     <p className="text-xs text-muted-foreground">
-                                        {new Date(b.createdAt).toLocaleString("tr-TR")}
+                                        {new Date(b.createdAt).toLocaleString(__dateTag)}
                                         {b.totalCount > 0 && (
                                             <span className="ml-2">
-                                                {b.sentCount}/{b.totalCount} sent
-                                                {b.failedCount > 0 && <span className="text-destructive"> · {b.failedCount} failed</span>}
+                                                {t("broadcasts_sentSuffix", { sent: b.sentCount, total: b.totalCount })}
+                                                {b.failedCount > 0 && <span className="text-destructive"> {t("broadcasts_failedSuffix", { failed: b.failedCount })}</span>}
                                             </span>
                                         )}
                                     </p>
@@ -188,7 +188,7 @@ export default function BroadcastsPage() {
                                 <div className="flex gap-1">
                                     {b.status === "draft" && (
                                         <Button variant="outline" size="sm" onClick={() => queueDraft(b)}>
-                                            <Send className="w-3 h-3 mr-1" /> Send
+                                            <Send className="w-3 h-3 mr-1" /> {t("broadcasts_sendButton")}
                                         </Button>
                                     )}
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteBroadcast(b)}>

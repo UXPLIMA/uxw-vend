@@ -149,6 +149,20 @@ export default function AdminTicketsPage() {
                 >
                     {t("adm_waitingReply")}
                 </Button>
+                <Button
+                    variant={statusFilter === "RESOLVED" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setStatusFilter("RESOLVED")}
+                >
+                    {t.has("adm_resolved") ? t("adm_resolved") : "Resolved"}
+                </Button>
+                <Button
+                    variant={statusFilter === "CLOSED" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setStatusFilter("CLOSED")}
+                >
+                    {t.has("adm_closed") ? t("adm_closed") : "Closed"}
+                </Button>
             </div>
 
             {/* Tickets Table */}

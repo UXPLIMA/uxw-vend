@@ -98,6 +98,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         }
     }
 
+    // Auto-stamp publishedAt when the article is being flipped to
+    // PUBLISHED for the first time. If the row already has a
+    // publishedAt, preserve it (republishing shouldn't shift the date);
+    // if the caller explicitly provided publishedAt, that wins.
+    let effectivePublishedAt: Date | undefined | null = publishedAt ? new Date(publishedAt) : undefined;
+    if (
+        effectivePublishedAt === undefined &&
+        effectiveStatus === "PUBLISHED" &&
+        !article.publishedAt
+    ) {
+        effectivePublishedAt = new Date();
+    }
+
     // Generate new slug if title changed
     let slug = article.slug;
     if (title && title !== article.title) {
@@ -133,7 +146,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             content: content !== undefined ? sanitizeHtml(content) : undefined,
             coverImage,
             status: effectiveStatus,
-            publishedAt: publishedAt ? new Date(publishedAt) : undefined,
+            publishedAt: effectivePublishedAt,
             publishAt: publishAtDate,
             categoryId,
             ...tagUpdate,

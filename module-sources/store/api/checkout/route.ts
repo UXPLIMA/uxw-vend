@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
-import { stripe, getStripeEnabled } from "../../lib/stripe";
+import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../lib/stripe";
 import { generateOrderNumber } from "@/core/lib/utils";
 import { sendDiscordWebhook } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
@@ -10,15 +10,15 @@ import { z } from "zod";
 
 const checkoutSchema = z.object({
     items: z.array(z.object({
-        productId: z.string(),
-        quantity: z.number().int().min(1),
-    })).min(1),
-    playerName: z.string().min(1, "Player name is required").max(50),
+        productId: z.string({ message: "Product is missing" }),
+        quantity: z.number().int().min(1, "Quantity must be at least 1"),
+    }), { message: "Your cart is empty" }).min(1, "Your cart is empty"),
+    playerName: z.string().min(1, "Player name is required").max(50, "Player name is too long"),
     couponCode: z.string().optional(),
     creatorCode: z.string().optional(),
     variables: z.record(z.string(), z.record(z.string(), z.string())).optional(),
     notes: z.string().optional(),
-    paymentMethod: z.enum(["stripe", "credits"]).default("stripe"),
+    paymentMethod: z.enum(["stripe", "credits"], { message: "Invalid payment method" }).default("stripe"),
 });
 
 // POST /api/v1/store/checkout - Create checkout session
@@ -135,30 +135,39 @@ export async function POST(request: NextRequest) {
         });
 
         // ── Apply coupon ──
+        // If the user supplied a coupon code, reject the checkout with a
+        // clear error when it doesn't apply (not found / inactive /
+        // expired / usage cap / min-purchase). Previously an invalid
+        // code was silently ignored — the customer paid full price with
+        // no feedback that their code didn't work.
         let couponDiscount = 0;
         if (couponCode) {
-            await prisma.$transaction(async (tx) => {
+            const couponError = await prisma.$transaction(async (tx): Promise<string | null> => {
                 const coupon = await tx.coupon.findUnique({
                     where: { code: couponCode.toUpperCase() },
                 });
-                if (coupon && coupon.isActive) {
-                    const now = new Date();
-                    const valid = (!coupon.startsAt || coupon.startsAt <= now) &&
-                        (!coupon.expiresAt || coupon.expiresAt >= now) &&
-                        (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit) &&
-                        (!coupon.minPurchase || subtotal >= Number(coupon.minPurchase));
+                if (!coupon || !coupon.isActive) return "Coupon code not found or inactive";
 
-                    if (valid) {
-                        if (coupon.type === "PERCENTAGE") {
-                            couponDiscount = subtotal * (Number(coupon.value) / 100);
-                            if (coupon.maxDiscount) couponDiscount = Math.min(couponDiscount, Number(coupon.maxDiscount));
-                        } else {
-                            couponDiscount = Math.min(Number(coupon.value), subtotal);
-                        }
-                        await tx.coupon.update({ where: { id: coupon.id }, data: { usageCount: { increment: 1 } } });
-                    }
+                const now = new Date();
+                if (coupon.startsAt && coupon.startsAt > now) return "Coupon is not yet active";
+                if (coupon.expiresAt && coupon.expiresAt < now) return "Coupon has expired";
+                if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) return "Coupon usage limit reached";
+                if (coupon.minPurchase && subtotal < Number(coupon.minPurchase)) {
+                    return `Coupon requires a minimum purchase of ${Number(coupon.minPurchase)}`;
                 }
+
+                if (coupon.type === "PERCENTAGE") {
+                    couponDiscount = subtotal * (Number(coupon.value) / 100);
+                    if (coupon.maxDiscount) couponDiscount = Math.min(couponDiscount, Number(coupon.maxDiscount));
+                } else {
+                    couponDiscount = Math.min(Number(coupon.value), subtotal);
+                }
+                await tx.coupon.update({ where: { id: coupon.id }, data: { usageCount: { increment: 1 } } });
+                return null;
             });
+            if (couponError) {
+                return NextResponse.json({ error: couponError, code: "invalid_coupon" }, { status: 400 });
+            }
         }
 
         // ── Apply creator code ──
@@ -393,11 +402,15 @@ export async function POST(request: NextRequest) {
             }],
         }).catch(console.error);
 
-        // ── Free checkout / Stripe not configured ──
-        if (!getStripeEnabled() || total <= 0) {
+        // ── Free order: complete & grant immediately ──
+        // CRITICAL: separated from the "Stripe missing" path. If a paid order
+        // arrives but Stripe isn't configured, refuse it (503) instead of
+        // silently giving the product away. Previously both conditions were
+        // OR'd together, which let any paid checkout succeed for free when
+        // STRIPE_SECRET_KEY was unset.
+        if (total <= 0) {
             await prisma.order.update({ where: { id: order.id }, data: { status: "COMPLETED" } });
 
-            // Grant ownership immediately for free orders
             for (const item of orderItems) {
                 await prisma.chestItem.create({
                     data: { userId: session.user.id, productId: item.productId, productName: item.name, quantity: item.quantity, orderId: order.id },
@@ -413,6 +426,15 @@ export async function POST(request: NextRequest) {
             await doActionAsync("store.order.created", order);
             await doActionAsync("store.order.completed", order);
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });
+        }
+
+        // Paid order but Stripe isn't wired — keep the order PENDING and tell
+        // the caller. Do NOT grant ownership.
+        if (!await getStripeEnabled()) {
+            return NextResponse.json(
+                { error: "Payments are not configured. Ask an administrator to set up Stripe before purchasing.", code: "payment_not_configured" },
+                { status: 503 },
+            );
         }
 
         // ── Create Stripe Checkout Session ──
@@ -431,7 +453,7 @@ export async function POST(request: NextRequest) {
 
             let customerId = user?.stripeCustomerId;
             if (!customerId) {
-                const customer = await stripe.customers.create({
+                const customer = await (await getStripe()).customers.create({
                     email: user?.email || undefined,
                     name: user?.username || undefined,
                     metadata: { userId: session.user.id },
@@ -449,7 +471,7 @@ export async function POST(request: NextRequest) {
                 const interval = (subProduct.subscriptionInterval as "month" | "year") || "month";
                 const intervalCount = subProduct.subscriptionIntervalCount || 1;
 
-                const stripePrice = await stripe.prices.create({
+                const stripePrice = await (await getStripe()).prices.create({
                     unit_amount: Math.round(Number(subProduct.price) * 100),
                     currency,
                     recurring: {
@@ -481,7 +503,7 @@ export async function POST(request: NextRequest) {
             };
 
             if (totalDiscount > 0) {
-                const stripeCoupon = await stripe.coupons.create({
+                const stripeCoupon = await (await getStripe()).coupons.create({
                     amount_off: Math.round(totalDiscount * 100),
                     currency,
                     duration: "once",
@@ -489,8 +511,9 @@ export async function POST(request: NextRequest) {
                 subParams.discounts = [{ coupon: stripeCoupon.id }];
             }
 
-            const checkoutSession = await stripe.checkout.sessions.create(
-                subParams as Parameters<typeof stripe.checkout.sessions.create>[0]
+            const stripeClient = await getStripe();
+            const checkoutSession = await stripeClient.checkout.sessions.create(
+                subParams as Parameters<typeof stripeClient.checkout.sessions.create>[0]
             );
 
             await prisma.order.update({
@@ -534,7 +557,7 @@ export async function POST(request: NextRequest) {
         };
 
         if (totalDiscount > 0) {
-            const stripeCoupon = await stripe.coupons.create({
+            const stripeCoupon = await (await getStripe()).coupons.create({
                 amount_off: Math.round(totalDiscount * 100),
                 currency,
                 duration: "once",
@@ -542,7 +565,8 @@ export async function POST(request: NextRequest) {
             stripeParams.discounts = [{ coupon: stripeCoupon.id }];
         }
 
-        const checkoutSession = await stripe.checkout.sessions.create(stripeParams as Parameters<typeof stripe.checkout.sessions.create>[0]);
+        const stripeClient = await getStripe();
+        const checkoutSession = await stripeClient.checkout.sessions.create(stripeParams as Parameters<typeof stripeClient.checkout.sessions.create>[0]);
 
         await prisma.order.update({
             where: { id: order.id },

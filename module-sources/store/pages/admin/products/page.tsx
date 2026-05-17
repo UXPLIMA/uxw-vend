@@ -107,7 +107,7 @@ export default function AdminProductsPage() {
                                                             {product.image ? (
                                                                 <Image src={product.image} alt={product.name} width={40} height={40} className="w-full h-full object-cover" />
                                                             ) : (
-                                                                <div className="w-full h-full flex items-center justify-center text-lg">📦</div>
+                                                                <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-muted-foreground" /></div>
                                                             )}
                                                         </div>
                                                         <div>

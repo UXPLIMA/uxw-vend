@@ -68,7 +68,7 @@
     },
     "tr": {
       "paypalGateway": {
-        "title": "PayPal Ayarlari",
+        "title": "PayPal Ayarları",
         "description": "PayPal odeme agirligi yapilandirmasi",
         "clientId": "Istemci Kimlik Numarasi",
         "clientSecret": "Istemci Gizli Anahtari",
@@ -77,7 +77,7 @@
         "liveMode": "Canli Mod",
         "enabled": "Etkin",
         "disabled": "Devre Disi",
-        "saveSettings": "Ayarlari Kaydet",
+        "saveSettings": "Ayarları Kaydet",
         "settingsSaved": "PayPal ayarlari basariyla kaydedildi",
         "settingsError": "PayPal ayarlari kaydedilemedi",
         "testConnection": "Baglanti Testi",
