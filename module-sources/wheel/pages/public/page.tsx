@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, PartyPopper } from "lucide-react";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Prize {
@@ -18,6 +19,7 @@ interface Prize {
 }
 
 export default function WheelPage() {
+    const t = useTranslations('wheel');
     const { data: session } = useSession();
     const [prizes, setPrizes] = useState<Prize[]>([]);
     const [loading, setLoading] = useState(true);
@@ -130,13 +132,13 @@ export default function WheelPage() {
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 flex flex-col items-center">
-                <h1 className="text-3xl font-bold text-foreground mb-2">Wheel of Fortune</h1>
-                <p className="text-muted-foreground mb-8">Spin the wheel for a chance to win prizes! One free spin per day.</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
+                <p className="text-muted-foreground mb-8">{t('description')}</p>
 
                 {loading ? (
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 ) : prizes.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">No prizes configured yet</CardContent></Card>
+                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('noPrizes')}</CardContent></Card>
                 ) : (
                     <div className="flex flex-col items-center gap-6">
                         {/* Wheel */}
@@ -162,13 +164,13 @@ export default function WheelPage() {
                             disabled={spinning || !session?.user}
                         >
                             {spinning ? (
-                                <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Spinning...</>
+                                <><Loader2 className="w-5 h-5 animate-spin mr-2" /> {t('spinning')}</>
                             ) : !session?.user ? (
-                                "Login to Spin"
+                                t('loginToSpin')
                             ) : freeSpinUsed && spinCost > 0 ? (
-                                `Spin Again (${spinCost} credits)`
+                                t('spinAgainCost', { cost: spinCost })
                             ) : (
-                                "Spin!"
+                                t('spin')
                             )}
                         </Button>
 
@@ -179,14 +181,14 @@ export default function WheelPage() {
                                     {result.type === "error" ? (
                                         <p className="text-red-600">{result.name}</p>
                                     ) : result.type === "nothing" ? (
-                                        <p className="text-muted-foreground">Better luck next time! You got: <strong>{result.name}</strong></p>
+                                        <p className="text-muted-foreground">{t('betterLuckNextTime', { prize: result.name })}</p>
                                     ) : (
                                         <div>
-                                            <p className="text-2xl mb-1">🎉</p>
-                                            <p className="font-bold text-foreground text-lg">You won: {result.name}!</p>
+                                            <PartyPopper className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                                            <p className="font-bold text-foreground text-lg">{t('youWon', { prize: result.name })}</p>
                                             {result.value > 0 && (
                                                 <p className="text-sm text-muted-foreground mt-1">
-                                                    {result.type === "credits" ? `${result.value} credits added` : `$${result.value} coupon created`}
+                                                    {result.type === "credits" ? t('creditsAdded', { value: result.value }) : t('couponCreated', { value: result.value })}
                                                 </p>
                                             )}
                                         </div>
@@ -197,13 +199,13 @@ export default function WheelPage() {
 
                         {/* Prize List */}
                         <div className="w-full max-w-sm">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-2">Available Prizes</h3>
+                            <h3 className="text-sm font-medium text-muted-foreground mb-2">{t('availablePrizes')}</h3>
                             <div className="space-y-1">
                                 {prizes.map((p) => (
                                     <div key={p.id} className="flex items-center gap-2 text-sm">
                                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
                                         <span className="text-foreground">{p.name}</span>
-                                        {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? `${p.value} credits` : `$${p.value}`})</span>}
+                                        {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? t('valueCredits', { value: p.value }) : `$${p.value}`})</span>}
                                     </div>
                                 ))}
                             </div>

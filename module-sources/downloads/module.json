@@ -86,7 +86,12 @@
         "adm_field4Placeholder": "https://example.com/file.zip",
         "adm_field5Label": "File Size (bytes)",
         "adm_field5Placeholder": "e.g. 1048576",
-        "adm_field6Label": "Active"
+        "adm_field6Label": "Active",
+        "subtitle": "Resource packs, mods, and other files",
+        "empty": "No downloads available",
+        "unknownSize": "Unknown size",
+        "downloadsCount": "{count, plural, one {# download} other {# downloads}}",
+        "downloadAction": "Download"
       },
       "admin": {
         "menu_downloads": "Downloads",
@@ -97,7 +102,7 @@
     },
     "tr": {
       "downloads": {
-        "title": "İndirmeler",
+        "title": "İndirilenler",
         "manage": "İndirmeleri Yönet",
         "create": "İndirme Ekle",
         "edit": "İndirmeyi Düzenle",
@@ -141,7 +146,12 @@
         "adm_field4Placeholder": "https://example.com/dosya.zip",
         "adm_field5Label": "Dosya Boyutu (bayt)",
         "adm_field5Placeholder": "örn. 1048576",
-        "adm_field6Label": "Aktif"
+        "adm_field6Label": "Aktif",
+        "subtitle": "Kaynak paketleri, modlar ve diğer dosyalar",
+        "empty": "İndirilecek dosya yok",
+        "unknownSize": "Bilinmiyor",
+        "downloadsCount": "{count, plural, one {# indirme} other {# indirme}}",
+        "downloadAction": "İndir"
       },
       "admin": {
         "menu_downloads": "İndirmeler",

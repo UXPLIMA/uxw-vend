@@ -20,6 +20,11 @@
     "noResults": "Sonuç bulunamadı",
     "error_title": "Bir şeyler ters gitti",
     "error_description": "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
+    "welcomeTitle": "Topluluğunuza hoş geldiniz",
+    "welcomeDescription": "Bir modül yüklediğinizde veya anasayfaya bölüm eklediğinizde içerik burada görünür. O zamana kadar burası başlangıç noktanız.",
+    "welcomeBrowseModules": "Modülleri keşfet",
+    "welcomeOpenSettings": "Ayarları aç",
+    "welcomeVisitorHint": "Üst menüden topluluğu keşfedebilirsiniz.",
     "retry": "Tekrar dene",
     "go_home": "Ana sayfa"
   },

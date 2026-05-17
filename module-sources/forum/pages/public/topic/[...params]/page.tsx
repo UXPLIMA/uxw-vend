@@ -11,6 +11,7 @@ import { Textarea } from "@/core/components/ui/textarea";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { ArrowLeft, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { formatRelativeTime } from "@/core/lib/utils";
+import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Post {
@@ -37,6 +38,7 @@ interface Topic {
 }
 
 export default function TopicDetailPage() {
+    const t = useTranslations('forum');
     const params = useParams();
     // Can be { slug: ["forum","topic","3","general"], params: "3/general" } etc
     const raw = params.params || params.slug;
@@ -121,7 +123,7 @@ export default function TopicDetailPage() {
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-600 mb-4">
-                    <ArrowLeft className="w-4 h-4" /> Back to Forum
+                    <ArrowLeft className="w-4 h-4" /> {t('backToForum')}
                 </Link>
 
                 {loading ? (
@@ -131,7 +133,7 @@ export default function TopicDetailPage() {
                 ) : !topic ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <p className="text-muted-foreground">Topic not found</p>
+                            <p className="text-muted-foreground">{t('topicNotFound')}</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -153,13 +155,13 @@ export default function TopicDetailPage() {
                                 >
                                     {topic.category.name}
                                 </span>
-                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{topic.views} views</span>
+                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t('viewsCount', { count: topic.views })}</span>
                                 <button
                                     onClick={toggleLike}
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${liked ? "bg-blue-100 text-blue-600" : "hover:bg-muted"}`}
                                 >
                                     <ThumbsUp className={`w-3 h-3 ${liked ? "fill-blue-600" : ""}`} />
-                                    {likeCount} likes
+                                    {t('likesCount', { count: likeCount })}
                                 </button>
                             </div>
                         </div>
@@ -184,7 +186,7 @@ export default function TopicDetailPage() {
                         {/* Replies */}
                         {topic.posts.length > 0 && (
                             <div className="space-y-3 mb-6">
-                                <h3 className="text-sm font-medium text-muted-foreground">{topic.posts.length} replies</h3>
+                                <h3 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h3>
                                 {topic.posts.map((post) => (
                                     <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
                                 ))}
@@ -195,26 +197,26 @@ export default function TopicDetailPage() {
                         {!topic.isLocked ? (
                             <Card>
                                 <CardContent className="p-5">
-                                    <h3 className="font-medium text-foreground mb-3">Reply</h3>
+                                    <h3 className="font-medium text-foreground mb-3">{t('reply')}</h3>
                                     <Textarea
                                         value={replyContent}
                                         onChange={(e) => setReplyContent(e.target.value)}
-                                        placeholder="Write your reply..."
+                                        placeholder={t('writeYourReply')}
                                         rows={4}
                                         className="mb-3"
                                     />
                                     <Button onClick={submitReply} disabled={sending || !replyContent.trim()}>
                                         {sending ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Posting...</>
+                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('posting')}</>
                                         ) : (
-                                            <><Send className="w-4 h-4 mr-2" /> Post Reply</>
+                                            <><Send className="w-4 h-4 mr-2" /> {t('postReply')}</>
                                         )}
                                     </Button>
                                 </CardContent>
                             </Card>
                         ) : (
                             <div className="text-center py-4 text-muted-foreground text-sm">
-                                <Lock className="w-4 h-4 inline mr-1" /> This topic is locked. No new replies can be posted.
+                                <Lock className="w-4 h-4 inline mr-1" /> {t('topicLocked')}
                             </div>
                         )}
                     </>

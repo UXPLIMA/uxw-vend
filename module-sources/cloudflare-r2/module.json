@@ -56,12 +56,14 @@
         "publicUrl": "Public URL",
         "publicUrlHint": "Your R2 public bucket URL (e.g. https://pub-xxx.r2.dev)",
         "active": "Set as active storage provider",
-        "saved": "R2 settings saved",
+        "saved": "Settings saved",
         "saveError": "Failed to save settings",
         "test": "Test Connection",
         "testSuccess": "Connection successful",
         "testFailed": "Connection failed",
-        "currentlyActive": "Currently active storage provider"
+        "currentlyActive": "Currently active storage provider",
+        "save": "Save",
+        "saving": "Saving…"
       },
       "admin": {
         "menu_cloudflare-r2": "Cloudflare R2",
@@ -79,12 +81,14 @@
         "publicUrl": "Genel URL",
         "publicUrlHint": "R2 genel bucket URL'iniz (örn. https://pub-xxx.r2.dev)",
         "active": "Aktif depolama sağlayıcısı yap",
-        "saved": "R2 ayarları kaydedildi",
+        "saved": "Ayarlar kaydedildi",
         "saveError": "Ayarlar kaydedilemedi",
         "test": "Bağlantıyı Test Et",
         "testSuccess": "Bağlantı başarılı",
         "testFailed": "Bağlantı başarısız",
-        "currentlyActive": "Şu anki aktif depolama sağlayıcısı"
+        "currentlyActive": "Şu anki aktif depolama sağlayıcısı",
+        "save": "Kaydet",
+        "saving": "Kaydediliyor…"
       },
       "admin": {
         "menu_cloudflare-r2": "Cloudflare R2",

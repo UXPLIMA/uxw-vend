@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatCurrency } from "@/core/lib/utils";
-import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Package } from "lucide-react";
 
 interface Product {
     id: string;
@@ -77,7 +77,7 @@ export default function AdminProductsPage() {
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-12">
-                            <span className="text-4xl mb-4 block">���</span>
+                            <Package className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
                             <p className="text-muted-foreground">{t("adm_noProductsYet")}</p>
                             <Link href="/admin/store/products/new">
                                 <Button className="mt-4">{t("adm_createFirstProduct")}</Button>

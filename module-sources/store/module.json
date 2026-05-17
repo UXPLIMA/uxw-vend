@@ -647,7 +647,19 @@
         "adm_orderStatus_REFUNDED": "Refunded",
         "adm_generateCodes": "Generate {count} Code(s)",
         "login": "Log in",
-        "loginRequired": "Please log in to continue"
+        "loginRequired": "Please log in to continue",
+        "paymentsTitle": "Payment settings",
+        "paymentsSubtitle": "Configure Stripe and tax for store checkout",
+        "paymentsStripePublicKey": "Stripe public key",
+        "paymentsStripePublicKeyDesc": "Found in your Stripe dashboard under Developers → API keys.",
+        "paymentsStripeSecretKey": "Stripe secret key",
+        "paymentsStripeSecretKeyDesc": "Kept server-side only. Used to create payment intents.",
+        "paymentsStripeWebhookSecret": "Stripe webhook signing secret",
+        "paymentsStripeWebhookSecretDesc": "Set the endpoint URL in Stripe to /api/v1/store/checkout/webhook and paste the signing secret here.",
+        "paymentsDefaultCurrency": "Default currency",
+        "paymentsDefaultCurrencyDesc": "Three-letter ISO code (e.g. usd, eur, gbp).",
+        "paymentsTaxRate": "Tax rate (%)",
+        "paymentsTaxRateDesc": "Applied to every order. 0 disables tax."
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1045,7 +1057,19 @@
         "adm_orderStatus_REFUNDED": "İade Edildi",
         "adm_generateCodes": "{count} Kod Oluştur",
         "login": "Giriş yap",
-        "loginRequired": "Devam etmek için giriş yapın"
+        "loginRequired": "Devam etmek için giriş yapın",
+        "paymentsTitle": "Ödeme ayarları",
+        "paymentsSubtitle": "Mağaza ödemesi için Stripe ve vergi ayarları",
+        "paymentsStripePublicKey": "Stripe public key",
+        "paymentsStripePublicKeyDesc": "Stripe panelinde Developers → API keys altında.",
+        "paymentsStripeSecretKey": "Stripe secret key",
+        "paymentsStripeSecretKeyDesc": "Sadece sunucuda saklanır. Payment intent oluşturmak için kullanılır.",
+        "paymentsStripeWebhookSecret": "Stripe webhook signing secret",
+        "paymentsStripeWebhookSecretDesc": "Stripe'da endpoint URL olarak /api/v1/store/checkout/webhook ekleyin, signing secret'i buraya yapıştırın.",
+        "paymentsDefaultCurrency": "Varsayılan para birimi",
+        "paymentsDefaultCurrencyDesc": "Üç harfli ISO kodu (örn. usd, eur, gbp).",
+        "paymentsTaxRate": "Vergi oranı (%)",
+        "paymentsTaxRateDesc": "Her siparişe uygulanır. 0 vergi devre dışı."
       },
       "cart": {
         "title": "Alışveriş Sepeti",
@@ -3236,6 +3260,13 @@
       "href": "/store",
       "icon": "ShoppingBag",
       "position": 30
+    }
+  ],
+  "footerLinks": [
+    {
+      "label": "Store",
+      "href": "/store",
+      "section": "quick"
     }
   ]
 }

@@ -319,5 +319,12 @@
       "icon": "Lightbulb",
       "position": 70
     }
+  ],
+  "footerLinks": [
+    {
+      "label": "Suggestions",
+      "href": "/suggestions",
+      "section": "quick"
+    }
   ]
 }

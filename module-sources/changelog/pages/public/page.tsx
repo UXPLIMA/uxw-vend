@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -18,6 +19,7 @@ interface Entry {
 }
 
 export default function ChangelogPage() {
+    const t = useTranslations('changelog');
     const [entries, setEntries] = useState<Entry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -34,13 +36,13 @@ export default function ChangelogPage() {
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                <h1 className="text-3xl font-bold text-foreground mb-2">Changelog</h1>
-                <p className="text-muted-foreground mb-8">Latest updates and improvements</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
+                <p className="text-muted-foreground mb-8">{t('subtitle')}</p>
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
                 ) : entries.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">No changelog entries yet</CardContent></Card>
+                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
                 ) : (
                     <div className="relative">
                         <div className="absolute left-[19px] top-0 bottom-0 w-0.5 bg-border" />

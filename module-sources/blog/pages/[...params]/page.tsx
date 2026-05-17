@@ -1,7 +1,8 @@
-import Link from "next/link";
+import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import DOMPurify from "isomorphic-dompurify";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/core/lib/db";
 import { formatDate } from "@/core/lib/utils";
 import { Navbar, Footer } from "@/core/components/layout";
@@ -80,6 +81,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
     }
 
     const relatedArticles = await getRelatedArticles(article.id, article.categoryId);
+    const commonT = await getTranslations("common");
 
     const articleJsonLd = buildArticleJsonLd({
         title: article.title,
@@ -156,7 +158,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                             <div className="lg:col-span-3">
                                 {/* Breadcrumb */}
                                 <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-blue-600">Home</Link>
+                                    <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
                                     <span className="mx-2">/</span>
                                     <Link href="/blog" className="hover:text-blue-600">Blog</Link>
                                     {article.category && (

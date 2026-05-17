@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -16,6 +17,7 @@ interface StaffMember {
 }
 
 export default function StaffPage() {
+    const t = useTranslations('staff');
     const [members, setMembers] = useState<StaffMember[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -33,14 +35,14 @@ export default function StaffPage() {
 
             <main className="container mx-auto px-4 py-6 flex-1">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">Our Team</h1>
-                    <p className="text-muted-foreground">The people behind the server</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
+                    <p className="text-muted-foreground">{t('subtitle')}</p>
                 </div>
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
                 ) : members.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">No staff members listed</CardContent></Card>
+                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
                         {members.map((member) => {

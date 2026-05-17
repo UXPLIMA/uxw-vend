@@ -20,6 +20,11 @@
     "noResults": "No results found",
     "error_title": "Something went wrong",
     "error_description": "An unexpected error occurred. Please try again.",
+    "welcomeTitle": "Welcome to your community",
+    "welcomeDescription": "Once you install a module or add a homepage section, content shows up here. Until then, this is your starting point.",
+    "welcomeBrowseModules": "Browse modules",
+    "welcomeOpenSettings": "Open settings",
+    "welcomeVisitorHint": "Use the navigation above to explore the community.",
     "retry": "Try again",
     "go_home": "Go home"
   },

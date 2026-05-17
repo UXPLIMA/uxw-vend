@@ -9,7 +9,7 @@ import { Input } from "@/core/components/ui/input";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Label } from "@/core/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -23,6 +23,7 @@ export default function NewTopicPage() {
     const router = useRouter();
     const t = useTranslations('forum');
     const [categories, setCategories] = useState<Category[]>([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +37,8 @@ export default function NewTopicPage() {
         fetch("/api/v1/forum/categories")
             .then((r) => r.json())
             .then((d) => setCategories(d.categories || []))
-            .catch(() => {});
+            .catch(() => undefined)
+            .finally(() => setCategoriesLoaded(true));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -81,59 +83,69 @@ export default function NewTopicPage() {
                         <CardTitle>{t('newTopic')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {error && (
-                            <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
-                                {error}
+                        {categoriesLoaded && categories.length === 0 ? (
+                            <div className="text-center py-10">
+                                <FolderPlus className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+                                <p className="font-medium text-foreground">{t('noCategoriesTitle')}</p>
+                                <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noCategoriesHelp')}</p>
                             </div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Label>Category *</Label>
-                                <select
-                                    value={form.categoryId}
-                                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                    required
-                                >
-                                    <option value="">{t('selectCategory')}</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <Label>Title *</Label>
-                                <Input
-                                    value={form.title}
-                                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                    placeholder={t('topicTitle')}
-                                    required
-                                    minLength={3}
-                                />
-                            </div>
-
-                            <div>
-                                <Label>Content *</Label>
-                                <Textarea
-                                    value={form.content}
-                                    onChange={(e) => setForm({ ...form, content: e.target.value })}
-                                    placeholder={t('topicContent')}
-                                    rows={8}
-                                    required
-                                    minLength={10}
-                                />
-                            </div>
-
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('creating')}</>
-                                ) : (
-                                    t('createTopic')
+                        ) : (
+                            <>
+                                {error && (
+                                    <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                                        {error}
+                                    </div>
                                 )}
-                            </Button>
-                        </form>
+
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div>
+                                        <Label>{t('categoryLabel')}</Label>
+                                        <select
+                                            value={form.categoryId}
+                                            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                            required
+                                        >
+                                            <option value="">{t('selectCategory')}</option>
+                                            {categories.map((cat) => (
+                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <Label>{t('titleLabel')}</Label>
+                                        <Input
+                                            value={form.title}
+                                            onChange={(e) => setForm({ ...form, title: e.target.value })}
+                                            placeholder={t('topicTitle')}
+                                            required
+                                            minLength={3}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <Label>{t('contentLabel')}</Label>
+                                        <Textarea
+                                            value={form.content}
+                                            onChange={(e) => setForm({ ...form, content: e.target.value })}
+                                            placeholder={t('topicContent')}
+                                            rows={8}
+                                            required
+                                            minLength={10}
+                                        />
+                                    </div>
+
+                                    <Button type="submit" disabled={saving}>
+                                        {saving ? (
+                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('creating')}</>
+                                        ) : (
+                                            t('createTopic')
+                                        )}
+                                    </Button>
+                                </form>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </main>

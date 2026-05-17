@@ -71,7 +71,7 @@
   "translations": {
     "en": {
       "staff": {
-        "title": "Staff Team",
+        "title": "Our team",
         "description": "Meet our staff members",
         "members": "Staff Members",
         "applications": "Staff Applications",
@@ -135,7 +135,9 @@
         "adm_apps_all": "All",
         "adm_apps_pending": "Pending",
         "adm_apps_accepted": "Accepted",
-        "adm_apps_rejected": "Rejected"
+        "adm_apps_rejected": "Rejected",
+        "subtitle": "The people behind the community",
+        "empty": "No staff members listed yet"
       },
       "admin": {
         "menu_staff": "Staff",
@@ -155,7 +157,7 @@
     },
     "tr": {
       "staff": {
-        "title": "Ekip",
+        "title": "Ekibimiz",
         "description": "Ekip uyelerimizle tanisin",
         "members": "Ekip Uyeleri",
         "applications": "Ekip Basvurulari",
@@ -219,7 +221,9 @@
         "adm_apps_all": "Tümü",
         "adm_apps_pending": "Bekleyen",
         "adm_apps_accepted": "Kabul Edilen",
-        "adm_apps_rejected": "Reddedilen"
+        "adm_apps_rejected": "Reddedilen",
+        "subtitle": "Topluluğun arkasındaki ekip",
+        "empty": "Henüz ekip üyesi listelenmemiş"
       },
       "admin": {
         "menu_staff": "Personel",

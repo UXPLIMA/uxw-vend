@@ -146,7 +146,7 @@ export default function CloudflareR2AdminPage() {
                     </label>
                     <Button onClick={save} disabled={saving} className="w-full">
                         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                        {t("saved")}
+                        {saving ? t("saving") : t("save")}
                     </Button>
                 </CardContent>
             </Card>

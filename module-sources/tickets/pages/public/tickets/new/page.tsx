@@ -24,6 +24,7 @@ export default function NewTicketPage() {
     const t = useTranslations('tickets');
     const commonT = useTranslations('common');
     const [departments, setDepartments] = useState<Department[]>([]);
+    const [departmentsLoaded, setDepartmentsLoaded] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -37,7 +38,8 @@ export default function NewTicketPage() {
         fetch("/api/v1/tickets/departments")
             .then((res) => res.json())
             .then((data) => setDepartments(Array.isArray(data) ? data : data.departments || []))
-            .catch(console.error);
+            .catch(console.error)
+            .finally(() => setDepartmentsLoaded(true));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -102,6 +104,12 @@ export default function NewTicketPage() {
                 <h1 className="text-2xl font-bold text-foreground mb-6">{t('createNewTicket')}</h1>
 
                 <div className="bg-card rounded-xl border border-border p-6 max-w-3xl">
+                    {departmentsLoaded && departments.length === 0 ? (
+                        <div className="text-center py-10">
+                            <p className="font-medium text-foreground">{t('noDepartmentsTitle')}</p>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noDepartmentsHelp')}</p>
+                        </div>
+                    ) : (<>
                     {error && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                             {error}
@@ -176,6 +184,7 @@ export default function NewTicketPage() {
                             </Link>
                         </div>
                     </form>
+                    </>)}
                 </div>
             </main>
 
