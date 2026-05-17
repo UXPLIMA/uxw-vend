@@ -65,7 +65,8 @@
         "submittedBy": "Submitted by",
         "loginToVote": "Log in to vote",
         "loginToSubmit": "Log in to submit a suggestion",
-        "deletedUser": "Deleted user"
+        "deletedUser": "Deleted user",
+        "login": "Log in"
       }
     },
     "tr": {
@@ -104,7 +105,8 @@
         "submittedBy": "Gönderen",
         "loginToVote": "Oy vermek için giriş yapın",
         "loginToSubmit": "Öneri göndermek için giriş yapın",
-        "deletedUser": "Silinmiş kullanıcı"
+        "deletedUser": "Silinmiş kullanıcı",
+        "login": "Giriş yap"
       }
     },
     "de": {

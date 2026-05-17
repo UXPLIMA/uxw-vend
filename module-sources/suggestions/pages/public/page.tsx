@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { useRouter } from "@/core/lib/i18n/navigation";
+import { toast } from "sonner";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -46,7 +49,18 @@ const statusKeys: Record<string, string> = {
 
 export default function SuggestionsPage() {
     const { data: session } = useSession();
+    const router = useRouter();
+    const pathname = usePathname();
     const t = useTranslations("suggestions");
+
+    const requireLogin = () => {
+        toast.error(t.has("loginToVote") ? t("loginToVote") : "Log in to vote", {
+            action: {
+                label: t.has("login") ? t("login") : "Log in",
+                onClick: () => router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/")}`),
+            },
+        });
+    };
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -87,6 +101,7 @@ export default function SuggestionsPage() {
     };
 
     const toggleVote = async (id: string) => {
+        if (!session?.user) { requireLogin(); return; }
         const res = await fetch(`/api/v1/suggestions/${id}/vote`, { method: "POST" });
         if (res.ok) {
             const data = await res.json();
@@ -98,6 +113,8 @@ export default function SuggestionsPage() {
                 if (data.voted) { next.add(id); } else { next.delete(id); }
                 return next;
             });
+        } else if (res.status === 401) {
+            requireLogin();
         }
     };
 
@@ -170,9 +187,10 @@ export default function SuggestionsPage() {
                                 <CardContent className="p-4">
                                     <div className="flex gap-4">
                                         <button
-                                            onClick={() => session?.user && toggleVote(s.id)}
-                                            className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-colors min-w-[60px] ${
-                                                votedIds.has(s.id) ? "bg-blue-100 text-blue-600" : "bg-muted text-muted-foreground hover:bg-muted"
+                                            onClick={() => toggleVote(s.id)}
+                                            aria-label={session?.user ? (votedIds.has(s.id) ? "Remove vote" : "Upvote") : "Log in to vote"}
+                                            className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-colors min-w-[60px] cursor-pointer ${
+                                                votedIds.has(s.id) ? "bg-blue-100 text-blue-600" : "bg-muted text-muted-foreground hover:bg-blue-50 hover:text-blue-600"
                                             }`}
                                         >
                                             <ThumbsUp className={`w-4 h-4 ${votedIds.has(s.id) ? "fill-blue-600" : ""}`} />

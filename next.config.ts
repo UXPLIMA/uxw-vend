@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" },
       { protocol: "http", hostname: "**" },
     ],
+    // Allow SVG avatars (DiceBear and similar). The optimizer serves them
+    // with a strict CSP and Content-Disposition: attachment so an SVG
+    // can't execute scripts in the page context if a user supplies a
+    // malicious URL.
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'none'; script-src 'none'; sandbox;",
+    contentDispositionType: "attachment",
   },
   async headers() {
     // Production-grade security header set.
