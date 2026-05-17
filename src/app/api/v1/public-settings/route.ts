@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
 import { cached } from "@/core/lib/cache";
 
-// Public settings keys that can be read without authentication
-// Only core platform keys — module-specific settings should be served by each module's own API
+// Public settings keys that can be read without authentication.
+// Only core platform keys — module-specific settings (Discord widget IDs,
+// hero text, server IPs, etc.) live in their own module's public API.
+// Themes that need extra public values use the theme.json schema-driven
+// settings system (read via useThemeConfig, not from here).
 const PUBLIC_KEYS = [
     "site_name",
     "site_description",
     "site_email",
+    "site_discord_url",
     "footer_text",
     "custom_css",
     "navbar_links",
@@ -16,14 +20,6 @@ const PUBLIC_KEYS = [
     "theme_color_accent",
     "currency",
     "currency_symbol",
-    // Hero banner settings (rendered on every public page)
-    "hero_background_image",
-    "hero_logo_image",
-    "hero_logo_url",
-    "hero_server_ip",
-    "hero_discord_url",
-    "hero_show_player_count",
-    "hero_height",
     // Theme customizer overrides
     "theme_overrides",
 ];

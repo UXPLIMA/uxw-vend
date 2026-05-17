@@ -25,12 +25,8 @@ const PER_KEY_STRING_LIMITS: Record<string, number> = {
     site_name: 100,
     site_description: 500,
     site_email: 254,
+    site_discord_url: 500,
     footer_text: 2_000,
-    hero_server_ip: 200,
-    hero_discord_url: 500,
-    hero_logo_url: 500,
-    hero_background_image: 2_000,
-    hero_logo_image: 2_000,
     currency: 16,
     currency_symbol: 8,
 };

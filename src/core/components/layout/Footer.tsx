@@ -26,7 +26,12 @@ function DefaultFooter() {
     const siteName = (settings.site_name as string) || serverConfig.name;
     const siteDescription = (settings.site_description as string) || serverConfig.description;
     const siteEmail = (settings.site_email as string) || serverConfig.email;
-    const communityUrl = (settings.hero_discord_url as string) || serverConfig.communityUrl;
+    // site_discord_url is the canonical key; hero_discord_url is read as a
+    // back-compat fallback for installs migrated from older versions where
+    // the Discord URL lived under the (misnamed) hero_* namespace.
+    const communityUrl = (settings.site_discord_url as string)
+        || (settings.hero_discord_url as string)
+        || serverConfig.communityUrl;
 
     // Build path→module map from registry — zero hardcoded module names
     const pathToModule: Record<string, string> = {};
