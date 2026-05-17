@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useId } from "react";
 import { useSession } from "next-auth/react";
-import { Link, useRouter } from "@/core/lib/i18n/navigation";
+import { useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Navbar, Footer } from "@/core/components/layout";

@@ -76,7 +76,13 @@ export default function ModerationPage() {
     }, []);
 
     const fetchItems = useCallback(async () => {
-        if (typeIds.length === 0) return;
+        if (typeIds.length === 0) {
+            setItems([]);
+            setTotal(0);
+            setPages(1);
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         setSelected(new Set());
         try {

@@ -21,7 +21,7 @@ vi.mock("@/core/lib/db", () => ({
     },
 }));
 
-type TrophyEngineModule = typeof import("@/core/lib/trophy-engine");
+type TrophyEngineModule = typeof import("@/modules/trophies/lib/trophy-engine");
 type HooksModule = typeof import("@/core/lib/hooks");
 
 let engine: TrophyEngineModule;
@@ -36,7 +36,7 @@ beforeEach(async () => {
 
     hooks = await import("@/core/lib/hooks");
     hooks.resetHooks();
-    engine = await import("@/core/lib/trophy-engine");
+    engine = await import("@/modules/trophies/lib/trophy-engine");
 });
 
 describe("trophy-engine: registerTrophyListeners", () => {
