@@ -150,18 +150,20 @@ export default function SuggestionsPage() {
                             <form onSubmit={handleSubmit} className="space-y-3">
                                 <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("suggestionTitlePlaceholder")} required minLength={3} maxLength={200} />
                                 <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder={t("suggestionDescriptionPlaceholder")} rows={4} required minLength={10} maxLength={5000} />
-                                <select
-                                    value={visibility}
-                                    onChange={(e) => setVisibility(e.target.value)}
-                                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                >
-                                    <option value="public">{t("open")}</option>
-                                    <option value="private">{t("other")}</option>
-                                </select>
-                                <Button type="submit" disabled={saving}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                    {t("submitSuggestion")}
-                                </Button>
+                                <div className="flex items-center justify-between gap-3 pt-1">
+                                    <select
+                                        value={visibility}
+                                        onChange={(e) => setVisibility(e.target.value)}
+                                        className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="public">{t("open")}</option>
+                                        <option value="private">{t("other")}</option>
+                                    </select>
+                                    <Button type="submit" disabled={saving}>
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                        {t("submitSuggestion")}
+                                    </Button>
+                                </div>
                             </form>
                         </CardContent>
                     </Card>

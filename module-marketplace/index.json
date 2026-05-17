@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-05-17",
-  "updatedAt": "2026-05-17T10:09:43Z",
+  "updatedAt": "2026-05-17T10:15:07Z",
   "modules": [
     {
       "id": "announcements",
@@ -12,7 +12,7 @@
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -35,7 +35,7 @@
       "icon": "Package",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -58,7 +58,7 @@
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -81,7 +81,7 @@
       "icon": "Cloud",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -104,7 +104,7 @@
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -127,7 +127,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -150,7 +150,7 @@
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -173,7 +173,7 @@
       "icon": "Download",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -196,7 +196,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -219,7 +219,7 @@
       "icon": "FileEdit",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -242,7 +242,7 @@
       "icon": "FileText",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -265,7 +265,7 @@
       "icon": "MessageSquare",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -288,7 +288,7 @@
       "icon": "MessageSquare",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -311,7 +311,7 @@
       "icon": "MessageSquare",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -336,7 +336,7 @@
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -359,7 +359,7 @@
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -382,7 +382,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -405,7 +405,7 @@
       "icon": "BarChart",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -428,7 +428,7 @@
       "icon": "Globe",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -451,7 +451,7 @@
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -474,7 +474,7 @@
       "icon": "Bell",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -497,7 +497,7 @@
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -522,7 +522,7 @@
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -545,7 +545,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -570,7 +570,7 @@
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -593,7 +593,7 @@
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -616,7 +616,7 @@
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -639,7 +639,7 @@
       "icon": "UserPlus",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -664,7 +664,7 @@
       "icon": "Mail",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -689,7 +689,7 @@
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -712,7 +712,7 @@
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -735,7 +735,7 @@
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -758,7 +758,7 @@
       "icon": "Users",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -781,7 +781,7 @@
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -806,7 +806,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -831,7 +831,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -854,7 +854,7 @@
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -877,7 +877,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -900,7 +900,7 @@
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -925,7 +925,7 @@
       "icon": "Webhook",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -948,7 +948,7 @@
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T10:09:43Z",
+      "updatedAt": "2026-05-17T10:15:07Z",
       "screenshots": [],
       "tags": [
         "commerce"
