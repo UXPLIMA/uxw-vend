@@ -24,6 +24,81 @@ const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
 const MAX_ATTEMPTS = 3;
 
+// Inline localized strings for transactional emails. Each entry has en + tr.
+// Other locales fall back to en. Kept here so emails don't depend on the
+// next-intl request context (they're often sent from background jobs).
+type EmailKey =
+    | "resetSubject" | "resetHeading" | "resetIntro" | "resetCta" | "resetButton" | "resetIgnore"
+    | "welcomeSubject" | "welcomeHeading" | "welcomeBody1" | "welcomeBody2"
+    | "verifySubject" | "verifyHeading" | "verifyBody" | "verifyButton" | "verifyIgnore"
+    | "lockoutSubject" | "lockoutHeading" | "lockoutHi" | "lockoutIntro" | "lockoutUnlocks"
+    | "lockoutWasYou" | "lockoutNotYou" | "lockoutFooter" | "lockoutIpLine";
+
+const EMAIL_STRINGS: Record<"en" | "tr", Record<EmailKey, string>> = {
+    en: {
+        resetSubject: "Reset your {app} password",
+        resetHeading: "Reset Your Password",
+        resetIntro: "You requested a password reset for your {app} account.",
+        resetCta: "Click the button below to set a new password. This link expires in 1 hour.",
+        resetButton: "Reset Password",
+        resetIgnore: "If you didn't request this, you can safely ignore this email.",
+        welcomeSubject: "Welcome to {app}!",
+        welcomeHeading: "Welcome, {username}!",
+        welcomeBody1: "Your {app} account has been created successfully.",
+        welcomeBody2: "Explore the platform and discover all available features.",
+        verifySubject: "Verify your {app} email",
+        verifyHeading: "Verify Your Email",
+        verifyBody: "Click the button below to verify your email address.",
+        verifyButton: "Verify Email",
+        verifyIgnore: "If you didn't create an account, ignore this email.",
+        lockoutSubject: "{app}: too many failed sign-in attempts",
+        lockoutHeading: "Unusual sign-in activity",
+        lockoutHi: "Hi {username},",
+        lockoutIntro: "Someone made too many failed sign-in attempts on your {app} account. We've temporarily locked it as a safety measure.",
+        lockoutUnlocks: "The account unlocks at:",
+        lockoutWasYou: "If this was you, wait until the lock lifts and try again.",
+        lockoutNotYou: "If this was NOT you, change your password as soon as the account unlocks — someone knows (or is guessing) part of your credentials.",
+        lockoutFooter: "{app} security notification.",
+        lockoutIpLine: "Attempts came from IP",
+    },
+    tr: {
+        resetSubject: "{app} şifreni sıfırla",
+        resetHeading: "Şifreni Sıfırla",
+        resetIntro: "{app} hesabın için şifre sıfırlama isteğinde bulundun.",
+        resetCta: "Yeni bir şifre belirlemek için aşağıdaki butona tıkla. Bağlantı 1 saat içinde geçerliliğini yitirir.",
+        resetButton: "Şifreyi Sıfırla",
+        resetIgnore: "Eğer bu isteği sen yapmadıysan, bu e-postayı yok sayabilirsin.",
+        welcomeSubject: "{app}'e hoş geldin!",
+        welcomeHeading: "Hoş geldin, {username}!",
+        welcomeBody1: "{app} hesabın başarıyla oluşturuldu.",
+        welcomeBody2: "Platformu keşfet ve tüm özellikleri kullanmaya başla.",
+        verifySubject: "{app} e-postanı doğrula",
+        verifyHeading: "E-postanı Doğrula",
+        verifyBody: "E-posta adresini doğrulamak için aşağıdaki butona tıkla.",
+        verifyButton: "E-postayı Doğrula",
+        verifyIgnore: "Eğer bir hesap oluşturmadıysan, bu e-postayı yok say.",
+        lockoutSubject: "{app}: çok fazla başarısız giriş denemesi",
+        lockoutHeading: "Olağandışı giriş etkinliği",
+        lockoutHi: "Merhaba {username},",
+        lockoutIntro: "{app} hesabında çok fazla başarısız giriş denemesi yapıldı. Güvenlik önlemi olarak hesabını geçici olarak kilitledik.",
+        lockoutUnlocks: "Hesabın şu zamanda açılacak:",
+        lockoutWasYou: "Bu sendin ise, kilit kalkana kadar bekleyip tekrar dene.",
+        lockoutNotYou: "Bu SEN DEĞİLSEN, hesabın açılır açılmaz şifreni değiştir — biri kimlik bilgilerinin bir kısmını biliyor (veya tahmin ediyor).",
+        lockoutFooter: "{app} güvenlik bildirimi.",
+        lockoutIpLine: "Denemeler şu IP'den geldi:",
+    },
+};
+
+function emailT(locale: string | undefined, key: EmailKey, vars: Record<string, string> = {}): string {
+    const dict = locale === "tr" ? EMAIL_STRINGS.tr : EMAIL_STRINGS.en;
+    let s = dict[key];
+    s = s.replace(/\{app\}/g, APP_NAME);
+    for (const [k, v] of Object.entries(vars)) {
+        s = s.replace(new RegExp(`\\{${k}\\}`, "g"), v);
+    }
+    return s;
+}
+
 function escapeHtml(str: string): string {
     return str
         .replace(/&/g, "&amp;")
@@ -308,7 +383,7 @@ export async function sendEmail(opts: {
 // Pre-rendered auth emails (must-send-now)
 // ---------------------------------------------------------------------------
 
-export async function sendPasswordResetEmail(email: string, resetUrl: string) {
+export async function sendPasswordResetEmail(email: string, resetUrl: string, locale?: string) {
     if (!getEmailEnabled()) {
         console.log(`[Email Disabled] Password reset for ${email}: ${resetUrl}`);
         return;
@@ -316,16 +391,16 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
 
     await sendEmail({
         to: email,
-        subject: `Reset your ${APP_NAME} password`,
+        subject: emailT(locale, "resetSubject"),
         html: `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #1f2937;">Reset Your Password</h2>
-                <p style="color: #6b7280;">You requested a password reset for your ${APP_NAME} account.</p>
-                <p style="color: #6b7280;">Click the button below to set a new password. This link expires in 1 hour.</p>
+                <h2 style="color: #1f2937;">${emailT(locale, "resetHeading")}</h2>
+                <p style="color: #6b7280;">${emailT(locale, "resetIntro")}</p>
+                <p style="color: #6b7280;">${emailT(locale, "resetCta")}</p>
                 <a href="${escapeHtml(resetUrl)}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 16px 0;">
-                    Reset Password
+                    ${emailT(locale, "resetButton")}
                 </a>
-                <p style="color: #9ca3af; font-size: 14px;">If you didn't request this, you can safely ignore this email.</p>
+                <p style="color: #9ca3af; font-size: 14px;">${emailT(locale, "resetIgnore")}</p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
                 <p style="color: #9ca3af; font-size: 12px;">${APP_NAME}</p>
             </div>
@@ -333,7 +408,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
     });
 }
 
-export async function sendWelcomeEmail(email: string, username: string) {
+export async function sendWelcomeEmail(email: string, username: string, locale?: string) {
     if (!getEmailEnabled()) {
         console.log(`[Email Disabled] Welcome email for ${username} (${email})`);
         return;
@@ -342,13 +417,13 @@ export async function sendWelcomeEmail(email: string, username: string) {
     // Welcome is non-urgent — queue it.
     await queueEmail({
         to: email,
-        subject: `Welcome to ${APP_NAME}!`,
-        body: `Welcome, ${username}! Your ${APP_NAME} account has been created successfully.`,
+        subject: emailT(locale, "welcomeSubject"),
+        body: `${emailT(locale, "welcomeHeading", { username })} ${emailT(locale, "welcomeBody1")}`,
         html: `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #1f2937;">Welcome, ${escapeHtml(username)}!</h2>
-                <p style="color: #6b7280;">Your ${APP_NAME} account has been created successfully.</p>
-                <p style="color: #6b7280;">Explore the platform and discover all available features.</p>
+                <h2 style="color: #1f2937;">${emailT(locale, "welcomeHeading", { username: escapeHtml(username) })}</h2>
+                <p style="color: #6b7280;">${emailT(locale, "welcomeBody1")}</p>
+                <p style="color: #6b7280;">${emailT(locale, "welcomeBody2")}</p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
                 <p style="color: #9ca3af; font-size: 12px;">${APP_NAME}</p>
             </div>
@@ -356,7 +431,7 @@ export async function sendWelcomeEmail(email: string, username: string) {
     });
 }
 
-export async function sendVerificationEmail(email: string, verifyUrl: string) {
+export async function sendVerificationEmail(email: string, verifyUrl: string, locale?: string) {
     if (!getEmailEnabled()) {
         console.log(`[Email Disabled] Verification for ${email}: ${verifyUrl}`);
         return;
@@ -364,15 +439,15 @@ export async function sendVerificationEmail(email: string, verifyUrl: string) {
 
     await sendEmail({
         to: email,
-        subject: `Verify your ${APP_NAME} email`,
+        subject: emailT(locale, "verifySubject"),
         html: `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #1f2937;">Verify Your Email</h2>
-                <p style="color: #6b7280;">Click the button below to verify your email address.</p>
+                <h2 style="color: #1f2937;">${emailT(locale, "verifyHeading")}</h2>
+                <p style="color: #6b7280;">${emailT(locale, "verifyBody")}</p>
                 <a href="${escapeHtml(verifyUrl)}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 16px 0;">
-                    Verify Email
+                    ${emailT(locale, "verifyButton")}
                 </a>
-                <p style="color: #9ca3af; font-size: 14px;">If you didn't create an account, ignore this email.</p>
+                <p style="color: #9ca3af; font-size: 14px;">${emailT(locale, "verifyIgnore")}</p>
             </div>
         `,
     });
@@ -389,29 +464,30 @@ export async function sendAccountLockoutEmail(opts: {
     username: string;
     unlocksAt: Date;
     ip?: string;
+    locale?: string;
 }): Promise<void> {
     const unlocks = opts.unlocksAt.toUTCString();
     const ipLine = opts.ip
-        ? `<p style="color: #6b7280;">Attempts came from IP <code>${escapeHtml(opts.ip)}</code>.</p>`
+        ? `<p style="color: #6b7280;">${emailT(opts.locale, "lockoutIpLine")} <code>${escapeHtml(opts.ip)}</code>.</p>`
         : "";
 
     // Queue rather than send — this is informational. If the email system
     // is down, nothing is lost; the lock itself has already been armed.
     await queueEmail({
         to: opts.to,
-        subject: `${APP_NAME}: too many failed sign-in attempts`,
-        body: `Someone made too many failed sign-in attempts on your ${APP_NAME} account. The account is temporarily locked until ${unlocks}.`,
+        subject: emailT(opts.locale, "lockoutSubject"),
+        body: emailT(opts.locale, "lockoutIntro") + " " + emailT(opts.locale, "lockoutUnlocks") + " " + unlocks,
         html: `
             <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #b91c1c;">Unusual sign-in activity</h2>
-                <p style="color: #374151;">Hi ${escapeHtml(opts.username)},</p>
-                <p style="color: #6b7280;">Someone made too many failed sign-in attempts on your ${APP_NAME} account. We've temporarily locked it as a safety measure.</p>
-                <p style="color: #6b7280;"><strong>The account unlocks at:</strong> ${escapeHtml(unlocks)}</p>
+                <h2 style="color: #b91c1c;">${emailT(opts.locale, "lockoutHeading")}</h2>
+                <p style="color: #374151;">${emailT(opts.locale, "lockoutHi", { username: escapeHtml(opts.username) })}</p>
+                <p style="color: #6b7280;">${emailT(opts.locale, "lockoutIntro")}</p>
+                <p style="color: #6b7280;"><strong>${emailT(opts.locale, "lockoutUnlocks")}</strong> ${escapeHtml(unlocks)}</p>
                 ${ipLine}
-                <p style="color: #6b7280;">If this was you, wait until the lock lifts and try again.</p>
-                <p style="color: #6b7280;">If this was NOT you, change your password as soon as the account unlocks — someone knows (or is guessing) part of your credentials.</p>
+                <p style="color: #6b7280;">${emailT(opts.locale, "lockoutWasYou")}</p>
+                <p style="color: #6b7280;">${emailT(opts.locale, "lockoutNotYou")}</p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-                <p style="color: #9ca3af; font-size: 12px;">${APP_NAME} security notification.</p>
+                <p style="color: #9ca3af; font-size: 12px;">${emailT(opts.locale, "lockoutFooter")}</p>
             </div>
         `,
     });

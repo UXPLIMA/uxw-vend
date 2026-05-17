@@ -69,6 +69,7 @@ export async function registerFailedLogin(
                 lockedUntil: true,
                 email: true,
                 username: true,
+                locale: true,
             },
         });
         if (!existing) return;
@@ -105,6 +106,7 @@ export async function registerFailedLogin(
                     username: existing.username,
                     unlocksAt: lockedUntil!,
                     ip: context?.ip,
+                    locale: existing.locale ?? undefined,
                 });
             } catch (err) {
                 console.error("[account-lockout] lockout notification failed:", err);

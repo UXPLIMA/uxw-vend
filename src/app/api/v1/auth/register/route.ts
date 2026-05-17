@@ -9,6 +9,19 @@ import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { checkPasswordBreach } from "@/core/lib/password-policy";
 
+// Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
+// Used at signup so the welcome email goes out in the language the visitor
+// was actually browsing in (instead of always English).
+function detectLocale(request: NextRequest): string {
+    const referer = request.headers.get("referer") || request.headers.get("origin") || "";
+    const path = (() => {
+        try { return new URL(referer).pathname; } catch { return ""; }
+    })();
+    const seg = path.split("/").filter(Boolean)[0];
+    if (seg === "tr" || seg === "en") return seg;
+    return "en";
+}
+
 export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute per IP
     const ip = getClientIP(request.headers);
@@ -68,6 +81,7 @@ export async function POST(request: NextRequest) {
         });
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        const userLocale = detectLocale(request);
 
         const user = await prisma.user.create({
             data: {
@@ -75,6 +89,7 @@ export async function POST(request: NextRequest) {
                 username,
                 password: hashedPassword,
                 roleId: defaultRole.id,
+                locale: userLocale,
             },
             select: {
                 id: true,
@@ -85,7 +100,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Send welcome email and Discord notification (non-blocking)
-        sendWelcomeEmail(email, username).catch(console.error);
+        sendWelcomeEmail(email, username, userLocale).catch(console.error);
         notifyUserRegistered({ username, email }).catch(console.error);
         logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch(console.error);
 

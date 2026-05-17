@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(GENERIC_OK);
         }
 
-        const user = await prisma.user.findUnique({ where: { email }, select: { id: true, isBanned: true, isDeleted: true } });
+        const user = await prisma.user.findUnique({ where: { email }, select: { id: true, isBanned: true, isDeleted: true, locale: true } });
 
         // Build the token unconditionally so the response time is (roughly)
         // constant whether or not the email belongs to a real account.
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
             const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
             const resetUrl = `${baseUrl}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
-            await sendPasswordResetEmail(email, resetUrl).catch((err) => {
+            await sendPasswordResetEmail(email, resetUrl, user.locale ?? undefined).catch((err) => {
                 console.error("[forgot-password] email send failed:", err);
             });
         }
