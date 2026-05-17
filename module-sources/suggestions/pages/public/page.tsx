@@ -88,16 +88,24 @@ export default function SuggestionsPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const res = await fetch("/api/v1/suggestions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title, content, visibility }),
-        });
-        if (res.ok) {
-            setTitle(""); setContent(""); setVisibility("public"); setShowForm(false);
-            fetchSuggestions();
+        try {
+            const res = await fetch("/api/v1/suggestions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, content, visibility }),
+            });
+            if (res.ok) {
+                setTitle(""); setContent(""); setVisibility("public"); setShowForm(false);
+                fetchSuggestions();
+            } else if (res.status === 401) {
+                requireLogin();
+            } else {
+                const body = await res.json().catch(() => ({}));
+                toast.error(body.error || "Failed to submit suggestion");
+            }
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const toggleVote = async (id: string) => {
@@ -140,8 +148,8 @@ export default function SuggestionsPage() {
                     <Card className="mb-6">
                         <CardContent className="p-5">
                             <form onSubmit={handleSubmit} className="space-y-3">
-                                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("suggestionTitlePlaceholder")} required />
-                                <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder={t("suggestionDescriptionPlaceholder")} rows={4} required />
+                                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("suggestionTitlePlaceholder")} required minLength={3} maxLength={200} />
+                                <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder={t("suggestionDescriptionPlaceholder")} rows={4} required minLength={10} maxLength={5000} />
                                 <select
                                     value={visibility}
                                     onChange={(e) => setVisibility(e.target.value)}
