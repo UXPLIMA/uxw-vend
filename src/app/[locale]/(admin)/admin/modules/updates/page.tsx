@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -27,7 +27,7 @@ export default function ModuleUpdatesPage() {
     const [updated, setUpdated] = useState<Set<string>>(new Set());
     const [checkedAt, setCheckedAt] = useState<string | null>(null);
 
-    const fetchUpdates = async () => {
+    const fetchUpdates = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -44,9 +44,9 @@ export default function ModuleUpdatesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [t]);
 
-    useEffect(() => { fetchUpdates(); }, []);
+    useEffect(() => { fetchUpdates(); }, [fetchUpdates]);
 
     const updateModule = async (moduleId: string) => {
         setUpdating((s) => new Set(s).add(moduleId));

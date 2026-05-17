@@ -19,7 +19,7 @@ function DefaultNavbar() {
     const pathname = usePathname();
     const t = useTranslations('nav');
     const commonT = useTranslations('common');
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     const [menuOpen, setMenuOpen] = useState(false);
     const [navDropdown, setNavDropdown] = useState<string | null>(null);
     const { settings } = useSiteSettings();
