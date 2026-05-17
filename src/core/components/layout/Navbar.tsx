@@ -1,7 +1,8 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, ShoppingCart, HelpCircle, MessageSquare, User, LogOut, Shield, Sun, Moon, Star, Download, Gift, Crown, FileText, ChevronDown, Trophy, Vote, Dices, History, Users, Newspaper, GitCommit, ShoppingBag, Lightbulb, LifeBuoy, Package } from "lucide-react";
+import { Home, User, LogOut, Shield, Sun, Moon, ChevronDown } from "lucide-react";
+import { NavIcon } from "@/core/components/ui/NavIcon";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
@@ -13,12 +14,6 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { Slot } from "@/core/components/Slot";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Home, ShoppingCart, HelpCircle, MessageSquare, Star, Download, Gift, Crown, FileText,
-    Trophy, Vote, Dices, History, Users, Shield,
-    Newspaper, GitCommit, ShoppingBag, Lightbulb, LifeBuoy, Package,
-};
 
 function DefaultNavbar() {
     const pathname = usePathname();
@@ -140,8 +135,6 @@ function DefaultNavbar() {
                     <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-wrap" aria-label="Primary">
                         <Slot name="navbar.start" />
                         {navLinks.map((link) => {
-                            const IconComp = link.icon ? iconMap[link.icon] : null;
-
                             // Dropdown menu
                             if (link.children && link.children.length > 0) {
                                 return (
@@ -155,24 +148,21 @@ function DefaultNavbar() {
                                             aria-expanded={navDropdown === link.label}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                                         >
-                                            {IconComp && <IconComp className="w-4 h-4" />}
+                                            <NavIcon name={link.icon} className="w-4 h-4" />
                                             {link.label}
                                             <ChevronDown className={`w-3 h-3 transition-transform ${navDropdown === link.label ? "rotate-180" : ""}`} />
                                         </button>
                                         {navDropdown === link.label && (
                                             <div className="absolute top-full left-0 pt-1 z-50">
                                                 <div className="w-52 bg-card border border-[var(--color-border)] rounded-lg shadow-lg py-1 animate-fade-in">
-                                                    {link.children.map((child: { label: string; href: string; icon?: string }) => {
-                                                        const ChildIcon = child.icon ? iconMap[child.icon] : null;
-                                                        return (
-                                                            <Link key={child.href} href={child.href}
-                                                                onClick={() => setNavDropdown(null)}
-                                                                className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                                                                {ChildIcon && <ChildIcon className="w-4 h-4 text-muted-foreground" />}
-                                                                {child.label}
-                                                            </Link>
-                                                        );
-                                                    })}
+                                                    {link.children.map((child: { label: string; href: string; icon?: string }) => (
+                                                        <Link key={child.href} href={child.href}
+                                                            onClick={() => setNavDropdown(null)}
+                                                            className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                                                            <NavIcon name={child.icon} className="w-4 h-4 text-muted-foreground" />
+                                                            {child.label}
+                                                        </Link>
+                                                    ))}
                                                 </div>
                                             </div>
                                         )}
@@ -184,7 +174,7 @@ function DefaultNavbar() {
                             return (
                                 <Link key={link.href} href={link.href}
                                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
-                                    {IconComp && <IconComp className="w-4 h-4" />}
+                                    <NavIcon name={link.icon} className="w-4 h-4" />
                                     {link.label}
                                 </Link>
                             );

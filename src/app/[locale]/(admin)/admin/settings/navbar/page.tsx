@@ -6,10 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Check, Plus, X, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Check, Plus, X, Trash2, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { invalidateSettingsCache } from "@/core/hooks/useSiteSettings";
 import { useTranslations } from "next-intl";
+import { ModuleNavLinks } from "@/core/generated/module-registry";
+import { useAllModules } from "@/core/providers/module-provider";
+import { NavIcon } from "@/core/components/ui/NavIcon";
 
 interface NavChild {
     label: string;
@@ -25,6 +28,7 @@ interface NavLink {
 
 export default function NavbarSettingsPage() {
     const t = useTranslations("admin");
+    const moduleStatus = useAllModules();
     const [links, setLinks] = useState<NavLink[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -35,14 +39,21 @@ export default function NavbarSettingsPage() {
             .then((r) => r.json())
             .then((data) => {
                 const navLinks = data.settings?.navbar_links;
-                if (Array.isArray(navLinks)) setLinks(navLinks);
-                else setLinks([
-                    { label: "Home", href: "/", icon: "Home" },
-                ]);
+                if (Array.isArray(navLinks)) {
+                    setLinks(navLinks);
+                } else {
+                    // No override yet — seed the editor with what the navbar is
+                    // currently rendering from the module registry, so the
+                    // admin sees real state and can edit from there.
+                    const registry = ModuleNavLinks
+                        .filter(nl => moduleStatus[nl.module] === true)
+                        .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "" }));
+                    setLinks([{ label: "Home", href: "/", icon: "Home" }, ...registry]);
+                }
                 setLoading(false);
             })
             .catch(() => setLoading(false));
-    }, []);
+    }, [moduleStatus]);
 
     const addLink = () => setLinks([...links, { label: "", href: "/", icon: "" }]);
     const addDropdown = () => setLinks([...links, { label: "More", href: "#", icon: "Star", children: [{ label: "", href: "/" }] }]);
@@ -137,7 +148,15 @@ export default function NavbarSettingsPage() {
                                         {!isDropdown && (
                                             <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1" />
                                         )}
-                                        <Input value={link.icon || ""} onChange={(e) => updateLink(i, "icon", e.target.value)} placeholder="Icon" className="w-28" />
+                                        <div className="flex items-center gap-1 w-32 rounded-md border border-input bg-background pl-2">
+                                            <NavIcon name={link.icon} className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                            <Input
+                                                value={link.icon || ""}
+                                                onChange={(e) => updateLink(i, "icon", e.target.value)}
+                                                placeholder="Icon"
+                                                className="border-0 bg-transparent shadow-none focus-visible:ring-0 px-1 h-8"
+                                            />
+                                        </div>
                                         {isDropdown && (
                                             <Button variant="ghost" size="sm" onClick={() => setExpandedDropdown(isExpanded ? null : i)}>
                                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -186,9 +205,19 @@ export default function NavbarSettingsPage() {
                 {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Check className="w-4 h-4 mr-2" /> Save Navbar</>}
             </Button>
 
-            <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground">
-                <strong>{t("navbar_icons")}</strong> Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Crown, Download, Gift, Star. Leave empty for no icon.
-                <br /><strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
+            <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">
+                <p>
+                    <strong>{t("navbar_icons")}</strong>{" "}
+                    Any Lucide icon name works (e.g. <code>Home</code>, <code>ShoppingBag</code>, <code>Newspaper</code>, <code>Gamepad2</code>).
+                    Browse the full set at{" "}
+                    <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                        lucide.dev/icons <ExternalLink className="w-3 h-3" />
+                    </a>
+                    {" "}— copy the name and paste it in. PascalCase or kebab-case both work. Leave empty for no icon.
+                </p>
+                <p>
+                    <strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
+                </p>
             </div>
         </>
     );

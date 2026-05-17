@@ -1,19 +1,13 @@
 "use client";
 
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
-import { Home, User, Package } from "lucide-react";
+import { Home, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { Slot } from "@/core/components/Slot";
-
-// Icon map for dynamic rendering from registry
-import { ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download, Gift, Crown, Trophy, Vote, Dices, History, Users, Shield } from "lucide-react";
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-    Home, ShoppingCart, MessageSquare, HelpCircle, FileText, Star, Download,
-    Gift, Crown, Trophy, Vote, Dices, History, Users, Shield, Package, User,
-};
+import { NavIcon } from "@/core/components/ui/NavIcon";
 
 export function MobileBottomNav() {
     const pathname = usePathname();
@@ -27,16 +21,12 @@ export function MobileBottomNav() {
     const moduleLinks = ModuleNavLinks
         .filter(nl => moduleStatus[nl.module] === true)
         .slice(0, 3)
-        .map(nl => ({
-            href: nl.href,
-            icon: iconMap[nl.icon || "Package"] || Package,
-            label: nl.label,
-        }));
+        .map(nl => ({ href: nl.href, iconName: nl.icon, label: nl.label }));
 
-    const items = [
-        { href: "/", icon: Home, label: t("home") },
+    const items: { href: string; iconName?: string; iconNode?: React.ReactNode; label: string }[] = [
+        { href: "/", iconNode: <Home className="w-5 h-5" />, label: t("home") },
         ...moduleLinks,
-        ...(session?.user ? [{ href: "/profile", icon: User, label: t("profile") }] : []),
+        ...(session?.user ? [{ href: "/profile", iconNode: <User className="w-5 h-5" />, label: t("profile") }] : []),
     ];
 
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -51,7 +41,7 @@ export function MobileBottomNav() {
                         href={item.href}
                         className={`flex flex-col items-center gap-0.5 px-3 py-1 ${isActive(item.href) ? "text-primary" : "text-muted-foreground"}`}
                     >
-                        <item.icon className="w-5 h-5" />
+                        {item.iconNode ?? <NavIcon name={item.iconName} className="w-5 h-5" />}
                         <span className="text-[10px] font-medium">{item.label}</span>
                     </Link>
                 ))}
