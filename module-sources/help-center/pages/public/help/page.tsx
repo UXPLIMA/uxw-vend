@@ -90,7 +90,7 @@ export default function HelpCenterPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                             placeholder={t('searchPlaceholder')}
-                            className="flex-1 px-4 py-3 rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-white"
+                            className="flex-1 min-w-0 px-4 py-3 rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-white"
                         />
                         <button
                             onClick={handleSearch}

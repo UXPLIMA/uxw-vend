@@ -27,7 +27,7 @@ export default function OrderSuccessPage() {
                             {t("orderSuccess_body")}
                         </p>
 
-                        <div className="flex gap-3 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link href="/profile">
                                 <Button variant="outline">
                                     <ShoppingBag className="w-4 h-4 mr-2" /> {t("orderSuccess_myOrders")}

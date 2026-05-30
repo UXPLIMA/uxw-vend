@@ -667,7 +667,11 @@
         "paymentsDefaultCurrency": "Default currency",
         "paymentsDefaultCurrencyDesc": "Three-letter ISO code (e.g. usd, eur, gbp).",
         "paymentsTaxRate": "Tax rate (%)",
-        "paymentsTaxRateDesc": "Applied to every order. 0 disables tax."
+        "paymentsTaxRateDesc": "Applied to every order. 0 disables tax.",
+        "orderSuccess_title": "Order Successful!",
+        "orderSuccess_body": "Thank you for your purchase. Your order has been placed and is being processed.",
+        "orderSuccess_myOrders": "My Orders",
+        "orderSuccess_continue": "Continue Shopping"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1163,7 +1167,11 @@
         "paymentsDefaultCurrency": "Varsayılan para birimi",
         "paymentsDefaultCurrencyDesc": "Üç harfli ISO kodu (örn. usd, eur, gbp).",
         "paymentsTaxRate": "Vergi oranı (%)",
-        "paymentsTaxRateDesc": "Her siparişe uygulanır. 0 vergi devre dışı."
+        "paymentsTaxRateDesc": "Her siparişe uygulanır. 0 vergi devre dışı.",
+        "orderSuccess_title": "Sipariş Başarılı!",
+        "orderSuccess_body": "Satın aldığın için teşekkürler. Siparişin alındı ve işleniyor.",
+        "orderSuccess_myOrders": "Siparişlerim",
+        "orderSuccess_continue": "Alışverişe Devam Et"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

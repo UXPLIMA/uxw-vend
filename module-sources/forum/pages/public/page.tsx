@@ -101,7 +101,7 @@ export default function ForumPage() {
                     />
                 </div>
 
-                <div className="grid lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     {/* Sidebar - Categories */}
                     <div className="lg:col-span-1">
                         <Card>
@@ -133,7 +133,7 @@ export default function ForumPage() {
                     </div>
 
                     {/* Topics List */}
-                    <div className="lg:col-span-4 space-y-3">
+                    <div className="lg:col-span-4 min-w-0 space-y-3">
                         {loading ? (
                             <div className="text-center py-12">
                                 <p className="text-muted-foreground">{t('loadingTopics')}</p>
