@@ -9,6 +9,9 @@ import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeManifest, ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 
+// Reject prototype-polluting keys when copying user-supplied override maps.
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
     const { id: themeId } = await ctx.params;
     const rows = await prisma.themeCustomization.findMany({ where: { themeId } });
@@ -89,6 +92,7 @@ function sanitizeTokenValue(tokenKey: "colors" | "fonts" | "radius" | "space", v
         if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
         const out: Record<string, string> = {};
         for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+            if (UNSAFE_KEYS.has(k)) continue;
             if (typeof v === "string" && HEX.test(v)) out[k] = v;
         }
         return Object.keys(out).length > 0 ? out : undefined;
@@ -97,6 +101,7 @@ function sanitizeTokenValue(tokenKey: "colors" | "fonts" | "radius" | "space", v
         if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
         const out: Record<string, string> = {};
         for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+            if (UNSAFE_KEYS.has(k)) continue;
             const s = clampString(v, 100);
             if (s !== undefined && SAFE_FONT.test(s)) out[k] = s;
         }
@@ -144,8 +149,9 @@ function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, un
         if (!rawGroupVal || typeof rawGroupVal !== "object" || Array.isArray(rawGroupVal)) continue;
         const cleanGroup: Record<string, unknown> = {};
         for (const [fieldKey, fieldVal] of Object.entries(rawGroupVal as Record<string, unknown>)) {
+            if (UNSAFE_KEYS.has(fieldKey)) continue;
             const fieldDef = groupDef.fields[fieldKey];
-            if (!fieldDef) continue;
+            if (!fieldDef || !Object.prototype.hasOwnProperty.call(groupDef.fields, fieldKey)) continue;
             const sanitized = sanitizeField(fieldDef, fieldVal);
             if (sanitized !== undefined) cleanGroup[fieldKey] = sanitized;
         }

@@ -9,6 +9,7 @@ import {
     loadAlertingConfig,
 } from "@/core/lib/health-alerting";
 import { logActivity } from "@/core/lib/activity-log";
+import { hostnameMatchesAllowlist } from "@/core/lib/url-safety";
 
 /**
  * GET  /api/v1/admin/alerting — fetch the current alerting config.
@@ -74,14 +75,14 @@ export async function POST(request: NextRequest) {
         try {
             const u = new URL(parsed.data.webhookUrl);
             if (parsed.data.provider === "discord") {
-                if (!u.hostname.endsWith("discord.com") && !u.hostname.endsWith("discordapp.com")) {
+                if (!hostnameMatchesAllowlist(u.hostname, ["discord.com", "discordapp.com"])) {
                     return NextResponse.json(
                         { error: "Discord webhook URL must be on discord.com" },
                         { status: 400 },
                     );
                 }
             } else {
-                if (!u.hostname.endsWith("slack.com")) {
+                if (!hostnameMatchesAllowlist(u.hostname, ["slack.com"])) {
                     return NextResponse.json(
                         { error: "Slack webhook URL must be on slack.com" },
                         { status: 400 },

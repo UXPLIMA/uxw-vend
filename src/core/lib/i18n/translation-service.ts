@@ -268,8 +268,12 @@ function flattenObject(
     }
 }
 
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 function setNestedValue(obj: Record<string, unknown>, dotPath: string, value: string): void {
     const parts = dotPath.split(".");
+    // Reject prototype-polluting keys anywhere in the path.
+    if (parts.some((p) => UNSAFE_KEYS.has(p))) return;
     let current = obj;
     for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];

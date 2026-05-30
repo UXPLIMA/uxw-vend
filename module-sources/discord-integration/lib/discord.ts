@@ -61,7 +61,11 @@ export async function sendDiscordWebhook(
     // tampered setting value can't be used to exfiltrate payloads (SSRF).
     try {
         const urlObj = new URL(url);
-        if (!urlObj.hostname.endsWith("discord.com") && !urlObj.hostname.endsWith("discordapp.com")) {
+        // Exact-or-subdomain match — endsWith("discord.com") alone would also
+        // accept "evildiscord.com" / "discord.com.attacker.test" (SSRF bypass).
+        const host = urlObj.hostname.toLowerCase().replace(/\.$/, "");
+        const onDiscord = ["discord.com", "discordapp.com"].some((d) => host === d || host.endsWith("." + d));
+        if (!onDiscord) {
             console.warn("[Discord] Invalid webhook domain:", urlObj.hostname);
             return;
         }

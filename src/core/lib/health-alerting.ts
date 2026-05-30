@@ -1,4 +1,5 @@
 import { prisma } from "@/core/lib/db";
+import { hostnameMatchesAllowlist } from "@/core/lib/url-safety";
 
 /**
  * Health alerting.
@@ -216,14 +217,11 @@ export async function sendHealthWebhook(
     try {
         const parsed = new URL(config.webhookUrl);
         if (config.provider === "discord") {
-            if (
-                !parsed.hostname.endsWith("discord.com") &&
-                !parsed.hostname.endsWith("discordapp.com")
-            ) {
+            if (!hostnameMatchesAllowlist(parsed.hostname, ["discord.com", "discordapp.com"])) {
                 return { ok: false, error: "Discord webhook URL must be on discord.com" };
             }
         } else {
-            if (!parsed.hostname.endsWith("slack.com")) {
+            if (!hostnameMatchesAllowlist(parsed.hostname, ["slack.com"])) {
                 return { ok: false, error: "Slack webhook URL must be on slack.com" };
             }
         }

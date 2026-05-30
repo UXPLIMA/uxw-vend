@@ -16,20 +16,36 @@ const EVENT_HANDLERS = /\s(on[a-z]+)\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi;
 const JS_HREF = /\s(href|xlink:href)\s*=\s*(['"])\s*javascript:[^'"\s>]*\2/gi;
 const DATA_HANDLER = /\s(href|xlink:href|src)\s*=\s*(['"])\s*data:text\/html[^'"\s>]*\2/gi;
 
+/**
+ * Apply a strip regex repeatedly until the string stops changing. A single
+ * pass is defeatable by overlapping/nested injections (e.g.
+ * `<scr<script>ipt>` collapses to `<script>` after one replace), so we
+ * re-run until stable, capped to avoid pathological inputs.
+ */
+function stripUntilStable(str: string, regex: RegExp): string {
+    let cur = str;
+    for (let i = 0; i < 20; i++) {
+        const next = cur.replace(regex, "");
+        if (next === cur) break;
+        cur = next;
+    }
+    return cur;
+}
+
 export function sanitizeSvg(input: string): string {
     if (!input) return "";
 
     let out = input;
 
     // Drop tags that can execute or fetch third-party content.
-    out = out.replace(DANGEROUS_TAGS, "");
+    out = stripUntilStable(out, DANGEROUS_TAGS);
 
     // Strip every on* attribute regardless of tag.
-    out = out.replace(EVENT_HANDLERS, "");
+    out = stripUntilStable(out, EVENT_HANDLERS);
 
     // Block javascript: and data:text/html URIs in href / xlink:href / src.
-    out = out.replace(JS_HREF, "");
-    out = out.replace(DATA_HANDLER, "");
+    out = stripUntilStable(out, JS_HREF);
+    out = stripUntilStable(out, DATA_HANDLER);
 
     return out;
 }

@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { hostnameMatchesAllowlist } from "./url-safety";
 
 interface DiscordEmbed {
     title?: string;
@@ -60,7 +61,7 @@ export async function sendDiscordWebhook(
     // Validate webhook domain
     try {
         const urlObj = new URL(url);
-        if (!urlObj.hostname.endsWith('discord.com') && !urlObj.hostname.endsWith('discordapp.com')) {
+        if (!hostnameMatchesAllowlist(urlObj.hostname, ['discord.com', 'discordapp.com'])) {
             console.warn('[Discord] Invalid webhook domain:', urlObj.hostname);
             return;
         }

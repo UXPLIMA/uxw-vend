@@ -96,6 +96,11 @@ export async function PATCH(request: NextRequest) {
     if (!moduleId) {
         return NextResponse.json({ error: "Module ID required" }, { status: 400 });
     }
+    // Module ids are slugs. Validate before the value is used in log output or
+    // filesystem paths (the onEnable/onDisable hook resolution below).
+    if (typeof moduleId !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(moduleId)) {
+        return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+    }
 
     const definition = moduleSystem.getDefinition(moduleId);
     if (!definition) {
