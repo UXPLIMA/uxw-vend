@@ -18,6 +18,7 @@
 
 import { execFile } from "child_process";
 import { promisify } from "util";
+import { log } from "./logger";
 
 const execFileAsync = promisify(execFile);
 
@@ -143,21 +144,39 @@ export function scheduleBuild(): void {
                 await execFileAsync("npx", ["tsx", "scripts/merge-schemas.ts"], {
                     cwd: process.cwd(), timeout: 60000,
                 });
-            } catch { /* schema merge failed — non-fatal */ }
+            } catch (err) {
+                // Non-fatal: Prisma Client types may be stale until next merge.
+                log.error("install-lock: schema merge failed", {
+                    step: "merge-schemas",
+                    error: err instanceof Error ? err.message : String(err),
+                });
+            }
 
             // 2. Apply per-module SQL migrations (replaces db push)
             try {
                 await execFileAsync("npx", ["tsx", "scripts/apply-migrations.ts"], {
                     cwd: process.cwd(), timeout: 120000,
                 });
-            } catch { /* migrations failed — non-fatal, but logged */ }
+            } catch (err) {
+                // Non-fatal: module tables may be missing until migrations re-run.
+                log.error("install-lock: migrations failed", {
+                    step: "apply-migrations",
+                    error: err instanceof Error ? err.message : String(err),
+                });
+            }
 
             // 3. Generate registry
             try {
                 await execFileAsync("npx", ["tsx", "scripts/generate-registry.ts"], {
                     cwd: process.cwd(), timeout: 30000,
                 });
-            } catch { /* registry gen failed */ }
+            } catch (err) {
+                // Non-fatal: registry may not reflect newly installed modules.
+                log.error("install-lock: registry generation failed", {
+                    step: "generate-registry",
+                    error: err instanceof Error ? err.message : String(err),
+                });
+            }
 
             // 4. Build
             await execFileAsync("npm", ["run", "build"], {
@@ -169,9 +188,19 @@ export function scheduleBuild(): void {
                 await execFileAsync("npx", ["pm2", "restart", "uxwvend"], {
                     cwd: process.cwd(), timeout: 10000,
                 });
-            } catch { /* no PM2 */ }
-        } catch {
-            // Build failed — will need manual rebuild
+            } catch (err) {
+                // Non-fatal: PM2 may not be present (e.g. dev / non-PM2 deploy).
+                log.error("install-lock: PM2 restart failed", {
+                    step: "pm2-restart",
+                    error: err instanceof Error ? err.message : String(err),
+                });
+            }
+        } catch (err) {
+            // Non-fatal: build failed — will need a manual rebuild.
+            log.error("install-lock: build failed", {
+                step: "build",
+                error: err instanceof Error ? err.message : String(err),
+            });
         } finally {
             buildRunning = false;
 

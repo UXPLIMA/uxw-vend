@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     const article = await prisma.blogArticle.create({
         data: {
-            title,
+            title: sanitizeHtml(title),
             slug,
             excerpt,
             content: sanitizeHtml(content),

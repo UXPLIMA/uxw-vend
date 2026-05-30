@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { categorySchema } from "../../lib/validations";
 import { slugify } from "@/core/lib/utils";
 import { isAdmin } from "@/core/lib/permissions";
+import { sanitizeHtml } from "@/core/lib/sanitize";
 
 // GET /api/v1/store/categories - List categories
 export async function GET() {
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
             data: {
                 name: data.name,
                 slug,
-                description: data.description,
+                description: data.description !== undefined ? sanitizeHtml(data.description) : data.description,
                 image: data.image,
                 parentId: data.parentId,
                 order: data.order ?? 0,

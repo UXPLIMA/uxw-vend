@@ -4,6 +4,16 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { canDownload } from "../../lib/can-download";
+import { z } from "zod";
+
+const downloadUpdateSchema = z.object({
+    title: z.string().optional(),
+    description: z.string().nullable().optional(),
+    fileName: z.string().optional(),
+    fileUrl: z.string().optional(),
+    fileSize: z.number().int().nullable().optional(),
+    isActive: z.boolean().optional(),
+});
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -75,7 +85,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await request.json();
-    const download = await prisma.download.update({ where: { id }, data: body });
+    const validation = downloadUpdateSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+    }
+    const download = await prisma.download.update({ where: { id }, data: validation.data });
     return NextResponse.json({ download });
 }
 

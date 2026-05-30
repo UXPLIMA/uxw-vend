@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+
+/**
+ * Constant-time API key comparison. Guards against undefined values and
+ * length mismatches before timingSafeEqual (which throws on unequal-length
+ * buffers) so an attacker can't learn the key length via a timing or error
+ * signal.
+ */
+function apiKeyMatches(provided: string | null | undefined, expected: string | undefined): boolean {
+    if (!provided || !expected) return false;
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+}
 
 // GET - Public: list punishments
 export async function GET(request: NextRequest) {
@@ -31,7 +46,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     // Check for API key (for external plugin integration) or admin session
     const apiKey = request.headers.get("x-api-key");
-    const isPluginAuth = apiKey && apiKey === process.env.PUNISHMENTS_API_KEY;
+    const isPluginAuth = apiKeyMatches(apiKey, process.env.PUNISHMENTS_API_KEY);
 
     let issuerUserId: string | null = null;
     if (!isPluginAuth) {

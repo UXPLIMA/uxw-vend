@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { categorySchema } from "../../../lib/validations";
 import { generateSlug } from "@/core/lib/utils";
+import { sanitizeHtml } from "@/core/lib/sanitize";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -55,6 +56,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const data: Record<string, unknown> = { ...validation.data };
+
+    if (typeof data.description === "string") {
+        data.description = sanitizeHtml(data.description);
+    }
 
     if (data.name && !data.slug) {
         const newSlug = generateSlug(data.name as string);

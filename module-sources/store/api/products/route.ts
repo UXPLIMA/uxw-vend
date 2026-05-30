@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { productSchema } from "../../lib/validations";
 import { slugify } from "@/core/lib/utils";
 import { isAdmin } from "@/core/lib/permissions";
+import { sanitizeHtml } from "@/core/lib/sanitize";
 
 // GET /api/v1/store/products - List products
 export async function GET(request: NextRequest) {
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
             data: {
                 name: data.name,
                 slug,
-                description: data.description,
+                description: data.description !== undefined ? sanitizeHtml(data.description) : data.description,
                 shortDesc: data.shortDesc,
                 price: data.price,
                 comparePrice: data.comparePrice,

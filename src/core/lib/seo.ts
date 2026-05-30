@@ -185,7 +185,9 @@ export function buildArticleJsonLd(input: ArticleJsonLdInput): string {
         ld.author = { "@type": "Person", name: input.authorName };
     }
 
-    return JSON.stringify(ld);
+    // Escape `<` so a value containing `</script>` cannot break out of the
+    // surrounding <script type="application/ld+json"> tag.
+    return JSON.stringify(ld).replace(/</g, "\\u003c");
 }
 
 /**
@@ -200,5 +202,7 @@ export function buildOrganizationJsonLd(): string {
         url: siteUrl,
         description: siteDescription,
     };
-    return JSON.stringify(ld);
+    // Escape `<` so a value containing `</script>` cannot break out of the
+    // surrounding <script type="application/ld+json"> tag.
+    return JSON.stringify(ld).replace(/</g, "\\u003c");
 }

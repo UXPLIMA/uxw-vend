@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { productSchema } from "../../../lib/validations";
 import { isAdmin } from "@/core/lib/permissions";
+import { sanitizeHtml } from "@/core/lib/sanitize";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -70,9 +71,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Product not found" }, { status: 404 });
         }
 
+        const data = { ...validation.data };
+        if (data.description !== undefined) {
+            data.description = sanitizeHtml(data.description);
+        }
+
         const product = await prisma.product.update({
             where: { id },
-            data: validation.data,
+            data,
             include: { category: true },
         });
 

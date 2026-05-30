@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import { z } from "zod";
+
+const staffUpdateSchema = z.object({
+    name: z.string().optional(),
+    role: z.string().optional(),
+    avatar: z.string().nullable().optional(),
+    order: z.number().int().optional(),
+    isActive: z.boolean().optional(),
+});
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -12,7 +21,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await request.json();
-    const member = await prisma.staffMember.update({ where: { id }, data: body });
+    const validation = staffUpdateSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+    }
+    const member = await prisma.staffMember.update({ where: { id }, data: validation.data });
     return NextResponse.json({ member });
 }
 

@@ -57,6 +57,18 @@ export async function sendDiscordWebhook(
 
     if (!url) return;
 
+    // Validate webhook domain — only post to official Discord hosts so a
+    // tampered setting value can't be used to exfiltrate payloads (SSRF).
+    try {
+        const urlObj = new URL(url);
+        if (!urlObj.hostname.endsWith("discord.com") && !urlObj.hostname.endsWith("discordapp.com")) {
+            console.warn("[Discord] Invalid webhook domain:", urlObj.hostname);
+            return;
+        }
+    } catch {
+        return;
+    }
+
     try {
         await fetch(url, {
             method: "POST",
