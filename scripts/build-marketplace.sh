@@ -33,23 +33,34 @@ SOURCES_DIR = "$SOURCES_DIR"
 OUTPUT_DIR = "$OUTPUT_DIR"
 UPDATED_AT = "$UPDATED_AT"
 
+# Categories mirror the README module table. Keys are real module ids
+# (= module-sources/<id> directory names). Anything not listed falls back
+# to "content".
 CATEGORY_MAP = {
+    # Commerce
     "store": "commerce", "stripe-gateway": "commerce", "paypal-gateway": "commerce",
-    "credits": "commerce", "currency": "commerce", "leaderboard": "commerce",
-    "vote": "commerce", "wheel": "commerce", "discord-widget": "commerce",
-    "forum": "community", "blog": "community", "changelog": "community",
-    "suggestions": "community",
-    "analytics": "management", "announcements": "management",
-    "cookie-consent": "management", "custom-forms": "management",
-    "custom-pages": "management", "data-tools": "management",
-    "discord-auth": "management", "discord-integration": "management",
-    "email-system": "management", "google-auth": "management",
-    "help-center": "management", "notifications": "management",
-    "popups": "management", "resend-provider": "management",
-    "security": "management", "tickets": "management",
-    "webhook-logs": "management", "two-factor-auth": "management",
+    "credits": "commerce", "currency": "commerce", "vote": "commerce",
+    "wheel": "commerce", "leaderboard": "commerce",
+    # Community
+    "blog": "community", "forum": "community", "suggestions": "community",
+    "changelog": "community", "in-app-notifications": "community",
+    "referral": "community", "trophies": "community",
+    # Gaming
     "servers": "gaming", "player-profiles": "gaming",
     "punishments": "gaming", "downloads": "gaming",
+    # Management
+    "tickets": "management", "help-center": "management", "staff": "management",
+    "announcements": "management", "popups": "management",
+    "login-protection": "management", "two-factor-auth": "management",
+    # Content
+    "slider": "content", "custom-pages": "content", "custom-forms": "content",
+    "email-templates": "content", "cookie-consent": "content", "seo": "content",
+    # Integration
+    "discord-auth": "integration", "discord-integration": "integration",
+    "discord-widget": "integration", "google-auth": "integration",
+    "google-analytics": "integration", "cloudflare-r2": "integration",
+    "cloudflare-turnstile": "integration", "resend-provider": "integration",
+    "csv-import-export": "integration", "webhook-logs": "integration",
 }
 
 modules = []

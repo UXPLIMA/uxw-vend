@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updated": "2026-05-17",
-  "updatedAt": "2026-05-17T12:15:31Z",
+  "updated": "2026-05-30",
+  "updatedAt": "2026-05-30T14:54:17Z",
   "modules": [
     {
       "id": "announcements",
@@ -12,7 +12,7 @@
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -32,10 +32,10 @@
       "description": "News and announcements system",
       "version": "1.0.0",
       "author": "uxwVend",
-      "icon": "Package",
+      "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -58,7 +58,7 @@
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -79,12 +79,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Cloud",
-      "category": "content",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "integration"
       ],
       "zip": "cloudflare-r2.zip",
       "dependencies": [],
@@ -102,12 +102,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
-      "category": "content",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "integration"
       ],
       "zip": "cloudflare-turnstile.zip",
       "dependencies": [],
@@ -125,12 +125,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
-      "category": "management",
+      "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "content"
       ],
       "zip": "cookie-consent.zip",
       "dependencies": [],
@@ -150,7 +150,7 @@
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -171,12 +171,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Download",
-      "category": "content",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "integration"
       ],
       "zip": "csv-import-export.zip",
       "dependencies": [],
@@ -196,7 +196,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -217,12 +217,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
-      "category": "management",
+      "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "content"
       ],
       "zip": "custom-forms.zip",
       "dependencies": [],
@@ -240,12 +240,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "FileText",
-      "category": "management",
+      "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "content"
       ],
       "zip": "custom-pages.zip",
       "dependencies": [],
@@ -263,12 +263,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
-      "category": "management",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "integration"
       ],
       "zip": "discord-auth.zip",
       "dependencies": [],
@@ -286,12 +286,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
-      "category": "management",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "integration"
       ],
       "zip": "discord-integration.zip",
       "dependencies": [],
@@ -309,12 +309,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
-      "category": "commerce",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "commerce"
+        "integration"
       ],
       "zip": "discord-widget.zip",
       "dependencies": [
@@ -322,8 +322,8 @@
       ],
       "stats": {
         "publicRoutes": 0,
-        "adminRoutes": 0,
-        "apiRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
         "widgets": 1
       }
     },
@@ -336,7 +336,7 @@
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -359,7 +359,7 @@
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -382,7 +382,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -403,12 +403,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "BarChart",
-      "category": "content",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "integration"
       ],
       "zip": "google-analytics.zip",
       "dependencies": [],
@@ -426,12 +426,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Globe",
-      "category": "management",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "integration"
       ],
       "zip": "google-auth.zip",
       "dependencies": [],
@@ -451,7 +451,7 @@
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -472,17 +472,17 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
-      "category": "content",
+      "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "community"
       ],
       "zip": "in-app-notifications.zip",
       "dependencies": [],
       "stats": {
-        "publicRoutes": 0,
+        "publicRoutes": 1,
         "adminRoutes": 0,
         "apiRoutes": 1,
         "widgets": 0
@@ -497,7 +497,7 @@
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -520,12 +520,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
-      "category": "content",
+      "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "management"
       ],
       "zip": "login-protection.zip",
       "dependencies": [],
@@ -545,7 +545,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -570,7 +570,7 @@
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -593,7 +593,7 @@
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -616,7 +616,7 @@
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -625,7 +625,7 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
       }
@@ -637,12 +637,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
-      "category": "content",
+      "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "community"
       ],
       "zip": "referral.zip",
       "dependencies": [
@@ -662,12 +662,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
-      "category": "management",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "integration"
       ],
       "zip": "resend-provider.zip",
       "dependencies": [
@@ -689,7 +689,7 @@
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -712,7 +712,7 @@
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -735,7 +735,7 @@
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -756,12 +756,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Users",
-      "category": "content",
+      "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "management"
       ],
       "zip": "staff.zip",
       "dependencies": [],
@@ -781,7 +781,7 @@
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -806,7 +806,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -831,7 +831,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -840,7 +840,7 @@
       "dependencies": [],
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 3,
         "widgets": 0
       }
@@ -854,7 +854,7 @@
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -869,6 +869,29 @@
       }
     },
     {
+      "id": "trophies",
+      "name": "Trophies",
+      "description": "Achievement badges with rule-based auto-award engine",
+      "version": "1.0.0",
+      "author": "uxwVend",
+      "icon": "Trophy",
+      "category": "community",
+      "verified": true,
+      "updatedAt": "2026-05-30T14:54:17Z",
+      "screenshots": [],
+      "tags": [
+        "community"
+      ],
+      "zip": "trophies.zip",
+      "dependencies": [],
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 6,
+        "widgets": 0
+      }
+    },
+    {
       "id": "two-factor-auth",
       "name": "Two-Factor Authentication",
       "description": "TOTP-based 2FA with backup codes for enhanced account security",
@@ -877,7 +900,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -900,7 +923,7 @@
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -923,12 +946,12 @@
       "version": "1.0.0",
       "author": "uxwVend",
       "icon": "Webhook",
-      "category": "management",
+      "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "integration"
       ],
       "zip": "webhook-logs.zip",
       "dependencies": [],
@@ -948,7 +971,7 @@
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-17T12:15:31Z",
+      "updatedAt": "2026-05-30T14:54:17Z",
       "screenshots": [],
       "tags": [
         "commerce"
