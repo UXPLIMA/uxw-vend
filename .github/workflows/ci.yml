@@ -7,7 +7,6 @@ on:
     branches: [main]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
   AUTH_SECRET: "ci-test-secret-key-32-characters!!"
 
@@ -16,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: "npm"
