@@ -168,7 +168,6 @@
         "adm_topic": "Topic",
         "adm_pageOf": "Page {page} of {totalPages}",
         "adm_topicsTotal": "{count} topics total",
-        "adm_delete": "Delete",
         "adm_deleted": "Deleted",
         "adm_deleteConfirm": "Are you sure you want to delete this topic?",
         "adm_deleteFailed": "Failed to delete",
@@ -220,6 +219,10 @@
         "pageOf": "Page {page} of {totalPages}",
         "menu_forum_forum_topics": "Forum Topics",
         "menu_forum_forum_categories": "Forum Categories"
+      },
+      "activity": {
+        "forumTopicCreated": "started a new topic:",
+        "forumPostCreated": "replied to:"
       }
     },
     "tr": {
@@ -289,7 +292,6 @@
         "adm_topic": "Konu",
         "adm_pageOf": "Sayfa {page} / {totalPages}",
         "adm_topicsTotal": "Toplam {count} konu",
-        "adm_delete": "Sil",
         "adm_deleted": "Silindi",
         "adm_deleteConfirm": "Bu konuyu silmek istediğinizden emin misiniz?",
         "adm_deleteFailed": "Silinemedi",
@@ -341,6 +343,10 @@
         "pageOf": "Sayfa {page} / {totalPages}",
         "menu_forum_forum_topics": "Forum Konuları",
         "menu_forum_forum_categories": "Forum Kategorileri"
+      },
+      "activity": {
+        "forumTopicCreated": "yeni konu açtı:",
+        "forumPostCreated": "yanıt verdi:"
       }
     },
     "de": {
@@ -833,7 +839,8 @@
     {
       "id": "forum-search",
       "label": "Forum",
-      "handler": "search/handler.ts"
+      "handler": "search/handler.ts",
+      "icon": "MessageSquare"
     }
   ],
   "notificationTypes": [
@@ -905,5 +912,21 @@
       "href": "/forum",
       "section": "quick"
     }
+  ],
+  "activityTitles": [
+    {
+      "type": "forum.topic.created",
+      "prefix": "New topic: ",
+      "key": "forumTopicCreated"
+    },
+    {
+      "type": "forum.post.created",
+      "prefix": "Replied to: ",
+      "key": "forumPostCreated"
+    }
+  ],
+  "permissionResources": [
+    "forum.topic",
+    "forum.category"
   ]
 }

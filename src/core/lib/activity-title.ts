@@ -8,21 +8,28 @@
  * `type` field) and replace just the prefix with a translated version,
  * keeping the entity name (the dynamic part) intact.
  *
+ * The prefix→key map is registry-driven: modules declare their activity
+ * event types via the `activityTitles` manifest field, aggregated at build
+ * time into `ModuleActivityTitles`. Core knows only its own events.
+ *
  * Pass `t` from `useTranslations("activity")` (client) or
  * `getTranslations("activity")` (server). Falls back to the raw title
  * for any type/prefix combination we don't recognize.
  */
+import { ModuleActivityTitles } from "@/core/generated/module-registry";
+
 type Translator = ((key: string) => string) & { has?: (key: string) => boolean };
 
+// Core-only activity events. Module events are merged in from the registry.
+const CORE_PREFIXES: Record<string, { prefix: string; key: string }> = {
+    "user.registered": { prefix: "", key: "userRegistered" },
+};
+
 const PREFIXES: Record<string, { prefix: string; key: string }> = {
-    "forum.topic.created":          { prefix: "New topic: ",       key: "forumTopicCreated" },
-    "forum.post.created":           { prefix: "Replied to: ",      key: "forumPostCreated" },
-    "suggestions.suggestion.created": { prefix: "Suggested: ",     key: "suggestionCreated" },
-    "tickets.ticket.created":       { prefix: "Opened ticket: ",   key: "ticketCreated" },
-    "tickets.reply.created":        { prefix: "Replied to ticket: ", key: "ticketReplyCreated" },
-    "blog.article.published":       { prefix: "Published: ",       key: "blogArticlePublished" },
-    "user.registered":              { prefix: "",                  key: "userRegistered" },
-    "store.order.completed":        { prefix: "Purchased: ",       key: "storeOrderCompleted" },
+    ...CORE_PREFIXES,
+    ...Object.fromEntries(
+        ModuleActivityTitles.map((e) => [e.type, { prefix: e.prefix, key: e.key }]),
+    ),
 };
 
 export function localizeActivityTitle(type: string, title: string, t: Translator): string {

@@ -139,7 +139,8 @@ export default function ThemeSettingsPage() {
         );
     };
 
-    const builtInThemes = ["flat"];
+    // Built-in themes ship in-tree — every key in the generated registry.
+    const builtInThemes = Object.keys(themeRegistry);
 
     // Marketplace
     const [marketplaceThemes, setMarketplaceThemes] = useState<{ id: string; name: string; version: string; type: string; description: string; verified: boolean; zip: string; colors?: Record<string, string> }[]>([]);

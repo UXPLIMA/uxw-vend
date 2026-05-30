@@ -146,6 +146,13 @@ const searchProvider = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
     label: z.string().min(1).max(100),
     handler: relativePath("handler"),
+    icon: iconName.optional(),
+});
+
+const activityTitle = z.object({
+    type: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
+    prefix: z.string().max(128),
+    key: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
 });
 
 const webhookReceiver = z
@@ -278,6 +285,8 @@ export const moduleManifestSchema = z.object({
     pageBlocks: z.array(pageBlock).max(100).optional(),
     cronJobs: z.array(cronJob).max(50).optional(),
     searchProviders: z.array(searchProvider).max(20).optional(),
+    activityTitles: z.array(activityTitle).max(50).optional(),
+    permissionResources: z.array(z.string().min(1).max(128).regex(/^[a-z0-9._-]+$/)).max(100).optional(),
     webhookReceivers: z.array(webhookReceiver).max(50).optional(),
     notificationTypes: z.array(notificationType).max(100).optional(),
     layoutComponents: z.array(layoutComponent).max(50).optional(),

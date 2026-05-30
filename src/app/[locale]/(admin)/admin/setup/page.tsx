@@ -15,6 +15,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 import { toast } from "sonner";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { defaultThemeId } from "@/core/generated/theme-registry";
 
 const steps = ["Welcome", "Site Info", "Modules", "Theme", "Done"];
 
@@ -89,7 +90,7 @@ export default function SetupWizardPage() {
 
     // Theme step state
     const [themes, setThemes] = useState<ThemeInfo[]>([]);
-    const [selectedTheme, setSelectedTheme] = useState<string>("flat");
+    const [selectedTheme, setSelectedTheme] = useState<string>(defaultThemeId);
     const [loadingThemes, setLoadingThemes] = useState(true);
 
     useEffect(() => {

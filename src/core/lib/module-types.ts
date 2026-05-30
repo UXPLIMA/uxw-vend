@@ -168,7 +168,22 @@ export interface ModuleManifest {
         id: string;           // e.g. "blog-articles"
         label: string;        // group label in results UI
         handler: string;      // path to file exporting default async fn
+        icon?: string;        // Lucide icon name shown on the result group card
     }[];
+
+    // Activity-feed title localization — modules that emit activity events
+    // declare how to localize their English-formatted titles. Core strips
+    // `prefix` from the stored title and substitutes the translation under
+    // the "activity" namespace `key`. Keeps core ignorant of module events.
+    activityTitles?: {
+        type: string;         // activity event type, e.g. "forum.topic.created"
+        prefix: string;       // English prefix to strip, e.g. "New topic: "
+        key: string;          // translation key under "activity", e.g. "forumTopicCreated"
+    }[];
+
+    // RBAC resource strings the module owns (e.g. "blog.article"). Surfaced
+    // in the admin permission matrix so admins can grant/deny per resource.
+    permissionResources?: string[];
 
     // Inbound webhook receivers — external services can POST to
     // /api/v1/webhook/<provider> and the dispatcher routes to the

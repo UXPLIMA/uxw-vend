@@ -922,6 +922,9 @@
         "cc_commissionPercentPlaceholder": "5",
         "cc_isActiveLabel": "Active",
         "cc_secondarySuffix": "{discount}% off / {commission}% commission"
+      },
+      "activity": {
+        "storeOrderCompleted": "purchased:"
       }
     },
     "tr": {
@@ -1415,6 +1418,9 @@
         "cc_commissionPercentPlaceholder": "5",
         "cc_isActiveLabel": "Aktif",
         "cc_secondarySuffix": "%{discount} indirim / %{commission} komisyon"
+      },
+      "activity": {
+        "storeOrderCompleted": "satın aldı:"
       }
     },
     "de": {
@@ -3362,7 +3368,8 @@
     {
       "id": "store-search",
       "label": "Store",
-      "handler": "search/handler.ts"
+      "handler": "search/handler.ts",
+      "icon": "ShoppingBag"
     }
   ],
   "notificationTypes": [
@@ -3442,5 +3449,17 @@
       "href": "/store",
       "section": "quick"
     }
+  ],
+  "activityTitles": [
+    {
+      "type": "store.order.completed",
+      "prefix": "Purchased: ",
+      "key": "storeOrderCompleted"
+    }
+  ],
+  "permissionResources": [
+    "store.product",
+    "store.order",
+    "store.category"
   ]
 }

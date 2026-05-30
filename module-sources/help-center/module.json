@@ -697,7 +697,8 @@
     {
       "id": "help-center-search",
       "label": "Help Center",
-      "handler": "search/handler.ts"
+      "handler": "search/handler.ts",
+      "icon": "BookOpen"
     }
   ],
   "seoRoutes": {
@@ -717,5 +718,8 @@
       "href": "/help",
       "section": "quick"
     }
+  ],
+  "permissionResources": [
+    "help.article"
   ]
 }

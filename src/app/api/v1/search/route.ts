@@ -16,6 +16,7 @@ interface SearchResult {
 interface ResultGroup {
     id: string;
     label: string;
+    icon?: string;
     results: SearchResult[];
 }
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
                 },
                 [],
             );
-            return { id: provider.id, label: provider.label, results };
+            return { id: provider.id, label: provider.label, icon: provider.icon, results };
         })
     );
 

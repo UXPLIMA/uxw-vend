@@ -38,14 +38,7 @@
     "placeholderHint": "Yöneticiler Ayarlar panelinden {key} anahtarını kaydederek bu sayfayı düzenleyebilir."
   },
   "activity": {
-    "forumTopicCreated": "yeni konu açtı:",
-    "forumPostCreated": "yanıt verdi:",
-    "suggestionCreated": "öneri gönderdi:",
-    "ticketCreated": "bilet açtı:",
-    "ticketReplyCreated": "bilete yanıt verdi:",
-    "blogArticlePublished": "yayınladı:",
-    "userRegistered": "topluluğa katıldı",
-    "storeOrderCompleted": "satın aldı:"
+    "userRegistered": "topluluğa katıldı"
   },
   "nav": {
     "home": "Ana Sayfa",

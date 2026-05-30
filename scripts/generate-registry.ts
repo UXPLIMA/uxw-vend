@@ -125,7 +125,9 @@ function generateRegistry() {
     const allSlotContents: ({ id: string; slot: string; component: string; order?: number; module: string })[] = [];
     const allPageBlocks: ({ id: string; category?: string; component: string; module: string })[] = [];
     const allCronJobs: ({ id: string; schedule: string; handler: string; module: string })[] = [];
-    const allSearchProviders: ({ id: string; label: string; handler: string; module: string })[] = [];
+    const allSearchProviders: ({ id: string; label: string; handler: string; icon?: string; module: string })[] = [];
+    const allActivityTitles: ({ type: string; prefix: string; key: string; module: string })[] = [];
+    const allPermissionResources: string[] = [];
     const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; timestampHeader?: string; module: string })[] = [];
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
@@ -159,6 +161,8 @@ function generateRegistry() {
         manifest.pageBlocks?.forEach((pb) => allPageBlocks.push({ ...pb, module: moduleName }));
         manifest.cronJobs?.forEach((cj) => allCronJobs.push({ ...cj, module: moduleName }));
         manifest.searchProviders?.forEach((sp) => allSearchProviders.push({ ...sp, module: moduleName }));
+        manifest.activityTitles?.forEach((at) => allActivityTitles.push({ ...at, module: moduleName }));
+        manifest.permissionResources?.forEach((r) => allPermissionResources.push(r));
         manifest.webhookReceivers?.forEach((wr) => allWebhookReceivers.push({ ...wr, module: moduleName }));
         manifest.notificationTypes?.forEach((nt) => allNotificationTypes.push({ ...nt, module: moduleName }));
         manifest.homepageSections?.forEach((section) => allHomepageSections.push({ ...section, module: moduleName }));
@@ -254,6 +258,10 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    widgetRegistry += `// Activity-feed title localization entries contributed by modules.\n`;
+    widgetRegistry += `export const ModuleActivityTitles: { type: string; prefix: string; key: string; module: string }[] = ${JSON.stringify(allActivityTitles, null, 2)};\n\n`;
+    widgetRegistry += `// RBAC resource strings modules own — surfaced in the admin permission matrix (flattened + deduped).\n`;
+    widgetRegistry += `export const ModulePermissionResources: string[] = ${JSON.stringify([...new Set(allPermissionResources)], null, 2)};\n\n`;
 
     let profileTabImports = emitDynamicRegistry('Profile tab component registry', 'ProfileTabRegistry', allProfileTabs);
     profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
@@ -364,11 +372,12 @@ function generateRegistry() {
 
     const SEARCH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-search.ts');
     let searchContent = '// Auto-generated public search providers registry\n\n';
-    searchContent += 'export const ModuleSearchProviders: { id: string; label: string; module: string; loader: () => Promise<{ default: (query: string) => Promise<unknown[]> }> }[] = [\n';
+    searchContent += 'export const ModuleSearchProviders: { id: string; label: string; module: string; icon?: string; loader: () => Promise<{ default: (query: string) => Promise<unknown[]> }> }[] = [\n';
     for (const sp of allSearchProviders) {
         const handlerPath = sp.handler.replace(/\.tsx?$/, '');
         const importPath = `@/modules/${sp.module}/${handlerPath}`;
-        searchContent += `  { id: ${JSON.stringify(sp.id)}, label: ${JSON.stringify(sp.label)}, module: ${JSON.stringify(sp.module)}, loader: () => import('${importPath}') as Promise<{ default: (query: string) => Promise<unknown[]> }> },\n`;
+        const icon = sp.icon ? JSON.stringify(sp.icon) : 'undefined';
+        searchContent += `  { id: ${JSON.stringify(sp.id)}, label: ${JSON.stringify(sp.label)}, module: ${JSON.stringify(sp.module)}, icon: ${icon}, loader: () => import('${importPath}') as Promise<{ default: (query: string) => Promise<unknown[]> }> },\n`;
     }
     searchContent += '];\n';
     fs.writeFileSync(SEARCH_FILE, searchContent);

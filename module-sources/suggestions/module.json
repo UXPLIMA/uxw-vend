@@ -102,6 +102,9 @@
         "loginToSubmit": "Log in to submit a suggestion",
         "deletedUser": "Deleted user",
         "login": "Log in"
+      },
+      "activity": {
+        "suggestionCreated": "suggested:"
       }
     },
     "tr": {
@@ -161,6 +164,9 @@
         "loginToSubmit": "Öneri göndermek için giriş yapın",
         "deletedUser": "Silinmiş kullanıcı",
         "login": "Giriş yap"
+      },
+      "activity": {
+        "suggestionCreated": "öneri gönderdi:"
       }
     },
     "de": {
@@ -390,6 +396,13 @@
       "label": "Suggestions",
       "href": "/suggestions",
       "section": "quick"
+    }
+  ],
+  "activityTitles": [
+    {
+      "type": "suggestions.suggestion.created",
+      "prefix": "Suggested: ",
+      "key": "suggestionCreated"
     }
   ]
 }

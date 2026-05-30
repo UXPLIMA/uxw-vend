@@ -8,15 +8,9 @@ import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
-import {
-    Search,
-    Loader2,
-    FileText,
-    MessageSquare,
-    BookOpen,
-    ShoppingBag,
-    File,
-} from "lucide-react";
+import type { ComponentType } from "react";
+import * as LucideIcons from "lucide-react";
+import { Search, Loader2, File } from "lucide-react";
 
 interface SearchResult {
     type?: string;
@@ -29,18 +23,21 @@ interface SearchResult {
 interface ResultGroup {
     id: string;
     label: string;
+    icon?: string;
     results: SearchResult[];
 }
 
-const GROUP_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
-    "blog-search": FileText,
-    "forum-search": MessageSquare,
-    "help-center-search": BookOpen,
-    "store-search": ShoppingBag,
-};
+type IconComponent = ComponentType<{ className?: string }>;
 
-function iconFor(groupId: string) {
-    return GROUP_ICON[groupId] ?? File;
+/**
+ * Resolves a Lucide icon name (declared by the search-providing module's
+ * manifest, returned per result group by /api/v1/search) to its component.
+ * Falls back to File so an unknown/missing name still renders an icon.
+ */
+function iconFor(name: string | undefined): IconComponent {
+    if (!name) return File;
+    const lib = LucideIcons as unknown as Record<string, IconComponent>;
+    return lib[name] || File;
 }
 
 export default function SearchPage() {
@@ -137,7 +134,7 @@ export default function SearchPage() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
                             {groups.map((group) => {
-                                const Icon = iconFor(group.id);
+                                const Icon = iconFor(group.icon);
                                 return (
                                     <Card key={group.id} className="flex flex-col">
                                         <CardHeader className="pb-2">

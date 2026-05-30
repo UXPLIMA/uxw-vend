@@ -237,6 +237,10 @@
         "subtitle": "Manage your platform settings and content",
         "menu_tickets_tickets": "Tickets",
         "menu_tickets_departments": "Departments"
+      },
+      "activity": {
+        "ticketCreated": "opened a ticket:",
+        "ticketReplyCreated": "replied to ticket:"
       }
     },
     "tr": {
@@ -375,6 +379,10 @@
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_tickets_tickets": "Talepler",
         "menu_tickets_departments": "Departmanlar"
+      },
+      "activity": {
+        "ticketCreated": "bilet açtı:",
+        "ticketReplyCreated": "bilete yanıt verdi:"
       }
     },
     "de": {
@@ -1074,5 +1082,20 @@
       "href": "/support",
       "section": "quick"
     }
+  ],
+  "activityTitles": [
+    {
+      "type": "tickets.ticket.created",
+      "prefix": "Opened ticket: ",
+      "key": "ticketCreated"
+    },
+    {
+      "type": "tickets.reply.created",
+      "prefix": "Replied to ticket: ",
+      "key": "ticketReplyCreated"
+    }
+  ],
+  "permissionResources": [
+    "tickets.ticket"
   ]
 }

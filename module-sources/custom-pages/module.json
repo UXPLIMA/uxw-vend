@@ -477,5 +477,8 @@
         "draft": "Draft"
       }
     }
-  }
+  },
+  "permissionResources": [
+    "custom-pages.page"
+  ]
 }

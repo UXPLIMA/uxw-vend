@@ -38,14 +38,7 @@
     "placeholderHint": "Admins can set this from the Settings panel by saving the {key} setting."
   },
   "activity": {
-    "forumTopicCreated": "started a new topic:",
-    "forumPostCreated": "replied to:",
-    "suggestionCreated": "suggested:",
-    "ticketCreated": "opened a ticket:",
-    "ticketReplyCreated": "replied to ticket:",
-    "blogArticlePublished": "published:",
-    "userRegistered": "joined the community",
-    "storeOrderCompleted": "purchased:"
+    "userRegistered": "joined the community"
   },
   "nav": {
     "home": "Home",

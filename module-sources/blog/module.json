@@ -3,6 +3,8 @@
   "name": "Blog Module",
   "description": "News and announcements system",
   "version": "1.0.0",
+  "author": "uxwVend",
+  "icon": "Newspaper",
   "defaultConfig": {
     "allowComments": true,
     "requireCommentApproval": false,
@@ -208,6 +210,9 @@
         "menu_blog_1": "Blog Categories",
         "menu_blog_articles": "Articles",
         "menu_blog_blog_categories": "Blog Categories"
+      },
+      "activity": {
+        "blogArticlePublished": "published:"
       }
     },
     "tr": {
@@ -312,6 +317,9 @@
         "menu_blog_1": "Blog Kategorileri",
         "menu_blog_articles": "Makaleler",
         "menu_blog_blog_categories": "Blog Kategorileri"
+      },
+      "activity": {
+        "blogArticlePublished": "yayınladı:"
       }
     },
     "de": {
@@ -806,7 +814,8 @@
     {
       "id": "blog-search",
       "label": "Blog",
-      "handler": "search/handler.ts"
+      "handler": "search/handler.ts",
+      "icon": "FileText"
     }
   ],
   "notificationTypes": [
@@ -873,5 +882,16 @@
       "href": "/blog",
       "section": "quick"
     }
+  ],
+  "activityTitles": [
+    {
+      "type": "blog.article.published",
+      "prefix": "Published: ",
+      "key": "blogArticlePublished"
+    }
+  ],
+  "permissionResources": [
+    "blog.article",
+    "blog.category"
   ]
 }

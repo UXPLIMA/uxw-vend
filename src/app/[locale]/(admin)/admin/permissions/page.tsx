@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { ModulePermissionResources } from "@/core/generated/module-registry";
 
 interface Role {
     id: string;
@@ -26,20 +27,10 @@ interface Grant {
     allow: boolean;
 }
 
-// Common resources to show in the matrix. Modules can have many — this is a curated subset
-// that the admin can extend by adding their own grants below.
-const COMMON_RESOURCES = [
-    "blog.article",
-    "blog.category",
-    "store.product",
-    "store.order",
-    "store.category",
-    "forum.topic",
-    "forum.category",
-    "tickets.ticket",
-    "help.article",
-    "custom-pages.page",
-];
+// RBAC resources to show in the matrix — contributed by installed modules
+// via their `permissionResources` manifest field (registry-driven). The
+// admin can extend this with custom grants below.
+const COMMON_RESOURCES = ModulePermissionResources;
 
 const ACTIONS = ["view", "create", "edit", "delete"];
 

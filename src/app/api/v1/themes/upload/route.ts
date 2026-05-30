@@ -11,9 +11,13 @@ import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { PROJECT_ROOT } from "@/core/lib/runtime-paths";
 import { devOnlyDetail } from "@/core/lib/api-utils";
+import { themeRegistry } from "@/core/generated/theme-registry";
 
 const THEMES_DIR = path.join(PROJECT_ROOT, "src/themes");
-const RESERVED_IDS = new Set(["flat", "flat-dark", "core", "admin"]);
+// Generic non-theme reservations + every in-tree theme id (from the
+// generated registry). Uploading over a shipped theme is disallowed; new
+// theme ids are kept distinct from the core/admin route namespaces.
+const RESERVED_IDS = new Set<string>(["core", "admin", ...Object.keys(themeRegistry)]);
 
 export async function POST(request: NextRequest) {
     const session = await auth();

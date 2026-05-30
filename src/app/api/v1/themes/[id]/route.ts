@@ -5,9 +5,12 @@ import { execFileSync } from "child_process";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
+import { themeRegistry } from "@/core/generated/theme-registry";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
-const PROTECTED_THEMES = ["flat"];
+// Themes shipped in-tree (every key in the generated registry) are the
+// protected set — they can't be deleted via the admin UI.
+const PROTECTED_THEMES = Object.keys(themeRegistry);
 
 type RouteParams = { params: Promise<{ id: string }> };
 
