@@ -4,11 +4,11 @@
   ![CI](https://github.com/siracozmen01/uxwVend/actions/workflows/ci.yml/badge.svg)
 
   <p><strong>Modular plugin-based platform with a built-in marketplace</strong></p>
-  <p>Ships with zero modules. Install what you need from 41 first-party modules in the marketplace, or upload custom ZIPs.</p>
+  <p>Ships with zero modules. Install what you need from 42 first-party modules in the marketplace, or upload custom ZIPs.</p>
 
   ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?logo=next.js)
-  ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)
-  ![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript)
+  ![Prisma](https://img.shields.io/badge/Prisma-7.6-2D3748?logo=prisma)
   ![Tailwind](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss)
   ![Zod](https://img.shields.io/badge/Zod-4-3E67B1)
   ![Auth.js](https://img.shields.io/badge/Auth.js-v5-purple)
@@ -27,7 +27,7 @@ uxwVend is a plugin-first platform for game-server websites, digital storefronts
 
 ### Three strict layers
 
-1. **Core** (`src/core/`) — site-type-agnostic infrastructure: auth, RBAC, i18n, navigation/footer link structure, health, rate limiting (Redis + memory fallback), maintenance, upload, SEO. Only three canonical slot names: `layout.beforeMain`, `layout.afterMain`, `head.extra`.
+1. **Core** (`src/core/`) — site-type-agnostic infrastructure: auth, RBAC, i18n, navigation/footer link structure, health, rate limiting (Redis + memory fallback), maintenance, upload, SEO. A fixed set of canonical slot names — the generic `layout.beforeMain`, `layout.afterMain`, `head.extra` plus layout-position slots (`layout.top`, `layout.bottom`, `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav`).
 2. **Modules** (`src/modules/<id>/`) — feature layer. Everything declared in `module.json`.
 3. **Themes** (`src/themes/<id>/`) — presentation + composition. Everything declared in `theme.json` (`schemaVersion: 2`).
 
@@ -35,12 +35,12 @@ uxwVend is a plugin-first platform for game-server websites, digital storefronts
 
 ## Module System
 
-41 first-party modules ship in `module-marketplace/` as ZIPs with an `index.json` catalog. Sources live in `module-sources/<id>/` (tracked in git). ZIPs are built from those sources via `npm run build:marketplace`.
+42 first-party modules ship in `module-marketplace/` as ZIPs with an `index.json` catalog. Sources live in `module-sources/<id>/` (tracked in git). ZIPs are built from those sources via `npm run build:marketplace`.
 
 | Category | Modules |
 |----------|---------|
 | Commerce | store, stripe-gateway, paypal-gateway, credits, currency, vote, wheel, leaderboard |
-| Community | blog, forum, suggestions, changelog, in-app-notifications, referral |
+| Community | blog, forum, suggestions, changelog, in-app-notifications, referral, trophies |
 | Gaming | servers, player-profiles, punishments, downloads |
 | Management | tickets, help-center, staff, announcements, popups, login-protection, two-factor-auth |
 | Content | slider, custom-pages, custom-forms, email-templates, cookie-consent, seo |
@@ -75,7 +75,7 @@ A theme manifest can declare:
 | Theme | Description |
 |-------|-------------|
 | `flat` | Default baseline. Light + dark modes in one manifest. No component overrides, no settings. |
-| `pixelcraft` | Gaming/Minecraft preset. Dark only. Compact Hypixel-style 3-column hero (server IP \| logo \| Discord) with schema-driven settings. Declares `hero.liveStats` and `hero.discordStats` slots. Suggests the `servers` + `store` modules. |
+| `pixelcraft` | Gaming/Minecraft preset. Dark only. Compact Hypixel-style 3-column hero (server IP \| logo \| Discord) with schema-driven settings. Declares a `hero.liveStats` slot. Suggests the `store` module. |
 
 **Data model:**
 
@@ -133,7 +133,7 @@ src/
   proxy.ts                  Middleware: i18n + module route gating + CSRF
 
 messages-core/{en,tr}.json  Core translation seed sources
-module-sources/<id>/        Authoritative source for 41 first-party modules
+module-sources/<id>/        Authoritative source for 42 first-party modules
 module-marketplace/         Distributable ZIPs + index.json catalog
 theme-marketplace/          Distributable theme ZIPs
 module-template/            Starter for `npm run create:module`

@@ -1,0 +1,7 @@
+# Default owner for everything in the repo.
+* @siracozmen01
+
+# Core is the load-bearing, motto-critical layer — review with extra care.
+/src/core/ @siracozmen01
+/prisma/ @siracozmen01
+/.github/ @siracozmen01

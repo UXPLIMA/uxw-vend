@@ -293,16 +293,6 @@ Module-contributed counters are fetched directly from each module's declared `st
 | GET | `/messages/[conversationId]` | Session | Read a single conversation |
 | POST | `/error-report` | None | Submit a client-side error report |
 
-### Warnings, Trophies, Moderation
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/warnings` | Admin | List user warnings |
-| POST | `/warnings` | Admin | Issue a warning |
-| DELETE | `/warnings/[id]` | Admin | Remove a warning |
-| GET | `/trophies` | Admin | List trophies |
-| GET | `/me/trophies` | Session | Trophies for the authenticated user |
-
 ### Admin — Observability
 
 | Method | Path | Auth | Description |
@@ -400,6 +390,19 @@ export async function POST(request: NextRequest) {
 ```
 
 Permission gating, validation, and rate limiting are the module's responsibility. The dispatcher only routes and method-checks.
+
+### Example module-provided endpoints
+
+These are contributed by first-party modules and are only available when the
+corresponding module is installed (paths are relative to `/api/v1`):
+
+| Method | Path | Auth | Module | Description |
+|--------|------|------|--------|-------------|
+| GET | `/warnings` | Admin | punishments | List user warnings |
+| POST | `/warnings` | Admin | punishments | Issue a warning |
+| DELETE | `/warnings/[id]` | Admin | punishments | Remove a warning |
+| GET | `/trophies` | Admin | trophies | List trophies |
+| GET | `/me/trophies` | Session | trophies | Trophies for the authenticated user |
 
 ---
 

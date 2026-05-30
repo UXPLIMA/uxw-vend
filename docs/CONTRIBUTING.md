@@ -187,7 +187,7 @@ To distribute a theme, zip the `<id>/` folder and upload via **Admin > Settings 
 Two themes ship in-tree:
 
 - `flat` — baseline. Light + dark modes. No component overrides, no settings.
-- `pixelcraft` — gaming/Minecraft preset. Dark only. Hypixel-style hero with schema-driven settings (title, subtitle, bgImage, logoImage, serverIp, ctaText, ctaHref, discordUrl). Declares `hero.liveStats` and `hero.discordStats` slots. Suggests `servers` + `store` modules.
+- `pixelcraft` — gaming/Minecraft preset. Dark only. Hypixel-style hero with schema-driven settings (title, subtitle, backgroundImage, logoImage, serverIp, ctaText, ctaHref, discordUrl). Declares a `hero.liveStats` slot. Suggests the `store` module.
 
 ---
 

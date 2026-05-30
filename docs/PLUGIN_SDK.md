@@ -78,7 +78,7 @@ Only `module.json` is required. Include only the directories your module needs.
 | `defaultConfig` | `object` | Default config values merged with the DB-stored `ModuleConfig.config` at runtime. |
 | `dependencies` | `string[]` | Module IDs that must be installed and enabled. Enable fails when a dependency is missing. |
 | `conflicts` | `string[]` | Module IDs that cannot be active simultaneously. |
-| `seedOnInstall` | `boolean` | If `true`, the install pipeline runs the module's seed routine. Default `false`. |
+| `hooks.onEnable` / `hooks.onDisable` | `string` | Path to a default-exported handler run when the module is enabled / disabled. Use this to seed default data on install. |
 
 ### `routes` — Public pages
 
@@ -337,7 +337,7 @@ Render components into named `<Slot>` points declared by themes or other modules
 ]
 ```
 
-Core declares only three canonical slots: `layout.beforeMain`, `layout.afterMain`, `head.extra`. Themes can declare additional slots through their `slots[]` array (e.g. `pixelcraft` exposes `hero.liveStats` and `hero.discordStats`).
+Core declares a fixed set of canonical slots — the generic `layout.beforeMain`, `layout.afterMain`, `head.extra` plus layout-position slots `layout.top`, `layout.bottom`, `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav` (see `src/core/lib/slot-registry.ts`). Themes can declare additional slots through their `slots[]` array (e.g. `pixelcraft` exposes `hero.liveStats`).
 
 ### `pageBlocks` — Page-builder blocks
 
@@ -733,7 +733,6 @@ Listeners declared in `hookListeners` are wired at build time and automatically 
     "conflicts": ["incompatible-module"],
     "permissions": ["mymod.view", "mymod.manage"],
     "defaultConfig": { "exampleSetting": true },
-    "seedOnInstall": false,
 
     "routes":            [{ "path": "/my-page", "component": "pages/public/page.tsx" }],
     "adminRoutes":       [{ "path": "/my-feature", "component": "pages/admin/page.tsx" }],

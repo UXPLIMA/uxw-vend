@@ -73,6 +73,9 @@ ROADMAP.md
 !README.md
 !docs/*.md
 
+# Internal AI-assisted planning/spec artifacts — not part of the public release.
+docs/superpowers/
+
 # claude code
 .claude/
 
