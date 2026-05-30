@@ -35,6 +35,42 @@ interface TrophyRule {
     threshold: number;
 }
 
+/**
+ * The five starter trophies this module ships with. They are seeded ONCE,
+ * on the first boot after the module is installed (see `seedDefaultTrophies`),
+ * so an admin can edit or delete them freely afterwards without them coming
+ * back. Rules reference other modules' events (forum, vote, store,
+ * suggestions); if those modules are not installed the rule simply never
+ * fires — the module is fully self-contained and core stays module-agnostic.
+ */
+const DEFAULT_TROPHIES = [
+    { id: "first-post", name: "First Post", description: "Started your very first forum topic.", icon: "MessageSquare", color: "#3b82f6", points: 5, awardOn: "forum.topic.created:1", ruleType: "event-count", ruleEvent: "forum.topic.created", ruleThreshold: 1, isActive: true },
+    { id: "commenter", name: "Commenter", description: "Replied to 10 forum topics.", icon: "MessageSquare", color: "#06b6d4", points: 15, awardOn: "forum.post.created:10", ruleType: "event-count", ruleEvent: "forum.post.created", ruleThreshold: 10, isActive: true },
+    { id: "voter", name: "Voter", description: "Cast 5 votes for the server.", icon: "ThumbsUp", color: "#10b981", points: 10, awardOn: "vote.vote.cast:5", ruleType: "event-count", ruleEvent: "vote.vote.cast", ruleThreshold: 5, isActive: true },
+    { id: "shopaholic", name: "Shopaholic", description: "Completed your first purchase in the store.", icon: "ShoppingBag", color: "#f59e0b", points: 20, awardOn: "store.order.completed:1", ruleType: "event-count", ruleEvent: "store.order.completed", ruleThreshold: 1, isActive: true },
+    { id: "suggestion-maker", name: "Suggestion Maker", description: "Shared your first suggestion.", icon: "Lightbulb", color: "#eab308", points: 5, awardOn: "suggestions.suggestion.created:1", ruleType: "event-count", ruleEvent: "suggestions.suggestion.created", ruleThreshold: 1, isActive: true },
+];
+
+/**
+ * Seed the starter trophies, but ONLY when the table is empty — i.e. the very
+ * first boot after install. Once any trophy exists (including admin-created
+ * ones) this is a no-op, so deleting a default trophy makes it stay deleted.
+ * Idempotent and non-fatal: a DB hiccup just skips the seed for this boot.
+ *
+ * This lives in the module (not core) so core ships zero knowledge of any
+ * module's default data — installing the module is what creates them.
+ */
+export async function seedDefaultTrophies(): Promise<void> {
+    try {
+        const existing = await prisma.trophy.count();
+        if (existing > 0) return;
+        await prisma.trophy.createMany({ data: DEFAULT_TROPHIES, skipDuplicates: true });
+        console.log(`[trophies] Seeded ${DEFAULT_TROPHIES.length} default trophies`);
+    } catch (err) {
+        console.warn("[trophies] default seed skipped:", (err as Error).message);
+    }
+}
+
 let registered = false;
 
 async function qualifies(userId: string, rule: TrophyRule): Promise<boolean> {

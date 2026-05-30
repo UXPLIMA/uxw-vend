@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
-import { seedTrophies } from "./seed-trophies";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -49,9 +48,6 @@ async function main() {
         create: { email: "admin@example.com", username: "uxwadmin", password: pw, roleId: adminRole.id },
     });
     console.log("[ok]Admin user");
-
-    // ==================== TROPHIES ====================
-    await seedTrophies(prisma);
 
     console.log("\n[done]Seeding complete!");
     console.log("   Admin account (password: password123):");

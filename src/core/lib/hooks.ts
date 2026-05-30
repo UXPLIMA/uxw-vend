@@ -302,8 +302,9 @@ export async function bootstrapHooks(): Promise<void> {
     }
 
     // Once every module's static listeners are wired, fire core.boot so modules
-    // that need DB-driven dynamic listener registration (e.g. the trophy
-    // engine) can hook in without core having to know about them.
+    // that need DB-driven dynamic listener registration (e.g. an engine that
+    // reads rules from its own tables) can hook in without core having to know
+    // about them.
     try {
         await doActionAsync("core.boot", {});
     } catch (err) {
