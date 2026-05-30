@@ -35,5 +35,5 @@ function run(label: string, cmd: string, args: string[]): void {
 }
 
 run("merge-schemas", "npx", ["tsx", "scripts/merge-schemas.ts"]);
-run("generate-themes", "npx", ["tsx", "scripts/generate-themes.ts"]);
+run("generate-themes", "npx", ["tsx", "scripts/generate-theme-registry.ts"]);
 run("generate-registry", "npx", ["tsx", "scripts/generate-registry.ts"]);

@@ -27,7 +27,7 @@ COPY . .
 # from committed source. scripts/postinstall.ts does this automatically on
 # `npm ci`, but we also need a full `next build` here.
 RUN npx tsx scripts/merge-schemas.ts && \
-    npx tsx scripts/generate-themes.ts && \
+    npx tsx scripts/generate-theme-registry.ts && \
     npx tsx scripts/generate-registry.ts && \
     npx tsx scripts/generate-openapi.ts && \
     npm run build
@@ -50,6 +50,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts ./next.config.ts
 COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
