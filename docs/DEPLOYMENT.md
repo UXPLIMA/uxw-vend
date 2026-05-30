@@ -25,6 +25,7 @@
 
 | Variable | Description |
 |---|---|
+| `SECRET_ENCRYPTION_KEY` | **Required in production.** Encrypts at-rest secrets (RCON passwords, module-stored third-party API tokens) with AES-256-GCM. The app hard-throws the first time a module reads/writes an encrypted secret if this is unset and `NODE_ENV=production`. 64-char hex (32 bytes). Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. |
 | `REDIS_URL` | Redis connection string (e.g. `redis://localhost:6379`). Required when running more than one PM2 worker — the in-memory rate limiter is process-local and can be bypassed without this. |
 | `ALLOW_MEMORY_RATE_LIMIT` | Set to `1` only on single-worker deployments where Redis is unavailable. Without Redis and without this flag, rate-limited requests return 503. |
 | `RESEND_API_KEY` | Resend email provider API key. Without it, outbound email degrades to `console.log` in dev and is silently dropped in prod. |
@@ -46,6 +47,8 @@
 |---|---|
 | `CSRF_ALLOWED_ORIGINS` | Extra origins accepted by the CSRF proxy guard. `AUTH_URL`, `NEXTAUTH_URL`, and `NEXT_PUBLIC_APP_URL` are always allowed. Add staging or preview hosts here. |
 | `CSRF_INTERNAL_SECRET` | Shared secret for server-to-server calls that need to bypass the CSRF origin check (`x-internal-request: <secret>`). Leave unset to disable. |
+| `INTERNAL_API_SECRET` | Shared secret authorizing trusted server-to-server calls to internal status endpoints (sent as the `x-internal-request` header). Leave unset to disable. |
+| `DEMO_MODE` | Set to `1` on a public demo deployment to reject all mutating requests, so visitors can browse but not change anything. |
 | `TRUSTED_PROXY_IPS` | Comma-separated list of trusted reverse-proxy IPs. When set, forwarded headers (`x-forwarded-for`) are only honored when the direct connection comes from one of these addresses — prevents header spoofing. |
 | `HEALTH_DEBUG` | Set to `1` to surface raw error details on `GET /api/health`. Only set this behind authentication in production. |
 | `OPENAPI_PUBLIC` | Set to `1` to make the OpenAPI spec at `/api/v1/openapi` readable without admin auth. Off by default. |
@@ -99,6 +102,34 @@ npx tsx scripts/seed-translations.ts   # seed default locale strings
 The seed creates:
 - Roles: `admin`, `moderator`, `member` (member is the default)
 - Admin user: `admin@example.com` / `password123` — **change this password immediately**
+
+---
+
+## Docker Compose (quickstart)
+
+The bundled `docker-compose.yml` runs Postgres, Redis, and the app together,
+and bootstraps the database automatically on first boot.
+
+```bash
+cp .env.example .env
+# Set at minimum: AUTH_SECRET, SECRET_ENCRYPTION_KEY, POSTGRES_PASSWORD
+docker compose up --build
+```
+
+What happens:
+- `db` (Postgres) and `redis` start with persistent named volumes.
+- The one-shot `migrate` service runs `scripts/docker-bootstrap.ts`, which on a
+  **fresh** database pushes the schema and seeds the 3 roles + admin user, then
+  exits. It is a no-op once the DB is initialized, so it is safe on every `up`.
+- `app` starts only after `migrate` completes successfully → login works out of
+  the box at <http://localhost:3001> (`admin@example.com` / `password123` —
+  **change immediately**).
+
+Compose injects its own `DATABASE_URL`/`REDIS_URL` pointing at the sibling
+services, so those values in `.env` are ignored on the compose path. Required
+`.env` keys for compose: `POSTGRES_PASSWORD`, `AUTH_SECRET` (and
+`SECRET_ENCRYPTION_KEY` for any module that stores secrets). Wipe everything
+with `docker compose down -v`.
 
 ---
 

@@ -31,7 +31,9 @@ function mapChangeFreq(freq: SitemapEntry["changeFreq"]): MetadataRoute.Sitemap[
  * one broken module cannot break the whole sitemap.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
+    // NEXT_PUBLIC_APP_URL is the documented canonical var; NEXT_PUBLIC_SITE_URL
+    // is accepted as a fallback for backwards compatibility.
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
     const now = new Date();
 
     const entries: MetadataRoute.Sitemap = CORE_STATIC_ROUTES.map((r) => ({
