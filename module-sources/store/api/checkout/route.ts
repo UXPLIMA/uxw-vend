@@ -6,6 +6,12 @@ import { generateOrderNumber } from "@/core/lib/utils";
 import { sendDiscordWebhook } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
 import { deliverProduct } from "../../lib/rcon";
+import {
+    computeOrderPricing,
+    computeCouponDiscount,
+    computeCreatorDiscount,
+    computeTotals,
+} from "../../lib/pricing";
 import { z } from "zod";
 
 const checkoutSchema = z.object({
@@ -91,47 +97,18 @@ export async function POST(request: NextRequest) {
         const ownedIds = new Set(ownedProducts.map((o) => o.productId));
 
         // ── Calculate item prices (with bulk discounts + cumulative upgrades) ──
-        let subtotal = 0;
-        const orderItems = items.map((item) => {
-            const product = products.find((p) => p.id === item.productId)!;
-            let price = Number(product.price);
-
-            // Cumulative upgrade: pay difference if user owns cheaper in same category
-            if (product.categoryId) {
-                const ownedInCategory = products.filter(
-                    (p) => p.categoryId === product.categoryId && ownedIds.has(p.id) && Number(p.price) < price
-                );
-                if (ownedInCategory.length > 0) {
-                    const highestOwned = Math.max(...ownedInCategory.map((p) => Number(p.price)));
-                    price = Math.max(0, price - highestOwned);
-                }
-            }
-
-            // Bulk discount: find best matching discount for this item
-            const matchingBulk = bulkDiscounts.find((bd) =>
-                bd.minQuantity <= item.quantity &&
-                (bd.productId === product.id || bd.categoryId === product.categoryId || (!bd.productId && !bd.categoryId))
-            );
-            let bulkDiscountApplied = 0;
-            if (matchingBulk) {
-                bulkDiscountApplied = matchingBulk.discountPercent;
-                price = price * (1 - matchingBulk.discountPercent / 100);
-            }
-
-            const itemTotal = price * item.quantity;
-            subtotal += itemTotal;
-
-            return {
-                productId: product.id,
-                name: product.name,
-                price,
-                quantity: item.quantity,
-                metadata: {
-                    type: product.type,
-                    variables: variables?.[product.id] || {},
-                    ...(bulkDiscountApplied > 0 ? { bulkDiscount: bulkDiscountApplied } : {}),
-                },
-            };
+        const { subtotal, orderItems } = computeOrderPricing({
+            items,
+            products: products.map((p) => ({
+                id: p.id,
+                name: p.name,
+                type: p.type,
+                price: Number(p.price),
+                categoryId: p.categoryId,
+            })),
+            bulkDiscounts,
+            ownedProductIds: ownedIds,
+            variables,
         });
 
         // ── Apply coupon ──
@@ -146,23 +123,10 @@ export async function POST(request: NextRequest) {
                 const coupon = await tx.coupon.findUnique({
                     where: { code: couponCode.toUpperCase() },
                 });
-                if (!coupon || !coupon.isActive) return "Coupon code not found or inactive";
-
-                const now = new Date();
-                if (coupon.startsAt && coupon.startsAt > now) return "Coupon is not yet active";
-                if (coupon.expiresAt && coupon.expiresAt < now) return "Coupon has expired";
-                if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) return "Coupon usage limit reached";
-                if (coupon.minPurchase && subtotal < Number(coupon.minPurchase)) {
-                    return `Coupon requires a minimum purchase of ${Number(coupon.minPurchase)}`;
-                }
-
-                if (coupon.type === "PERCENTAGE") {
-                    couponDiscount = subtotal * (Number(coupon.value) / 100);
-                    if (coupon.maxDiscount) couponDiscount = Math.min(couponDiscount, Number(coupon.maxDiscount));
-                } else {
-                    couponDiscount = Math.min(Number(coupon.value), subtotal);
-                }
-                await tx.coupon.update({ where: { id: coupon.id }, data: { usageCount: { increment: 1 } } });
+                const { error, discount } = computeCouponDiscount(coupon, subtotal);
+                if (error) return error;
+                couponDiscount = discount;
+                await tx.coupon.update({ where: { id: coupon!.id }, data: { usageCount: { increment: 1 } } });
                 return null;
             });
             if (couponError) {
@@ -187,8 +151,7 @@ export async function POST(request: NextRequest) {
                     creatorId: code.creatorId,
                     commissionPercent: code.commissionPercent,
                 };
-                const afterCoupon = subtotal - couponDiscount;
-                creatorDiscount = afterCoupon * (code.discountPercent / 100);
+                creatorDiscount = computeCreatorDiscount(subtotal, couponDiscount, code.discountPercent);
             }
         }
 
@@ -198,10 +161,12 @@ export async function POST(request: NextRequest) {
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
         const currency = ((currSetting?.value as string) || "usd").toLowerCase();
 
-        const totalDiscount = couponDiscount + creatorDiscount;
-        const taxableAmount = Math.max(0, subtotal - totalDiscount);
-        const tax = taxRate > 0 ? Math.round(taxableAmount * taxRate) / 100 : 0;
-        const total = Math.max(0, taxableAmount + tax);
+        const { totalDiscount, tax, total } = computeTotals({
+            subtotal,
+            couponDiscount,
+            creatorDiscount,
+            taxRate,
+        });
 
         // ── Credits payment ──
         if (paymentMethod === "credits") {
