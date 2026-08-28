@@ -52,7 +52,7 @@
     "@measured/puck": "^0.20.2",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
-    "adm-zip": "^0.5.17",
+    "adm-zip": "^0.6.0",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
@@ -61,7 +61,7 @@
     "isomorphic-dompurify": "^3.8.0",
     "lucide-react": "^1.7.0",
     "next": "^16.2.4",
-    "next-auth": "5.0.0-beta.30",
+    "next-auth": "5.0.0-beta.32",
     "next-intl": "^4.9.0",
     "nprogress": "^0.2.0",
     "otpauth": "^9.5.0",
@@ -103,7 +103,8 @@
     "fast-xml-parser": ">=5.7.0",
     "hono": ">=4.12.18",
     "icu-minify": ">=4.9.2",
-    "postcss": ">=8.5.10"
+    "postcss": ">=8.5.10",
+    "deepmerge-ts": "^8.0.2"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.2",
