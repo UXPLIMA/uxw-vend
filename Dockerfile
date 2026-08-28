@@ -17,7 +17,14 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# The postinstall hook is `npx tsx scripts/postinstall.ts`, and this stage
+# copies only the manifests, so npm ci used to die on the missing file before
+# the script could read its own SKIP_POSTINSTALL escape hatch. Copy the script
+# so the hook resolves, and set the flag so it exits immediately: everything
+# it would do (merge-schemas, generate-theme-registry, generate-registry) the
+# builder stage below runs explicitly. Dependency install scripts still run.
+COPY scripts/postinstall.ts ./scripts/postinstall.ts
+RUN SKIP_POSTINSTALL=1 npm ci
 
 FROM node:24-alpine AS builder
 WORKDIR /app
