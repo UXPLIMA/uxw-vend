@@ -73,7 +73,7 @@
     "react-dom": "19.2.4",
     "react-quill-new": "^3.8.3",
     "resend": "^6.10.0",
-    "sonner": "^2.0.7",
+    "sonner": "^2.0.8",
     "stripe": "^22.0.0",
     "swagger-ui-react": "^5.32.2",
     "tailwind-merge": "^3.5.0",
