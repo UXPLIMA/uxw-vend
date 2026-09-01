@@ -76,8 +76,11 @@ Only `module.json` is required. Include only the directories your module needs.
 | `icon` | `string` | Lucide icon name shown in the admin sidebar. |
 | `permissions` | `string[]` | RBAC permission strings the module registers (e.g. `["store.view", "store.manage"]`). |
 | `defaultConfig` | `object` | Default config values merged with the DB-stored `ModuleConfig.config` at runtime. |
-| `dependencies` | `string[]` | Module IDs that must be installed and enabled. Enable fails when a dependency is missing. |
-| `conflicts` | `string[]` | Module IDs that cannot be active simultaneously. |
+| `dependencies` | `string[]` | Modules that must be installed and enabled, as `"id"` or `"id@range"` (e.g. `["store@^1.2.0", "currency"]`). A bare id accepts any installed version. Install and enable both fail when a dependency is missing, disabled, or outside its range. |
+| `conflicts` | `string[]` | Same `id` / `id@range` grammar; these must not be enabled at the same time. A range narrows the clash to the versions that actually conflict. |
+| `coreVersion` | `string` | Semver range of `CORE_API_VERSION` this module was built against, e.g. `"^1.0.0"`. Omit for unconstrained. Install, update and enable reject a module the running core does not satisfy. |
+| `category` | `string` | Marketplace grouping slug (`commerce`, `community`, `gaming`, `management`, `content`, `integration`, or your own). Drives the category headings in the marketplace and the setup wizard. |
+| `tags` | `string[]` | Free-form search keywords. Falls back to `[category]`. |
 | `hooks.onEnable` / `hooks.onDisable` | `string` | Path to a default-exported handler run when the module is enabled / disabled. Use this to seed default data on install. |
 
 ### `routes` — Public pages
@@ -129,6 +132,27 @@ Mounted at `/api/v1/{path}` via the `[...path]` catch-all that resolves `ModuleA
 | `handler` | Yes | Path to the handler file, relative to the module root. Export named `GET` / `POST` / `PUT` / `DELETE` / `PATCH` functions. |
 | `method` | No | `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, or `ALL`. Defaults to `ALL`. The dispatcher returns 405 if the request method doesn't match. |
 | `description` | No | OpenAPI summary surfaced in the generated spec at `/api/v1/openapi`. |
+
+### `navGroups` — Admin sidebar groups
+
+```json
+"navGroups": [
+    { "id": "commerce", "label": "Commerce", "icon": "ShoppingBag", "order": 10 }
+]
+```
+
+Creates a group on the admin sidebar rail so `menu` entries can target it with
+`"group": "commerce"`. Core declares no group a module might want to fill, so a
+group that nothing installs simply does not exist.
+
+Several modules may declare the same group — the first one wins and the rest are
+ignored, so two commerce modules never fight over it. If they disagree on the
+label or icon, the generator prints a warning naming both modules. A `menu` entry
+pointing at a group nobody declared is not dropped; it lands in a fallback
+"Modules" group.
+
+`order` places the group on the rail relative to other module groups (core groups
+always come first, the theme group last).
 
 ### `menu` — Admin sidebar
 
@@ -276,6 +300,51 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
 ]
 ```
 
+### `authProviders` — OAuth sign-in providers
+
+```json
+"authProviders": [
+    { "id": "discord", "envIdVar": "AUTH_DISCORD_ID", "envSecretVar": "AUTH_DISCORD_SECRET" }
+]
+```
+
+Core ships no OAuth provider. `id` is an Auth.js provider id — the registry
+generator emits `import from "next-auth/providers/<id>"`, so it must be a
+lowercase slug and must be a provider Auth.js actually ships.
+
+The provider activates only when both named environment variables are set, which
+is what lets an installed-but-unconfigured module contribute nothing. Pair this
+with an `oauthButtons` entry to render the login button.
+
+### `webhookChannels` — Outbound webhook delivery
+
+```json
+"webhookChannels": [
+    {
+        "id": "discord",
+        "label": "Discord",
+        "layout": "embed",
+        "hosts": ["discord.com", "discordapp.com"],
+        "urlPlaceholder": "https://discord.com/api/webhooks/..."
+    }
+]
+```
+
+Teaches core how to talk to a chat vendor without naming one. Core builds the
+alert content and owns the wire layouts; the channel says which hosts an admin's
+webhook URL may use and which layout the receiver understands:
+
+| `layout` | Body |
+|----------|------|
+| `json` | `{ title, text, content, fields, timestamp }` — neutral |
+| `embed` | `{ content, embeds: [...] }` |
+| `attachment` | `{ text, attachments: [...] }` |
+
+Channels appear in Admin > Settings > Alerting. Core always offers a built-in
+`generic` channel, so alerting works with no modules installed; `hosts` is
+optional, and a channel that omits it inherits core's rule that the URL must be
+https on a public host.
+
 ### `oauthButtons` — Login/register OAuth buttons
 
 ```json
@@ -320,7 +389,27 @@ WordPress-style hooks wired at build time. Listeners are auto-registered when th
 - `priority` — lower runs earlier. Default 10.
 - Async listeners have a per-listener timeout (default 5 s, override with `HOOK_LISTENER_TIMEOUT_MS`).
 
-Core-fired actions include `user.registered`, `module.enabled`, `module.disabled`. Modules fire their own hooks via `doAction` / `applyFilters` from `@/core/lib/hooks`.
+Core-fired actions include `user.registered`, `user.login`, `user.email.verified`, `user.password.changed`, `user.profile.updated`, `user.warning.issued`, `user.warning.threshold`, and the module lifecycle: `module.installed`, `module.uninstalled`, `module.enabled`, `module.disabled`. Their payloads are declared in `src/core/types/hook-payloads.d.ts`. Modules fire their own hooks via `doAction` / `applyFilters` from `@/core/sdk` — and must declare them, see below.
+
+### `hooksEmitted` — Hooks this module fires
+
+The other half of the contract. Every `doAction` / `applyFilters` call with a literal name must be declared here, and every declaration must correspond to a call:
+
+```json
+"hooksEmitted": [
+    { "hook": "my-module.item.created", "type": "action", "description": "A new item was published" }
+]
+```
+
+Why it is mandatory rather than documentation: a hook name is an agreement between two modules that never import each other, and a listener subscribed to a misspelled name does not fail — it silently never runs. Declaring emitters makes that checkable, and three gates do check it:
+
+| Gate | What it catches |
+|---|---|
+| `npm run validate:module` | a hook fired but not declared, declared but never fired, or declared with the wrong `type` |
+| `npm run build:marketplace` | a `hookListeners` entry naming a hook no module in the catalog emits (i.e. a typo) |
+| `npm run typecheck:modules` | a listener whose payload type disagrees with what the emitting module promises |
+
+Hooks with a dynamic name (`doAction(\`${resource}.created\`, …)`) cannot be declared and are not required to be.
 
 ### `slotContents` — Slot contributions
 
@@ -404,7 +493,7 @@ Surfaces in the profile preferences grid so users can opt out per channel.
 
 ### `storageProviders` — File-storage backends
 
-Implement the `StorageProvider` interface from `@/core/lib/storage`. The active provider is selected at runtime via the `storage_active_provider` Setting key (or the `STORAGE_PROVIDER` env var).
+Implement the `StorageProvider` interface from `@/core/sdk/server`. The active provider is selected at runtime via the `storage_active_provider` Setting key (or the `STORAGE_PROVIDER` env var).
 
 ```json
 "storageProviders": [
@@ -491,7 +580,7 @@ Schema changes against an already-deployed database go through `module-sources/<
 
 ```tsx
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link } from "@/core/sdk/navigation";
 
 export default async function MyPage() {
     const t = await getTranslations("my-module");
@@ -507,7 +596,7 @@ export default async function MyPage() {
 
 Rules:
 
-- Use `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — never `next/link`.
+- Use `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` — never `next/link`.
 - No hardcoded UI strings — use `useTranslations` (client) or `getTranslations` (server) from `next-intl`.
 - No emojis in UI — use Lucide icons.
 - No `confirm()` / `alert()` — use `useConfirm()` and `toast` from `sonner`.
@@ -518,7 +607,7 @@ Rules:
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/core/components/ui/card";
+import { Card, CardContent } from "@/core/sdk/ui";
 
 interface Item { id: string; name: string }
 
@@ -550,8 +639,7 @@ Admin pages render inside the admin layout — sidebar, header, and auth guard a
 ```tsx
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 
 export default function MyAdminPage() {
     return (
@@ -575,11 +663,8 @@ API handlers follow Next.js App Router conventions. Export a named function per 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin, hasPermission } from "@/core/lib/permissions";
-import { logActivity } from "@/core/lib/activity-log";
-import { apiSuccess, apiError, apiPaginated } from "@/core/lib/api-utils";
+import { auth } from "@/core/sdk/auth";
+import { prisma, isAdmin, hasPermission, logActivity, apiSuccess, apiError, apiPaginated } from "@/core/sdk/server";
 
 // GET /api/v1/my-module/items
 export async function GET(request: NextRequest) {
@@ -628,56 +713,73 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
 }
 ```
 
-The canonical envelope is `{ ok: true, data }` / `{ ok: false, error, code?, details? }` from `@/core/lib/api-utils`. Legacy `{ error }` / `{ data }` shapes still work but new code should standardize.
+The canonical envelope is `{ ok: true, data }` / `{ ok: false, error, code?, details? }` from `@/core/sdk/server`. Legacy `{ error }` / `{ data }` shapes still work but new code should standardize.
 
 ---
 
 ## Core Imports
 
+Modules import core through the **SDK** — `@/core/sdk*`. Core's internal
+layout (`@/core/lib/*`, `@/core/components/*`) is not part of the contract and
+is free to change;
+reaching into it fails `npm run validate:module`, the marketplace build and
+ESLint.
+
+| Entry point | Use from | Contents |
+|-------------|----------|----------|
+| `@/core/sdk` | server **and** client | formatting, slugs, the hook bus |
+| `@/core/sdk/server` | server only | `prisma`, permissions, rate limiting, cache, secrets, activity log, revisions, uploads, 2FA, email, API envelope, `isModuleEnabled` |
+| `@/core/sdk/auth` | server only | `auth()` session lookup |
+| `@/core/sdk/navigation` | client | locale-aware `Link`, `useRouter`, `redirect`, `usePathname` |
+| `@/core/sdk/blocks` | client | `buildMergedBlockConfig` (Puck) |
+| `@/core/sdk/theme` | client | `useThemeConfig`, `ThemeComponentSlot` |
+| `@/core/sdk/ui` | client | `Button`, `Card*`, `Input`, `Label`, `Textarea`, `Select*`, `Skeleton`, `useConfirm`, `RichTextEditor`, `FileUpload`, `FooterDropdown` |
+| `@/core/sdk/layout` | server + client | `Navbar`, `Footer`, `StandardSidebarLayout`, `Slot` |
+| `@/core/sdk/admin` | client | `AdminCrudPage`, `SettingsForm` and their field types |
+
+The split is by runtime, not topic: a single barrel would pull `prisma` into
+the client bundle the moment a component imported `formatDate`.
+
+Migrating an older module: `npx tsx scripts/migrate-module-imports.ts module-sources/<id>`.
+
 ```typescript
 // Database
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 // Auth & permissions
-import { auth } from "@/core/lib/auth";
-import { isAdmin, isStaff, hasPermission, hasAnyPermission } from "@/core/lib/permissions";
+import { auth } from "@/core/sdk/auth";
+import { isAdmin, hasPermission, hasResourcePermission } from "@/core/sdk/server";
 
 // Validation (Zod 4 — read .issues, not .errors)
 import { z } from "zod";
 
 // Activity logging
-import { logActivity } from "@/core/lib/activity-log";
-
-// Discord webhooks (generic sender)
-import { sendDiscordWebhook } from "@/core/lib/discord";
+import { logActivity } from "@/core/sdk/server";
 
 // Email (Resend backend, falls back to console in dev)
-import { sendEmail } from "@/core/lib/email";
+import { sendEmail, queueEmail } from "@/core/sdk/server";
 
 // Rate limiting (Redis + memory fallback, trust-proxy aware)
-import { rateLimit, rateLimitForRole, getClientIP } from "@/core/lib/rate-limit";
+import { rateLimitForRole, rateLimitForRoleAsync, rateLimits, getClientIP } from "@/core/sdk/server";
 
 // API envelope helpers
-import { apiSuccess, apiError, apiPaginated, devOnlyDetail } from "@/core/lib/api-utils";
+import { apiSuccess, apiError, apiPaginated, devOnlyDetail } from "@/core/sdk/server";
 
 // Hooks (action/filter system)
-import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, addFilter } from "@/core/lib/hooks";
+import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, addFilter } from "@/core/sdk";
 
 // i18n — navigation
-import { Link, usePathname, redirect } from "@/core/lib/i18n/navigation";
+import { Link, usePathname, redirect, useRouter } from "@/core/sdk/navigation";
 
 // i18n — translations
 import { useTranslations } from "next-intl";                       // client
 import { getTranslations } from "next-intl/server";                // server
 
 // Theme config (client only — server reads ThemeState directly)
-import { useThemeConfig } from "@/core/lib/theme-config-client";
+import { useThemeConfig } from "@/core/sdk/theme";
 
 // UI primitives
-import { Button } from "@/core/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Input } from "@/core/components/ui/input";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useConfirm } from "@/core/sdk/ui";
 import { toast } from "sonner";
 ```
 
@@ -690,7 +792,7 @@ The hook system in `src/core/lib/hooks.ts` is WordPress-style, type-safe, and ES
 **Actions** — fire and forget:
 
 ```typescript
-import { doAction, doActionAsync } from "@/core/lib/hooks";
+import { doAction, doActionAsync } from "@/core/sdk";
 
 doAction("my-module.item.created", { itemId: item.id, userId });
 await doActionAsync("my-module.order.completed", { orderId });
@@ -699,7 +801,7 @@ await doActionAsync("my-module.order.completed", { orderId });
 **Filters** — value transformation:
 
 ```typescript
-import { applyFilters, applyFiltersAsync } from "@/core/lib/hooks";
+import { applyFilters, applyFiltersAsync } from "@/core/sdk";
 
 const processed = applyFilters("post.content", rawHtml, { postId });
 const result    = await applyFiltersAsync("checkout.total", baseTotal, { cart });
@@ -708,13 +810,57 @@ const result    = await applyFiltersAsync("checkout.total", baseTotal, { cart })
 **Registering listeners imperatively** (rarely needed — prefer declaring `hookListeners` in the manifest so the build-time registry can manage them):
 
 ```typescript
-import { addAction, addFilter } from "@/core/lib/hooks";
+import { addAction, addFilter } from "@/core/sdk";
 
 addAction("user.registered", (payload) => { /* ... */ }, 10, "my-module");
 addFilter("post.content", (html) => html.replace(/badword/g, "***"), 20, "my-module");
 ```
 
 Listeners declared in `hookListeners` are wired at build time and automatically removed when the module is disabled or uninstalled.
+
+### Typing the payload
+
+`doAction` and `addAction` look the hook name up in a payload registry. A name that is registered has its payload checked; a name that is not stays open and its payload is `unknown`.
+
+**The module that fires a hook owns its payload shape.** Declare it in a `hooks.d.ts` at the module root:
+
+```typescript
+declare global {
+    interface UxwVendHookPayloads {
+        "my-module.item.created": { id: string; title: string; authorId: string };
+    }
+}
+export {};
+```
+
+That is a global interface rather than an augmentation of `@/core/sdk` on purpose: interface augmentation has to name the module that *declares* the interface, and modules are not allowed to import `@/core/lib/*`. A global needs no import specifier at all. Use `UxwVendFilterPayloads` for filters.
+
+Consumers get it for free — no import between the two modules:
+
+```typescript
+addAction("my-module.item.created", (item) => item.title);   // `item` is typed
+doAction("my-module.item.created", { id, title });            // error: authorId missing
+```
+
+**Listening to your own hook** — take the signature straight from the contract, so the two cannot drift:
+
+```typescript
+import type { HookHandlerFor } from "@/core/sdk";
+
+const onItemCreated: HookHandlerFor<"my-module.item.created", "action"> = async (item) => { /* … */ };
+export default onItemCreated;
+```
+
+**Listening to another module's hook** — declare your own view of the payload instead. The emitting module may not be installed, and a handler that resolves its type through an absent module will not compile:
+
+```typescript
+interface ItemPayload { title: string }   // only what this listener reads
+export default async function onItemCreated(payload: ItemPayload) { /* … */ }
+```
+
+You are not skipping the check by doing that: `npm run typecheck:modules` generates an assertion per manifest-declared listener and verifies your view against the emitter's declaration whenever both modules are present. A listener may read *fewer* fields than the hook carries, never different ones.
+
+Declaring a payload is optional — an undeclared hook works exactly as before. Declaring one turns a runtime surprise into a build error.
 
 ---
 
@@ -731,6 +877,7 @@ Listeners declared in `hookListeners` are wired at build time and automatically 
 
     "dependencies": ["other-module"],
     "conflicts": ["incompatible-module"],
+    "hooksEmitted": [{ "hook": "my-module.item.created", "type": "action" }],
     "permissions": ["mymod.view", "mymod.manage"],
     "defaultConfig": { "exampleSetting": true },
 
@@ -749,7 +896,10 @@ Listeners declared in `hookListeners` are wired at build time and automatically 
     "dashboardCards":    [{ "id": "my-stat", "label": "My Stat", "labelKey": "dashboard_my_stat", "icon": "Star", "href": "/admin/my-feature", "color": "text-blue-500", "statKey": "myCount" }],
     "statsApi":          "/my-api/stats",
     "settingsCards":     [{ "title": "My Settings", "description": "...", "href": "/my-settings", "icon": "Settings", "color": "text-gray-500" }],
+    "navGroups":         [{ "id": "my-group", "label": "My Group", "icon": "Package", "order": 10 }],
+    "authProviders":     [{ "id": "my-provider", "envIdVar": "AUTH_MY_ID", "envSecretVar": "AUTH_MY_SECRET" }],
     "oauthButtons":      [{ "id": "my-login", "provider": "my-provider", "label": "My Login", "color": "#000000", "svgIcon": "M12..." }],
+    "webhookChannels":   [{ "id": "my-chat", "label": "My Chat", "layout": "embed", "hosts": ["hooks.example.com"] }],
     "contextProviders":  [{ "id": "MyProvider", "component": "providers/MyProvider", "order": 10 }],
     "hookListeners":     [{ "hook": "user.registered", "type": "action", "handler": "hooks/on-user.ts", "priority": 10 }],
     "slotContents":      [{ "id": "MySlot", "slot": "layout.beforeMain", "component": "slots/MyBanner", "order": 10 }],
@@ -831,11 +981,11 @@ The DB (`ModuleConfig.enabled`) is the single source of truth for whether a modu
 - Zod 4: use `.issues`, not `.errors`, on `SafeParseError`.
 - ES imports only — no `require()`.
 - Path alias `@/*` resolves to `src/*`.
-- `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation` — never `next/link`.
+- `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` — never `next/link`.
 - `"use client"` only when the component needs browser APIs, hooks, or event handlers.
 - Lucide icons only — no emoji.
 - `useConfirm()` + `toast` from `sonner` — no `confirm()` / `alert()`.
-- API responses: `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils`.
+- API responses: `apiSuccess` / `apiError` / `apiPaginated` from `@/core/sdk/server`.
 - Dark mode: `data-mode="dark"` attribute, CSS variables — no `.dark` class selector.
 
 ---

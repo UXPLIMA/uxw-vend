@@ -44,7 +44,7 @@ npm run dev
 
 The `predev` hook runs `db:merge` + `generate:themes` + `generate-registry` automatically before Turbopack starts on `http://localhost:3001` (host `0.0.0.0`). You do not need to run those manually on startup.
 
-Default admin credentials: `admin@example.com` / `password123` — change immediately.
+The seed prints the generated admin password once; set `SEED_ADMIN_PASSWORD` before `npm run db:seed` to pick your own.
 
 ---
 
