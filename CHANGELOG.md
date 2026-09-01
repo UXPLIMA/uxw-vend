@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-01
+
+A correctness release. Every user-visible entry below is a defect that shipped
+in 0.1.0 and that no gate could have caught, because every gate ran against the
+source tree and none of them ran the image people install.
+
+The minor bump (rather than a patch) is for one breaking contract change:
+`coreVersion` is now required in `module.json`. `CORE_API_VERSION` moves to
+1.1.0 for the new optional `searchProviders[].indexes` capability; every
+first-party module's `^1.0.0` range still resolves.
+
 ### Fixed
 - **Installing a module had no effect until the app was restarted by hand.**
   After the build, `scheduleBuild()` called `npx pm2 restart uxwvend` inside a
@@ -291,5 +302,6 @@ shipping — what it no longer does.
 - The discord-integration webhook sender enforces the same hostname allowlist as
   core; the punishments API key check is now constant-time.
 
-[Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/UXPLIMA/uxw-vend/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/UXPLIMA/uxw-vend/releases/tag/v0.1.0
