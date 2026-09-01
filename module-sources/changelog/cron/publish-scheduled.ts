@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Publish changelog entries whose `publishAt` has elapsed. Clears the
@@ -12,7 +12,7 @@ export default async function publishScheduled(): Promise<void> {
             data: { publishAt: null },
         });
         if (result.count > 0) {
-            console.log(`[changelog] publish-scheduled: ${result.count} entry/entries`);
+            log.info("cron: changelog entries published", { job: "changelog:publish-scheduled", published: result.count });
         }
     } catch (err) {
         console.error("[changelog] publish-scheduled failed:", err);

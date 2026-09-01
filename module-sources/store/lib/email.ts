@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { log } from "@/core/sdk/server";
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
@@ -17,7 +18,7 @@ function getEmailEnabled(): boolean {
 
 export async function sendOrderConfirmationEmail(email: string, orderNumber: string, total: number) {
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] Order confirmation for ${email}: ${orderNumber}`);
+        log.warn("email suppressed: no transport configured", { kind: "order-confirmation", to: email, orderNumber });
         return;
     }
 
