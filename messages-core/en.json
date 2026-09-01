@@ -33,10 +33,6 @@
     "description": "The page you’re looking for doesn’t exist or has been moved.",
     "goHome": "Go home"
   },
-  "legal": {
-    "placeholder": "This page hasn’t been filled in yet.",
-    "placeholderHint": "Admins can set this from the Settings panel by saving the {key} setting."
-  },
   "activity": {
     "userRegistered": "joined the community"
   },
@@ -566,7 +562,7 @@
     "rateLimits_saveError": "Failed to save rate limits",
     "rateLimits_loadError": "Failed to load rate limits",
     "settings_alerting": "Health Alerting",
-    "settings_alertingDesc": "Send Discord or Slack notifications when the platform degrades.",
+    "settings_alertingDesc": "Send webhook notifications when the platform degrades.",
     "settings_apiDocs": "API Docs",
     "settings_apiDocsDesc": "Interactive OpenAPI reference for core and module endpoints.",
     "settings_ipBlocks": "IP Blocks",
@@ -577,7 +573,6 @@
     "settings_rateLimitsDesc": "Per-role API rate limit multipliers.",
     "alerting_title": "Health Alerting",
     "alerting_enabled": "Enable alerting",
-    "alerting_provider": "Provider",
     "alerting_webhookUrl": "Webhook URL",
     "alerting_webhookTitle": "Webhook configuration",
     "alerting_alertOn": "Alert on statuses",
@@ -591,8 +586,6 @@
     "alerting_testSent": "Test webhook sent",
     "alerting_testFailed": "Test failed",
     "alerting_selectAtLeastOne": "Select at least one status",
-    "alerting_discordHint": "Discord webhook URL (e.g. https://discord.com/api/webhooks/...)",
-    "alerting_slackHint": "Slack incoming webhook URL",
     "ipBlocks_subtitle": "Ban specific IPs or CIDR ranges from accessing the site or admin panel.",
     "ipBlocks_add": "Block IP",
     "ipBlocks_cancel": "Cancel",
@@ -829,7 +822,6 @@
     "generalSettings_passwordResetExpiry": "Password reset link expiry (minutes)",
     "generalSettings_cachePerformance": "Cache & Performance",
     "generalSettings_cacheSeconds": "Settings cache TTL (seconds)",
-    "generalSettings_widgetRefresh": "Widget data refresh (seconds)",
     "generalSettings_saving": "Saving…",
     "generalSettings_saveSettings": "Save Settings",
     "generalSettings_saved": "Settings saved successfully",
@@ -1062,16 +1054,23 @@
     "settingsForm_saveSettings": "Save Settings",
     "settingsForm_failedToSave": "Failed to save",
     "settingsForm_somethingWrong": "Something went wrong",
-    "alerting_subtitle": "Send a Discord or Slack notification when /api/health goes degraded or down.",
-    "alerting_alertOnHint": "Recovery ('ok' after a bad state) is always sent."
+    "alerting_subtitle": "Send a webhook notification when /api/health goes degraded or down.",
+    "alerting_alertOnHint": "Recovery ('ok' after a bad state) is always sent.",
+    "alerting_channel": "Delivery channel",
+    "alerting_channelHint": "Install a module that provides a delivery channel to get richer formatting.",
+    "alerting_hostHint": "Must be a webhook URL on:",
+    "alerting_publicHint": "Must be an https URL on a public host.",
+    "generalSettings_minPasswordLengthHint": "Only raises the requirement — the built-in minimum of 10 characters always applies.",
+    "widgets_title": "Sidebar Widgets",
+    "widgets_subtitle": "Toggle visibility and reorder homepage sidebar widgets",
+    "widgets_none": "No widgets yet. Install a module that contributes one.",
+    "widgets_fromModule": "Widget from the {module} module",
+    "widgets_save": "Save",
+    "widgets_saving": "Saving..."
   },
   "footer": {
     "quickLinks": "Quick Links",
     "legal": "Legal",
-    "termsOfService": "Terms of Service",
-    "privacyPolicy": "Privacy Policy",
-    "refundPolicy": "Refund Policy",
-    "serverRules": "Server Rules",
     "faq": "FAQ",
     "allRightsReserved": "All rights reserved.",
     "builtWith": "Built with",
@@ -1090,13 +1089,6 @@
     "saved": "Saved",
     "failedToUpdate": "Failed to update profile",
     "somethingWentWrong": "Something went wrong",
-    "accounts": "Accounts",
-    "linkedAccounts": "Linked Accounts",
-    "unlink": "Unlink",
-    "linkGameAccount": "Link Game Account",
-    "gameUsername": "Game username",
-    "link": "Link",
-    "oauthAutoLink": "Discord and Google accounts are automatically linked when you log in with them.",
     "messages": "Messages",
     "notifications": "Notifications",
     "sessions": "Sessions",
@@ -1227,5 +1219,92 @@
     "results": "results",
     "source": "source",
     "sources": "sources"
+  },
+  "setup": {
+    "title": "uxwVend Setup",
+    "subtitle": "A few quick steps and your platform is ready.",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish Setup",
+    "finishing": "Finishing…",
+    "incomplete": "Please complete the required fields before continuing.",
+    "failed": "Setup failed. Please try again.",
+    "steps": {
+      "welcome": "Welcome",
+      "admin": "Admin",
+      "site": "Site",
+      "type": "Site type",
+      "theme": "Theme",
+      "modules": "Modules",
+      "done": "Done"
+    },
+    "welcome": {
+      "title": "Welcome to uxwVend",
+      "body": "This wizard creates your administrator account, sets up your site and installs your first modules from the marketplace. You can change any of it later from the admin panel.",
+      "note": "The platform ships with no modules. Everything you add here is optional."
+    },
+    "admin": {
+      "title": "Create the administrator account",
+      "description": "This account has full access. Use an address you can receive mail at.",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "passwordConfirm": "Confirm password",
+      "passwordHint": "At least 8 characters.",
+      "mismatch": "Passwords do not match."
+    },
+    "site": {
+      "title": "Name your site",
+      "description": "Shown in the header, page titles and search results.",
+      "name": "Site name",
+      "descriptionField": "Short description",
+      "descriptionHint": "One sentence. Used for SEO and social previews.",
+      "locale": "Default language"
+    },
+    "type": {
+      "title": "What is this site for?",
+      "description": "Pick the closest match and we will preselect a set of modules. You can edit the selection on the next steps.",
+      "unavailable": "No presets available — continue and choose modules by hand.",
+      "moduleCount": "{count} modules",
+      "noModules": "No modules preselected"
+    },
+    "theme": {
+      "title": "Choose a theme",
+      "description": "Pick the look and feel of your site. You can switch themes later.",
+      "empty": "No themes are installed. Setup will continue with the built-in default.",
+      "suggested": "Suggests: {modules}"
+    },
+    "modules": {
+      "title": "Choose modules",
+      "description": "Install what you need now. Everything here can be added or removed later from the admin panel.",
+      "search": "Search modules…",
+      "noResults": "No modules match “{query}”.",
+      "empty": "No modules available yet. You can install modules from the marketplace after setup.",
+      "selectedCount": "{count} selected",
+      "autoAddedCount": "{count} added automatically",
+      "requiredBy": "Required by {modules}",
+      "requires": "Requires {modules}",
+      "clear": "Clear selection",
+      "conflict": "Cannot be installed together with {modules}",
+      "categories": {
+        "commerce": "Commerce",
+        "community": "Community",
+        "gaming": "Gaming",
+        "management": "Management",
+        "content": "Content",
+        "integration": "Integration",
+        "other": "Other"
+      }
+    },
+    "done": {
+      "title": "Setup complete!",
+      "working": "Finishing…",
+      "body": "Your platform is ready. You can sign in to the admin panel now.",
+      "waiting": "Please wait while we finalize your setup.",
+      "installed": "Installed: {modules}",
+      "autoAdded": "Added as dependencies: {modules}",
+      "failed": "Could not install: {modules}",
+      "goAdmin": "Go to admin panel"
+    }
   }
 }

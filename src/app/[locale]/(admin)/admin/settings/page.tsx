@@ -4,6 +4,8 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/core/components/
 import { Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package, Shield, ShieldOff, ShieldAlert, Mail, MessageSquare, BarChart, DollarSign, Server, Download, Target, Webhook, Bell, Gauge, FileJson, History, ShieldCheck, AlertTriangle, Activity, Clock, Inbox, Award, Database, ScrollText, Wrench } from "lucide-react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { ModuleWidgets } from "@/core/generated/module-registry";
+import { useAllModules } from "@/core/providers/module-provider";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
@@ -13,6 +15,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function SettingsPage() {
     const t = useTranslations("admin");
+    const modules = useAllModules();
+
+    // Sidebar widgets are contributed by modules. With none installed the page
+    // behind this card is an empty list, so the card itself does not appear.
+    const hasWidgets = ModuleWidgets.some((w) => modules[w.module] === true);
 
     // Core settings — always visible
     const coreSettings = [
@@ -20,7 +27,9 @@ export default function SettingsPage() {
         { title: t("settings_appearance"), description: t("settings_appearanceDesc"), href: "/admin/settings/theme", icon: "Palette", color: "text-purple-500" },
         { title: t("settings_navbar"), description: t("settings_navbarDesc"), href: "/admin/settings/navbar", icon: "Navigation", color: "text-blue-500" },
         { title: t("settings_footer"), description: t("settings_footerDesc"), href: "/admin/settings/footer", icon: "PanelBottom", color: "text-gray-500" },
-        { title: t("settings_widgets"), description: t("settings_widgetsDesc"), href: "/admin/settings/widgets", icon: "LayoutGrid", color: "text-teal-500" },
+        ...(hasWidgets
+            ? [{ title: t("settings_widgets"), description: t("settings_widgetsDesc"), href: "/admin/settings/widgets", icon: "LayoutGrid", color: "text-teal-500" }]
+            : []),
         { title: t("settings_customCss"), description: t("settings_customCssDesc"), href: "/admin/settings/css", icon: "Code", color: "text-yellow-500" },
         { title: t("settings_siteConfig"), description: t("settings_siteConfigDesc"), href: "/admin/settings/site", icon: "Globe", color: "text-blue-400" },
         {
@@ -109,7 +118,7 @@ export default function SettingsPage() {
         },
         {
             title: t.has("settings_alerting") ? t("settings_alerting") : "Health Alerting",
-            description: t.has("settings_alertingDesc") ? t("settings_alertingDesc") : "Send Discord or Slack notifications when the platform degrades.",
+            description: t.has("settings_alertingDesc") ? t("settings_alertingDesc") : "Send webhook notifications when the platform degrades.",
             href: "/admin/settings/alerting",
             icon: "Bell",
             color: "text-amber-500",

@@ -8,6 +8,14 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import {
+    checkModuleDependencies,
+    dependencyErrorMessage,
+    installedVersionsFrom,
+    parseDependency,
+} from "@/core/lib/module-dependencies";
+import { satisfiesRange } from "@/core/lib/semver-range";
+import moduleSystem from "@/core/lib/modules";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
@@ -129,6 +137,55 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json(
                     { error: `Manifest ID '${manifest.id}' does not match requested module '${moduleId}'` },
                     { status: 400 },
+                );
+            }
+
+            // Forward: does the incoming version still fit this deployment?
+            const depCheck = await checkModuleDependencies(manifest, {
+                installedVersions: installedVersionsFrom(moduleSystem.getDefinitions()),
+            });
+            if (!depCheck.ok) {
+                return NextResponse.json(
+                    {
+                        error: `Module ${moduleId} ${dependencyErrorMessage(depCheck)}`,
+                        missingDependencies: depCheck.missingDependencies,
+                        disabledDependencies: depCheck.disabledDependencies,
+                        activeConflicts: depCheck.activeConflicts,
+                        versionMismatches: depCheck.versionMismatches,
+                        coreIncompatible: depCheck.coreIncompatible,
+                    },
+                    { status: 409 },
+                );
+            }
+
+            // Reverse: an update is the one operation that can silently break
+            // a *different* module. Anything enabled that pins a range on this
+            // module gets its range re-checked against the incoming version
+            // before a single file is replaced.
+            const enabledIds = new Set(
+                (await prisma.moduleConfig.findMany({ where: { enabled: true }, select: { id: true } }))
+                    .map((r) => r.id),
+            );
+            const brokenDependents: Array<{ id: string; required: string }> = [];
+            for (const def of moduleSystem.getDefinitions()) {
+                if (def.id === moduleId || !enabledIds.has(def.id)) continue;
+                for (const spec of def.dependencies ?? []) {
+                    const dep = parseDependency(spec);
+                    if (dep.id !== moduleId || !dep.range) continue;
+                    if (!satisfiesRange(manifest.version, dep.range)) {
+                        brokenDependents.push({ id: def.id, required: dep.range });
+                    }
+                }
+            }
+            if (brokenDependents.length > 0) {
+                return NextResponse.json(
+                    {
+                        error:
+                            `Updating ${moduleId} to ${manifest.version} would break enabled modules: ` +
+                            brokenDependents.map((d) => `${d.id} (requires ${d.required})`).join(", "),
+                        brokenDependents,
+                    },
+                    { status: 409 },
                 );
             }
 

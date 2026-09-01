@@ -5,7 +5,8 @@ import { createHash } from "crypto";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
-import { checkPasswordPolicy, checkPasswordBreach } from "@/core/lib/password-policy";
+import { checkPasswordBreach } from "@/core/lib/password-policy";
+import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        const policyCheck = checkPasswordPolicy(password);
+        const policyCheck = await enforcePasswordPolicy(password);
         if (!policyCheck.ok) {
             return NextResponse.json(
                 { error: policyCheck.message ?? "Invalid password" },

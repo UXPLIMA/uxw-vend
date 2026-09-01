@@ -4,8 +4,9 @@ import { ModulePageBlocks } from "@/core/generated/module-blocks";
 
 /**
  * Async-load all module-contributed Puck blocks and merge them into the
- * core block config. Used by both the editor (/admin/page-builder/[id])
- * and the public renderer (custom-pages public view).
+ * core block config. Core owns the block registry; the editor and the public
+ * renderer that consume it are supplied by whichever module owns page
+ * authoring, so no route is named here.
  *
  * Each module block module exports a Puck ComponentConfig as default.
  * Categories collected from manifest.pageBlocks[].category.
