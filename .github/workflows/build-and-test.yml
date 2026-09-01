@@ -95,19 +95,133 @@ jobs:
         run: npm run build
 
   docker:
-    name: Docker image build
+    name: Docker image + module lifecycle smoke test
     runs-on: ubuntu-latest
+    # Boots the real image with the real compose stack and drives the module
+    # lifecycle end to end. Every previous gate ran against the source tree,
+    # so nothing tested the artifact people actually install — and two release
+    # blockers lived exactly there: an install rebuilt but kept serving the old
+    # build, and installed modules disappeared after `uxwvend update`.
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
-      - name: Build image (no push)
+
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: false
-          load: false
+          # Loaded into the local daemon so compose can run it.
+          load: true
+          tags: uxwvend:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Write .env for the stack
+        run: |
+          set -euo pipefail
+          cat > .env <<'ENVEOF'
+          UXWVEND_IMAGE=uxwvend
+          UXWVEND_VERSION=ci
+          POSTGRES_PASSWORD=ci-smoke-postgres-password
+          AUTH_SECRET=ci-smoke-secret-key-32-characters!
+          SECRET_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000
+          AUTH_URL=http://127.0.0.1:3001
+          NEXTAUTH_URL=http://127.0.0.1:3001
+          APP_PORT=3001
+          APP_BIND_ADDR=127.0.0.1
+          ENVEOF
+
+      - name: Start the stack
+        run: docker compose up -d
+
+      - name: Wait for health
+        run: ./.github/scripts/wait-for-health.sh 180
+
+      # A path served only by the blog module. Before the module exists the
+      # API catch-all has no route for it, so this is a 404 — the baseline the
+      # post-install assertion is measured against.
+      - name: Blog API is absent before install
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3001/api/v1/blog/articles)
+          echo "pre-install status: $code"
+          [ "$code" = "404" ] || { echo "expected 404 before the module exists"; exit 1; }
+
+      # Stands in for an admin install: the module files land in the modules
+      # volume and its tables are created. The HTTP install route is covered by
+      # the unit suite; what is under test here is what happens next.
+      - name: Install the blog module into the volume
+        run: |
+          set -euo pipefail
+          docker compose exec -T app cp -R module-sources/blog src/modules/blog
+          docker compose exec -T app npx tsx scripts/merge-schemas.ts
+          docker compose exec -T app npx tsx scripts/apply-migrations.ts
+          docker compose exec -T app npx prisma db push --accept-data-loss
+
+      - name: Restart, and expect a reconciling rebuild
+        run: |
+          set -euo pipefail
+          docker compose restart app
+          ./.github/scripts/wait-for-health.sh 900
+          # Written to a file, not piped: `grep -q` exits on the first match
+          # and the writer dies of SIGPIPE, which `pipefail` then reports as a
+          # failed assertion on a log line that was actually present.
+          docker compose logs app > /tmp/app-logs.txt 2>&1
+          grep -q 'rebuild required' /tmp/app-logs.txt \
+            || { echo "reconciler did not notice the installed module"; tail -60 /tmp/app-logs.txt; exit 1; }
+          grep -q 'rebuild finished' /tmp/app-logs.txt \
+            || { echo "reconciling rebuild did not complete"; tail -60 /tmp/app-logs.txt; exit 1; }
+
+      # The bug this replaces: the build ran, the process kept serving the old
+      # one, and the module was invisible until someone restarted by hand.
+      - name: Blog API is served after install
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3001/api/v1/blog/articles)
+          echo "post-install status: $code"
+          [ "$code" != "404" ] || { echo "module route still unknown to the running server"; exit 1; }
+
+      - name: Reconciler is a no-op once the build matches
+        run: |
+          set -euo pipefail
+          docker compose exec -T app npx tsx scripts/reconcile-build.ts > /tmp/reconcile.txt 2>&1
+          cat /tmp/reconcile.txt
+          grep -q 'build matches installed modules' /tmp/reconcile.txt
+
+      # `uxwvend update` recreates containers from a new image while the
+      # volumes survive. Recreating from the same image is the same shape
+      # minus the image change, and is what used to lose the module.
+      - name: Modules survive container recreation
+        run: |
+          set -euo pipefail
+          docker compose down
+          docker compose up -d
+          ./.github/scripts/wait-for-health.sh 900
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3001/api/v1/blog/articles)
+          echo "post-recreate status: $code"
+          [ "$code" = "200" ] || { echo "expected the module API to work, got $code"; docker compose logs --tail=60 app; exit 1; }
+          [ "$code" != "404" ] || { echo "the module did not survive container recreation"; exit 1; }
+          # `down` removes the containers, so these logs are only from this boot.
+          docker compose logs app > /tmp/app-logs.txt 2>&1
+          if grep -q 'rebuild required' /tmp/app-logs.txt; then
+            echo "rebuilt again with nothing changed — the build volume is not persisting"
+            exit 1
+          fi
+          # node_modules came back from the image layer, so the generated
+          # Prisma client lost every module model while the build volume kept
+          # them. Regenerating it is required, and skipping it is how a
+          # recreated container answered module queries with a 500.
+          grep -q 'regenerating the Prisma client' /tmp/app-logs.txt \
+            || { echo "the Prisma client was not reconciled after recreation"; tail -60 /tmp/app-logs.txt; exit 1; }
+
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose logs --tail=200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
 
   e2e:
     name: End-to-end (Playwright)

@@ -78,9 +78,21 @@ update)
     info "Migrating and restarting…"
     compose up -d
     port="$(env_get APP_PORT)"; port="${port:-3001}"
-    for _ in $(seq 1 60); do
+    # Up to 15 minutes. Module pages are compiled into the app, so the first
+    # boot on a new image recompiles them against the modules in the volume
+    # before it serves anything (see scripts/reconcile-build.ts). That is a
+    # full `next build` — minutes on a small VPS, and the reason this wait is
+    # not the 3 minutes it used to be.
+    notified=0
+    for i in $(seq 1 300); do
         if curl -fsS --max-time 5 "http://127.0.0.1:$port/api/health" >/dev/null 2>&1; then
             ok "Updated and healthy"; exit 0
+        fi
+        if [ "$i" -eq 10 ] && [ "$notified" -eq 0 ]; then
+            notified=1
+            info "Still starting. If you have modules installed, the app is
+  recompiling them for this version — several minutes is normal.
+  Watch it with: uxwvend logs"
         fi
         sleep 3
     done

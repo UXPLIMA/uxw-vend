@@ -5,6 +5,7 @@ import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
+import { scheduleBuild } from "@/core/lib/install-lock";
 import AdmZip from "adm-zip";
 import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
@@ -232,13 +233,10 @@ export async function POST(request: NextRequest) {
                 }, { status: 400 });
             }
 
-            if (process.env.NODE_ENV === "production") {
-                try {
-                    execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
-                    try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }
-                    catch { process.kill(process.pid, "SIGUSR2"); }
-                } catch { /* will work after manual restart */ }
-            }
+            // Deferred + debounced build and process replacement. Building
+            // inline blocked the HTTP thread for minutes and then restarted
+            // via a pm2 binary the image does not contain.
+            scheduleBuild();
 
             const installedAt = new Date();
             const hash = manifestHash(manifest);

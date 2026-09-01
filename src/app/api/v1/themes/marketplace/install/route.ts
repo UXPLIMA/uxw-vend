@@ -4,6 +4,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
+import { scheduleBuild } from "@/core/lib/install-lock";
 import AdmZip from "adm-zip";
 import { logActivity } from "@/core/lib/activity-log";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
@@ -93,17 +94,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
         }
 
-        // Rebuild + restart production. Next.js sets NODE_ENV=development
-        // during `next dev`; there is no NEXT_DEV variable, so the previous
-        // check was always false and every theme install ran a 3-minute
-        // blocking build on the HTTP thread (self-DoS for the admin).
-        if (process.env.NODE_ENV === "production") {
-            try {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 180000, stdio: "pipe" });
-                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
-                catch { process.kill(process.pid, "SIGUSR2"); }
-            } catch { /* will work after manual restart */ }
-        }
+        // Deferred, debounced rebuild + process replacement. Running the
+        // build inline held the HTTP thread for three minutes (a self-DoS for
+        // the admin) and then "restarted" through a pm2 binary that is in
+        // neither the image nor package.json.
+        scheduleBuild();
 
         logActivity({
             userId: session.user.id,

@@ -7,20 +7,46 @@
  * 1. Bulk install (37 modules) — build runs ONCE at the end, not 37 times
  * 2. Concurrent install requests — queued, not rejected
  * 3. Build already running — waits for completion
- * 4. PM2 restart debounce — single restart after build
+ * 4. Restart debounce — a single process replacement after the build
  * 5. Partial install failure — does not block other installs
  *
- * The lock itself is a Postgres advisory lock so two PM2 workers (or two
- * pods) cannot both run an install at the same time. The in-process flag
- * is kept as a fast path so callers in the same worker can early-reject
- * without a round trip.
+ * The lock itself is a Postgres advisory lock, so a second process — a
+ * lingering old container during a deploy, or an operator running a script
+ * against the same database — cannot start an install while one is underway.
+ * The in-process flag is kept as a fast path so concurrent requests to this
+ * process can early-reject without a round trip.
+ *
+ * Note that running two app processes permanently is not a supported topology
+ * (see docs/DEPLOYMENT.md, "The Build Lifecycle"): they would compile into the
+ * same .next. The lock narrows the window, it does not make that safe.
  */
 
 import { execFile } from "child_process";
 import { promisify } from "util";
 import { log } from "./logger";
+import { writeBuildState, writeSchemaState } from "./build-state";
 
 const execFileAsync = promisify(execFile);
+
+/**
+ * Ask the supervisor to replace this process, after letting in-flight work
+ * finish. SIGTERM (not `process.exit`) so the shutdown registry installed by
+ * src/instrumentation.ts runs: Prisma drains, the scheduler interval clears,
+ * and open responses are allowed to complete inside the grace window.
+ *
+ * The short delay lets the HTTP response that triggered the install reach the
+ * admin's browser first — without it the request that installed a module dies
+ * with the process and the UI reports a failure for a build that succeeded.
+ */
+function requestRestart(): void {
+    log.info("install-lock: build complete, restarting to serve it", {
+        step: "restart",
+        pid: process.pid,
+    });
+    setTimeout(() => {
+        process.kill(process.pid, "SIGTERM");
+    }, RESTART_GRACE_MS).unref();
+}
 
 // Advisory lock key — arbitrary constant. Postgres session-level advisory
 // locks are identified by a bigint; any app-wide constant works as long as
@@ -36,6 +62,7 @@ let buildScheduled = false;
 let buildRunning = false;
 let buildTimer: ReturnType<typeof setTimeout> | null = null;
 const BUILD_DEBOUNCE_MS = 3000; // Wait 3s after last install before building
+const RESTART_GRACE_MS = 2000;  // Let the triggering HTTP response flush first
 
 // Dedicated pg pool with a single connection so the advisory lock acquire
 // and release are guaranteed to execute on the same Postgres session.
@@ -183,18 +210,30 @@ export function scheduleBuild(): void {
                 cwd: process.cwd(), timeout: 300000, // 5 min max
             });
 
-            // 5. PM2 restart
-            try {
-                await execFileAsync("npx", ["pm2", "restart", "uxwvend"], {
-                    cwd: process.cwd(), timeout: 10000,
-                });
-            } catch (err) {
-                // Non-fatal: PM2 may not be present (e.g. dev / non-PM2 deploy).
-                log.error("install-lock: PM2 restart failed", {
-                    step: "pm2-restart",
-                    error: err instanceof Error ? err.message : String(err),
-                });
-            }
+            // 5. Record what the fresh build and the regenerated Prisma
+            //    client were made from, so the boot-time reconciler
+            //    recognises both as current and does neither again.
+            writeBuildState();
+            writeSchemaState();
+
+            // 6. Replace the process so the new build is actually served.
+            //
+            //    `next start` reads the route + build manifests once, at boot.
+            //    Rebuilding underneath it changes nothing the running process
+            //    can see, so an install is not live until the process is
+            //    replaced. This used to call `npx pm2 restart uxwvend` inside
+            //    a try/catch — and pm2 is in neither the image nor
+            //    package.json, so the call always threw and was always
+            //    swallowed. Every module install rebuilt and then served the
+            //    old build.
+            //
+            //    Raising SIGTERM on ourselves is the portable replacement: it
+            //    runs the shutdown registry (draining Prisma, clearing the
+            //    scheduler interval) and exits, and every supervisor this
+            //    project supports treats that as "start me again" —
+            //    docker-compose `restart: unless-stopped`, systemd
+            //    `Restart=always`, and pm2 if an operator does use it.
+            requestRestart();
         } catch (err) {
             // Non-fatal: build failed — will need a manual rebuild.
             log.error("install-lock: build failed", {

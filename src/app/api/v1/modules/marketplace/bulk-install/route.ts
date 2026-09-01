@@ -7,7 +7,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
-import { acquireInstallLock } from "@/core/lib/install-lock";
+import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
@@ -128,15 +128,10 @@ export async function POST(request: NextRequest) {
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
         } catch { /* will need manual: npx tsx scripts/generate-registry.ts */ }
 
-        // Single build + restart. NEXT_DEV was a typo (Next.js sets
-        // NODE_ENV=development), so this branch used to fire even in dev.
-        if (process.env.NODE_ENV === "production") {
-            try {
-                execFileSync("npm", ["run", "build"], { cwd: process.cwd(), timeout: 300000, stdio: "pipe" });
-                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: process.cwd(), timeout: 10000, stdio: "pipe" }); }
-                catch { /* no PM2 */ }
-            } catch { /* build failed — manual rebuild needed */ }
-        }
+        // Single deferred build + restart for the whole batch. scheduleBuild
+        // is a no-op outside production and debounces, so 37 modules still
+        // produce exactly one build.
+        scheduleBuild();
     }
 
     return NextResponse.json({
