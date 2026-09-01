@@ -126,6 +126,10 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
             .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
             .mockResolvedValueOnce({
                 id: "order-1",
+                // The update above already ran, so the row Prisma hands back
+                // here is the completed one. Omitting this made the fixture
+                // describe a state the handler can never observe.
+                status: "COMPLETED",
                 orderNumber: "ORD-1",
                 userId: "user-1",
                 total: 42,
