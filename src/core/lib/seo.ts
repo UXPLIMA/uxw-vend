@@ -12,6 +12,7 @@
 
 import type { Metadata } from "next";
 import { prisma } from "./db";
+import { resolveAppUrl } from "./app-url";
 import { serverConfig } from "@/core/config/server";
 
 export interface PageMetaInput {
@@ -44,7 +45,9 @@ interface SeoSiteInfo {
 
 /** Reads site_name + site_description from Settings with env fallbacks. */
 async function getSeoSiteInfo(): Promise<SeoSiteInfo> {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
+    // Runtime-resolved: see app-url.ts. Reading NEXT_PUBLIC_SITE_URL here
+    // baked localhost into every canonical tag of every prebuilt-image install.
+    const siteUrl = resolveAppUrl();
 
     let siteName: string = serverConfig.name;
     let siteDescription: string = serverConfig.description || "";
@@ -70,7 +73,7 @@ function getSeoSiteInfoSync(): SeoSiteInfo {
     return {
         siteName: serverConfig.name,
         siteDescription: serverConfig.description || "",
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001",
+        siteUrl: resolveAppUrl(),
     };
 }
 
