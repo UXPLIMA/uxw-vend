@@ -37,7 +37,8 @@ RUN npx tsx scripts/merge-schemas.ts && \
     npx tsx scripts/generate-theme-registry.ts && \
     npx tsx scripts/generate-registry.ts && \
     npx tsx scripts/generate-openapi.ts && \
-    npm run build
+    npm run build && \
+    rm -rf .next/cache
 
 FROM node:24-alpine AS runner
 WORKDIR /app
@@ -52,6 +53,10 @@ RUN addgroup --system --gid 1001 nodejs && \
 # client, marketplace ZIPs, and the scripts the runtime still invokes
 # (generate-registry runs on module install, merge-schemas on module
 # schema updates, apply-migrations on module install).
+#
+# .next/cache is deleted above, not copied around: Turbopack's build cache is
+# ~580MB and `next start` never reads it. Next recreates the directory itself
+# if a runtime cache (ISR, fetch) needs one.
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
