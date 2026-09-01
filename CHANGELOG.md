@@ -141,6 +141,13 @@ shipping — what it no longer does.
   bundler traced server-only code into the browser graph and failed on
   `fs/promises`, `async_hooks` and `next/headers`. Page and API registries now
   have their own generated files, each consumed only by server code.
+- **The Redis requirement was documented as a multi-worker concern.** It is
+  not: with `NODE_ENV=production` and no `REDIS_URL`, the rate limiter fails
+  closed and answers *every* rate-limited request with 429 — `/api/health`
+  included, so the site reads as down. `docs/DEPLOYMENT.md` and
+  `.env.example` said it mattered only for PM2 cluster or multi-pod setups,
+  and the troubleshooting entry named the wrong status code. The E2E job
+  found this the first time it managed to start a server.
 
 ### Security
 - **Postgres and Redis are no longer published to the host.** The compose file

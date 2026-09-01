@@ -104,8 +104,8 @@ end on every release.
 | Variable | Description |
 |---|---|
 | `SECRET_ENCRYPTION_KEY` | **Required in production.** Encrypts at-rest secrets (RCON passwords, module-stored third-party API tokens) with AES-256-GCM. The app hard-throws the first time a module reads/writes an encrypted secret if this is unset and `NODE_ENV=production`. 64-char hex (32 bytes). Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. |
-| `REDIS_URL` | Redis connection string (e.g. `redis://localhost:6379`). Required when running more than one PM2 worker — the in-memory rate limiter is process-local and can be bypassed without this. |
-| `ALLOW_MEMORY_RATE_LIMIT` | Set to `1` only on single-worker deployments where Redis is unavailable. Without Redis and without this flag, rate-limited requests return 503. |
+| `REDIS_URL` | **Required in production**, whatever your worker count. Redis connection string (e.g. `redis://localhost:6379`). The in-memory rate limiter is process-local and bypassable, so production does not silently fall back to it: without `REDIS_URL` (and without the opt-out below) every rate-limited request is denied with 429. `/api/health` is one of them, so the site reads as down. |
+| `ALLOW_MEMORY_RATE_LIMIT` | Set to `1` to run production on the in-memory limiter anyway. Only sane on a true single-worker deployment: counters are per-process, so any multi-worker setup can be bypassed by rotating between workers. |
 | `RESEND_API_KEY` | Resend email provider API key. Without it, outbound email degrades to `console.log` in dev and is silently dropped in prod. |
 | `EMAIL_FROM` | Sender address for transactional email (e.g. `noreply@example.com`). |
 
@@ -247,7 +247,7 @@ For cluster mode (multiple workers sharing one port):
 pm2 start npm --name uxwvend -i max -- start -- -p 3001 -H 0.0.0.0
 ```
 
-When running cluster mode, `REDIS_URL` is required for rate limiting to work correctly across workers. Without Redis in cluster mode, each worker has its own in-memory rate limiter and an attacker can bypass limits by rotating between workers.
+`REDIS_URL` is required in production regardless of mode — see the environment table above. Cluster mode is the reason why: each worker would otherwise hold its own in-memory counters, and an attacker bypasses the limit by rotating between workers.
 
 Useful PM2 commands:
 
@@ -311,7 +311,7 @@ sudo systemctl enable redis-server
 sudo systemctl start redis-server
 ```
 
-Set `REDIS_URL=redis://localhost:6379` in `.env`. The rate limiter automatically detects and uses Redis. If Redis goes down at runtime, the rate limiter falls back to the in-memory backend automatically without taking the site down.
+Set `REDIS_URL=redis://localhost:6379` in `.env`. The rate limiter detects and uses Redis on its own. If Redis goes down *at runtime* it falls back to the in-memory backend rather than taking the site down — that failover is deliberate, and is not the same as starting with no `REDIS_URL` at all, which denies requests instead.
 
 The Docker install needs none of this — the stack runs its own Redis container
 and wires `REDIS_URL` to it.
@@ -446,7 +446,7 @@ After upgrading, visit `GET /api/health` to confirm the database is reachable.
 - [ ] Admin password changed from the seeded default
 - [ ] Nginx configured with HTTPS
 - [ ] PM2 configured with startup script (`pm2 startup`)
-- [ ] `REDIS_URL` set (required for multi-worker deployments)
+- [ ] `REDIS_URL` set (required in production — without it the site answers 429)
 - [ ] `TRUSTED_PROXY_IPS` set to your nginx server IP
 - [ ] Firewall allows only ports 80 and 443 (not 3001 directly)
 - [ ] Backup cron job scheduled
@@ -457,9 +457,14 @@ After upgrading, visit `GET /api/health` to confirm the database is reachable.
 
 ## Troubleshooting
 
-**Site returns 503 on rate-limited routes**
+**Every request returns 429, including `/api/health`**
 
-Redis is not configured and `ALLOW_MEMORY_RATE_LIMIT` is not set. Set `REDIS_URL` or set `ALLOW_MEMORY_RATE_LIMIT=1` (single-worker only).
+`NODE_ENV=production` with no `REDIS_URL`. The rate limiter fails closed
+rather than fall back to a bypassable in-memory counter, and logs
+`[rate-limit] REDIS_URL is required in production` once a minute. Set
+`REDIS_URL`, or `ALLOW_MEMORY_RATE_LIMIT=1` to accept the weaker limiter on a
+single-worker deployment. No restart is needed after setting `REDIS_URL` —
+the backend is re-evaluated per request until one is configured.
 
 **Login cookies not persisting after OAuth redirect**
 
