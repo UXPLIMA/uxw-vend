@@ -1,5 +1,83 @@
 # Deployment Guide
 
+## Install
+
+On a fresh Linux server:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+```
+
+It installs Docker if it is missing, generates every secret, writes `.env`,
+pulls the image, starts Postgres + Redis + the app, waits until the site
+answers, and prints the URL and the admin password. Three questions — domain,
+admin e-mail, HTTPS yes/no — each with a default.
+
+Give a domain and say yes to HTTPS and a Caddy container obtains and renews a
+Let's Encrypt certificate on its own. Leave the domain blank and the site is
+served over HTTP on the server's IP.
+
+Non-interactive:
+
+```bash
+curl -fsSL .../install.sh | sudo bash -s -- \
+    --domain shop.example.com --email you@example.com --tls --yes
+```
+
+| Flag | Meaning |
+|---|---|
+| `--dir PATH` | Install root (default `/opt/uxwvend`) |
+| `--domain HOST` | Public hostname; blank means "use the server IP" |
+| `--email ADDR` | Admin account e-mail |
+| `--tls` / `--no-tls` | Run Caddy for automatic HTTPS (needs `--domain`) |
+| `--port N` | Host port for HTTP installs (default 3001) |
+| `--version TAG` | Image tag to install (default `latest`) |
+| `--build` | Build from the local source tree instead of pulling |
+| `--yes` | Never prompt |
+| `--dry-run` | Compute everything, change nothing |
+
+Re-running the installer is an upgrade. Your `.env` is never overwritten, so
+secrets and answers survive.
+
+### After it finishes
+
+```bash
+uxwvend update          # pull the newest image, migrate, restart
+uxwvend update v1.4.0   # pin a specific version
+uxwvend backup          # dump the database to <install-dir>/backups
+uxwvend restore FILE    # restore a dump (asks first)
+uxwvend logs [service]  # follow logs
+uxwvend status          # what is running, and whether the app is healthy
+uxwvend restart | stop | start
+```
+
+**Back up `/opt/uxwvend/.env`.** It holds `SECRET_ENCRYPTION_KEY`, and the
+database rows encrypted with it cannot be read without it. A database dump
+alone is not a complete backup.
+
+### What gets exposed
+
+Only the app's port (or 80/443 with TLS). Postgres and Redis are reachable
+only from inside the compose network — no host port is published for either.
+For a psql shell use `docker compose exec db psql -U uxwvend uxwvend` from the
+install directory; to reach them from your laptop, use an SSH tunnel together
+with `docker-compose.debug.yml`, which binds them to `127.0.0.1` only.
+
+### If the image cannot be pulled
+
+The installer names the tag it tried. Either no release has been published
+yet, or the GHCR package is private. Clone the repository and run
+`./install.sh --build` to compile on the server instead.
+
+---
+
+## Manual install (advanced)
+
+Everything below describes running uxwVend without the installer — directly on
+the host with Node, PostgreSQL, PM2 and Nginx. It is supported but not the
+recommended path: the Docker install above is the one that is tested end to
+end on every release.
+
 ## Prerequisites
 
 | Requirement | Minimum version | Notes |
@@ -58,6 +136,8 @@
 
 Module-specific secrets (Stripe, PayPal keys, RCON, Discord bot token, etc.) are configured through Admin Panel > Settings after installing the relevant module. They do not belong in `.env`.
 
+The exception is OAuth sign-in: a module that declares `authProviders` names the env vars holding its client id and secret, because Auth.js builds its configuration at process start, before any database read. The provider stays inactive until both variables are set.
+
 See `.env.example` for the full annotated list with inline documentation.
 
 ---
@@ -101,19 +181,22 @@ npx tsx scripts/seed-translations.ts   # seed default locale strings
 
 The seed creates:
 - Roles: `admin`, `moderator`, `member` (member is the default)
-- Admin user: `admin@example.com` / `password123` — **change this password immediately**
+- Admin user: `admin@example.com`, password from `SEED_ADMIN_PASSWORD` — or, if unset, randomly generated and **printed once** in the seed output
 
 ---
 
-## Docker Compose (quickstart)
+## Docker Compose by hand
 
-The bundled `docker-compose.yml` runs Postgres, Redis, and the app together,
-and bootstraps the database automatically on first boot.
+`install.sh` above is the supported way to run this stack. Drive compose
+yourself only if you need to change something the installer does not expose.
 
 ```bash
 cp .env.example .env
 # Set at minimum: AUTH_SECRET, SECRET_ENCRYPTION_KEY, POSTGRES_PASSWORD
-docker compose up --build
+docker compose up -d                                   # pull the published image
+docker compose --profile tls up -d                     # ...with Caddy in front
+docker compose -f docker-compose.yml \
+               -f docker-compose.build.yml up -d --build   # ...from source
 ```
 
 What happens:
@@ -122,8 +205,10 @@ What happens:
   **fresh** database pushes the schema and seeds the 3 roles + admin user, then
   exits. It is a no-op once the DB is initialized, so it is safe on every `up`.
 - `app` starts only after `migrate` completes successfully → login works out of
-  the box at <http://localhost:3001> (`admin@example.com` / `password123` —
-  **change immediately**).
+  the box at <http://localhost:3001> as `admin@example.com`. Set
+  `SEED_ADMIN_PASSWORD` in `.env` before the first `up`; without it the seed
+  generates one and prints it once, so read it with
+  `docker compose logs migrate`.
 
 Compose injects its own `DATABASE_URL`/`REDIS_URL` pointing at the sibling
 services, so those values in `.env` are ignored on the compose path. Required
@@ -228,6 +313,9 @@ sudo systemctl start redis-server
 
 Set `REDIS_URL=redis://localhost:6379` in `.env`. The rate limiter automatically detects and uses Redis. If Redis goes down at runtime, the rate limiter falls back to the in-memory backend automatically without taking the site down.
 
+The Docker install needs none of this — the stack runs its own Redis container
+and wires `REDIS_URL` to it.
+
 ---
 
 ## Rate Limiting
@@ -305,6 +393,21 @@ The cron endpoint runs maintenance tasks registered by installed modules (expiri
 ---
 
 ## Upgrades
+
+On a Docker install (the supported path), upgrading is one command:
+
+```bash
+uxwvend update            # newest published image
+uxwvend update v1.4.0     # a specific tag
+```
+
+It pulls the image and restarts. The one-shot `migrate` service runs before
+the app is allowed back up and performs the sequence below inside the
+container — merge schemas, push them, apply module SQL migrations — so the
+database can never be left behind the code. If any step fails the app stays
+down rather than serving against a mismatched schema.
+
+### Manual install
 
 Pull the latest code and rebuild:
 

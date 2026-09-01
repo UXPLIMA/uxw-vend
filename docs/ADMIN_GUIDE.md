@@ -2,7 +2,7 @@
 
 ## Accessing the Admin Panel
 
-Navigate to `/admin` in your browser. You must be logged in with an account that has the `admin.access` permission. The seeded admin account is `admin@example.com` / `password123` — change this immediately after first login.
+Navigate to `/admin` in your browser. You must be logged in with an account that has the `admin.access` permission. The seeded admin account is `admin@example.com`; its password is whatever `SEED_ADMIN_PASSWORD` was set to when the database was seeded, or the random one the seed printed once.
 
 The admin sidebar uses an icon rail on the left with a contextual panel that expands on hover or click. Top-level groups:
 

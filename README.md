@@ -48,6 +48,12 @@ uxwVend is a plugin-first platform for game-server websites, digital storefronts
 
 Each `module.json` declares everything the module contributes — routes, admin routes, API endpoints, sidebar menu, dashboard cards, widgets, navbar/footer/layout components, profile tabs, settings cards, OAuth buttons, dependencies, conflicts, RBAC permissions, cron jobs, webhook receivers, hook listeners, slot contributions, search providers, page-builder blocks, notification types, and translations. See [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) for the complete reference.
 
+**Compatibility contract:** a manifest declares `coreVersion` (a semver range of `CORE_API_VERSION`, the module-facing contract version — separate from the product version) and may pin dependency versions as `"store@^1.2.0"`. Install, update and enable all reject a module the running core or the installed dependencies cannot satisfy, instead of failing later at runtime.
+
+**Module SDK:** modules import core through `@/core/sdk` (isomorphic), `@/core/sdk/server`, `@/core/sdk/auth`, `@/core/sdk/navigation`, `@/core/sdk/blocks` and `@/core/sdk/theme` — split by runtime so a client component can never pull `prisma` into its bundle. Core's internal layout (`@/core/lib/*`) is not part of the contract; reaching into it fails `npm run validate:module`, the marketplace build and ESLint.
+
+**Dependency resolution:** every install path plans before it installs. `resolveInstallPlan` expands the selection transitively, orders it topologically so prerequisites are extracted first, reports what it added on the operator's behalf, and refuses cycles, conflicts, unknown ids and version mismatches rather than installing part of a set.
+
 **Lifecycle:** install (extract ZIP → regenerate registry → run module SQL migrations → create `ModuleConfig` row → sync translations) → enable → disable (vanishes from every UI surface, data preserved) → uninstall (files removed, `ModuleConfig` deleted, admin-overridden translations preserved). The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active.
 
 **Install safety:** Postgres advisory lock prevents concurrent installs in PM2 cluster mode. Registry regeneration runs synchronously and rolls back the filesystem on failure — no silent partial installs.
@@ -87,7 +93,23 @@ No `Theme` DB model — filesystem + codegen is the source of truth for theme ex
 
 ---
 
-## Quick Start
+## Install on a server
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+```
+
+Installs Docker if it is missing, generates every secret, starts Postgres +
+Redis + the app, waits until the site answers, and prints the URL and admin
+password. Three questions, each with a default. Give it a domain and it also
+obtains and renews an HTTPS certificate on its own.
+
+Afterwards: `uxwvend update`, `uxwvend backup`, `uxwvend logs`, `uxwvend status`.
+Full reference in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+---
+
+## Develop locally
 
 Prerequisites: Node.js 24+, PostgreSQL 14+. Redis is optional but strongly recommended in production.
 
@@ -106,7 +128,7 @@ npx tsx scripts/seed-translations.ts   # seed default locale strings
 npm run dev                            # Turbopack on http://localhost:3001
 ```
 
-Default admin credentials: `admin@example.com` / `password123`. **Change the password immediately after first login.**
+The seed creates `admin@example.com` with a **randomly generated password, printed once** in the seed output — copy it before the terminal scrolls. Set `SEED_ADMIN_PASSWORD` (and optionally `SEED_ADMIN_EMAIL`) beforehand to choose your own. Re-seeding never resets an existing admin's password.
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for production setup (PM2, nginx, Redis, backups, environment variables, hardening).
 
@@ -120,7 +142,7 @@ src/
     (admin)/                Admin panel
     (auth)/                 Auth pages
     (public)/               Public pages
-    (setup)/                First-run setup wizard
+    (setup)/                First-run setup wizard (site-type presets, categorised module picker)
     [...slug]/              Catch-all for module-contributed public routes
   app/api/v1/               Core REST API + [...path] catch-all for module APIs
   core/                     Site-type-agnostic infrastructure
@@ -135,6 +157,7 @@ src/
 messages-core/{en,tr}.json  Core translation seed sources
 module-sources/<id>/        Authoritative source for 42 first-party modules
 module-marketplace/         Distributable ZIPs + index.json catalog
+module-marketplace/presets.json  Site-type presets read by the setup wizard (data, not core code)
 theme-marketplace/          Distributable theme ZIPs
 module-template/            Starter for `npm run create:module`
 scripts/                    Codegen, migration, backup, marketplace tooling
@@ -172,6 +195,9 @@ npm run create:module <id> "Name" "Desc"      # Scaffold a module from module-te
 npm run validate:module module-sources/<id>   # Validate a module manifest
 npm run build:marketplace                     # Rebuild every marketplace ZIP from module-sources/
 npm run lint                                   # ESLint
+npm run typecheck                              # tsc --noEmit (core + app)
+npm run typecheck:modules                      # tsc --noEmit over module-sources/
+npx tsx scripts/migrate-module-imports.ts <path>   # Rewrite @/core/lib imports onto the SDK
 npm run clean                                  # Clear .next + node_modules/.cache
 
 # Testing
