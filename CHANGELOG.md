@@ -133,6 +133,14 @@ shipping — what it no longer does.
   imported auth relatively where the rest of the tree uses `@/core/lib/auth`,
   and the Stripe webhook fixture returned an order without the `status` its
   own handler had just written.
+- **`next build` failed on any installation that had modules.** Not on a clean
+  checkout, where `src/modules` is empty — which is how it went unnoticed
+  until CI, which seeds modules, got far enough to reach the build step. The
+  generated `module-registry.tsx` carried both the module page components and
+  the module API handlers, and client components import that file, so the
+  bundler traced server-only code into the browser graph and failed on
+  `fs/promises`, `async_hooks` and `next/headers`. Page and API registries now
+  have their own generated files, each consumed only by server code.
 
 ### Security
 - **Postgres and Redis are no longer published to the host.** The compose file
