@@ -2,8 +2,14 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright config for uxwVend E2E tests.
- * Runs against the live PM2 instance on http://127.0.0.1:3001.
- * No webServer is configured — we assume the dev/prod server is already running.
+ *
+ * No `webServer` is configured on purpose: locally the suite runs against the
+ * server you already have up (PM2, `npm run dev`), and letting Playwright boot
+ * its own would fight with it over the port. CI starts the server itself and
+ * points `E2E_BASE_URL` at it.
+ *
+ * `retries` stays at 0 and `workers` at 1 — these tests share one database and
+ * one admin session, so parallelism makes them flake rather than run faster.
  */
 export default defineConfig({
     testDir: './tests/e2e',
@@ -14,7 +20,7 @@ export default defineConfig({
     workers: 1,
     reporter: [['list']],
     use: {
-        baseURL: 'http://127.0.0.1:3001',
+        baseURL: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3001',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
         video: 'off',

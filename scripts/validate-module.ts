@@ -13,6 +13,7 @@ interface CheckResult {
 
 function usage(): never {
     console.error("Usage: npx tsx scripts/validate-module.ts <module-path>");
+    console.error("       npx tsx scripts/validate-module.ts --all   (every module in module-sources/)");
     console.error("");
     console.error("  module-path   Path to the module directory (e.g., module-sources/my-module)");
     console.error("");
@@ -617,8 +618,102 @@ function checkHooksEmitted(modulePath: string): CheckResult {
     };
 }
 
+/**
+ * Run every check against one module. Returns the failures, if any.
+ *
+ * `withTypeScript` exists because `checkTypeScript` shells out to a full
+ * `tsc --noEmit` over the whole project and then filters the output down to
+ * this module's files. That is tolerable for one module — a third-party author
+ * running the command once — but `--all` would pay it 42 times over. In that
+ * mode `npm run typecheck:modules` is the check that actually covers the tree,
+ * and it does so against a Prisma client that has the module models in it,
+ * which this one does not.
+ */
+function validateOne(modulePath: string, verbose: boolean, withTypeScript = true): CheckResult[] {
+    const moduleName = path.basename(modulePath);
+
+    if (verbose) {
+        console.log(`\nValidating module: ${moduleName}`);
+        console.log(`Path: ${modulePath}`);
+        console.log("─".repeat(60));
+    }
+
+    const checks: CheckResult[] = [
+        checkManifestExists(modulePath),
+        checkRequiredFields(modulePath),
+        checkIdFormat(modulePath),
+        checkReferencedFiles(modulePath),
+        checkNoCoreImports(modulePath),
+        checkSdkImports(modulePath),
+        checkSchemaPrisma(modulePath),
+        ...(withTypeScript
+            ? [checkTypeScript(modulePath)]
+            : [
+                  {
+                      name: "TypeScript compilation",
+                      passed: true,
+                      message: "Skipped - covered by `npm run typecheck:modules`",
+                  },
+              ]),
+        checkNoAnyTypes(modulePath),
+        checkApiAuthChecks(modulePath),
+        checkHooksEmitted(modulePath),
+    ];
+
+    if (verbose) {
+        for (const check of checks) {
+            console.log(`\n  [${check.passed ? "PASS" : "FAIL"}] ${check.name}`);
+            console.log(`      ${check.message}`);
+            if (!check.passed && check.suggestion) {
+                console.log(`      Suggestion: ${check.suggestion}`);
+            }
+        }
+
+        const failed = checks.filter((c) => !c.passed).length;
+        console.log("\n" + "─".repeat(60));
+        console.log(`Results: ${checks.length - failed} passed, ${failed} failed out of ${checks.length} checks`);
+        console.log(failed > 0 ? "\nFix the issues above and run validation again." : "\nAll checks passed!");
+    }
+
+    return checks.filter((c) => !c.passed);
+}
+
 function main(): void {
     const args = process.argv.slice(2);
+
+    // `--all` walks module-sources/ in one process. Spawning tsx per module
+    // costs ~3s of startup each, which is why CI needs this rather than a
+    // shell loop.
+    if (args[0] === "--all") {
+        const sources = path.join(ROOT, "module-sources");
+        const modules = fs
+            .readdirSync(sources, { withFileTypes: true })
+            .filter((e) => e.isDirectory() && fs.existsSync(path.join(sources, e.name, "module.json")))
+            .map((e) => e.name)
+            .sort();
+
+        const broken = new Map<string, CheckResult[]>();
+        for (const name of modules) {
+            const failures = validateOne(path.join(sources, name), false, false);
+            if (failures.length > 0) broken.set(name, failures);
+            console.log(`  [${failures.length === 0 ? "PASS" : "FAIL"}] ${name}`);
+        }
+
+        if (broken.size > 0) {
+            console.error(`\n${broken.size} of ${modules.length} module(s) failed validation:\n`);
+            for (const [name, failures] of broken) {
+                console.error(`  ${name}`);
+                for (const f of failures) {
+                    console.error(`    - ${f.name}: ${f.message.split("\n")[0]}`);
+                    if (f.suggestion) console.error(`      ${f.suggestion}`);
+                }
+            }
+            process.exit(1);
+        }
+
+        console.log(`\n${modules.length} module(s) validated, 0 failures.`);
+        return;
+    }
 
     if (args.length === 0) {
         usage();
@@ -636,53 +731,7 @@ function main(): void {
         process.exit(1);
     }
 
-    const moduleName = path.basename(modulePath);
-    console.log(`\nValidating module: ${moduleName}`);
-    console.log(`Path: ${modulePath}`);
-    console.log("─".repeat(60));
-
-    const checks: CheckResult[] = [
-        checkManifestExists(modulePath),
-        checkRequiredFields(modulePath),
-        checkIdFormat(modulePath),
-        checkReferencedFiles(modulePath),
-        checkNoCoreImports(modulePath),
-        checkSdkImports(modulePath),
-        checkSchemaPrisma(modulePath),
-        checkTypeScript(modulePath),
-        checkNoAnyTypes(modulePath),
-        checkApiAuthChecks(modulePath),
-        checkHooksEmitted(modulePath),
-    ];
-
-    let passed = 0;
-    let failed = 0;
-
-    for (const check of checks) {
-        const icon = check.passed ? "PASS" : "FAIL";
-        console.log(`\n  [${icon}] ${check.name}`);
-        console.log(`      ${check.message}`);
-
-        if (!check.passed && check.suggestion) {
-            console.log(`      Suggestion: ${check.suggestion}`);
-        }
-
-        if (check.passed) {
-            passed++;
-        } else {
-            failed++;
-        }
-    }
-
-    console.log("\n" + "─".repeat(60));
-    console.log(`Results: ${passed} passed, ${failed} failed out of ${checks.length} checks`);
-
-    if (failed > 0) {
-        console.log("\nFix the issues above and run validation again.");
-        process.exit(1);
-    } else {
-        console.log("\nAll checks passed!");
-    }
+    if (validateOne(modulePath, true).length > 0) process.exit(1);
 }
 
 main();
