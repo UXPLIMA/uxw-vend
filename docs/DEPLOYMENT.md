@@ -231,15 +231,20 @@ The `prebuild` hook runs the full code-generation pipeline automatically. Do not
 
 ## PM2 Process Management
 
-Install PM2 globally and start the app on port 3001:
+Install PM2 globally and start the app from the checked-in config:
 
 ```bash
 npm install -g pm2
 
-pm2 start npm --name uxwvend -- start -- -p 3001 -H 0.0.0.0
+pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup    # follow the printed command to register PM2 on boot
 ```
+
+`ecosystem.config.cjs` reads `.env`, pins the process to one instance, and sets
+`kill_timeout` above `SHUTDOWN_GRACE_MS` so the shutdown registry finishes
+draining before PM2 sends SIGKILL. Starting PM2 by hand with a different
+invocation loses all three.
 
 **Do not use cluster mode.** PM2 will happily run `-i max`, and it will look
 fine until someone installs a module. Only one worker takes the install lock
