@@ -5,11 +5,18 @@ import { login } from "./helpers/login";
 test.describe("theme v2 acceptance", () => {
     test("theme settings page renders manifest-driven color inputs", async ({ page }) => {
         await login(page);
-        await page.goto("/tr/admin/settings/theme");
+        // The manifest-driven colour inputs live here. /admin/settings/theme
+        // is the theme library (install, activate, delete) and has never had
+        // them.
+        await page.goto("/tr/admin/theme/appearance");
         // Flat (active) declares `primary` and `background` tokens — expect at
-        // least one of these as a labeled input. Heading check guarantees we
-        // landed on the right page.
-        await expect(page.locator("h1, h2").filter({ hasText: /color|renk/i }).first()).toBeVisible({ timeout: 15_000 });
+        // least one of these as a labeled input. The heading check guarantees
+        // we landed on the right page; CardTitle renders an h3, so match by
+        // role rather than by tag.
+        await expect(
+            page.getByRole("heading", { name: /renk|color/i }).first(),
+        ).toBeVisible({ timeout: 15_000 });
+        await expect(page.locator('input[type="color"]').first()).toBeVisible({ timeout: 15_000 });
     });
 
     test("/admin/settings/customizer returns 404", async ({ page }) => {

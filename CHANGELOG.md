@@ -148,6 +148,13 @@ shipping — what it no longer does.
   `.env.example` said it mattered only for PM2 cluster or multi-pod setups,
   and the troubleshooting entry named the wrong status code. The E2E job
   found this the first time it managed to start a server.
+- **Three E2E specs asserted on text and routes the app does not have.** They
+  looked for an "API Rate Limits" heading (the page reads "Rate Limits" once
+  translations are seeded, and only falls back to the longer string when they
+  are not), an "Email Broadcasts" heading and a "Compose" button (the page
+  says "Broadcasts" and "New"), and manifest-driven colour inputs on
+  `/admin/settings/theme`, which is the theme library — they live on
+  `/admin/theme/appearance`. None of it had ever been executed.
 
 ### Security
 - **Postgres and Redis are no longer published to the host.** The compose file

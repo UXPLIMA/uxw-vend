@@ -13,8 +13,11 @@ test.describe('Admin rate limits settings', () => {
         const response = await page.goto('/en/admin/settings/rate-limits');
         expect(response?.status(), 'rate-limits HTTP status').toBeLessThan(400);
 
+        // `rateLimits_title` — "Rate Limits" in en. The page falls back to
+        // "API Rate Limits" only when translations are absent, which is not
+        // what any real install looks like.
         const heading = page
-            .getByRole('heading', { name: /API Rate Limits/i })
+            .getByRole('heading', { name: /Rate Limits/i })
             .first();
         await expect(heading).toBeVisible();
 

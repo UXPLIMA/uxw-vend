@@ -8,13 +8,16 @@ test.describe('Admin broadcasts', () => {
         const response = await page.goto('/en/admin/broadcasts');
         expect(response?.status(), 'broadcasts HTTP status').toBeLessThan(400);
 
+        // The h1 is `sidebar_broadcasts` — "Broadcasts" in en. "Email
+        // Broadcasts" is the settings-index card label, not this page.
         const heading = page
-            .getByRole('heading', { name: /Email Broadcasts/i })
+            .getByRole('heading', { name: /Broadcasts/i })
             .first();
         await expect(heading).toBeVisible();
 
         // Open composer
-        const composeButton = page.getByRole('button', { name: /^Compose$/i }).first();
+        // `common_new` — the button reads "New", not "Compose".
+        const composeButton = page.getByRole('button', { name: /^New$/i }).first();
         await expect(composeButton).toBeVisible();
         await composeButton.click();
 
