@@ -86,7 +86,11 @@ export function SessionsTab() {
         if (res.ok) {
             const data = await res.json();
             toast.success(t("revokedSessions", { count: data.count }));
-            // After revoking all, the current request will fail next time → user is logged out
+            // After revoking all sessions this tab holds a cookie that no longer
+            // resolves. A full load is the point: it discards every cached
+            // server component and client store built while the user was
+            // authenticated, rather than carrying them into a logged-out session.
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             window.location.href = "/auth/login";
         }
     };

@@ -32,7 +32,11 @@ export function ImpersonationBanner() {
             }
             await update({ stopImpersonating: true });
             toast.success("Returned to your account");
-            // Reload so server-rendered permissions re-run with the restored session
+            // Reload so server-rendered permissions re-run with the restored
+            // session — the mirror of starting impersonation. A soft navigation
+            // would leave the impersonated user's server-rendered tree in place
+            // after the real session has already been restored.
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             window.location.href = "/admin/users";
         } catch {
             toast.error("Failed to stop impersonating");
