@@ -4,20 +4,18 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
-import type { ComponentType } from "react";
 import * as LucideIcons from "lucide-react";
+import { ModuleNavGroups } from "@/core/generated/module-registry";
 import { Menu, X, Sun, Moon, Package } from "lucide-react";
 import {
-    CORE_NAV_GROUPS,
+    buildNavGroups,
     buildThemeNavGroup,
     findActiveGroupId,
-    inferModuleGroup,
     type NavGroup,
     type NavItem,
     type NavSection,
+    type NavIconComponent as IconComponent,
 } from "@/core/lib/admin-nav-groups";
-
-type IconComponent = ComponentType<{ size?: number; className?: string }>;
 
 /**
  * Resolves a Lucide icon name (as stored on a module menu item) to its
@@ -54,13 +52,13 @@ interface AdminSidebarProps {
  *   [ icon rail ] [ contextual sidebar ]
  *       w-14            w-56
  *
- * Icon rail: one icon per top-level group (Dashboard, Users, Content,
- * Commerce, Design, Marketplace, Activity, Advanced, Settings). Clicking
- * an icon selects that group.
+ * Icon rail: one icon per top-level group. Only groups that actually have
+ * items appear, so a zero-module install shows no dead entries. Clicking an
+ * icon selects that group.
  *
  * Contextual sidebar: shows the items in the currently-selected group,
  * broken into sections with small uppercase headers. Module `menu[]`
- * contributions are merged in under the matching group at render time.
+ * contributions are merged in by `buildNavGroups`.
  *
  * Mobile: both rails collapse into a single overlay sheet.
  */
@@ -71,78 +69,19 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
 
-    // Merge module menus into matching groups.
-    // - Multi-item modules get one labelled section per module
-    // - Single-item modules append to a shared "Extensions" tail section
-    //   (no per-module header — avoids a wall of one-item headers)
+    // Merge module menus into the nav groups. `buildNavGroups` owns the
+    // merge and the pruning, so anything that arrives here has items to show.
     const groups: NavGroup[] = useMemo(() => {
-        // Build base group list: core → theme → (modules extend existing groups)
-        const themeGroup = activeThemeId ? buildThemeNavGroup(activeThemeId) : null;
-        const baseGroups = themeGroup
-            ? [...CORE_NAV_GROUPS, themeGroup]
-            : [...CORE_NAV_GROUPS];
-
-        const byId = new Map(
-            baseGroups.map((g) => [
-                g.id,
-                { ...g, sections: g.sections.map((s) => ({ ...s, items: [...s.items] })) },
-            ]),
-        );
-
-        // Per-group, track a section per module id so we don't create
-        // duplicate headers for the same module.
-        const sectionByGroupAndModule = new Map<string, NavSection>();
-        const extensionSectionByGroup = new Map<string, NavSection>();
-
-        for (const mod of modules) {
-            if (!mod.menu || mod.menu.length === 0) continue;
-
-            const modLabelKey = `menu_${mod.id}`;
-            const modLabel = t.has(modLabelKey)
-                ? t(modLabelKey)
-                : mod.id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
-            const isMulti = mod.menu.length > 1;
-
-            for (const item of mod.menu) {
-                const groupId = item.group || inferModuleGroup(mod.id);
-                const target = byId.get(groupId);
-                if (!target) continue;
-
-                const itemLabelKey = `menu_${mod.id}_${item.label.replace(/\s+/g, "_").toLowerCase()}`;
-                const label = t.has(itemLabelKey) ? t(itemLabelKey) : item.label;
-                const href = `/admin${item.path.startsWith("/") ? item.path : "/" + item.path}`;
-
-                const itemIcon = resolveIcon(item.icon);
-
-                if (isMulti) {
-                    // Named section for multi-item modules, keyed by moduleId
-                    const key = `${groupId}::${mod.id}`;
-                    let section = sectionByGroupAndModule.get(key);
-                    if (!section) {
-                        section = { header: modLabel, items: [] };
-                        sectionByGroupAndModule.set(key, section);
-                        target.sections.push(section);
-                    }
-                    section.items.push({ href, label, icon: itemIcon });
-                } else {
-                    // Single-item module: append to shared extensions tail
-                    let section = extensionSectionByGroup.get(groupId);
-                    if (!section) {
-                        const headerKey = "sidebar_extensions";
-                        section = {
-                            header: t.has(headerKey) ? t(headerKey) : "Extensions",
-                            items: [],
-                        };
-                        extensionSectionByGroup.set(groupId, section);
-                        target.sections.push(section);
-                    }
-                    section.items.push({ href, label, icon: itemIcon });
-                }
-            }
-        }
-
-        return Array.from(byId.values());
+        // Only groups declared by a module that is actually installed here —
+        // the registry lists every module's declaration, installed or not.
+        const enabled = new Set(modules.map((m) => m.id));
+        return buildNavGroups({
+            modules,
+            navGroups: ModuleNavGroups.filter((g) => enabled.has(g.module)),
+            themeGroup: activeThemeId ? buildThemeNavGroup(activeThemeId) : null,
+            translate: (key, fallback) => (t.has(key) ? t(key) : fallback),
+            resolveIcon,
+        });
     }, [modules, activeThemeId, t]);
 
     // Selection state machine:
@@ -159,16 +98,21 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
         setUserSelection(null);
     }, [pathname]);
 
+    // The selected group can disappear underneath us — a module disabled in
+    // another tab drops its group from the merge. Fall back to the dashboard
+    // rather than rendering an empty shell.
     const effectiveGroupId = userSelection || pathDerivedId;
-    const activeGroup = groups.find((g) => g.id === effectiveGroupId) || groups[0];
+    const activeGroup =
+        groups.find((g) => g.id === effectiveGroupId) ??
+        groups.find((g) => g.id === "dashboard") ??
+        groups[0];
 
     const handleGroupClick = (group: NavGroup) => {
         setUserSelection(group.id);
         setMobileOpen(false);
-        // If the group has items and the current pathname isn't already
-        // in that group, navigate to the first item so the main content
-        // updates immediately. Commerce-style empty groups just reveal
-        // the contextual sidebar with a "no items" message.
+        // Every group has at least one item, so selecting one always has
+        // somewhere to go. Navigate to the first item unless we are already
+        // inside the group, so the main content updates with the rail.
         const firstItem = group.sections.find((s) => s.items.length > 0)?.items[0];
         if (firstItem && pathDerivedId !== group.id) {
             router.push(firstItem.href);
@@ -230,7 +174,6 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
             {groups.map((group) => {
                 const Icon = group.icon;
                 const isSelected = effectiveGroupId === group.id;
-                const hasItems = group.sections.some((s) => s.items.length > 0);
                 const label = groupLabelOf(group);
                 return (
                     <div key={group.id} className="relative group/rail">
@@ -242,9 +185,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                             className={`w-10 h-10 rounded-lg flex items-center justify-center transition relative ${
                                 isSelected
                                     ? "bg-primary/15 text-primary"
-                                    : hasItems
-                                        ? "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                        : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                             }`}
                         >
                             <Icon size={18} />
@@ -323,11 +264,6 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                         </ul>
                     </div>
                 ))}
-                {activeGroup.sections.every((s) => s.items.length === 0) && (
-                    <div className="px-2 py-4 text-xs text-muted-foreground">
-                        {t.has("sidebar_emptyGroup") ? t("sidebar_emptyGroup") : "No items in this group yet."}
-                    </div>
-                )}
             </nav>
         </div>
     );

@@ -13,7 +13,8 @@ import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
-import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
+import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
+import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 const RESERVED_IDS = new Set([
     "auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes",
@@ -125,7 +126,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Module ID is reserved" }, { status: 400 });
         }
 
-        const depCheck = await checkModuleDependencies(manifest);
+        const depCheck = await checkModuleDependencies(manifest, {
+            installedVersions: installedVersionsFrom(moduleSystem.getDefinitions()),
+        });
         if (!depCheck.ok) {
             return NextResponse.json(
                 {
@@ -133,6 +136,8 @@ export async function POST(request: NextRequest) {
                     missingDependencies: depCheck.missingDependencies,
                     disabledDependencies: depCheck.disabledDependencies,
                     activeConflicts: depCheck.activeConflicts,
+                    versionMismatches: depCheck.versionMismatches,
+                    coreIncompatible: depCheck.coreIncompatible,
                 },
                 { status: 409 },
             );
@@ -212,6 +217,11 @@ export async function POST(request: NextRequest) {
                 installedByUserId: session.user.id,
             },
         });
+
+        {
+            const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
+            await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId: manifest.id });
+        }
 
         // Invalidate the module-state cache so the proxy and request handlers
         // see the freshly-installed module immediately. Without this, the

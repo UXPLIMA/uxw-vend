@@ -3,11 +3,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/core/lib/db";
 import { registerSchema } from "@/core/lib/validations";
 import { sendWelcomeEmail } from "@/core/lib/email";
-import { notifyUserRegistered } from "@/core/lib/discord";
 import { logActivity } from "@/core/lib/activity-log";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { checkPasswordBreach } from "@/core/lib/password-policy";
+import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
 // Used at signup so the welcome email goes out in the language the visitor
@@ -39,6 +39,13 @@ export async function POST(request: NextRequest) {
         }
 
         const { email, username, password } = validation.data;
+
+        // The zod schema enforces the built-in policy; this adds the admin's
+        // configured minimum length, which can only be stricter.
+        const policyCheck = await enforcePasswordPolicy(password);
+        if (!policyCheck.ok) {
+            return NextResponse.json({ error: policyCheck.message ?? "Invalid password" }, { status: 400 });
+        }
 
         // Optional HIBP breach check (opt-in via PASSWORD_BREACH_CHECK=1).
         // Uses k-anonymity so only the first 5 chars of the SHA-1 digest
@@ -99,9 +106,9 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Send welcome email and Discord notification (non-blocking)
+        // Non-blocking side effects. Anything module-specific reacts to the
+        // `user.registered` hook fired below rather than being called here.
         sendWelcomeEmail(email, username, userLocale).catch(console.error);
-        notifyUserRegistered({ username, email }).catch(console.error);
         logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch(console.error);
 
         // Fire user.registered hook action — modules can react (welcome coupons, etc.)

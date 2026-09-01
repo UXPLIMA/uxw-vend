@@ -52,11 +52,6 @@ export default function ProfilePage() {
     const memberSinceId = useId();
     const deletePasswordId = useId();
     const deleteConfirmId = useId();
-    const mcUsernameId = useId();
-
-    // Linked accounts
-    const [linkedAccounts, setLinkedAccounts] = useState<{ id: string; provider: string; username: string | null }[]>([]);
-    const [mcUsername, setMcUsername] = useState("");
 
     // Profile form
     const [username, setUsername] = useState("");
@@ -149,18 +144,17 @@ export default function ProfilePage() {
         }
         if (authStatus !== "authenticated") return;
 
-        Promise.all([
-            fetch("/api/v1/auth/profile").then(r => r.json()),
-            fetch("/api/v1/linked-accounts").then(r => r.json()).catch(() => ({ accounts: [] })),
-        ]).then(([profileData, accountsData]) => {
-            if (profileData.user) {
-                setProfile(profileData.user);
-                setUsername(profileData.user.username);
-                setAvatar(profileData.user.avatar || "");
-            }
-            setLinkedAccounts(accountsData.accounts || []);
-            setLoading(false);
-        }).catch(() => setLoading(false));
+        fetch("/api/v1/auth/profile")
+            .then(r => r.json())
+            .then((profileData) => {
+                if (profileData.user) {
+                    setProfile(profileData.user);
+                    setUsername(profileData.user.username);
+                    setAvatar(profileData.user.avatar || "");
+                }
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
     }, [authStatus, router]);
 
     const saveProfile = async (e: React.FormEvent) => {
@@ -213,7 +207,6 @@ export default function ProfilePage() {
             const key = `profileTab_${mt.id}`;
             return { id: mt.id, label: t.has(key) ? t(key) : mt.label };
         }),
-        { id: "accounts", label: t("accounts") },
     ];
 
     return (
@@ -402,55 +395,6 @@ export default function ProfilePage() {
                     );
                 })}
 
-                {/* Accounts Tab */}
-                {activeTab === "accounts" && (
-                    <Card>
-                        <CardHeader><CardTitle>{t("linkedAccounts")}</CardTitle></CardHeader>
-                        <CardContent className="space-y-4">
-                            {/* Current links */}
-                            {linkedAccounts.length > 0 && (
-                                <div className="space-y-2 mb-4">
-                                    {linkedAccounts.map((acc) => (
-                                        <div key={acc.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                                            <div className="flex items-center gap-3">
-                                                <span className="capitalize font-medium">{acc.provider}</span>
-                                                {acc.username && <span className="text-sm text-muted-foreground">{acc.username}</span>}
-                                            </div>
-                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={async () => {
-                                                await fetch("/api/v1/linked-accounts", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ provider: acc.provider }) });
-                                                setLinkedAccounts(linkedAccounts.filter((a) => a.id !== acc.id));
-                                            }}>{t("unlink")}</Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Link Game Account */}
-                            {linkedAccounts.length > 0 && !linkedAccounts.find((a) => a.provider === "minecraft") && (
-                                <div className="p-4 border border-dashed border-border rounded-lg">
-                                    <p className="text-sm font-medium mb-2">{t("linkGameAccount")}</p>
-                                    <div className="flex gap-2">
-                                        <Input id={mcUsernameId} value={mcUsername} onChange={(e) => setMcUsername(e.target.value)} placeholder={t("gameUsername")} aria-label={t("gameUsername")} />
-                                        <Button size="sm" onClick={async () => {
-                                            if (!mcUsername.trim()) return;
-                                            const res = await fetch("/api/v1/linked-accounts", {
-                                                method: "POST", headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ provider: "minecraft", providerId: mcUsername, username: mcUsername }),
-                                            });
-                                            if (res.ok) {
-                                                const data = await res.json();
-                                                setLinkedAccounts([...linkedAccounts, data.account]);
-                                                setMcUsername("");
-                                            }
-                                        }}>{t("link")}</Button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <p className="text-xs text-muted-foreground">{t("oauthAutoLink")}</p>
-                        </CardContent>
-                    </Card>
-                )}
                 </div>
             </main>
 

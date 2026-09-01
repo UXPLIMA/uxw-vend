@@ -13,7 +13,8 @@ import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
-import { checkModuleDependencies, dependencyErrorMessage } from "@/core/lib/module-dependencies";
+import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
+import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -162,7 +163,9 @@ export async function POST(request: NextRequest) {
         // a declared conflict is currently active. Runs BEFORE the registry
         // regen so a mis-installed module can't drag half-initialized state
         // into the runtime registry.
-        const depCheck = await checkModuleDependencies(manifestData);
+        const depCheck = await checkModuleDependencies(manifestData, {
+            installedVersions: installedVersionsFrom(moduleSystem.getDefinitions()),
+        });
         if (!depCheck.ok) {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json(
@@ -171,6 +174,8 @@ export async function POST(request: NextRequest) {
                     missingDependencies: depCheck.missingDependencies,
                     disabledDependencies: depCheck.disabledDependencies,
                     activeConflicts: depCheck.activeConflicts,
+                    versionMismatches: depCheck.versionMismatches,
+                    coreIncompatible: depCheck.coreIncompatible,
                 },
                 { status: 409 },
             );
@@ -261,6 +266,12 @@ export async function POST(request: NextRequest) {
         // Schedule deferred build + restart (debounced — waits for more installs)
         // Bulk install: 37 modules call this, but only ONE build runs after all finish
         scheduleBuild();
+
+        // HookNames.MODULE_INSTALLED is part of the published contract, so it has to
+        // actually fire — a declared hook nobody emits is a listener that never
+        // runs, with nothing to show for it in any log.
+        const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
+        await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId });
 
         logActivity({
             userId: session.user.id,

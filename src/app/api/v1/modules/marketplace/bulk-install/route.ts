@@ -100,6 +100,9 @@ export async function POST(request: NextRequest) {
                 create: { id, name: manifest.name, enabled: true },
             });
 
+            const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
+            await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId: id });
+
             results.push({ id, name: manifest.name, status: "installed" });
         } catch (err) {
             await fs.rm(path.join(MODULES_DIR, id), { recursive: true, force: true }).catch(() => {});

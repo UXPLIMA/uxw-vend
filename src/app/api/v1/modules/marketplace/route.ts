@@ -42,6 +42,8 @@ function ensureDefaults(
         tags: m.tags ?? [m.category ?? "uncategorized"],
         zip: m.zip ?? `${m.id}.zip`,
         dependencies: m.dependencies ?? [],
+        conflicts: m.conflicts ?? [],
+        coreVersion: m.coreVersion ?? null,
         stats: m.stats ?? { publicRoutes: 0, adminRoutes: 0, apiRoutes: 0, widgets: 0 },
     };
 }

@@ -1,7 +1,11 @@
+// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// outside Next.js, which is what normally loads the env file.
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -40,18 +44,37 @@ async function main() {
     console.log("[ok]Permissions");
 
     // ==================== ADMIN USER ====================
-    const pw = await bcrypt.hash("password123", 12);
+    // No fixed default: a shipped password ends up unchanged on real
+    // deployments, and "password123" is on core's own weak-password list.
+    // Set SEED_ADMIN_PASSWORD to choose one; otherwise a random one is
+    // generated and printed once, here, and never again.
+    const generated = !process.env.SEED_ADMIN_PASSWORD;
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? crypto.randomBytes(18).toString("base64url");
+    const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@example.com";
+    const pw = await bcrypt.hash(adminPassword, 12);
 
-    await prisma.user.upsert({
-        where: { email: "admin@example.com" },
+    // `update` deliberately leaves `password` alone: re-seeding an existing
+    // install must not reset an admin's chosen password.
+    const admin = await prisma.user.upsert({
+        where: { email: adminEmail },
         update: { roleId: adminRole.id },
-        create: { email: "admin@example.com", username: "uxwadmin", password: pw, roleId: adminRole.id },
+        create: { email: adminEmail, username: "uxwadmin", password: pw, roleId: adminRole.id },
     });
+    const created = admin.createdAt.getTime() === admin.updatedAt.getTime();
     console.log("[ok]Admin user");
 
     console.log("\n[done]Seeding complete!");
-    console.log("   Admin account (password: password123):");
-    console.log("   - admin@example.com\n");
+    if (created) {
+        console.log(`   Admin account: ${adminEmail}`);
+        if (generated) {
+            console.log(`   Generated password (shown once): ${adminPassword}`);
+            console.log("   Set SEED_ADMIN_PASSWORD to choose your own.\n");
+        } else {
+            console.log("   Password: the SEED_ADMIN_PASSWORD you supplied.\n");
+        }
+    } else {
+        console.log(`   Admin account ${adminEmail} already existed — password left unchanged.\n`);
+    }
 }
 
 main()

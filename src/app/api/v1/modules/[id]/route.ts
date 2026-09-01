@@ -94,6 +94,12 @@ export async function DELETE(
             console.error("[module:uninstall] registry regeneration failed for", moduleId, err);
         }
 
+        // HookNames.MODULE_UNINSTALLED is part of the published contract, so it has to
+        // actually fire — a declared hook nobody emits is a listener that never
+        // runs, with nothing to show for it in any log.
+        const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
+        await doActionAsync(HookNames.MODULE_UNINSTALLED, { moduleId });
+
         logActivity({
             action: "module.uninstall",
             entity: "module",

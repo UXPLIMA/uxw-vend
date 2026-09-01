@@ -2,7 +2,7 @@
 
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, Mail, Heart } from "lucide-react";
+import { Globe, Mail, Users, Heart } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
@@ -11,7 +11,22 @@ import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 import { Slot } from "@/core/components/Slot";
+import { parseFooterLinks, type FooterLink } from "@/core/lib/footer-links";
 
+
+const FOOTER_LINK_CLASS = "text-muted-foreground hover:text-foreground transition-colors";
+
+/** Internal links go through next-intl's locale-aware Link; external ones don't. */
+function FooterLinkItem({ link }: { link: FooterLink }) {
+    if (link.external) {
+        return (
+            <a href={link.href} target="_blank" rel="noopener noreferrer" className={FOOTER_LINK_CLASS}>
+                {link.label}
+            </a>
+        );
+    }
+    return <Link href={link.href} className={FOOTER_LINK_CLASS}>{link.label}</Link>;
+}
 
 function DefaultFooter() {
     const t = useTranslations('footer');
@@ -24,7 +39,9 @@ function DefaultFooter() {
 
     // Prefer DB settings, fall back to serverConfig defaults
     const siteName = (settings.site_name as string) || serverConfig.name;
-    const siteDescription = (settings.site_description as string) || serverConfig.description;
+    const siteDescription = (settings.footer_about_text as string)
+        || (settings.site_description as string)
+        || serverConfig.description;
     const siteEmail = (settings.site_email as string) || serverConfig.email;
     // site_discord_url is the canonical key; hero_discord_url is read as a
     // back-compat fallback for installs migrated from older versions where
@@ -58,6 +75,25 @@ function DefaultFooter() {
         }
     }
 
+    // Module footer links grouped by the section they declare. Core renders
+    // two named columns; a link naming any other section joins Quick Links
+    // rather than vanishing, which is what filtering on `section === "quick"`
+    // silently did to it.
+    const enabledFooterLinks = ModuleFooterLinks.filter((fl) => moduleStatus[fl.module] === true);
+    const toLink = (fl: { label: string; href: string }): FooterLink => ({ ...fl, external: false });
+    const legalLinks: FooterLink[] = [
+        ...parseFooterLinks(settings.footer_legal_links),
+        ...enabledFooterLinks.filter((fl) => fl.section === "legal").map(toLink),
+    ];
+    const quickLinks: FooterLink[] = [
+        ...parseFooterLinks(settings.footer_quick_links),
+        ...enabledFooterLinks.filter((fl) => fl.section !== "legal").map(toLink),
+    ];
+
+    // The legal column only exists when something fills it, so the remaining
+    // columns keep an even split instead of leaving a hole in the grid.
+    const columnClass = legalLinks.length > 0 ? "md:grid-cols-4" : "md:grid-cols-3";
+
     const handleLocaleChange = (newLocale: string) => {
         router.replace(pathname, { locale: newLocale });
     };
@@ -67,7 +103,7 @@ function DefaultFooter() {
         <footer className="bg-card text-card-foreground border-t border-border mt-12">
             <Slot name="footer.top" />
             <div className="container mx-auto px-4 py-12">
-                <div className="grid md:grid-cols-4 gap-8">
+                <div className={`grid ${columnClass} gap-8`}>
                     {/* Brand */}
                     <div>
                         <div className="flex items-center gap-3 mb-4">
@@ -99,7 +135,7 @@ function DefaultFooter() {
                             )}
                             {communityUrl && (
                                 <li><a href={communityUrl} target="_blank" rel="noopener noreferrer" aria-label="Community" className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors">
-                                    <Mail className="w-4 h-4" aria-hidden="true" />
+                                    <Users className="w-4 h-4" aria-hidden="true" />
                                 </a></li>
                             )}
                         </ul>
@@ -110,24 +146,24 @@ function DefaultFooter() {
                         <h4 className="font-semibold text-foreground mb-4">{t('quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">{commonT('home')}</Link></li>
-                            {ModuleFooterLinks
-                                .filter(fl => fl.section === "quick" && moduleStatus[fl.module] === true)
-                                .map(fl => (
-                                    <li key={fl.href}><Link href={fl.href} className="text-muted-foreground hover:text-foreground transition-colors">{fl.label}</Link></li>
-                                ))}
+                            {quickLinks.map(fl => (
+                                <li key={fl.href}><FooterLinkItem link={fl} /></li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Legal */}
-                    <div>
-                        <h4 className="font-semibold text-foreground mb-4">{t('legal')}</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/legal/terms" className="text-muted-foreground hover:text-foreground transition-colors">{t('termsOfService')}</Link></li>
-                            <li><Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground transition-colors">{t('privacyPolicy')}</Link></li>
-                            <li><Link href="/legal/refund" className="text-muted-foreground hover:text-foreground transition-colors">{t('refundPolicy')}</Link></li>
-                            <li><Link href="/legal/rules" className="text-muted-foreground hover:text-foreground transition-colors">{t('serverRules')}</Link></li>
-                        </ul>
-                    </div>
+                    {/* Legal — admin-authored links plus anything modules contribute.
+                        Core names no legal page of its own. */}
+                    {legalLinks.length > 0 && (
+                        <div>
+                            <h4 className="font-semibold text-foreground mb-4">{t('legal')}</h4>
+                            <ul className="space-y-2 text-sm">
+                                {legalLinks.map(fl => (
+                                    <li key={fl.href}><FooterLinkItem link={fl} /></li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* Settings */}
                     <div>
@@ -155,12 +191,14 @@ function DefaultFooter() {
                                 })}
                         </div>
 
-                        <div className="mt-6">
-                            <p className="text-muted-foreground text-sm flex items-center gap-2">
-                                <Mail className="w-4 h-4" />
-                                {siteEmail}
-                            </p>
-                        </div>
+                        {siteEmail && (
+                            <div className="mt-6">
+                                <p className="text-muted-foreground text-sm flex items-center gap-2">
+                                    <Mail className="w-4 h-4" />
+                                    {siteEmail}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -170,13 +208,14 @@ function DefaultFooter() {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-muted-foreground text-sm">
-                            © 2026 {siteName}. {t('allRightsReserved')}
+                            {(settings.footer_copyright as string)
+                                || `© ${new Date().getFullYear()} ${siteName}. ${t('allRightsReserved')}`}
                         </p>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span>{t('builtWith')}</span>
                             <Heart className="w-4 h-4 text-red-400 fill-red-400" />
                             <span>{t('by')}</span>
-                            <span className="text-blue-400 font-medium">uxwVend Team</span>
+                            <span className="text-blue-400 font-medium">{siteName}</span>
                         </div>
                     </div>
                 </div>

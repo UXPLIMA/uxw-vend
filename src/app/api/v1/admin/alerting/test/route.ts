@@ -3,9 +3,11 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import {
     buildTestPayload,
+    listAlertingChannels,
     loadAlertingConfig,
     sendHealthWebhook,
 } from "@/core/lib/health-alerting";
+import { resolveWebhookChannel } from "@/core/lib/webhook-channels";
 
 /**
  * POST /api/v1/admin/alerting/test
@@ -29,8 +31,9 @@ export async function POST() {
         );
     }
 
-    const payload = buildTestPayload(config);
-    const result = await sendHealthWebhook(config, payload);
+    const channel = resolveWebhookChannel(config.channel, await listAlertingChannels());
+    const payload = buildTestPayload(channel);
+    const result = await sendHealthWebhook(config, payload, channel);
 
     if (!result.ok) {
         return NextResponse.json({ error: result.error || "Failed" }, { status: 502 });

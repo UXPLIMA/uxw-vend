@@ -19,7 +19,7 @@ export function registerActivityFeedListeners(): void {
     registered = true;
 
     // ─── User events ───
-    addAction<{ userId: string; email: string; username: string }>("user.registered", async (payload) => {
+    addAction("user.registered", async (payload) => {
         try {
             await prisma.activityFeedItem.create({
                 data: {
@@ -34,7 +34,7 @@ export function registerActivityFeedListeners(): void {
     });
 
     // Profile updates — private (only visible to the user in their own feed)
-    addAction<{ userId: string; changes: Record<string, unknown> }>("user.profile.updated", async (payload) => {
+    addAction("user.profile.updated", async (payload) => {
         try {
             const user = await prisma.user.findUnique({
                 where: { id: payload.userId },
@@ -53,7 +53,7 @@ export function registerActivityFeedListeners(): void {
     });
 
     // 2FA enabled — private security audit trail
-    addAction<{ userId: string }>("user.2fa.enabled", async (payload) => {
+    addAction("user.2fa.enabled", async (payload: { userId: string }) => {
         try {
             await prisma.activityFeedItem.create({
                 data: {
@@ -68,7 +68,7 @@ export function registerActivityFeedListeners(): void {
     });
 
     // 2FA disabled — private security audit trail
-    addAction<{ userId: string }>("user.2fa.disabled", async (payload) => {
+    addAction("user.2fa.disabled", async (payload: { userId: string }) => {
         try {
             await prisma.activityFeedItem.create({
                 data: {

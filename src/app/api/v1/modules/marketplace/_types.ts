@@ -20,7 +20,11 @@ export interface MarketplaceModule {
     screenshots: string[];
     tags: string[];
     zip: string;
+    /** `id` or `id@range` specs — see module-dependencies.parseDependency. */
     dependencies: string[];
+    conflicts: string[];
+    /** Range of CORE_API_VERSION the module accepts; null when unconstrained. */
+    coreVersion: string | null;
     stats: MarketplaceModuleStats;
 }
 

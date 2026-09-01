@@ -12,38 +12,15 @@ import {
 import { getClientIP } from "./rate-limit";
 
 import type { Provider } from "next-auth/providers";
+import { ModuleAuthProviders, ModuleAuthProviderFactories } from "@/core/generated/module-auth-providers";
+import { resolveAuthProviders } from "./auth-providers";
 
-// Build OAuth providers conditionally — modules set env vars, providers activate
-const oauthProviders: Provider[] = [];
-
-// `allowDangerousEmailAccountLinking` defaults to false in NextAuth v5, which
-// is the safe choice: if an attacker registers an OAuth identity with the same
-// email as an existing credentials account, Auth.js rejects the sign-in with
-// OAuthAccountNotLinked. We set it explicitly so a future accidental flip to
-// true would be an obvious code review red flag.
-if (process.env.AUTH_DISCORD_ID) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const Discord = require("next-auth/providers/discord").default;
-    oauthProviders.push(
-        Discord({
-            clientId: process.env.AUTH_DISCORD_ID,
-            clientSecret: process.env.AUTH_DISCORD_SECRET,
-            allowDangerousEmailAccountLinking: false,
-        })
-    );
-}
-
-if (process.env.AUTH_GOOGLE_ID) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const Google = require("next-auth/providers/google").default;
-    oauthProviders.push(
-        Google({
-            clientId: process.env.AUTH_GOOGLE_ID,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET,
-            allowDangerousEmailAccountLinking: false,
-        })
-    );
-}
+// OAuth providers come from installed modules only — core names none. A module
+// declares `authProviders` in its manifest, the registry generator collects the
+// declarations, and the provider activates once its env vars are set.
+const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
+    factories: ModuleAuthProviderFactories,
+}) as Provider[];
 
 // Session cookie hardening.
 //

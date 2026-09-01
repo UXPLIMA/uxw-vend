@@ -1,20 +1,33 @@
 import { prisma } from "@/core/lib/db";
-import { hostnameMatchesAllowlist } from "@/core/lib/url-safety";
+import { getModuleStates } from "@/core/lib/module-cache";
+import { ModuleWebhookChannels } from "@/core/generated/module-data";
+import {
+    GENERIC_CHANNEL_ID,
+    buildWebhookPayload,
+    listWebhookChannels,
+    resolveWebhookChannel,
+    validateWebhookUrl,
+    type WebhookAlert,
+    type WebhookChannel,
+} from "@/core/lib/webhook-channels";
 
 /**
  * Health alerting.
  *
  * Cron-driven watchdog that hits the internal /api/health endpoint
- * and posts to a configured Discord or Slack webhook when the
- * platform transitions into a degraded/down state (and when it
- * recovers). Debounced so a single flapping check does not spam
- * the channel.
+ * and posts to a configured webhook when the platform transitions
+ * into a degraded/down state (and when it recovers). Debounced so a
+ * single flapping check does not spam the channel.
+ *
+ * The channel decides the wire format and which hosts are acceptable.
+ * Core ships only the vendor-neutral `generic` channel; modules add
+ * richer ones through `webhookChannels` in their manifest.
  *
  * Config lives in Setting { key: "health_alerting" } as JSON:
  *   {
  *     "enabled": true,
  *     "webhookUrl": "https://...",
- *     "provider": "discord" | "slack",
+ *     "channel": "<channel id>",
  *     "alertOn": ["degraded", "down"]
  *   }
  *
@@ -28,7 +41,7 @@ export type HealthStatus = "ok" | "degraded" | "down";
 export interface HealthAlertingConfig {
     enabled: boolean;
     webhookUrl: string;
-    provider: "discord" | "slack";
+    channel: string;
     alertOn: HealthStatus[];
 }
 
@@ -66,7 +79,7 @@ export async function loadAlertingConfig(): Promise<HealthAlertingConfig> {
     const fallback: HealthAlertingConfig = {
         enabled: false,
         webhookUrl: "",
-        provider: "discord",
+        channel: GENERIC_CHANNEL_ID,
         alertOn: ["degraded", "down"],
     };
 
@@ -78,7 +91,10 @@ export async function loadAlertingConfig(): Promise<HealthAlertingConfig> {
             return fallback;
         }
         const v = row.value as Record<string, unknown>;
-        const provider = v.provider === "slack" ? "slack" : "discord";
+        // `provider` is the pre-registry key; a config written before channels
+        // existed still names its vendor there.
+        const rawChannel = typeof v.channel === "string" ? v.channel : v.provider;
+        const channel = typeof rawChannel === "string" && rawChannel ? rawChannel : GENERIC_CHANNEL_ID;
         const webhookUrl = typeof v.webhookUrl === "string" ? v.webhookUrl : "";
         const enabled = v.enabled === true;
         const rawAlertOn = Array.isArray(v.alertOn) ? v.alertOn : ["degraded", "down"];
@@ -88,7 +104,7 @@ export async function loadAlertingConfig(): Promise<HealthAlertingConfig> {
         return {
             enabled,
             webhookUrl,
-            provider,
+            channel,
             alertOn: alertOn.length > 0 ? alertOn : ["degraded", "down"],
         };
     } catch {
@@ -145,89 +161,48 @@ function formatMessage(status: HealthStatus, snapshot: HealthSnapshot, recovery:
     return `Platform status: ${status}.`;
 }
 
-function buildDiscordPayload(
-    status: HealthStatus,
-    snapshot: HealthSnapshot,
-    recovery: boolean,
-): Record<string, unknown> {
-    const message = formatMessage(status, snapshot, recovery);
-    const color = recovery ? COLORS.ok : COLORS[status];
-    return {
-        content: message,
-        embeds: [
-            {
-                title: recovery ? "Health recovered" : `Health: ${status}`,
-                description: message,
-                color,
-                fields: [
-                    { name: "Status", value: status, inline: true },
-                    {
-                        name: "Version",
-                        value: snapshot.version ?? "unknown",
-                        inline: true,
-                    },
-                ],
-                timestamp: snapshot.timestamp ?? new Date().toISOString(),
-            },
-        ],
-        username: "uxwVend Health",
-    };
+/** Channels an admin can pick from on this install. */
+export async function listAlertingChannels(): Promise<WebhookChannel[]> {
+    let states: Record<string, boolean> = {};
+    try {
+        states = await getModuleStates();
+    } catch {
+        // No module state available (first boot, DB hiccup): offer the
+        // built-in channel rather than failing the settings page.
+    }
+    return listWebhookChannels(ModuleWebhookChannels, (moduleId) => states[moduleId] === true);
 }
 
-function buildSlackPayload(
+function buildAlert(
     status: HealthStatus,
     snapshot: HealthSnapshot,
     recovery: boolean,
-): Record<string, unknown> {
+): WebhookAlert {
     const message = formatMessage(status, snapshot, recovery);
-    const colorHex = recovery
-        ? "#22c55e"
-        : status === "down"
-            ? "#dc2626"
-            : status === "degraded"
-                ? "#f59e0b"
-                : "#22c55e";
     return {
-        text: message,
-        attachments: [
-            {
-                color: colorHex,
-                text: message,
-                fields: [
-                    { title: "Status", value: status, short: true },
-                    { title: "Version", value: snapshot.version ?? "unknown", short: true },
-                ],
-                ts: Math.floor(Date.now() / 1000),
-            },
+        title: recovery ? "Health recovered" : `Health: ${status}`,
+        message,
+        color: recovery ? COLORS.ok : COLORS[status],
+        fields: [
+            { name: "Status", value: status },
+            { name: "Version", value: snapshot.version ?? "unknown" },
         ],
+        timestamp: snapshot.timestamp ?? new Date().toISOString(),
     };
 }
 
 /**
- * Send a webhook payload to the configured URL. Validates that
- * the URL belongs to the expected provider to prevent SSRF to
- * arbitrary hosts.
+ * Send a webhook payload to the configured URL. The channel decides which
+ * hosts are acceptable, so core does not have to know any vendor by name.
  */
 export async function sendHealthWebhook(
     config: HealthAlertingConfig,
     payload: Record<string, unknown>,
+    channel?: WebhookChannel,
 ): Promise<{ ok: boolean; error?: string }> {
-    if (!config.webhookUrl) return { ok: false, error: "No webhook URL" };
-
-    try {
-        const parsed = new URL(config.webhookUrl);
-        if (config.provider === "discord") {
-            if (!hostnameMatchesAllowlist(parsed.hostname, ["discord.com", "discordapp.com"])) {
-                return { ok: false, error: "Discord webhook URL must be on discord.com" };
-            }
-        } else {
-            if (!hostnameMatchesAllowlist(parsed.hostname, ["slack.com"])) {
-                return { ok: false, error: "Slack webhook URL must be on slack.com" };
-            }
-        }
-    } catch {
-        return { ok: false, error: "Invalid webhook URL" };
-    }
+    const target = channel ?? resolveWebhookChannel(config.channel, await listAlertingChannels());
+    const check = validateWebhookUrl(target, config.webhookUrl);
+    if (!check.ok) return { ok: false, error: check.error };
 
     try {
         const res = await fetch(config.webhookUrl, {
@@ -248,17 +223,13 @@ export async function sendHealthWebhook(
 /**
  * Build a sample payload for the admin "Test webhook" button.
  */
-export function buildTestPayload(
-    config: HealthAlertingConfig,
-): Record<string, unknown> {
+export function buildTestPayload(channel: WebhookChannel): Record<string, unknown> {
     const snapshot: HealthSnapshot = {
         status: "ok",
         version: "test",
         timestamp: new Date().toISOString(),
     };
-    return config.provider === "discord"
-        ? buildDiscordPayload("ok", snapshot, false)
-        : buildSlackPayload("ok", snapshot, false);
+    return buildWebhookPayload(channel, buildAlert("ok", snapshot, false));
 }
 
 /**
@@ -320,12 +291,10 @@ export async function checkAndAlert(): Promise<{ notified: boolean; status: stri
         return { notified: false, status: snapshot.status };
     }
 
-    const payload =
-        config.provider === "discord"
-            ? buildDiscordPayload(snapshot.status, snapshot, decision.recovery)
-            : buildSlackPayload(snapshot.status, snapshot, decision.recovery);
+    const channel = resolveWebhookChannel(config.channel, await listAlertingChannels());
+    const payload = buildWebhookPayload(channel, buildAlert(snapshot.status, snapshot, decision.recovery));
 
-    const result = await sendHealthWebhook(config, payload);
+    const result = await sendHealthWebhook(config, payload, channel);
 
     state.lastStatus = snapshot.status;
     if (result.ok) {

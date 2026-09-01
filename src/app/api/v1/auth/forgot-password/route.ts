@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
+import { PASSWORD_RESET_EXPIRY, getDurationMs } from "@/core/lib/security-settings";
 import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
             // Single active reset token per user.
             await prisma.verificationToken.deleteMany({ where: { identifier: email } });
 
-            const expires = new Date(Date.now() + 60 * 60 * 1000);
+            const expires = new Date(Date.now() + (await getDurationMs(PASSWORD_RESET_EXPIRY)));
             await prisma.verificationToken.create({
                 data: {
                     identifier: email,

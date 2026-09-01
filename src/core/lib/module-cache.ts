@@ -35,6 +35,25 @@ export async function getModuleStates(): Promise<Record<string, boolean>> {
     return states;
 }
 
+/**
+ * Whether one module is currently enabled.
+ *
+ * This is what a module should call to gate its own endpoints. The alternative
+ * — `moduleSystem.isEnabled()` — reports false until something has called
+ * `moduleSystem.initialize()`, which pushed modules into re-initialising a
+ * shared singleton on every request just to answer this question.
+ *
+ * An unknown id resolves to `true`, matching the convention `getModuleStates`
+ * documents and `/api/v1/modules` already applies: a missing row means "no
+ * explicit state known", and during a DB outage that returns an empty map.
+ * Defaulting to false there would 404 every module the moment the database
+ * blinked.
+ */
+export async function isModuleEnabled(id: string): Promise<boolean> {
+    const states = await getModuleStates();
+    return states[id] ?? true;
+}
+
 /** Invalidate module states cache (call after enable/disable/install/uninstall) */
 export async function invalidateModuleCache(): Promise<void> {
     await cacheDel(CACHE_KEY);

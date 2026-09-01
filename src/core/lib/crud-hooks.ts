@@ -21,7 +21,7 @@ export async function fireCreate<T extends object>(
     data: T,
     persist: (data: T) => Promise<T & { id: string }>
 ): Promise<T & { id: string }> {
-    const filtered = await applyFiltersAsync<T>(`${resource}.beforeCreate`, data);
+    const filtered = await applyFiltersAsync(`${resource}.beforeCreate`, data);
     const persisted = await persist(filtered);
     await doActionAsync(`${resource}.created`, persisted);
     return persisted;
@@ -33,7 +33,7 @@ export async function fireUpdate<T extends object>(
     patch: Partial<T>,
     persist: (id: string, data: Partial<T>) => Promise<T & { id: string }>
 ): Promise<T & { id: string }> {
-    const filtered = await applyFiltersAsync<Partial<T>>(`${resource}.beforeUpdate`, patch, { id });
+    const filtered = await applyFiltersAsync(`${resource}.beforeUpdate`, patch, { id });
     const persisted = await persist(id, filtered);
     await doActionAsync(`${resource}.updated`, persisted);
     return persisted;

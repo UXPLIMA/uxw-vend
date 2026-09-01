@@ -33,10 +33,6 @@
     "description": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
     "goHome": "Ana sayfaya dön"
   },
-  "legal": {
-    "placeholder": "Bu sayfa henüz doldurulmamış.",
-    "placeholderHint": "Yöneticiler Ayarlar panelinden {key} anahtarını kaydederek bu sayfayı düzenleyebilir."
-  },
   "activity": {
     "userRegistered": "topluluğa katıldı"
   },
@@ -566,7 +562,7 @@
     "rateLimits_saveError": "Oran sınırları kaydedilemedi",
     "rateLimits_loadError": "Oran sınırları yüklenemedi",
     "settings_alerting": "Sağlık Uyarıları",
-    "settings_alertingDesc": "Platform bozulduğunda Discord veya Slack bildirimleri gönder.",
+    "settings_alertingDesc": "Platform bozulduğunda webhook bildirimi gönder.",
     "settings_apiDocs": "API Dokümantasyonu",
     "settings_apiDocsDesc": "Çekirdek ve modül uç noktaları için etkileşimli OpenAPI referansı.",
     "settings_ipBlocks": "IP Engelleri",
@@ -577,7 +573,6 @@
     "settings_rateLimitsDesc": "Rol başına API oran sınırı çarpanları.",
     "alerting_title": "Sağlık Uyarıları",
     "alerting_enabled": "Uyarıları etkinleştir",
-    "alerting_provider": "Sağlayıcı",
     "alerting_webhookUrl": "Webhook URL",
     "alerting_webhookTitle": "Webhook yapılandırması",
     "alerting_alertOn": "Şu durumlarda uyar",
@@ -591,8 +586,6 @@
     "alerting_testSent": "Test webhook'u gönderildi",
     "alerting_testFailed": "Test başarısız",
     "alerting_selectAtLeastOne": "En az bir durum seçin",
-    "alerting_discordHint": "Discord webhook URL'si (ör. https://discord.com/api/webhooks/...)",
-    "alerting_slackHint": "Slack gelen webhook URL'si",
     "ipBlocks_subtitle": "Belirli IP'lerin veya CIDR aralıklarının siteye ya da admin paneline erişimini engelleyin.",
     "ipBlocks_add": "IP Engelle",
     "ipBlocks_cancel": "İptal",
@@ -829,7 +822,6 @@
     "generalSettings_passwordResetExpiry": "Şifre sıfırlama bağlantısı süresi (dakika)",
     "generalSettings_cachePerformance": "Önbellek ve Performans",
     "generalSettings_cacheSeconds": "Ayar önbelleği TTL (saniye)",
-    "generalSettings_widgetRefresh": "Widget veri yenileme (saniye)",
     "generalSettings_saving": "Kaydediliyor…",
     "generalSettings_saveSettings": "Ayarları Kaydet",
     "generalSettings_saved": "Ayarlar başarıyla kaydedildi",
@@ -1062,16 +1054,23 @@
     "settingsForm_saveSettings": "Ayarları Kaydet",
     "settingsForm_failedToSave": "Kaydedilemedi",
     "settingsForm_somethingWrong": "Bir seyler yanlis gitti",
-    "alerting_subtitle": "/api/health bozulma veya cokme durumuna gectiginde Discord veya Slack bildirimi gönderin.",
-    "alerting_alertOnHint": "Iyilesme (kosu durumdan sonra 'ok') her zaman gönderilir."
+    "alerting_subtitle": "/api/health bozulduğunda veya düştüğünde webhook bildirimi gönder.",
+    "alerting_alertOnHint": "Iyilesme (kosu durumdan sonra 'ok') her zaman gönderilir.",
+    "alerting_channel": "Gönderim kanalı",
+    "alerting_channelHint": "Daha zengin biçimlendirme için kanal sağlayan bir modül kurun.",
+    "alerting_hostHint": "Webhook URL'si şu adreslerden birinde olmalı:",
+    "alerting_publicHint": "Herkese açık bir sunucuda https URL'si olmalı.",
+    "generalSettings_minPasswordLengthHint": "Yalnızca şartı yükseltir — yerleşik 10 karakter alt sınırı her zaman geçerlidir.",
+    "widgets_title": "Kenar Çubuğu Bileşenleri",
+    "widgets_subtitle": "Ana sayfa kenar çubuğu bileşenlerinin görünürlüğünü ve sırasını ayarlayın",
+    "widgets_none": "Henüz bileşen yok. Bileşen sağlayan bir modül kurun.",
+    "widgets_fromModule": "{module} modülünden gelen bileşen",
+    "widgets_save": "Kaydet",
+    "widgets_saving": "Kaydediliyor..."
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",
     "legal": "Yasal",
-    "termsOfService": "Kullanım Şartları",
-    "privacyPolicy": "Gizlilik Politikası",
-    "refundPolicy": "İade Politikası",
-    "serverRules": "Sunucu Kuralları",
     "faq": "SSS",
     "allRightsReserved": "Tüm hakları saklıdır.",
     "builtWith": "Şununla yapıldı",
@@ -1090,13 +1089,6 @@
     "saved": "Kaydedildi",
     "failedToUpdate": "Profil güncellenemedi",
     "somethingWentWrong": "Bir şeyler ters gitti",
-    "accounts": "Hesaplar",
-    "linkedAccounts": "Bağlı Hesaplar",
-    "unlink": "Bağlantıyı Kaldır",
-    "linkGameAccount": "Oyun Hesabı Bağla",
-    "gameUsername": "Oyun kullanıcı adı",
-    "link": "Bağla",
-    "oauthAutoLink": "Discord ve Google hesapları, onlarla giriş yaptığınızda otomatik olarak bağlanır.",
     "messages": "Mesajlar",
     "notifications": "Bildirimler",
     "sessions": "Oturumlar",
@@ -1227,5 +1219,92 @@
     "results": "sonuç",
     "source": "kaynak",
     "sources": "kaynak"
+  },
+  "setup": {
+    "title": "uxwVend Kurulumu",
+    "subtitle": "Birkaç adımda platformunuz hazır.",
+    "back": "Geri",
+    "next": "İleri",
+    "finish": "Kurulumu Tamamla",
+    "finishing": "Tamamlanıyor…",
+    "incomplete": "Devam etmeden önce zorunlu alanları doldurun.",
+    "failed": "Kurulum başarısız oldu. Lütfen tekrar deneyin.",
+    "steps": {
+      "welcome": "Karşılama",
+      "admin": "Yönetici",
+      "site": "Site",
+      "type": "Site tipi",
+      "theme": "Tema",
+      "modules": "Modüller",
+      "done": "Bitti"
+    },
+    "welcome": {
+      "title": "uxwVend'e hoş geldiniz",
+      "body": "Bu sihirbaz yönetici hesabınızı oluşturur, sitenizi yapılandırır ve pazar yerinden ilk modüllerinizi kurar. Hepsini sonradan yönetim panelinden değiştirebilirsiniz.",
+      "note": "Platform hiçbir modülle gelmez. Burada eklediğiniz her şey isteğe bağlıdır."
+    },
+    "admin": {
+      "title": "Yönetici hesabını oluşturun",
+      "description": "Bu hesap tam yetkilidir. Posta alabileceğiniz bir adres kullanın.",
+      "email": "E-posta",
+      "username": "Kullanıcı adı",
+      "password": "Parola",
+      "passwordConfirm": "Parolayı doğrulayın",
+      "passwordHint": "En az 8 karakter.",
+      "mismatch": "Parolalar eşleşmiyor."
+    },
+    "site": {
+      "title": "Sitenize bir ad verin",
+      "description": "Başlıkta, sayfa adlarında ve arama sonuçlarında görünür.",
+      "name": "Site adı",
+      "descriptionField": "Kısa açıklama",
+      "descriptionHint": "Tek cümle. SEO ve sosyal medya önizlemelerinde kullanılır.",
+      "locale": "Varsayılan dil"
+    },
+    "type": {
+      "title": "Bu site ne için?",
+      "description": "En yakın seçeneği işaretleyin, size uygun modülleri önceden seçelim. Sonraki adımlarda düzenleyebilirsiniz.",
+      "unavailable": "Hazır paket yok — devam edip modülleri elle seçebilirsiniz.",
+      "moduleCount": "{count} modül",
+      "noModules": "Önceden seçili modül yok"
+    },
+    "theme": {
+      "title": "Bir tema seçin",
+      "description": "Sitenizin görünümünü belirleyin. Temayı sonradan değiştirebilirsiniz.",
+      "empty": "Kurulu tema yok. Kurulum yerleşik varsayılanla devam edecek.",
+      "suggested": "Önerdiği modüller: {modules}"
+    },
+    "modules": {
+      "title": "Modülleri seçin",
+      "description": "Şimdi ihtiyacınız olanları kurun. Buradaki her şey sonradan yönetim panelinden eklenip kaldırılabilir.",
+      "search": "Modül ara…",
+      "noResults": "“{query}” ile eşleşen modül yok.",
+      "empty": "Henüz modül yok. Kurulumdan sonra pazar yerinden kurabilirsiniz.",
+      "selectedCount": "{count} seçili",
+      "autoAddedCount": "{count} otomatik eklendi",
+      "requiredBy": "{modules} için gerekli",
+      "requires": "{modules} modülünü gerektirir",
+      "clear": "Seçimi temizle",
+      "conflict": "{modules} ile birlikte kurulamaz",
+      "categories": {
+        "commerce": "Ticaret",
+        "community": "Topluluk",
+        "gaming": "Oyun",
+        "management": "Yönetim",
+        "content": "İçerik",
+        "integration": "Entegrasyon",
+        "other": "Diğer"
+      }
+    },
+    "done": {
+      "title": "Kurulum tamamlandı!",
+      "working": "Tamamlanıyor…",
+      "body": "Platformunuz hazır. Yönetim paneline giriş yapabilirsiniz.",
+      "waiting": "Kurulum sonlandırılırken lütfen bekleyin.",
+      "installed": "Kurulanlar: {modules}",
+      "autoAdded": "Bağımlılık olarak eklenenler: {modules}",
+      "failed": "Kurulamayanlar: {modules}",
+      "goAdmin": "Yönetim paneline git"
+    }
   }
 }

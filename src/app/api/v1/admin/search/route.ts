@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     } catch { /* ignore */ }
 
     // 5. Modules can extend via hook filter
-    const extended = await applyFiltersAsync<SearchResult[], { query: string }>("admin.search.results", results, { query: q });
+    const extended = await applyFiltersAsync("admin.search.results", results, { query: q });
 
     // Sort by score, dedupe by href
     const seen = new Set<string>();

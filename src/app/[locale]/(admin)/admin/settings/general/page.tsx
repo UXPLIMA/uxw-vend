@@ -15,7 +15,7 @@ interface FieldDef {
     labelKey: string;
     type: "number";
     defaultValue: number;
-    description?: string;
+    descriptionKey?: string;
 }
 
 interface SectionDef {
@@ -27,7 +27,7 @@ const sections: SectionDef[] = [
     {
         titleKey: "generalSettings_authSecurity",
         fields: [
-            { key: "password_min_length", labelKey: "generalSettings_minPasswordLength", type: "number", defaultValue: 6 },
+            { key: "password_min_length", labelKey: "generalSettings_minPasswordLength", type: "number", defaultValue: 10, descriptionKey: "generalSettings_minPasswordLengthHint" },
             { key: "email_verify_expiry_hours", labelKey: "generalSettings_emailVerifyExpiry", type: "number", defaultValue: 24 },
             { key: "password_reset_expiry_minutes", labelKey: "generalSettings_passwordResetExpiry", type: "number", defaultValue: 60 },
         ],
@@ -36,7 +36,6 @@ const sections: SectionDef[] = [
         titleKey: "generalSettings_cachePerformance",
         fields: [
             { key: "settings_cache_seconds", labelKey: "generalSettings_cacheSeconds", type: "number", defaultValue: 60 },
-            { key: "widget_refresh_seconds", labelKey: "generalSettings_widgetRefresh", type: "number", defaultValue: 30 },
         ],
     },
 ];
@@ -127,8 +126,8 @@ export default function GeneralSettingsPage() {
                                             placeholder={String(field.defaultValue)}
                                             min={0}
                                         />
-                                        {field.description && (
-                                            <p className="text-xs text-muted-foreground mt-1">{field.description}</p>
+                                        {field.descriptionKey && (
+                                            <p className="text-xs text-muted-foreground mt-1">{t(field.descriptionKey)}</p>
                                         )}
                                     </div>
                                 ))}

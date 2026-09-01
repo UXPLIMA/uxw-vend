@@ -11,22 +11,30 @@
  * the contextual sidebar (like "User Management", "Actions").
  *
  * Module contributions: modules declare `menu[]` in their manifest with
- * an optional `group` field. If a module item doesn't declare a group,
- * `inferModuleGroup(moduleId)` is used to pick a sensible default based
- * on the module's id (content / commerce / community / other).
+ * an optional `group` field naming the group to join. Items that name no
+ * group — or one nothing provides — land in a catch-all bucket that is
+ * only created when something needs it.
  *
- * Core items live in the `CORE_NAV_GROUPS` constant; module items are
- * merged at render time in the sidebar component.
+ * Core items live in the `CORE_NAV_GROUPS` constant; `buildNavGroups()`
+ * merges module items in and prunes whatever ends up empty.
  */
 
 import type { ComponentType } from "react";
+import {
+    byDeclaringModule,
+    findNavGroupConflicts,
+    type ModuleNavGroupDeclaration,
+    type NavGroupConflict,
+} from "@/core/lib/nav-group-conflicts";
 import { themeRegistry } from "@/core/generated/theme-registry";
+
+export { findNavGroupConflicts };
+export type { ModuleNavGroupDeclaration, NavGroupConflict };
 import { themeAdminRoutes, type ThemeAdminNavItem } from "@/core/generated/theme-admin-routes";
 import {
     LayoutDashboard,
     Users,
     FileText,
-    ShoppingBag,
     Palette,
     Package,
     Activity,
@@ -58,11 +66,14 @@ import {
     Cog,
 } from "lucide-react";
 
+/** Lucide-compatible icon component used across the admin sidebar. */
+export type NavIconComponent = ComponentType<{ size?: number; className?: string }>;
+
 export interface NavItem {
     href: string;
     label: string;
     labelKey?: string;
-    icon?: ComponentType<{ size?: number; className?: string }>;
+    icon?: NavIconComponent;
 }
 
 export interface NavSection {
@@ -73,7 +84,7 @@ export interface NavSection {
 
 export interface NavGroup {
     id: string;
-    icon: ComponentType<{ size?: number; className?: string }>;
+    icon: NavIconComponent;
     label: string;
     labelKey?: string;
     sections: NavSection[];
@@ -82,8 +93,9 @@ export interface NavGroup {
 }
 
 /**
- * Core navigation groups — these are always present regardless of
- * installed modules. Modules extend groups at render time.
+ * Core navigation groups. Every group here owns at least one core item,
+ * so none of them can render empty. Modules extend them via
+ * `buildNavGroups()`.
  */
 export const CORE_NAV_GROUPS: NavGroup[] = [
     {
@@ -148,15 +160,6 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         ],
     },
     {
-        id: "commerce",
-        icon: ShoppingBag,
-        label: "Commerce",
-        labelKey: "sidebar_commerce",
-        sections: [
-            // Modules contribute here
-        ],
-    },
-    {
         id: "design",
         icon: Palette,
         label: "Design",
@@ -201,18 +204,6 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                     { href: "/admin/modules", label: "Modules", labelKey: "sidebar_modules", icon: Package },
                 ],
             },
-        ],
-    },
-    {
-        // Fallback bucket for module-contributed menu items that don't declare a
-        // `group` in their manifest. Modules can opt into other groups (content,
-        // commerce, users, etc.) by setting `menu[].group` explicitly.
-        id: "modules",
-        icon: Package,
-        label: "Modules",
-        labelKey: "sidebar_modules",
-        sections: [
-            // Modules contribute here by default
         ],
     },
     {
@@ -286,14 +277,169 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
     },
 ];
 
+/** Id of the catch-all bucket for menu items that name no group. */
+export const FALLBACK_NAV_GROUP_ID = "modules";
+
+// Render order. Core groups keep their declared array order; everything a
+// module or theme adds sits after them, so installing a module never
+// reshuffles the groups an admin already knows.
+const MODULE_GROUP_ORDER_BASE = 1000;
+const FALLBACK_GROUP_ORDER = 8000;
+const THEME_GROUP_ORDER = 9000;
+
+export interface ModuleMenuContribution {
+    id: string;
+    menu?: { path: string; label: string; icon?: string; group?: string }[];
+}
+
+export interface BuildNavGroupsOptions {
+    /** Enabled modules only — the caller filters on `ModuleConfig.enabled`. */
+    modules?: ModuleMenuContribution[];
+    /** Nav groups declared by enabled modules. */
+    navGroups?: ModuleNavGroupDeclaration[];
+    themeGroup?: NavGroup | null;
+    coreGroups?: NavGroup[];
+    /** Resolves a translation key, returning `fallback` when it is missing. */
+    translate?: (key: string, fallback: string) => string;
+    /** Resolves a Lucide icon name from a manifest to a component. */
+    resolveIcon?: (name: string | undefined) => NavIconComponent;
+}
+
+function cloneGroup(group: NavGroup): NavGroup {
+    return { ...group, sections: group.sections.map((s) => ({ ...s, items: [...s.items] })) };
+}
+
+function prettifyModuleId(id: string): string {
+    return id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 /**
- * Default nav group for module menu items that don't declare a `group`.
- * Core knows nothing about specific modules — modules opt into other groups
- * (content, commerce, users, etc.) by setting `menu[].group` in their
- * manifest. Anything else lands in the catch-all "Modules" bucket.
+ * Find the group a menu item asked for, creating the catch-all bucket when
+ * nothing provides it.
+ *
+ * An item may name a group no installed module declares. Dropping it would
+ * make that module's admin page unreachable with no visible cause, so it
+ * lands in the bucket instead.
  */
-export function inferModuleGroup(_moduleId: string): string {
-    return "modules";
+function resolveGroup(
+    requested: string | undefined,
+    groups: NavGroup[],
+    byId: Map<string, NavGroup>,
+    sortOrder: Map<string, number>,
+    translate: (key: string, fallback: string) => string,
+): NavGroup {
+    const existing = requested ? byId.get(requested) : undefined;
+    if (existing) return existing;
+
+    const bucket = byId.get(FALLBACK_NAV_GROUP_ID);
+    if (bucket) return bucket;
+
+    const created: NavGroup = {
+        id: FALLBACK_NAV_GROUP_ID,
+        icon: Package,
+        label: translate("sidebar_modules", "Modules"),
+        labelKey: "sidebar_modules",
+        sections: [],
+    };
+    byId.set(created.id, created);
+    sortOrder.set(created.id, FALLBACK_GROUP_ORDER);
+    groups.push(created);
+    return created;
+}
+
+/**
+ * Merge module menu contributions into the nav groups, then drop everything
+ * that ended up empty.
+ *
+ * Core ships only the groups it fills itself. A group declared purely for
+ * modules to populate renders as a dead entry in the icon rail when nothing
+ * is installed — preventing that is this function's job: sections with no
+ * items, and groups with no sections, never reach the caller.
+ *
+ * Modules are processed in lexical id order so the rendered sidebar does not
+ * depend on install order or filesystem enumeration.
+ */
+export function buildNavGroups({
+    modules = [],
+    navGroups = [],
+    themeGroup = null,
+    coreGroups = CORE_NAV_GROUPS,
+    translate = (_key, fallback) => fallback,
+    resolveIcon = () => Package,
+}: BuildNavGroupsOptions = {}): NavGroup[] {
+    const groups: NavGroup[] = coreGroups.map(cloneGroup);
+    const sortOrder = new Map<string, number>();
+    groups.forEach((group, index) => sortOrder.set(group.id, index));
+
+    // Modules may declare groups core does not ship, and several modules may
+    // declare the same one — a storefront and a credits module both belong
+    // under Commerce. The first declaration by module id wins the label and
+    // icon; every declaring module still contributes its items.
+    // `findNavGroupConflicts` reports disagreements at validation time.
+    for (const declaration of [...navGroups].sort(byDeclaringModule)) {
+        if (sortOrder.has(declaration.id)) continue;
+        groups.push({
+            id: declaration.id,
+            icon: resolveIcon(declaration.icon),
+            label: declaration.label,
+            sections: [],
+        });
+        sortOrder.set(declaration.id, MODULE_GROUP_ORDER_BASE + (declaration.order ?? 0));
+    }
+
+    if (themeGroup) {
+        groups.push(cloneGroup(themeGroup));
+        sortOrder.set(themeGroup.id, THEME_GROUP_ORDER);
+    }
+
+    const byId = new Map(groups.map((g) => [g.id, g]));
+
+    // One named section per multi-item module; the single-item ones share a
+    // tail section per group, because a wall of one-item headers reads worse
+    // than a single "Extensions" list.
+    const namedSections = new Map<string, NavSection>();
+    const pooledSections = new Map<string, NavSection>();
+
+    for (const mod of [...modules].sort((a, b) => a.id.localeCompare(b.id))) {
+        if (!mod.menu || mod.menu.length === 0) continue;
+
+        const moduleLabel = translate(`menu_${mod.id}`, prettifyModuleId(mod.id));
+        const isMulti = mod.menu.length > 1;
+
+        for (const entry of mod.menu) {
+            const group = resolveGroup(entry.group, groups, byId, sortOrder, translate);
+            const labelKey = `menu_${mod.id}_${entry.label.replace(/\s+/g, "_").toLowerCase()}`;
+            const item: NavItem = {
+                href: `/admin${entry.path.startsWith("/") ? entry.path : "/" + entry.path}`,
+                label: translate(labelKey, entry.label),
+                icon: resolveIcon(entry.icon),
+            };
+
+            if (isMulti) {
+                const key = `${group.id}::${mod.id}`;
+                let section = namedSections.get(key);
+                if (!section) {
+                    section = { header: moduleLabel, items: [] };
+                    namedSections.set(key, section);
+                    group.sections.push(section);
+                }
+                section.items.push(item);
+            } else {
+                let section = pooledSections.get(group.id);
+                if (!section) {
+                    section = { header: translate("sidebar_extensions", "Extensions"), items: [] };
+                    pooledSections.set(group.id, section);
+                    group.sections.push(section);
+                }
+                section.items.push(item);
+            }
+        }
+    }
+
+    return groups
+        .map((group) => ({ ...group, sections: group.sections.filter((s) => s.items.length > 0) }))
+        .filter((group) => group.sections.length > 0)
+        .sort((a, b) => (sortOrder.get(a.id) ?? 0) - (sortOrder.get(b.id) ?? 0) || a.id.localeCompare(b.id));
 }
 
 /**

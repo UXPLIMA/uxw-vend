@@ -72,9 +72,11 @@ vi.mock("@/core/lib/module-backup", () => ({
     backupBeforeModuleChange: async () => {},
 }));
 
-vi.mock("@/core/lib/module-dependencies", () => ({
+// Only the DB-touching check is stubbed; everything else stays real so this
+// mock doesn't need updating each time the module gains an export.
+vi.mock("@/core/lib/module-dependencies", async (importOriginal) => ({
+    ...(await importOriginal<typeof import("@/core/lib/module-dependencies")>()),
     checkModuleDependencies: async () => ({ ok: true }),
-    dependencyErrorMessage: () => "ok",
 }));
 
 // child_process.execFileSync is what runs `scripts/generate-registry.ts`.
