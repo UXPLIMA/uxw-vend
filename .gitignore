@@ -38,6 +38,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+# Local `next start` / dev-server logs. Dotfiles are not ignored by default,
+# so `git add -A` will otherwise commit them.
+.*.log
+*.log
 
 # env files
 .env
