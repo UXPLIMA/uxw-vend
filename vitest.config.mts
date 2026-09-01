@@ -60,12 +60,19 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 48,
-                branches: 46,
-                functions: 40,
-                lines: 49,
+                statements: 49,
+                branches: 48,
+                functions: 42,
+                lines: 50,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
+                },
+                // Reconciling the build against the installed modules is the
+                // difference between a module install working and silently
+                // doing nothing. Every branch of the drift detection is worth
+                // a test, so hold it near the top.
+                'src/core/lib/build-state.ts': {
+                    statements: 95, branches: 92, functions: 100, lines: 95,
                 },
                 'src/core/lib/secret-storage.ts': {
                     statements: 92, branches: 80, functions: 100, lines: 92,

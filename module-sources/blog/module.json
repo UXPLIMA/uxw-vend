@@ -825,7 +825,10 @@
       "id": "blog-search",
       "label": "Blog",
       "handler": "search/handler.ts",
-      "icon": "FileText"
+      "icon": "FileText",
+      "indexes": [
+        { "table": "BlogArticle", "columns": ["title", "excerpt", "content"] }
+      ]
     }
   ],
   "notificationTypes": [

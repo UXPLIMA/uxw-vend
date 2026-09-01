@@ -6,6 +6,12 @@
  * and returns a fallback value. Also writes a best-effort audit row to
  * ActivityLog so admins can see runtime failures from the dashboard.
  *
+ * This file was called `module-sandbox.ts`, which claimed something it does
+ * not do. There is no sandbox here and none anywhere else: module code runs
+ * in the same process, with the same database credentials and the same
+ * filesystem access as core. This is an error boundary — it contains a
+ * *crash*, not a module. See docs/PLUGIN_SDK.md ("The trust model").
+ *
  * Example:
  *   const results = await safeCall(
  *     provider.module,
@@ -26,7 +32,7 @@ export async function safeCall<T>(
     try {
         return await fn();
     } catch (err) {
-        console.error(`[module-sandbox] ${moduleName}:${opName} failed:`, err);
+        console.error(`[module-safe-call] ${moduleName}:${opName} failed:`, err);
         try {
             const { prisma } = await import("@/core/lib/db");
             await prisma.activityLog

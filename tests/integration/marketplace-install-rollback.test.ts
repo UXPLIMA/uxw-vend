@@ -107,6 +107,7 @@ function buildModuleZip(moduleId: string): Buffer {
         name: "Test Module",
         description: "Test module for rollback test",
         version: "1.0.0",
+        coreVersion: "^1.0.0",
     };
     zip.addFile("module.json", Buffer.from(JSON.stringify(manifest)));
     return zip.toBuffer();

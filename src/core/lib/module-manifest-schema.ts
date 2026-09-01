@@ -218,11 +218,34 @@ const cronJob = z.object({
     handler: relativePath("handler"),
 });
 
+/**
+ * A full-text index the module needs on one of its own tables.
+ *
+ * Modules declare identifiers, never SQL. Core builds the `to_tsvector(...)`
+ * expression from them, so a module cannot inject anything into the DDL — and
+ * the regex below is what makes that guarantee hold rather than assume it.
+ */
+const searchIndex = z.object({
+    table: z.string().min(1).max(63).regex(/^[A-Za-z][A-Za-z0-9_]*$/, "table must be a plain SQL identifier"),
+    columns: z
+        .array(z.string().min(1).max(63).regex(/^[A-Za-z][A-Za-z0-9_]*$/, "column must be a plain SQL identifier"))
+        .min(1)
+        .max(10),
+});
+
 const searchProvider = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
     label: z.string().min(1).max(100),
     handler: relativePath("handler"),
     icon: iconName.optional(),
+    /**
+     * Core used to carry a hardcoded list of four module tables in
+     * `scripts/ensure-search-indexes.ts` — `BlogArticle`, `ForumTopic`,
+     * `HelpArticle`, `Product` — which is exactly the coupling the project
+     * forbids, and which logged an error for every uninstalled module on
+     * every boot. The module that owns the table declares the index instead.
+     */
+    indexes: z.array(searchIndex).max(5).optional(),
 });
 
 const activityTitle = z.object({
@@ -336,11 +359,16 @@ export const moduleManifestSchema = z.object({
     dependencies: z.array(dependencySpec).max(50).optional(),
     conflicts: z.array(dependencySpec).max(50).optional(),
     /**
-     * Range of CORE_API_VERSION this module was built against. Optional:
-     * omitting it means "unconstrained", which is what every manifest written
-     * before this field existed implicitly declared.
+     * Range of CORE_API_VERSION this module was built against.
+     *
+     * Required. It used to be optional, and an omitted range meant
+     * "unconstrained" — which is the one answer a compatibility gate must
+     * never accept by default: a module built against a core it has never
+     * seen installed silently and failed at runtime instead of at install
+     * time. Declaring the range is one line, and getting it wrong is a clear
+     * error message; guessing on the module's behalf is neither.
      */
-    coreVersion: semverRange.optional(),
+    coreVersion: semverRange,
     /**
      * Marketplace grouping. Free-form rather than a fixed enum so core owns no
      * category vocabulary — the catalog groups by whatever values are present.

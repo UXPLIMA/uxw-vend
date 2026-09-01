@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ModuleSearchProviders } from "@/core/generated/module-search";
 import { applyFiltersAsync } from "@/core/lib/hooks";
 import { getModuleStates } from "@/core/lib/module-cache";
-import { safeCall } from "@/core/lib/module-sandbox";
+import { safeCall } from "@/core/lib/module-safe-call";
 
 interface SearchResult {
     type?: string;
