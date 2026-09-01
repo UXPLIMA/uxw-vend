@@ -1,0 +1,18 @@
+# Troubleshooting override: republish Postgres and Redis on the host.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d
+#
+# Both bind to 127.0.0.1 ONLY, so they stay unreachable from the network even
+# while this override is active — reach them through an SSH tunnel:
+#
+#   ssh -L 5432:127.0.0.1:5432 you@server
+#
+# Prefer `docker compose exec db psql -U uxwvend uxwvend`, which needs no
+# published port at all. Remove this override when you are done.
+services:
+  db:
+    ports:
+      - "127.0.0.1:${DEBUG_DB_PORT:-5432}:5432"
+  redis:
+    ports:
+      - "127.0.0.1:${DEBUG_REDIS_PORT:-6379}:6379"
