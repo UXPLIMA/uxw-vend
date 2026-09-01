@@ -190,10 +190,22 @@ On subsequent module updates, the same flow runs. New migration files in the upd
 After one or more module installs, `scheduleBuild()` fires a debounced background job:
 
 ```
-db:merge → apply-migrations (all) → generate-registry → npm run build → pm2 restart
+db:merge → apply-migrations (all) → generate-registry → npm run build
+         → record the build fingerprint → SIGTERM (the supervisor restarts us)
 ```
 
-The 3-second debounce ensures bulk installs (e.g., installing five modules in quick succession) trigger only one rebuild.
+The 3-second debounce ensures bulk installs (e.g., installing five modules in
+quick succession) trigger only one rebuild.
+
+The last step is not optional. `next start` reads its route and build manifests
+once, at boot, so a rebuild underneath a running process changes nothing that
+process can serve. Replacing the process is what makes the module live. It used
+to be `pm2 restart uxwvend` inside a swallowing try/catch — and pm2 is in
+neither the Docker image nor `package.json`, so it never ran and every install
+silently kept serving the old build. Raising `SIGTERM` on ourselves works for
+every supervisor the project supports (compose `restart: unless-stopped`,
+systemd `Restart=always`, and pm2 for anyone who does run it) and drains
+in-flight work through the shutdown registry on the way out.
 
 ---
 
@@ -219,7 +231,7 @@ If you are adding the migration system to a module that already has tables in a 
 
 **Abort-on-first-error per module.** If migration `002_add_slug.sql` fails, the runner does not attempt `003_rename_field.sql`. Skipping ahead in sequence could leave the schema in an inconsistent state.
 
-**Advisory lock on install.** The module install route acquires a PostgreSQL advisory lock (`pg_try_advisory_lock`) so concurrent installs in a PM2 cluster cannot race each other.
+**Advisory lock on install.** The module install route acquires a PostgreSQL advisory lock (`pg_try_advisory_lock`) so two installs cannot race each other — whether they arrive as concurrent requests to one process or from a second process during a deploy.
 
 ---
 

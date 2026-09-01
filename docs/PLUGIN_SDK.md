@@ -67,6 +67,7 @@ Only `module.json` is required. Include only the directories your module needs.
 | `name` | `string` | Human-readable display name. |
 | `description` | `string` | Short description shown in admin and marketplace. |
 | `version` | `string` | Semver string, e.g. `"1.0.0"`. |
+| `coreVersion` | `string` | Semver range of `CORE_API_VERSION` this module was built against, e.g. `"^1.0.0"`. Install, update and enable reject a module the running core does not satisfy. Omitting it used to mean "unconstrained" and was allowed; it now fails validation, because a compatibility gate whose default is "compatible with everything" is not a gate. |
 
 ### Optional metadata
 
@@ -78,7 +79,6 @@ Only `module.json` is required. Include only the directories your module needs.
 | `defaultConfig` | `object` | Default config values merged with the DB-stored `ModuleConfig.config` at runtime. |
 | `dependencies` | `string[]` | Modules that must be installed and enabled, as `"id"` or `"id@range"` (e.g. `["store@^1.2.0", "currency"]`). A bare id accepts any installed version. Install and enable both fail when a dependency is missing, disabled, or outside its range. |
 | `conflicts` | `string[]` | Same `id` / `id@range` grammar; these must not be enabled at the same time. A range narrows the clash to the versions that actually conflict. |
-| `coreVersion` | `string` | Semver range of `CORE_API_VERSION` this module was built against, e.g. `"^1.0.0"`. Omit for unconstrained. Install, update and enable reject a module the running core does not satisfy. |
 | `category` | `string` | Marketplace grouping slug (`commerce`, `community`, `gaming`, `management`, `content`, `integration`, or your own). Drives the category headings in the marketplace and the setup wizard. |
 | `tags` | `string[]` | Free-form search keywords. Falls back to `[category]`. |
 | `hooks.onEnable` / `hooks.onDisable` | `string` | Path to a default-exported handler run when the module is enabled / disabled. Use this to seed default data on install. |
@@ -456,11 +456,30 @@ Handler file: `export default async function (): Promise<void>`. Last-run state 
 
 ```json
 "searchProviders": [
-    { "id": "blog-search", "label": "Blog", "handler": "search/handler.ts" }
+    {
+        "id": "blog-search",
+        "label": "Blog",
+        "handler": "search/handler.ts",
+        "indexes": [
+            { "table": "BlogArticle", "columns": ["title", "excerpt", "content"] }
+        ]
+    }
 ]
 ```
 
 Handler: `export default async (query: string) => Promise<SearchResult[]>`. `GET /api/v1/search` merges results from every enabled provider.
+
+`indexes` is optional and asks core to create a GIN `tsvector` index on one of
+your own tables at boot — `CREATE INDEX IF NOT EXISTS "<Table>_fts_idx"`, so it
+is idempotent and costs nothing on later boots. Declare it if your handler runs
+a full-text query; a sequential scan over a growing table is the alternative.
+
+**You declare identifiers, not SQL.** `table` and `columns` must match
+`^[A-Za-z][A-Za-z0-9_]*$` and are rejected at validation time otherwise; core
+builds the `to_tsvector('english', coalesce(...) || ' ' || ...)` expression
+itself. Core previously kept this list hardcoded — four module table names
+inside `src/`, which the architecture forbids, and which logged an error for
+every module that was not installed on every boot.
 
 ### `webhookReceivers` — Inbound webhooks
 
@@ -949,7 +968,7 @@ The ZIP must contain `module.json` at its root.
 The install handler (whichever route fires) follows the same pipeline:
 
 1. Extract to a temp directory and validate `module.json`.
-2. Acquire a Postgres advisory lock (serializes installs in PM2 cluster).
+2. Acquire a Postgres advisory lock (serializes concurrent installs).
 3. Copy files to `src/modules/{id}/`.
 4. Run `db:merge` if the module declares a schema.
 5. Apply pending SQL migrations (`apply-migrations` scoped to this module).
@@ -958,7 +977,55 @@ The install handler (whichever route fires) follows the same pipeline:
 8. Sync `translations` into the `Translation` table.
 9. On any failure: roll back the filesystem and abort. No silent partial installs.
 
-`scheduleBuild()` then fires a debounced background `npm run build && pm2 restart` so the new module's bundled code is available — bulk installs in quick succession trigger only one rebuild.
+`scheduleBuild()` then fires a debounced background rebuild so the new module's
+bundled code is available — bulk installs in quick succession trigger only one
+rebuild. When the build succeeds it records the fingerprint of the installed
+module set beside the build and replaces the process (SIGTERM, which the
+supervisor answers by starting it again), because `next start` reads its
+manifests only at boot. See [docs/MIGRATIONS.md](MIGRATIONS.md#deferred-build).
+
+---
+
+## The trust model
+
+**Installing a module gives it everything the application has.** Read that
+sentence again before you install one you did not write.
+
+Module code is compiled into the same Node.js process as core and runs with:
+
+- the same `DATABASE_URL`, so it can read and write every table, including
+  `User`, `Session` and `ApiKey` — not only the tables it declared;
+- the same filesystem access as the app user, including `.env` and the
+  uploads directory;
+- the same network access, outbound to anywhere;
+- the same secrets, including `AUTH_SECRET` and `SECRET_ENCRYPTION_KEY`.
+
+There is no sandbox, no permission prompt, and no capability list. The
+manifest's `permissions` key describes what the module asks the *admin UI* to
+show; it is not enforced against the module's own code and cannot be. Node.js
+offers no isolation boundary that would survive a module that simply calls
+`prisma` directly.
+
+What the platform does provide is narrower, and worth naming precisely so it
+is not mistaken for isolation:
+
+| Mechanism | What it actually protects |
+|-----------|---------------------------|
+| SDK import boundary (ESLint + `validate-module` + `typecheck:modules`) | Keeps a *cooperating* module off private core internals so upgrades don't break it. Three static gates; a determined module bypasses them at runtime. |
+| `safeCall` (`src/core/lib/module-safe-call.ts`) | Contains a *crash*. A module that throws degrades one feature instead of the request. Not a security boundary. |
+| ZIP validation on install | Rejects path traversal, symlinks and oversized archives — an attack on the *installer*, before any module code runs. |
+| Postgres advisory lock | Serializes concurrent installs. Integrity, not security. |
+| Non-root container user | Limits damage to `/app` if a module achieves code execution. |
+
+The practical rule: **treat installing a module exactly as you would treat
+`npm install` of an unaudited package into a production app with database
+credentials in scope, because that is what it is.** Install first-party modules
+and modules you have read. The marketplace ZIPs shipped in this repository are
+first-party.
+
+If you need to run untrusted third-party extensions, this architecture is the
+wrong one for that, and no amount of manifest validation changes it. That would
+require out-of-process modules with an RPC boundary — a different product.
 
 ---
 
@@ -969,9 +1036,44 @@ The install handler (whichever route fires) follows the same pipeline:
 | Install | Files extracted to `src/modules/<id>/`, schema merged, SQL migrations applied, registry regenerated, `ModuleConfig` row created (`enabled: true`), translations synced. |
 | Enable | Module appears in every UI surface — sidebar, navbar, homepage, dashboard, settings, profile. Hook listeners, cron jobs, search providers, webhook receivers, slot contents — all active. |
 | Disable | Module vanishes from all UI surfaces. Listeners, crons, and other runtime contributions removed. DB data preserved. |
-| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated. Module translations removed (admin-overridden rows preserved). Module-owned tables are NOT dropped — a maintainer must run the SQL manually if they want a clean wipe. |
+| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated, app rebuilt and restarted. Module translations removed (admin-overridden rows preserved). Module-owned tables are **not** dropped — see the data policy below. |
 
 The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled — this was a past footgun and is no longer the case.
+
+### What uninstall does to your data
+
+**Uninstalling a module never deletes the rows it created.** This is a
+deliberate policy, not an omission.
+
+| Removed on uninstall | Kept on uninstall |
+|----------------------|-------------------|
+| The module's files in `src/modules/<id>/` | Every table the module's schema declared, with all its rows |
+| Its `ModuleConfig` row | Its `ModuleMigration` checksum rows |
+| Its translation rows (except ones an admin edited) | Uploaded files it wrote under `public/uploads/` |
+| Its entries in the generated registries | Settings rows it created |
+
+The reasoning: a store module's `Order` table is the shop's accounting record.
+An uninstall is frequently a mistake, a troubleshooting step, or a prelude to
+reinstalling a fixed version — and in all three cases silently dropping the
+data would be unrecoverable, while keeping it costs disk. Reinstalling the same
+module picks its data back up: `apply-migrations` skips migrations whose
+checksums are already recorded, so the tables are left exactly as they were.
+
+**To actually delete the data**, do it deliberately and after a backup:
+
+```bash
+uxwvend backup                       # always first
+docker compose exec -T db psql -U uxwvend -d uxwvend
+\dt                                  # find the module's tables
+DROP TABLE "StoreOrder" CASCADE;     # one at a time, on purpose
+DELETE FROM "ModuleMigration" WHERE "moduleId" = 'store';
+```
+
+Dropping the `ModuleMigration` rows matters: leave them and a later reinstall
+will consider the migrations applied and never recreate the tables.
+
+A module that wants a cleaner story should keep its data behind an export the
+admin can take before uninstalling. The platform will not do it for them.
 
 ---
 

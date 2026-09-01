@@ -26,13 +26,27 @@ The platform ships with no modules installed. All domain features (store, forum,
 ### Installing from the Marketplace
 
 1. Go to **Admin > Modules > Marketplace**.
-2. Browse the 41 available modules. Each card shows the module name, description, version, and any dependencies.
+2. Browse the 42 available modules. Each card shows the module name, description, version, and any dependencies.
 3. Click **Install** on the module you want.
 4. The system extracts the ZIP to `src/modules/<id>/`, regenerates the registry synchronously, creates the `ModuleConfig` database record, and syncs translations to the `Translation` table.
 5. If the module has a database schema, the merged schema is updated. If it includes SQL migrations, they run automatically.
 6. If the module has dependencies, they must be installed first. The UI shows which dependencies are missing.
 
 Install fails atomically — if registry regeneration fails, the module files are removed and the `ModuleConfig` record is not created. No silent partial installs.
+
+**The site restarts a few seconds after the install completes.** Module pages
+are compiled into the application, so the platform rebuilds in the background
+and then replaces its own process to serve the result. Expect a short outage —
+seconds on a fast machine, a couple of minutes on a small VPS — and install
+during a quiet period on a busy site. Installing several modules at once
+produces one rebuild, not one per module, so bulk installs are cheaper than
+sequential ones.
+
+> **Only install modules you trust.** A module runs with the same database
+> access and the same secrets as the platform itself; there is no sandbox. The
+> modules in the bundled marketplace are first-party. Treat anything else the
+> way you would treat running someone else's code on your server, because that
+> is what it is. See [docs/PLUGIN_SDK.md](PLUGIN_SDK.md) ("The trust model").
 
 ### Installing from a ZIP Upload
 

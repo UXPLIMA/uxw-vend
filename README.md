@@ -56,7 +56,7 @@ Each `module.json` declares everything the module contributes — routes, admin 
 
 **Lifecycle:** install (extract ZIP → regenerate registry → run module SQL migrations → create `ModuleConfig` row → sync translations) → enable → disable (vanishes from every UI surface, data preserved) → uninstall (files removed, `ModuleConfig` deleted, admin-overridden translations preserved). The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active.
 
-**Install safety:** Postgres advisory lock prevents concurrent installs in PM2 cluster mode. Registry regeneration runs synchronously and rolls back the filesystem on failure — no silent partial installs.
+**Install safety:** a Postgres advisory lock prevents two installs from racing. Registry regeneration runs synchronously and rolls back the filesystem on failure — no silent partial installs.
 
 ---
 

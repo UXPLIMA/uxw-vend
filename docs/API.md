@@ -111,7 +111,7 @@ if (!limit.allowed) return NextResponse.json({ error: "Rate limited" }, { status
 
 `rateLimitForRole(profile, userId, ip)` looks up the user's role and applies the multiplier from `rate_limit_role_multipliers`. Multipliers are read at runtime — no rebuild required when an admin tunes them.
 
-When Redis is configured (`REDIS_URL`), counters are shared across PM2 workers. Without Redis, the rate limiter falls back to in-memory storage; in multi-worker deployments this is unsafe and `ALLOW_MEMORY_RATE_LIMIT=1` must be set explicitly or rate-limited routes return 503.
+`REDIS_URL` is **required in production**. Without it the limiter fails closed: every rate-limited route answers `429`, `/api/health` included, so a misconfigured deployment reads as down rather than as quietly unprotected. The in-memory fallback resets on every restart — and this platform restarts itself after a module install — which is why it is not the production default. Set `ALLOW_MEMORY_RATE_LIMIT=1` to accept that trade-off deliberately. Outside production the in-memory backend is used with no ceremony.
 
 ---
 
@@ -207,7 +207,7 @@ NextAuth's own endpoints (`/api/auth/...`) sit outside `/api/v1`. Two-factor set
 | POST | `/modules/marketplace/install` | Admin | Install a module from the marketplace |
 | POST | `/modules/marketplace/bulk-install` | Admin | Install multiple marketplace modules |
 
-Install / uninstall acquire a Postgres advisory lock to serialize concurrent operations in PM2 cluster mode. Registry regeneration is synchronous and rolls back the filesystem on failure.
+Install / uninstall acquire a Postgres advisory lock to serialize concurrent operations. Registry regeneration is synchronous and rolls back the filesystem on failure.
 
 ### Themes
 

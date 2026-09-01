@@ -95,7 +95,7 @@ end on every release.
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string. Example: `postgresql://user:pass@localhost:5432/uxwvend`. Append `?connection_limit=20` for high-traffic or PM2 cluster deployments. |
+| `DATABASE_URL` | PostgreSQL connection string. Example: `postgresql://user:pass@localhost:5432/uxwvend`. Append `?connection_limit=20` for a high-traffic site. |
 | `AUTH_SECRET` | JWT signing secret. Must be 32+ chars. Generate: `openssl rand -base64 32`. Must be identical across all replicas behind the same load balancer. |
 | `AUTH_URL` | Canonical public URL of the site (e.g. `https://yourdomain.com`). Used for OAuth callback URLs and password-reset links. **Must start with `https://` in production** to activate `__Secure-` cookie prefixes and the `Secure` flag. On plain-HTTP deployments, leave this unset and Auth.js picks safe defaults. |
 
@@ -241,13 +241,18 @@ pm2 save
 pm2 startup    # follow the printed command to register PM2 on boot
 ```
 
-For cluster mode (multiple workers sharing one port):
+**Do not use cluster mode.** PM2 will happily run `-i max`, and it will look
+fine until someone installs a module. Only one worker takes the install lock
+and rebuilds; the others keep serving the build they read at boot, so the
+module appears and disappears depending on which worker answers. Worse, a
+second worker that starts its own build writes into the same `.next` the first
+is reading. One process per installation is the supported topology — see
+["The Build Lifecycle"](#the-build-lifecycle) for why, and for what to do when
+you outgrow it.
 
-```bash
-pm2 start npm --name uxwvend -i max -- start -- -p 3001 -H 0.0.0.0
-```
-
-`REDIS_URL` is required in production regardless of mode — see the environment table above. Cluster mode is the reason why: each worker would otherwise hold its own in-memory counters, and an attacker bypasses the limit by rotating between workers.
+`REDIS_URL` is required in production. Without it the rate limiter fails closed
+and answers every rate-limited request with 429 — see the environment table
+above.
 
 Useful PM2 commands:
 
@@ -430,9 +435,87 @@ After upgrading, visit `GET /api/health` to confirm the database is reachable.
 ## Zero-Downtime Considerations
 
 - `pm2 reload uxwvend` performs a rolling restart (one worker at a time) rather than a hard restart. Use this for routine upgrades.
-- The module install route holds a PostgreSQL advisory lock (`pg_try_advisory_lock`) to prevent two concurrent installs from racing in a PM2 cluster.
-- After installing one or more modules, the platform schedules a deferred build (`scheduleBuild()`): `db-merge → apply-migrations → generate-registry → npm run build → pm2 restart`. A 3-second debounce ensures bulk installs don't trigger one build per module.
+- The module install route holds a PostgreSQL advisory lock (`pg_try_advisory_lock`) to prevent two installs from racing.
 - Session JWTs refresh every hour (`updateAge: 3600`). Role, ban, and permission changes propagate to dormant sessions within that window.
+- **Installing a module is not zero-downtime, and cannot be.** See the next section.
+
+---
+
+## The Build Lifecycle
+
+Read this before you plan capacity or debug a "my module disappeared" report.
+It is the one architectural fact about uxwVend that leaks into operations.
+
+**Module pages are compiled into the app.** A module ships React server
+components; Next.js compiles those at build time. There is no runtime loader
+that could render them, so installing a module means rebuilding the app. This
+is the decision everything below follows from.
+
+### What happens on install
+
+`scheduleBuild()` runs, debounced by 3 seconds so a bulk install of thirty
+modules produces one build:
+
+```
+db:merge → apply-migrations → generate-registry → npm run build
+         → record the build fingerprint → SIGTERM
+```
+
+The process then exits and the supervisor starts it again. That last step is
+what makes the module live: `next start` reads its route and build manifests
+once at boot, so a rebuild underneath a running process changes nothing it can
+serve. Expect a gap of a few seconds to a few minutes, depending on how fast
+the machine builds. Install modules during a maintenance window on a busy site.
+
+> **Run the app under a supervisor.** Docker Compose (`restart:
+> unless-stopped`) and systemd (`Restart=always`) both qualify, and so does
+> pm2. A bare `npm start` in a terminal does not: the process will exit after a
+> module install and nothing will bring it back. The Docker install does the
+> right thing with no configuration; if you deploy manually, this is the one
+> thing you must not skip.
+
+### What happens on boot
+
+`scripts/reconcile-build.ts` runs before the server binds a port. It compares a
+fingerprint of `src/modules/` against the fingerprint recorded beside the build
+and rebuilds when they disagree. Four situations reach it:
+
+| Situation | What the reconciler does |
+|-----------|--------------------------|
+| Fresh install, no modules | Nothing. Adopts the image's build. Sub-second. |
+| Restart, nothing changed | Nothing. Sub-second. |
+| `uxwvend update` with modules installed | Rebuilds. The new image's build was made with zero modules; yours were not in it. **Minutes.** |
+| A build was interrupted (OOM, `docker kill` mid-install) | Rebuilds. |
+
+Row three is why `uxwvend update` can take several minutes on a site with
+modules and only seconds on one without. The CLI says so while it waits.
+
+A rebuild that *fails* is loud in the logs but does not stop the boot: the
+previous build is served so the admin UI stays reachable and the offending
+module can be removed. Only a completely missing build is fatal.
+
+### Where the build lives
+
+In Docker, `/app/.next` is the `nextbuild` named volume, so a rebuild survives
+container replacement — otherwise every `uxwvend restart` on a site with
+modules would pay for a full build. Docker seeds the volume from the image the
+first time it is created, which is why a fresh install never rebuilds.
+
+`docker compose down -v` deletes it along with everything else. The next boot
+rebuilds; nothing is lost but time.
+
+### The scaling ceiling this implies
+
+**uxwVend runs one app process per installation.** Not one per core — one,
+full stop. Two processes sharing the `modules` volume would both try to build
+into the same `.next`, and the loser would serve a half-written build.
+
+That is a real limit and it is not currently enforced by anything but this
+paragraph. A single Node process on a 2-core VPS serves this workload
+comfortably; if you outgrow it, the fix is a read replica and a CDN in front of
+the public pages, not a second app container. Horizontal scaling would need the
+build moved out of the app process entirely — a design change, not a config
+one.
 
 ---
 
@@ -480,7 +563,15 @@ Registry regeneration failed (e.g. a TypeScript error in the new module). Check 
 
 **PM2 workers each show different rate limit counters**
 
-`REDIS_URL` is not set. Multiple workers each have their own in-memory counter. Set Redis.
+You are running more than one worker, which this architecture does not support
+— see ["The Build Lifecycle"](#the-build-lifecycle). Drop to a single process.
+The counters are the symptom you noticed; module installs are the one that will
+bite you.
+
+**A module I installed shows up on some page loads and not others**
+
+Same cause: more than one app process. Only the one that took the install lock
+rebuilt.
 
 **Schema drift after a `git pull`**
 

@@ -7,6 +7,118 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Installing a module had no effect until the app was restarted by hand.**
+  After the build, `scheduleBuild()` called `npx pm2 restart uxwvend` inside a
+  try/catch that swallowed the failure — and pm2 is in neither the Docker image
+  nor `package.json`, so the call always failed. `next start` reads its route
+  and build manifests once at boot, so the rebuild changed nothing the running
+  process could serve. The restart is now a `SIGTERM` to ourselves, which runs
+  the shutdown registry and lets the supervisor (compose `restart:
+  unless-stopped`, systemd, or pm2 for anyone who does run it) start the
+  process again. Four more copies of the same dead pm2 call — module
+  uninstall, module update, bulk install and theme install — now go through
+  the same debounced `scheduleBuild()` path, which also stops them holding an
+  HTTP request open for the length of a build.
+- **Installed modules disappeared after `uxwvend update`.** The new image
+  carried a build made with zero modules while the `modules` volume still held
+  the admin's modules, and nothing reconciled the two. `scripts/reconcile-build.ts`
+  now runs before the server binds a port: it fingerprints `src/modules/`,
+  compares it against the fingerprint recorded beside the build, and rebuilds
+  when they disagree. A failed rebuild is loud but keeps the previous build
+  serving, so the admin UI stays reachable.
+- **An in-container rebuild produced a stylesheet Tailwind never processed.**
+  `postcss.config.mjs` was not copied into the runner stage, so the rebuild
+  that runs on module install silently skipped Tailwind. `next-env.d.ts` was
+  missing for the same reason, and `/app` itself was root-owned, so the
+  rebuild could not write the files Next.js writes at the project root.
+- `coverage/` is now excluded from ESLint. CI only escaped this because it
+  lints before it runs the suite; on any machine that had run
+  `npm run test:coverage`, `npm run lint -- --max-warnings=0` failed on
+  vendored report helpers.
+
+### Added
+- **Boot-time build reconciliation** (`src/core/lib/build-state.ts`,
+  `scripts/reconcile-build.ts`, `scripts/docker-entrypoint.sh`). The build and
+  the installed module set can no longer silently disagree. 16 unit tests cover
+  the four ways they can drift.
+- **`src/instrumentation.ts`** — a real process lifecycle entry point. Hook,
+  scheduler and search-index bootstrap used to hang off the root layout, so
+  they ran on a render: per-request, per-locale, and never at all for a
+  container serving only API routes, which left it without a scheduler.
+- **CI now boots the published image.** A new job builds the image, runs the
+  real compose stack, installs a module into the volume, restarts, and asserts
+  the module is served and survives container recreation. Every previous gate
+  ran against the source tree, so nothing tested the artifact people install —
+  and both bugs above lived exactly there.
+- **`docs/DEPLOYMENT.md` — "The Build Lifecycle"**, including the
+  single-process scaling ceiling that compiling module pages into the app
+  implies, stated plainly for the first time.
+- **`docs/PLUGIN_SDK.md` — "The trust model"**: installing a module grants it
+  the same database credentials, filesystem and secrets as core. There is no
+  sandbox, the manifest `permissions` key is not enforced against module code,
+  and the document now says so instead of implying otherwise.
+- **`docs/PLUGIN_SDK.md` — "What uninstall does to your data"**: module tables
+  and their rows are deliberately kept, with the SQL to remove them on purpose.
+
+### Changed
+- **`coreVersion` is now required in `module.json`.** Omitting it used to mean
+  "compatible with every core version there will ever be" — the one default a
+  compatibility gate must not have. All 42 first-party modules already declared
+  it.
+- **`src/core/lib/module-sandbox.ts` → `module-safe-call.ts`.** It is an error
+  boundary, not a sandbox, and the old name claimed a security property the
+  file does not provide.
+- **The Docker image drops the test and lint toolchain.** The packages the
+  runtime build genuinely needs (typescript, tailwind, tsx, prisma, dotenv,
+  the `@types`) moved from `devDependencies` to `dependencies` — accurate,
+  because this image rebuilds itself on module install — which lets the
+  builder run `npm prune --omit=dev`.
+- `uxwvend update` waits up to 15 minutes for health instead of 3, and says
+  why, because a post-update boot with modules installed recompiles them
+  first.
+- **Full-text search indexes are declared by the module that owns the table.**
+  `scripts/ensure-search-indexes.ts` held a hardcoded list of four module
+  tables — `BlogArticle`, `ForumTopic`, `HelpArticle`, `Product` — inside core,
+  the exact coupling the architecture forbids, and it logged an error for every
+  one of them that was not installed on every boot. Modules now declare
+  `searchProviders[].indexes` as plain identifiers (validated against
+  `^[A-Za-z][A-Za-z0-9_]*$`); core builds the `tsvector` expression, so a
+  module never supplies SQL. The index names and expressions are byte-identical
+  to the old ones, so existing indexes are reused rather than duplicated.
+- **Documentation corrected where it described behaviour the code does not
+  have**: `docs/API.md` said an unconfigured rate limiter returns 503 and falls
+  back to memory (it returns 429 and denies); PM2 cluster mode was recommended
+  in `docs/DEPLOYMENT.md` and is now documented as unsupported, with the
+  symptoms it produces; `SECURITY.md` now states that what an installed module
+  can do is out of scope, and that the install pipeline is firmly in scope;
+  `docs/ADMIN_GUIDE.md` now tells admins the site restarts after an install and
+  that a module is not sandboxed.
+- **Dependencies updated**: `@aws-sdk/client-s3`, `lucide-react`,
+  `isomorphic-dompurify` 3 → 4, `redis` 5 → 6, `jsdom` 29 → 30,
+  `@types/node` 25 → 26, `@testing-library/jest-dom` 6 → 7.
+
+  Three were held back deliberately, each for a blocker that is reproducible
+  rather than a matter of taste:
+  - **ESLint 10** — `eslint-config-next` bundles an `eslint-plugin-react` that
+    calls the ESLint 9 context API; every lint run dies with
+    `contextOrFilename.getFilename is not a function`. Upstream fix required.
+  - **TypeScript 7** — compiles the tree cleanly, but `typescript-eslint`
+    refuses to run against the TS 7 API (their issue #10940). The documented
+    workaround is a second, aliased TypeScript 6 for the linter, which would
+    mean two type checkers disagreeing about one codebase. Revisit when
+    `typescript-eslint` supports TS ≥ 7.1.
+  - **Prisma 8** — `8.0.0-rc.12` is a release candidate. npm reports it as
+    `latest` because of the dist-tag; it is not a released version, and the ORM
+    is not where this project takes that bet.
+- **`mysql2` pinned to `>= 3.22.0` via `overrides`** (GHSA-3f6p-5ww8-9rcr, auth
+  plugin downgrade leaking plaintext credentials). It arrives through the
+  Prisma CLI and is only reachable by a MySQL datasource, which this project
+  does not use — but the advisory is high severity and the audit gate is not
+  something to argue with. The remaining moderate advisory on `quill` has no
+  fixed release; rich-text HTML is sanitized server-side with DOMPurify on
+  write, so the export path it concerns never reaches stored content.
+
 ## [0.1.0] - 2026-09-01
 
 First public release: a modular, plugin-based platform with a marketplace of
