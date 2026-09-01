@@ -52,6 +52,13 @@ export default function Error({
                 <Button onClick={() => reset()}>
                     <RotateCcw className="w-4 h-4 mr-2" /> {labels.retry}
                 </Button>
+                {/*
+                  * A hard navigation, deliberately. This is the error boundary:
+                  * the React tree below it has already thrown, and a soft
+                  * navigation reuses that tree. Reloading is what makes
+                  * "go home" reliably recover.
+                  */}
+                {/* eslint-disable-next-line @next/next/no-location-assign-relative-destination */}
                 <Button variant="outline" onClick={() => window.location.href = "/"}>
                     <Home className="w-4 h-4 mr-2" /> {labels.goHome}
                 </Button>

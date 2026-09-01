@@ -6,6 +6,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { downloadFromUrl } from "@/core/lib/download";
 import {
     ChevronLeft,
     ChevronRight,
@@ -188,7 +189,7 @@ export default function AuditLogPage() {
         sp.set("export", "csv");
         sp.delete("page");
         sp.delete("limit");
-        window.location.href = `/api/v1/admin/audit-log?${sp.toString()}`;
+        downloadFromUrl(`/api/v1/admin/audit-log?${sp.toString()}`, "audit-log.csv");
     };
 
     const resetPageAndSet = <T,>(setter: (v: T) => void) => (v: T) => {

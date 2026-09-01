@@ -70,9 +70,9 @@
     "pg": "^8.20.0",
     "qrcode": "^1.5.4",
     "rcon-client": "^4.2.5",
-    "react": "19.2.4",
+    "react": "19.2.8",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "19.2.4",
+    "react-dom": "19.2.8",
     "react-quill-new": "^3.8.3",
     "redis": "^5.10.0",
     "resend": "^6.10.0",
@@ -92,6 +92,7 @@
     "react-inspector": {
       "react": "$react"
     },
+    "uuid": "^11.1.1",
     "@hono/node-server": ">=1.19.13",
     "fast-uri": ">=3.1.2",
     "fast-xml-builder": ">=1.1.7",

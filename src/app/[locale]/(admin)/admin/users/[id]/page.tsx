@@ -104,6 +104,12 @@ export default function AdminUserDetailPage() {
             }
             await updateSession({ impersonate: userId });
             toast.success(t("users_nowLoggedAs", { username: user.username }));
+            // A hard navigation on purpose. Impersonation changes who the SERVER
+            // thinks you are, and every server component in the tree has already
+            // rendered against the old session. router.push() would keep that
+            // cached tree and show the admin their own permissions while acting
+            // as someone else.
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             window.location.href = "/";
         } catch {
             toast.error(t("users_impersonateFailed"));
