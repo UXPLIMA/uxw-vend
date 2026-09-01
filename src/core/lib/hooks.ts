@@ -21,6 +21,21 @@ export type AsyncActionListener<T = unknown> = (payload: T) => void | Promise<vo
 export type FilterListener<T = unknown, C = unknown> = (value: T, context?: C) => T;
 export type AsyncFilterListener<T = unknown, C = unknown> = (value: T, context?: C) => T | Promise<T>;
 
+/**
+ * Payload declared for an action name, or `unknown` when nothing has claimed
+ * that name. See src/core/types/hook-payloads.d.ts for how a module claims one.
+ *
+ * `unknown` is the deliberate fallback rather than `never` or `any`: an
+ * undeclared hook must stay usable (a module may emit hooks core has never
+ * heard of) without silently accepting a mistyped payload on a declared one.
+ */
+export type ActionPayload<K extends string> =
+    K extends keyof UxwVendHookPayloads ? UxwVendHookPayloads[K] : unknown;
+
+/** The value flowing through a filter chain, or `unknown` when undeclared. */
+export type FilterValue<K extends string> =
+    K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : unknown;
+
 interface Registration {
     listener: (...args: unknown[]) => unknown;
     priority: number;
@@ -92,8 +107,15 @@ function removeRegistration(map: Map<string, Registration[]>, name: string, list
 
 /* ───────────────────────────── Actions ──────────────────────────────── */
 
-export function addAction<T>(
-    name: string,
+/**
+ * `T` defaults to the registry entry for `name` and is normally left alone —
+ * an unannotated listener parameter is typed from the registry. Annotating it
+ * explicitly still works (needed when `name` is a variable rather than a
+ * literal), but on a declared hook the annotation must be compatible with the
+ * declared payload.
+ */
+export function addAction<K extends string, T extends ActionPayload<K> = ActionPayload<K>>(
+    name: K,
     listener: ActionListener<T> | AsyncActionListener<T>,
     options: { priority?: number; moduleId?: string } = {}
 ): void {
@@ -109,12 +131,12 @@ export function removeAction<T>(name: string, listener: ActionListener<T> | Asyn
 }
 
 /** Synchronous action dispatch. Errors in listeners are logged but do not propagate. */
-export function doAction<T>(name: string, payload: T): void {
+export function doAction<K extends string>(name: K, payload: ActionPayload<K>): void {
     const list = actionRegistry.get(name);
     if (!list || list.length === 0) return;
     for (const reg of list) {
         try {
-            (reg.listener as ActionListener<T>)(payload);
+            (reg.listener as ActionListener<ActionPayload<K>>)(payload);
         } catch (err) {
             console.error(`[hooks] Action "${name}" listener failed:`, err);
         }
@@ -122,13 +144,13 @@ export function doAction<T>(name: string, payload: T): void {
 }
 
 /** Async action dispatch. Awaits each listener in priority order. Errors are isolated. */
-export async function doActionAsync<T>(name: string, payload: T): Promise<void> {
+export async function doActionAsync<K extends string>(name: K, payload: ActionPayload<K>): Promise<void> {
     const list = actionRegistry.get(name);
     if (!list || list.length === 0) return;
     for (const reg of list) {
         try {
             await raceWithTimeout(
-                (reg.listener as AsyncActionListener<T>)(payload),
+                (reg.listener as AsyncActionListener<ActionPayload<K>>)(payload),
                 `${name} (${reg.moduleId ?? "core"})`,
             );
         } catch (err) {
@@ -139,8 +161,8 @@ export async function doActionAsync<T>(name: string, payload: T): Promise<void> 
 
 /* ───────────────────────────── Filters ──────────────────────────────── */
 
-export function addFilter<T, C = unknown>(
-    name: string,
+export function addFilter<K extends string, T extends FilterValue<K> = FilterValue<K>, C = unknown>(
+    name: K,
     listener: FilterListener<T, C> | AsyncFilterListener<T, C>,
     options: { priority?: number; moduleId?: string } = {}
 ): void {
@@ -155,31 +177,45 @@ export function removeFilter<T, C = unknown>(name: string, listener: FilterListe
     removeRegistration(filterRegistry, name, listener as (...args: unknown[]) => unknown);
 }
 
-/** Apply a filter chain synchronously. Returns the transformed value. */
-export function applyFilters<T, C = unknown>(name: string, value: T, context?: C): T {
+/**
+ * Apply a filter chain synchronously. Returns the transformed value.
+ *
+ * On a declared filter name the value is pinned to the declared type; on an
+ * undeclared one it is inferred from the argument, so ad-hoc filter chains keep
+ * working with no registry entry.
+ */
+export function applyFilters<K extends string, V extends FilterValue<K>>(
+    name: K,
+    value: V,
+    context?: unknown,
+): K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V {
     const list = filterRegistry.get(name);
-    if (!list || list.length === 0) return value;
+    if (!list || list.length === 0) return value as never;
     let result = value;
     for (const reg of list) {
         try {
-            result = (reg.listener as FilterListener<T, C>)(result, context);
+            result = (reg.listener as FilterListener<V, unknown>)(result, context);
         } catch (err) {
             console.error(`[hooks] Filter "${name}" listener failed:`, err);
             // Keep the previous value on error (fail-safe).
         }
     }
-    return result;
+    return result as never;
 }
 
 /** Async filter chain — each listener can return a Promise. */
-export async function applyFiltersAsync<T, C = unknown>(name: string, value: T, context?: C): Promise<T> {
+export async function applyFiltersAsync<K extends string, V extends FilterValue<K>>(
+    name: K,
+    value: V,
+    context?: unknown,
+): Promise<K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V> {
     const list = filterRegistry.get(name);
-    if (!list || list.length === 0) return value;
+    if (!list || list.length === 0) return value as never;
     let result = value;
     for (const reg of list) {
         try {
             result = await raceWithTimeout(
-                (reg.listener as AsyncFilterListener<T, C>)(result, context),
+                (reg.listener as AsyncFilterListener<V, unknown>)(result, context),
                 `${name} (${reg.moduleId ?? "core"})`,
             );
         } catch (err) {
@@ -188,8 +224,49 @@ export async function applyFiltersAsync<T, C = unknown>(name: string, value: T, 
             // corrupt the chain — downstream listeners still get a value.
         }
     }
-    return result;
+    return result as never;
 }
+
+/* ─────────────────── Manifest listener type contract ────────────────── */
+
+/**
+ * The handler shape a `hookListeners` entry must export as its default.
+ *
+ * Listener payloads are contravariant: a handler is free to declare fewer
+ * fields than the hook carries (it just reads less), but not more, and not
+ * different ones.
+ */
+export type HookHandlerFor<K extends string, T extends "action" | "filter"> =
+    T extends "action"
+        ? AsyncActionListener<ActionPayload<K>>
+        : AsyncFilterListener<FilterValue<K>>;
+
+type DeclaredNames<T extends "action" | "filter"> =
+    T extends "action" ? keyof UxwVendHookPayloads : keyof UxwVendFilterPayloads;
+
+/**
+ * Resolves to `true` when a manifest-declared handler matches the payload its
+ * hook is declared to carry, and to a descriptive object otherwise — which
+ * `Expect` below turns into a compile error naming the hook.
+ *
+ * Manifest listeners are wired by codegen through a dynamic import, so their
+ * signature is erased and nothing would otherwise check it: a handler reading
+ * `payload.orderNumber` from a hook that carries `{ id }` fails at runtime, on
+ * a code path that only runs when two particular modules are both installed.
+ * This moves that failure to `npm run typecheck:modules`.
+ *
+ * A hook no module has declared a payload for resolves to `true` — undeclared
+ * hooks stay usable, they simply are not checked.
+ */
+export type AssertHookHandler<K extends string, T extends "action" | "filter", F> =
+    K extends DeclaredNames<T>
+        ? F extends HookHandlerFor<K, T>
+            ? true
+            : { error: "handler does not accept the payload this hook carries"; hook: K; expected: HookHandlerFor<K, T>; got: F }
+        : true;
+
+/** Forces an `AssertHookHandler` result to be checked. */
+export type Expect<T extends true> = T;
 
 /* ───────────────────────── Module lifecycle ─────────────────────────── */
 

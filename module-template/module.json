@@ -5,6 +5,8 @@
     "name": "My Module",
     "description": "A template module for uxwVend",
     "version": "1.0.0",
+    "coreVersion": "^1.0.0",
+    "category": "content",
     "author": "Your Name",
     "icon": "Star",
 
@@ -20,7 +22,6 @@
         "exampleSetting": true
     },
 
-    "seedOnInstall": false,
 
     "menu": [
         {

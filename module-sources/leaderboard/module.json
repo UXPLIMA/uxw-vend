@@ -3,6 +3,8 @@
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "Trophy",
   "dependencies": [

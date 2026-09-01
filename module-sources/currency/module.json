@@ -3,6 +3,8 @@
   "name": "Multi-Currency",
   "description": "Multi-currency support with automatic conversion",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "DollarSign",
   "menu": [

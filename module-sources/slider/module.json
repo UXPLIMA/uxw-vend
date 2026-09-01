@@ -3,6 +3,8 @@
   "name": "Slider",
   "description": "Homepage image carousel and banners",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "content",
   "author": "uxwVend",
   "icon": "Image",
   "permissions": [

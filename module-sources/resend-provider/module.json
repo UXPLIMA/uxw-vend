@@ -3,6 +3,8 @@
   "name": "Resend Email Provider",
   "description": "Send emails via Resend API",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "Mail",
   "adminRoutes": [

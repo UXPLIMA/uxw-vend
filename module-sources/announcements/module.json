@@ -3,6 +3,8 @@
   "name": "Announcements",
   "description": "Site-wide announcement banners",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "management",
   "author": "uxwVend",
   "icon": "Megaphone",
   "permissions": [
@@ -32,6 +34,11 @@
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single announcement (admin)."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "announcements.announcement.created", "type": "action" },
+    { "hook": "announcements.announcement.deleted", "type": "action" },
+    { "hook": "announcements.announcement.updated", "type": "action" }
   ],
   "translations": {
     "en": {

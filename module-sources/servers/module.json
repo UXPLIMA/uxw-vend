@@ -3,6 +3,8 @@
   "name": "Game Servers",
   "description": "Game server management, RCON, and status monitoring",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "gaming",
   "author": "uxwVend",
   "icon": "Server",
   "permissions": [
