@@ -1,4 +1,5 @@
 import { createBackup, type BackupMeta } from "./backup";
+import { log } from "./logger";
 
 /**
  * Snapshot the database before a destructive module operation so ops can
@@ -21,7 +22,7 @@ export async function backupBeforeModuleChange(
 
     try {
         const meta = await createBackup("manual", `pre-${action}:${moduleId}`);
-        console.log(`[module-backup] ${action} ${moduleId}: snapshot ${meta.filename} (${meta.sizeBytes} bytes)`);
+        log.info("module snapshot created", { action, moduleId, filename: meta.filename, sizeBytes: meta.sizeBytes });
         return meta;
     } catch (err) {
         console.error(

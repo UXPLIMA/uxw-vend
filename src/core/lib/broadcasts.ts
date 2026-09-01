@@ -1,5 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import { sendEmail } from "@/core/lib/email";
+import { log } from "./logger";
 
 interface BroadcastFilter {
     all?: boolean;
@@ -109,5 +110,5 @@ export async function processQueuedBroadcasts(): Promise<void> {
         },
     });
 
-    console.log(`[broadcast] ${broadcast.id} done: ${sent} sent, ${failed} failed`);
+    log.info("broadcast complete", { broadcastId: broadcast.id, sent, failed });
 }

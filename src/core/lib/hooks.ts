@@ -372,6 +372,10 @@ export async function bootstrapHooks(): Promise<void> {
             }
         }
 
+        // console, not `log` from ./logger, on purpose: this file is exported
+        // through the isomorphic SDK entry (@/core/sdk) and deliberately has no
+        // imports at all. logger.ts pulls in next/headers, which would land in
+        // every client bundle that imports so much as formatDate.
         console.log(`[hooks] Registered ${ModuleHookListeners.length} module hook listeners`);
     } catch (err) {
         // The generated registry may not exist on first build.

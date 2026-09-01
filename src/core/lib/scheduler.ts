@@ -1,5 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import { onShutdown, installShutdownHandlers, isShuttingDown } from "@/core/lib/shutdown";
+import { log } from "./logger";
 
 /**
  * Lightweight cron-style scheduler.
@@ -145,7 +146,7 @@ export async function bootstrapScheduler(): Promise<void> {
         handler: async () => {
             const { pruneOldRevisions } = await import("./revisions");
             const count = await pruneOldRevisions(90);
-            console.log(`[cron] prune-revisions: removed ${count} entries`);
+            log.info("cron: prune-revisions complete", { job: "prune-revisions", removed: count });
         },
     });
 
@@ -157,7 +158,7 @@ export async function bootstrapScheduler(): Promise<void> {
                 where: { isActive: true, expiresAt: { lt: new Date() } },
                 data: { isActive: false },
             });
-            if (result.count > 0) console.log(`[cron] expire-warnings: ${result.count}`);
+            if (result.count > 0) log.info("cron: expire-warnings complete", { job: "expire-warnings", expired: result.count });
         },
     });
 
@@ -177,7 +178,7 @@ export async function bootstrapScheduler(): Promise<void> {
             const { processEmailQueue } = await import("./email");
             const result = await processEmailQueue();
             if (result.sent > 0 || result.failed > 0) {
-                console.log(`[cron] email-queue: sent=${result.sent} failed=${result.failed}`);
+                log.info("cron: email-queue drained", { job: "email-queue", sent: result.sent, failed: result.failed });
             }
         },
     });
@@ -190,7 +191,14 @@ export async function bootstrapScheduler(): Promise<void> {
             const r = await pruneOldRecords();
             const total = r.activityFeed + r.webhookLog + r.cronRun + r.revision + r.userSession;
             if (total > 0) {
-                console.log(`[cron] retention: activityFeed=${r.activityFeed} webhookLog=${r.webhookLog} cronRun=${r.cronRun} revision=${r.revision} userSession=${r.userSession}`);
+                log.info("cron: retention sweep complete", {
+                    job: "retention",
+                    activityFeed: r.activityFeed,
+                    webhookLog: r.webhookLog,
+                    cronRun: r.cronRun,
+                    revision: r.revision,
+                    userSession: r.userSession,
+                });
             }
         },
     });
@@ -202,7 +210,7 @@ export async function bootstrapScheduler(): Promise<void> {
             const { checkAndAlert } = await import("./health-alerting");
             const result = await checkAndAlert();
             if (result.notified) {
-                console.log(`[cron] health-alerting: notified status=${result.status}`);
+                log.info("cron: health alert sent", { job: "health-alerting", status: result.status });
             }
         },
     });
@@ -222,7 +230,7 @@ export async function bootstrapScheduler(): Promise<void> {
             });
             invalidateIpBlockCache();
             if (result.count > 0) {
-                console.log(`[cron] prune-ip-blocks: removed ${result.count} expired entries`);
+                log.info("cron: prune-ip-blocks complete", { job: "prune-ip-blocks", removed: result.count });
             }
         },
     });
@@ -234,7 +242,7 @@ export async function bootstrapScheduler(): Promise<void> {
             const { createBackup } = await import("./backup");
             try {
                 const meta = await createBackup("scheduled", "Daily automated backup");
-                console.log(`[cron] automated-backup: created ${meta.filename} (${meta.sizeBytes} bytes)`);
+                log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
             } catch (err) {
                 console.error("[cron] automated-backup failed:", err);
             }
@@ -265,7 +273,7 @@ export async function bootstrapScheduler(): Promise<void> {
         // module-crons.ts may not exist on first build — silently continue
     }
 
-    console.log(`[scheduler] Registered ${registeredJobs.size} cron jobs, ticking every minute`);
+    log.info("scheduler started", { jobs: registeredJobs.size, tickIntervalMs: 60_000 });
 
     // First tick after a short delay so the server settles
     tickTimeoutHandle = setTimeout(() => { void tick(); }, 5_000);
