@@ -1,5 +1,4 @@
-import { prisma } from "@/core/lib/db";
-import { decryptSecret } from "@/core/lib/secret-storage";
+import { decryptSecret, prisma } from "@/core/sdk/server";
 
 interface RconConfig {
     host: string;

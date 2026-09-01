@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe, getStripeWebhookSecret } from "../../../lib/stripe";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 import { sendOrderConfirmationEmail } from "../../../lib/email";
-import { sendDiscordWebhook } from "@/core/lib/discord";
 import { deliverProduct } from "../../../lib/rcon";
 import Stripe from "stripe";
 
@@ -110,18 +109,8 @@ export async function POST(request: NextRequest) {
             sendOrderConfirmationEmail(buyer.email, order.orderNumber, Number(order.total)).catch(console.error);
 
             // ── Discord notification ──
-            sendDiscordWebhook("order_completed", {
-                embeds: [{
-                    title: "Order Completed",
-                    color: 0x22c55e,
-                    fields: [
-                        { name: "Order", value: order.orderNumber, inline: true },
-                        { name: "Total", value: `${Number(order.total)} ${order.currency}`, inline: true },
-                        { name: "User", value: buyer.username || buyer.email, inline: true },
-                    ],
-                    timestamp: new Date().toISOString(),
-                }],
-            }).catch(console.error);
+            const { doActionAsync } = await import("@/core/sdk");
+            await doActionAsync("store.order.completed", order);
 
             // ── RCON delivery ──
             const playerName = session.metadata?.playerName

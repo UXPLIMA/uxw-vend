@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Navbar, Footer } from "@/core/components/layout";
-import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
+import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { User, CreditCard, Package, Wrench, Info, BookOpen } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 

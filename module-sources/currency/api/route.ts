@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/core/lib/auth";
-import { isAdmin } from "@/core/lib/permissions";
-import { prisma } from "@/core/lib/db";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 const SETTING_KEY = "currency_config";
 

@@ -5,8 +5,8 @@ import Link from "next/link";
 import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { Navbar, Footer } from "@/core/components/layout";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 interface Article {
     id: string;

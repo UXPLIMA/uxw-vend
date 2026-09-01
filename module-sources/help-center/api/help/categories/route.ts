@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { slugify } from "@/core/lib/utils";
+import { slugify } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { helpCategorySchema } from "../../../lib/validations";
 
 // GET /api/v1/help/categories - List categories

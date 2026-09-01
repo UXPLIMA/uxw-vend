@@ -4,9 +4,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Textarea } from "@/core/components/ui/textarea";
+import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 
 interface Message {

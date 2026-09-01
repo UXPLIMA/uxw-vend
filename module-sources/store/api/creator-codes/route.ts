@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 const CREATOR_DEFAULT_DISCOUNT = 5;
 const CREATOR_DEFAULT_COMMISSION = 10;
 

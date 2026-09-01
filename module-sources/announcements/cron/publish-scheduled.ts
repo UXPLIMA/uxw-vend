@@ -1,4 +1,4 @@
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 /**
  * Publish announcements whose `publishAt` has elapsed. Clears the

@@ -1,4 +1,4 @@
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 interface DiscordEmbed {
     title?: string;

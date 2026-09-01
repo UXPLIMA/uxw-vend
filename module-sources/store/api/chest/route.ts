@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/chest - User's chest items
 export async function GET() {

@@ -2,11 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, Card, CardContent, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Suggestion {
     id: string;

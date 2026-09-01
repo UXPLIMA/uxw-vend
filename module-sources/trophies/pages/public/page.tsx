@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Award, Check, Loader2, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Navbar, Footer } from "@/core/components/layout";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 interface TrophyRow {
     id: string;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 export async function GET(request: NextRequest) {
     const path = request.nextUrl.searchParams.get("path");

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -26,7 +24,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the previous content before edit (subset — posts can be large)
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision(
         "forum.post",
         id,
@@ -41,7 +39,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         include: { author: { select: { id: true, username: true, avatar: true } } },
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.post.updated", updated);
 
     return NextResponse.json({ post: updated });
@@ -67,7 +65,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the deleted post for potential restore (subset — posts can be large)
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision(
         "forum.post",
         id,
@@ -78,7 +76,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     await prisma.forumPost.delete({ where: { id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.post.deleted", post);
 
     return NextResponse.json({ message: "Post deleted" });

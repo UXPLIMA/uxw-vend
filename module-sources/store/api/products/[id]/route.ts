@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../../lib/validations";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 type RouteParams = { params: Promise<{ id: string }> };
 

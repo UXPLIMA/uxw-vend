@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
-import { cached } from "@/core/lib/cache";
+import { cached, prisma } from "@/core/sdk/server";
 
 interface LeaderboardEntry {
     username: string;

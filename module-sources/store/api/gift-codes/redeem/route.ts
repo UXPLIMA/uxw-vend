@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
 export async function POST(request: NextRequest) {

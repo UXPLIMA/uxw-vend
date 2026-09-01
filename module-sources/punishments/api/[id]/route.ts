@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -21,7 +20,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // If the punishment was revoked (active → false), fire revoke hook + feed
     if (body.active === false) {
-        const { doActionAsync } = await import("@/core/lib/hooks");
+        const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("punishments.punishment.revoked", {
             punishmentId: punishment.id,
             playerName: punishment.playerName,
@@ -52,7 +51,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.punishment.delete({ where: { id } });
 
     if (punishment) {
-        const { doActionAsync } = await import("@/core/lib/hooks");
+        const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("punishments.punishment.revoked", {
             punishmentId: punishment.id,
             playerName: punishment.playerName,

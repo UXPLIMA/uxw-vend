@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
+import { isAdmin, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("customforms.submission.created", { form, submission });
 
     // Private activity feed entry (only if logged in)
@@ -86,7 +84,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const updated = await prisma.customForm.update({ where: { id: form.id }, data });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("customforms.form.updated", updated);
 
     return NextResponse.json({ form: updated });
@@ -103,7 +101,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     await prisma.customForm.delete({ where: { id: form.id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("customforms.form.deleted", form);
 
     return NextResponse.json({ message: "Deleted" });

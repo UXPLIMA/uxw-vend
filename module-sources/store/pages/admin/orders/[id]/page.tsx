@@ -1,12 +1,10 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { formatCurrency, formatDate } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ArrowLeft, Package } from "lucide-react";
 import { OrderStatusSelect } from "./status-select";
 import { getTranslations } from "next-intl/server";

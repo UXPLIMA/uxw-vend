@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma, rateLimitForRole, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { forumTopicSchema } from "../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
-import { sendDiscordWebhook } from "@/core/lib/discord";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -111,21 +107,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Discord notification
-    sendDiscordWebhook("forum_topic_created", {
-        embeds: [{
-            title: "New Forum Topic",
-            color: 0x6366f1,
-            fields: [
-                { name: "Title", value: topic.title, inline: true },
-                { name: "Author", value: topic.author?.username ?? "Deleted user", inline: true },
-                { name: "Category", value: topic.category?.name || "General", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    }).catch(console.error);
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.topic.created", topic);
 
     // Public activity feed entry

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { generateOrderNumber } from "@/core/lib/utils";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateOrderNumber } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
 const checkoutSchema = z.object({

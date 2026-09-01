@@ -3,11 +3,9 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, Card, CardContent, CardHeader, CardTitle, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 interface Topic {

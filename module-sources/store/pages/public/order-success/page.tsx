@@ -1,12 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Button } from "@/core/components/ui/button";
-import { Card, CardContent } from "@/core/components/ui/card";
+import { Link } from "@/core/sdk/navigation";
+import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 export default function OrderSuccessPage() {
     const t = useTranslations("store");

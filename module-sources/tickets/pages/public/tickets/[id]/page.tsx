@@ -5,12 +5,10 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button } from "@/core/components/ui/button";
-import { Textarea } from "@/core/components/ui/textarea";
-import { Navbar, Footer } from "@/core/components/layout";
-import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
+import { Button, Textarea } from "@/core/sdk/ui";
+import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Message {
     id: string;

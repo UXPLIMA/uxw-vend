@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { verifyToken } from "@/core/lib/two-factor";
+import { prisma, verifyToken } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/disable - Disable 2FA
 // Requires current password OR a valid TOTP code.
@@ -78,7 +77,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire user.2fa.disabled hook — security audit trail, etc.
-    import("@/core/lib/hooks")
+    import("@/core/sdk")
         .then(({ doActionAsync }) =>
             doActionAsync("user.2fa.disabled", { userId: session.user!.id })
         )

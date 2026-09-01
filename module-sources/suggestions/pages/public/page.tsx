@@ -4,16 +4,13 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { useRouter } from "@/core/lib/i18n/navigation";
+import { useRouter } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, Input, Textarea } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { toast } from "sonner";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 // Suggestion bodies are stored as rich-text HTML; the list view shows a
 // short preview, so strip tags rather than rendering them clamped.

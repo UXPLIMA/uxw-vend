@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { blogCategorySchema } from "../../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -67,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         data,
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.category.updated", category);
 
     return NextResponse.json(category);
@@ -100,7 +99,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     await prisma.blogCategory.delete({ where: { id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.category.deleted", existing);
 
     return NextResponse.json({ message: "Category deleted" });

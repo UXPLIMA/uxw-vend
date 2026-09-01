@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Button } from "@/core/components/ui/button";
-import { Navbar, Footer } from "@/core/components/layout";
+import { Button } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Ticket {
     id: string;

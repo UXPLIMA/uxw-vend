@@ -203,14 +203,14 @@ npm run build:marketplace
 
 - **Server components by default** — add `"use client"` only when needed.
 - **No hardcoded UI strings** — use `useTranslations()` (`next-intl`) or declare `translations` in `module.json`.
-- **Auth checks** — admin pages call `isAdmin()` from `@/core/lib/permissions`; write API endpoints verify `session.user.id` + `hasPermission()`.
-- **Imports** — `@/core/lib/*` for core utilities, relative paths within the module.
+- **Auth checks** — admin pages call `isAdmin()` from `@/core/sdk/server`; write API endpoints verify `session.user.id` + `hasPermission()`.
+- **Imports** — the SDK (`@/core/sdk`, `/server`, `/auth`, `/navigation`, `/blocks`, `/theme`, `/ui`, `/layout`, `/admin`) for core, relative paths within the module. Reaching into `@/core/lib/*` or `@/core/components/*` fails `npm run validate:module`.
 - **No `any`** — TypeScript strict mode.
 - **No `confirm()` / `alert()`** — use `useConfirm()` + `toast` from `sonner`.
 - **No emojis in UI** — Lucide icons only.
-- **API responses** — `{ ok: true, data }` / `{ ok: false, error, code?, details? }` via `apiSuccess` / `apiError` / `apiPaginated` from `@/core/lib/api-utils`.
+- **API responses** — `{ ok: true, data }` / `{ ok: false, error, code?, details? }` via `apiSuccess` / `apiError` / `apiPaginated` from `@/core/sdk/server`.
 - **Zod 4** — read validation issues from `.issues`, not `.errors`.
-- **Routing** — `Link`, `usePathname`, `redirect` from `@/core/lib/i18n/navigation`, not `next/link`.
+- **Routing** — `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation`, not `next/link`.
 
 ---
 

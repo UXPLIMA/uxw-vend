@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link } from "@/core/sdk/navigation";
+import { Button } from "@/core/sdk/ui";
 import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { ChevronRight, ChevronLeft, Newspaper } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
 import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
+import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/store/coupons/validate - Check coupon validity
 export async function POST(request: NextRequest) {

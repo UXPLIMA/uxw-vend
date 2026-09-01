@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { verifyToken, generateBackupCodes } from "@/core/lib/two-factor";
+import { generateBackupCodes, prisma, verifyToken } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/verify - Verify token and enable 2FA
 export async function POST(request: NextRequest) {
@@ -38,7 +37,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire user.2fa.enabled hook — security audit trail, etc.
-    import("@/core/lib/hooks")
+    import("@/core/sdk")
         .then(({ doActionAsync }) =>
             doActionAsync("user.2fa.enabled", { userId: session.user!.id })
         )

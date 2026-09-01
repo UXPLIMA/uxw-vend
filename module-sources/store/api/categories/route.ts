@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { slugify } from "@/core/sdk";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { categorySchema } from "../../lib/validations";
-import { slugify } from "@/core/lib/utils";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 // GET /api/v1/store/categories - List categories
 export async function GET() {

@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 // Stripe client + enabled flag. Credentials are resolved from the
 // `stripe_secret_key` / `stripe_public_key` Settings rows first (the

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DollarSign } from "lucide-react";
-import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
+import { FooterDropdown } from "@/core/sdk/ui";
 import { useCurrency, currencies, type CurrencyCode } from "../lib/context";
 
 interface ConfiguredCurrency {

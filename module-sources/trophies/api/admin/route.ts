@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/core/lib/auth";
-import { isAdmin } from "@/core/lib/permissions";
-import { prisma } from "@/core/lib/db";
-import { logActivity } from "@/core/lib/activity-log";
-import { invalidate } from "@/core/lib/cache";
+import { invalidate, isAdmin, logActivity, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 /**
  * Admin trophy CRUD.

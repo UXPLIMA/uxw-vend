@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
+import { isAdmin, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { canDownload } from "../../lib/can-download";
 import { z } from "zod";
 
@@ -56,7 +54,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     await prisma.download.update({ where: { id }, data: { downloads: { increment: 1 } } });
 
     // Fire hook + activity feed entry
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("downloads.file.downloaded", {
         downloadId: download.id,
         title: download.title,

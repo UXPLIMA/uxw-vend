@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/credits/purchase - Admin only: add credits to a user
 export async function POST(request: NextRequest) {
@@ -26,7 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook + activity feed entry
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("credits.credit.added", {
         userId,
         amount,

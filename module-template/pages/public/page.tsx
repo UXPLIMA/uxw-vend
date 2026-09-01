@@ -1,6 +1,6 @@
-import { prisma } from "@/core/lib/db";
-import { HeroBanner, Navbar, Footer } from "@/core/components/layout";
-import { ThemeSlot } from "@/core/components/theme-slot";
+import { prisma } from "@/core/sdk/server";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 export const revalidate = 60;
 
@@ -21,8 +21,9 @@ export default async function MyModulePage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <ThemeSlot name="HeroBanner" defaultComponent={<HeroBanner />} />
-            <ThemeSlot name="Navbar" defaultComponent={<Navbar />} />
+            {/* Renders nothing unless the active theme provides a "Hero". */}
+            <ThemeComponentSlot name="Hero" />
+            <Navbar />
 
             <main className="flex-1 container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-6">My Module</h1>
@@ -51,7 +52,7 @@ export default async function MyModulePage() {
                 )}
             </main>
 
-            <ThemeSlot name="Footer" defaultComponent={<Footer />} />
+            <Footer />
         </div>
     );
 }

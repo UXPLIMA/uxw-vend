@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { SettingsForm } from "@/core/components/admin/SettingsForm";
+import { SettingsForm } from "@/core/sdk/admin";
 
 export default function GoogleAuthSettingsPage() {
     const t = useTranslations("googleAuth");

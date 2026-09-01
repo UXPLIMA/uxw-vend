@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { blogCategorySchema } from "../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
 
 // GET /api/v1/blog/categories - List all categories (public)
 export async function GET() {
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
         data: { name, slug, description },
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.category.created", category);
 
     return NextResponse.json(category, { status: 201 });

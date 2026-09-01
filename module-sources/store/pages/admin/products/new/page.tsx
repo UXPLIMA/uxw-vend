@@ -6,12 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
-import { FileUpload } from "@/core/components/ui/file-upload";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 
 interface Category {

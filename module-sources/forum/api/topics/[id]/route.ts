@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma, rateLimitForRole, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { forumPostSchema } from "../../../lib/validations";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -112,7 +109,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.post.created", post);
 
     // Public activity feed entry
@@ -161,7 +158,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Only snapshot on content-meaningful edits (title / content), not pin/lock toggles
     if (data.title !== undefined || data.content !== undefined) {
-        const { recordRevision } = await import("@/core/lib/revisions");
+        const { recordRevision } = await import("@/core/sdk/server");
         await recordRevision("forum.topic", id, topic, "update", session.user.id);
     }
 
@@ -170,7 +167,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         data,
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.topic.updated", updated);
 
     return NextResponse.json({ topic: updated });
@@ -196,12 +193,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the deleted topic for potential restore
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("forum.topic", id, topic, "delete", session.user.id);
 
     await prisma.forumTopic.delete({ where: { id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("forum.topic.deleted", topic);
 
     return NextResponse.json({ message: "Topic deleted" });

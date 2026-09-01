@@ -243,6 +243,56 @@ function checkNoCoreImports(modulePath: string): CheckResult {
     return { name: "No cross-module imports", passed: true, message: "No cross-module imports found" };
 }
 
+/**
+ * Modules must import core through the published SDK (`@/core/sdk*`), never
+ * through core's internal layout (`@/core/lib/*`, `@/core/components/*`).
+ *
+ * This is the gate that actually holds the boundary: ESLint globally ignores
+ * `module-sources/**` and `src/modules/**`, and the main tsconfig excludes
+ * module sources, so neither would catch a violation. This check runs in
+ * `build-marketplace.sh` and in CI, and covers third-party ZIPs at authoring
+ * time.
+ */
+function checkSdkImports(modulePath: string): CheckResult {
+    function walkFiles(dir: string): string[] {
+        const results: string[] = [];
+        if (!fs.existsSync(dir)) return results;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                results.push(...walkFiles(fullPath));
+            } else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) {
+                results.push(fullPath);
+            }
+        }
+        return results;
+    }
+
+    const violations: string[] = [];
+    // Catches both `from "@/core/lib/x"` and `await import("@/core/lib/x")`.
+    const deepImport = /["']@\/core\/(lib|components)\/[^"']*["']/;
+
+    for (const file of walkFiles(modulePath)) {
+        const lines = fs.readFileSync(file, "utf8").split("\n");
+        for (let i = 0; i < lines.length; i++) {
+            if (deepImport.test(lines[i])) {
+                violations.push(`${path.relative(modulePath, file)}:${i + 1}`);
+            }
+        }
+    }
+
+    if (violations.length > 0) {
+        return {
+            name: "SDK imports only",
+            passed: false,
+            message: `${violations.length} import(s) reach into core internals:\n      ${violations.slice(0, 5).join("\n      ")}${violations.length > 5 ? `\n      ... and ${violations.length - 5} more` : ""}`,
+            suggestion: "Import from @/core/sdk (isomorphic), or one of @/core/sdk/{server,auth,navigation,blocks,theme,ui,layout,admin}. Run `npx tsx scripts/migrate-module-imports.ts <path>` to rewrite them.",
+        };
+    }
+
+    return { name: "SDK imports only", passed: true, message: "No @/core/lib or @/core/components imports" };
+}
+
 function checkSchemaPrisma(modulePath: string): CheckResult {
     const schemaPath = path.join(modulePath, "schema.prisma");
 
@@ -252,27 +302,34 @@ function checkSchemaPrisma(modulePath: string): CheckResult {
 
     const content = fs.readFileSync(schemaPath, "utf8");
 
-    // Check for basic model definitions
+    const hasUserRelations = content.includes("@@user-relations-start");
+
+    // Check for basic model definitions. A schema whose only job is to add
+    // fields to the core User model (two-factor-auth) legitimately declares
+    // no models of its own.
     const modelCount = (content.match(/^model\s+\w+/gm) || []).length;
-    if (modelCount === 0) {
+    if (modelCount === 0 && !hasUserRelations) {
         return {
             name: "schema.prisma",
             passed: false,
             message: "No model definitions found",
-            suggestion: "Add at least one Prisma model, or remove schema.prisma if not needed.",
+            suggestion: "Add at least one Prisma model or a @@user-relations-start/end block, or remove schema.prisma if not needed.",
         };
     }
 
-    // Check for user-relations comment block
-    const hasUserRelations = content.includes("@@user-relations-start");
-    const modelsWithUserId = (content.match(/userId\s+String/g) || []).length;
+    // A field typed `User` needs the reverse field on the core User model,
+    // and merge-schemas only emits those from the relations block — without
+    // it the merged schema does not validate. A bare `userId String` column
+    // with no `@relation` is a deliberate loose reference (anonymous form
+    // submissions, records that outlive their author) and needs nothing.
+    const relatesToUser = /^\s*\w+\s+User(\[\]|\?)?(\s|$)/m.test(content);
 
-    if (modelsWithUserId > 0 && !hasUserRelations) {
+    if (relatesToUser && !hasUserRelations) {
         return {
             name: "schema.prisma",
             passed: false,
-            message: "Models reference userId but missing @@user-relations-start/end block",
-            suggestion: "Add @@user-relations-start/end comment block to declare User model relations.",
+            message: "Models declare a User relation but no @@user-relations-start/end block",
+            suggestion: "Add a @@user-relations-start/end comment block declaring the reverse field on User.",
         };
     }
 
@@ -458,7 +515,14 @@ function checkApiAuthChecks(modulePath: string): CheckResult {
                 content.includes("isAdmin(") ||
                 content.includes("isStaff(") ||
                 content.includes("hasPermission(") ||
-                content.includes("session?.user");
+                content.includes("session?.user") ||
+                // Provider webhooks have no session by construction: the caller
+                // is Stripe/PayPal/Discord, not a browser. They authenticate by
+                // verifying a signature over the raw body, which is stronger
+                // than a session check for that endpoint. Both markers below
+                // are signature verification and cannot appear by accident.
+                content.includes("webhooks.constructEvent(") ||
+                content.includes("timingSafeEqual(");
 
             if (!hasAuthCheck) {
                 const relPath = path.relative(modulePath, file);
@@ -477,6 +541,80 @@ function checkApiAuthChecks(modulePath: string): CheckResult {
     }
 
     return { name: "API auth checks", passed: true, message: "All write endpoints have auth checks" };
+}
+
+/**
+ * A hook name is a contract with modules that will never import this one, and
+ * nothing fails at runtime when the two halves disagree: a listener on a
+ * misspelled hook simply never fires. `hooksEmitted` makes this module's half
+ * declarative so it can be checked — here against the module's own source, and
+ * in build-marketplace.sh against every listener in the catalog.
+ *
+ * Only string literals are matched. A dynamically named hook
+ * (`doAction(`${resource}.created`, …)`, as core's crud helpers do) cannot be
+ * declared and is not required to be.
+ */
+function checkHooksEmitted(modulePath: string): CheckResult {
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name: "hooksEmitted", passed: true, message: "No manifest" };
+    }
+
+    let manifest: { hooksEmitted?: { hook: string; type: string }[] };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name: "hooksEmitted", passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    function walkFiles(dir: string): string[] {
+        const results: string[] = [];
+        if (!fs.existsSync(dir)) return results;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) results.push(...walkFiles(full));
+            else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) results.push(full);
+        }
+        return results;
+    }
+
+    const emitCall = /\b(doAction|doActionAsync|applyFilters|applyFiltersAsync)\(\s*"([^"]+)"/g;
+    const found = new Map<string, "action" | "filter">();
+    for (const file of walkFiles(modulePath)) {
+        const content = fs.readFileSync(file, "utf8");
+        for (const m of content.matchAll(emitCall)) {
+            found.set(m[2], m[1].includes("Filter") ? "filter" : "action");
+        }
+    }
+
+    const declared = new Map((manifest.hooksEmitted ?? []).map((h) => [h.hook, h.type]));
+
+    const undeclared = [...found].filter(([hook]) => !declared.has(hook)).map(([hook]) => hook);
+    const unused = [...declared.keys()].filter((hook) => !found.has(hook));
+    const wrongType = [...found]
+        .filter(([hook, type]) => declared.has(hook) && declared.get(hook) !== type)
+        .map(([hook, type]) => `${hook} (fired as ${type}, declared as ${declared.get(hook)})`);
+
+    const problems = [
+        ...undeclared.map((h) => `fired but not declared: ${h}`),
+        ...unused.map((h) => `declared but never fired: ${h}`),
+        ...wrongType.map((h) => `type mismatch: ${h}`),
+    ];
+
+    if (problems.length > 0) {
+        return {
+            name: "hooksEmitted",
+            passed: false,
+            message: `${problems.length} hook declaration problem(s):\n      ${problems.slice(0, 8).join("\n      ")}${problems.length > 8 ? `\n      ... and ${problems.length - 8} more` : ""}`,
+            suggestion: 'Every doAction/applyFilters call with a literal name needs a matching { "hook", "type" } entry in the manifest\'s hooksEmitted array, and vice versa.',
+        };
+    }
+
+    return {
+        name: "hooksEmitted",
+        passed: true,
+        message: found.size === 0 ? "Fires no hooks" : `${found.size} hook(s) fired and declared`,
+    };
 }
 
 function main(): void {
@@ -509,10 +647,12 @@ function main(): void {
         checkIdFormat(modulePath),
         checkReferencedFiles(modulePath),
         checkNoCoreImports(modulePath),
+        checkSdkImports(modulePath),
         checkSchemaPrisma(modulePath),
         checkTypeScript(modulePath),
         checkNoAnyTypes(modulePath),
         checkApiAuthChecks(modulePath),
+        checkHooksEmitted(modulePath),
     ];
 
     let passed = 0;

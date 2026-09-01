@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { generateSecret, generateQRCode } from "@/core/lib/two-factor";
+import { generateQRCode, generateSecret, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/setup - Generate secret and QR code
 export async function POST() {

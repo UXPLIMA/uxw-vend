@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
+import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { randomInt } from "crypto";
 
 // POST - Spin the wheel (1 free spin per day, paid spins via credits)
@@ -128,7 +127,7 @@ export async function POST() {
     const prizeIndex = prizes.findIndex((p) => p.id === selectedPrize.id);
 
     // Fire hooks + activity feed entry
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("wheel.spin.completed", {
         userId: session.user.id,
         prizeId: selectedPrize.id,

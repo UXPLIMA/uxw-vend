@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
-import { Button } from "@/core/components/ui/button";
+import { Button } from "@/core/sdk/ui";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 
 interface Comment {

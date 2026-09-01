@@ -1,11 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { formatDate } from "@/core/lib/utils";
+import { formatDate } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { getTranslations } from "next-intl/server";
 
 

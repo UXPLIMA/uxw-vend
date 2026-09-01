@@ -3,11 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, X, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";

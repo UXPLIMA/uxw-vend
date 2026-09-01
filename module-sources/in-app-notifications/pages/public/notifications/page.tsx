@@ -5,12 +5,11 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Bell, Check, CheckCheck, Loader2 } from "lucide-react";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Link } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface NotificationItem {
     id: string;

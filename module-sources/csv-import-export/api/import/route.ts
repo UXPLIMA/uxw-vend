@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/admin/import?type=...
 export async function POST(request: NextRequest) {

@@ -3,10 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
 import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";

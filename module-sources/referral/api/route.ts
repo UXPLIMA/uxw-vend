@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
+import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { nanoid } from "nanoid";
 
 // GET /api/v1/referral — Get user's referral code + stats
@@ -156,7 +155,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     // Fire hook + activity feed entry
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("referral.referral.used", {
         referrerId: referrer.id,
         referredId: session.user.id,

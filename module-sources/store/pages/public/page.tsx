@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link } from "@/core/sdk/navigation";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
-import { Navbar, Footer } from "@/core/components/layout";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
 import { useCurrency } from "../../lib/currency-context";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 interface Category {
     id: string;
     name: string;

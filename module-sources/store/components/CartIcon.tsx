@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 
 export function CartIcon() {

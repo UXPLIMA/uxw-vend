@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { generateSlug } from "@/core/lib/utils";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/custom-pages
 export async function GET() {

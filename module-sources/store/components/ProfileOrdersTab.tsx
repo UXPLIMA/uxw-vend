@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { formatCurrency, formatDate } from "@/core/sdk";
+import { Link } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
-import { formatCurrency, formatDate } from "@/core/lib/utils";
 
 interface Order {
     id: string;

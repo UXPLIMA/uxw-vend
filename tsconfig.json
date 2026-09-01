@@ -30,5 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "module-template", "module-sources"]
+  "//exclude": "tests/modules/<id>/ holds tests that import @/modules/<id>, which only exists once that module is installed. vitest gates those globs on install state (see vitest.config.ts); tsc cannot, so they are excluded here rather than failing every checkout.",
+  "exclude": ["node_modules", "module-template", "module-sources", "tests/modules"]
 }

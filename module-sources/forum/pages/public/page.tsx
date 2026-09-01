@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Card, CardContent } from "@/core/components/ui/card";
+import { Link } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, Input } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Category {
     id: string;

@@ -33,8 +33,9 @@ vi.mock("@/modules/store/lib/email", () => ({
 vi.mock("@/modules/store/lib/rcon", () => ({
     deliverProduct: vi.fn(async () => {}),
 }));
-vi.mock("@/core/lib/discord", () => ({
-    sendDiscordWebhook: vi.fn(async () => {}),
+const doActionAsync = vi.fn<(...a: unknown[]) => Promise<void>>(async () => {});
+vi.mock("@/core/lib/hooks", () => ({
+    doActionAsync: (...a: unknown[]) => doActionAsync(...a),
 }));
 
 // ── In-memory prisma ──
@@ -160,6 +161,11 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
                 }),
             })
         );
+        // Integrations react through the hook, not through a direct call.
+        expect(doActionAsync).toHaveBeenCalledWith(
+            "store.order.completed",
+            expect.objectContaining({ id: "order-1", status: "COMPLETED" })
+        );
     });
 
     it("(d) idempotency: replaying an already-COMPLETED order does not double-grant", async () => {
@@ -185,6 +191,7 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
 
         // No status flip, no grant, no payment row.
         expect(orderUpdate).not.toHaveBeenCalled();
+        expect(doActionAsync).not.toHaveBeenCalled();
         expect(chestCreate).not.toHaveBeenCalled();
         expect(ownedUpsert).not.toHaveBeenCalled();
         expect(paymentCreate).not.toHaveBeenCalled();

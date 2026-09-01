@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import moduleSystem from "@/core/lib/modules";
+import { isAdmin, isModuleEnabled, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // GET ?productId=xxx
 export async function GET(request: NextRequest) {
@@ -10,9 +8,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-    await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-    if (!moduleSystem.isEnabled("store")) return NextResponse.json({ error: "Store module is disabled" }, { status: 404 });
+    if (!(await isModuleEnabled("store"))) return NextResponse.json({ error: "Store module is disabled" }, { status: 404 });
 
     const productId = request.nextUrl.searchParams.get("productId");
     if (!productId) return NextResponse.json({ error: "productId required" }, { status: 400 });

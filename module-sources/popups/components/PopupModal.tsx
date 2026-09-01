@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Button } from "@/core/components/ui/button";
+import { Button } from "@/core/sdk/ui";
 import { X } from "lucide-react";
 
 interface PopupData {

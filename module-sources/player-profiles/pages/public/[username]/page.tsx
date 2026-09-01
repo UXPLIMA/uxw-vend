@@ -3,12 +3,12 @@
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Link } from "@/core/sdk/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
 import { getMinecraftAvatar } from "../../../lib/minecraft";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Player {
     id: string;

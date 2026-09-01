@@ -10,7 +10,7 @@
  * dominates anyway.
  */
 
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 type PaypalCreds = { clientId: string | null; clientSecret: string | null; mode: "live" | "sandbox" };
 

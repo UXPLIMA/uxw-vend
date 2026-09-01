@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Button } from "@/core/components/ui/button";
+import { Link } from "@/core/sdk/navigation";
+import { Button } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Check, X, Crown, Loader2 } from "lucide-react";
 import { useCurrency } from "../../../lib/currency-context";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Product {
     id: string;

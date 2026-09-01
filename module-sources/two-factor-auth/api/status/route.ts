@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { countRemainingBackupCodes } from "@/core/lib/two-factor";
+import { countRemainingBackupCodes, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/auth/two-factor/status - Current 2FA status for the signed-in user
 export async function GET() {
