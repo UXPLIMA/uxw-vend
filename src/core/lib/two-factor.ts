@@ -2,8 +2,11 @@ import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
 import { randomBytes, createHash, timingSafeEqual } from "crypto";
 import { cacheGet, cacheSet } from "./redis";
+import { resolveAppName } from "./app-url";
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
+// Runtime-resolved — see app-url.ts. This is the issuer shown in the
+// user's authenticator app, so it must reflect the operator's brand.
+const APP_NAME = resolveAppName();
 
 export function generateSecret(email: string): { secret: string; uri: string } {
     const totp = new OTPAuth.TOTP({

@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { resolveAppName } from "./app-url";
 
 /**
  * Core email service.
@@ -21,7 +22,9 @@ import { prisma } from "./db";
  */
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
+// Runtime-resolved: NEXT_PUBLIC_* is inlined at build time and cannot
+// differ per installation in the prebuilt image. See app-url.ts.
+const APP_NAME = resolveAppName();
 const MAX_ATTEMPTS = 3;
 
 // Inline localized strings for transactional emails. Each entry has en + tr.
