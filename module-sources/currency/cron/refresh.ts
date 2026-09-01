@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Currency rate refresh cron job.
@@ -47,7 +47,7 @@ export default async function refreshCurrencyRates(): Promise<void> {
             }
         }
 
-        console.log(`[cron] currency-rate-refresh: updated ${updated} currencies`);
+        log.info("cron: currency rates refreshed", { job: "currency:refresh", updated });
     } catch (err) {
         console.error("[cron] currency-rate-refresh failed:", err);
     }

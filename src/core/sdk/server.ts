@@ -65,3 +65,9 @@ export { sendEmail, queueEmail } from "@/core/lib/email";
 
 // --- Structured data ---
 export { buildArticleJsonLd } from "@/core/lib/seo";
+
+// Structured logging. A module's cron jobs and hook listeners run outside any
+// request, and `log` handles that — it reads the correlation id from
+// AsyncLocalStorage when there is one and falls back cleanly when there is not.
+// Server-only because logger.ts imports next/headers.
+export { log } from "@/core/lib/logger";

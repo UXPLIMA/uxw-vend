@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Publish announcements whose `publishAt` has elapsed. Clears the
@@ -12,7 +12,7 @@ export default async function publishScheduled(): Promise<void> {
             data: { publishAt: null },
         });
         if (result.count > 0) {
-            console.log(`[announcements] publish-scheduled: ${result.count} announcement(s)`);
+            log.info("cron: announcements published", { job: "announcements:publish-scheduled", published: result.count });
         }
     } catch (err) {
         console.error("[announcements] publish-scheduled failed:", err);

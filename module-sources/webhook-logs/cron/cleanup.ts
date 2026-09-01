@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Webhook logs cleanup cron job.
@@ -12,7 +12,7 @@ export default async function cleanupWebhookLogs(): Promise<void> {
             where: { createdAt: { lt: cutoff } },
         });
         if (result.count > 0) {
-            console.log(`[cron] webhook-logs-cleanup: deleted ${result.count} rows`);
+            log.info("cron: webhook logs pruned", { job: "webhook-logs:cleanup", deleted: result.count });
         }
     } catch (err) {
         console.error("[cron] webhook-logs-cleanup failed:", err);
