@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const nonEmpty = groups.filter((g) => g.results.length > 0);
 
     // Allow modules to transform the final result set
-    const finalGroups = await applyFiltersAsync<ResultGroup[], { query: string }>("search.groups", nonEmpty, { query: q });
+    const finalGroups = await applyFiltersAsync("search.groups", nonEmpty, { query: q });
 
     const total = finalGroups.reduce((sum, g) => sum + g.results.length, 0);
 

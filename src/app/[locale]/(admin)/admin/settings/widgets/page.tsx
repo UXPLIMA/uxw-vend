@@ -8,9 +8,11 @@ import { Loader2, Check, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
+import { useTranslations } from "next-intl";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
+    const t = useTranslations("admin");
 
     // Build available widgets from registry, filtered to enabled modules
     const availableWidgets = useMemo(() =>
@@ -19,10 +21,10 @@ export default function WidgetSettingsPage() {
             .map((w) => ({
                 id: w.id,
                 name: w.id.replace(/([A-Z])/g, " $1").trim(),
-                description: `Widget from ${w.module} module`,
+                description: t("widgets_fromModule", { module: w.module }),
                 module: w.module,
             })),
-        [modules]
+        [modules, t]
     );
 
     const [widgetConfig, setWidgetConfig] = useState<Record<string, boolean>>({});
@@ -121,10 +123,17 @@ export default function WidgetSettingsPage() {
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Sidebar Widgets</h1>
-                <p className="text-muted-foreground">Toggle visibility and reorder homepage sidebar widgets</p>
+                <h1 className="text-3xl font-bold">{t("widgets_title")}</h1>
+                <p className="text-muted-foreground">{t("widgets_subtitle")}</p>
             </div>
 
+            {sortedWidgets.length === 0 ? (
+                <Card className="mb-6 border-dashed">
+                    <CardContent className="py-12 text-center">
+                        <p className="text-muted-foreground">{t("widgets_none")}</p>
+                    </CardContent>
+                </Card>
+            ) : (
             <Card className="mb-6">
                 <CardContent className="p-0">
                     <div className="divide-y">
@@ -159,10 +168,13 @@ export default function WidgetSettingsPage() {
                     </div>
                 </CardContent>
             </Card>
+            )}
 
+            {sortedWidgets.length > 0 && (
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Check className="w-4 h-4 mr-2" /> Save</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("widgets_save")}</>}
             </Button>
+            )}
         </>
     );
 }

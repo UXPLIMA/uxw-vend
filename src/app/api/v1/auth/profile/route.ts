@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
@@ -43,6 +44,11 @@ export async function PATCH(request: NextRequest) {
         const validation = updatePasswordSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+        }
+
+        const policyCheck = await enforcePasswordPolicy(validation.data.newPassword);
+        if (!policyCheck.ok) {
+            return NextResponse.json({ error: policyCheck.message ?? "Invalid password" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({ where: { id: session.user.id } });

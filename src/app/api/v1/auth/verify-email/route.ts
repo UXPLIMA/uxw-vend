@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { EMAIL_VERIFY_EXPIRY, getDurationMs } from "@/core/lib/security-settings";
 import { randomBytes, createHash } from "crypto";
 import { sendVerificationEmail } from "@/core/lib/email";
 import { rateLimit } from "@/core/lib/rate-limit";
@@ -41,7 +42,7 @@ export async function POST(_request: NextRequest) {
         data: {
             identifier: user.email,
             token: hashToken(token),
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            expires: new Date(Date.now() + (await getDurationMs(EMAIL_VERIFY_EXPIRY))),
         },
     });
 

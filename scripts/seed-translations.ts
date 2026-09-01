@@ -7,6 +7,9 @@
  * Usage: npx tsx scripts/seed-translations.ts
  */
 
+// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// outside Next.js, which is what normally loads the env file.
+import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { PrismaClient } from "@prisma/client";

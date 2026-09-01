@@ -9,14 +9,25 @@ import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-type Provider = "discord" | "slack";
 type HealthStatus = "ok" | "degraded" | "down";
 
 interface AlertingConfig {
     enabled: boolean;
-    provider: Provider;
+    channel: string;
     webhookUrl: string;
     alertOn: HealthStatus[];
+}
+
+/**
+ * Delivery channels are supplied by the API, which builds the list from the
+ * built-in generic channel plus whatever enabled modules declare. The page
+ * names no vendor of its own.
+ */
+interface WebhookChannel {
+    id: string;
+    label: string;
+    hosts?: string[];
+    urlPlaceholder?: string;
 }
 
 const STATUSES: HealthStatus[] = ["degraded", "down"];
@@ -30,7 +41,8 @@ export default function AlertingSettingsPage() {
     const [testing, setTesting] = useState(false);
 
     const [enabled, setEnabled] = useState(false);
-    const [provider, setProvider] = useState<Provider>("discord");
+    const [channels, setChannels] = useState<WebhookChannel[]>([]);
+    const [channelId, setChannelId] = useState("generic");
     const [webhookUrl, setWebhookUrl] = useState("");
     const [alertOn, setAlertOn] = useState<HealthStatus[]>(["degraded", "down"]);
 
@@ -41,8 +53,9 @@ export default function AlertingSettingsPage() {
                 if (res.ok) {
                     const data = await res.json();
                     const config: AlertingConfig = data.config;
+                    setChannels(data.channels ?? []);
                     setEnabled(config.enabled);
-                    setProvider(config.provider);
+                    setChannelId(config.channel);
                     setWebhookUrl(config.webhookUrl);
                     setAlertOn(config.alertOn);
                 }
@@ -51,6 +64,8 @@ export default function AlertingSettingsPage() {
             }
         })();
     }, []);
+
+    const activeChannel = channels.find((c) => c.id === channelId);
 
     const toggleAlertOn = (status: HealthStatus) => {
         setAlertOn((prev) =>
@@ -69,7 +84,7 @@ export default function AlertingSettingsPage() {
             const res = await fetch("/api/v1/admin/alerting", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ enabled, provider, webhookUrl, alertOn }),
+                body: JSON.stringify({ enabled, channel: channelId, webhookUrl, alertOn }),
             });
             if (res.ok) {
                 toast.success(fallback("alerting_saved", "Alerting settings saved."));
@@ -118,7 +133,7 @@ export default function AlertingSettingsPage() {
                 <p className="text-muted-foreground">
                     {fallback(
                         "alerting_subtitle",
-                        "Send a Discord or Slack notification when /api/health goes degraded or down.",
+                        "Send a webhook notification when /api/health goes degraded or down.",
                     )}
                 </p>
             </div>
@@ -143,29 +158,29 @@ export default function AlertingSettingsPage() {
                         </div>
 
                         <div>
-                            <Label>{fallback("alerting_provider", "Provider")}</Label>
-                            <div className="flex gap-4 mt-2">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="provider"
-                                        value="discord"
-                                        checked={provider === "discord"}
-                                        onChange={() => setProvider("discord")}
-                                    />
-                                    <span>Discord</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="provider"
-                                        value="slack"
-                                        checked={provider === "slack"}
-                                        onChange={() => setProvider("slack")}
-                                    />
-                                    <span>Slack</span>
-                                </label>
+                            <Label>{fallback("alerting_channel", "Delivery channel")}</Label>
+                            <div className="flex flex-wrap gap-4 mt-2">
+                                {channels.map((c) => (
+                                    <label key={c.id} className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="channel"
+                                            value={c.id}
+                                            checked={channelId === c.id}
+                                            onChange={() => setChannelId(c.id)}
+                                        />
+                                        <span>{c.label}</span>
+                                    </label>
+                                ))}
                             </div>
+                            {channels.length === 1 && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {fallback(
+                                        "alerting_channelHint",
+                                        "Install a module that provides a delivery channel to get richer formatting.",
+                                    )}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -174,16 +189,12 @@ export default function AlertingSettingsPage() {
                                 type="url"
                                 value={webhookUrl}
                                 onChange={(e) => setWebhookUrl(e.target.value)}
-                                placeholder={
-                                    provider === "discord"
-                                        ? "https://discord.com/api/webhooks/..."
-                                        : "https://hooks.slack.com/services/..."
-                                }
+                                placeholder={activeChannel?.urlPlaceholder ?? "https://"}
                             />
                             <p className="text-xs text-muted-foreground mt-1">
-                                {provider === "discord"
-                                    ? fallback("alerting_discordHint", "Must be a discord.com webhook URL.")
-                                    : fallback("alerting_slackHint", "Must be a slack.com webhook URL.")}
+                                {activeChannel?.hosts?.length
+                                    ? fallback("alerting_hostHint", "Must be a webhook URL on:") + " " + activeChannel.hosts.join(", ")
+                                    : fallback("alerting_publicHint", "Must be an https URL on a public host.")}
                             </p>
                         </div>
 

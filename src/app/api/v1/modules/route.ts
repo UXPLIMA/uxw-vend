@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
+import {
+    checkModuleDependencies,
+    dependencyErrorMessage,
+    installedVersionsFrom,
+    parseDependency,
+} from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import path from "path";
@@ -116,55 +122,35 @@ export async function PATCH(request: NextRequest) {
 
     // --- Dependency resolution ---
     if (wantEnabled) {
-        // When enabling: check that all dependencies are enabled
-        const deps = definition.dependencies ?? [];
-        if (deps.length > 0) {
-            const missingDeps: string[] = [];
-
-            for (const dep of deps) {
-                const depDef = moduleSystem.getDefinition(dep);
-                if (!depDef) {
-                    missingDeps.push(dep);
-                    continue;
-                }
-                const depConfig = configMap.get(dep);
-                if (depConfig && !depConfig.enabled) {
-                    missingDeps.push(dep);
-                }
-            }
-
-            if (missingDeps.length > 0) {
-                return NextResponse.json({
-                    error: `Cannot enable '${moduleId}': requires module '${missingDeps[0]}' to be enabled first`,
-                    missingDeps,
-                }, { status: 400 });
-            }
+        // Forward direction (this module's own dependencies, conflicts and
+        // core-version range) is the shared checker, so enable/install/upload
+        // all apply identical rules. Only the reverse direction below is
+        // specific to toggling.
+        const depCheck = await checkModuleDependencies(definition, {
+            installedVersions: installedVersionsFrom(allDefs),
+        });
+        if (!depCheck.ok) {
+            return NextResponse.json({
+                error: `Cannot enable '${definition.name}': ${dependencyErrorMessage(depCheck)}`,
+                missingDependencies: depCheck.missingDependencies,
+                disabledDependencies: depCheck.disabledDependencies,
+                activeConflicts: depCheck.activeConflicts,
+                versionMismatches: depCheck.versionMismatches,
+                coreIncompatible: depCheck.coreIncompatible,
+            }, { status: 400 });
         }
 
-        // When enabling: check for conflicts
-        const conflicts = definition.conflicts ?? [];
-        if (conflicts.length > 0) {
-            const activeConflicts = conflicts.filter(cId => configMap.get(cId)?.enabled === true);
-            if (activeConflicts.length > 0) {
-                const conflictNames = activeConflicts.map(cId => moduleSystem.getDefinition(cId)?.name || cId);
-                return NextResponse.json({
-                    error: `Cannot enable '${definition.name}': incompatible with ${conflictNames.join(', ')}`,
-                    conflicts: activeConflicts,
-                }, { status: 400 });
-            }
-        }
-
-        // Also check if any enabled module declares conflict with this one
+        // Reverse direction: an already-enabled module that declares a
+        // conflict with this one. The shared checker only looks outward from
+        // the manifest being enabled, so this stays here.
         for (const def of allDefs) {
             if (def.id === moduleId) continue;
-            const theirConflicts = def.conflicts ?? [];
-            if (theirConflicts.includes(moduleId)) {
-                if (configMap.get(def.id)?.enabled === true) {
-                    return NextResponse.json({
-                        error: `Cannot enable '${definition.name}': incompatible with ${def.name}`,
-                        conflicts: [def.id],
-                    }, { status: 400 });
-                }
+            const clashes = (def.conflicts ?? []).some((spec) => parseDependency(spec).id === moduleId);
+            if (clashes && configMap.get(def.id)?.enabled === true) {
+                return NextResponse.json({
+                    error: `Cannot enable '${definition.name}': incompatible with ${def.name}`,
+                    conflicts: [def.id],
+                }, { status: 400 });
             }
         }
     } else {
@@ -174,7 +160,7 @@ export async function PATCH(request: NextRequest) {
         for (const def of allDefs) {
             if (def.id === moduleId) continue;
             const deps = def.dependencies ?? [];
-            if (!deps.includes(moduleId)) continue;
+            if (!deps.some((spec) => parseDependency(spec).id === moduleId)) continue;
             // Check if this dependent module is enabled
             const depConfig = configMap.get(def.id);
             const isEnabled = depConfig ? depConfig.enabled : true;

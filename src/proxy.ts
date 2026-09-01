@@ -222,22 +222,28 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     // The setup API itself stays reachable so the wizard can post back.
     if (!isStaticAsset(pathname) && !pathname.startsWith('/api/setup')) {
         const setupDone = await isSetupComplete();
-        if (!setupDone) {
-            const locale = extractLocale(pathname);
-            const setupPath = `/${locale}/setup`;
-            const isAlreadyOnSetup =
-                pathname === setupPath || pathname.startsWith(`${setupPath}/`);
+        const locale = extractLocale(pathname);
+        const setupPath = `/${locale}/setup`;
+        const isOnSetup =
+            pathname === setupPath || pathname.startsWith(`${setupPath}/`);
 
-            if (!isAlreadyOnSetup) {
-                if (pathname.startsWith('/api/')) {
-                    return NextResponse.json(
-                        { error: 'Setup required', redirectTo: setupPath },
-                        { status: 503 }
-                    );
-                }
-                const url = new URL(setupPath, request.url);
-                return NextResponse.rewrite(url);
+        if (!setupDone && !isOnSetup) {
+            if (pathname.startsWith('/api/')) {
+                return NextResponse.json(
+                    { error: 'Setup required', redirectTo: setupPath },
+                    { status: 503 }
+                );
             }
+            const url = new URL(setupPath, request.url);
+            return NextResponse.rewrite(url);
+        }
+
+        // The gate used to be one-directional: it forced visitors onto the
+        // wizard but never sent them back off it. A live site therefore still
+        // served the wizard at /setup — its steps empty, because every
+        // /api/setup route answers 409 once a user exists.
+        if (setupDone && isOnSetup) {
+            return NextResponse.redirect(new URL(`/${locale}`, request.url));
         }
     }
 

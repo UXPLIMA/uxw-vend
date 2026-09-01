@@ -16,7 +16,10 @@ async function fetchSettings(): Promise<Record<string, unknown>> {
         })
         .then((d) => {
             cachedSettings = d.settings || {};
-            setTimeout(() => { cachedSettings = null; fetchPromise = null; }, 60000);
+            // The server tells us how long it considers the payload fresh
+            // (Admin > Settings > General). Fall back to a minute.
+            const ttlSeconds = typeof d.cacheSeconds === "number" && d.cacheSeconds > 0 ? d.cacheSeconds : 60;
+            setTimeout(() => { cachedSettings = null; fetchPromise = null; }, ttlSeconds * 1000);
             return cachedSettings!;
         })
         .catch((err) => {
