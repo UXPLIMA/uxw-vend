@@ -1,6 +1,6 @@
 
 import { notFound, redirect } from "next/navigation";
-import { ModuleRegistry } from "@/core/generated/module-registry";
+import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
