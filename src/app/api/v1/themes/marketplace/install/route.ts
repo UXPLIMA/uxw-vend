@@ -7,9 +7,9 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { logActivity } from "@/core/lib/activity-log";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
-const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/theme-marketplace";
 
 export async function POST(request: NextRequest) {
     const session = await auth();
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Download ZIP with size limit
-        const res = await fetch(`${MARKETPLACE_BASE}/${zipFile}`);
+        const res = await fetch(`${themeMarketplaceBase()}/${zipFile}`);
         if (!res.ok) return NextResponse.json({ error: `Download failed: HTTP ${res.status}` }, { status: 502 });
 
         const contentLength = res.headers.get("content-length");

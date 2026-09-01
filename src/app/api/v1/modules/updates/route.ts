@@ -3,8 +3,8 @@ import fs from "fs/promises";
 import path from "path";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
+import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 
-const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
 interface MarketplaceModule {
@@ -56,7 +56,7 @@ export async function GET() {
 
     let marketplace: MarketplaceIndex;
     try {
-        const res = await fetch(MARKETPLACE_URL, { next: { revalidate: 300 } });
+        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         marketplace = await res.json();
     } catch (err) {

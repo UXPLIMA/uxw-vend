@@ -94,5 +94,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial public release: modular, plugin-based platform with a marketplace of
   first-party modules and a schema-driven theme system.
 
-[Unreleased]: https://github.com/siracozmen01/uxwVend/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/siracozmen01/uxwVend/releases/tag/v0.1.0
+[Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/UXPLIMA/uxw-vend/releases/tag/v0.1.0

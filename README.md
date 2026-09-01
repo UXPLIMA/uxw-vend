@@ -1,14 +1,14 @@
 <div align="center">
   <h1>uxwVend</h1>
 
-  ![CI](https://github.com/siracozmen01/uxwVend/actions/workflows/ci.yml/badge.svg)
+  ![CI](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml/badge.svg)
 
   <p><strong>Modular plugin-based platform with a built-in marketplace</strong></p>
   <p>Ships with zero modules. Install what you need from 42 first-party modules in the marketplace, or upload custom ZIPs.</p>
 
-  ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?logo=next.js)
+  ![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)
   ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript)
-  ![Prisma](https://img.shields.io/badge/Prisma-7.6-2D3748?logo=prisma)
+  ![Prisma](https://img.shields.io/badge/Prisma-7.10-2D3748?logo=prisma)
   ![Tailwind](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss)
   ![Zod](https://img.shields.io/badge/Zod-4-3E67B1)
   ![Auth.js](https://img.shields.io/badge/Auth.js-v5-purple)
@@ -114,7 +114,7 @@ Full reference in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 Prerequisites: Node.js 24+, PostgreSQL 14+. Redis is optional but strongly recommended in production.
 
 ```bash
-git clone https://github.com/siracozmen01/uxwVend.git
+git clone https://github.com/UXPLIMA/uxw-vend.git
 cd uxwVend
 npm install                            # postinstall runs db:merge + generate-themes + generate-registry
 

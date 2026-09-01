@@ -163,7 +163,7 @@ postgresql://uxwvend:your_secure_password@localhost:5432/uxwvend
 ## Install and Initialize
 
 ```bash
-git clone https://github.com/siracozmen01/uxwVend.git
+git clone https://github.com/UXPLIMA/uxw-vend.git
 cd uxwVend
 npm install              # also runs postinstall: merge-schemas + generate-registry + generate-themes
 cp .env.example .env
