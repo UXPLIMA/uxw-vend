@@ -62,6 +62,20 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
+      # module-sources/ is excluded from tsconfig.json (its files import
+      # @/modules/<id> paths that only exist once installed), so `tsc --noEmit`
+      # above never looks at it. This gate builds a Prisma client from every
+      # module schema and type-checks the tree against it, including the
+      # generated hook-listener contracts.
+      - name: TypeScript check (module sources)
+        run: npm run typecheck:modules
+
+      # The SDK boundary, manifest shape and hook declarations are enforced
+      # here, not by ESLint — ESLint cannot see inside a third-party ZIP, and
+      # this is the same check that runs on install.
+      - name: Validate module manifests
+        run: npx tsx scripts/validate-module.ts --all
+
       - name: Lint
         # The `--` separator is required — otherwise npm swallows the flag
         # and eslint doesn't see it.
@@ -90,3 +104,111 @@ jobs:
           load: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    # Only worth the ~5 minutes once the cheap gates are green.
+    needs: check
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: uxwvend
+          POSTGRES_PASSWORD: uxwvend
+          POSTGRES_DB: uxwvend_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U uxwvend"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: "postgresql://uxwvend:uxwvend@localhost:5432/uxwvend_e2e"
+      AUTH_SECRET: "ci-e2e-secret-key-32-characters!!"
+      SECRET_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      AUTH_URL: "http://127.0.0.1:3001"
+      E2E_BASE_URL: "http://127.0.0.1:3001"
+      # The suite signs in as the seeded admin. prisma/seed.ts generates a
+      # random password unless these are set, so they are what makes the
+      # login-dependent specs runnable at all.
+      SEED_ADMIN_EMAIL: "admin@uxwvend.com"
+      SEED_ADMIN_PASSWORD: "e2e-admin-password"
+      E2E_ADMIN_EMAIL: "admin@uxwvend.com"
+      E2E_ADMIN_PASSWORD: "e2e-admin-password"
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        env:
+          SKIP_POSTINSTALL: "1"
+        run: npm ci
+
+      # Same reasoning as the check job: a fresh clone has src/modules empty,
+      # and the specs exercise module-provided routes.
+      - name: Seed src/modules/ from module-sources
+        run: |
+          set -euo pipefail
+          rm -rf src/modules
+          cp -R module-sources src/modules
+
+      - name: Merge Prisma schema + generate client
+        run: npx tsx scripts/merge-schemas.ts
+
+      - name: Generate themes & registry & openapi
+        run: |
+          npm run generate:themes
+          npx tsx scripts/generate-registry.ts
+          npx tsx scripts/generate-openapi.ts
+
+      - name: Create schema and seed
+        run: |
+          set -euo pipefail
+          npx prisma db push --accept-data-loss
+          npx tsx prisma/seed.ts
+          npx tsx scripts/seed-translations.ts
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Start server
+        run: |
+          set -euo pipefail
+          npm start -- --port 3001 --hostname 127.0.0.1 > /tmp/uxwvend-server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3001/api/health >/dev/null 2>&1; then
+              echo "server up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "server did not become healthy within 60s; last 50 log lines:"
+          tail -50 /tmp/uxwvend-server.log || true
+          curl -sS -i http://127.0.0.1:3001/api/health || true
+          exit 1
+
+      - name: Run Playwright tests
+        run: npm run test:e2e
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
