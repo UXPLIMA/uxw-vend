@@ -2,10 +2,18 @@ import type { MetadataRoute } from "next";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { ModuleSeoRoutes, type SitemapEntry } from "@/core/generated/module-seo";
 import { safeCall } from "@/core/lib/module-sandbox";
+import { connection } from "next/server";
+import { resolveAppUrl } from "@/core/lib/app-url";
 
-// Revalidate sitemap every hour so bots hitting /sitemap.xml don't force
-// a DB query per request but newly published content still surfaces quickly.
-export const revalidate = 3600;
+// This used to be `export const revalidate = 3600`, which made Next prerender
+// the sitemap at BUILD time and serve that copy for the first hour. In a
+// prebuilt image that meant every URL in it read `http://localhost:3001` — the
+// value CI had while building. `connection()` in the handler below opts the
+// route out of build-time prerendering; this in-process memo restores exactly
+// what `revalidate` was protecting: bots hitting /sitemap.xml still do not
+// force a DB query per request.
+const SITEMAP_TTL_MS = 3_600_000;
+let sitemapMemo: { at: number; siteUrl: string; entries: MetadataRoute.Sitemap } | null = null;
 
 interface CoreStaticRoute {
     path: string;
@@ -31,9 +39,21 @@ function mapChangeFreq(freq: SitemapEntry["changeFreq"]): MetadataRoute.Sitemap[
  * one broken module cannot break the whole sitemap.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    // NEXT_PUBLIC_APP_URL is the documented canonical var; NEXT_PUBLIC_SITE_URL
-    // is accepted as a fallback for backwards compatibility.
-    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
+    await connection();
+
+    // Runtime-resolved from AUTH_URL — a NEXT_PUBLIC_* read here would be
+    // frozen at build time and emit localhost URLs from the prebuilt image.
+    const siteUrl = resolveAppUrl();
+
+    // Keyed on siteUrl as well as age: an operator who changes AUTH_URL and
+    // restarts must not be served an hour of stale, wrong-host URLs.
+    if (
+        sitemapMemo &&
+        sitemapMemo.siteUrl === siteUrl &&
+        Date.now() - sitemapMemo.at < SITEMAP_TTL_MS
+    ) {
+        return sitemapMemo.entries;
+    }
     const now = new Date();
 
     const entries: MetadataRoute.Sitemap = CORE_STATIC_ROUTES.map((r) => ({
@@ -81,5 +101,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
     }
 
+    sitemapMemo = { at: Date.now(), siteUrl, entries };
     return entries;
 }

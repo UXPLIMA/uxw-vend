@@ -1,9 +1,18 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
+import { resolveAppUrl } from "@/core/lib/app-url";
 
-export default function robots(): MetadataRoute.Robots {
-    // NEXT_PUBLIC_APP_URL is the documented canonical var; NEXT_PUBLIC_SITE_URL
-    // is accepted as a fallback for backwards compatibility.
-    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
+export default async function robots(): Promise<MetadataRoute.Robots> {
+    // `robots.ts` is a Route Handler that Next caches — i.e. prerenders at
+    // build time — unless it touches a request-time API. Without the
+    // `connection()` below, the canonical URL resolved here would be the one
+    // CI had while building the image, so every installation would publish
+    // `Sitemap: http://localhost:3001/sitemap.xml`. See
+    // node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/01-metadata/robots.md
+    await connection();
+
+    // Runtime-resolved from AUTH_URL — see app-url.ts.
+    const siteUrl = resolveAppUrl();
 
     return {
         rules: [
