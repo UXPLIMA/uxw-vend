@@ -13,6 +13,8 @@
  * unwinds before early-init code (Prisma).
  */
 
+import { log } from "./logger";
+
 type ShutdownCallback = () => Promise<void> | void;
 
 interface Registration {
@@ -46,7 +48,7 @@ export function onShutdown(name: string, fn: ShutdownCallback): void {
 async function runShutdown(signal: string): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
-    console.log(`[shutdown] ${signal} received, draining ${callbacks.length} handlers`);
+    log.info("shutdown started", { signal, handlers: callbacks.length });
 
     for (const entry of [...callbacks].reverse()) {
         try {
@@ -58,7 +60,7 @@ async function runShutdown(signal: string): Promise<void> {
             console.error(`[shutdown] ${entry.name} failed:`, err);
         }
     }
-    console.log("[shutdown] drain complete");
+    log.info("shutdown complete");
 }
 
 /**

@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Publish blog articles whose `publishAt` has elapsed.
@@ -15,7 +15,7 @@ export default async function publishScheduled(): Promise<void> {
             data: { status: "PUBLISHED", publishAt: null, publishedAt: now },
         });
         if (result.count > 0) {
-            console.log(`[blog] publish-scheduled: ${result.count} article(s)`);
+            log.info("cron: blog articles published", { job: "blog:publish-scheduled", published: result.count });
         }
     } catch (err) {
         console.error("[blog] publish-scheduled failed:", err);

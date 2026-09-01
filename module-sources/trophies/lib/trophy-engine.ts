@@ -1,5 +1,5 @@
 import { addAction } from "@/core/sdk";
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Trophy auto-award engine (DB-driven).
@@ -65,7 +65,7 @@ export async function seedDefaultTrophies(): Promise<void> {
         const existing = await prisma.trophy.count();
         if (existing > 0) return;
         await prisma.trophy.createMany({ data: DEFAULT_TROPHIES, skipDuplicates: true });
-        console.log(`[trophies] Seeded ${DEFAULT_TROPHIES.length} default trophies`);
+        log.info("default trophies seeded", { seeded: DEFAULT_TROPHIES.length });
     } catch (err) {
         console.warn("[trophies] default seed skipped:", (err as Error).message);
     }

@@ -42,7 +42,19 @@ async function resolveStripe(): Promise<Stripe | null> {
         cachedAt = now;
         return cached.stripe;
     }
-    const stripe = new Stripe(secret, { apiVersion: "2026-04-22.dahlia" });
+    // Pinned deliberately, and NOT bumped when the SDK is. `stripe` narrows
+    // `apiVersion` to whatever version that SDK release was generated against
+    // (22.6.0 wants 2026-08-26.dahlia), so a routine dependency update would
+    // otherwise silently change which Stripe API this store talks to — new
+    // webhook payload shapes and checkout behaviour arriving as a side effect
+    // of `npm update`, on the payments path, untested.
+    //
+    // Moving to a newer API version is its own change: read Stripe's upgrade
+    // notes, replay the checkout and webhook flows, then update this literal
+    // and drop the cast.
+    const stripe = new Stripe(secret, {
+        apiVersion: "2026-04-22.dahlia" as Stripe.StripeConfig["apiVersion"],
+    });
     cached = { stripe, secret };
     cachedAt = now;
     return stripe;
