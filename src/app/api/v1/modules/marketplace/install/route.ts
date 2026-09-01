@@ -16,7 +16,7 @@ import { manifestHash } from "@/core/lib/module-install-audit";
 import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
-const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
+import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         } catch { /* statfs not available on all platforms */ }
 
         // Download ZIP from GitHub with size limit
-        const zipUrl = `${MARKETPLACE_BASE}/${zipFile}`;
+        const zipUrl = `${moduleMarketplaceBase()}/${zipFile}`;
         const res = await fetch(zipUrl);
         if (!res.ok) {
             return NextResponse.json({ error: `Failed to download module: HTTP ${res.status}` }, { status: 502 });

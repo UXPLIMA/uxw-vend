@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
+import { themeMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 
-const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/theme-marketplace/index.json";
 
 let cached: Record<string, unknown> | null = null;
 let cacheTime = 0;
@@ -10,7 +10,7 @@ export async function GET() {
     if (cached && now - cacheTime < 300000) return NextResponse.json(cached);
 
     try {
-        const res = await fetch(MARKETPLACE_URL, { next: { revalidate: 300 } });
+        const res = await fetch(themeMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         cached = data;

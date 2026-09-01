@@ -7,9 +7,8 @@ import {
     getCachedMarketplace,
     setCachedMarketplace,
 } from "./_cache";
+import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 
-const MARKETPLACE_URL =
-    "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
 
 async function loadBaseIndex(): Promise<MarketplaceIndex> {
@@ -19,7 +18,7 @@ async function loadBaseIndex(): Promise<MarketplaceIndex> {
         const raw = await fs.readFile(LOCAL_INDEX_PATH, "utf-8");
         return JSON.parse(raw) as MarketplaceIndex;
     } catch {
-        const res = await fetch(MARKETPLACE_URL, { next: { revalidate: 300 } });
+        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return (await res.json()) as MarketplaceIndex;
     }

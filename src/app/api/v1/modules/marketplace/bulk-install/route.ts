@@ -8,9 +8,9 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock } from "@/core/lib/install-lock";
+import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
-const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
 interface BulkResult {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         if (exists) { results.push({ id, name: name || id, status: "skipped", error: "Already installed" }); continue; }
 
         try {
-            const res = await fetch(`${MARKETPLACE_BASE}/${zip}`);
+            const res = await fetch(`${moduleMarketplaceBase()}/${zip}`);
             if (!res.ok) { results.push({ id, name: name || id, status: "failed", error: `Download failed: ${res.status}` }); continue; }
 
             const buffer = Buffer.from(await res.arrayBuffer());
