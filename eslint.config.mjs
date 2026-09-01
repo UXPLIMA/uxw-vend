@@ -57,6 +57,46 @@ const eslintConfig = defineConfig([
             ],
         },
     },
+    // Module sources are NOT subject to the core platform's lint bar — each
+    // module has its own quality profile, which is why every stylistic rule is
+    // switched off below. Exactly one rule is enforced, and it is
+    // architectural rather than stylistic: a module must import core through
+    // the published SDK, never through core's internal layout.
+    //
+    // This is editor feedback, not the gate. ESLint can't see a third-party
+    // ZIP; `scripts/validate-module.ts` (run by build-marketplace.sh and CI)
+    // is what actually holds the boundary.
+    {
+        files: ["module-sources/**/*.{ts,tsx}"],
+        rules: {
+            "@typescript-eslint/no-unused-vars": "off",
+            "react-hooks/exhaustive-deps": "off",
+            "@next/next/no-img-element": "off",
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        {
+                            group: [
+                                "@/core/lib",
+                                "@/core/lib/*",
+                                "@/core/components",
+                                "@/core/components/*",
+                            ],
+                            message:
+                                "Modules must import core through the SDK: @/core/sdk (isomorphic), or one of @/core/sdk/{server,auth,navigation,blocks,theme,ui,layout,admin}. Run `npx tsx scripts/migrate-module-imports.ts <path>` to rewrite.",
+                        },
+                    ],
+                },
+            ],
+        },
+        linterOptions: {
+            // The module sources carry their own eslint-disable comments for
+            // rules this block switches off; don't report them as unused.
+            reportUnusedDisableDirectives: false,
+        },
+    },
+
     // Override default ignores of eslint-config-next.
     globalIgnores([
         // Default ignores of eslint-config-next:
@@ -67,12 +107,8 @@ const eslintConfig = defineConfig([
         // Generated artifacts — never owned by humans.
         "src/core/generated/**",
         "src/generated/**",
-        // First-party module source + its runtime copy are NOT subject to the
-        // core platform's lint bar. Each module has its own quality profile; we
-        // enforce lint on src/core, src/app, src/proxy.ts, and scripts/ — the
-        // parts that DO share a standard. Module sources are linted separately
-        // by their module authors.
-        "module-sources/**",
+        // The installed runtime copy of a module is generated state, never
+        // hand-edited — lint the authoritative source instead.
         "src/modules/**",
     ]),
 ]);
