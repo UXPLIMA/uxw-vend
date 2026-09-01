@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "presets": [
+    {
+      "id": "game-store",
+      "name": "Game server store",
+      "description": "Sell ranks and items, take payments, show live server status and a vote reward loop.",
+      "icon": "Gamepad2",
+      "theme": "pixelcraft",
+      "modules": ["store", "currency", "credits", "servers", "vote", "custom-pages"]
+    },
+    {
+      "id": "community",
+      "name": "Community portal",
+      "description": "Forum, news and member profiles for a site built around discussion.",
+      "icon": "Users",
+      "theme": "flat",
+      "modules": ["forum", "blog", "trophies", "in-app-notifications", "suggestions"]
+    },
+    {
+      "id": "showcase",
+      "name": "Simple showcase",
+      "description": "A few content pages, a homepage slider and search-engine basics. Nothing else.",
+      "icon": "LayoutTemplate",
+      "theme": "flat",
+      "modules": ["custom-pages", "slider", "seo", "announcements"]
+    },
+    {
+      "id": "custom",
+      "name": "I'll choose myself",
+      "description": "Start from nothing and pick modules by hand.",
+      "icon": "SlidersHorizontal",
+      "modules": []
+    }
+  ]
+}

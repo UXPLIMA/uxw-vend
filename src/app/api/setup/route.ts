@@ -9,6 +9,11 @@ import prisma from "@/core/lib/db";
 import { markSetupComplete } from "@/core/lib/setup-state";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
+import {
+    resolveInstallPlan,
+    installPlanErrorMessage,
+    type CatalogEntry,
+} from "@/core/lib/module-dependencies";
 
 /**
  * First-run setup API.
@@ -31,7 +36,10 @@ const setupSchema = z.object({
         defaultLocale: z.string().min(2).max(5),
     }),
     theme: z.string().min(1).max(50),
-    modules: z.array(z.string().regex(/^[a-z0-9-]+$/)).max(20).default([]),
+    // 50, not 20: the largest preset plus manual additions plus everything
+    // those pull in transitively can exceed the old cap, and silently dropping
+    // the tail produced a half-installed site.
+    modules: z.array(z.string().regex(/^[a-z0-9-]+$/)).max(50).default([]),
 });
 
 const MARKETPLACE_DIR = path.join(process.cwd(), "module-marketplace");
@@ -170,28 +178,64 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // ---------- Install requested modules from local marketplace ----------
+        // ---------- Plan the install ----------
+        // The previous implementation installed the selection verbatim, in
+        // whatever order it arrived. Picking `wheel` without `credits`, or
+        // `store` without `currency`, therefore produced a module whose
+        // prerequisites were simply absent. Planning first turns that into
+        // either a corrected install or a clear refusal.
         const installedModules: string[] = [];
-        const failedModules: string[] = [];
+        const failedModules: Array<{ id: string; reason: string }> = [];
+        let autoAdded: string[] = [];
         let registryNeedsRegen = false;
 
-        for (const moduleId of data.modules) {
-            try {
-                await installModuleFromLocalMarketplace(moduleId);
-                await prisma.moduleConfig.upsert({
-                    where: { id: moduleId },
-                    update: { enabled: true },
-                    create: {
-                        id: moduleId,
-                        name: moduleId,
-                        enabled: true,
+        if (data.modules.length > 0) {
+            const plan = resolveInstallPlan(data.modules, await loadCatalog());
+
+            if (plan.errors.length > 0) {
+                // Refuse the module set rather than install part of it. The
+                // admin account and settings above are already committed, so
+                // the operator can re-run just the module step from the admin
+                // panel — a half-installed site is the worse outcome.
+                markSetupComplete();
+                return NextResponse.json(
+                    {
+                        error: "The selected modules cannot be installed together.",
+                        issues: plan.errors.map((e) => ({ ...e, message: installPlanErrorMessage(e) })),
+                        adminCreated: true,
                     },
-                });
-                installedModules.push(moduleId);
-                registryNeedsRegen = true;
-            } catch (err) {
-                console.error(`[setup] Failed to install module "${moduleId}":`, err);
-                failedModules.push(moduleId);
+                    { status: 400 },
+                );
+            }
+
+            autoAdded = plan.autoAdded;
+
+            // plan.order is topological: a module is never extracted before
+            // something it depends on.
+            for (const moduleId of plan.order) {
+                try {
+                    await installModuleFromLocalMarketplace(moduleId);
+                    await prisma.moduleConfig.upsert({
+                        where: { id: moduleId },
+                        update: { enabled: true },
+                        create: {
+                            id: moduleId,
+                            name: moduleId,
+                            enabled: true,
+                        },
+                    });
+                    const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
+                    await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId });
+
+                    installedModules.push(moduleId);
+                    registryNeedsRegen = true;
+                } catch (err) {
+                    console.error(`[setup] Failed to install module "${moduleId}":`, err);
+                    failedModules.push({
+                        id: moduleId,
+                        reason: err instanceof Error ? err.message : String(err),
+                    });
+                }
             }
         }
 
@@ -216,6 +260,22 @@ export async function POST(request: NextRequest) {
             } catch {
                 /* non-fatal */
             }
+            // Per-module SQL migrations. Setup never ran these, so a module
+            // shipping migrations installed with none of its tables — the
+            // module then failed at first use with a Prisma error rather than
+            // anything the operator could act on.
+            for (const moduleId of installedModules) {
+                try {
+                    execFileSync("npx", ["tsx", "scripts/apply-migrations.ts", `--module=${moduleId}`], {
+                        cwd: process.cwd(),
+                        timeout: 120000,
+                        stdio: "pipe",
+                    });
+                } catch (err) {
+                    console.error(`[setup] Migrations failed for "${moduleId}":`, err);
+                    failedModules.push({ id: moduleId, reason: "migrations failed" });
+                }
+            }
         }
 
         await invalidateModuleCache().catch(() => {});
@@ -230,6 +290,7 @@ export async function POST(request: NextRequest) {
                     entityId: null,
                     metadata: {
                         installedModules,
+                        autoAdded,
                         failedModules,
                         theme: data.theme,
                     },
@@ -245,6 +306,9 @@ export async function POST(request: NextRequest) {
             success: true,
             redirectTo: "/admin",
             installedModules,
+            // Dependencies the operator did not pick but that had to come
+            // along. Surfaced so the wizard can say what it installed.
+            autoAdded,
             failedModules,
         });
     } catch (err) {
@@ -252,6 +316,40 @@ export async function POST(request: NextRequest) {
             { error: "Setup failed", details: devOnlyDetail(err) },
             { status: 500 },
         );
+    }
+}
+
+/**
+ * Reads the shipped marketplace catalog for dependency planning.
+ *
+ * Returns an empty catalog when the file is unreadable — `resolveInstallPlan`
+ * then reports every requested module as unknown, which is the honest outcome:
+ * without a catalog we cannot know what a module needs.
+ */
+async function loadCatalog(): Promise<CatalogEntry[]> {
+    try {
+        const raw = await fs.readFile(path.join(MARKETPLACE_DIR, "index.json"), "utf8");
+        const parsed = JSON.parse(raw) as {
+            modules?: Array<{
+                id?: string;
+                version?: string;
+                dependencies?: string[];
+                conflicts?: string[];
+                coreVersion?: string | null;
+            }>;
+        };
+        return (parsed.modules ?? [])
+            .filter((m): m is { id: string; version?: string } & typeof m => typeof m.id === "string")
+            .map((m) => ({
+                id: m.id,
+                version: m.version ?? "0.0.0",
+                dependencies: m.dependencies ?? [],
+                conflicts: m.conflicts ?? [],
+                ...(m.coreVersion ? { coreVersion: m.coreVersion } : {}),
+            }));
+    } catch (err) {
+        console.error("[setup] Could not read the marketplace catalog:", err);
+        return [];
     }
 }
 
