@@ -3,6 +3,8 @@
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "Coins",
   "permissions": [
@@ -28,6 +30,9 @@
       "handler": "api/credits/purchase/route.ts",
       "description": "Purchase credits via the configured payment gateway."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "credits.credit.added", "type": "action" }
   ],
   "translations": {
     "en": {

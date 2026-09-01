@@ -3,6 +3,8 @@
   "name": "Downloads",
   "description": "File download center for resources and mods",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "gaming",
   "author": "uxwVend",
   "icon": "Download",
   "permissions": [
@@ -38,6 +40,9 @@
       "handler": "api/[id]/route.ts",
       "description": "Get, update, or delete a single download entry."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "downloads.file.downloaded", "type": "action" }
   ],
   "translations": {
     "en": {

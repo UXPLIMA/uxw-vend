@@ -3,6 +3,8 @@
   "name": "Vote System",
   "description": "Vote-for-rewards system with configurable sites and cooldowns",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "Vote",
   "permissions": [
@@ -41,6 +43,9 @@
   ],
   "dependencies": [
     "credits"
+  ],
+  "hooksEmitted": [
+    { "hook": "vote.vote.cast", "type": "action" }
   ],
   "translations": {
     "en": {

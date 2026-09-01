@@ -3,6 +3,8 @@
   "name": "PayPal Payment Gateway",
   "description": "Accept payments via PayPal",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "DollarSign",
   "dependencies": [

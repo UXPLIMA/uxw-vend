@@ -3,6 +3,8 @@
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "content",
   "author": "uxwVend",
   "icon": "FileEdit",
   "permissions": [
@@ -52,6 +54,12 @@
       "handler": "api/submissions/route.ts",
       "description": "List form submissions (admin)."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "customforms.form.created", "type": "action" },
+    { "hook": "customforms.form.deleted", "type": "action" },
+    { "hook": "customforms.form.updated", "type": "action" },
+    { "hook": "customforms.submission.created", "type": "action" }
   ],
   "translations": {
     "en": {

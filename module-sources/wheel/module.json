@@ -3,6 +3,8 @@
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "Dices",
   "permissions": [
@@ -46,6 +48,10 @@
   ],
   "dependencies": [
     "credits"
+  ],
+  "hooksEmitted": [
+    { "hook": "wheel.prize.won", "type": "action" },
+    { "hook": "wheel.spin.completed", "type": "action" }
   ],
   "translations": {
     "en": {

@@ -3,6 +3,8 @@
   "name": "Popups",
   "description": "Modal popup notifications and promotions",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "management",
   "author": "uxwVend",
   "icon": "Bell",
   "permissions": [
