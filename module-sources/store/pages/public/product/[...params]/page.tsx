@@ -2,18 +2,17 @@
 
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link, useRouter } from "@/core/sdk/navigation";
+import { Button } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useParams, usePathname } from "next/navigation";
-import { useRouter } from "@/core/lib/i18n/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
-import { Navbar, Footer } from "@/core/components/layout";
 import { useCurrency } from "../../../../lib/currency-context";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Product {
     id: string;

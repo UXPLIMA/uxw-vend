@@ -6,7 +6,7 @@
  * is enabled.
  */
 
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 import type { SitemapEntry } from "@/core/generated/module-seo";
 
 export default async function helpCenterSitemap(): Promise<SitemapEntry[]> {

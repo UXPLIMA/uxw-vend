@@ -1,16 +1,13 @@
-import { Link } from "@/core/lib/i18n/navigation";
+import { formatDate } from "@/core/sdk";
+import { buildArticleJsonLd, prisma } from "@/core/sdk/server";
+import { Link } from "@/core/sdk/navigation";
+import { Footer, Navbar, Slot, StandardSidebarLayout } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import DOMPurify from "isomorphic-dompurify";
 import { getTranslations } from "next-intl/server";
-import { prisma } from "@/core/lib/db";
-import { formatDate } from "@/core/lib/utils";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Slot } from "@/core/components/Slot";
-import StandardSidebarLayout from "@/core/components/layout/SidebarLayout";
-import { buildArticleJsonLd } from "@/core/lib/seo";
 import { CommentSection } from "../../components/CommentSection";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface PageProps {
     params: Promise<Record<string, unknown>>;

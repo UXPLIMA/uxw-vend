@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
 export async function GET() {
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("changelog.entry.published", entry);
 
     // Public activity feed entry

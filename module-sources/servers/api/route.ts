@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { encryptSecret } from "@/core/lib/secret-storage";
+import { encryptSecret, isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 export async function GET() {
     const servers = await prisma.gameServer.findMany({

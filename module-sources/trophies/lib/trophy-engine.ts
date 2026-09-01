@@ -1,5 +1,5 @@
-import { prisma } from "@/core/lib/db";
-import { addAction } from "@/core/lib/hooks";
+import { addAction } from "@/core/sdk";
+import { prisma } from "@/core/sdk/server";
 
 /**
  * Trophy auto-award engine (DB-driven).
@@ -160,7 +160,10 @@ export async function registerTrophyListeners(force = false): Promise<void> {
     }
 
     for (const [event, eventRules] of byEvent.entries()) {
-        addAction<{ userId?: string; authorId?: string }>(event, async (payload) => {
+        // `event` comes from the database, so it is never a literal the payload
+        // registry can resolve — the shape this rule engine reads is annotated
+        // on the parameter instead.
+        addAction(event, async (payload: { userId?: string; authorId?: string }) => {
             const userId = payload.userId || payload.authorId;
             if (!userId) return;
             for (const rule of eventRules) {

@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
-import moduleSystem from "@/core/lib/modules";
+import { isModuleEnabled, prisma } from "@/core/sdk/server";
 
 // GET /api/v1/store/widget-stats - Public stats for homepage widgets
 export async function GET() {
     try {
         // Check if store module is enabled
-        const configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true, config: true } });
-        await moduleSystem.initialize(configs.map(c => ({ id: c.id, enabled: c.enabled, config: c.config as Record<string, unknown> })));
-        if (!moduleSystem.isEnabled("store")) {
+        if (!(await isModuleEnabled("store"))) {
             return NextResponse.json({
                 recentPurchases: [],
                 topCustomer: null,

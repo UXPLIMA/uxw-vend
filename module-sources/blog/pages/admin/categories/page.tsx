@@ -3,13 +3,9 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 interface Category {
     id: string;

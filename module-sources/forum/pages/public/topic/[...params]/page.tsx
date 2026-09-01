@@ -6,15 +6,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Button } from "@/core/components/ui/button";
-import { Textarea } from "@/core/components/ui/textarea";
-import { Card, CardContent } from "@/core/components/ui/card";
+import { Link } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, Textarea } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Post {
     id: string;

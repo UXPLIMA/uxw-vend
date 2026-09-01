@@ -4,11 +4,11 @@ import { useState, useEffect, use } from "react";
 import DOMPurify from "dompurify";
 import { Render, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent } from "@/core/components/ui/card";
+import { Card, CardContent } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { buildMergedBlockConfig } from "@/core/sdk/blocks";
 import { Loader2 } from "lucide-react";
-import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface PageProps {
     params: Promise<{ slug: string }>;

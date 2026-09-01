@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { slugify } from "@/core/sdk";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
-import { slugify } from "@/core/lib/utils";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 // GET /api/v1/store/products - List products
 export async function GET(request: NextRequest) {
@@ -127,7 +125,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        const { doActionAsync } = await import("@/core/lib/hooks");
+        const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("store.product.created", product);
 
         return NextResponse.json({ product }, { status: 201 });

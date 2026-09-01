@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { logActivity } from "@/core/lib/activity-log";
+import { isAdmin, logActivity, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/admin/export?type=users
 export async function GET(request: NextRequest) {

@@ -6,7 +6,7 @@
  * ModuleSeoRoutes registry when the forum module is enabled.
  */
 
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 import type { SitemapEntry } from "@/core/generated/module-seo";
 
 export default async function forumSitemap(): Promise<SitemapEntry[]> {

@@ -3,13 +3,11 @@
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface ReferralData {
     referralCode: string;

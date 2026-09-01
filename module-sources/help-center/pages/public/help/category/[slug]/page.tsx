@@ -3,8 +3,8 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Navbar, Footer } from "@/core/components/layout";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 interface Article {
     id: string;

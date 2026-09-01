@@ -1,17 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "@/core/lib/i18n/navigation";
-import { Link } from "@/core/lib/i18n/navigation";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Textarea } from "@/core/components/ui/textarea";
-import { Label } from "@/core/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Link, useRouter } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Category {
     id: string;

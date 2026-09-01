@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -31,12 +30,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the previous state before update
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("suggestions.suggestion", id, suggestion, "update", session.user.id);
 
     const updated = await prisma.suggestion.update({ where: { id }, data });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("suggestions.suggestion.updated", updated);
     if (data.status && data.status !== suggestion.status) {
         await doActionAsync("suggestions.suggestion.statusChanged", {
@@ -63,12 +62,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the deleted suggestion for potential restore
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("suggestions.suggestion", id, suggestion, "delete", session.user.id);
 
     await prisma.suggestion.delete({ where: { id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("suggestions.suggestion.deleted", suggestion);
 
     return NextResponse.json({ message: "Deleted" });

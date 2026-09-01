@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Coins, Loader2, ArrowDownLeft, ArrowUpRight, ShoppingBag, Send } from "lucide-react";
 
 interface Transaction {

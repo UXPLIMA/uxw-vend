@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
-import { slugify } from "@/core/lib/utils";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { slugify } from "@/core/sdk";
+import { isAdmin, prisma, rateLimitForRole, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { helpArticleSchema } from "../../../lib/validations";
 
 // GET /api/v1/help/articles - List articles
@@ -87,7 +84,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("helpcenter.article.created", article);
 
     // Public activity feed entry

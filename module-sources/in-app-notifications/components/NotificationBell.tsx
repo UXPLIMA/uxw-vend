@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell, Check, CheckCheck, ExternalLink } from "lucide-react";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";

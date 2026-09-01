@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 
 export const dynamic = "force-dynamic";
 

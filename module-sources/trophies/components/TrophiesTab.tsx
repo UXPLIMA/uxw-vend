@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Link } from "@/core/sdk/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Award, Loader2 } from "lucide-react";
-import { Link } from "@/core/lib/i18n/navigation";
 
 interface EarnedTrophy {
     id: string;

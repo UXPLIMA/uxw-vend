@@ -1,4 +1,4 @@
-import { hasPermission, hasResourcePermission } from "@/core/lib/permissions";
+import { hasPermission, hasResourcePermission } from "@/core/sdk/server";
 
 /**
  * Determine whether a user may download a specific file.

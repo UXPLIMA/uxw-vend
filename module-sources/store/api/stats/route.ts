@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
-import { formatCurrency } from "@/core/lib/utils";
+import { formatCurrency } from "@/core/sdk";
+import { prisma } from "@/core/sdk/server";
 
 /**
  * Store stats endpoint.
