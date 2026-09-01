@@ -65,6 +65,9 @@ shipping — what it no longer does.
   are reachable from client bundles, and the logger imports `next/headers`.
 - **1,419 lines of dead code removed**, including seven orphaned copies of
   `settings-form.tsx` and three unreferenced module libraries.
+- **The published image no longer carries the build cache.** `next build`
+  leaves ~580MB in `.next/cache`; the runner stage copied `.next` wholesale
+  and `next start` never reads it. 3.03GB down to 1.99GB per pull.
 
 ### Fixed
 - **The in-app marketplace fetched from the old repository.** Eight route
@@ -120,6 +123,16 @@ shipping — what it no longer does.
   (falling back to `NEXT_PUBLIC_SITE_URL`) instead of silently defaulting to
   `localhost`.
 - Marketplace ZIPs rebuilt from current sources.
+- **The two module test suites had never run.** Vitest collects
+  `tests/modules/<id>/` only when that module is installed, and `src/modules`
+  is empty on a normal checkout — so they were silent everywhere except the
+  CI job that seeds modules, which had itself never run the suite. All three
+  faults they were hiding are fixed: `next` ships no `exports` map so
+  next-auth's `import "next/server"` cannot resolve outside Next's bundler
+  (any test reaching `@/core/sdk/server` died at collection), `activity-log`
+  imported auth relatively where the rest of the tree uses `@/core/lib/auth`,
+  and the Stripe webhook fixture returned an order without the `status` its
+  own handler had just written.
 
 ### Security
 - **Postgres and Redis are no longer published to the host.** The compose file
