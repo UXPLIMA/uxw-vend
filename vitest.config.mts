@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 51,
-                branches: 49,
-                functions: 44,
-                lines: 52,
+                statements: 55,
+                branches: 54,
+                functions: 47,
+                lines: 56,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -86,6 +86,22 @@ export default defineConfig({
                 // install, so this registry is on the critical path of every
                 // module install, not just of `docker stop`.
                 'src/core/lib/shutdown.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                // Irreversible or unrecoverable by nature: an erasure that
+                // deletes too much destroys the public record, an export that
+                // leaks a password hash cannot be un-sent, and every upload on
+                // the instance passes through storage.ts's sniffer.
+                'src/core/lib/user-deletion.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/user-data-export.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/module-backup.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/storage.ts': {
                     statements: 95, branches: 95, functions: 100, lines: 95,
                 },
                 'src/core/lib/secret-storage.ts': {
