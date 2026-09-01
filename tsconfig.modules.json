@@ -1,0 +1,13 @@
+{
+  "//": "Typechecks module-sources/, which the main tsconfig excludes. NOTE: `exclude` must be overridden here — it is inherited from the base config and takes precedence over `include`, so without this the project matches zero files and reports a meaningless 0 errors. Run via `npm run typecheck:modules`.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true },
+  "exclude": ["node_modules", "module-template", ".next"],
+  "//include": "src/core/types holds global `.d.ts` declarations (the hook payload registry). Nothing imports them, so they only enter a program that lists them explicitly — without this line every module file sees UxwVendHookPayloads as undeclared.",
+  "include": [
+    "module-sources/**/*.ts",
+    "module-sources/**/*.tsx",
+    "next-env.d.ts",
+    "src/core/types/**/*.d.ts"
+  ]
+}
