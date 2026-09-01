@@ -1,14 +1,33 @@
-// Docker first-boot database bootstrap.
+// Docker database bootstrap AND upgrade.
 //
-// Run by the `migrate` service in docker-compose.yml before the app starts.
-// On a FRESH database it pushes the (core-only) schema and seeds the 3 roles
-// + core permissions + admin user, so the documented one-command quickstart
-// (`docker compose up`) yields a working login out of the box.
+// Run by the `migrate` service in docker-compose.yml before the app starts,
+// on every `up`. It has two jobs, decided by whether the core `User` table
+// already exists:
 //
-// It is a NO-OP once the database is already initialized (the core `User`
-// table exists), so it is safe to run on every `docker compose up` and never
-// touches module-owned tables an admin created at runtime.
+//   FRESH database  — merge schemas, push, and seed the 3 roles + core
+//                     permissions + admin user, so `install.sh` yields a
+//                     working login out of the box.
+//
+//   EXISTING database — run the upgrade sequence documented in
+//                     docs/DEPLOYMENT.md ("Upgrades") and docs/MIGRATIONS.md:
+//                     merge-schemas -> prisma db push -> apply-migrations.
+//                     It used to return early here, which meant pulling a
+//                     newer image left the database on the old schema: the
+//                     install was one command, the upgrade was silently
+//                     broken. Seeding is NEVER repeated.
+//
+// merge-schemas reads src/modules, so the `migrate` service mounts the same
+// `modules` volume the app does — otherwise the merged schema would be
+// core-only and `db push` would try to drop every table the installed
+// modules own.
+//
+// If any step fails the service exits non-zero and the app never starts
+// (`depends_on: service_completed_successfully`). That is deliberate: a
+// running app on a mismatched schema is worse than a stopped one.
 
+// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// outside Next.js, which is what normally loads the env file.
+import "dotenv/config";
 import { Pool } from "pg";
 import { spawnSync } from "child_process";
 
@@ -45,13 +64,25 @@ async function main(): Promise<void> {
         await pool.end();
     }
 
+    // Rebuild prisma/schema.prisma from the core schema plus whatever modules
+    // are installed in the mounted volume right now. On a fresh install that
+    // is core-only; on an upgrade it is core + every module the admin added,
+    // which is what makes the `db push` below safe.
+    run("merge-schemas", "npx", ["tsx", "scripts/merge-schemas.ts"]);
+    // No --skip-generate: Prisma 7 removed the flag (`prisma db push` accepts
+    // only --config, --schema, --url, --accept-data-loss and --force-reset),
+    // and passing it aborts the push. merge-schemas.ts above already ran
+    // `prisma generate`, so there is nothing to skip.
+    run("prisma db push", "npx", ["prisma", "db", "push"]);
+
     if (initialized) {
-        console.log("[bootstrap] Database already initialized — skipping schema push + seed.");
+        console.log("[bootstrap] Existing database — applying module migrations…");
+        run("apply-migrations", "npx", ["tsx", "scripts/apply-migrations.ts"]);
+        console.log("[bootstrap] Upgrade complete.");
         return;
     }
 
-    console.log("[bootstrap] Fresh database — pushing schema and seeding core data…");
-    run("prisma db push", "npx", ["prisma", "db", "push", "--skip-generate"]);
+    console.log("[bootstrap] Fresh database — seeding core data…");
     run("seed", "npx", ["tsx", "prisma/seed.ts"]);
     console.log("[bootstrap] Done.");
 }

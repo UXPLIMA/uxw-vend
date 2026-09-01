@@ -1,0 +1,19 @@
+# Build the image from the source tree instead of pulling it from GHCR.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+#
+# The installer does this when given --build. Two situations need it:
+#   - no release has been published yet, so the registry has no image
+#   - you are developing and want your working tree in the container
+#
+# This is not the supported install path. A normal install pulls a prebuilt
+# image and never compiles on the target server.
+services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile

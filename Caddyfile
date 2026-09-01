@@ -1,0 +1,28 @@
+# Reverse proxy + automatic HTTPS for uxwVend.
+#
+# DOMAIN and TLS_EMAIL come from .env via docker-compose.yml. Caddy obtains a
+# Let's Encrypt certificate on first request and renews it by itself; there is
+# no certbot timer to install and no renewal cron to forget.
+#
+# Only reached when the `tls` compose profile is active. Without a domain the
+# app publishes its own port and this file is unused.
+
+{
+	# Empty is fine — Let's Encrypt just won't send expiry reminders.
+	email {$TLS_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# The app trusts x-forwarded-* only from configured proxies; see
+	# TRUSTED_PROXY_IPS in .env.example. Caddy sets them correctly.
+	reverse_proxy app:3001 {
+		header_up X-Real-IP {remote_host}
+	}
+
+	log {
+		output stderr
+		format console
+	}
+}

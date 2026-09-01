@@ -1,18 +1,19 @@
-# Single-command stack: Postgres, Redis, and the uxwVend app.
+# uxwVend production stack: Postgres, Redis, the app, and (optionally) Caddy.
 #
-#   cp .env.example .env && docker compose up --build
+# You should not need to read this file. Run the installer instead:
 #
-# Named volumes persist DB rows, Redis state, uploaded files, and installed
-# modules across restarts. Use `docker compose down -v` to wipe everything.
+#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
 #
-# Ports on the host:
-#   app      → http://localhost:3001
-#   postgres → localhost:5432
-#   redis    → localhost:6379
+# It writes the .env this file needs, picks the ports, and starts everything.
+# To drive compose by hand, copy .env.example to .env and set at minimum
+# POSTGRES_PASSWORD and AUTH_SECRET, then `docker compose up -d`.
 #
-# Env vars come from .env (via env_file). The connection strings below
-# override what .env has so the app always talks to the sibling services
-# rather than a localhost Postgres that doesn't exist inside the container.
+# Companion files:
+#   docker-compose.build.yml — build the image from source instead of pulling
+#   docker-compose.debug.yml — republish Postgres/Redis on 127.0.0.1
+#
+# Named volumes persist DB rows, Redis state, uploads, installed modules and
+# backups across restarts. `docker compose down -v` wipes all of it.
 
 services:
   db:
@@ -24,8 +25,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # No `ports:` on purpose. Publishing 5432 puts Postgres on the public
+    # internet of every VPS this stack is installed on, guarded by nothing but
+    # the password. Sibling services reach it over the compose network by name;
+    # for a shell use `docker compose exec db psql -U uxwvend`, and for a host
+    # port use the docker-compose.debug.yml override (binds 127.0.0.1 only).
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U uxwvend -d uxwvend"]
       interval: 5s
@@ -36,12 +40,12 @@ services:
     image: redis:8-alpine
     restart: unless-stopped
     # Append-only persistence so cached module state + rate-limit counters
-    # survive restarts cleanly. Drop --appendonly yes for ephemeral dev.
+    # survive restarts cleanly.
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data
-    ports:
-      - "6379:6379"
+    # No `ports:` — same reasoning as db. Redis has no password here; its only
+    # protection is being unreachable from outside the compose network.
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -52,9 +56,7 @@ services:
   # then exits. No-op once the DB is initialized, so it is safe on every
   # `up`. The app waits for this to finish successfully before starting.
   migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${UXWVEND_IMAGE:-ghcr.io/uxplima/uxw-vend}:${UXWVEND_VERSION:-latest}
     depends_on:
       db:
         condition: service_healthy
@@ -64,12 +66,16 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
     command: ["npx", "tsx", "scripts/docker-bootstrap.ts"]
+    # Same modules volume the app uses. scripts/merge-schemas.ts reads
+    # src/modules to rebuild the merged Prisma schema; without this the
+    # upgrade path would push a core-only schema over a database that has
+    # module tables in it.
+    volumes:
+      - modules:/app/src/modules
     restart: "no"
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${UXWVEND_IMAGE:-ghcr.io/uxplima/uxw-vend}:${UXWVEND_VERSION:-latest}
     restart: unless-stopped
     depends_on:
       db:
@@ -87,8 +93,11 @@ services:
       AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
       AUTH_URL: ${AUTH_URL:-http://localhost:3001}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
+    # APP_BIND_ADDR is 127.0.0.1 when Caddy terminates TLS in front of the
+    # app — the container must not also be reachable directly on :3001.
+    # Without TLS the installer leaves it at 0.0.0.0 and publishes APP_PORT.
     ports:
-      - "3001:3001"
+      - "${APP_BIND_ADDR:-0.0.0.0}:${APP_PORT:-3001}:3001"
     # Runtime state that must not live inside the read-only image layers.
     volumes:
       # Uploaded files (local storage provider fallback).
@@ -105,9 +114,37 @@ services:
       retries: 3
       start_period: 60s
 
+  # TLS terminator. Enabled only with `--profile tls`, which the installer
+  # passes when the operator supplied a domain. Caddy obtains and renews a
+  # Let's Encrypt certificate on its own — no certbot timer to forget.
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["tls"]
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      # No `:?` guard here. Compose interpolates every service's environment
+      # even when the service's profile is inactive, so a required-variable
+      # check would break every domainless (IP-only) install. install.sh
+      # already refuses --tls without a domain, which is the right place for
+      # that rule.
+      DOMAIN: ${DOMAIN:-}
+      TLS_EMAIL: ${TLS_EMAIL:-}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+
 volumes:
   pgdata:
   redisdata:
   uploads:
   modules:
   backups:
+  caddydata:
+  caddyconfig:
