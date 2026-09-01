@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 // GET /api/v1/discord-widget — Public: returns the configured Discord server ID
 // for the homepage widget iframe. Anyone visiting the public homepage needs this,

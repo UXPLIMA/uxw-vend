@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 /**
  * Constant-time API key comparison. Guards against undefined values and
@@ -92,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fire hook + activity feed entry (private)
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("punishments.punishment.issued", {
         punishmentId: punishment.id,
         playerName,

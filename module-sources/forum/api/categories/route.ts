@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { forumCategorySchema } from "../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
 
 // GET /api/v1/forum/categories
 export async function GET() {

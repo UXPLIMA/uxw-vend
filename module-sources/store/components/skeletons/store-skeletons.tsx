@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@/core/components/ui/skeleton";
+import { Skeleton } from "@/core/sdk/ui";
 
 export function SkeletonCard() {
     return (

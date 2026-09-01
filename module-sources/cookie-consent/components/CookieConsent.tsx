@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/core/components/ui/button";
+import { Button } from "@/core/sdk/ui";
 import { Cookie } from "lucide-react";
 import { useTranslations } from "next-intl";
 

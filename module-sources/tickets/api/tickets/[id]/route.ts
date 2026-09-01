@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
+import { isAdmin, prisma, rateLimitForRole } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { ticketMessageSchema, ticketUpdateSchema } from "../../../lib/validations";
 import { canAccessTicket } from "../../../lib/can-access-ticket";
 
@@ -121,7 +119,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("tickets.ticket.replied", { ticket, message, isStaffReply });
 
     // Private activity feed entry
@@ -195,7 +193,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("tickets.ticket.updated", updated);
 
     if (validation.data.status === "CLOSED" || validation.data.status === "RESOLVED") {

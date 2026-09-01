@@ -3,9 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
 import { Loader2, Users, UserPlus, Coins, Clock, Save } from "lucide-react";
 import { toast } from "sonner";
 

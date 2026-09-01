@@ -1,5 +1,26 @@
 import { defineConfig } from 'vitest/config';
+import fs from 'fs';
 import path from 'path';
+
+/**
+ * Tests for a module live in `tests/modules/<moduleId>/` and are included only
+ * when that module is actually installed.
+ *
+ * The platform ships with zero modules, so `src/modules/` is normally empty. A
+ * test that imports `@/modules/<id>/...` cannot even be transformed in that
+ * state — it fails at collection, not as an assertion. Gating the glob on what
+ * is installed keeps `npm test` green on a clean checkout while still running
+ * these tests on a machine where the module is present.
+ */
+const modulesDir = path.resolve(__dirname, 'src/modules');
+const installedModules = fs.existsSync(modulesDir)
+    ? fs.readdirSync(modulesDir, { withFileTypes: true })
+          .filter((e) => e.isDirectory() && fs.existsSync(path.join(modulesDir, e.name, 'module.json')))
+          .map((e) => e.name)
+    : [];
+const installedModuleTestGlobs = installedModules.map(
+    (id) => `tests/modules/${id}/**/*.test.{ts,tsx}`,
+);
 
 export default defineConfig({
     test: {
@@ -8,6 +29,7 @@ export default defineConfig({
         include: [
             'tests/unit/**/*.test.{ts,tsx}',
             'tests/integration/**/*.test.{ts,tsx}',
+            ...installedModuleTestGlobs,
         ],
         coverage: {
             provider: 'v8',

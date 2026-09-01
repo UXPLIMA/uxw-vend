@@ -1,8 +1,6 @@
 import crypto from "crypto";
 import path from "path";
-import { prisma } from "@/core/lib/db";
-import type { StorageProvider, UploadResult } from "@/core/lib/storage";
-import { sanitizeFilename } from "@/core/lib/storage";
+import { prisma, sanitizeFilename, type StorageProvider, type UploadResult } from "@/core/sdk/server";
 
 declare const __webpack_require__: unknown;
 declare const __non_webpack_require__: (id: string) => Record<string, unknown>;

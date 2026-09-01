@@ -1,20 +1,14 @@
-import { prisma } from "@/core/lib/db";
-
-interface BlogArticleCreatedPayload {
-    id: string;
-    title: string;
-    slug: string;
-    status: string;
-    authorId: string;
-}
+import { prisma } from "@/core/sdk/server";
+import type { HookHandlerFor } from "@/core/sdk";
 
 /**
  * Records a public ActivityFeedItem when a blog article is published.
  * Wired via the blog manifest's `hookListeners` entry on `blog.article.created`.
+ *
+ * The payload type comes from this module's own hooks.d.ts, so the listener
+ * cannot drift from what the emitter promises.
  */
-export default async function onBlogArticleCreated(
-    payload: BlogArticleCreatedPayload,
-): Promise<void> {
+const onBlogArticleCreated: HookHandlerFor<"blog.article.created", "action"> = async (payload) => {
     if (payload.status !== "PUBLISHED") return;
     try {
         await prisma.activityFeedItem.create({
@@ -30,4 +24,6 @@ export default async function onBlogArticleCreated(
     } catch {
         /* non-fatal */
     }
-}
+};
+
+export default onBlogArticleCreated;

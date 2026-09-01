@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { isAdmin, prisma, rateLimitForRole } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { ticketSchema } from "../../lib/validations";
-import { sendDiscordWebhook } from "@/core/lib/discord";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
 
 // GET /api/v1/tickets - List tickets
 export async function GET(request: NextRequest) {
@@ -134,22 +131,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Discord notification
-    sendDiscordWebhook("ticket_created", {
-        embeds: [{
-            title: "New Support Ticket",
-            color: 0xf59e0b,
-            fields: [
-                { name: "Subject", value: subject, inline: true },
-                { name: "User", value: ticket.user?.username ?? "Deleted user", inline: true },
-                { name: "Department", value: ticket.department.name, inline: true },
-                { name: "Priority", value: ticket.priority, inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    }).catch(console.error);
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("tickets.ticket.opened", ticket);
 
     // Private activity feed entry (only visible to actor)

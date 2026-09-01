@@ -4,9 +4,8 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { formatCurrency, formatDate } from "@/core/sdk";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 
 interface Order {

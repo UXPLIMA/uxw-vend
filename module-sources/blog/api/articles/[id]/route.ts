@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { blogArticleSchema } from "../../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -73,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the previous state for rollback
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("blog.article", id, article, "update", session.user.id);
 
     const body = await request.json();
@@ -158,7 +156,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         },
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.article.updated", updatedArticle);
 
     return NextResponse.json(updatedArticle);
@@ -188,12 +186,12 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     }
 
     // Snapshot the deleted entity for potential restore
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("blog.article", id, article, "delete", session.user.id);
 
     await prisma.blogArticle.delete({ where: { id } });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.article.deleted", article);
 
     return NextResponse.json({ message: "Article deleted successfully" });

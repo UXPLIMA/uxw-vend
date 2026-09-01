@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
+import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/vote/claim - Claim vote reward
 export async function POST(request: NextRequest) {
@@ -66,7 +65,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Fire hook + activity feed entry
-        const { doActionAsync } = await import("@/core/lib/hooks");
+        const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("vote.vote.cast", {
             userId: session.user.id,
             voteSiteId,

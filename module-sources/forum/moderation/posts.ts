@@ -1,4 +1,4 @@
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 import type { ModerationProvider } from "@/core/generated/module-moderation";
 
 const provider: ModerationProvider = {

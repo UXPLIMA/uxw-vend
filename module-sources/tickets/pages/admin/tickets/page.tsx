@@ -4,8 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
 

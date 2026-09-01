@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 import { capturePaypalOrder } from "../../../../lib/paypal";
 import { sendOrderConfirmationEmail } from "../../../../lib/email";
-import { sendDiscordWebhook } from "@/core/lib/discord";
 import { deliverProduct } from "../../../../lib/rcon";
 
 // GET /api/v1/store/checkout/paypal/capture — PayPal return URL after approval
@@ -77,12 +76,8 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        sendDiscordWebhook("order_completed", {
-            embeds: [{ title: "Order Completed (PayPal)", color: 0x0070ba, fields: [
-                { name: "Order", value: order.orderNumber, inline: true },
-                { name: "Total", value: `${Number(order.total)} ${order.currency}`, inline: true },
-            ], timestamp: new Date().toISOString() }],
-        }).catch(console.error);
+        const { doActionAsync } = await import("@/core/sdk");
+        await doActionAsync("store.order.completed", order);
 
         const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3001";
         return NextResponse.redirect(new URL("/store/order-success", baseUrl));

@@ -3,14 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Navbar, Footer } from "@/core/components/layout";
-import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
 // Minecraft avatar helper - inline
 function getMinecraftAvatar(username: string, size = 64) { return `https://mc-heads.net/avatar/${username}/${size}`; }
 import { useCurrency } from "../../lib/currency-context";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface LeaderEntry {
     username: string;

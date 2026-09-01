@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
+import { generateOrderNumber } from "@/core/sdk";
+import { logActivity, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../lib/stripe";
-import { generateOrderNumber } from "@/core/lib/utils";
-import { sendDiscordWebhook } from "@/core/lib/discord";
-import { logActivity } from "@/core/lib/activity-log";
 import { deliverProduct } from "../../lib/rcon";
 import {
     computeOrderPricing,
@@ -283,20 +281,7 @@ export async function POST(request: NextRequest) {
                 metadata: { orderNumber: order.orderNumber, total, paymentMethod: "credits" },
             }).catch(console.error);
 
-            sendDiscordWebhook("order_completed", {
-                embeds: [{
-                    title: "Order Completed (Credits)",
-                    color: 0x22c55e,
-                    fields: [
-                        { name: "Order", value: order.orderNumber, inline: true },
-                        { name: "Total", value: `${total.toFixed(2)} credits`, inline: true },
-                        { name: "Player", value: playerName, inline: true },
-                    ],
-                    timestamp: new Date().toISOString(),
-                }],
-            }).catch(console.error);
-
-            const { doActionAsync } = await import("@/core/lib/hooks");
+            const { doActionAsync } = await import("@/core/sdk");
             await doActionAsync("store.order.created", order);
             await doActionAsync("store.order.completed", order);
             return NextResponse.json({ order, redirect: null, message: "Order completed with credits" }, { status: 201 });
@@ -354,18 +339,8 @@ export async function POST(request: NextRequest) {
             metadata: { orderNumber: order.orderNumber, total },
         }).catch(console.error);
 
-        sendDiscordWebhook("order_created", {
-            embeds: [{
-                title: "New Order",
-                color: 0x3b82f6,
-                fields: [
-                    { name: "Order", value: order.orderNumber, inline: true },
-                    { name: "Total", value: `${total.toFixed(2)} ${currency.toUpperCase()}`, inline: true },
-                    { name: "Player", value: playerName, inline: true },
-                ],
-                timestamp: new Date().toISOString(),
-            }],
-        }).catch(console.error);
+        const { doActionAsync } = await import("@/core/sdk");
+        await doActionAsync("store.order.created", order);
 
         // ── Free order: complete & grant immediately ──
         // CRITICAL: separated from the "Stripe missing" path. If a paid order
@@ -387,8 +362,6 @@ export async function POST(request: NextRequest) {
                 });
             }
 
-            const { doActionAsync } = await import("@/core/lib/hooks");
-            await doActionAsync("store.order.created", order);
             await doActionAsync("store.order.completed", order);
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });
         }

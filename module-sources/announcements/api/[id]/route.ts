@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { logActivity } from "@/core/lib/activity-log";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { isAdmin, logActivity, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -35,7 +32,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         metadata: { description: `Updated: ${id}` },
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("announcements.announcement.updated", announcement);
 
     return NextResponse.json({ announcement });
@@ -56,7 +53,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         metadata: { description: `Deleted: ${id}` },
     });
 
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("announcements.announcement.deleted", existing);
 
     return NextResponse.json({ message: "Deleted" });

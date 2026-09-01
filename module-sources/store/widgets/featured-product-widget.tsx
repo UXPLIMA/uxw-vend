@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/core/components/ui/button";
+import { Link } from "@/core/sdk/navigation";
+import { Button } from "@/core/sdk/ui";
 import { Crown } from "lucide-react";
 import { useCurrency } from "../lib/currency-context";
-import { Link } from "@/core/lib/i18n/navigation";
 
 interface Product {
     id: string;

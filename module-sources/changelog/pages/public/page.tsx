@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
-import { Navbar, Footer } from "@/core/components/layout";
+import { Card, CardContent } from "@/core/sdk/ui";
+import { Footer, Navbar } from "@/core/sdk/layout";
+import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useLocalDate } from "@/core/hooks/useLocalDate";
-import { Card, CardContent } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
 interface Entry {
     id: string;

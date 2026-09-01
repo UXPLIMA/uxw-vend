@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
+import { prisma } from "@/core/sdk/server";
 
 type RouteParams = { params: Promise<{ username: string }> };
 

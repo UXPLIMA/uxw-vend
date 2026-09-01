@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { blogArticleSchema } from "../../lib/validations";
-import { generateSlug } from "@/core/lib/utils";
-import { sanitizeHtml } from "@/core/lib/sanitize";
 
 // GET /api/v1/blog/articles - List all articles (public)
 export async function GET(request: NextRequest) {
@@ -138,7 +136,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook for cross-module reactions (discord webhook, notifications, etc.)
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("blog.article.created", article);
 
     return NextResponse.json(article, { status: 201 });

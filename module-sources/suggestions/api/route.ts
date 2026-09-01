@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { rateLimitForRole } from "@/core/lib/rate-limit";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { isAdmin, prisma, rateLimitForRole, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
 type ModerationSettingValue = {
@@ -97,7 +94,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("suggestions.suggestion.created", suggestion);
 
     // Activity feed entry (public only if visibility public)

@@ -5,9 +5,8 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/core/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { formatCurrency } from "@/core/lib/utils";
+import { formatCurrency } from "@/core/sdk";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, Package } from "lucide-react";
 
 interface Product {

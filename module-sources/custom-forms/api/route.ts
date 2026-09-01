@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { generateSlug } from "@/core/lib/utils";
+import { generateSlug } from "@/core/sdk";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 export async function GET() {
     const forms = await prisma.customForm.findMany({
@@ -27,7 +26,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fire hook for cross-module reactions
-    const { doActionAsync } = await import("@/core/lib/hooks");
+    const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("customforms.form.created", form);
 
     return NextResponse.json({ form }, { status: 201 });

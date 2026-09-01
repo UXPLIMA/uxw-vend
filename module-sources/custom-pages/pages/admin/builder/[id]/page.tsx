@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { Link, useRouter } from "@/core/lib/i18n/navigation";
+import { Link, useRouter } from "@/core/sdk/navigation";
+import { Button } from "@/core/sdk/ui";
+import { buildMergedBlockConfig } from "@/core/sdk/blocks";
 import { Puck, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
-import { buildMergedBlockConfig } from "@/core/lib/blocks-merger";
-import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Save, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";

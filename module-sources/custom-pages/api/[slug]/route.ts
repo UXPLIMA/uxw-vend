@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { isAdmin } from "@/core/lib/permissions";
-import { sanitizeHtml } from "@/core/lib/sanitize";
+import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
@@ -34,7 +32,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (body.order !== undefined) data.order = body.order;
 
     // Snapshot the previous state before update
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("custom-pages.page", page.id, page, "update", session.user.id);
 
     const updated = await prisma.customPage.update({ where: { id: page.id }, data });
@@ -52,7 +50,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
 
     // Snapshot the deleted page for potential restore
-    const { recordRevision } = await import("@/core/lib/revisions");
+    const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("custom-pages.page", page.id, page, "delete", session.user.id);
 
     await prisma.customPage.delete({ where: { id: page.id } });

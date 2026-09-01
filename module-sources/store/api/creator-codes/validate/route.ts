@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/lib/db";
-import { rateLimitForRole, getClientIP, rateLimits } from "@/core/lib/rate-limit";
+import { getClientIP, prisma, rateLimitForRole, rateLimits } from "@/core/sdk/server";
 
 // GET /api/v1/store/creator-codes/validate?code=XXX
 export async function GET(request: NextRequest) {

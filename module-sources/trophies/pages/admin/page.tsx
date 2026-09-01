@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { Textarea } from "@/core/components/ui/textarea";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, useConfirm } from "@/core/sdk/ui";
 import {
     Plus,
     X,
@@ -16,7 +12,6 @@ import {
     Users,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
 
 interface AdminTrophy {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { AdminCrudPage } from "@/core/components/admin/AdminCrudPage";
+import { AdminCrudPage } from "@/core/sdk/admin";
 
 export default function Page() {
     const t = useTranslations("tickets");

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
-import { generateBackupCodes, verifyToken } from "@/core/lib/two-factor";
+import { generateBackupCodes, prisma, verifyToken } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/regenerate-codes - Regenerate backup codes
 // Requires current password OR a valid TOTP code.
