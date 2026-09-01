@@ -1,24 +1,34 @@
 {
   "version": "1.0.0",
-  "updated": "2026-05-30",
-  "updatedAt": "2026-05-30T16:50:42Z",
+  "updated": "2026-09-01",
+  "updatedAt": "2026-09-01T11:59:02Z",
   "modules": [
     {
       "id": "announcements",
       "name": "Announcements",
       "description": "Site-wide announcement banners",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "announcements.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "announcements.announcement.created",
+          "announcements.announcement.deleted",
+          "announcements.announcement.updated"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -31,17 +41,32 @@
       "name": "Blog Module",
       "description": "News and announcements system",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "blog.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "blog.article.created",
+          "blog.article.deleted",
+          "blog.article.updated",
+          "blog.category.created",
+          "blog.category.deleted",
+          "blog.category.updated"
+        ],
+        "listens": [
+          "blog.article.created"
+        ]
+      },
       "stats": {
         "publicRoutes": 2,
         "adminRoutes": 4,
@@ -54,17 +79,27 @@
       "name": "Changelog",
       "description": "Release notes and update history",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "changelog.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "changelog.entry.deleted",
+          "changelog.entry.published",
+          "changelog.entry.updated"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -77,17 +112,23 @@
       "name": "Cloudflare R2 Storage",
       "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "cloudflare-r2.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -100,17 +141,23 @@
       "name": "Cloudflare Turnstile",
       "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "cloudflare-turnstile.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -123,17 +170,23 @@
       "name": "Cookie Consent",
       "description": "GDPR cookie consent banner",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "cookie-consent.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 0,
@@ -146,17 +199,25 @@
       "name": "Credit System",
       "description": "Virtual currency wallet for users",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "credits.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "credits.credit.added"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 0,
@@ -169,17 +230,23 @@
       "name": "CSV Import/Export",
       "description": "CSV export and import utilities for data backup",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "csv-import-export.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -192,17 +259,23 @@
       "name": "Multi-Currency",
       "description": "Multi-currency support with automatic conversion",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "currency.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -215,17 +288,28 @@
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "custom-forms.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "customforms.form.created",
+          "customforms.form.deleted",
+          "customforms.form.updated",
+          "customforms.submission.created"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 2,
@@ -238,20 +322,26 @@
       "name": "Custom Pages",
       "description": "Admin-created HTML content pages",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "custom-pages.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
-        "adminRoutes": 1,
+        "adminRoutes": 2,
         "apiRoutes": 2,
         "widgets": 0
       }
@@ -261,17 +351,23 @@
       "name": "Discord Login",
       "description": "Allow users to sign in with their Discord account",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "discord-auth.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -284,17 +380,30 @@
       "name": "Discord Integration",
       "description": "Discord webhook notifications and settings",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "discord-integration.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": [
+          "user.registered",
+          "blog.article.created",
+          "forum.topic.created",
+          "tickets.ticket.opened",
+          "store.order.created",
+          "store.order.completed"
+        ]
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -307,11 +416,12 @@
       "name": "Discord Widget",
       "description": "Discord server widget on homepage sidebar",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -320,6 +430,11 @@
       "dependencies": [
         "discord-integration"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -332,17 +447,25 @@
       "name": "Downloads",
       "description": "File download center for resources and mods",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "gaming"
       ],
       "zip": "downloads.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "downloads.file.downloaded"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -355,17 +478,23 @@
       "name": "Email Templates",
       "description": "Email service configuration and templates",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "email-templates.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -378,17 +507,30 @@
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "forum.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "forum.post.created",
+          "forum.post.deleted",
+          "forum.post.updated",
+          "forum.topic.created",
+          "forum.topic.deleted",
+          "forum.topic.updated"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 3,
         "adminRoutes": 2,
@@ -401,17 +543,23 @@
       "name": "Google Analytics",
       "description": "Google Analytics tracking integration",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "google-analytics.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -424,17 +572,23 @@
       "name": "Google Login",
       "description": "Allow users to sign in with their Google account",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "google-auth.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -447,17 +601,25 @@
       "name": "Help Center",
       "description": "Knowledge base with categories and searchable articles",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "help-center.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "helpcenter.article.created"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 3,
         "adminRoutes": 1,
@@ -470,17 +632,23 @@
       "name": "In-App Notifications",
       "description": "In-app notification system with bell icon",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "in-app-notifications.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
@@ -493,11 +661,12 @@
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -506,6 +675,11 @@
       "dependencies": [
         "store"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
@@ -518,17 +692,23 @@
       "name": "Login Protection",
       "description": "CAPTCHA, login throttling, and account security",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "login-protection.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -541,11 +721,12 @@
       "name": "PayPal Payment Gateway",
       "description": "Accept payments via PayPal",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -554,6 +735,11 @@
       "dependencies": [
         "store"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -566,17 +752,23 @@
       "name": "Player Profiles",
       "description": "Public player profile pages",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "gaming"
       ],
       "zip": "player-profiles.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 0,
@@ -589,17 +781,23 @@
       "name": "Popups",
       "description": "Modal popup notifications and promotions",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "popups.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -612,17 +810,26 @@
       "name": "Punishments",
       "description": "Player punishment history and ban management",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "gaming"
       ],
       "zip": "punishments.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "punishments.punishment.issued",
+          "punishments.punishment.revoked"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -635,11 +842,12 @@
       "name": "Referral System",
       "description": "Earn credits by referring new users",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -648,6 +856,13 @@
       "dependencies": [
         "store"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "referral.referral.used"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -660,11 +875,12 @@
       "name": "Resend Email Provider",
       "description": "Send emails via Resend API",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -673,6 +889,11 @@
       "dependencies": [
         "email-templates"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -685,17 +906,23 @@
       "name": "SEO Manager",
       "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "seo.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 2,
@@ -708,17 +935,23 @@
       "name": "Game Servers",
       "description": "Game server management, RCON, and status monitoring",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "gaming"
       ],
       "zip": "servers.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 2,
@@ -731,17 +964,23 @@
       "name": "Slider",
       "description": "Homepage image carousel and banners",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "slider.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -754,17 +993,23 @@
       "name": "Staff",
       "description": "Staff member listing and applications",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "staff.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 2,
@@ -777,11 +1022,12 @@
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -790,6 +1036,18 @@
       "dependencies": [
         "currency"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "store.order.completed",
+          "store.order.created",
+          "store.product.created"
+        ],
+        "listens": [
+          "user.registered",
+          "store.order.completed"
+        ]
+      },
       "stats": {
         "publicRoutes": 5,
         "adminRoutes": 12,
@@ -802,11 +1060,12 @@
       "name": "Stripe Payment Gateway",
       "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -815,6 +1074,11 @@
       "dependencies": [
         "store"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -827,17 +1091,30 @@
       "name": "Suggestions",
       "description": "Community feature suggestions with voting",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "suggestions.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "suggestions.suggestion.created",
+          "suggestions.suggestion.deleted",
+          "suggestions.suggestion.statusChanged",
+          "suggestions.suggestion.unvoted",
+          "suggestions.suggestion.updated",
+          "suggestions.suggestion.voted"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -850,17 +1127,28 @@
       "name": "Support Tickets",
       "description": "Customer support ticket system with departments and priority levels",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "tickets.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "tickets.ticket.closed",
+          "tickets.ticket.opened",
+          "tickets.ticket.replied",
+          "tickets.ticket.updated"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 3,
         "adminRoutes": 3,
@@ -873,17 +1161,25 @@
       "name": "Trophies",
       "description": "Achievement badges with rule-based auto-award engine",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "trophies.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": [
+          "core.boot"
+        ]
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -896,17 +1192,26 @@
       "name": "Two-Factor Authentication",
       "description": "TOTP-based 2FA with backup codes for enhanced account security",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "management"
       ],
       "zip": "two-factor-auth.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "user.2fa.disabled",
+          "user.2fa.enabled"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 0,
@@ -919,11 +1224,12 @@
       "name": "Vote System",
       "description": "Vote-for-rewards system with configurable sites and cooldowns",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -932,6 +1238,13 @@
       "dependencies": [
         "credits"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "vote.vote.cast"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
@@ -944,17 +1257,23 @@
       "name": "Webhook Logs",
       "description": "View and manage webhook delivery logs",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "webhook-logs.zip",
       "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
@@ -967,11 +1286,12 @@
       "name": "Wheel of Fortune",
       "description": "Spin-to-win game with configurable prizes and cooldowns",
       "version": "1.0.0",
+      "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-05-30T16:50:42Z",
+      "updatedAt": "2026-09-01T11:59:02Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -980,6 +1300,14 @@
       "dependencies": [
         "credits"
       ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "wheel.prize.won",
+          "wheel.spin.completed"
+        ],
+        "listens": []
+      },
       "stats": {
         "publicRoutes": 1,
         "adminRoutes": 1,
