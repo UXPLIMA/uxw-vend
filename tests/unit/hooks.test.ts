@@ -74,8 +74,8 @@ describe("hooks: filters", () => {
     beforeEach(() => resetHooks());
 
     it("applyFilters chains transformations", () => {
-        addFilter<number>("test", (v) => v + 1);
-        addFilter<number>("test", (v) => v * 2);
+        addFilter("test", (v: number) => v + 1);
+        addFilter("test", (v: number) => v * 2);
         // Default priority same → insertion order; first +1 then *2
         const result = applyFilters("test", 5);
         expect(result).toBe(12);
@@ -88,9 +88,9 @@ describe("hooks: filters", () => {
 
     it("applyFilters keeps previous value when a listener throws", () => {
         const errSpy = vi.spyOn(console, "error").mockImplementation(() => { });
-        addFilter<number>("test", (v) => v + 1);
-        addFilter<number>("test", () => { throw new Error("boom"); });
-        addFilter<number>("test", (v) => v * 2);
+        addFilter("test", (v: number) => v + 1);
+        addFilter("test", (): number => { throw new Error("boom"); });
+        addFilter("test", (v: number) => v * 2);
         const r = applyFilters("test", 5);
         // 5+1=6, throw → keeps 6, *2 → 12
         expect(r).toBe(12);
@@ -107,7 +107,7 @@ describe("hooks: filters", () => {
     });
 
     it("applyFiltersAsync supports async listeners", async () => {
-        addFilter<number>("test", async (v) => {
+        addFilter("test", async (v: number) => {
             await new Promise((r) => setTimeout(r, 5));
             return v + 10;
         });

@@ -3,9 +3,13 @@
   "name": "Trophies",
   "description": "Achievement badges with rule-based auto-award engine",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "community",
   "author": "uxwVend",
   "icon": "Trophy",
-  "permissions": ["trophies.manage"],
+  "permissions": [
+    "trophies.manage"
+  ],
   "menu": [
     {
       "label": "Trophies",

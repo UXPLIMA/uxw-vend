@@ -43,15 +43,15 @@ describe("hook listener timeout", () => {
     it("passes the previous value down the filter chain when a listener times out", async () => {
         vi.spyOn(console, "error").mockImplementation(() => {});
 
-        addFilter<string>("test.chain", (v) => v + "a");
-        addFilter<string>(
+        addFilter("test.chain", (v: string) => v + "a");
+        addFilter(
             "test.chain",
-            () => new Promise<string>((resolve) => setTimeout(() => resolve("never"), 2_000)),
+            (): Promise<string> => new Promise((resolve) => setTimeout(() => resolve("never"), 2_000)),
             { moduleId: "slow" },
         );
-        addFilter<string>("test.chain", (v) => v + "c");
+        addFilter("test.chain", (v: string) => v + "c");
 
-        const result = await applyFiltersAsync<string>("test.chain", "");
+        const result = await applyFiltersAsync("test.chain", "");
         expect(result).toBe("ac");
     });
 });

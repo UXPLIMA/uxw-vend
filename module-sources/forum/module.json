@@ -3,6 +3,8 @@
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "community",
   "author": "uxwVend Team",
   "icon": "MessageSquare",
   "permissions": [
@@ -100,6 +102,14 @@
     }
   ],
   "statsApi": "/forum/stats",
+  "hooksEmitted": [
+    { "hook": "forum.post.created", "type": "action" },
+    { "hook": "forum.post.deleted", "type": "action" },
+    { "hook": "forum.post.updated", "type": "action" },
+    { "hook": "forum.topic.created", "type": "action" },
+    { "hook": "forum.topic.deleted", "type": "action" },
+    { "hook": "forum.topic.updated", "type": "action" }
+  ],
   "translations": {
     "en": {
       "nav": {

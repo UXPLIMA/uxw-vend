@@ -3,6 +3,8 @@
   "name": "Changelog",
   "description": "Release notes and update history",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "community",
   "author": "uxwVend",
   "icon": "History",
   "permissions": [
@@ -38,6 +40,11 @@
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single changelog entry (admin)."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "changelog.entry.deleted", "type": "action" },
+    { "hook": "changelog.entry.published", "type": "action" },
+    { "hook": "changelog.entry.updated", "type": "action" }
   ],
   "translations": {
     "en": {

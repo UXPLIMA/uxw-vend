@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { moduleManifestSchema, type ValidatedModuleManifest } from '../src/core/lib/module-manifest-schema';
+import { findNavGroupConflicts, type ModuleNavGroupDeclaration } from '../src/core/lib/nav-group-conflicts';
 
 function toComponentName(basename: string): string {
     return basename
@@ -118,6 +119,9 @@ function generateRegistry() {
     const allFooterComponents: ({ id: string; component: string; section?: string; order?: number; module: string })[] = [];
     const allSettingsCards: ManifestItem[] = [];
     const allOauthButtons: ManifestItem[] = [];
+    const allNavGroups: ModuleNavGroupDeclaration[] = [];
+    const allAuthProviders: ({ id: string; envIdVar: string; envSecretVar: string; module: string })[] = [];
+    const allWebhookChannels: ({ id: string; label: string; layout: string; hosts?: string[]; urlPlaceholder?: string; module: string })[] = [];
     const allProfileTabs: ({ id: string; label: string; component: string; order: number; module: string })[] = [];
     const allStorageProviders: ({ id: string; name: string; handler: string; module: string })[] = [];
     const allContextProviders: ({ id: string; component: string; order?: number; module: string })[] = [];
@@ -151,6 +155,9 @@ function generateRegistry() {
         manifest.layoutComponents?.forEach((lc) => allLayoutComponents.push({ ...lc, module: moduleName }));
         manifest.profileTabs?.forEach((pt) => allProfileTabs.push({ ...pt, module: moduleName }));
         manifest.oauthButtons?.forEach((btn) => allOauthButtons.push({ ...btn, module: moduleName }));
+        manifest.navGroups?.forEach((ng) => allNavGroups.push({ ...ng, module: moduleName }));
+        manifest.authProviders?.forEach((ap) => allAuthProviders.push({ ...ap, module: moduleName }));
+        manifest.webhookChannels?.forEach((wc) => allWebhookChannels.push({ ...wc, module: moduleName }));
         manifest.settingsCards?.forEach((sc) => allSettingsCards.push({ ...sc, module: moduleName }));
         manifest.navbarComponents?.forEach((nc) => allNavbarComponents.push({ ...nc, module: moduleName }));
         manifest.footerComponents?.forEach((fc) => allFooterComponents.push({ ...fc, module: moduleName }));
@@ -268,6 +275,8 @@ function generateRegistry() {
 
     widgetRegistry += profileTabImports;
     widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
+    widgetRegistry += `// Admin nav groups declared by modules. A group with no items is never rendered.\n`;
+    widgetRegistry += `export const ModuleNavGroups: { id: string; label: string; icon?: string; order?: number; module: string }[] = ${JSON.stringify(allNavGroups, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n\n`;
     widgetRegistry += `// User-data-export registry: tables modules contribute to GDPR personal-data exports.\n`;
     widgetRegistry += `export const ModuleUserDataTables: { model: string; key: string; column: string; module: string }[] = ${JSON.stringify(allUserDataTables, null, 2)};\n`;
@@ -319,11 +328,68 @@ function generateRegistry() {
     fs.writeFileSync(slotOutPath, slotContent);
     console.log(`Generated slot registry at ${slotOutPath} (${slotEntries.length} contributions)`);
 
+    for (const conflict of findNavGroupConflicts(allNavGroups)) {
+        console.warn(
+            `[registry] nav group "${conflict.id}": using ${conflict.field} ` +
+            `"${conflict.winningValue}" from "${conflict.winner}"; ` +
+            `"${conflict.loser}" declares "${conflict.losingValue}".`,
+        );
+    }
+
     const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
     let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
     dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
-    dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n`;
+    dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
+    dataContent += `// Outbound webhook channels contributed by modules. Core owns the alert\n`;
+    dataContent += `// content and the wire layouts; a channel only names its hosts and layout.\n`;
+    dataContent += `export const ModuleWebhookChannels: { id: string; label: string; layout: "json" | "embed" | "attachment"; hosts?: string[]; urlPlaceholder?: string; module: string }[] = ${JSON.stringify(allWebhookChannels, null, 2)};\n`;
     fs.writeFileSync(DATA_FILE, dataContent);
+
+    // ── Auth.js providers ─────────────────────────────────────────────────
+    // Emitted as static imports rather than a runtime `require(\`.../${id}\`)`:
+    // a dynamic specifier makes the bundler treat next-auth/providers as a
+    // context module and pull in every provider it ships (including ones with
+    // optional native dependencies), which fails to build.
+    //
+    // The id is interpolated into an import specifier here, so it is re-checked
+    // even though the manifest schema already enforces the same slug rule.
+    const PROVIDER_ID = /^[a-z0-9][a-z0-9-]*$/;
+    const authProviderImports: string[] = [];
+    const authProviderEntries: string[] = [];
+    const seenProviderIds = new Set<string>();
+    const safeAuthProviders = allAuthProviders.filter((p) => {
+        if (!PROVIDER_ID.test(p.id)) {
+            console.warn(
+                `[registry] module "${p.module}" declared an unsafe auth provider id "${p.id}" — skipped.`,
+            );
+            return false;
+        }
+        return true;
+    });
+    for (const provider of safeAuthProviders) {
+        if (seenProviderIds.has(provider.id)) continue;
+        seenProviderIds.add(provider.id);
+        const local = `AuthProvider_${provider.id.replace(/-/g, '_')}`;
+        authProviderImports.push(`import ${local} from "next-auth/providers/${provider.id}";`);
+        authProviderEntries.push(`    ${JSON.stringify(provider.id)}: ${local},`);
+    }
+
+    const AUTH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-auth-providers.ts');
+    let authContent = '// Auto-generated Auth.js provider registry - server only\n';
+    authContent += '// Core names no OAuth provider. Every entry here comes from an installed\n';
+    authContent += "// module's `authProviders` manifest declaration, and only activates once\n";
+    authContent += '// the env vars it names are set.\n';
+    if (authProviderImports.length > 0) authContent += `${authProviderImports.join('\n')}\n`;
+    authContent += '\n';
+    authContent += `export const ModuleAuthProviders: { id: string; envIdVar: string; envSecretVar: string; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
+    authContent += 'export const ModuleAuthProviderFactories: Record<string, (config: {\n';
+    authContent += '    clientId: string;\n';
+    authContent += '    clientSecret: string;\n';
+    authContent += '    allowDangerousEmailAccountLinking: boolean;\n';
+    authContent += '}) => unknown> = {\n';
+    authContent += authProviderEntries.length > 0 ? `${authProviderEntries.join('\n')}\n` : '';
+    authContent += '};\n';
+    fs.writeFileSync(AUTH_FILE, authContent);
 
     const HOOKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-hooks.ts');
     let hooksContent = '// Auto-generated hook listener registry — server only\n\n';

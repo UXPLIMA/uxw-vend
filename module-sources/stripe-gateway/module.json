@@ -3,6 +3,8 @@
   "name": "Stripe Payment Gateway",
   "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend",
   "icon": "CreditCard",
   "dependencies": [

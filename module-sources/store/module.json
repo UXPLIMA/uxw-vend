@@ -3,6 +3,8 @@
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "commerce",
   "author": "uxwVend Team",
   "icon": "ShoppingBag",
   "permissions": [
@@ -27,6 +29,14 @@
     "enableCoupons": true,
     "enableGiftCards": false
   },
+  "navGroups": [
+    {
+      "id": "commerce",
+      "label": "Commerce",
+      "icon": "ShoppingBag",
+      "order": 10
+    }
+  ],
   "menu": [
     {
       "label": "Products",
@@ -429,6 +439,11 @@
   ],
   "dependencies": [
     "currency"
+  ],
+  "hooksEmitted": [
+    { "hook": "store.order.completed", "type": "action" },
+    { "hook": "store.order.created", "type": "action" },
+    { "hook": "store.product.created", "type": "action" }
   ],
   "translations": {
     "en": {

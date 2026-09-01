@@ -16,10 +16,10 @@ export interface ModuleManifest {
         label: string;
         path: string; // Relative to /admin. e.g. "/store/products"
         icon?: string; // Icon name from Lucide
-        // Which core admin nav group to attach this item to (see
-        // admin-nav-groups.ts). Omit to fall back to the generic "modules"
-        // bucket. Known core groups: commerce, content, design, activity,
-        // advanced, marketplace, settings.
+        // Which admin nav group to attach this item to (see
+        // admin-nav-groups.ts). May name a core group, or one declared in
+        // `navGroups` by this or any other module. Omit — or name a group
+        // nothing provides — to land in the generic "modules" bucket.
         group?: string;
     }[];
     routes?: {
@@ -38,8 +38,21 @@ export interface ModuleManifest {
         description?: string; // Optional OpenAPI summary (used by /api/v1/openapi)
     }[];
 
+    /**
+     * Module ids this module needs, each optionally suffixed with a semver
+     * range: `"store@^1.2.0"`. A bare id means any installed version.
+     */
     dependencies?: string[];
-    conflicts?: string[];       // Modules that can't be active at the same time
+    /** Same `id` / `id@range` grammar; these must NOT be enabled alongside. */
+    conflicts?: string[];
+    /**
+     * Range of CORE_API_VERSION (see core-version.ts) this module was built
+     * against. Omitted means unconstrained.
+     */
+    coreVersion?: string;
+    /** Marketplace grouping slug. Free-form — core owns no category list. */
+    category?: string;
+    tags?: string[];
 
     // Module translations — merged into core messages at runtime
     translations?: {
@@ -77,6 +90,39 @@ export interface ModuleManifest {
         label: string;
         component: string;       // path to tab component
         order: number;           // render order
+    }[];
+
+    // Admin nav groups this module contributes to the sidebar rail. Declaring
+    // a group does not create it on its own: a group with no items is never
+    // rendered. Several modules may declare the same group — they share it,
+    // and the declaration from the lexically-first module id supplies the
+    // label and icon.
+    navGroups?: {
+        id: string;      // e.g. "commerce"
+        label: string;   // Rail label, e.g. "Commerce"
+        icon?: string;   // Lucide icon name
+        order?: number;  // Sort order among module groups (lower first)
+    }[];
+
+    // Auth.js providers this module enables. Core resolves the provider from
+    // `next-auth/providers/<id>` and activates it once the named env vars are
+    // present, so core never names a provider itself.
+    authProviders?: {
+        id: string;           // Auth.js provider id, e.g. "discord"
+        envIdVar: string;     // Env var holding the client id
+        envSecretVar: string; // Env var holding the client secret
+    }[];
+
+    // Outbound webhook channels this module teaches core to talk to. Core owns
+    // the alert content and the wire layouts; a channel only names the hosts it
+    // accepts and which layout its receiver understands, so core never has to
+    // know a vendor by name.
+    webhookChannels?: {
+        id: string;              // Channel id stored in settings, e.g. "discord"
+        label: string;           // Shown in the admin channel picker
+        layout: "json" | "embed" | "attachment";
+        hosts?: string[];        // Allowed webhook hostnames (exact or subdomain)
+        urlPlaceholder?: string; // Example URL shown in the admin form
     }[];
 
     // OAuth login buttons — rendered on login/register pages
@@ -130,6 +176,17 @@ export interface ModuleManifest {
         type: "action" | "filter";
         handler: string;      // path to file (relative to module root) exporting default fn
         priority?: number;    // default 10; lower runs earlier
+    }[];
+
+    // Hooks this module FIRES. The other half of the contract above: a listener
+    // can only be verified against a declared emitter, and a hook nobody
+    // declares is indistinguishable from a typo. Kept in sync with the source
+    // by `npm run validate:module`; the payload type belongs in a
+    // `declare global { interface UxwVendHookPayloads }` block in this module.
+    hooksEmitted?: {
+        hook: string;         // hook name this module fires
+        type: "action" | "filter";
+        description?: string; // what it means / when it fires
     }[];
 
     // Slot contributions — React components that render into named <Slot>

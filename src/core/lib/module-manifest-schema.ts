@@ -1,7 +1,40 @@
 import { z } from "zod";
+import { isValidRange } from "./semver-range";
 
 const SAFE_ID = /^[a-z0-9][a-z0-9-]*$/;
 const SAFE_SLUG = /^[A-Za-z0-9_-]+$/;
+
+/**
+ * A semver range the module declares it accepts. Validated eagerly so an
+ * unparseable range is a manifest error rather than something that silently
+ * fails every comparison at install time.
+ */
+const semverRange = z
+    .string()
+    .min(1)
+    .max(64)
+    .refine(isValidRange, { message: "must be a semver range (e.g. ^1.2.0, >=1.0.0 <2.0.0, 1.x)" });
+
+/**
+ * `id` or `id@range`. The range is optional so every manifest written before
+ * the compatibility contract existed stays valid, and an entry without one
+ * keeps the original meaning: any installed version will do.
+ */
+const DEPENDENCY_SPEC = /^([a-z0-9][a-z0-9-]*)(?:@(.+))?$/;
+const dependencySpec = z
+    .string()
+    .min(1)
+    .max(96)
+    .superRefine((value, ctx) => {
+        const m = DEPENDENCY_SPEC.exec(value);
+        if (!m) {
+            ctx.addIssue({ code: "custom", message: `"${value}" must be a module id, optionally suffixed with @range` });
+            return;
+        }
+        if (m[2] !== undefined && !isValidRange(m[2])) {
+            ctx.addIssue({ code: "custom", message: `"${m[2]}" is not a valid semver range in "${value}"` });
+        }
+    });
 
 const relativePath = (label: string) =>
     z.string()
@@ -84,6 +117,33 @@ const oauthButton = z.object({
     svgIcon: z.string().min(1).max(8192),
 });
 
+const navGroup = z.object({
+    id: z.string().min(1).max(64).regex(SAFE_ID, "Nav group id must be a lowercase slug"),
+    label: z.string().min(1).max(64),
+    icon: iconName.optional(),
+    order: z.number().int().min(0).max(9999).optional(),
+});
+
+// A channel id is stored in settings and matched against this list, so it is
+// held to the same slug rule as other registry keys.
+const webhookChannel = z.object({
+    id: z.string().min(1).max(64).regex(SAFE_ID, "Webhook channel id must be a lowercase slug"),
+    label: z.string().min(1).max(64),
+    layout: z.enum(["json", "embed", "attachment"]),
+    // Hostnames the admin's webhook URL must match. Omitted means core applies
+    // its own conservative rule instead of a per-vendor allowlist.
+    hosts: z.array(z.string().min(1).max(253)).max(10).optional(),
+    urlPlaceholder: z.string().max(300).optional(),
+});
+// The provider id is interpolated into a `next-auth/providers/<id>` import, so
+// it is held to the strict slug rule rather than the looser SAFE_SLUG used for
+// display-only ids — a "/" or ".." here would escape the providers directory.
+const authProvider = z.object({
+    id: z.string().min(1).max(64).regex(SAFE_ID, "Auth provider id must be a lowercase slug"),
+    envIdVar: z.string().min(1).max(128).regex(/^[A-Z][A-Z0-9_]*$/, "envIdVar must be an env var name"),
+    envSecretVar: z.string().min(1).max(128).regex(/^[A-Z][A-Z0-9_]*$/, "envSecretVar must be an env var name"),
+});
+
 const navbarComponent = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
     component: relativePath("component"),
@@ -109,11 +169,27 @@ const contextProvider = z.object({
     order: z.number().int().optional(),
 });
 
+const HOOK_NAME = /^[a-zA-Z0-9._-]+$/;
+
 const hookListener = z.object({
-    hook: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
+    hook: z.string().min(1).max(128).regex(HOOK_NAME),
     type: z.enum(["action", "filter"]),
     handler: relativePath("handler"),
     priority: z.number().int().optional(),
+});
+
+/**
+ * A hook this module fires. Declaring it makes the module's half of the
+ * cross-module contract inspectable: `validate:module` checks the declaration
+ * against the `doAction`/`applyFilters` calls in the source, and the
+ * marketplace build rejects a `hookListeners` entry naming a hook no module in
+ * the catalog emits — which is the only thing that can catch a typo in a hook
+ * name, since nothing fails at runtime when a listener never fires.
+ */
+const hookEmitted = z.object({
+    hook: z.string().min(1).max(128).regex(HOOK_NAME),
+    type: z.enum(["action", "filter"]),
+    description: z.string().max(200).optional(),
 });
 
 const slotContent = z.object({
@@ -257,8 +333,20 @@ export const moduleManifestSchema = z.object({
     icon: iconName.optional(),
     permissions: z.array(z.string().min(1).max(128).regex(/^[a-z0-9._-]+$/)).max(100).optional(),
     defaultConfig: z.record(z.string(), z.unknown()).optional(),
-    dependencies: z.array(z.string().regex(SAFE_ID)).max(50).optional(),
-    conflicts: z.array(z.string().regex(SAFE_ID)).max(50).optional(),
+    dependencies: z.array(dependencySpec).max(50).optional(),
+    conflicts: z.array(dependencySpec).max(50).optional(),
+    /**
+     * Range of CORE_API_VERSION this module was built against. Optional:
+     * omitting it means "unconstrained", which is what every manifest written
+     * before this field existed implicitly declared.
+     */
+    coreVersion: semverRange.optional(),
+    /**
+     * Marketplace grouping. Free-form rather than a fixed enum so core owns no
+     * category vocabulary — the catalog groups by whatever values are present.
+     */
+    category: z.string().min(1).max(32).regex(SAFE_ID, "category must be a lowercase slug").optional(),
+    tags: z.array(z.string().min(1).max(32)).max(10).optional(),
     translations: translations.optional(),
 
     hooks: z.object({
@@ -275,11 +363,15 @@ export const moduleManifestSchema = z.object({
     footerLinks: z.array(footerLink).max(50).optional(),
     profileTabs: z.array(profileTab).max(50).optional(),
     oauthButtons: z.array(oauthButton).max(20).optional(),
+    navGroups: z.array(navGroup).max(20).optional(),
+    authProviders: z.array(authProvider).max(20).optional(),
+    webhookChannels: z.array(webhookChannel).max(20).optional(),
     navbarComponents: z.array(navbarComponent).max(30).optional(),
     footerComponents: z.array(footerComponent).max(30).optional(),
     storageProviders: z.array(storageProvider).max(10).optional(),
     contextProviders: z.array(contextProvider).max(20).optional(),
     hookListeners: z.array(hookListener).max(200).optional(),
+    hooksEmitted: z.array(hookEmitted).max(200).optional(),
     slotContents: z.array(slotContent).max(100).optional(),
     slots: z.array(slotContribution).max(200).optional(),
     pageBlocks: z.array(pageBlock).max(100).optional(),

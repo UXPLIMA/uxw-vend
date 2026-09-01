@@ -3,6 +3,8 @@
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "community",
   "author": "uxwVend",
   "icon": "MessageSquare",
   "permissions": [
@@ -43,6 +45,14 @@
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single suggestion (admin)."
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "suggestions.suggestion.created", "type": "action" },
+    { "hook": "suggestions.suggestion.deleted", "type": "action" },
+    { "hook": "suggestions.suggestion.statusChanged", "type": "action" },
+    { "hook": "suggestions.suggestion.unvoted", "type": "action" },
+    { "hook": "suggestions.suggestion.updated", "type": "action" },
+    { "hook": "suggestions.suggestion.voted", "type": "action" }
   ],
   "translations": {
     "en": {

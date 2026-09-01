@@ -3,6 +3,8 @@
   "name": "Discord Login",
   "description": "Allow users to sign in with their Discord account",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "MessageSquare",
   "adminRoutes": [
@@ -18,6 +20,13 @@
       "href": "/settings/discord-auth",
       "icon": "MessageSquare",
       "color": "text-indigo-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "discord",
+      "envIdVar": "AUTH_DISCORD_ID",
+      "envSecretVar": "AUTH_DISCORD_SECRET"
     }
   ],
   "oauthButtons": [

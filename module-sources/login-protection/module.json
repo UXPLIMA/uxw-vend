@@ -3,6 +3,8 @@
   "name": "Login Protection",
   "description": "CAPTCHA, login throttling, and account security",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "management",
   "author": "uxwVend",
   "icon": "Shield",
   "menu": [

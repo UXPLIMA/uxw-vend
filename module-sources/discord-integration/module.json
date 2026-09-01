@@ -3,6 +3,8 @@
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "MessageSquare",
   "menu": [
@@ -27,11 +29,48 @@
       "color": "text-indigo-500"
     }
   ],
+  "webhookChannels": [
+    {
+      "id": "discord",
+      "label": "Discord",
+      "layout": "embed",
+      "hosts": [
+        "discord.com",
+        "discordapp.com"
+      ],
+      "urlPlaceholder": "https://discord.com/api/webhooks/..."
+    }
+  ],
   "hookListeners": [
+    {
+      "hook": "user.registered",
+      "type": "action",
+      "handler": "listeners/user-registered.ts"
+    },
     {
       "hook": "blog.article.created",
       "type": "action",
       "handler": "listeners/blog-article-created.ts"
+    },
+    {
+      "hook": "forum.topic.created",
+      "type": "action",
+      "handler": "listeners/forum-topic-created.ts"
+    },
+    {
+      "hook": "tickets.ticket.opened",
+      "type": "action",
+      "handler": "listeners/ticket-opened.ts"
+    },
+    {
+      "hook": "store.order.created",
+      "type": "action",
+      "handler": "listeners/order-created.ts"
+    },
+    {
+      "hook": "store.order.completed",
+      "type": "action",
+      "handler": "listeners/order-completed.ts"
     }
   ],
   "translations": {

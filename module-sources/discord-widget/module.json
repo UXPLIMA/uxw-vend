@@ -3,6 +3,8 @@
   "name": "Discord Widget",
   "description": "Discord server widget on homepage sidebar",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "MessageSquare",
   "widgets": [

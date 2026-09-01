@@ -3,6 +3,8 @@
   "name": "Webhook Logs",
   "description": "View and manage webhook delivery logs",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "Webhook",
   "permissions": [

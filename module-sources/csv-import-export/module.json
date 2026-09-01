@@ -3,6 +3,8 @@
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
   "author": "uxwVend",
   "icon": "Download",
   "permissions": [

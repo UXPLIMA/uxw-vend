@@ -3,6 +3,8 @@
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "management",
   "author": "uxwVend Team",
   "icon": "Ticket",
   "permissions": [
@@ -100,6 +102,12 @@
     }
   ],
   "statsApi": "/support/stats",
+  "hooksEmitted": [
+    { "hook": "tickets.ticket.closed", "type": "action" },
+    { "hook": "tickets.ticket.opened", "type": "action" },
+    { "hook": "tickets.ticket.replied", "type": "action" },
+    { "hook": "tickets.ticket.updated", "type": "action" }
+  ],
   "translations": {
     "en": {
       "tickets": {

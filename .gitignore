@@ -89,6 +89,10 @@ playwright-report/
 backups/
 *.sql
 *.sql.gz
+# ...but per-module SQL migrations are source, not a dump: they ship inside the
+# module ZIP and are replayed by scripts/apply-migrations.ts.
+!module-sources/*/migrations/*.sql
+!module-template/migrations/*.sql
 .env.production
 .env.staging
 logs/
@@ -111,3 +115,4 @@ messages/
 # User-uploaded files (local fallback when S3 not configured)
 public/uploads/*
 !public/uploads/.gitkeep
+module-sources/__hook-contracts__.ts

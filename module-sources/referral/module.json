@@ -3,6 +3,8 @@
   "name": "Referral System",
   "description": "Earn credits by referring new users",
   "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "community",
   "author": "uxwVend",
   "icon": "UserPlus",
   "dependencies": [
@@ -49,6 +51,9 @@
       "component": "components/ReferralTab.tsx",
       "order": 40
     }
+  ],
+  "hooksEmitted": [
+    { "hook": "referral.referral.used", "type": "action" }
   ],
   "translations": {
     "en": {
