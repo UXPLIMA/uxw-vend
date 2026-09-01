@@ -1,12 +1,20 @@
 import type { Page } from '@playwright/test';
 
 /**
- * Default credentials for the seeded admin user.
- * The login form uses the email field as the identifier.
+ * Credentials for the seeded admin user. The login form uses the email field
+ * as the identifier.
+ *
+ * Read from the environment because `prisma/seed.ts` generates a random
+ * password unless `SEED_ADMIN_PASSWORD` is set — hardcoding one here meant the
+ * suite only ever passed against a developer's hand-made account, which is why
+ * it could not run in CI. CI seeds with these same two variables.
+ *
+ * The fallbacks are the long-standing local dev values, so an existing
+ * workstation keeps working without setting anything.
  */
-export const ADMIN_EMAIL = 'admin@uxwvend.com';
-export const ADMIN_USERNAME = 'admin';
-export const ADMIN_PASSWORD = 'admin123';
+export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? 'admin@uxwvend.com';
+export const ADMIN_USERNAME = process.env.E2E_ADMIN_USERNAME ?? 'admin';
+export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'admin123';
 
 /**
  * Logs a user in via the /tr/auth/login page.
