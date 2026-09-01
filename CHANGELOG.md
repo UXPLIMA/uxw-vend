@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-01
+
+First public release: a modular, plugin-based platform with a marketplace of
+first-party modules and a schema-driven theme system. The entries below record
+what the release contains, and — where a defect was found and corrected before
+shipping — what it no longer does.
+
 ### Added
 - **One-command install.** `install.sh` installs Docker if missing, generates
   every secret, writes `.env`, pulls the published image, starts the stack,
@@ -28,6 +35,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hook listeners can emit structured logs with a correlation id.
 - **`validate-module.ts --all`** validates every module in one process (1.2s,
   down from minutes of per-module `tsc` runs).
+- `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue/PR templates, Dependabot, and
+  CodeQL scanning for the open-source release.
+- Docker Compose now bootstraps the database (schema push + seed) on first boot
+  via a one-shot `migrate` service, so `docker compose up` yields a working
+  login out of the box.
+- `SECRET_ENCRYPTION_KEY`, `INTERNAL_API_SECRET`, `DEMO_MODE`, and
+  `POSTGRES_PASSWORD` documented in `.env.example` and `docs/DEPLOYMENT.md`.
+- `trophies` module: ships with starter trophies that seed on first boot from
+  within the module (no longer coupled to the core seed).
 
 ### Changed
 - `docker-compose.yml` runs the published image
@@ -49,23 +65,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are reachable from client bundles, and the logger imports `next/headers`.
 - **1,419 lines of dead code removed**, including seven orphaned copies of
   `settings-form.tsx` and three unreferenced module libraries.
-
-### Security
-- **Postgres and Redis are no longer published to the host.** The compose file
-  mapped `5432:5432` and `6379:6379`, putting both on the public internet of
-  every server the stack was installed on. They are now reachable only from
-  inside the compose network.
-- **Vulnerability reports were being sent to the wrong repository.**
-  `SECURITY.md` and the issue-template config pointed at the project's previous
-  GitHub location, so anyone following the documented disclosure path was
-  filing where nobody would read it.
-- **Both moderate advisories cleared** (uuid via `@measured/puck`), with an
-  override rather than npm's suggested major downgrade of Puck. The two
-  remaining are low: quill's HTML-export XSS has no upstream fix, and editor
-  content is already sanitized on write and again on render.
-- **Password-reset and verification URLs are no longer logged in production**
-  when no mail transport is configured. They stay in dev, where a developer
-  without SMTP needs them to finish the flow.
 
 ### Fixed
 - **The in-app marketplace fetched from the old repository.** Eight route
@@ -113,17 +112,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   URL was baked into the image regardless of where it was read from. Both now
   touch a request-time API to opt out; the sitemap keeps its one-hour cache
   through an in-process memo instead of `revalidate`.
-- `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue/PR templates, Dependabot, and
-  CodeQL scanning for the open-source release.
-- Docker Compose now bootstraps the database (schema push + seed) on first boot
-  via a one-shot `migrate` service, so `docker compose up` yields a working
-  login out of the box.
-- `SECRET_ENCRYPTION_KEY`, `INTERNAL_API_SECRET`, `DEMO_MODE`, and
-  `POSTGRES_PASSWORD` documented in `.env.example` and `docs/DEPLOYMENT.md`.
-- `trophies` module: ships with starter trophies that seed on first boot from
-  within the module (no longer coupled to the core seed).
-
-### Fixed
 - Docker build no longer aborts: the builder and `postinstall` now call the
   correct `generate-theme-registry.ts` script.
 - `npm run db:seed` on a fresh clone no longer references a module-owned model
@@ -134,17 +122,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Marketplace ZIPs rebuilt from current sources.
 
 ### Security
+- **Postgres and Redis are no longer published to the host.** The compose file
+  mapped `5432:5432` and `6379:6379`, putting both on the public internet of
+  every server the stack was installed on. They are now reachable only from
+  inside the compose network.
+- **Vulnerability reports were being sent to the wrong repository.**
+  `SECURITY.md` and the issue-template config pointed at the project's previous
+  GitHub location, so anyone following the documented disclosure path was
+  filing where nobody would read it.
+- **Both moderate advisories cleared** (uuid via `@measured/puck`), with an
+  override rather than npm's suggested major downgrade of Puck. The two
+  remaining are low: quill's HTML-export XSS has no upstream fix, and editor
+  content is already sanitized on write and again on render.
+- **Password-reset and verification URLs are no longer logged in production**
+  when no mail transport is configured. They stay in dev, where a developer
+  without SMTP needs them to finish the flow.
 - Admin update handlers (downloads, popups, staff) now validate input against an
   explicit allowlist instead of spreading the raw request body (mass-assignment).
 - Store product/category descriptions and blog titles are sanitized at write
   time; JSON-LD output is escaped against `</script>` breakout.
 - The discord-integration webhook sender enforces the same hostname allowlist as
   core; the punishments API key check is now constant-time.
-
-## [0.1.0]
-
-- Initial public release: modular, plugin-based platform with a marketplace of
-  first-party modules and a schema-driven theme system.
 
 [Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/UXPLIMA/uxw-vend/releases/tag/v0.1.0
