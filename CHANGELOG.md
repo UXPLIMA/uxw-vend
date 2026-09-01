@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **A module declaring a catch-all API route would have taken down the whole
+  module API router.** `matchApiRoute` built its own regex and turned
+  `[...rest]` into the capture group `(?<...rest>…)`, which is not a legal
+  group name, so `new RegExp` threw a `SyntaxError` from inside the loop that
+  walks every installed module's routes — every route behind the offender was
+  lost too. Nothing in the manifest schema forbids that path; no first-party
+  module happened to declare one. Both matchers now share
+  `src/core/lib/path-pattern.ts`, which handles catch-alls, escapes regex
+  metacharacters in literal segments (`/store/v1.0` no longer matches
+  `/store/v1X0`), and returns `null` instead of throwing on a malformed
+  pattern.
+
+### Added
+- Tests for the paths where a bug cannot be undone: the shutdown registry and
+  the install lock (now on the critical path of every module install), the
+  GDPR erasure and export, the pre-install snapshot, the upload funnel, the
+  HTML sanitiser, and the IP blocklist. Coverage thresholds raised from
+  49/48/42/50 to 59/58/50/60, with per-file floors on each.
+
 ## [0.2.0] - 2026-09-01
 
 A correctness release. Every user-visible entry below is a defect that shipped
