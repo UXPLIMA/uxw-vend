@@ -42,8 +42,17 @@ upstream), issues that require a pre-compromised admin account, and findings
 that depend on running with insecure non-default configuration (e.g.
 `PAYPAL_ALLOW_UNVERIFIED=1`).
 
+Also out of scope: **what an installed module can do.** Modules are compiled
+into the same process as core and run with the same database credentials,
+filesystem access and secrets. This is documented, deliberate, and not a
+vulnerability — installing a module is equivalent to installing a dependency,
+and the manifest's `permissions` key is UI metadata, not an enforced boundary.
+See [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) ("The trust model"). Reports about
+the *install pipeline* — ZIP path traversal, manifest validation bypass,
+privilege checks on the install routes — are firmly in scope.
+
 ## Hardening Notes
 
-Production deployments should set `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY`, a
-shared `REDIS_URL` (for multi-worker rate limiting), and serve over HTTPS so
-the secure cookie prefixes activate. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Production deployments should set `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY` and
+`REDIS_URL` (required — without it the rate limiter fails closed and answers
+429), and serve over HTTPS so the secure cookie prefixes activate. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
