@@ -1,5 +1,5 @@
 {
-  "//": "Typechecks module-sources/, which the main tsconfig excludes. NOTE: `exclude` must be overridden here — it is inherited from the base config and takes precedence over `include`, so without this the project matches zero files and reports a meaningless 0 errors. Run via `npm run typecheck:modules`.",
+  "//": "Typechecks module-sources/, which the main tsconfig excludes. Do not run tsc against this file directly — it resolves @prisma/client to the core-only client, in which no module model exists. `npm run typecheck:modules` generates tsconfig.modules.generated.json, which repoints @prisma/client at a client built from every module schema, and runs tsc against that. NOTE: `exclude` must be overridden here — it is inherited from the base config and takes precedence over `include`, so without this the project matches zero files and reports a meaningless 0 errors.",
   "extends": "./tsconfig.json",
   "compilerOptions": { "noEmit": true },
   "exclude": ["node_modules", "module-template", ".next"],

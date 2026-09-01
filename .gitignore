@@ -116,3 +116,7 @@ messages/
 public/uploads/*
 !public/uploads/.gitkeep
 module-sources/__hook-contracts__.ts
+
+# Throwaway Prisma client + tsconfig built by scripts/typecheck-modules.ts.
+.typecheck-modules/
+tsconfig.modules.generated.json

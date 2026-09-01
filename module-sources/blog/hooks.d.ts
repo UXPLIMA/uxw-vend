@@ -22,7 +22,10 @@ declare global {
 
 interface BlogArticleHookPayload {
     id: string;
-    authorId: string;
+    // Nullable, and not by accident: `author` is `onDelete: SetNull`, so an
+    // article outlives the account that wrote it. A listener that assumes a
+    // string here breaks the first time an author deletes their account.
+    authorId: string | null;
     title: string;
     slug: string;
     excerpt?: string | null;

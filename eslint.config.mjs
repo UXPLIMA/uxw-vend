@@ -106,6 +106,8 @@ const eslintConfig = defineConfig([
         "next-env.d.ts",
         // Generated artifacts — never owned by humans.
         "src/core/generated/**",
+        // Throwaway Prisma client built by scripts/typecheck-modules.ts.
+        ".typecheck-modules/**",
         "src/generated/**",
         // The installed runtime copy of a module is generated state, never
         // hand-edited — lint the authoritative source instead.
