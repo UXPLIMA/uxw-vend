@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 49,
-                branches: 48,
-                functions: 42,
-                lines: 50,
+                statements: 51,
+                branches: 49,
+                functions: 44,
+                lines: 52,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -73,6 +73,20 @@ export default defineConfig({
                 // a test, so hold it near the top.
                 'src/core/lib/build-state.ts': {
                     statements: 95, branches: 92, functions: 100, lines: 95,
+                },
+                // The install path: the lock that keeps two installs from
+                // racing, and the queue that decides whether a module install
+                // is ever served. Two of the three defects fixed in 0.2.0
+                // lived here — a restart that always threw and a build whose
+                // result nothing recorded — and neither had a test.
+                'src/core/lib/install-lock.ts': {
+                    statements: 95, branches: 75, functions: 100, lines: 95,
+                },
+                // SIGTERM is now how the platform restarts itself after an
+                // install, so this registry is on the critical path of every
+                // module install, not just of `docker stop`.
+                'src/core/lib/shutdown.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
                 },
                 'src/core/lib/secret-storage.ts': {
                     statements: 92, branches: 80, functions: 100, lines: 92,
