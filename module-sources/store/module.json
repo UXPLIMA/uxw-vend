@@ -3392,7 +3392,10 @@
       "id": "store-search",
       "label": "Store",
       "handler": "search/handler.ts",
-      "icon": "ShoppingBag"
+      "icon": "ShoppingBag",
+      "indexes": [
+        { "table": "Product", "columns": ["name", "shortDesc", "description"] }
+      ]
     }
   ],
   "notificationTypes": [

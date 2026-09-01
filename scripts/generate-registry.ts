@@ -131,7 +131,7 @@ function generateRegistry() {
     const allSlotContents: ({ id: string; slot: string; component: string; order?: number; module: string })[] = [];
     const allPageBlocks: ({ id: string; category?: string; component: string; module: string })[] = [];
     const allCronJobs: ({ id: string; schedule: string; handler: string; module: string })[] = [];
-    const allSearchProviders: ({ id: string; label: string; handler: string; icon?: string; module: string })[] = [];
+    const allSearchProviders: ({ id: string; label: string; handler: string; icon?: string; indexes?: { table: string; columns: string[] }[]; module: string })[] = [];
     const allActivityTitles: ({ type: string; prefix: string; key: string; module: string })[] = [];
     const allPermissionResources: string[] = [];
     const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; timestampHeader?: string; module: string })[] = [];
@@ -476,6 +476,21 @@ function generateRegistry() {
         const importPath = `@/modules/${sp.module}/${handlerPath}`;
         const icon = sp.icon ? JSON.stringify(sp.icon) : 'undefined';
         searchContent += `  { id: ${JSON.stringify(sp.id)}, label: ${JSON.stringify(sp.label)}, module: ${JSON.stringify(sp.module)}, icon: ${icon}, loader: () => import('${importPath}') as Promise<{ default: (query: string) => Promise<unknown[]> }> },\n`;
+    }
+    searchContent += '];\n\n';
+
+    // Full-text indexes the modules own. Core builds the DDL from these
+    // identifiers; it no longer carries a hardcoded list of module tables.
+    searchContent += 'export const ModuleSearchIndexes: { module: string; table: string; columns: string[] }[] = [\n';
+    const seenIndexTables = new Set<string>();
+    for (const sp of allSearchProviders) {
+        for (const idx of sp.indexes ?? []) {
+            // Two providers in one module may name the same table; one index
+            // per table is what Postgres wants and what the DDL below emits.
+            if (seenIndexTables.has(idx.table)) continue;
+            seenIndexTables.add(idx.table);
+            searchContent += `  { module: ${JSON.stringify(sp.module)}, table: ${JSON.stringify(idx.table)}, columns: ${JSON.stringify(idx.columns)} },\n`;
+        }
     }
     searchContent += '];\n';
     fs.writeFileSync(SEARCH_FILE, searchContent);

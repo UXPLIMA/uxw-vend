@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { ModuleSeoRoutes, type SitemapEntry } from "@/core/generated/module-seo";
-import { safeCall } from "@/core/lib/module-sandbox";
+import { safeCall } from "@/core/lib/module-safe-call";
 import { connection } from "next/server";
 import { resolveAppUrl } from "@/core/lib/app-url";
 

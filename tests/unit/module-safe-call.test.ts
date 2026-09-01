@@ -16,7 +16,7 @@ vi.mock("@/core/lib/db", () => ({
     },
 }));
 
-import { safeCall } from "@/core/lib/module-sandbox";
+import { safeCall } from "@/core/lib/module-safe-call";
 
 describe("safeCall", () => {
     let consoleError: ReturnType<typeof vi.spyOn>;

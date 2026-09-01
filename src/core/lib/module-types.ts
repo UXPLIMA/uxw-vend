@@ -49,7 +49,7 @@ export interface ModuleManifest {
      * Range of CORE_API_VERSION (see core-version.ts) this module was built
      * against. Omitted means unconstrained.
      */
-    coreVersion?: string;
+    coreVersion: string;
     /** Marketplace grouping slug. Free-form — core owns no category list. */
     category?: string;
     tags?: string[];
@@ -226,6 +226,10 @@ export interface ModuleManifest {
         label: string;        // group label in results UI
         handler: string;      // path to file exporting default async fn
         icon?: string;        // Lucide icon name shown on the result group card
+        // Full-text indexes core should create on this module's own tables.
+        // Plain identifiers only — core builds the tsvector expression, so a
+        // module never supplies SQL.
+        indexes?: { table: string; columns: string[] }[];
     }[];
 
     // Activity-feed title localization — modules that emit activity events

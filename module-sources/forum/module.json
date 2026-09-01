@@ -850,7 +850,10 @@
       "id": "forum-search",
       "label": "Forum",
       "handler": "search/handler.ts",
-      "icon": "MessageSquare"
+      "icon": "MessageSquare",
+      "indexes": [
+        { "table": "ForumTopic", "columns": ["title", "content"] }
+      ]
     }
   ],
   "notificationTypes": [

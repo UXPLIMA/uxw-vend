@@ -703,7 +703,10 @@
       "id": "help-center-search",
       "label": "Help Center",
       "handler": "search/handler.ts",
-      "icon": "BookOpen"
+      "icon": "BookOpen",
+      "indexes": [
+        { "table": "HelpArticle", "columns": ["title", "content"] }
+      ]
     }
   ],
   "seoRoutes": {

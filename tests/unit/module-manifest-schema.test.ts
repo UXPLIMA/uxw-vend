@@ -8,6 +8,7 @@ const base = {
     name: "Demo",
     description: "A demo module",
     version: "1.0.0",
+    coreVersion: "^1.0.0",
 };
 
 describe("moduleManifestSchema — compatibility contract", () => {
@@ -50,8 +51,16 @@ describe("moduleManifestSchema — compatibility contract", () => {
         expect(moduleManifestSchema.safeParse({ ...base, coreVersion: "" }).success).toBe(false);
     });
 
-    it("treats coreVersion as optional", () => {
-        expect(moduleManifestSchema.safeParse(base).success).toBe(true);
+    // coreVersion used to be optional, and an omitted range meant "compatible
+    // with every core there will ever be". That is the one default a
+    // compatibility gate cannot have.
+    it("requires coreVersion", () => {
+        const { coreVersion: _omitted, ...withoutCoreVersion } = base;
+        const r = moduleManifestSchema.safeParse(withoutCoreVersion);
+        expect(r.success).toBe(false);
+        if (!r.success) {
+            expect(r.error.issues[0].path).toEqual(["coreVersion"]);
+        }
     });
 
     it("accepts category and tags", () => {
