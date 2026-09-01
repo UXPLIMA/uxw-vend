@@ -396,15 +396,27 @@ compose up -d || die "The stack failed to start. Run 'uxwvend logs' to see why."
 # ---------------------------------------------------------------- health ----
 step "Waiting for the app"
 HEALTH_URL="http://127.0.0.1:$APP_PORT/api/health"
-DEADLINE=$(( $(date +%s) + 180 ))
+# A first install boots in well under a minute. Re-running the installer over
+# an existing install is an upgrade, though, and an upgrade on a site with
+# modules recompiles them before the app serves anything — minutes, not
+# seconds (see docs/DEPLOYMENT.md, "The Build Lifecycle"). The wait has to
+# cover the slow case or the installer reports a failure for a healthy boot.
+HEALTH_TIMEOUT=900
+DEADLINE=$(( $(date +%s) + HEALTH_TIMEOUT ))
 HEALTHY=0
+NOTIFIED=0
 while [ "$(date +%s)" -lt "$DEADLINE" ]; do
     if curl -fsS --max-time 5 "$HEALTH_URL" >/dev/null 2>&1; then HEALTHY=1; break; fi
+    if [ "$NOTIFIED" -eq 0 ] && [ "$(date +%s)" -gt $(( DEADLINE - HEALTH_TIMEOUT + 45 )) ]; then
+        NOTIFIED=1
+        info "Still starting. On an upgrade with modules installed the app
+  recompiles them first — several minutes is normal."
+    fi
     sleep 3
 done
 
 if [ "$HEALTHY" -eq 0 ]; then
-    warn "The app did not answer $HEALTH_URL within 180 seconds. Last 50 log lines:"
+    warn "The app did not answer $HEALTH_URL within $HEALTH_TIMEOUT seconds. Last 50 log lines:"
     compose logs --tail=50 2>&1 | sed 's/^/    /' >&2
     die "Installation did not complete. The stack is still running — inspect it with 'uxwvend logs'."
 fi

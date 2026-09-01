@@ -132,10 +132,19 @@ export const RedisBackend: RateLimitBackend = {
  * Pick the backend on first use (not at module load) so `next build` can
  * compile when REDIS_URL is only present at runtime.
  *
- * Production requires Redis: the memory backend is process-local and breaks
- * under multi-worker deployments, making limits trivially bypassable. Without
- * Redis we deny requests instead of silently falling back. Set
- * ALLOW_MEMORY_RATE_LIMIT=1 to opt in on a true single-worker prod setup.
+ * Production requires Redis, and denies every rate-limited request until it
+ * has it — including /api/health, so the site reads as down rather than as
+ * quietly unprotected. Two reasons, both still true now that a single app
+ * process is the only supported topology:
+ *
+ *  - The memory backend is process-local, so it resets on every restart. This
+ *    platform restarts itself after a module install, which hands an attacker
+ *    a fresh quota on demand.
+ *  - A second process during a deploy window, or an operator who ignores the
+ *    single-process rule, silently halves every limit.
+ *
+ * ALLOW_MEMORY_RATE_LIMIT=1 opts out, for a single-process deployment whose
+ * operator has read the above and accepts it.
  */
 let cachedBackend: RateLimitBackend | null = null;
 let prodMisconfigLoggedAt = 0;
@@ -156,9 +165,10 @@ function getActiveBackend(): RateLimitBackend {
             prodMisconfigLoggedAt = now;
             console.error(
                 "[rate-limit] REDIS_URL is required in production. " +
-                "The in-memory backend does not share state across workers and is bypassable. " +
-                "Set REDIS_URL, or ALLOW_MEMORY_RATE_LIMIT=1 to opt out (single-worker only). " +
-                "Requests are being denied until Redis is configured.",
+                "The in-memory backend resets on every restart — including the restart a " +
+                "module install performs — so limits are bypassable on demand. " +
+                "Set REDIS_URL, or ALLOW_MEMORY_RATE_LIMIT=1 to accept that. " +
+                "Every rate-limited request, /api/health included, is denied until then.",
             );
         }
         // Not cached: re-evaluate on every call so a freshly-set REDIS_URL

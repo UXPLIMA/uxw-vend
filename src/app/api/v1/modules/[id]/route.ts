@@ -6,7 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import { logActivity } from "@/core/lib/activity-log";
-import { acquireInstallLock } from "@/core/lib/install-lock";
+import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
@@ -78,12 +78,14 @@ export async function DELETE(
 
         let registryNeedsRebuild = false;
         try {
+            // Synchronous: the generated registry must stop importing the
+            // deleted module's files before anything else runs, or the next
+            // build fails on a missing import.
             execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
-            if (process.env.NODE_ENV === "production") {
-                execFileSync("npm", ["run", "build"], { cwd: PROJECT_ROOT, timeout: 180000, stdio: "pipe" });
-                try { execFileSync("npx", ["pm2", "restart", "uxwvend"], { cwd: PROJECT_ROOT, timeout: 10000, stdio: "pipe" }); }
-                catch { process.kill(process.pid, "SIGUSR2"); }
-            }
+            // The rebuild + process replacement is deferred and debounced, so
+            // this response returns now instead of after a 3-minute build the
+            // admin's browser would have given up on.
+            scheduleBuild();
         } catch (err) {
             // Registry/build failure is non-fatal for uninstall — the module
             // files are already gone and the DB row is cleared. But the

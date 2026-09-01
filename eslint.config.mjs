@@ -112,6 +112,11 @@ const eslintConfig = defineConfig([
         // The installed runtime copy of a module is generated state, never
         // hand-edited — lint the authoritative source instead.
         "src/modules/**",
+        // v8 coverage report. Gitignored, but present on any machine that has
+        // run `npm run test:coverage` — and its vendored HTML helpers carry
+        // eslint-disable directives that trip --max-warnings=0. CI only
+        // avoided this because it lints before it runs the suite.
+        "coverage/**",
     ]),
 ]);
 

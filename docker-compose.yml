@@ -12,8 +12,9 @@
 #   docker-compose.build.yml — build the image from source instead of pulling
 #   docker-compose.debug.yml — republish Postgres/Redis on 127.0.0.1
 #
-# Named volumes persist DB rows, Redis state, uploads, installed modules and
-# backups across restarts. `docker compose down -v` wipes all of it.
+# Named volumes persist DB rows, Redis state, uploads, installed modules, the
+# compiled app and backups across restarts. `docker compose down -v` wipes all
+# of it — including the build, which the next boot then recreates.
 
 services:
   db:
@@ -107,12 +108,25 @@ services:
       - modules:/app/src/modules
       # DB backups written by the automated-backup cron + admin UI.
       - backups:/app/backups
+      # The compiled app. Module pages are compiled into the Next build, so
+      # installing a module rebuilds it — and that rebuild has to outlive the
+      # container or it would be redone on every restart. Docker seeds this
+      # volume from the image on first creation, so a fresh install starts
+      # with the image's build and never rebuilds at all.
+      #
+      # After `uxwvend update` the volume still holds the previous image's
+      # build. scripts/reconcile-build.ts detects that at boot (via the
+      # image-build-id stamp the volume cannot mask) and rebuilds once, which
+      # is also what makes installed modules survive an update.
+      - nextbuild:/app/.next
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      # Long enough for a boot-time rebuild after an update. See the matching
+      # note on HEALTHCHECK in the Dockerfile.
+      start_period: 600s
 
   # TLS terminator. Enabled only with `--profile tls`, which the installer
   # passes when the operator supplied a domain. Caddy obtains and renews a
@@ -145,6 +159,7 @@ volumes:
   redisdata:
   uploads:
   modules:
+  nextbuild:
   backups:
   caddydata:
   caddyconfig:

@@ -12,9 +12,6 @@ import { getActiveTheme } from "@/core/lib/theme-state";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
-import { bootstrapHooks } from "@/core/lib/hooks";
-import { bootstrapScheduler } from "@/core/lib/scheduler";
-import { ensureIndexes as ensureSearchIndexes } from "../../../scripts/ensure-search-indexes";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -72,14 +69,9 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
-  // All bootstrap calls below are idempotent — safe to invoke on every render,
-  // run their setup once per process.
-  await bootstrapHooks();
-  await bootstrapScheduler();
-  // Fire-and-forget: search index creation must not block first paint.
-  ensureSearchIndexes().catch((err: unknown) => {
-    console.warn("[search-indexes] bootstrap failed:", err instanceof Error ? err.message : String(err));
-  });
+  // Process-wide bootstrap (hooks, scheduler, search indexes) lives in
+  // src/instrumentation.ts. A layout render is a per-request event and was
+  // never the right trigger for it.
 
   const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
   const moduleStates: Record<string, boolean> = {};
