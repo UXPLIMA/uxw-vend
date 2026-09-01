@@ -1,5 +1,6 @@
 
 import { ModuleRoutes } from "@/core/generated/module-registry";
+import { isDynamicPattern, matchPathPattern } from "@/core/lib/path-pattern";
 
 export interface RouteMatch {
     key: string;
@@ -10,7 +11,8 @@ export interface RouteMatch {
 export function matchModuleRoute(pathSegments: string[]): RouteMatch | null {
     const urlPath = "/" + pathSegments.join("/");
 
-    // Check for exact matches first
+    // Static routes win over dynamic ones regardless of declaration order,
+    // so /blog/archive is never swallowed by /blog/[slug].
     const exactMatch = ModuleRoutes.find(r => r.path === urlPath);
     if (exactMatch) {
         return {
@@ -20,39 +22,15 @@ export function matchModuleRoute(pathSegments: string[]): RouteMatch | null {
         };
     }
 
-    // Check for dynamic matches
     for (const route of ModuleRoutes) {
-        if (!route.path.includes("[")) continue;
+        if (!isDynamicPattern(route.path)) continue;
 
-        // Handle catch-all routes [...param]
-        if (route.path.includes("[...")) {
-            const prefix = route.path.replace(/\/\[\.\.\..*?\]$/, "");
-            if (urlPath.startsWith(prefix + "/")) {
-                const rest = urlPath.substring(prefix.length + 1);
-                const paramName = route.path.match(/\[\.\.\.(\w+)\]/)?.[1] || "params";
-                return {
-                    key: route.key,
-                    module: route.module,
-                    params: { [paramName]: rest }
-                };
-            }
-            continue;
-        }
-
-        // Convert route pattern to regex for single dynamic segments
-        // /blog/[slug] -> ^\/blog\/(?<slug>[^/]+)$
-        const pattern = route.path
-            .replace(/\//g, "\\/")
-            .replace(/\[(\w+)\]/g, "(?<$1>[^/]+)");
-
-        const regex = new RegExp(`^${pattern}$`);
-        const match = urlPath.match(regex);
-
+        const match = matchPathPattern(route.path, urlPath);
         if (match) {
             return {
                 key: route.key,
                 module: route.module,
-                params: match.groups || {}
+                params: match.params
             };
         }
     }

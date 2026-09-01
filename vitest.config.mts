@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 55,
-                branches: 54,
-                functions: 47,
-                lines: 56,
+                statements: 59,
+                branches: 58,
+                functions: 50,
+                lines: 60,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -103,6 +103,24 @@ export default defineConfig({
                 },
                 'src/core/lib/storage.ts': {
                     statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                // Both routers walk every installed module's declared paths,
+                // so a bug here is cross-module: the loop that throws is
+                // walking somebody else's routes. The API matcher used to
+                // build an illegal capture group for a catch-all and take the
+                // whole router down with it.
+                'src/core/lib/path-pattern.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                // Sanitising happens on write, so anything that gets past
+                // this is in the database and every later render serves it.
+                'src/core/lib/sanitize.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // Consulted by middleware on every request. Too wide a CIDR
+                // locks the admin out; a propagated DB error denies everyone.
+                'src/core/lib/ip-blocks.ts': {
+                    statements: 100, branches: 95, functions: 100, lines: 100,
                 },
                 'src/core/lib/secret-storage.ts': {
                     statements: 92, branches: 80, functions: 100, lines: 92,

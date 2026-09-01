@@ -1,5 +1,6 @@
 
 import { ModuleApiRoutes } from "@/core/generated/module-registry";
+import { isDynamicPattern, matchPathPattern } from "@/core/lib/path-pattern";
 
 export interface ApiRouteMatch {
     key: string;
@@ -9,11 +10,10 @@ export interface ApiRouteMatch {
 }
 
 export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
-    // Construct path relative to /api/v1
-    // if url is /api/v1/blog/articles -> pathSegments = ['blog', 'articles'] -> /blog/articles
+    // Path is relative to /api/v1: /api/v1/blog/articles arrives here as
+    // ['blog', 'articles'] and is matched as /blog/articles.
     const urlPath = "/" + pathSegments.join("/");
 
-    // Check for exact matches
     const exactMatch = ModuleApiRoutes.find(r => r.path === urlPath);
     if (exactMatch) {
         return {
@@ -24,22 +24,15 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
         };
     }
 
-    // Check for dynamic matches
     for (const route of ModuleApiRoutes) {
-        if (!route.path.includes("[")) continue;
+        if (!isDynamicPattern(route.path)) continue;
 
-        const pattern = route.path
-            .replace(/\//g, "\\/")
-            .replace(/\[(.*?)\]/g, "(?<$1>[^/]+)");
-
-        const regex = new RegExp(`^${pattern}$`);
-        const match = urlPath.match(regex);
-
+        const match = matchPathPattern(route.path, urlPath);
         if (match) {
             return {
                 key: route.key,
                 module: route.module,
-                params: match.groups || {},
+                params: match.params,
                 method: route.method
             };
         }
