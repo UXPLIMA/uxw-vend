@@ -20,7 +20,7 @@ Any domain feature (store, forum, blog, tickets, analytics, payment gateway, gam
 ### First-time setup
 
 ```bash
-git clone https://github.com/siracozmen01/uxwVend.git
+git clone https://github.com/UXPLIMA/uxw-vend.git
 cd uxwVend
 npm install
 cp .env.example .env

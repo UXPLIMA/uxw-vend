@@ -17,7 +17,7 @@ the latest `main` and the most recent tagged release only.
 Report privately through one of:
 
 1. **GitHub Security Advisories** (preferred) — open a draft advisory at
-   <https://github.com/siracozmen01/uxwVend/security/advisories/new>.
+   <https://github.com/UXPLIMA/uxw-vend/security/advisories/new>.
 2. **Email** — `siracozmen@protonmail.com` with the subject line
    `[SECURITY] uxwVend`.
 

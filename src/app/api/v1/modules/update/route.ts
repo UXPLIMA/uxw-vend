@@ -19,8 +19,8 @@ import moduleSystem from "@/core/lib/modules";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
+import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 
-const MARKETPLACE_BASE = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
 // POST /api/v1/modules/update — Update an installed module from marketplace
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         // to roll back to when a migration half-applies.
         await backupBeforeModuleChange("update", moduleId);
 
-        const zipUrl = `${MARKETPLACE_BASE}/${zipFile}`;
+        const zipUrl = `${moduleMarketplaceBase()}/${zipFile}`;
         const res = await fetch(zipUrl);
         if (!res.ok) {
             return NextResponse.json({ error: `Failed to download module: HTTP ${res.status}` }, { status: 502 });

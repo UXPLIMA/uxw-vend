@@ -576,7 +576,7 @@ function generate() {
             version: "1.0.0",
             contact: {
                 name: "uxwVend",
-                url: "https://github.com/siracozmen01/uxwVend",
+                url: "https://github.com/UXPLIMA/uxw-vend",
             },
         },
         servers: [{ url: "/", description: "Current server" }],

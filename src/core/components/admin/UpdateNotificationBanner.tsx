@@ -5,9 +5,9 @@ import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
 import { UpdateBannerDismiss } from "./UpdateBannerDismiss";
+import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
-const REMOTE_INDEX = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
 interface MinimalModule {
@@ -40,7 +40,7 @@ async function loadMarketplace(): Promise<MinimalIndex | null> {
         return JSON.parse(raw) as MinimalIndex;
     } catch { /* fall through */ }
     try {
-        const res = await fetch(REMOTE_INDEX, { next: { revalidate: 300 } });
+        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) return null;
         return (await res.json()) as MinimalIndex;
     } catch {

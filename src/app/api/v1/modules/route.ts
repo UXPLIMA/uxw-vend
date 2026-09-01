@@ -11,8 +11,8 @@ import {
 import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import path from "path";
+import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 
-const MARKETPLACE_URL = "https://raw.githubusercontent.com/siracozmen01/uxwVend/main/module-marketplace/index.json";
 
 // Cache marketplace index for update checks
 let marketplaceCache: { modules: Array<{ id: string; version: string }> } | null = null;
@@ -25,7 +25,7 @@ async function fetchMarketplaceIndex(): Promise<Map<string, string>> {
         return new Map(marketplaceCache.modules.map(m => [m.id, m.version]));
     }
     try {
-        const res = await fetch(MARKETPLACE_URL, { next: { revalidate: 300 } });
+        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) return new Map();
         const data = await res.json();
         marketplaceCache = data;
