@@ -24,8 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tests for the paths where a bug cannot be undone: the shutdown registry and
   the install lock (now on the critical path of every module install), the
   GDPR erasure and export, the pre-install snapshot, the upload funnel, the
-  HTML sanitiser, and the IP blocklist. Coverage thresholds raised from
-  49/48/42/50 to 59/58/50/60, with per-file floors on each.
+  HTML sanitiser, the IP blocklist, the backup/restore/rotate lifecycle, and
+  the scheduler's tick loop and cluster claim. Coverage thresholds raised
+  from 49/48/42/50 to 64/61/56/65, with per-file floors on each.
 
 ## [0.2.0] - 2026-09-01
 

@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 59,
-                branches: 58,
-                functions: 50,
-                lines: 60,
+                statements: 64,
+                branches: 61,
+                functions: 56,
+                lines: 65,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -121,6 +121,18 @@ export default defineConfig({
                 // locks the admin out; a propagated DB error denies everyone.
                 'src/core/lib/ip-blocks.ts': {
                     statements: 100, branches: 95, functions: 100, lines: 100,
+                },
+                // Restore is the most destructive operation the platform has
+                // (pg_dump --clean drops every table before reloading), and
+                // rotation deletes archives on its own schedule.
+                'src/core/lib/backup.ts': {
+                    statements: 95, branches: 80, functions: 100, lines: 95,
+                },
+                // On the boot path since 0.2.0. A ticker that never starts
+                // stops backups, the email queue, warning expiry and health
+                // alerting, and nothing surfaces it.
+                'src/core/lib/scheduler.ts': {
+                    statements: 90, branches: 70, functions: 100, lines: 90,
                 },
                 'src/core/lib/secret-storage.ts': {
                     statements: 92, branches: 80, functions: 100, lines: 92,
