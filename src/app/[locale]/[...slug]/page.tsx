@@ -1,7 +1,7 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ModuleRegistry } from "@/core/generated/module-registry";
+import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ModuleApiRegistry } from "@/core/generated/module-registry";
+import { ModuleApiRegistry } from "@/core/generated/module-api-registry";
 import { matchApiRoute } from "@/core/lib/api-matcher";
 import { logRequest } from "@/core/lib/logger";
 import { recordMetric } from "@/core/lib/metrics";
