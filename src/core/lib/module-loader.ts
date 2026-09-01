@@ -30,6 +30,9 @@ class ModuleLoader {
             }
 
             this.initialized = true;
+            // console rather than ./logger: this module is reachable from the
+            // client (hence the `typeof window` guard above), and logger.ts
+            // imports next/headers.
             console.log(`Loaded ${this.modules.size} modules`);
         } catch {
             // fs not available (client-side) — return empty

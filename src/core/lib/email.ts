@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { resolveAppName } from "./app-url";
+import { log } from "./logger";
 
 /**
  * Core email service.
@@ -177,7 +178,7 @@ async function deliverViaProvider(opts: {
     }
 
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] To ${opts.to}: ${safeSubject}`);
+        log.warn("email suppressed: no transport configured", { to: opts.to, subject: safeSubject });
         return { ok: true }; // Treat as delivered (dev/test mode)
     }
     const resend = await getResend();
@@ -388,7 +389,14 @@ export async function sendEmail(opts: {
 
 export async function sendPasswordResetEmail(email: string, resetUrl: string, locale?: string) {
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] Password reset for ${email}: ${resetUrl}`);
+        // The URL is logged only outside production. A developer with no SMTP
+        // needs it to finish the flow; in production it is a single-use
+        // account-takeover token sitting in the log aggregator.
+        log.warn("email suppressed: no transport configured", {
+            kind: "password-reset",
+            to: email,
+            ...(process.env.NODE_ENV === "production" ? {} : { resetUrl }),
+        });
         return;
     }
 
@@ -413,7 +421,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string, lo
 
 export async function sendWelcomeEmail(email: string, username: string, locale?: string) {
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] Welcome email for ${username} (${email})`);
+        log.warn("email suppressed: no transport configured", { kind: "welcome", to: email, username });
         return;
     }
 
@@ -436,7 +444,11 @@ export async function sendWelcomeEmail(email: string, username: string, locale?:
 
 export async function sendVerificationEmail(email: string, verifyUrl: string, locale?: string) {
     if (!getEmailEnabled()) {
-        console.log(`[Email Disabled] Verification for ${email}: ${verifyUrl}`);
+        log.warn("email suppressed: no transport configured", {
+            kind: "email-verification",
+            to: email,
+            ...(process.env.NODE_ENV === "production" ? {} : { verifyUrl }),
+        });
         return;
     }
 
