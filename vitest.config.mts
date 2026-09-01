@@ -48,6 +48,29 @@ export default defineConfig({
             // — are deliberately NOT excluded so their coverage is measured and
             // can be enforced. Do not add them here.
             exclude: ['src/core/lib/db.ts', 'src/core/lib/auth.ts'],
+            // A ratchet, not a target. Set just under the numbers the suite
+            // actually produced on 2026-09-01 so an unrelated change cannot
+            // quietly remove coverage; raise them when you add tests, never
+            // lower them to make a build pass.
+            //
+            // The two security-critical files carry their own floors. That is
+            // the whole reason they are not in `exclude` above — measuring
+            // them was pointless while nothing enforced the measurement, and
+            // for a long time nothing did: `@vitest/coverage-v8` was not even
+            // installed, so `npm run test:coverage` failed on the missing
+            // provider and CI ran `npm test` without it.
+            thresholds: {
+                statements: 48,
+                branches: 46,
+                functions: 40,
+                lines: 49,
+                'src/core/lib/permissions.ts': {
+                    statements: 85, branches: 90, functions: 72, lines: 80,
+                },
+                'src/core/lib/secret-storage.ts': {
+                    statements: 92, branches: 80, functions: 100, lines: 92,
+                },
+            },
         },
     },
     resolve: {
