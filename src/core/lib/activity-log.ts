@@ -1,6 +1,6 @@
 import { prisma } from "./db";
 import { Prisma } from "@prisma/client";
-import { auth } from "./auth";
+import { auth } from "@/core/lib/auth";
 
 /**
  * Record a single audit event. The schema stores `metadata` as a Json

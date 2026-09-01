@@ -52,6 +52,14 @@ export default defineConfig({
     },
     resolve: {
         alias: {
+            // Order matters: Vite tries alias entries in sequence and '@'
+            // matches as a prefix, so the specific entry has to come first.
+            //
+            // Everything that reaches `@/core/lib/auth` — including any test
+            // that touches `@/core/sdk/server`, whose `activity-log` re-export
+            // imports it — gets a stub instead. See tests/stubs/core-auth.ts
+            // for why the real module cannot be imported outside Next.
+            '@/core/lib/auth': path.resolve(rootDir, 'tests/stubs/core-auth.ts'),
             '@': path.resolve(rootDir, 'src'),
         },
     },
