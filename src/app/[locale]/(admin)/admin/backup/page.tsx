@@ -7,6 +7,7 @@ import { Input } from "@/core/components/ui/input";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
+import { downloadFromUrl } from "@/core/lib/download";
 import {
     Database,
     Download,
@@ -160,7 +161,7 @@ export default function BackupAdminPage() {
     };
 
     const handleDownload = (row: BackupRow) => {
-        window.location.href = `/api/v1/admin/backup/${encodeURIComponent(row.id)}/download`;
+        downloadFromUrl(`/api/v1/admin/backup/${encodeURIComponent(row.id)}/download`);
     };
 
     const openRestoreDialog = (row: BackupRow) => {
