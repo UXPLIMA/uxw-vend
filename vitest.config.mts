@@ -2,6 +2,11 @@ import { defineConfig } from 'vitest/config';
 import fs from 'fs';
 import path from 'path';
 
+// `.mts` so Vite loads this as real ESM. As `.ts` it was loaded as CommonJS,
+// which Vite warns about on every single run and plans to stop supporting —
+// hence `import.meta.dirname` rather than `__dirname` below.
+const rootDir = import.meta.dirname;
+
 /**
  * Tests for a module live in `tests/modules/<moduleId>/` and are included only
  * when that module is actually installed.
@@ -12,7 +17,7 @@ import path from 'path';
  * is installed keeps `npm test` green on a clean checkout while still running
  * these tests on a machine where the module is present.
  */
-const modulesDir = path.resolve(__dirname, 'src/modules');
+const modulesDir = path.resolve(rootDir, 'src/modules');
 const installedModules = fs.existsSync(modulesDir)
     ? fs.readdirSync(modulesDir, { withFileTypes: true })
           .filter((e) => e.isDirectory() && fs.existsSync(path.join(modulesDir, e.name, 'module.json')))
@@ -47,7 +52,7 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'src'),
+            '@': path.resolve(rootDir, 'src'),
         },
     },
 });
