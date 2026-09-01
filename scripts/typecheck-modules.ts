@@ -1,31 +1,39 @@
-// Typecheck the module-sources tree against a recorded baseline.
+// Typecheck module-sources/ — the 24k lines the main tsconfig excludes.
 //
-// `tsc -p tsconfig.modules.json` cannot reach zero errors, and that is not a
-// defect in the modules: module-sources compiles against the Prisma client
-// generated from prisma/schema.prisma, which contains ONLY core models. Every
-// model a module ships in its own schema.prisma (Order, Coupon, WheelPrize, …)
-// is therefore missing from PrismaClient, and each use of one is an error. A
-// zero-error run would require generating a client from core + all 42 module
-// schemas, which is exactly the merged schema core must NOT ship.
+// The exclusion in tsconfig.json is deliberate: a module imports
+// `@/modules/<id>/...` paths that exist only once it is installed. But the
+// consequence was that module code was never type-checked by anything.
 //
-// So the gate is a delta: errors already in the baseline are tolerated, any
-// NEW error fails. Line/column numbers are stripped before comparing so that
-// unrelated edits above an error do not produce phantom diffs.
+// The hard part is Prisma. `module-sources` compiles against the client
+// generated from `prisma/schema.prisma`, which holds only the models of the
+// modules that happen to be INSTALLED — normally none. Every reference to a
+// module's own model (Order, Coupon, WheelPrize, …) is then a "does not exist
+// on PrismaClient" error. This script used to tolerate 503 such errors through
+// a recorded baseline, which meant real errors could hide among them, and two
+// did.
 //
-// Refresh the baseline with `npm run typecheck:modules -- --update` after
-// deliberately changing the module tree.
+// So instead of tolerating them, remove their cause: generate a throwaway
+// Prisma client from core + EVERY module-sources schema, point `@prisma/client`
+// at it for the duration of the run, and demand zero errors. Nothing about this
+// client is shipped — core must not carry models for modules nobody installed —
+// and it is regenerated only when the merged schema actually changes.
 
 import { spawnSync } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { mergeSchemas } from "./lib/merge-prisma-schemas";
 
 const ROOT = process.cwd();
-const BASELINE = path.join(ROOT, "module-sources/.typecheck-baseline.txt");
 const SOURCES = path.join(ROOT, "module-sources");
+const WORK_DIR = path.join(ROOT, ".typecheck-modules");
+const CLIENT_DIR = path.join(WORK_DIR, "client");
+const SCHEMA_PATH = path.join(WORK_DIR, "schema.prisma");
+const STAMP_PATH = path.join(WORK_DIR, "schema.hash");
+const TSCONFIG_PATH = path.join(ROOT, "tsconfig.modules.generated.json");
 // Sits at the root of module-sources, not inside any module: it must not end
 // up in a ZIP, and the boundary scanners only walk module directories.
 const CONTRACTS = path.join(SOURCES, "__hook-contracts__.ts");
-const update = process.argv.includes("--update");
 
 /**
  * A `hookListeners` entry is wired by codegen through a dynamic import, so the
@@ -76,11 +84,74 @@ function writeHookContracts(): number {
     return count;
 }
 
+/**
+ * Generate the all-modules Prisma client, skipping the work when the merged
+ * schema is byte-identical to the one already generated. `prisma generate` is
+ * the slowest step here by an order of magnitude, and the schema only changes
+ * when a module's models do.
+ */
+function ensureMergedClient(): { modules: number; models: number; regenerated: boolean } {
+    const merged = mergeSchemas(ROOT, "all-sources");
+    for (const warning of merged.warnings) console.warn(`[typecheck-modules] WARNING: ${warning}`);
+
+    // The core generator block has no `output`, which lands the client in
+    // node_modules and would clobber the real one.
+    const schema = merged.schema.replace(
+        /generator\s+client\s*\{[^}]*\}/,
+        `generator client {\n  provider = "prisma-client-js"\n  output   = "${CLIENT_DIR}"\n}`,
+    );
+    const hash = crypto.createHash("sha256").update(schema).digest("hex");
+
+    fs.mkdirSync(WORK_DIR, { recursive: true });
+    const fresh =
+        fs.existsSync(CLIENT_DIR) &&
+        fs.existsSync(STAMP_PATH) &&
+        fs.readFileSync(STAMP_PATH, "utf-8").trim() === hash;
+
+    if (!fresh) {
+        fs.writeFileSync(SCHEMA_PATH, schema, "utf-8");
+        const gen = spawnSync("npx", ["prisma", "generate", "--schema", SCHEMA_PATH], {
+            cwd: ROOT,
+            encoding: "utf-8",
+            timeout: 180_000,
+        });
+        if (gen.status !== 0) {
+            console.error("prisma generate failed for the merged module schema:\n");
+            console.error(`${gen.stdout ?? ""}${gen.stderr ?? ""}`);
+            process.exit(1);
+        }
+        fs.writeFileSync(STAMP_PATH, hash, "utf-8");
+    }
+
+    return { modules: merged.moduleNames.length, models: merged.modelCount, regenerated: !fresh };
+}
+
+function writeTsconfig(): void {
+    // Written at the repo root, not inside WORK_DIR: `extends`, `include` and
+    // `paths` all resolve relative to the file that declares them, so moving it
+    // a directory down would silently repoint every glob.
+    const config = {
+        "//": `GENERATED by scripts/typecheck-modules.ts — do not edit or commit. Points @prisma/client at ${path.relative(ROOT, CLIENT_DIR)}, a client generated from core plus every module-sources schema.`,
+        extends: "./tsconfig.modules.json",
+        compilerOptions: {
+            // `paths` replaces rather than merges, so the base mapping is restated.
+            paths: {
+                "@/*": ["./src/*"],
+                "@prisma/client": [`./${path.relative(ROOT, CLIENT_DIR)}`],
+                "@prisma/client/*": [`./${path.relative(ROOT, CLIENT_DIR)}/*`],
+            },
+        },
+    };
+    fs.writeFileSync(TSCONFIG_PATH, JSON.stringify(config, null, 2) + "\n", "utf-8");
+}
+
+const client = ensureMergedClient();
+writeTsconfig();
 const contractCount = writeHookContracts();
 
 let raw: string;
 try {
-    const run = spawnSync("npx", ["tsc", "--noEmit", "-p", "tsconfig.modules.json"], {
+    const run = spawnSync("npx", ["tsc", "--noEmit", "-p", path.basename(TSCONFIG_PATH)], {
         cwd: ROOT,
         encoding: "utf-8",
         maxBuffer: 32 * 1024 * 1024,
@@ -89,66 +160,24 @@ try {
 } finally {
     fs.rmSync(CONTRACTS, { force: true });
 }
-const errors = raw
-    .split("\n")
-    .filter((l) => / error TS\d+: /.test(l))
-    // Drop the (line,col) so the baseline survives unrelated edits in the file.
-    .map((l) => l.replace(/\(\d+,\d+\)/, ""))
-    // Drop inlined type printouts. TypeScript spells whole object types into
-    // the message ("does not exist on type '{ id: string; email: … }'"), and
-    // their field order changes every time the Prisma client is regenerated —
-    // which would invalidate the entire baseline for no real change. Short
-    // quoted names (the property that is actually missing) are kept.
-    //
-    // The generated contracts file is exempt: there the spelled-out type IS the
-    // diagnostic — it names the hook, the payload the emitter promises and the
-    // one the listener wants — and it is regenerated per run, so it can never
-    // go stale in the baseline.
-    .map((l) => (l.includes("__hook-contracts__") ? l : l.replace(/'[^']{60,}'|'[^']*;[^']*'/g, "'…'")))
-    .sort();
 
-if (update) {
-    fs.writeFileSync(BASELINE, errors.join("\n") + (errors.length ? "\n" : ""), "utf-8");
-    console.log(`Baseline updated: ${errors.length} known error(s) recorded.`);
-    process.exit(0);
-}
+const errors = raw.split("\n").filter((l) => / error TS\d+: /.test(l));
 
-if (!fs.existsSync(BASELINE)) {
-    console.error(`No baseline at ${path.relative(ROOT, BASELINE)}. Run: npm run typecheck:modules -- --update`);
-    process.exit(1);
-}
-
-const known = new Map<string, number>();
-for (const line of fs.readFileSync(BASELINE, "utf-8").split("\n")) {
-    if (line.trim()) known.set(line, (known.get(line) ?? 0) + 1);
-}
-
-const introduced: string[] = [];
-for (const err of errors) {
-    const left = known.get(err) ?? 0;
-    if (left > 0) known.set(err, left - 1);
-    else introduced.push(err);
-}
-const fixed = [...known.values()].reduce((a, b) => a + b, 0);
-
-if (introduced.length > 0) {
-    console.error(`${introduced.length} new type error(s) in module-sources:\n`);
-    for (const err of introduced) console.error(`  ${err}`);
-    if (introduced.some((e) => e.includes("__hook-contracts__"))) {
+if (errors.length > 0) {
+    console.error(`${errors.length} type error(s) in module-sources:\n`);
+    for (const err of errors) console.error(`  ${err}`);
+    if (errors.some((e) => e.includes("__hook-contracts__"))) {
         console.error(
             "\n  __hook-contracts__.ts is generated from every module's hookListeners:\n" +
-            "  an error there means a listener's payload type disagrees with the\n" +
-            "  payload the emitting module declares in its UxwVendHookPayloads block.",
+                "  an error there means a listener's payload type disagrees with the\n" +
+                "  payload the emitting module declares in its UxwVendHookPayloads block.",
         );
     }
-    console.error(`\n(${errors.length - introduced.length} pre-existing error(s) tolerated — see the header of scripts/typecheck-modules.ts.)`);
     process.exit(1);
 }
 
 console.log(
-    `module-sources: no new type errors (${errors.length} known, see module-sources/.typecheck-baseline.txt); ` +
-    `${contractCount} hook listener contract(s) verified.`,
+    `module-sources: 0 type errors across ${client.modules} module schema(s) / ${client.models} models` +
+        `${client.regenerated ? " (client regenerated)" : ""}; ` +
+        `${contractCount} hook listener contract(s) verified.`,
 );
-if (fixed > 0) {
-    console.log(`${fixed} baseline error(s) no longer occur — refresh with: npm run typecheck:modules -- --update`);
-}
