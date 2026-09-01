@@ -300,23 +300,30 @@ Rules:
 
 ## CI Checklist
 
-`.github/workflows/ci.yml` runs on every push and PR to `main`. All steps must pass:
+`.github/workflows/build-and-test.yml` runs on every push and PR to `main`. All steps must pass:
 
 1. `npm ci`
 2. Seed `src/modules/` from `module-sources/` (CI only — simulates a fully-installed state so the type checker sees every model)
 3. `npx tsx scripts/merge-schemas.ts` (merge Prisma schema + generate client)
 4. `npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/generate-openapi.ts`
 5. `npx tsc --noEmit` (zero errors)
-6. `npm run lint` (zero warnings)
-7. `npm audit --audit-level=high`
-8. `npm test`
-9. `npm run build`
+6. `npm run typecheck:modules` (zero errors — see below)
+7. `npx tsx scripts/validate-module.ts --all` (every module passes the boundary and manifest gates)
+8. `npm run lint` (zero warnings)
+9. `npm audit --audit-level=high`
+10. `npm test`
+11. `npm run build`
+
+A second job runs the Playwright suite against a real Postgres and a built
+server, and a third builds the Docker image.
 
 Run locally before opening a PR:
 
 ```bash
 npm run lint
 npx tsc --noEmit
+npm run typecheck:modules
+npx tsx scripts/validate-module.ts --all
 npm test
 npm run build
 ```
@@ -326,6 +333,37 @@ If you changed a manifest or added/removed routes, also run:
 ```bash
 npx tsx scripts/generate-registry.ts
 ```
+
+### Why `typecheck:modules` is separate
+
+`tsconfig.json` excludes `module-sources/`: a module imports
+`@/modules/<id>/...` paths that only exist once it is installed, so including
+it would fail every clean checkout. `npm run typecheck:modules` covers it
+instead, and does one thing `tsc` alone cannot — it generates a throwaway
+Prisma client from core plus *every* module schema and type-checks against
+that.
+
+Without it, every reference to a module's own model (`prisma.order`,
+`prisma.coupon`) is a "does not exist on PrismaClient" error. That is why this
+gate used to carry a baseline of 503 tolerated errors. It carries none now, so
+a new type error in any module fails the build.
+
+The same command also verifies hook listeners: for every `hookListeners` entry
+in every manifest it asserts, at the type level, that the handler accepts the
+payload the emitting module declares.
+
+### Running the E2E suite locally
+
+The suite signs in as the seeded admin, and `prisma/seed.ts` generates a random
+password unless you choose one. Seed and run with the same values:
+
+```bash
+SEED_ADMIN_EMAIL=admin@uxwvend.com SEED_ADMIN_PASSWORD=local-dev npx tsx prisma/seed.ts
+E2E_ADMIN_EMAIL=admin@uxwvend.com E2E_ADMIN_PASSWORD=local-dev npm run test:e2e
+```
+
+`E2E_BASE_URL` overrides the target (default `http://127.0.0.1:3001`). No
+`webServer` is configured, so start the app yourself first.
 
 ---
 
