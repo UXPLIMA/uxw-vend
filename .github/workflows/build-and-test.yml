@@ -84,8 +84,12 @@ jobs:
       - name: Security audit (fails on high/critical)
         run: npm audit --audit-level=high
 
-      - name: Unit tests
-        run: npm test
+      # `test:coverage` runs the same suite and additionally enforces the
+      # thresholds in vitest.config.mts. Running plain `npm test` here left
+      # the coverage config as decoration — and the provider it needs was
+      # missing from the lockfile entirely, so the script could not run at all.
+      - name: Unit tests + coverage thresholds
+        run: npm run test:coverage
 
       - name: Build
         run: npm run build
