@@ -9,9 +9,13 @@ import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
+import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
+import { validateZipEntries } from "@/core/lib/module-zip-validator";
+import { MODULES_DIR } from "@/core/lib/runtime-paths";
 
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
+const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
 interface BulkResult {
     id: string;
@@ -54,6 +58,7 @@ export async function POST(request: NextRequest) {
         if (!id || !zip) { results.push({ id: id || "unknown", name: name || id, status: "failed", error: "Missing id or zip" }); continue; }
         if (!/^[a-z0-9-]+\.zip$/.test(zip)) { results.push({ id, name: name || id, status: "failed", error: "Invalid zip name" }); continue; }
         if (!/^[a-z0-9-]+$/.test(id)) { results.push({ id, name: name || id, status: "failed", error: "Invalid module ID" }); continue; }
+        if (RESERVED_IDS.includes(id)) { results.push({ id, name: name || id, status: "failed", error: "Module ID is reserved" }); continue; }
 
         const targetDir = path.join(MODULES_DIR, id);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
@@ -67,8 +72,14 @@ export async function POST(request: NextRequest) {
             if (buffer.length > MAX_MODULE_SIZE) { results.push({ id, name: name || id, status: "failed", error: "Too large" }); continue; }
             if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4B) { results.push({ id, name: name || id, status: "failed", error: "Invalid ZIP" }); continue; }
 
-            await fs.mkdir(targetDir, { recursive: true });
             const zipFile = new AdmZip(buffer);
+            const contentCheck = validateZipEntries(zipFile.getEntries());
+            if (!contentCheck.ok) {
+                results.push({ id, name: name || id, status: "failed", error: contentCheck.error ?? "ZIP validation failed" });
+                continue;
+            }
+
+            await fs.mkdir(targetDir, { recursive: true });
             for (const entry of zipFile.getEntries()) {
                 if (entry.isDirectory || entry.entryName.includes("../")) continue;
                 const resolvedPath = path.resolve(targetDir, entry.entryName);
@@ -86,7 +97,46 @@ export async function POST(request: NextRequest) {
                 continue;
             }
 
-            const manifest = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+            // Until this ran, bulk install was the one path into src/modules/
+            // that accepted a manifest without validating it: no schema parse,
+            // no file-ref check, no reserved-id check. Installing the same
+            // module one at a time went through all three. Two doors into the
+            // same directory with different locks is not a design.
+            const parsedManifest = moduleManifestSchema.safeParse(
+                JSON.parse(await fs.readFile(manifestPath, "utf-8")),
+            );
+            if (!parsedManifest.success) {
+                await fs.rm(targetDir, { recursive: true, force: true });
+                const first = parsedManifest.error.issues[0];
+                results.push({
+                    id,
+                    name: name || id,
+                    status: "failed",
+                    error: `Invalid manifest: ${first ? `${first.path.join(".")}: ${first.message}` : "does not match schema"}`.slice(0, 100),
+                });
+                continue;
+            }
+            const manifest = parsedManifest.data;
+
+            if (manifest.id !== id) {
+                await fs.rm(targetDir, { recursive: true, force: true });
+                results.push({ id, name: name || id, status: "failed", error: `Manifest id is ${manifest.id}` });
+                continue;
+            }
+
+            const refCheck = checkManifestFileRefs(targetDir, manifest);
+            const badRefs = [...refCheck.escaping, ...refCheck.missing];
+            if (badRefs.length > 0) {
+                await fs.rm(targetDir, { recursive: true, force: true });
+                results.push({
+                    id,
+                    name: name || id,
+                    status: "failed",
+                    error: `Manifest references missing files: ${badRefs.slice(0, 3).join(", ")}`.slice(0, 100),
+                });
+                continue;
+            }
+
             const hasSchema = await fs.access(path.join(targetDir, "schema.prisma")).then(() => true).catch(() => false);
             if (hasSchema) hasSchemaChanges = true;
 

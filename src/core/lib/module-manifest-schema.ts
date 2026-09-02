@@ -425,6 +425,36 @@ export type ValidatedModuleManifest = z.infer<typeof moduleManifestSchema>;
  * Collects every `handler`/`component` path referenced by a manifest. Used
  * after ZIP extraction to verify that files the manifest claims actually exist.
  */
+/**
+ * The file extensions a manifest ref may be written without. The registry
+ * generator strips any extension off a ref and emits a bare import specifier
+ * (`@/modules/blog/components/BlogNewsSection`), leaving the bundler to pick
+ * the file — so `components/Foo`, `components/Foo.tsx` and `components/Foo/`
+ * all name the same module. Anything that validates refs against the disk has
+ * to apply the same rule or it rejects manifests the build would have loaded
+ * fine.
+ */
+const MODULE_REF_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js", ".mjs", ".cjs"];
+
+/**
+ * Every on-disk path a single manifest ref may legitimately resolve to, in the
+ * order a resolver should try them: the literal path first (a ref that already
+ * carries its extension), then each extension appended, then `index.*` inside
+ * a directory of that name.
+ *
+ * Pure — no filesystem access — so this stays importable from the client
+ * bundle alongside the rest of the schema. `checkManifestFileRefs` in
+ * `module-ref-resolver.ts` is the filesystem-aware half.
+ */
+export function manifestRefCandidates(ref: string): string[] {
+    const cleaned = ref.replace(/^\.\//, "").replace(/\/+$/, "");
+    const base = cleaned.replace(/\.(tsx|ts|jsx|js|mjs|cjs)$/, "");
+    const candidates = [cleaned];
+    for (const ext of MODULE_REF_EXTENSIONS) candidates.push(base + ext);
+    for (const ext of MODULE_REF_EXTENSIONS) candidates.push(`${base}/index${ext}`);
+    return [...new Set(candidates)];
+}
+
 export function collectManifestFileRefs(m: ValidatedModuleManifest): string[] {
     const refs: string[] = [];
     const push = (v: string | undefined) => { if (v) refs.push(v); };

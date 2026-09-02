@@ -7,7 +7,8 @@ import path from "path";
 import { execFileSync } from "child_process";
 import { scheduleBuild } from "@/core/lib/install-lock";
 import AdmZip from "adm-zip";
-import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
+import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
+import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import {
     checkModuleDependencies,
@@ -190,22 +191,16 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            const missingRefs: string[] = [];
-            for (const ref of collectManifestFileRefs(manifest)) {
-                const cleaned = ref.replace(/^\.\//, "");
-                const refPath = path.resolve(stageDir, cleaned);
-                if (!refPath.startsWith(stageRoot + path.sep)) {
-                    return NextResponse.json(
-                        { error: `Manifest references escape module root: ${ref}` },
-                        { status: 400 },
-                    );
-                }
-                const refExists = await fs.access(refPath).then(() => true).catch(() => false);
-                if (!refExists) missingRefs.push(ref);
-            }
-            if (missingRefs.length > 0) {
+            const refCheck = checkManifestFileRefs(stageDir, manifest);
+            if (refCheck.escaping.length > 0) {
                 return NextResponse.json(
-                    { error: `Manifest references missing files: ${missingRefs.slice(0, 5).join(", ")}` },
+                    { error: `Manifest references escape module root: ${refCheck.escaping.slice(0, 5).join(", ")}` },
+                    { status: 400 },
+                );
+            }
+            if (refCheck.missing.length > 0) {
+                return NextResponse.json(
+                    { error: `Manifest references missing files: ${refCheck.missing.slice(0, 5).join(", ")}` },
                     { status: 400 },
                 );
             }

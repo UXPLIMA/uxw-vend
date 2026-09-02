@@ -9,7 +9,8 @@ import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { acquireInstallLock } from "@/core/lib/install-lock";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
-import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
+import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
+import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
@@ -143,23 +144,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const manifestRoot = path.resolve(manifestDir);
-        const missingRefs: string[] = [];
-        for (const ref of collectManifestFileRefs(manifest)) {
-            const cleaned = ref.replace(/^\.\//, "");
-            const refPath = path.resolve(manifestDir, cleaned);
-            if (!refPath.startsWith(manifestRoot + path.sep)) {
-                return NextResponse.json(
-                    { error: `Manifest references escape module root: ${ref}` },
-                    { status: 400 },
-                );
-            }
-            const exists = await fs.access(refPath).then(() => true).catch(() => false);
-            if (!exists) missingRefs.push(ref);
-        }
-        if (missingRefs.length > 0) {
+        const refCheck = checkManifestFileRefs(manifestDir, manifest);
+        if (refCheck.escaping.length > 0) {
             return NextResponse.json(
-                { error: `Manifest references missing files: ${missingRefs.slice(0, 5).join(", ")}` },
+                { error: `Manifest references escape module root: ${refCheck.escaping.slice(0, 5).join(", ")}` },
+                { status: 400 },
+            );
+        }
+        if (refCheck.missing.length > 0) {
+            return NextResponse.json(
+                { error: `Manifest references missing files: ${refCheck.missing.slice(0, 5).join(", ")}` },
                 { status: 400 },
             );
         }

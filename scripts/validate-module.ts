@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
+import { moduleManifestSchema } from "../src/core/lib/module-manifest-schema";
+import { checkManifestFileRefs } from "../src/core/lib/module-ref-resolver";
 
 const ROOT = process.cwd();
 
@@ -111,6 +113,43 @@ function checkIdFormat(modulePath: string): CheckResult {
     }
 }
 
+function checkManifestSchema(modulePath: string): CheckResult {
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name: "Manifest schema", passed: false, message: "No module.json to check" };
+    }
+
+    try {
+        const parsed = moduleManifestSchema.safeParse(
+            JSON.parse(fs.readFileSync(manifestPath, "utf8")),
+        );
+        if (parsed.success) {
+            return { name: "Manifest schema", passed: true, message: "Matches moduleManifestSchema" };
+        }
+
+        // This is the same schema the install, upload and update routes run a
+        // manifest through before they touch the disk. Until it was wired in
+        // here, a manifest CI called valid could still be refused on install —
+        // a ref like `../../src/core/lib/db` passed every check in this script
+        // while the routes rejected it outright.
+        const issues = parsed.error.issues
+            .slice(0, 10)
+            .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+        return {
+            name: "Manifest schema",
+            passed: false,
+            message: `${parsed.error.issues.length} problem(s):\n      ${issues.join("\n      ")}`,
+            suggestion: "Fix module.json to match the manifest schema in src/core/lib/module-manifest-schema.ts.",
+        };
+    } catch (err) {
+        return {
+            name: "Manifest schema",
+            passed: false,
+            message: `Error: ${err instanceof Error ? err.message : String(err)}`,
+        };
+    }
+}
+
 function checkReferencedFiles(modulePath: string): CheckResult {
     const manifestPath = path.join(modulePath, "module.json");
     if (!fs.existsSync(manifestPath)) {
@@ -118,68 +157,29 @@ function checkReferencedFiles(modulePath: string): CheckResult {
     }
 
     try {
-        const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-        const missing: string[] = [];
+        const parsed = moduleManifestSchema.safeParse(
+            JSON.parse(fs.readFileSync(manifestPath, "utf8")),
+        );
+        if (!parsed.success) {
+            // The manifest-shape check reports this properly; don't double-fail.
+            return { name: "Referenced files", passed: true, message: "Skipped (manifest does not parse)" };
+        }
 
-        // Check route components
-        const routeArrays = [
-            { key: "routes", field: "component" },
-            { key: "adminRoutes", field: "component" },
+        // Same resolver the install, upload and update routes use. This check
+        // used to be a separate hand-rolled walk that covered only five of the
+        // keys that can carry a ref and matched the others verbatim, so it
+        // passed fourteen modules the install route then refused.
+        const { escaping, missing } = checkManifestFileRefs(modulePath, parsed.data);
+        const problems = [
+            ...escaping.map((r) => `escapes module root: ${r}`),
+            ...missing.map((r) => `not found: ${r}`),
         ];
 
-        for (const { key, field } of routeArrays) {
-            if (manifest[key]) {
-                for (const route of manifest[key]) {
-                    const filePath = path.join(modulePath, route[field]);
-                    if (!fs.existsSync(filePath)) {
-                        missing.push(`${key}: ${route[field]}`);
-                    }
-                }
-            }
-        }
-
-        // Check API handlers
-        if (manifest.api) {
-            for (const api of manifest.api) {
-                const filePath = path.join(modulePath, api.handler);
-                if (!fs.existsSync(filePath)) {
-                    missing.push(`api: ${api.handler}`);
-                }
-            }
-        }
-
-        // Check widget/component paths (these don't have extensions, try with .tsx)
-        const componentArrays = [
-            "widgets",
-            "navbarComponents",
-            "layoutComponents",
-            "homepageSections",
-            "profileTabs",
-        ];
-
-        for (const key of componentArrays) {
-            if (manifest[key]) {
-                for (const item of manifest[key]) {
-                    const comp = item.component;
-                    // Skip @core references
-                    if (comp.startsWith("@core/")) continue;
-
-                    const withExt = path.join(modulePath, comp + ".tsx");
-                    const withoutExt = path.join(modulePath, comp);
-                    const indexPath = path.join(modulePath, comp, "index.tsx");
-
-                    if (!fs.existsSync(withExt) && !fs.existsSync(withoutExt) && !fs.existsSync(indexPath)) {
-                        missing.push(`${key}: ${comp}`);
-                    }
-                }
-            }
-        }
-
-        if (missing.length > 0) {
+        if (problems.length > 0) {
             return {
                 name: "Referenced files",
                 passed: false,
-                message: `${missing.length} file(s) not found:\n      ${missing.join("\n      ")}`,
+                message: `${problems.length} file(s) not found:\n      ${problems.join("\n      ")}`,
                 suggestion: "Create the missing files or update the paths in module.json.",
             };
         }
@@ -193,7 +193,6 @@ function checkReferencedFiles(modulePath: string): CheckResult {
         };
     }
 }
-
 function checkNoCoreImports(modulePath: string): CheckResult {
     // Check that module code doesn't import from other modules directly
     const moduleId = path.basename(modulePath);
@@ -642,6 +641,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkManifestExists(modulePath),
         checkRequiredFields(modulePath),
         checkIdFormat(modulePath),
+        checkManifestSchema(modulePath),
         checkReferencedFiles(modulePath),
         checkNoCoreImports(modulePath),
         checkSdkImports(modulePath),
