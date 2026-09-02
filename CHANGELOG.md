@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   both are committed, but nothing compared one against the other. The
   published `blog`, `forum`, `help-center` and `store` ZIPs predated the
   `searchProviders[].indexes` block their sources had gained — the exact
-  capability `CORE_API_VERSION` was raised to 1.1.0 for. Installing any of
-  them from the in-app marketplace gave you a working module whose content
-  never appeared in site search. Rebuilt; the other 38 were already in sync.
+  capability `CORE_API_VERSION` was raised to 1.1.0 for. Results were still
+  correct — the provider's `to_tsvector` query runs either way — but the four largest content tables never got their GIN
+  full-text indexes created, so every site search on a marketplace install
+  fell back to a sequential scan that recomputes a `tsvector` for every row. Rebuilt; the other 38 were already in sync.
 - **A module declaring a catch-all API route would have taken down the whole
   module API router.** `matchApiRoute` built its own regex and turned
   `[...rest]` into the capture group `(?<...rest>…)`, which is not a legal
