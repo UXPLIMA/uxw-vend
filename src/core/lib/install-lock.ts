@@ -166,12 +166,18 @@ export function scheduleBuild(): void {
         buildScheduled = false;
 
         try {
-            // 1. Merge schemas (for Prisma Client type generation only — not for DB)
+            // 1. Rebuild prisma/schema.prisma from the core schema plus every
+            //    module currently in src/modules. This is what makes the push
+            //    below safe: the merged schema describes the modules that are
+            //    actually installed, so the diff adds their tables rather than
+            //    dropping tables it does not know about.
+            let schemaMerged = true;
             try {
                 await execFileAsync("npx", ["tsx", "scripts/merge-schemas.ts"], {
                     cwd: process.cwd(), timeout: 60000,
                 });
             } catch (err) {
+                schemaMerged = false;
                 // Non-fatal: Prisma Client types may be stale until next merge.
                 log.error("install-lock: schema merge failed", {
                     step: "merge-schemas",
@@ -179,7 +185,41 @@ export function scheduleBuild(): void {
                 });
             }
 
-            // 2. Apply per-module SQL migrations (replaces db push)
+            // 2. Create the tables the merged schema declares.
+            //
+            //    Twenty-five of the twenty-six modules that ship a
+            //    schema.prisma ship no migrations/ directory, because
+            //    docs/MIGRATIONS.md says migrations are for altering a
+            //    module's schema *after* it is deployed and that `db push`
+            //    creates the tables on first install. This step used to be
+            //    absent — the comment on step 3 read "replaces db push" — so
+            //    installing any of those modules one at a time left it enabled
+            //    with none of its tables: every one of its API routes answered
+            //    500 with Prisma P2021 and its cron job logged the same error
+            //    once a minute, forever. Bulk install pushed and worked, which
+            //    is how the gap stayed invisible.
+            //
+            //    Skipped when the merge failed: pushing a stale or core-only
+            //    schema is how you drop the tables of every installed module.
+            if (schemaMerged) {
+                try {
+                    await execFileAsync("npx", ["prisma", "db", "push"], {
+                        cwd: process.cwd(), timeout: 120000,
+                    });
+                } catch (err) {
+                    log.error("install-lock: db push failed", {
+                        step: "db-push",
+                        error: err instanceof Error ? err.message : String(err),
+                    });
+                }
+            } else {
+                log.error("install-lock: skipping db push after a failed schema merge", {
+                    step: "db-push",
+                });
+            }
+
+            // 3. Apply per-module SQL migrations — schema changes a module
+            //    shipped after its initial release.
             try {
                 await execFileAsync("npx", ["tsx", "scripts/apply-migrations.ts"], {
                     cwd: process.cwd(), timeout: 120000,
@@ -192,7 +232,7 @@ export function scheduleBuild(): void {
                 });
             }
 
-            // 3. Generate registry
+            // 4. Generate registry
             try {
                 await execFileAsync("npx", ["tsx", "scripts/generate-registry.ts"], {
                     cwd: process.cwd(), timeout: 30000,
@@ -205,18 +245,18 @@ export function scheduleBuild(): void {
                 });
             }
 
-            // 4. Build
+            // 5. Build
             await execFileAsync("npm", ["run", "build"], {
                 cwd: process.cwd(), timeout: 300000, // 5 min max
             });
 
-            // 5. Record what the fresh build and the regenerated Prisma
+            // 6. Record what the fresh build and the regenerated Prisma
             //    client were made from, so the boot-time reconciler
             //    recognises both as current and does neither again.
             writeBuildState();
             writeSchemaState();
 
-            // 6. Replace the process so the new build is actually served.
+            // 7. Replace the process so the new build is actually served.
             //
             //    `next start` reads the route + build manifests once, at boot.
             //    Rebuilding underneath it changes nothing the running process

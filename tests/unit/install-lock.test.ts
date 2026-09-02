@@ -290,7 +290,7 @@ describe("scheduleBuild", () => {
         expect(execFileMock).not.toHaveBeenCalled();
     });
 
-    it("runs the four build steps in order, then records and restarts", async () => {
+    it("runs the five build steps in order, then records and restarts", async () => {
         setProduction();
         const mod = await load();
 
@@ -298,8 +298,14 @@ describe("scheduleBuild", () => {
         expect(mod.isBuildPending()).toBe(true);
         await drainBuild();
 
+        // `prisma db push` sits between the merge and the migrations because
+        // migrations only alter a module's schema after its initial release —
+        // the push is what creates its tables the first time. Without it,
+        // installing one of the twenty-five schema-bearing modules that ship
+        // no migrations/ left it enabled and tableless.
         expect(ranCommands()).toEqual([
             "npx tsx scripts/merge-schemas.ts",
+            "npx prisma db push",
             "npx tsx scripts/apply-migrations.ts",
             "npx tsx scripts/generate-registry.ts",
             "npm run build",
@@ -357,6 +363,42 @@ describe("scheduleBuild", () => {
         await drainBuild();
 
         // A stale schema or registry is recoverable; refusing to build is not.
+        expect(ranCommands()).toContain("npm run build");
+        expect(writeBuildState).toHaveBeenCalledTimes(1);
+    });
+
+    it("skips the db push when the schema merge failed", async () => {
+        setProduction();
+        execFileMock.mockImplementation(((_file: string, args: string[], _opts: unknown, cb: ExecFileCb) => {
+            if ((args as string[]).includes("scripts/merge-schemas.ts")) {
+                cb(new Error("merge blew up"), "", "");
+            } else {
+                cb(null, "", "");
+            }
+        }) as never);
+        const mod = await load();
+
+        mod.scheduleBuild();
+        await drainBuild();
+
+        // A failed merge leaves prisma/schema.prisma stale or core-only.
+        // Pushing that is how you drop the tables of every installed module —
+        // the one step here that is worse to run than to skip.
+        expect(ranCommands()).not.toContain("npx prisma db push");
+        expect(ranCommands()).toContain("npm run build");
+    });
+
+    it("treats a failed db push as non-fatal", async () => {
+        setProduction();
+        execFileMock.mockImplementation(((file: string, args: string[], _opts: unknown, cb: ExecFileCb) => {
+            if (file === "npx" && (args as string[])[0] === "prisma") cb(new Error("push failed"), "", "");
+            else cb(null, "", "");
+        }) as never);
+        const mod = await load();
+
+        mod.scheduleBuild();
+        await drainBuild();
+
         expect(ranCommands()).toContain("npm run build");
         expect(writeBuildState).toHaveBeenCalledTimes(1);
     });
