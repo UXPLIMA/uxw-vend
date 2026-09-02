@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-02
+
 ### Fixed
 - **A module installed one at a time came up enabled with none of its
   tables.** Twenty-five of the twenty-six modules that ship a `schema.prisma`
@@ -452,6 +454,7 @@ shipping — what it no longer does.
 - The discord-integration webhook sender enforces the same hostname allowlist as
   core; the punishments API key check is now constant-time.
 
-[Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/UXPLIMA/uxw-vend/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/UXPLIMA/uxw-vend/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/UXPLIMA/uxw-vend/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/UXPLIMA/uxw-vend/releases/tag/v0.1.0
