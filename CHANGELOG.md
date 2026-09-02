@@ -12,21 +12,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tables.** Twenty-five of the twenty-six modules that ship a `schema.prisma`
   ship no `migrations/` directory, which is what `docs/MIGRATIONS.md`
   prescribes: migrations exist to alter a module's schema *after* it is
-  deployed, and `prisma db push` is what creates its tables the first time.
-  The deferred build pipeline in `install-lock.ts` had dropped that push — its
-  migration step was commented "replaces db push" — so a module installed at
-  runtime never got one. `db push` still ran in the `migrate` service at
-  container start, but that is a one-shot service that does not re-run when
-  the app restarts itself after an install. The result was a module the admin
-  UI showed as installed and enabled whose every API route answered 500 with
-  Prisma `P2021`, and whose cron job logged the same error once a minute
-  indefinitely. Verified against a real install: `BlogArticle`, `BlogComment`,
-  `BlogCategory` and `BlogTag` did not exist. The first-run setup wizard had
-  the same gap.
+  deployed, and the schema itself is what creates its tables the first time.
+  The deferred build pipeline in `install-lock.ts` had no step that did that —
+  its migration step was commented "replaces db push" — so a module installed
+  at runtime never got one. `prisma db push` still ran in the `migrate`
+  service at container start, but that is a one-shot service that does not
+  re-run when the app restarts itself after an install. The result was a
+  module the admin UI showed as installed and enabled whose every API route
+  answered 500 with Prisma `P2021`, and whose cron job logged the same error
+  once a minute indefinitely. Verified against a real install: `BlogArticle`,
+  `BlogComment`, `BlogCategory` and `BlogTag` did not exist. The first-run
+  setup wizard had the same gap.
   Bulk install pushed and worked, which is how this stayed invisible — the
   same asymmetry as the manifest-ref bug below, on the same two routes.
-  The push is skipped if the schema merge before it failed: pushing a stale or
-  core-only schema is how you drop the tables of every installed module.
+- **`prisma db push` could not have been the fix, and was removed from the
+  paths that already used it.** It reconciles the whole database to the merged
+  schema, and uninstall deliberately leaves a module's tables behind so a
+  reinstall keeps the admin's data — so after any uninstall the database
+  legitimately holds tables the schema no longer declares. Both of push's
+  answers to that are wrong, and both were reproduced against a real install:
+  a leftover *empty* table is dropped silently at exit 0, quietly breaking the
+  preserved-for-reinstall promise; a leftover table *with rows* makes the push
+  refuse to run at all, which under the fix above would have left the module
+  being installed with no tables either. The second case also means that
+  today, uninstalling a module that has data makes the next `docker compose
+  up` fail in the `migrate` service and the app never start — so the Docker
+  bootstrap's upgrade branch now applies the additive pass first and treats
+  push's data-loss refusal as a warning it names rather than a fatal error.
+  Every other push failure stays fatal, and a fresh database still pushes
+  outright: there is nothing there to lose.
+  `scripts/apply-schema-additions.ts` replaces it on every runtime path: it
+  asks Prisma for the same diff with `migrate diff --script` and runs only the
+  statements that add — `CreateEnum`, `CreateTable`, `CreateIndex`,
+  `AddForeignKey`, and an `AlterTable` that neither drops nor retypes a
+  column. Prisma annotates each statement with the operation that produced it,
+  so the filter reads annotations rather than parsing SQL, and an operation it
+  does not recognise is skipped rather than guessed at. Everything applies in
+  one transaction. Verified live in the exact scenario that defeats `db push`:
+  two missing module tables created, a populated undeclared table untouched.
 - **Fourteen of the forty-two first-party modules could not be installed at
   all.** The marketplace-install, ZIP-upload and update routes each checked
   that the files a manifest names exist by comparing the ref to the disk

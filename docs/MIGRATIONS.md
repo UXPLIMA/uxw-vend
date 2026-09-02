@@ -124,7 +124,15 @@ npm run db:migrate:bootstrap   # bootstrap all
 
 Write a migration whenever you need to change the database schema of an already-deployed module — adding a column, renaming a field, creating a new table, adding an index, seeding lookup data, etc.
 
-For a **brand new module** that has never been deployed, `001_init.sql` is sufficient — `db:push` will apply the Prisma schema on first install, and the migration file just needs to match that schema for the bootstrap step.
+For a **brand new module** that has never been deployed, you do not need a migration at all: the module's `schema.prisma` is merged into the core schema on install, and `scripts/apply-schema-additions.ts` creates the tables it declares. Write `001_init.sql` only if you want the module to be installable by the bootstrap path on a database that predates it.
+
+### Why the install path does not run `prisma db push`
+
+`db push` reconciles the entire database to the merged schema, which means it also removes whatever the schema stops declaring. Uninstalling a module deliberately leaves its tables in place so a reinstall keeps the admin's data, so after any uninstall the database legitimately holds tables the schema no longer mentions — and `db push` has only two answers to that, both wrong: it drops the leftover table silently when it is empty, and it refuses to run at all when it has rows (`Use the --accept-data-loss flag`), which leaves the module being installed with no tables either.
+
+So the install path asks Prisma for the same diff via `prisma migrate diff --script` and runs only the statements that add: `CreateEnum`, `CreateTable`, `CreateIndex`, `AddForeignKey`, and an `AlterTable` that neither drops nor retypes a column. Prisma annotates every statement in that script with the operation that produced it, so the filter reads annotations rather than parsing SQL. Everything else is skipped and named in the log — dropping a column, renaming a table, changing a type are what your module's `migrations/` directory is for.
+
+`prisma db push` is still the right tool for a fresh database, where there is nothing to lose, and that is where the Docker bootstrap uses it.
 
 ### File naming
 

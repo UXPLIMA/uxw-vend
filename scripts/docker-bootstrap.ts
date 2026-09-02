@@ -10,11 +10,11 @@
 //
 //   EXISTING database — run the upgrade sequence documented in
 //                     docs/DEPLOYMENT.md ("Upgrades") and docs/MIGRATIONS.md:
-//                     merge-schemas -> prisma db push -> apply-migrations.
-//                     It used to return early here, which meant pulling a
-//                     newer image left the database on the old schema: the
-//                     install was one command, the upgrade was silently
-//                     broken. Seeding is NEVER repeated.
+//                     merge-schemas -> apply-schema-additions -> db push ->
+//                     apply-migrations. It used to return early here, which
+//                     meant pulling a newer image left the database on the old
+//                     schema: the install was one command, the upgrade was
+//                     silently broken. Seeding is NEVER repeated.
 //
 // merge-schemas reads src/modules, so the `migrate` service mounts the same
 // `modules` volume the app does — otherwise the merged schema would be
@@ -50,6 +50,46 @@ function run(label: string, cmd: string, args: string[]): void {
     }
 }
 
+/**
+ * `prisma db push` on an existing database, tolerating exactly one failure:
+ * its refusal to drop something that has rows in it.
+ *
+ * Uninstalling a module deliberately leaves its tables in place so a
+ * reinstall keeps the admin's data. `db push` wants to remove every table the
+ * merged schema no longer declares, and when one of them is not empty it
+ * stops with "Use the --accept-data-loss flag" and a non-zero exit. Treating
+ * that as fatal — which it was — means an operator who ever uninstalled a
+ * module with data in it cannot start the app again after an upgrade: the
+ * migrate service fails, and `depends_on: service_completed_successfully`
+ * keeps the app down with it.
+ *
+ * The additive half of the same reconciliation has already run by this point,
+ * so the schema is current in every direction that matters; what push would
+ * still have done is drop things, and declining to drop them is the safe
+ * outcome. Every other push failure stays fatal.
+ */
+function pushTolerantOfRetainedTables(): void {
+    const result = spawnSync("npx", ["prisma", "db", "push"], {
+        encoding: "utf-8",
+    });
+    const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+    process.stdout.write(output);
+
+    if (result.status === 0) return;
+
+    if (output.includes("--accept-data-loss")) {
+        console.warn(
+            "[bootstrap] db push declined to drop tables that still hold rows — " +
+            "these are almost certainly from a module you uninstalled, and they are kept. " +
+            "The schema is otherwise up to date; drop them by hand if you want them gone.",
+        );
+        return;
+    }
+
+    console.error(`[bootstrap] prisma db push failed (exit ${result.status}).`);
+    process.exit(result.status ?? 1);
+}
+
 async function main(): Promise<void> {
     if (!process.env.DATABASE_URL) {
         console.error("[bootstrap] DATABASE_URL is not set.");
@@ -67,20 +107,32 @@ async function main(): Promise<void> {
     // Rebuild prisma/schema.prisma from the core schema plus whatever modules
     // are installed in the mounted volume right now. On a fresh install that
     // is core-only; on an upgrade it is core + every module the admin added,
-    // which is what makes the `db push` below safe.
+    // which is what keeps the reconciliation below from mistaking a live
+    // module's tables for leftovers.
     run("merge-schemas", "npx", ["tsx", "scripts/merge-schemas.ts"]);
+
+    if (initialized) {
+        console.log("[bootstrap] Existing database — upgrading…");
+        // Additive first, and unconditionally: this is the half that cannot
+        // fail for a reason the operator should have to think about, and it
+        // guarantees every new table and column exists before anything else
+        // runs. See docs/MIGRATIONS.md.
+        run("apply-schema-additions", "npx", ["tsx", "scripts/apply-schema-additions.ts"]);
+        // Then the full reconciliation, for the removals and retypes the
+        // additive pass deliberately will not do.
+        pushTolerantOfRetainedTables();
+        run("apply-migrations", "npx", ["tsx", "scripts/apply-migrations.ts"]);
+        console.log("[bootstrap] Upgrade complete.");
+        return;
+    }
+
+    // Fresh database: nothing to lose, so push outright.
+    //
     // No --skip-generate: Prisma 7 removed the flag (`prisma db push` accepts
     // only --config, --schema, --url, --accept-data-loss and --force-reset),
     // and passing it aborts the push. merge-schemas.ts above already ran
     // `prisma generate`, so there is nothing to skip.
     run("prisma db push", "npx", ["prisma", "db", "push"]);
-
-    if (initialized) {
-        console.log("[bootstrap] Existing database — applying module migrations…");
-        run("apply-migrations", "npx", ["tsx", "scripts/apply-migrations.ts"]);
-        console.log("[bootstrap] Upgrade complete.");
-        return;
-    }
 
     console.log("[bootstrap] Fresh database — seeding core data…");
     run("seed", "npx", ["tsx", "prisma/seed.ts"]);
