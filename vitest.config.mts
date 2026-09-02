@@ -49,7 +49,7 @@ export default defineConfig({
             // can be enforced. Do not add them here.
             exclude: ['src/core/lib/db.ts', 'src/core/lib/auth.ts'],
             // A ratchet, not a target. Set just under the numbers the suite
-            // actually produced on 2026-09-01 so an unrelated change cannot
+            // actually produced on 2026-09-02 so an unrelated change cannot
             // quietly remove coverage; raise them when you add tests, never
             // lower them to make a build pass.
             //
@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 64,
-                branches: 61,
-                functions: 56,
-                lines: 65,
+                statements: 76,
+                branches: 70,
+                functions: 70,
+                lines: 78,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -136,6 +136,54 @@ export default defineConfig({
                 },
                 'src/core/lib/secret-storage.ts': {
                     statements: 92, branches: 80, functions: 100, lines: 92,
+                },
+                // Every outbound message passes through email.ts, and `to`
+                // and `subject` arrive there from user-controlled places. A
+                // bare CR/LF that survives sanitisation turns any of them
+                // into an arbitrary-recipient Bcc.
+                'src/core/lib/email.ts': {
+                    statements: 95, branches: 92, functions: 100, lines: 98,
+                },
+                // The cache layer's whole contract is that it degrades: a
+                // flaky Redis has to fall back to memory rather than turn a
+                // slow page into a 500.
+                'src/core/lib/redis.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                'src/core/lib/cache.ts': {
+                    statements: 95, branches: 90, functions: 100, lines: 98,
+                },
+                // Maintenance mode is the switch that takes the site offline
+                // and setup state is the gate that redirects every request to
+                // the wizard. Both must fail *open* on a database error, and
+                // both are cheap enough to hold at full coverage.
+                'src/core/lib/maintenance.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/setup-state.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // Opt-out by default: inverting this either silences every
+                // notification or ignores every user's mute.
+                'src/core/lib/notif-prefs.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // Crossing a warning threshold is what auto-mutes and
+                // auto-bans users, via a hook other modules subscribe to.
+                'src/core/lib/warnings.ts': {
+                    statements: 100, branches: 90, functions: 100, lines: 100,
+                },
+                // Re-exported through the module SDK, so `slugify` and
+                // friends are a published contract third-party modules build
+                // on — changing one silently changes their URLs.
+                'src/core/lib/utils.ts': {
+                    statements: 100, branches: 95, functions: 100, lines: 100,
+                },
+                // Two separate output paths, only one of which ever runs
+                // locally: a break in the production JSON path shows up as
+                // "the log aggregator is empty" long after deploy.
+                'src/core/lib/logger.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
                 },
             },
         },

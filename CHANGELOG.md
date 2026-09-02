@@ -25,8 +25,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the install lock (now on the critical path of every module install), the
   GDPR erasure and export, the pre-install snapshot, the upload funnel, the
   HTML sanitiser, the IP blocklist, the backup/restore/rotate lifecycle, and
-  the scheduler's tick loop and cluster claim. Coverage thresholds raised
-  from 49/48/42/50 to 64/61/56/65, with per-file floors on each.
+  the scheduler's tick loop and cluster claim.
+- Tests for the paths that fail quietly rather than loudly: the outbound email
+  queue and its SMTP header-injection defence, the Redis client and its
+  fall-back-to-memory contract, the read-through cache, the structured
+  logger's production JSON path, maintenance mode and setup state (both of
+  which must fail *open* on a database error), notification preferences, the
+  warning-threshold crossing that auto-mutes users, and the shared formatting
+  helpers the module SDK re-exports.
+- Coverage thresholds raised from 49/48/42/50 to 76/70/70/78 across two
+  passes, with per-file floors on every module named above. The suite is
+  1196 tests over 83 files, up from 644.
+
+### Verified
+- The published install path, end to end, for the first time: `install.sh`
+  piped from `main` as a new user would run it, pulling
+  `ghcr.io/uxplima/uxw-vend:latest` from the now-public registry rather than
+  building locally. The image digest matched the 0.2.0 release, the stack came
+  up healthy, and the `uxwvend` CLI it installs worked. CI's smoke test builds
+  the image itself, so this leg had never actually been exercised.
 
 ## [0.2.0] - 2026-09-01
 
