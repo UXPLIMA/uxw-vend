@@ -4,8 +4,8 @@ import path from "path";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { MODULES_DIR } from "@/core/lib/runtime-paths";
 
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
 interface MarketplaceModule {
     id: string;

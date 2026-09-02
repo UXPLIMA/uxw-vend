@@ -9,7 +9,8 @@ import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { logActivity } from "@/core/lib/activity-log";
-import { moduleManifestSchema, collectManifestFileRefs } from "@/core/lib/module-manifest-schema";
+import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
+import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
@@ -181,24 +182,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const missingRefs: string[] = [];
-        for (const ref of collectManifestFileRefs(manifestData)) {
-            const cleaned = ref.replace(/^\.\//, "");
-            const refPath = path.resolve(targetDir, cleaned);
-            if (!refPath.startsWith(targetRoot + path.sep)) {
-                await fs.rm(targetDir, { recursive: true, force: true });
-                return NextResponse.json(
-                    { error: `Manifest references escape module root: ${ref}` },
-                    { status: 400 },
-                );
-            }
-            const refExists = await fs.access(refPath).then(() => true).catch(() => false);
-            if (!refExists) missingRefs.push(ref);
-        }
-        if (missingRefs.length > 0) {
+        const refCheck = checkManifestFileRefs(targetDir, manifestData);
+        if (refCheck.escaping.length > 0) {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json(
-                { error: `Manifest references missing files: ${missingRefs.slice(0, 5).join(", ")}` },
+                { error: `Manifest references escape module root: ${refCheck.escaping.slice(0, 5).join(", ")}` },
+                { status: 400 },
+            );
+        }
+        if (refCheck.missing.length > 0) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json(
+                { error: `Manifest references missing files: ${refCheck.missing.slice(0, 5).join(", ")}` },
                 { status: 400 },
             );
         }

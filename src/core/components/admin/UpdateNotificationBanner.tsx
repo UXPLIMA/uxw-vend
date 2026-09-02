@@ -6,9 +6,9 @@ import fs from "fs/promises";
 import path from "path";
 import { UpdateBannerDismiss } from "./UpdateBannerDismiss";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { MODULES_DIR } from "@/core/lib/runtime-paths";
 
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
 
 interface MinimalModule {
     id: string;

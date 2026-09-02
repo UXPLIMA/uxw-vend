@@ -59,6 +59,26 @@ Only `module.json` is required. Include only the directories your module needs.
 
 ## `module.json` Reference
 
+### How file references resolve
+
+Every field below that names a file — `component`, `layout`, `handler` — is
+resolved the way an import specifier is, not as a literal path. The registry
+generator strips any `.tsx`/`.ts`/`.jsx`/`.js` extension off the value and
+emits `@/modules/<id>/<ref>`, so all three of these name the same file:
+
+```
+"components/CartIcon"
+"components/CartIcon.tsx"
+"components/CartIcon/"      → components/CartIcon/index.tsx
+```
+
+Write whichever reads better; the examples in this document use both. Install,
+upload, update and `npm run validate:module` all resolve refs through
+`src/core/lib/module-ref-resolver.ts`, so what CI accepts and what an install
+accepts cannot drift apart. A ref that climbs out of the module directory
+(`../`, or an absolute path) is rejected by the manifest schema before any of
+that runs.
+
 ### Required
 
 | Field | Type | Description |

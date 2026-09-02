@@ -14,6 +14,7 @@ import {
     installPlanErrorMessage,
     type CatalogEntry,
 } from "@/core/lib/module-dependencies";
+import { MODULES_DIR } from "@/core/lib/runtime-paths";
 
 /**
  * First-run setup API.
@@ -43,7 +44,6 @@ const setupSchema = z.object({
 });
 
 const MARKETPLACE_DIR = path.join(process.cwd(), "module-marketplace");
-const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {

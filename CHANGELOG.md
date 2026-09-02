@@ -8,6 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Fourteen of the forty-two first-party modules could not be installed at
+  all.** The marketplace-install, ZIP-upload and update routes each checked
+  that the files a manifest names exist by comparing the ref to the disk
+  verbatim — so `components/BlogNewsSection` was reported missing while
+  `components/BlogNewsSection.tsx` sat right next to it. That extensionless
+  form is not a mistake: `scripts/generate-registry.ts` strips the extension
+  off every ref and emits a bare import specifier, leaving the bundler to pick
+  the file, so the two spellings mean the same thing everywhere else in the
+  system. `blog`, `store`, `popups`, `currency` and ten others tripped it and
+  came back `400 Manifest references missing files`.
+  `scripts/validate-module.ts` — the CI gate — did not catch this because it
+  was a fourth, separate implementation of the same check: extension-tolerant,
+  but only across five of the twenty-one manifest keys that can carry a ref,
+  and verbatim for `routes`, `adminRoutes` and `api`. All four callers now
+  share `src/core/lib/module-ref-resolver.ts`, which resolves a ref the way
+  the build does and reports escapes and misses separately.
+- **Bulk install accepted a module no other path would have.** "Install all"
+  in the admin module list posts to a separate route, and that route validated
+  nothing: it `JSON.parse`d the manifest without running it through
+  `moduleManifestSchema`, skipped the reserved-id list, skipped
+  `validateZipEntries` (so no symlink, entry-count or zip-bomb check), and
+  never confirmed the files the manifest names exist or that the manifest's
+  own `id` matched the one requested. Installing the same module one at a time
+  went through all of those. Two doors into `src/modules/` with different
+  locks; they now carry the same ones.
+- **CI validated module manifests without ever running them through the
+  manifest schema.** `validate-module.ts` checked ids, fields and referenced
+  files by hand but never called `moduleManifestSchema`, so a manifest the
+  install route would reject outright — a `component` containing `..`, for
+  instance — passed every check in the script. It is now the first thing the
+  script checks after the id.
 - **Four marketplace modules shipped a stale manifest for the whole 0.2.0
   cycle.** `module-marketplace/` holds ZIPs built from `module-sources/`, and
   both are committed, but nothing compared one against the other. The
@@ -62,6 +93,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all gitignored and regenerated on every build.
 
 ### Changed
+- The four places in `src/` that still built their own
+  `path.join(process.cwd(), "src/modules")` now import `MODULES_DIR` from
+  `runtime-paths.ts`. The value is identical; the point of the helper is its
+  single `turbopackIgnore` hint, and an unbounded `process.cwd()` join
+  anywhere in the import graph is exactly what it exists to keep out — each
+  one pulls the whole project into whichever bundle reaches it.
 - CI actions moved to their current majors: `actions/checkout` 5→7,
   `actions/setup-node` 5→7, `docker/login-action` 3→4,
   `docker/metadata-action` 5→6 and `github/codeql-action` 3→4 (v3 is

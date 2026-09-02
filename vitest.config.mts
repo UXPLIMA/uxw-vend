@@ -194,6 +194,13 @@ export default defineConfig({
                 // The boundary between untrusted files on disk and the module
                 // registry. One malformed manifest must remove exactly one
                 // module, never take the whole scan down with it.
+                // The single resolver every path that accepts a module now
+                // shares. Four hand-rolled copies of this check had drifted far
+                // enough apart that fourteen first-party modules passed CI and
+                // were impossible to install.
+                'src/core/lib/module-ref-resolver.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
                 'src/core/lib/module-loader.ts': {
                     statements: 100, branches: 90, functions: 100, lines: 100,
                 },
