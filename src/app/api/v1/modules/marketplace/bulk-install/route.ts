@@ -169,7 +169,13 @@ export async function POST(request: NextRequest) {
         if (hasSchemaChanges) {
             try {
                 execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], { cwd: process.cwd(), timeout: 60000, stdio: "pipe" });
-                execFileSync("npx", ["prisma", "db", "push"], { cwd: process.cwd(), timeout: 60000, stdio: "pipe" });
+                // Not `prisma db push`, which is what this used to run: it
+                // reconciles the whole database to the merged schema, and
+                // uninstall deliberately leaves a module's tables behind, so
+                // after any uninstall push either drops them silently or
+                // refuses to run at all. This applies only the additive half
+                // of the same diff.
+                execFileSync("npx", ["tsx", "scripts/apply-schema-additions.ts"], { cwd: process.cwd(), timeout: 120000, stdio: "pipe" });
             } catch { /* will need manual: npm run db:merge && npm run db:push */ }
         }
 

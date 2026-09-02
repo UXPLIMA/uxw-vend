@@ -190,31 +190,42 @@ export function scheduleBuild(): void {
             //    Twenty-five of the twenty-six modules that ship a
             //    schema.prisma ship no migrations/ directory, because
             //    docs/MIGRATIONS.md says migrations are for altering a
-            //    module's schema *after* it is deployed and that `db push`
-            //    creates the tables on first install. This step used to be
-            //    absent — the comment on step 3 read "replaces db push" — so
-            //    installing any of those modules one at a time left it enabled
-            //    with none of its tables: every one of its API routes answered
-            //    500 with Prisma P2021 and its cron job logged the same error
-            //    once a minute, forever. Bulk install pushed and worked, which
-            //    is how the gap stayed invisible.
+            //    module's schema *after* it is deployed and that the schema
+            //    itself is what creates the tables on first install. This
+            //    step used to be absent — the comment on step 3 read
+            //    "replaces db push" — so installing any of those modules one
+            //    at a time left it enabled with none of its tables: every one
+            //    of its API routes answered 500 with Prisma P2021 and its
+            //    cron job logged the same error once a minute, forever. Bulk
+            //    install pushed and worked, which is how the gap stayed
+            //    invisible.
             //
-            //    Skipped when the merge failed: pushing a stale or core-only
-            //    schema is how you drop the tables of every installed module.
+            //    `prisma db push` is not what runs here, though it is the
+            //    obvious choice and was the first thing tried. It reconciles
+            //    the *whole* database to the merged schema, and uninstall
+            //    deliberately leaves a module's tables behind so a reinstall
+            //    keeps the admin's data — so after any uninstall the database
+            //    legitimately holds tables the schema no longer mentions, and
+            //    push either drops them silently or refuses to run at all.
+            //    scripts/apply-schema-additions.ts asks Prisma for the same
+            //    diff and runs only the statements that add.
+            //
+            //    Skipped when the merge failed: a stale or core-only merged
+            //    schema describes a database this instance does not have.
             if (schemaMerged) {
                 try {
-                    await execFileAsync("npx", ["prisma", "db", "push"], {
+                    await execFileAsync("npx", ["tsx", "scripts/apply-schema-additions.ts"], {
                         cwd: process.cwd(), timeout: 120000,
                     });
                 } catch (err) {
-                    log.error("install-lock: db push failed", {
-                        step: "db-push",
+                    log.error("install-lock: schema additions failed", {
+                        step: "schema-additions",
                         error: err instanceof Error ? err.message : String(err),
                     });
                 }
             } else {
-                log.error("install-lock: skipping db push after a failed schema merge", {
-                    step: "db-push",
+                log.error("install-lock: skipping schema additions after a failed merge", {
+                    step: "schema-additions",
                 });
             }
 

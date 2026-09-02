@@ -251,20 +251,20 @@ export async function POST(request: NextRequest) {
                 // Create the tables the merged schema declares. Only one of
                 // the twenty-six modules that ship a schema.prisma also ships
                 // a migrations/ directory — per docs/MIGRATIONS.md, migrations
-                // cover changes *after* a module's initial release and `db
-                // push` is what creates its tables the first time. Without
+                // cover changes *after* a module's initial release, and the
+                // schema is what creates the tables the first time. Without
                 // this, every module the wizard installs comes up enabled and
                 // tableless: Prisma P2021 on its first request.
-                execFileSync("npx", ["prisma", "db", "push"], {
+                execFileSync("npx", ["tsx", "scripts/apply-schema-additions.ts"], {
                     cwd: process.cwd(),
                     timeout: 120000,
                     stdio: "pipe",
                 });
             } catch (err) {
                 // Non-fatal, but the operator needs to know: a failed merge
-                // means the push above did not run, and a failed push means
+                // means the step above did not run, and a failed apply means
                 // the modules below have no tables.
-                console.error("[setup] Schema merge/push failed:", err);
+                console.error("[setup] Schema merge/additions failed:", err);
             }
             try {
                 execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
