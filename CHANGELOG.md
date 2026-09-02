@@ -60,6 +60,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gate; the merged Prisma schema, the module registry and the OpenAPI spec are
   all gitignored and regenerated on every build.
 
+### Changed
+- CI actions moved to their current majors: `actions/checkout` 5→7,
+  `actions/setup-node` 5→7, `docker/login-action` 3→4,
+  `docker/metadata-action` 5→6 and `github/codeql-action` 3→4 (v3 is
+  deprecated). All five are runner/Node-runtime bumps with no input changes.
+  These had been sitting as separate Dependabot pull requests since June;
+  applying them together produces one CI cycle instead of five conflicting
+  rebases.
+
 ### Verified
 - The published install path, end to end, for the first time: `install.sh`
   piped from `main` as a new user would run it, pulling
