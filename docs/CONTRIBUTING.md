@@ -442,6 +442,69 @@ npm run build
 
 ---
 
+## Pinned dependencies and why
+
+Three dependencies are deliberately held back. Each was attempted, failed, and
+rolled back — twice, in two different sessions, because the reason was not
+written down. Verified 2026-09-02; every entry carries the command that
+re-checks it, so nobody has to rediscover the failure by installing it.
+
+### `eslint` held at `^9`
+
+`eslint-config-next` bundles its own `eslint-plugin-react`. The latest stable
+release of that plugin, 7.37.5, declares `eslint: ^3 || ... || ^9.7` and calls
+`context.getFilename()`, which ESLint 10 removed. Upgrading produces:
+
+```
+TypeError: Error while loading rule 'react/display-name':
+contextOrFilename.getFilename is not a function
+```
+
+before a single file is linted. Only `eslint-plugin-react@7.8.0-rc.0` supports
+ESLint 10, and pinning a linter plugin to a release candidate buys nothing.
+
+Re-check with `npm view eslint-plugin-react@latest peerDependencies` — when the
+stable range includes `^10`, the upgrade is free.
+
+### `typescript` held at `^6`
+
+`typescript-eslint@8.69.0` declares `typescript: >=4.8.4 <6.1.0`. TypeScript 7
+type-checks this codebase cleanly (`tsc --noEmit` passes), but `npm run lint`
+refuses to run against it. The workaround typescript-eslint documents is a
+second, aliased TypeScript install for the linter alone — two type checkers
+disagreeing about one codebase is worse than being a major version behind.
+
+Re-check with `npm view typescript-eslint@latest peerDependencies`.
+
+### `next-auth` held at `5.0.0-beta.32`
+
+This is a beta authentication library in production, and it is the largest
+standing risk in the dependency tree. It is not held back by choice: beta.32
+is the newest v5 release, and the `latest` tag points at v4, a different API.
+There is nowhere better to go.
+
+Re-check with `npm view next-auth dist-tags` — the moment a stable 5.x ships,
+upgrading to it takes priority over anything else in this file.
+
+### Versions forced by `overrides`
+
+`package.json` carries an `overrides` block. Most entries pin a transitive
+dependency past a published advisory; three re-point a React peer at our own
+`$react` so a stale peer range cannot fork the React copy in the bundle.
+
+`"mysql2": "^3.22.0"` is the one the CI gate depends on: advisory
+GHSA-3f6p-5ww8-9rcr (high) reaches us through the `prisma` CLI's tree, and
+`npm audit --audit-level=high` fails the build without the override. Each
+entry can go when its upstream moves past the advisory on its own — check
+with `npm audit` after removing one, never by assumption.
+
+The remaining `react-quill-new` advisories are *low* and below the gate. They
+are also mitigated where it counts: rich-text HTML is sanitised server-side on
+write by `src/core/lib/sanitize.ts`, so an editor-side flaw cannot put a
+payload in the database.
+
+---
+
 ## Cross-references
 
 - [PLUGIN_SDK.md](PLUGIN_SDK.md) — complete `module.json` reference and authoring patterns

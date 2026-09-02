@@ -2,6 +2,7 @@
   "name": "uxwvend",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
   "description": "Open source game server management platform",
   "engines": {
     "node": ">=24"
