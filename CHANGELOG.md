@@ -33,9 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which must fail *open* on a database error), notification preferences, the
   warning-threshold crossing that auto-mutes users, and the shared formatting
   helpers the module SDK re-exports.
-- Coverage thresholds raised from 49/48/42/50 to 76/70/70/78 across two
+- Tests for the rest of the untested surface: the health watchdog and its
+  debounce, the module loader's tolerance of one bad manifest among many,
+  the module registry's fail-closed enable check (the deliberate opposite of
+  module-cache's fail-open one), email broadcasts, content revisions, the
+  request-metrics window, and the SEO builders' `</script>` escaping.
+- Coverage thresholds raised from 49/48/42/50 to 84/80/79/86 across three
   passes, with per-file floors on every module named above. The suite is
-  1196 tests over 83 files, up from 644.
+  1401 tests over 92 files, up from 644.
 
 ### Verified
 - The published install path, end to end, for the first time: `install.sh`

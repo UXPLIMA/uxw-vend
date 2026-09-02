@@ -60,10 +60,10 @@ export default defineConfig({
             // installed, so `npm run test:coverage` failed on the missing
             // provider and CI ran `npm test` without it.
             thresholds: {
-                statements: 76,
-                branches: 70,
-                functions: 70,
-                lines: 78,
+                statements: 84,
+                branches: 80,
+                functions: 79,
+                lines: 86,
                 'src/core/lib/permissions.ts': {
                     statements: 85, branches: 90, functions: 72, lines: 80,
                 },
@@ -184,6 +184,49 @@ export default defineConfig({
                 // "the log aggregator is empty" long after deploy.
                 'src/core/lib/logger.ts': {
                     statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                // The watchdog that tells an operator the platform is down.
+                // Every failure here is silent: too eager a debounce means no
+                // page ever arrives, too lax and the channel gets muted.
+                'src/core/lib/health-alerting.ts': {
+                    statements: 95, branches: 95, functions: 100, lines: 95,
+                },
+                // The boundary between untrusted files on disk and the module
+                // registry. One malformed manifest must remove exactly one
+                // module, never take the whole scan down with it.
+                'src/core/lib/module-loader.ts': {
+                    statements: 100, branches: 90, functions: 100, lines: 100,
+                },
+                // Answers "is this module on?" for the admin surface, and
+                // fails *closed* — the opposite of module-cache.ts, which
+                // fails open. Both defaults are deliberate.
+                'src/core/lib/modules.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/module-cache.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // A broadcast fans one message out to every user on the
+                // instance and cannot be recalled; a run that never reaches a
+                // terminal status blocks the cron on that row forever.
+                'src/core/lib/broadcasts.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // Snapshots taken immediately before a destructive update.
+                'src/core/lib/revisions.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                'src/core/lib/scheduled-tasks.ts': {
+                    statements: 100, branches: 100, functions: 100, lines: 100,
+                },
+                // The JSON-LD builders interpolate database strings into a
+                // <script> block; the `<` escape is all that keeps a site
+                // name containing </script> from breaking out of it.
+                'src/core/lib/seo.ts': {
+                    statements: 100, branches: 90, functions: 100, lines: 100,
+                },
+                'src/core/lib/metrics.ts': {
+                    statements: 100, branches: 94, functions: 100, lines: 100,
                 },
             },
         },
