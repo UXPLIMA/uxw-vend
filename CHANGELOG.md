@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Four marketplace modules shipped a stale manifest for the whole 0.2.0
+  cycle.** `module-marketplace/` holds ZIPs built from `module-sources/`, and
+  both are committed, but nothing compared one against the other. The
+  published `blog`, `forum`, `help-center` and `store` ZIPs predated the
+  `searchProviders[].indexes` block their sources had gained — the exact
+  capability `CORE_API_VERSION` was raised to 1.1.0 for. Installing any of
+  them from the in-app marketplace gave you a working module whose content
+  never appeared in site search. Rebuilt; the other 38 were already in sync.
 - **A module declaring a catch-all API route would have taken down the whole
   module API router.** `matchApiRoute` built its own regex and turned
   `[...rest]` into the capture group `(?<...rest>…)`, which is not a legal
@@ -41,6 +49,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coverage thresholds raised from 49/48/42/50 to 84/80/79/86 across three
   passes, with per-file floors on every module named above. The suite is
   1401 tests over 92 files, up from 644.
+- `scripts/check-marketplace-sync.ts`, wired into CI: every published ZIP is
+  unpacked and compared file-by-file against `module-sources/`, and
+  `index.json` is checked against the manifests. The comparison is
+  content-based rather than byte-based, because rebuilding a ZIP rewrites its
+  embedded timestamps even when nothing inside changed. It was verified to
+  fail on each drift it is meant to catch — an edited source file, a bumped
+  version, a source with no ZIP, a malformed manifest — not just to pass.
+  `module-marketplace/` was the only committed build artifact without such a
+  gate; the merged Prisma schema, the module registry and the OpenAPI spec are
+  all gitignored and regenerated on every build.
 
 ### Verified
 - The published install path, end to end, for the first time: `install.sh`
