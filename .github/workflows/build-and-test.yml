@@ -80,8 +80,8 @@ jobs:
       # and until this gate existed nothing compared it against the sources it
       # is built from. Four modules — blog, forum, help-center, store — shipped
       # the entire 0.2.0 cycle without the searchProviders[].indexes block
-      # their sources had gained, so installing any of them from the in-app
-      # marketplace gave you a module whose content never reached site search.
+      # their sources had gained, so a marketplace install never created their
+      # GIN full-text indexes and every site search seq-scanned those tables.
       - name: Marketplace ZIPs match module-sources
         run: npx tsx scripts/check-marketplace-sync.ts
 

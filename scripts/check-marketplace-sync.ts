@@ -10,8 +10,9 @@
  * That is not hypothetical: blog, forum, help-center and store were published
  * for the whole 0.2.0 cycle without the `searchProviders[].indexes` block
  * their sources had gained, which is exactly the capability CORE_API_VERSION
- * 1.1.0 was cut for. Installing any of them gave you a working module whose
- * content never appeared in site search.
+ * 1.1.0 was cut for. Search still returned the right rows, but the four
+ * largest content tables never got their GIN indexes, so every query fell
+ * back to a sequential scan recomputing a tsvector per row.
  *
  * The comparison is content-based, not byte-based: rebuilding a ZIP rewrites
  * its embedded timestamps even when nothing inside changed, so comparing the
