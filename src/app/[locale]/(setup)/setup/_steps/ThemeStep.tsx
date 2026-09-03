@@ -27,7 +27,7 @@ export function ThemeStep({ themes, activeTheme, setActiveTheme }: ThemeStepProp
                                 type="button"
                                 onClick={() => setActiveTheme(th.id)}
                                 className={`p-4 rounded-lg border-2 text-left transition-colors ${
-                                    active ? "border-blue-600 bg-blue-50" : "border-border bg-card hover:border-blue-300"
+                                    active ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
                                 }`}
                             >
                                 <div className="font-medium text-foreground">{th.name}</div>
@@ -36,7 +36,7 @@ export function ThemeStep({ themes, activeTheme, setActiveTheme }: ThemeStepProp
                                 )}
                                 {th.suggestedModules && th.suggestedModules.length > 0 && (
                                     <div className="text-[11px] text-muted-foreground mt-2">
-                                        {t("suggested", { modules: th.suggestedModules.join(", ") })}
+                                        {t("suggested", { modules: th.suggestedModules.map((m) => m.id).join(", ") })}
                                     </div>
                                 )}
                             </button>

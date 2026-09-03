@@ -10,7 +10,12 @@ export interface ThemeOption {
     id: string;
     name: string;
     description?: string;
-    suggestedModules?: string[];
+    /**
+     * As declared in theme.json and served by /api/setup/themes: an object per
+     * module, not a bare id. Typing it as string[] rendered the theme card as
+     * "Suggests: [object Object]", because join() stringified the objects.
+     */
+    suggestedModules?: Array<{ id: string; reason?: string }>;
 }
 
 export interface PresetOption {

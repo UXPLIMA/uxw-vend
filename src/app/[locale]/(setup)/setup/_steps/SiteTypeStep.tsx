@@ -27,14 +27,14 @@ export function SiteTypeStep({ presets, selected, onSelect }: SiteTypeStepProps)
                                 type="button"
                                 onClick={() => onSelect(p)}
                                 className={`p-4 rounded-lg border-2 text-left transition-colors ${
-                                    active ? "border-blue-600 bg-blue-50" : "border-border bg-card hover:border-blue-300"
+                                    active ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
                                 }`}
                             >
                                 <div className="font-medium text-foreground">{p.name}</div>
                                 {p.description && (
                                     <div className="text-xs text-muted-foreground mt-1">{p.description}</div>
                                 )}
-                                <div className="text-[11px] text-blue-700 mt-2">
+                                <div className="text-[11px] text-primary mt-2">
                                     {p.modules.length > 0
                                         ? t("moduleCount", { count: p.modules.length })
                                         : t("noModules")}
