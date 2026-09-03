@@ -10,8 +10,8 @@ curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | 
 
 It installs Docker if it is missing, generates every secret, writes `.env`,
 pulls the image, starts Postgres + Redis + the app, waits until the site
-answers, and prints the URL and the admin password. Three questions — domain,
-admin e-mail, HTTPS yes/no — each with a default.
+answers, and prints the URL and the admin password. Three questions - domain,
+admin e-mail, HTTPS yes/no - each with a default.
 
 Give a domain and say yes to HTTPS and a Caddy container obtains and renews a
 Let's Encrypt certificate on its own. Leave the domain blank and the site is
@@ -58,7 +58,7 @@ alone is not a complete backup.
 ### What gets exposed
 
 Only the app's port (or 80/443 with TLS). Postgres and Redis are reachable
-only from inside the compose network — no host port is published for either.
+only from inside the compose network - no host port is published for either.
 For a psql shell use `docker compose exec db psql -U uxwvend uxwvend` from the
 install directory; to reach them from your laptop, use an SSH tunnel together
 with `docker-compose.debug.yml`, which binds them to `127.0.0.1` only.
@@ -73,7 +73,7 @@ yet, or the GHCR package is private. Clone the repository and run
 
 ## Manual install (advanced)
 
-Everything below describes running uxwVend without the installer — directly on
+Everything below describes running uxwVend without the installer - directly on
 the host with Node, PostgreSQL, PM2 and Nginx. It is supported but not the
 recommended path: the Docker install above is the one that is tested end to
 end on every release.
@@ -127,7 +127,7 @@ end on every release.
 | `CSRF_INTERNAL_SECRET` | Shared secret for server-to-server calls that need to bypass the CSRF origin check (`x-internal-request: <secret>`). Leave unset to disable. |
 | `INTERNAL_API_SECRET` | Shared secret authorizing trusted server-to-server calls to internal status endpoints (sent as the `x-internal-request` header). Leave unset to disable. |
 | `DEMO_MODE` | Set to `1` on a public demo deployment to reject all mutating requests, so visitors can browse but not change anything. |
-| `TRUSTED_PROXY_IPS` | Comma-separated list of trusted reverse-proxy IPs. When set, forwarded headers (`x-forwarded-for`) are only honored when the direct connection comes from one of these addresses — prevents header spoofing. |
+| `TRUSTED_PROXY_IPS` | Comma-separated list of trusted reverse-proxy IPs. When set, forwarded headers (`x-forwarded-for`) are only honored when the direct connection comes from one of these addresses - prevents header spoofing. |
 | `HEALTH_DEBUG` | Set to `1` to surface raw error details on `GET /api/health`. Only set this behind authentication in production. |
 | `OPENAPI_PUBLIC` | Set to `1` to make the OpenAPI spec at `/api/v1/openapi` readable without admin auth. Off by default. |
 | `HOOK_LISTENER_TIMEOUT_MS` | Abort hook listeners that take longer than this many milliseconds (default: 5000). Prevents misbehaving modules from hanging requests. |
@@ -181,7 +181,7 @@ npx tsx scripts/seed-translations.ts   # seed default locale strings
 
 The seed creates:
 - Roles: `admin`, `moderator`, `member` (member is the default)
-- Admin user: `admin@example.com`, password from `SEED_ADMIN_PASSWORD` — or, if unset, randomly generated and **printed once** in the seed output
+- Admin user: `admin@example.com`, password from `SEED_ADMIN_PASSWORD` - or, if unset, randomly generated and **printed once** in the seed output
 
 ---
 
@@ -251,12 +251,12 @@ fine until someone installs a module. Only one worker takes the install lock
 and rebuilds; the others keep serving the build they read at boot, so the
 module appears and disappears depending on which worker answers. Worse, a
 second worker that starts its own build writes into the same `.next` the first
-is reading. One process per installation is the supported topology — see
+is reading. One process per installation is the supported topology - see
 ["The Build Lifecycle"](#the-build-lifecycle) for why, and for what to do when
 you outgrow it.
 
 `REDIS_URL` is required in production. Without it the rate limiter fails closed
-and answers every rate-limited request with 429 — see the environment table
+and answers every rate-limited request with 429 - see the environment table
 above.
 
 Useful PM2 commands:
@@ -321,9 +321,9 @@ sudo systemctl enable redis-server
 sudo systemctl start redis-server
 ```
 
-Set `REDIS_URL=redis://localhost:6379` in `.env`. The rate limiter detects and uses Redis on its own. If Redis goes down *at runtime* it falls back to the in-memory backend rather than taking the site down — that failover is deliberate, and is not the same as starting with no `REDIS_URL` at all, which denies requests instead.
+Set `REDIS_URL=redis://localhost:6379` in `.env`. The rate limiter detects and uses Redis on its own. If Redis goes down *at runtime* it falls back to the in-memory backend rather than taking the site down - that failover is deliberate, and is not the same as starting with no `REDIS_URL` at all, which denies requests instead.
 
-The Docker install needs none of this — the stack runs its own Redis container
+The Docker install needs none of this - the stack runs its own Redis container
 and wires `REDIS_URL` to it.
 
 ---
@@ -345,7 +345,7 @@ Per-role rate limit multipliers are stored in the `Setting` table under the key 
 
 Two scripts are provided:
 
-**Backup** — creates a gzipped SQL dump and keeps the last 10:
+**Backup** - creates a gzipped SQL dump and keeps the last 10:
 
 ```bash
 npm run db:backup
@@ -355,7 +355,7 @@ bash scripts/backup.sh
 
 Backups are written to `./backups/uxwvend_<timestamp>.sql.gz`. The script reads `DATABASE_URL` from `.env` automatically.
 
-**Restore** — overwrites the current database from a backup file:
+**Restore** - overwrites the current database from a backup file:
 
 ```bash
 npm run db:restore backups/uxwvend_20260403_120000.sql.gz
@@ -413,7 +413,7 @@ uxwvend update v1.4.0     # a specific tag
 
 It pulls the image and restarts. The one-shot `migrate` service runs before
 the app is allowed back up and performs the sequence below inside the
-container — merge schemas, push them, apply module SQL migrations — so the
+container - merge schemas, push them, apply module SQL migrations - so the
 database can never be left behind the code. If any step fails the app stays
 down rather than serving against a mismatched schema.
 
@@ -462,9 +462,21 @@ is the decision everything below follows from.
 modules produces one build:
 
 ```
-db:merge → apply-migrations → generate-registry → npm run build
-         → record the build fingerprint → SIGTERM
+db:merge → apply-schema-additions → apply-migrations → generate-registry
+         → npm run build → record the build fingerprint → SIGTERM
 ```
+
+`apply-schema-additions` is what creates a newly installed module's tables. It
+asks Prisma for the diff between the database and the merged schema and runs
+only the statements that add, never the ones that drop. `prisma db push` cannot
+stand in for it: uninstall deliberately leaves a module's tables behind so a
+reinstall keeps the data, so after any uninstall the database legitimately holds
+tables the schema no longer mentions, and push either drops them or refuses to
+run. See ["Why the install path does not run `prisma db push`"](MIGRATIONS.md#why-the-install-path-does-not-run-prisma-db-push).
+
+A merge failure skips the schema step rather than running it against a stale
+merged schema. Every step before the build is non-fatal and logged with its
+step name; only the build itself aborts the pipeline.
 
 The process then exits and the supervisor starts it again. That last step is
 what makes the module live: `next start` reads its route and build manifests
@@ -502,7 +514,7 @@ module can be removed. Only a completely missing build is fatal.
 ### Where the build lives
 
 In Docker, `/app/.next` is the `nextbuild` named volume, so a rebuild survives
-container replacement — otherwise every `uxwvend restart` on a site with
+container replacement - otherwise every `uxwvend restart` on a site with
 modules would pay for a full build. Docker seeds the volume from the image the
 first time it is created, which is why a fresh install never rebuilds.
 
@@ -511,7 +523,7 @@ rebuilds; nothing is lost but time.
 
 ### The scaling ceiling this implies
 
-**uxwVend runs one app process per installation.** Not one per core — one,
+**uxwVend runs one app process per installation.** Not one per core - one,
 full stop. Two processes sharing the `modules` volume would both try to build
 into the same `.next`, and the loser would serve a half-written build.
 
@@ -519,7 +531,7 @@ That is a real limit and it is not currently enforced by anything but this
 paragraph. A single Node process on a 2-core VPS serves this workload
 comfortably; if you outgrow it, the fix is a read replica and a CDN in front of
 the public pages, not a second app container. Horizontal scaling would need the
-build moved out of the app process entirely — a design change, not a config
+build moved out of the app process entirely - a design change, not a config
 one.
 
 ---
@@ -534,7 +546,7 @@ one.
 - [ ] Admin password changed from the seeded default
 - [ ] Nginx configured with HTTPS
 - [ ] PM2 configured with startup script (`pm2 startup`)
-- [ ] `REDIS_URL` set (required in production — without it the site answers 429)
+- [ ] `REDIS_URL` set (required in production - without it the site answers 429)
 - [ ] `TRUSTED_PROXY_IPS` set to your nginx server IP
 - [ ] Firewall allows only ports 80 and 443 (not 3001 directly)
 - [ ] Backup cron job scheduled
@@ -551,7 +563,7 @@ one.
 rather than fall back to a bypassable in-memory counter, and logs
 `[rate-limit] REDIS_URL is required in production` once a minute. Set
 `REDIS_URL`, or `ALLOW_MEMORY_RATE_LIMIT=1` to accept the weaker limiter on a
-single-worker deployment. No restart is needed after setting `REDIS_URL` —
+single-worker deployment. No restart is needed after setting `REDIS_URL` -
 the backend is re-evaluated per request until one is configured.
 
 **Login cookies not persisting after OAuth redirect**
@@ -564,12 +576,13 @@ the backend is re-evaluated per request until one is configured.
 
 **Module install fails and rolls back**
 
-Registry regeneration failed (e.g. a TypeScript error in the new module). Check the install error message — it includes the generator output. Fix the module source and re-upload.
+Registry regeneration failed (e.g. a TypeScript error in the new module). Check the install error message - it includes the generator output. Fix the module source and re-upload.
 
 **PM2 workers each show different rate limit counters**
 
-You are running more than one worker, which this architecture does not support
-— see ["The Build Lifecycle"](#the-build-lifecycle). Drop to a single process.
+You are running more than one worker, which this architecture does not
+support. See ["The Build Lifecycle"](#the-build-lifecycle), then drop to a
+single process.
 The counters are the symptom you noticed; module installs are the one that will
 bite you.
 

@@ -1,41 +1,110 @@
 <div align="center">
   <h1>uxwVend</h1>
 
-  ![CI](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml/badge.svg)
+  <p><strong>A plugin-first platform whose core ships empty.</strong></p>
+  <p>Game-server websites, digital storefronts and community portals. Every feature is a module installed at runtime from a built-in marketplace, or uploaded as a ZIP.</p>
 
-  <p><strong>Modular plugin-based platform with a built-in marketplace</strong></p>
-  <p>Ships with zero modules. Install what you need from 42 first-party modules in the marketplace, or upload custom ZIPs.</p>
+  [![CI](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml)
+  [![Release](https://img.shields.io/github/v/release/UXPLIMA/uxw-vend?display_name=tag&sort=semver)](https://github.com/UXPLIMA/uxw-vend/releases)
+  [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
   ![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)
   ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript)
   ![Prisma](https://img.shields.io/badge/Prisma-7.10-2D3748?logo=prisma)
+  ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?logo=postgresql&logoColor=white)
   ![Tailwind](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss)
-  ![Zod](https://img.shields.io/badge/Zod-4-3E67B1)
   ![Auth.js](https://img.shields.io/badge/Auth.js-v5-purple)
-  ![License](https://img.shields.io/badge/License-MIT-green)
 </div>
 
 ---
 
-## What is uxwVend?
+## Install
 
-uxwVend is a plugin-first platform for game-server websites, digital storefronts, and community portals. The core ships empty — every feature is a module installed at runtime through the admin panel or uploaded as a ZIP. Themes are declarative manifest packages that handle presentation, component overrides, and schema-driven admin settings pages.
+```bash
+curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+```
 
-### Core motto
+One command on a fresh VPS. It installs Docker if the machine does not have it,
+generates every secret, pulls a prebuilt image, starts Postgres, Redis and the
+app, waits until the site answers, and prints the URL and the admin password.
+Three questions, each with a default. Give it a domain and it also obtains and
+renews an HTTPS certificate on its own.
 
-**Core knows nothing about any module or theme.** No module names, no module paths, no module-specific code anywhere in `src/core/`. No theme names hardcoded. Everything is registry-driven from manifests. When a module or theme is not installed, zero traces exist in core.
+Afterwards the machine has a `uxwvend` command: `update`, `backup`, `restore`,
+`logs`, `status`, `restart`. Full reference in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-### Three strict layers
-
-1. **Core** (`src/core/`) — site-type-agnostic infrastructure: auth, RBAC, i18n, navigation/footer link structure, health, rate limiting (Redis + memory fallback), maintenance, upload, SEO. A fixed set of canonical slot names — the generic `layout.beforeMain`, `layout.afterMain`, `head.extra` plus layout-position slots (`layout.top`, `layout.bottom`, `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav`).
-2. **Modules** (`src/modules/<id>/`) — feature layer. Everything declared in `module.json`.
-3. **Themes** (`src/themes/<id>/`) — presentation + composition. Everything declared in `theme.json` (`schemaVersion: 2`).
+Then open the site, finish the setup wizard, and install modules from
+**Admin > Modules > Marketplace**.
 
 ---
 
-## Module System
+## What makes it different
 
-42 first-party modules ship in `module-marketplace/` as ZIPs with an `index.json` catalog. Sources live in `module-sources/<id>/` (tracked in git). ZIPs are built from those sources via `npm run build:marketplace`.
+**The core knows nothing about any module or theme.** No module names, no module
+paths, no module-specific code anywhere in `src/core/`. No theme names
+hardcoded. Everything is registry-driven from manifests, and three CI gates fail
+the build if that stops being true. When a module is not installed, zero traces
+of it exist in core.
+
+That constraint is the product. It is what lets a site be assembled from parts
+at runtime without the parts leaking into each other, and it is why a module
+author only ever edits their own directory.
+
+### Three strict layers
+
+1. **Core** (`src/core/`) is site-type-agnostic infrastructure: auth, RBAC,
+   i18n, navigation and footer structure, health, rate limiting (Redis with a
+   memory fallback), maintenance mode, uploads, SEO. It declares a fixed set of
+   canonical slots: the generic `layout.beforeMain`, `layout.afterMain`,
+   `head.extra`, plus layout-position slots `layout.top`, `layout.bottom`,
+   `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav`.
+2. **Modules** (`src/modules/<id>/`) are the feature layer. Everything a module
+   contributes is declared in its `module.json`.
+3. **Themes** (`src/themes/<id>/`) are presentation and composition, declared in
+   `theme.json` (`schemaVersion: 2`).
+
+### Modules are compiled, not loaded
+
+This is the one architectural fact that leaks into operations, so it belongs
+above the fold rather than buried in a deployment guide.
+
+A module ships React server components, and Next.js compiles those at build
+time. There is no runtime loader that could render them. **Installing a module
+therefore rebuilds the app and replaces the process**, on a 3-second debounce so
+a bulk install of thirty modules produces one build:
+
+```
+db:merge → apply-schema-additions → apply-migrations → generate-registry
+         → npm run build → record the build fingerprint → SIGTERM
+```
+
+Two consequences worth knowing before you deploy:
+
+- **Run the app under a supervisor.** Docker Compose (`restart: unless-stopped`),
+  systemd (`Restart=always`) and pm2 all qualify. A bare `npm start` in a
+  terminal does not: the process exits after an install and nothing brings it
+  back. The Docker install gets this right with no configuration.
+- **One app process per installation.** Not one per core. Two processes sharing
+  the modules volume would both build into the same `.next` and the loser would
+  serve a half-written build.
+
+Expect a gap of seconds to minutes while a build runs, so install modules during
+a quiet window on a busy site. A rebuild that fails is loud in the logs but does
+not stop the boot: the previous build keeps being served, so the admin panel
+stays reachable and the offending module can be removed. On every boot,
+`scripts/reconcile-build.ts` compares a fingerprint of `src/modules/` against
+the one recorded beside the build and rebuilds only when they disagree.
+
+Full detail in ["The Build Lifecycle"](docs/DEPLOYMENT.md#the-build-lifecycle).
+
+---
+
+## Modules
+
+42 first-party modules ship in `module-marketplace/` as ZIPs with an
+`index.json` catalog. Their sources live in `module-sources/<id>/` and are
+tracked in git; the ZIPs are built from those sources by
+`npm run build:marketplace`, and CI fails if the two drift apart.
 
 | Category | Modules |
 |----------|---------|
@@ -46,122 +115,147 @@ uxwVend is a plugin-first platform for game-server websites, digital storefronts
 | Content | slider, custom-pages, custom-forms, email-templates, cookie-consent, seo |
 | Integration | discord-auth, discord-integration, discord-widget, google-auth, google-analytics, cloudflare-r2, cloudflare-turnstile, resend-provider, csv-import-export, webhook-logs |
 
-Each `module.json` declares everything the module contributes — routes, admin routes, API endpoints, sidebar menu, dashboard cards, widgets, navbar/footer/layout components, profile tabs, settings cards, OAuth buttons, dependencies, conflicts, RBAC permissions, cron jobs, webhook receivers, hook listeners, slot contributions, search providers, page-builder blocks, notification types, and translations. See [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) for the complete reference.
+A `module.json` declares everything the module contributes: routes, admin
+routes, API endpoints, sidebar menu, dashboard cards, widgets, navbar/footer/
+layout components, profile tabs, settings cards, OAuth buttons, dependencies,
+conflicts, RBAC permissions, cron jobs, webhook receivers, hook listeners, slot
+contributions, search providers, page-builder blocks, notification types and
+translations. The complete reference is [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md).
 
-**Compatibility contract:** a manifest declares `coreVersion` (a semver range of `CORE_API_VERSION`, the module-facing contract version — separate from the product version) and may pin dependency versions as `"store@^1.2.0"`. Install, update and enable all reject a module the running core or the installed dependencies cannot satisfy, instead of failing later at runtime.
+**Compatibility contract.** A manifest declares `coreVersion`, a semver range
+over `CORE_API_VERSION` (the module-facing contract version, deliberately
+separate from the product version), and may pin dependencies as
+`"store@^1.2.0"`. Install, update and enable all refuse a module the running
+core or the installed dependencies cannot satisfy, rather than failing later at
+runtime.
 
-**Module SDK:** modules import core through `@/core/sdk` (isomorphic), `@/core/sdk/server`, `@/core/sdk/auth`, `@/core/sdk/navigation`, `@/core/sdk/blocks` and `@/core/sdk/theme` — split by runtime so a client component can never pull `prisma` into its bundle. Core's internal layout (`@/core/lib/*`) is not part of the contract; reaching into it fails `npm run validate:module`, the marketplace build and ESLint.
+**Module SDK.** Modules import core through `@/core/sdk` (isomorphic),
+`@/core/sdk/server`, `@/core/sdk/auth`, `@/core/sdk/navigation`,
+`@/core/sdk/blocks` and `@/core/sdk/theme`, split by runtime so a client
+component can never pull `prisma` into its bundle. Core's internal layout
+(`@/core/lib/*`) is not part of the contract; reaching into it fails
+`npm run validate:module`, the marketplace build and ESLint.
 
-**Dependency resolution:** every install path plans before it installs. `resolveInstallPlan` expands the selection transitively, orders it topologically so prerequisites are extracted first, reports what it added on the operator's behalf, and refuses cycles, conflicts, unknown ids and version mismatches rather than installing part of a set.
+**Dependency resolution.** Every install path plans before it installs.
+`resolveInstallPlan` expands the selection transitively, orders it topologically
+so prerequisites are extracted first, reports what it added on the operator's
+behalf, and refuses cycles, conflicts, unknown ids and version mismatches rather
+than installing part of a set.
 
-**Lifecycle:** install (extract ZIP → regenerate registry → run module SQL migrations → create `ModuleConfig` row → sync translations) → enable → disable (vanishes from every UI surface, data preserved) → uninstall (files removed, `ModuleConfig` deleted, admin-overridden translations preserved). The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active.
+**Lifecycle.** install (extract ZIP, regenerate registry, create tables, run
+module SQL migrations, create the `ModuleConfig` row, sync translations) →
+enable → disable (vanishes from every UI surface, data preserved) → uninstall
+(files removed, `ModuleConfig` deleted, admin-overridden translations and module
+tables preserved so a reinstall keeps the data). `ModuleConfig.enabled` in the
+database is the single source of truth for whether a module is active.
 
-**Install safety:** a Postgres advisory lock prevents two installs from racing. Registry regeneration runs synchronously and rolls back the filesystem on failure — no silent partial installs.
+**Install safety.** A Postgres advisory lock prevents two installs from racing.
+Registry regeneration runs synchronously and rolls back the filesystem on
+failure, so there are no silent partial installs. Uploaded ZIPs are checked for
+path traversal, reserved ids, manifest schema violations, id mismatches and
+manifest file references that point outside the module directory.
 
 ---
 
-## Theme System (v2)
+## Themes
 
-Themes live in `src/themes/<id>/` with a `theme.json` manifest. `schemaVersion: 2` is required. Modes (light / dark / any named variant) live inside a single manifest — there are no separate dark-variant themes and no parent inheritance. v1 manifests are rejected at upload.
+Themes live in `src/themes/<id>/` behind a `theme.json` manifest;
+`schemaVersion: 2` is required and v1 manifests are rejected at upload. Modes
+(light, dark, or any named variant) live inside a single manifest: there are no
+separate dark-variant themes and no parent inheritance.
 
 A theme manifest can declare:
 
-- **`modes`** — default mode + per-mode token values (`tokens.colors`, `tokens.fonts`).
-- **`tokens.colors` / `tokens.fonts` / `tokens.radius` / `tokens.space`** — field definitions for the customizer.
-- **`settings.<group>.fields.<key>`** — schema-driven admin settings. Core auto-renders `/admin/theme/<group>` with labels, inputs, save/reset — theme author writes zero React for these. Field types: `text`, `url`, `color`, `richtext`, `image`.
-- **`components.<Name>: "components/Foo.tsx"`** — React component overrides wired via `<ThemeComponentSlot name="...">`.
-- **`slots` / `slotContents`** — declare named slots and contribute into own or core-declared slots.
-- **`adminNav.label` / `adminNav.icon`** — sidebar "Theme" group label and Lucide icon for this theme.
-- **`adminRoutes`** — escape hatch for custom React admin pages.
-- **`suggestedModules`** — opt-in banner recommending modules (never auto-installs).
-- **`translations`** — synced to the Translation DB table on activation.
+- **`modes`**: the default mode plus per-mode token values (`tokens.colors`, `tokens.fonts`).
+- **`tokens.colors` / `tokens.fonts` / `tokens.radius` / `tokens.space`**: field definitions for the customizer.
+- **`settings.<group>.fields.<key>`**: schema-driven admin settings. Core auto-renders `/admin/theme/<group>` with labels, inputs and save/reset, so a theme author writes zero React for these. Field types: `text`, `url`, `color`, `richtext`, `image`.
+- **`components.<Name>: "components/Foo.tsx"`**: React component overrides, wired via `<ThemeComponentSlot name="...">`.
+- **`slots` / `slotContents`**: declare named slots, and contribute into your own or core-declared ones.
+- **`adminNav.label` / `adminNav.icon`**: the sidebar "Theme" group label and Lucide icon for this theme.
+- **`adminRoutes`**: an escape hatch for custom React admin pages.
+- **`suggestedModules`**: an opt-in banner recommending modules. Never auto-installs.
+- **`translations`**: synced to the `Translation` table on activation.
 
 **Shipped themes:**
 
 | Theme | Description |
 |-------|-------------|
-| `flat` | Default baseline. Light + dark modes in one manifest. No component overrides, no settings. |
-| `pixelcraft` | Gaming/Minecraft preset. Dark only. Compact Hypixel-style 3-column hero (server IP \| logo \| Discord) with schema-driven settings. Declares a `hero.liveStats` slot. Suggests the `store` module. |
+| `flat` | The default. Light and dark modes in one manifest, on a neutral gray palette with a single blue accent; every token pair meets WCAG AA. No component overrides, no settings. |
+| `pixelcraft` | Gaming preset, dark only. Compact 3-column hero (server IP \| logo \| Discord) with schema-driven settings. Declares a `hero.liveStats` slot and suggests the `store` module. |
 
-**Data model:**
-
-- `ThemeState` (singleton, `id = 1`) — active themeId + mode.
-- `ThemeCustomization` (`@@unique([themeId, mode])`) — mode-scoped token override JSON.
-- `ThemeSetting` (`@@unique([themeId, groupKey, key])`) — settings values. `groupKey` is named that way because `group` is a SQL reserved word.
-
-No `Theme` DB model — filesystem + codegen is the source of truth for theme existence.
-
----
-
-## Install on a server
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
-```
-
-Installs Docker if it is missing, generates every secret, starts Postgres +
-Redis + the app, waits until the site answers, and prints the URL and admin
-password. Three questions, each with a default. Give it a domain and it also
-obtains and renews an HTTPS certificate on its own.
-
-Afterwards: `uxwvend update`, `uxwvend backup`, `uxwvend logs`, `uxwvend status`.
-Full reference in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+**Data model.** `ThemeState` (singleton, `id = 1`) holds the active theme id and
+mode. `ThemeCustomization` (`@@unique([themeId, mode])`) holds mode-scoped token
+overrides. `ThemeSetting` (`@@unique([themeId, groupKey, key])`) holds settings
+values; `groupKey` is named that way because `group` is a SQL reserved word.
+There is no `Theme` model: the filesystem plus codegen is the source of truth
+for whether a theme exists.
 
 ---
 
 ## Develop locally
 
-Prerequisites: Node.js 24+, PostgreSQL 14+. Redis is optional but strongly recommended in production.
+Requires Node.js 24+ and PostgreSQL 14+. Redis is optional locally and required
+in production, where the rate limiter fails closed without it.
 
 ```bash
 git clone https://github.com/UXPLIMA/uxw-vend.git
-cd uxwVend
+cd uxw-vend
 npm install                            # postinstall runs db:merge + generate-themes + generate-registry
 
 cp .env.example .env
-# Edit .env — at minimum: DATABASE_URL, AUTH_SECRET, AUTH_URL
+# Edit .env - at minimum DATABASE_URL, AUTH_SECRET, AUTH_URL
 
 npm run db:merge                       # merge core + module schemas
-npm run db:push                        # push merged schema to the database
-npm run db:seed                        # seed 3 roles + admin user
-npx tsx scripts/seed-translations.ts   # seed default locale strings
+npm run db:push                        # push the merged schema to a fresh database
+npm run db:seed                        # 3 roles + admin user
+npx tsx scripts/seed-translations.ts   # default locale strings
 npm run dev                            # Turbopack on http://localhost:3001
 ```
 
-The seed creates `admin@example.com` with a **randomly generated password, printed once** in the seed output — copy it before the terminal scrolls. Set `SEED_ADMIN_PASSWORD` (and optionally `SEED_ADMIN_EMAIL`) beforehand to choose your own. Re-seeding never resets an existing admin's password.
+The seed creates `admin@example.com` with a **randomly generated password,
+printed once** in the seed output. Copy it before the terminal scrolls, or set
+`SEED_ADMIN_PASSWORD` (and optionally `SEED_ADMIN_EMAIL`) beforehand to choose
+your own. Re-seeding never resets an existing admin's password.
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for production setup (PM2, nginx, Redis, backups, environment variables, hardening).
+`db:push` is for a fresh local database only. The running app never pushes: it
+applies additive schema statements instead, because uninstall deliberately
+leaves module tables behind and a push would drop or refuse them. See
+[docs/MIGRATIONS.md](docs/MIGRATIONS.md).
+
+Production setup, environment variables, nginx, backups and hardening are in
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
 src/
-  app/[locale]/             Next.js App Router (i18n locale segment)
+  app/[locale]/             Next.js App Router, i18n locale segment
     (admin)/                Admin panel
     (auth)/                 Auth pages
     (public)/               Public pages
-    (setup)/                First-run setup wizard (site-type presets, categorised module picker)
+    (setup)/                First-run wizard: site-type presets, categorised module picker
     [...slug]/              Catch-all for module-contributed public routes
   app/api/v1/               Core REST API + [...path] catch-all for module APIs
   core/                     Site-type-agnostic infrastructure
     components/             Shared UI primitives, layout, admin shell
     generated/              Codegen output (gitignored)
-    lib/                    Utilities and services (db, auth, hooks, scheduler, ...)
+    lib/                    Utilities and services: db, auth, hooks, scheduler, ...
+    sdk/                    The module-facing contract
     providers/              ModuleProvider, ThemeProvider
-  modules/                  Installed module state (gitignored — populated at runtime)
+  modules/                  Installed module state (gitignored, populated at runtime)
   themes/                   Installed themes (flat + pixelcraft ship in-tree)
-  proxy.ts                  Middleware: i18n + module route gating + CSRF
+  proxy.ts                  Middleware: i18n, module route gating, CSRF
 
-messages-core/{en,tr}.json  Core translation seed sources
-module-sources/<id>/        Authoritative source for 42 first-party modules
-module-marketplace/         Distributable ZIPs + index.json catalog
+messages-core/{en,tr}.json       Core translation seed sources
+module-sources/<id>/             Authoritative source for the 42 first-party modules
+module-marketplace/              Distributable ZIPs + index.json catalog
 module-marketplace/presets.json  Site-type presets read by the setup wizard (data, not core code)
-theme-marketplace/          Distributable theme ZIPs
-module-template/            Starter for `npm run create:module`
-scripts/                    Codegen, migration, backup, marketplace tooling
-prisma/schema.core.prisma   Core schema (never edit the merged schema.prisma directly)
+theme-marketplace/               Distributable theme ZIPs
+module-template/                 Starter for `npm run create:module`
+scripts/                         Codegen, migration, backup and marketplace tooling
+prisma/schema.core.prisma        Core schema (never edit the merged schema.prisma)
 ```
 
 ---
@@ -171,73 +265,107 @@ prisma/schema.core.prisma   Core schema (never edit the merged schema.prisma dir
 ```bash
 # Development
 npm run dev              # Dev server (Turbopack, port 3001, 0.0.0.0)
-npm run build            # Production build (prebuild = merge-schemas + generate-themes + generate-registry + generate-openapi)
+npm run build            # Production build (prebuild regenerates schema, themes, registry, openapi)
 npm run start            # Production server
 
 # Database
 npm run db:merge         # Merge core + module schemas into prisma/schema.prisma
-npm run db:generate      # Run prisma generate
-npm run db:push          # Push merged schema to the database (no migrations for core)
-npm run db:migrate       # Apply per-module SQL migrations (see docs/MIGRATIONS.md)
-npm run db:seed          # Seed 3 roles + admin user
+npm run db:generate      # prisma generate
+npm run db:push          # Push the merged schema to a fresh database
+npm run db:migrate       # Apply per-module SQL migrations (docs/MIGRATIONS.md)
+npm run db:seed          # 3 roles + admin user
 npm run db:studio        # Prisma Studio
 npm run db:backup        # Gzipped SQL dump to ./backups/
 npm run db:restore       # Restore from a backup file
 
 # Code generation
-npm run generate:themes                       # theme-registry + theme-tokens.css + theme-components + theme-admin-routes
-npx tsx scripts/generate-registry.ts          # module-registry + module-routes + module-hooks + module-crons + ...
-npx tsx scripts/generate-openapi.ts           # src/core/generated/openapi.json from module manifests
-npx tsx scripts/seed-translations.ts          # Sync translations from messages-core + module manifests into DB
+npm run generate:themes                       # theme registry, tokens CSS, components, admin routes
+npx tsx scripts/generate-registry.ts          # module registry, routes, hooks, crons, ...
+npx tsx scripts/generate-openapi.ts           # src/core/generated/openapi.json from manifests
+npx tsx scripts/seed-translations.ts          # Sync translations from messages-core + manifests into the DB
+npx tsx scripts/apply-schema-additions.ts     # Additive-only schema sync (what installs run)
+npx tsx scripts/reconcile-build.ts            # Rebuild if src/modules/ no longer matches the build
 
-# Tooling
-npm run create:module <id> "Name" "Desc"      # Scaffold a module from module-template/
-npm run validate:module module-sources/<id>   # Validate a module manifest
-npm run build:marketplace                     # Rebuild every marketplace ZIP from module-sources/
-npm run lint                                   # ESLint
-npm run typecheck                              # tsc --noEmit (core + app)
-npm run typecheck:modules                      # tsc --noEmit over module-sources/
+# Module authoring
+npm run create:module <id> "Name" "Desc"      # Scaffold from module-template/
+npm run module:add-block                      # Add a page-builder block
+npm run module:add-hook                       # Add a hook listener
+npm run module:add-slot                       # Add a slot contribution
+npm run module:add-cron                       # Add a cron job
+npm run module:add-search                     # Add a search provider
+npm run module:list                           # List modules and what they declare
+npm run validate:module module-sources/<id>   # Validate one manifest (--all for every module)
+npm run build:marketplace                     # Rebuild every ZIP from module-sources/
 npx tsx scripts/migrate-module-imports.ts <path>   # Rewrite @/core/lib imports onto the SDK
-npm run clean                                  # Clear .next + node_modules/.cache
 
-# Testing
-npm test                 # Vitest
-npm run test:e2e         # Playwright
+# Quality gates (all of these run in CI)
+npm run typecheck                             # tsc --noEmit over core + app
+npm run typecheck:modules                     # tsc --noEmit over module-sources/
+npm run lint                                  # ESLint, including the SDK boundary rules
+npm run check:style                           # House style: hyphens, never em dashes
+npx tsx scripts/check-marketplace-sync.ts     # ZIPs match module-sources/ and index.json
+npm test                                      # Vitest
+npm run test:coverage                         # Vitest with coverage thresholds
+npm run test:e2e                              # Playwright
+
+npm run clean                                 # Clear .next + node_modules/.cache
 ```
 
 ---
 
-## Authoring a Module
+## Authoring a module
 
 ```bash
 npm run create:module my-module "My Module" "Short description"
 # Creates module-sources/my-module/ from module-template/ with placeholders replaced.
 
-# Edit module.json, optionally schema.prisma, components, pages, api/
-npm run db:merge && npm run db:push           # If you added DB models
-npm run build:marketplace                     # Package as ZIP + update index.json
+# Edit module.json, and optionally schema.prisma, components, pages, api/
+npm run db:merge && npm run db:push           # if you added DB models
+npm run validate:module module-sources/my-module
+npm run build:marketplace                     # package as a ZIP and update index.json
 ```
 
-Install via **Admin > Modules > Upload ZIP** or **Marketplace**, then enable the toggle on the module card.
+Install it via **Admin > Modules > Upload ZIP** or the marketplace, then flip the
+toggle on the module card.
 
-For local development you can also copy the source directly into `src/modules/<id>/` and run `npx tsx scripts/generate-registry.ts` to wire it up without packaging.
+For a faster local loop you can copy the source straight into
+`src/modules/<id>/` and run `npx tsx scripts/generate-registry.ts` to wire it up
+without packaging.
 
-See [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) for the full manifest reference and [module-template/README.md](module-template/README.md) for the starter walkthrough.
+The full manifest reference is [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md), and
+[module-template/README.md](module-template/README.md) is a walkthrough of the
+starter.
 
 ---
 
 ## Documentation
 
-- [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) — admin panel walkthrough (modules, themes, users, roles, settings)
-- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — production deployment (PM2, nginx, Redis, backups, env vars)
-- [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) — module authoring reference with complete `module.json` schema
-- [docs/API.md](docs/API.md) — REST API reference, auth, rate limiting, module APIs, webhooks, cron
-- [docs/MIGRATIONS.md](docs/MIGRATIONS.md) — per-module SQL migration system
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — contribution guide, coding conventions, CI checks
-- [module-template/README.md](module-template/README.md) — scaffold a new module from the template
+| Document | What it covers |
+|----------|----------------|
+| [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | Admin panel walkthrough: modules, themes, users, roles, settings |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment, environment variables, the build lifecycle, backups |
+| [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) | Module authoring reference and the complete `module.json` schema |
+| [docs/API.md](docs/API.md) | REST API, auth, rate limiting, module APIs, webhooks, cron |
+| [docs/MIGRATIONS.md](docs/MIGRATIONS.md) | Per-module SQL migrations, and why the install path never pushes |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Contribution guide, coding conventions, CI checks |
+| [module-template/README.md](module-template/README.md) | Scaffolding a new module from the template |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |
+| [SECURITY.md](SECURITY.md) | Reporting a vulnerability |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community expectations |
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Read
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) first: it covers the coding
+conventions and the gates a PR has to pass. The short version is that
+`npm run typecheck && npm run lint && npm test` should be green before you open
+one, and that a change to core which mentions a module by name will be rejected
+by CI regardless of how well it works.
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).
