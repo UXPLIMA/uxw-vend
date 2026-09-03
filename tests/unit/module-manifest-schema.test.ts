@@ -363,3 +363,38 @@ describe("moduleManifestSchema - oauth button href", () => {
         expect(parse("javascript:alert(1)").success).toBe(false);
     });
 });
+
+describe("moduleManifestSchema - admin paths are panel-relative", () => {
+    const cases: Array<[string, (p: string) => Record<string, unknown>]> = [
+        ["adminRoutes", (p) => ({ adminRoutes: [{ path: p, component: "pages/admin/page.tsx" }] })],
+        ["menu", (p) => ({ menu: [{ label: "Thing", path: p, icon: "Vote" }] })],
+        [
+            "settingsCards",
+            (p) => ({
+                settingsCards: [
+                    { title: "Thing", description: "", href: p, icon: "Cog", color: "text-blue-500" },
+                ],
+            }),
+        ],
+    ];
+
+    for (const [field, build] of cases) {
+        it(`accepts a panel-relative ${field} path`, () => {
+            expect(moduleManifestSchema.safeParse({ ...base, ...build("/vote-sites") }).success).toBe(true);
+        });
+
+        it(`rejects an ${field} path that carries the /admin prefix itself`, () => {
+            // Core adds the prefix; a manifest that adds it too links to
+            // /admin/admin/vote-sites, which is a 404.
+            const r = moduleManifestSchema.safeParse({ ...base, ...build("/admin/vote-sites") });
+            expect(r.success).toBe(false);
+            if (!r.success) {
+                expect(r.error.issues[0].message).toMatch(/relative to the panel/);
+            }
+        });
+
+        it(`still accepts an ${field} path that merely begins with the word admin`, () => {
+            expect(moduleManifestSchema.safeParse({ ...base, ...build("/administrators") }).success).toBe(true);
+        });
+    }
+});

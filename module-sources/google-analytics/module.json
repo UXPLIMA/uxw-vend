@@ -2,7 +2,7 @@
   "id": "google-analytics",
   "name": "Google Analytics",
   "description": "Google Analytics tracking integration",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -23,7 +23,7 @@
     {
       "title": "Google Analytics",
       "description": "Google Analytics tracking.",
-      "href": "/admin/google-analytics",
+      "href": "/google-analytics",
       "icon": "BarChart",
       "color": "text-green-500"
     }

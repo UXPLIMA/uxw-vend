@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { applyFiltersAsync } from "@/core/lib/hooks";
 import { ModuleSettingsCards, ModuleRoutes } from "@/core/generated/module-registry";
+import { adminHref } from "@/core/lib/admin-path";
 
 interface SearchResult {
     type: string;
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     for (const card of ModuleSettingsCards) {
         const s = score(card.title, q);
         if (s > 0) {
-            results.push({ type: "settings", id: card.href, title: card.title, subtitle: card.description, href: `/admin${card.href}`, score: s });
+            results.push({ type: "settings", id: card.href, title: card.title, subtitle: card.description, href: adminHref(card.href), score: s });
         }
     }
 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
         if (!route.isAdmin) continue;
         const s = score(route.path, q);
         if (s > 0) {
-            results.push({ type: "module-page", id: route.key, title: route.path.split("/").pop() || route.path, subtitle: route.module, href: `/admin${route.path}`, score: s });
+            results.push({ type: "module-page", id: route.key, title: route.path.split("/").pop() || route.path, subtitle: route.module, href: adminHref(route.path), score: s });
         }
     }
 
