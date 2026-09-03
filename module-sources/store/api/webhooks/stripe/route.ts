@@ -3,6 +3,7 @@ import { getStripe, getStripeWebhookSecret } from "../../../lib/stripe";
 import { prisma } from "@/core/sdk/server";
 import { sendOrderConfirmationEmail } from "../../../lib/email";
 import { deliverProduct } from "../../../lib/delivery";
+import { announceOrderCompleted } from "../../../lib/order-events";
 import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
@@ -109,8 +110,7 @@ export async function POST(request: NextRequest) {
             sendOrderConfirmationEmail(buyer.email, order.orderNumber, Number(order.total)).catch(console.error);
 
             // ── Discord notification ──
-            const { doActionAsync } = await import("@/core/sdk");
-            await doActionAsync("store.order.completed", order);
+            await announceOrderCompleted(order.id);
 
             // ── RCON delivery ──
             const playerName = session.metadata?.playerName

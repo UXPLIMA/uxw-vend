@@ -4,6 +4,7 @@ import { logActivity, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../lib/stripe";
 import { deliverProduct } from "../../lib/delivery";
+import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import {
     computeOrderPricing,
     computeCouponDiscount,
@@ -281,9 +282,8 @@ export async function POST(request: NextRequest) {
                 metadata: { orderNumber: order.orderNumber, total, paymentMethod: "credits" },
             }).catch(console.error);
 
-            const { doActionAsync } = await import("@/core/sdk");
-            await doActionAsync("store.order.created", order);
-            await doActionAsync("store.order.completed", order);
+            await announceOrderCreated(order.id);
+            await announceOrderCompleted(order.id);
             return NextResponse.json({ order, redirect: null, message: "Order completed with credits" }, { status: 201 });
         }
 
@@ -339,8 +339,7 @@ export async function POST(request: NextRequest) {
             metadata: { orderNumber: order.orderNumber, total },
         }).catch(console.error);
 
-        const { doActionAsync } = await import("@/core/sdk");
-        await doActionAsync("store.order.created", order);
+        await announceOrderCreated(order.id);
 
         // ── Free order: complete & grant immediately ──
         // CRITICAL: separated from the "Stripe missing" path. If a paid order
@@ -362,7 +361,7 @@ export async function POST(request: NextRequest) {
                 });
             }
 
-            await doActionAsync("store.order.completed", order);
+            await announceOrderCompleted(order.id);
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });
         }
 

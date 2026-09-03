@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and they type it back. No server plugin: the proof is that only that account
   could read the whisper, and only while it was online. Fires
   `minecraft.account.linked` / `.unlinked` for other modules to follow.
+- **License keys** (`license-keys`). Digital products hand out a key when the
+  order completes: one per item, per seat, or in a bundle, with an optional
+  term and an activation limit per machine. Software checks and activates over
+  a public, rate limited endpoint that says the same thing about a wrong key as
+  about one that never existed. Keys are stored hashed for lookup and encrypted
+  for display, so a dumped table is not a bag of usable keys, and only the
+  owner can read one back.
 
 ### Changed
 - **RCON lives in one place.** The store and servers modules each carried a

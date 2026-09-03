@@ -1,0 +1,77 @@
+// License Keys Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// A key issued to a buyer, and what it entitles them to.
+//
+// The key is stored twice: hashed, which is what an activation looks it up by,
+// and encrypted, which is what the buyer's own page decrypts to show them.
+// Neither column on its own lets a leaked database dump produce a working key.
+model LicenseKey {
+  id        String   @id @default(cuid())
+  /** SHA-256 of the normalised key. Unique, and how activation finds a row. */
+  keyHash   String   @unique
+  /** The key itself, AES-256-GCM. Only ever decrypted to show its owner. */
+  keySealed String
+  /** First block of the key, safe to show in a list so a support agent can match one. */
+  keyHint   String
+
+  /** Opaque product identifier, matching LicenseProduct.productId. */
+  productId String?
+  /** Product name at the time of issue, for a list that still reads correctly later. */
+  productName String?
+  /** Which order it came from, when it came from one. */
+  orderId   String?
+  /** Who owns it. Null for a key issued ahead of a sale. */
+  userId    String?
+
+  status    String   @default("active")
+  maxActivations Int @default(1)
+  expiresAt DateTime?
+  note      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activations LicenseActivation[]
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([productId])
+}
+
+// One machine that has claimed a key.
+//
+// The machine identifier is hashed: it is a fingerprint the customer's own
+// software sends, and this module has no reason to be able to read it back.
+model LicenseActivation {
+  id           String   @id @default(cuid())
+  licenseKeyId String
+  licenseKey   LicenseKey @relation(fields: [licenseKeyId], references: [id], onDelete: Cascade)
+  /** SHA-256 of the machine id the client sent. */
+  machineHash  String
+  label        String?
+  activatedAt  DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+
+  @@unique([licenseKeyId, machineHash])
+  @@index([licenseKeyId])
+}
+
+// Which store products come with a key, and what that key is worth.
+//
+// Keyed by an opaque product id rather than a relation: this module has no
+// business holding a foreign key into another module's tables, and it has to
+// keep working when that module is uninstalled.
+model LicenseProduct {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  /** Keys handed over per unit bought. */
+  keysPerUnit    Int      @default(1)
+  maxActivations Int      @default(1)
+  /** Days until the key expires. Null means it does not. */
+  validDays      Int?
+  /** Prepended to the key, so a support inbox can tell products apart. */
+  prefix         String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
