@@ -7,7 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **No module could be picked during first-run setup.** The wizard's module
+  step fetched `/api/v1/modules/marketplace`, and the setup gate in `proxy.ts`
+  answers every path outside `/api/setup` with 503 until a user exists. The
+  fetch failed on the one install the wizard exists to serve, the step caught
+  the error, and it rendered "No modules available yet" with all 42 modules
+  unreachable behind the gate. The theme step had the identical defect and was
+  fixed earlier by adding `/api/setup/themes`; the module counterpart was never
+  written. It exists now, and the catalog loader is shared rather than copied.
+- A theme card in the wizard read "Suggests: [object Object]".
+  `suggestedModules` is declared in `theme.json` as `{id, reason}` objects and
+  the wizard typed it as `string[]`, so `join()` stringified them. TypeScript
+  could not catch it because the response is cast, not validated.
+- The wizard ignored the active theme: twenty-one hardcoded Tailwind blues
+  across its six steps. They are theme tokens now.
+- The wizard's step bar drifted out of line whenever a label wrapped to two
+  lines. The connector was placed with a negative margin inside a row centred
+  on the whole column, so a taller column pushed its connectors down.
+
 ### Changed
+- The site-type presets are rebuilt around the site kinds people actually
+  arrive with: `minecraft`, `roblox`, `fivem`, `unturned`, `ecommerce`,
+  `license-sales` and `software-sales`, replacing the three generic ones.
+  Selecting one still preselects a theme and a module set and still opens the
+  remaining steps for editing; only the catalog changed, not the flow. The
+  wizard now renders each preset's declared Lucide icon, which the schema had
+  documented as rendered while nothing drew it.
 - The default `flat` theme is rebuilt on a neutral gray palette. Its dark mode
   used Tailwind slate, which measures H222 S47% at the background token and
   reads as blue rather than gray. Two further problems came out of the audit:

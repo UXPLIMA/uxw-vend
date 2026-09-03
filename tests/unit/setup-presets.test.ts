@@ -98,4 +98,19 @@ describe("shipped presets.json", () => {
     it("offers a manual path", () => {
         expect(presetsRaw.presets.some((p: { modules: string[] }) => p.modules.length === 0)).toBe(true);
     });
+
+    // Module ids were already checked above; themes were not, and a preset
+    // naming a theme that does not ship preselects nothing while still looking
+    // like it chose one.
+    it("names only themes that ship in-tree", () => {
+        const themeIds = fs
+            .readdirSync(path.join(root, "src", "themes"), { withFileTypes: true })
+            .filter((e) => e.isDirectory())
+            .map((e) => e.name);
+
+        for (const p of presetsRaw.presets as Array<{ id: string; theme?: string }>) {
+            if (!p.theme) continue;
+            expect(themeIds, `${p.id} -> ${p.theme}`).toContain(p.theme);
+        }
+    });
 });

@@ -1,29 +1,138 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "presets": [
     {
-      "id": "game-store",
-      "name": "Game server store",
-      "description": "Sell ranks and items, take payments, show live server status and a vote reward loop.",
-      "icon": "Gamepad2",
+      "id": "minecraft",
+      "name": "Minecraft server",
+      "description": "Rank and VIP sales, live server status over RCON, vote rewards, a public ban list and player profiles.",
+      "icon": "Blocks",
       "theme": "pixelcraft",
-      "modules": ["store", "currency", "credits", "servers", "vote", "custom-pages"]
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "vote",
+        "punishments",
+        "player-profiles",
+        "leaderboard",
+        "discord-auth",
+        "announcements"
+      ]
     },
     {
-      "id": "community",
-      "name": "Community portal",
-      "description": "Forum, news and member profiles for a site built around discussion.",
-      "icon": "Users",
-      "theme": "flat",
-      "modules": ["forum", "blog", "trophies", "in-app-notifications", "suggestions"]
+      "id": "roblox",
+      "name": "Roblox game",
+      "description": "Game pass and currency sales with trophies and a leaderboard. No RCON: Roblox has no server console to talk to.",
+      "icon": "Boxes",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "vote",
+        "trophies",
+        "leaderboard",
+        "player-profiles",
+        "discord-auth",
+        "announcements"
+      ]
     },
     {
-      "id": "showcase",
-      "name": "Simple showcase",
-      "description": "A few content pages, a homepage slider and search-engine basics. Nothing else.",
-      "icon": "LayoutTemplate",
+      "id": "fivem",
+      "name": "FiveM roleplay",
+      "description": "Whitelist applications through custom forms, a staff roster, server status, punishments and a donation store.",
+      "icon": "Car",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "punishments",
+        "player-profiles",
+        "custom-forms",
+        "staff",
+        "tickets",
+        "discord-auth",
+        "announcements"
+      ]
+    },
+    {
+      "id": "unturned",
+      "name": "Unturned server",
+      "description": "The same shape as a Minecraft store: kit and rank sales, server status, vote rewards and a ban list.",
+      "icon": "Tent",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "vote",
+        "punishments",
+        "player-profiles",
+        "leaderboard",
+        "discord-auth"
+      ]
+    },
+    {
+      "id": "ecommerce",
+      "name": "Online store",
+      "description": "Products, cart and checkout with two payment gateways, multi-currency, support tickets, SEO and a cookie banner.",
+      "icon": "ShoppingBag",
       "theme": "flat",
-      "modules": ["custom-pages", "slider", "seo", "announcements"]
+      "modules": [
+        "store",
+        "stripe-gateway",
+        "paypal-gateway",
+        "currency",
+        "tickets",
+        "custom-pages",
+        "seo",
+        "cookie-consent",
+        "email-templates",
+        "csv-import-export",
+        "google-analytics"
+      ]
+    },
+    {
+      "id": "license-sales",
+      "name": "License sales",
+      "description": "Sell licensed products with gated downloads, a help centre and support tickets. Two-factor is on because a buyer account holds their purchases.",
+      "icon": "KeyRound",
+      "theme": "flat",
+      "modules": [
+        "store",
+        "stripe-gateway",
+        "paypal-gateway",
+        "downloads",
+        "tickets",
+        "help-center",
+        "custom-pages",
+        "seo",
+        "email-templates",
+        "two-factor-auth"
+      ]
+    },
+    {
+      "id": "software-sales",
+      "name": "Software sales",
+      "description": "A download centre, release notes, a searchable knowledge base and support tickets around a paid product.",
+      "icon": "Package",
+      "theme": "flat",
+      "modules": [
+        "store",
+        "stripe-gateway",
+        "paypal-gateway",
+        "downloads",
+        "changelog",
+        "help-center",
+        "tickets",
+        "custom-pages",
+        "seo",
+        "email-templates"
+      ]
     },
     {
       "id": "custom",
