@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { toast } from "sonner";
@@ -82,7 +82,7 @@ export default function SetupWizardPage() {
                 /* non-fatal - the site-type step explains the empty state */
             });
 
-        fetch("/api/v1/modules/marketplace")
+        fetch("/api/setup/modules")
             .then((r) => (r.ok ? r.json() : null))
             .then((data: { modules?: Array<Partial<ModuleOption> & { id: string; name: string }> } | null) => {
                 if (!data?.modules) return;
@@ -225,29 +225,34 @@ export default function SetupWizardPage() {
                     <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
                 </div>
 
-                {/* Progress */}
-                <div className="flex items-center justify-between mb-8">
+                {/* Progress.
+                    `items-start` plus a fixed offset on the connector, rather
+                    than centring the whole column: a label that wraps to two
+                    lines ("Site type" in English) makes its column taller, and
+                    a centred connector then sits lower than its neighbours. The
+                    offset is half the 36px circle, less half the 2px line. */}
+                <div className="flex items-start mb-8">
                     {STEP_IDS.map((id, idx) => {
                         const Icon = STEP_ICONS[idx];
                         const number = idx + 1;
                         const reached = step >= number;
                         const active = step === number;
                         return (
-                            <div key={id} className="flex-1 flex items-center">
-                                <div className="flex flex-col items-center flex-1">
+                            <Fragment key={id}>
+                                <div className="flex w-20 shrink-0 flex-col items-center">
                                     <div
                                         className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-colors ${
                                             active
-                                                ? "bg-blue-600 border-blue-600 text-white"
+                                                ? "bg-primary border-primary text-primary-foreground"
                                                 : reached
-                                                  ? "bg-blue-100 border-blue-600 text-blue-600"
+                                                  ? "bg-primary/10 border-primary text-primary"
                                                   : "bg-card border-border text-muted-foreground"
                                         }`}
                                     >
                                         <Icon className="w-4 h-4" />
                                     </div>
                                     <span
-                                        className={`text-[11px] mt-1 text-center ${
+                                        className={`text-[11px] mt-1 text-center leading-tight ${
                                             active ? "text-foreground font-medium" : "text-muted-foreground"
                                         }`}
                                     >
@@ -256,12 +261,12 @@ export default function SetupWizardPage() {
                                 </div>
                                 {idx < STEP_IDS.length - 1 && (
                                     <div
-                                        className={`h-0.5 w-full -mt-4 ${
-                                            step > number ? "bg-blue-600" : "bg-border"
+                                        className={`h-0.5 mt-[17px] flex-1 ${
+                                            step > number ? "bg-primary" : "bg-border"
                                         }`}
                                     />
                                 )}
-                            </div>
+                            </Fragment>
                         );
                     })}
                 </div>
@@ -331,7 +336,7 @@ export default function SetupWizardPage() {
                                 type="button"
                                 onClick={goNext}
                                 disabled={!canAdvance()}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
                                 {t("next")} <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
@@ -342,7 +347,7 @@ export default function SetupWizardPage() {
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={submitting || !canAdvance()}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
                                 {submitting ? (
                                     <>

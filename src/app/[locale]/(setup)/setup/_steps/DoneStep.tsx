@@ -24,7 +24,7 @@ export function DoneStep({ completed, result }: { completed: boolean; result: Se
                 <div className="text-xs text-muted-foreground space-y-1">
                     <div>{t("installed", { modules: installed.join(", ") })}</div>
                     {autoAdded.length > 0 && (
-                        <div className="text-blue-700">
+                        <div className="text-primary">
                             {t("autoAdded", { modules: autoAdded.join(", ") })}
                         </div>
                     )}
@@ -40,7 +40,7 @@ export function DoneStep({ completed, result }: { completed: boolean; result: Se
                 <div className="pt-2">
                     <Link
                         href="/admin"
-                        className="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium"
+                        className="inline-flex items-center gap-1 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-medium"
                     >
                         {t("goAdmin")} <ArrowRight className="w-4 h-4" />
                     </Link>

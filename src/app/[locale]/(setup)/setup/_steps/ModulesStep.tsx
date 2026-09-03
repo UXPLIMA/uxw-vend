@@ -88,7 +88,7 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                             {t("selectedCount", { count: pickedSet.size })}
                         </span>
                         {autoAddedSet.size > 0 && (
-                            <span className="text-blue-700">
+                            <span className="text-primary">
                                 {t("autoAddedCount", { count: autoAddedSet.size })}
                             </span>
                         )}
@@ -134,7 +134,7 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                                                     key={m.id}
                                                     className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
                                                         isAuto
-                                                            ? "border-blue-300 bg-blue-50/60 cursor-default"
+                                                            ? "border-primary/40 bg-primary/5 cursor-default"
                                                             : "border-border hover:bg-accent/30 cursor-pointer"
                                                     }`}
                                                 >
@@ -152,14 +152,14 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                                                         <div className="font-medium text-foreground flex items-center gap-1.5">
                                                             {m.name}
                                                             {isAuto && !isPicked && (
-                                                                <Lock className="w-3 h-3 text-blue-600" />
+                                                                <Lock className="w-3 h-3 text-primary" />
                                                             )}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">
                                                             {m.description}
                                                         </div>
                                                         {isAuto && !isPicked && pulledBy.length > 0 && (
-                                                            <div className="text-[11px] text-blue-700 mt-1">
+                                                            <div className="text-[11px] text-primary mt-1">
                                                                 {t("requiredBy", { modules: pulledBy.join(", ") })}
                                                             </div>
                                                         )}
