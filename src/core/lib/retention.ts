@@ -11,7 +11,7 @@ import { prisma } from "@/core/lib/db";
  *   ActivityFeedItem   180
  *   WebhookLog          30
  *   CronRun             30
- *   Revision           365  (longer — it's a compliance/audit trail)
+ *   Revision           365  (longer - it's a compliance/audit trail)
  *   UserSession         30  (past expiresAt OR revoked)
  *
  * Returns a summary of how many rows each table dropped so the cron log

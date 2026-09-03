@@ -1,4 +1,4 @@
-// Custom Forms Module — Database Models
+// Custom Forms Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // ==================== CUSTOM FORMS ====================
@@ -26,7 +26,7 @@ model CustomFormSubmission {
   status    String     @default("new")
   createdAt DateTime   @default(now())
 
-  // No User FK relation declared here — userId is a loose reference so the
+  // No User FK relation declared here - userId is a loose reference so the
   // form module stays decoupled from the User model (anonymous submissions
   // are valid). Stale userIds become harmless dangling pointers after the
   // user is deleted.

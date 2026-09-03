@@ -1,5 +1,5 @@
 /**
- * Action/Filter hook API — the foundational extension mechanism.
+ * Action/Filter hook API - the foundational extension mechanism.
  *
  * Actions: fire-and-forget notifications. `doAction("user.registered", payload)`
  * runs every listener in priority order; if one throws the rest still run.
@@ -108,7 +108,7 @@ function removeRegistration(map: Map<string, Registration[]>, name: string, list
 /* ───────────────────────────── Actions ──────────────────────────────── */
 
 /**
- * `T` defaults to the registry entry for `name` and is normally left alone —
+ * `T` defaults to the registry entry for `name` and is normally left alone -
  * an unannotated listener parameter is typed from the registry. Annotating it
  * explicitly still works (needed when `name` is a variable rather than a
  * literal), but on a declared hook the annotation must be compatible with the
@@ -203,7 +203,7 @@ export function applyFilters<K extends string, V extends FilterValue<K>>(
     return result as never;
 }
 
-/** Async filter chain — each listener can return a Promise. */
+/** Async filter chain - each listener can return a Promise. */
 export async function applyFiltersAsync<K extends string, V extends FilterValue<K>>(
     name: K,
     value: V,
@@ -221,7 +221,7 @@ export async function applyFiltersAsync<K extends string, V extends FilterValue<
         } catch (err) {
             console.error(`[hooks] Async filter "${name}" listener failed:`, err);
             // Keep the previous value so a slow/broken listener doesn't
-            // corrupt the chain — downstream listeners still get a value.
+            // corrupt the chain - downstream listeners still get a value.
         }
     }
     return result as never;
@@ -246,7 +246,7 @@ type DeclaredNames<T extends "action" | "filter"> =
 
 /**
  * Resolves to `true` when a manifest-declared handler matches the payload its
- * hook is declared to carry, and to a descriptive object otherwise — which
+ * hook is declared to carry, and to a descriptive object otherwise - which
  * `Expect` below turns into a compile error naming the hook.
  *
  * Manifest listeners are wired by codegen through a dynamic import, so their
@@ -255,7 +255,7 @@ type DeclaredNames<T extends "action" | "filter"> =
  * a code path that only runs when two particular modules are both installed.
  * This moves that failure to `npm run typecheck:modules`.
  *
- * A hook no module has declared a payload for resolves to `true` — undeclared
+ * A hook no module has declared a payload for resolves to `true` - undeclared
  * hooks stay usable, they simply are not checked.
  */
 export type AssertHookHandler<K extends string, T extends "action" | "filter", F> =
@@ -332,7 +332,7 @@ export async function bootstrapHooks(): Promise<void> {
     if (bootstrapped) return;
     bootstrapped = true;
 
-    // Core listeners — activity feed, etc. (module-specific listeners live in their modules)
+    // Core listeners - activity feed, etc. (module-specific listeners live in their modules)
     try {
         const { registerActivityFeedListeners } = await import("./activity-feed");
         registerActivityFeedListeners();
@@ -401,7 +401,7 @@ export function resetHooks(): void {
 }
 
 // ===== Standard hook names =====
-// Convention only — modules may use any string. Format: `<noun>.<verb>` for
+// Convention only - modules may use any string. Format: `<noun>.<verb>` for
 // actions, `<noun>.<adjective>` for filters; resource events like
 // "store.product.created" / "blog.article.updated" are emitted by modules.
 export const HookNames = {

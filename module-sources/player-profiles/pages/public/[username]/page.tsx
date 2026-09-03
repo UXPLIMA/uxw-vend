@@ -56,7 +56,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                         <div className="flex items-center gap-5 mb-8">
                             {(() => {
                                 // Only call mc-heads.net when we know this user has a linked
-                                // Minecraft account — otherwise the service 301s an HTML page
+                                // Minecraft account - otherwise the service 301s an HTML page
                                 // that Next/Image rejects with a 400.
                                 const mcAccount = player.linkedAccounts.find(
                                     (a) => (a.provider || "").toLowerCase() === "minecraft" && a.username,

@@ -17,7 +17,7 @@ test.describe('Admin revisions', () => {
         const resourceFilterLabel = page.getByText(/^Resource$/i).first();
         await expect(resourceFilterLabel).toBeVisible();
 
-        // Resource filter is a native <select> — change it to verify it's wired.
+        // Resource filter is a native <select> - change it to verify it's wired.
         const resourceSelect = page.locator('select').first();
         await expect(resourceSelect).toBeVisible();
         await resourceSelect.selectOption({ index: 0 });

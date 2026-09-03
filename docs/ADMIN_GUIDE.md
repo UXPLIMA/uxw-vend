@@ -6,14 +6,14 @@ Navigate to `/admin` in your browser. You must be logged in with an account that
 
 The admin sidebar uses an icon rail on the left with a contextual panel that expands on hover or click. Top-level groups:
 
-- **Dashboard** — overview stats + module-contributed cards
-- **Content** — module-contributed content management pages
-- **Users** — user list, roles, permissions
-- **Modules** — marketplace and installed module management
-- **Theme** — active theme appearance settings (dynamic: label and icon come from the active theme's manifest)
-- **Design** — Custom CSS, Navbar, Footer
-- **Settings** — Site, Maintenance, Rate Limits, Alerting, Moderation, and other core settings
-- **Observability** — health, email queue, scheduler, cron errors, failed emails, stats
+- **Dashboard** - overview stats + module-contributed cards
+- **Content** - module-contributed content management pages
+- **Users** - user list, roles, permissions
+- **Modules** - marketplace and installed module management
+- **Theme** - active theme appearance settings (dynamic: label and icon come from the active theme's manifest)
+- **Design** - Custom CSS, Navbar, Footer
+- **Settings** - Site, Maintenance, Rate Limits, Alerting, Moderation, and other core settings
+- **Observability** - health, email queue, scheduler, cron errors, failed emails, stats
 
 Module-contributed menu groups appear below the core groups.
 
@@ -32,12 +32,12 @@ The platform ships with no modules installed. All domain features (store, forum,
 5. If the module has a database schema, the merged schema is updated. If it includes SQL migrations, they run automatically.
 6. If the module has dependencies, they must be installed first. The UI shows which dependencies are missing.
 
-Install fails atomically — if registry regeneration fails, the module files are removed and the `ModuleConfig` record is not created. No silent partial installs.
+Install fails atomically - if registry regeneration fails, the module files are removed and the `ModuleConfig` record is not created. No silent partial installs.
 
 **The site restarts a few seconds after the install completes.** Module pages
 are compiled into the application, so the platform rebuilds in the background
-and then replaces its own process to serve the result. Expect a short outage —
-seconds on a fast machine, a couple of minutes on a small VPS — and install
+and then replaces its own process to serve the result. Expect a short outage -
+seconds on a fast machine, a couple of minutes on a small VPS - and install
 during a quiet period on a busy site. Installing several modules at once
 produces one rebuild, not one per module, so bulk installs are cheaper than
 sequential ones.
@@ -60,7 +60,7 @@ sequential ones.
 1. Go to **Admin > Modules**.
 2. Toggle the switch on any installed module card.
 
-Disabling a module hides all its routes (public pages, admin pages, API endpoints) via the proxy middleware. Module files remain on disk. The `ModuleConfig.enabled` flag is all that changes — re-enabling is instant.
+Disabling a module hides all its routes (public pages, admin pages, API endpoints) via the proxy middleware. Module files remain on disk. The `ModuleConfig.enabled` flag is all that changes - re-enabling is instant.
 
 A module with unmet dependencies cannot be enabled. The UI shows which dependency is missing.
 
@@ -68,7 +68,7 @@ A module with unmet dependencies cannot be enabled. The UI shows which dependenc
 
 1. Click the delete button on a module card.
 2. A confirmation dialog appears.
-3. Confirm — the module files are removed from disk, the `ModuleConfig` record is deleted, and the registry is regenerated.
+3. Confirm - the module files are removed from disk, the `ModuleConfig` record is deleted, and the registry is regenerated.
 
 Data created by the module (its database tables and rows) is **not deleted** on uninstall by default. This matches established convention: data survives so it can be recovered if the module is reinstalled. To permanently drop the module's tables, a maintainer must manually run the appropriate SQL.
 
@@ -81,12 +81,12 @@ Data created by the module (its database tables and rows) is **not deleted** on 
 Go to **Admin > Settings > Theme** (or follow the **Theme** sidebar group). The library shows all installed themes as cards with a preview of their primary color palette.
 
 Two themes ship out of the box:
-- **Flat** — minimal baseline, light and dark modes
-- **PixelCraft** — gaming dark theme with MC hero section
+- **Flat** - minimal baseline, light and dark modes
+- **PixelCraft** - gaming dark theme with MC hero section
 
 ### Switching the Active Theme
 
-Click on a theme card and confirm. The `ThemeState` singleton is updated immediately. All pages reflect the new theme on next load — no rebuild required.
+Click on a theme card and confirm. The `ThemeState` singleton is updated immediately. All pages reflect the new theme on next load - no rebuild required.
 
 ### Installing a New Theme
 
@@ -105,7 +105,7 @@ Themes that are currently active cannot be deleted. Switch to a different theme 
 
 When a theme is active, the **Theme** sidebar group provides access to its appearance settings. The group label and icon come from the theme's `adminNav` declaration in the manifest.
 
-- **Appearance** is always present — shows the color token editor and mode selector.
+- **Appearance** is always present - shows the color token editor and mode selector.
 - Additional groups correspond to `settings` blocks declared in the theme manifest (e.g., a "Hero" group for hero section configuration).
 - Additional pages correspond to `adminRoutes` declared in the theme manifest (e.g., PixelCraft's hero banner page).
 
@@ -114,7 +114,7 @@ When a theme is active, the **Theme** sidebar group provides access to its appea
 1. Navigate to **Theme > Appearance**.
 2. Select the mode to customize (light or dark).
 3. Use the color picker for each token. Values are validated as hex colors.
-4. Save — overrides are stored in `ThemeCustomization` (one row per theme+mode combination) as a diff against the manifest defaults. Resetting a token removes it from the diff and falls back to the manifest default.
+4. Save - overrides are stored in `ThemeCustomization` (one row per theme+mode combination) as a diff against the manifest defaults. Resetting a token removes it from the diff and falls back to the manifest default.
 
 #### Theme Settings
 
@@ -147,7 +147,7 @@ Go to **Admin > Users**. The list shows all registered users with their email, u
 
 Click on a user row to open the detail page. From here you can:
 
-- Change the user's **role** (applied immediately — propagates to active sessions within one hour via JWT `updateAge`)
+- Change the user's **role** (applied immediately - propagates to active sessions within one hour via JWT `updateAge`)
 - **Ban** the user with an optional reason. Banned users cannot log in. The `isBanned`, `banReason`, and `bannedAt` fields are set.
 - **Unban** the user, clearing those fields.
 - View the user's activity history, profile details, and any module-contributed profile data.
@@ -157,9 +157,9 @@ Click on a user row to open the detail page. From here you can:
 Go to **Admin > Users > Roles**.
 
 **Built-in roles:**
-- `admin` — all permissions, priority 100
-- `moderator` — moderation permissions, priority 50
-- `member` — default role for new registrations, priority 0
+- `admin` - all permissions, priority 100
+- `moderator` - moderation permissions, priority 50
+- `member` - default role for new registrations, priority 0
 
 **Creating a custom role:**
 1. Click **New Role**.
@@ -169,7 +169,7 @@ Go to **Admin > Users > Roles**.
 
 **Editing permissions:** Click a role to open its permission editor. Toggle individual permissions. Changes take effect within the JWT update window (one hour) for users already logged in.
 
-**Priority:** When a user's role priority is evaluated, higher numbers win. Priority affects ordering and display, not permission inheritance — each role has its own explicit permission set.
+**Priority:** When a user's role priority is evaluated, higher numbers win. Priority affects ordering and display, not permission inheritance - each role has its own explicit permission set.
 
 ---
 
@@ -177,12 +177,12 @@ Go to **Admin > Users > Roles**.
 
 Go to **Admin > Observability**. This page aggregates:
 
-- **Health** — live database connectivity, uptime, and the same response as `GET /api/health`
-- **Email Queue** — pending, sent, and failed transactional emails
-- **Scheduler** — scheduled task registry and last-run timestamps
-- **Cron Errors** — history of failed cron endpoint calls
-- **Failed Emails** — list of emails that failed to deliver with error details
-- **Stats** — aggregate counters from installed module `statsApi` endpoints
+- **Health** - live database connectivity, uptime, and the same response as `GET /api/health`
+- **Email Queue** - pending, sent, and failed transactional emails
+- **Scheduler** - scheduled task registry and last-run timestamps
+- **Cron Errors** - history of failed cron endpoint calls
+- **Failed Emails** - list of emails that failed to deliver with error details
+- **Stats** - aggregate counters from installed module `statsApi` endpoints
 
 The health sub-section respects the `HEALTH_DEBUG` environment variable. Raw database errors are only shown when `HEALTH_DEBUG=1` is set.
 
@@ -227,7 +227,7 @@ The platform uses a Redis-backed (or memory-backed) sliding window rate limiter.
 | API | 100 requests | 1 minute |
 | Upload | 20 requests | 1 minute |
 
-**Per-role multipliers** let trusted roles bypass tighter limits. For example, setting the `admin` role multiplier to `10` allows admins 100 auth attempts per window instead of 10. Multipliers are stored in the `Setting` table under `rate_limit_role_multipliers` and are read at runtime — no rebuild required.
+**Per-role multipliers** let trusted roles bypass tighter limits. For example, setting the `admin` role multiplier to `10` allows admins 100 auth attempts per window instead of 10. Multipliers are stored in the `Setting` table under `rate_limit_role_multipliers` and are read at runtime - no rebuild required.
 
 ---
 
@@ -238,7 +238,7 @@ Translations live in the `Translation` DB table and are read at request time. Co
 To override a translation:
 1. Go to **Admin > Settings > Translations** (if the translations UI module is installed), or edit the `Translation` table directly.
 2. Find the key you want to override (e.g., `common.welcome`).
-3. Set a custom value for the locale. Admin-overridden rows survive module reinstallation — module sync does not overwrite rows that have been manually edited.
+3. Set a custom value for the locale. Admin-overridden rows survive module reinstallation - module sync does not overwrite rows that have been manually edited.
 
 ---
 
@@ -271,8 +271,8 @@ Go to **Admin > Design > Footer**. Module-contributed footer links are grouped b
 
 The admin dashboard adapts to installed modules. Each module can contribute:
 
-- **Dashboard cards** — stat counters (revenue, user count, orders, tickets, etc.) with links to the relevant admin page
-- **Stats API** — a module endpoint that returns dynamic numbers for those cards
+- **Dashboard cards** - stat counters (revenue, user count, orders, tickets, etc.) with links to the relevant admin page
+- **Stats API** - a module endpoint that returns dynamic numbers for those cards
 
 With no modules installed, the dashboard shows only core metrics (total users, total roles).
 

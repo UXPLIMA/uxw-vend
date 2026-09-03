@@ -7,7 +7,7 @@ import { resolveAppUrl } from "@/core/lib/app-url";
 
 // This used to be `export const revalidate = 3600`, which made Next prerender
 // the sitemap at BUILD time and serve that copy for the first hour. In a
-// prebuilt image that meant every URL in it read `http://localhost:3001` — the
+// prebuilt image that meant every URL in it read `http://localhost:3001` - the
 // value CI had while building. `connection()` in the handler below opts the
 // route out of build-time prerendering; this in-process memo restores exactly
 // what `revalidate` was protecting: bots hitting /sitemap.xml still do not
@@ -21,7 +21,7 @@ interface CoreStaticRoute {
     priority: number;
 }
 
-// Static routes that always exist in core — no module involvement.
+// Static routes that always exist in core - no module involvement.
 const CORE_STATIC_ROUTES: CoreStaticRoute[] = [
     { path: "/", changeFrequency: "daily", priority: 1.0 },
     { path: "/activity", changeFrequency: "daily", priority: 0.6 },
@@ -41,7 +41,7 @@ function mapChangeFreq(freq: SitemapEntry["changeFreq"]): MetadataRoute.Sitemap[
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await connection();
 
-    // Runtime-resolved from AUTH_URL — a NEXT_PUBLIC_* read here would be
+    // Runtime-resolved from AUTH_URL - a NEXT_PUBLIC_* read here would be
     // frozen at build time and emit localhost URLs from the prebuilt image.
     const siteUrl = resolveAppUrl();
 

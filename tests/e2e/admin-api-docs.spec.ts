@@ -16,7 +16,7 @@ test.describe('Admin API docs', () => {
         const swagger = page.locator('.swagger-ui').first();
         await expect(swagger).toBeVisible({ timeout: 20_000 });
 
-        // At least one section should render — either info block or an operation tag
+        // At least one section should render - either info block or an operation tag
         const anyBlock = page
             .locator('.swagger-ui .info, .swagger-ui .opblock, .swagger-ui .opblock-tag')
             .first();

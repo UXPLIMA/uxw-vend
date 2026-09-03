@@ -13,7 +13,7 @@ test.describe('Admin rate limits settings', () => {
         const response = await page.goto('/en/admin/settings/rate-limits');
         expect(response?.status(), 'rate-limits HTTP status').toBeLessThan(400);
 
-        // `rateLimits_title` — "Rate Limits" in en. The page falls back to
+        // `rateLimits_title` - "Rate Limits" in en. The page falls back to
         // "API Rate Limits" only when translations are absent, which is not
         // what any real install looks like.
         const heading = page
@@ -21,7 +21,7 @@ test.describe('Admin rate limits settings', () => {
             .first();
         await expect(heading).toBeVisible();
 
-        // At least one role slider (range input) — appears after data fetch
+        // At least one role slider (range input) - appears after data fetch
         const slider = page.locator('input[type="range"]').first();
         await expect(slider).toBeVisible({ timeout: 15_000 });
 

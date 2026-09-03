@@ -22,7 +22,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
 
 /**
  * Cmd+K / Ctrl+K spotlight search.
- * Mounted in the admin layout — listens globally for the keyboard shortcut.
+ * Mounted in the admin layout - listens globally for the keyboard shortcut.
  */
 export function AdminSpotlight() {
     const router = useRouter();

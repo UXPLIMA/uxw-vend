@@ -3,7 +3,7 @@
  * Unit tests for the store checkout money math, extracted into
  * module-sources/store/lib/pricing.ts (and synced to src/modules/store) so it
  * can be tested without a DB / Stripe / auth. The route now imports these
- * helpers instead of inlining the arithmetic — behaviour is identical.
+ * helpers instead of inlining the arithmetic - behaviour is identical.
  *
  * We import the canonical source copy (module-sources). The src/modules copy
  * is a byte-for-byte sync of the same file.

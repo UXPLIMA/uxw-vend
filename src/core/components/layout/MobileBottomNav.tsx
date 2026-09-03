@@ -17,7 +17,7 @@ export function MobileBottomNav() {
 
     if (pathname.startsWith("/admin")) return null;
 
-    // Build nav items from registry — Home + first 3 enabled module links + Profile
+    // Build nav items from registry - Home + first 3 enabled module links + Profile
     const moduleLinks = ModuleNavLinks
         .filter(nl => moduleStatus[nl.module] === true)
         .slice(0, 3)

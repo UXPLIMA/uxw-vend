@@ -31,7 +31,7 @@ function log(msg: string): void {
 /**
  * Regenerate the Prisma client when it does not know about the installed
  * modules. This is separate from the build check because the client lives in
- * node_modules — an image layer — so recreating a container silently reverts
+ * node_modules - an image layer - so recreating a container silently reverts
  * it to the zero-module client while the build volume keeps every module. That
  * combination answers module queries with `undefined.findMany`.
  *
@@ -41,7 +41,7 @@ function reconcileSchema(): void {
     const drift = detectSchemaDrift();
     if (!drift) return;
 
-    log(`regenerating the Prisma client — ${drift.kind}: ${drift.detail}`);
+    log(`regenerating the Prisma client - ${drift.kind}: ${drift.detail}`);
     try {
         execFileSync("npx", ["tsx", "scripts/merge-schemas.ts"], {
             stdio: "inherit",
@@ -50,7 +50,7 @@ function reconcileSchema(): void {
         writeSchemaState();
         log("Prisma client regenerated");
     } catch {
-        console.error("[reconcile] Prisma client regeneration FAILED — module queries will not work.");
+        console.error("[reconcile] Prisma client regeneration FAILED - module queries will not work.");
         console.error("[reconcile] Starting anyway so the admin UI stays reachable.");
     }
 }
@@ -66,8 +66,8 @@ function main(): void {
         const state = readBuildState();
         log(
             state
-                ? `build matches installed modules (${state.moduleFingerprint.slice(0, 12)}) — starting`
-                : "no modules installed and build is clean — starting",
+                ? `build matches installed modules (${state.moduleFingerprint.slice(0, 12)}) - starting`
+                : "no modules installed and build is clean - starting",
         );
         // A first boot from a fresh image has a valid build and no state file.
         // Adopt it so the next boot compares against something.
@@ -82,7 +82,7 @@ function main(): void {
         process.exit(1);
     }
 
-    log(`rebuild required — ${drift.kind}: ${drift.detail}`);
+    log(`rebuild required - ${drift.kind}: ${drift.detail}`);
     log(`installed module fingerprint: ${computeModuleFingerprint().slice(0, 12)}`);
     log("running `npm run build` (this takes a few minutes; the container is not serving yet)");
 
@@ -101,7 +101,7 @@ function main(): void {
     // are current now.
     writeBuildState();
     writeSchemaState();
-    log(`rebuild finished in ${Math.round((Date.now() - started) / 1000)}s — starting`);
+    log(`rebuild finished in ${Math.round((Date.now() - started) / 1000)}s - starting`);
 }
 
 main();

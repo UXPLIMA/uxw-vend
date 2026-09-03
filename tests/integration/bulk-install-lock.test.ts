@@ -10,7 +10,7 @@
  * The advisory-lock path requires Postgres (sets up a dedicated pg pool
  * via `eval('require')("pg")`). Without DATABASE_URL pointing at a
  * reachable Postgres, the implementation catches the connection error and
- * falls back to an in-process flag — which still satisfies the
+ * falls back to an in-process flag - which still satisfies the
  * serialization contract for a single worker. That's what we test here so
  * the test runs in CI without a database.
  *

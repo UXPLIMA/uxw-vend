@@ -137,7 +137,7 @@ const webhookChannel = z.object({
 });
 // The provider id is interpolated into a `next-auth/providers/<id>` import, so
 // it is held to the strict slug rule rather than the looser SAFE_SLUG used for
-// display-only ids — a "/" or ".." here would escape the providers directory.
+// display-only ids - a "/" or ".." here would escape the providers directory.
 const authProvider = z.object({
     id: z.string().min(1).max(64).regex(SAFE_ID, "Auth provider id must be a lowercase slug"),
     envIdVar: z.string().min(1).max(128).regex(/^[A-Z][A-Z0-9_]*$/, "envIdVar must be an env var name"),
@@ -183,7 +183,7 @@ const hookListener = z.object({
  * cross-module contract inspectable: `validate:module` checks the declaration
  * against the `doAction`/`applyFilters` calls in the source, and the
  * marketplace build rejects a `hookListeners` entry naming a hook no module in
- * the catalog emits — which is the only thing that can catch a typo in a hook
+ * the catalog emits - which is the only thing that can catch a typo in a hook
  * name, since nothing fails at runtime when a listener never fires.
  */
 const hookEmitted = z.object({
@@ -222,7 +222,7 @@ const cronJob = z.object({
  * A full-text index the module needs on one of its own tables.
  *
  * Modules declare identifiers, never SQL. Core builds the `to_tsvector(...)`
- * expression from them, so a module cannot inject anything into the DDL — and
+ * expression from them, so a module cannot inject anything into the DDL - and
  * the regex below is what makes that guarantee hold rather than assume it.
  */
 const searchIndex = z.object({
@@ -240,8 +240,8 @@ const searchProvider = z.object({
     icon: iconName.optional(),
     /**
      * Core used to carry a hardcoded list of four module tables in
-     * `scripts/ensure-search-indexes.ts` — `BlogArticle`, `ForumTopic`,
-     * `HelpArticle`, `Product` — which is exactly the coupling the project
+     * `scripts/ensure-search-indexes.ts` - `BlogArticle`, `ForumTopic`,
+     * `HelpArticle`, `Product` - which is exactly the coupling the project
      * forbids, and which logged an error for every uninstalled module on
      * every boot. The module that owns the table declares the index instead.
      */
@@ -362,7 +362,7 @@ export const moduleManifestSchema = z.object({
      * Range of CORE_API_VERSION this module was built against.
      *
      * Required. It used to be optional, and an omitted range meant
-     * "unconstrained" — which is the one answer a compatibility gate must
+     * "unconstrained" - which is the one answer a compatibility gate must
      * never accept by default: a module built against a core it has never
      * seen installed silently and failed at runtime instead of at install
      * time. Declaring the range is one line, and getting it wrong is a clear
@@ -371,7 +371,7 @@ export const moduleManifestSchema = z.object({
     coreVersion: semverRange,
     /**
      * Marketplace grouping. Free-form rather than a fixed enum so core owns no
-     * category vocabulary — the catalog groups by whatever values are present.
+     * category vocabulary - the catalog groups by whatever values are present.
      */
     category: z.string().min(1).max(32).regex(SAFE_ID, "category must be a lowercase slug").optional(),
     tags: z.array(z.string().min(1).max(32)).max(10).optional(),
@@ -429,7 +429,7 @@ export type ValidatedModuleManifest = z.infer<typeof moduleManifestSchema>;
  * The file extensions a manifest ref may be written without. The registry
  * generator strips any extension off a ref and emits a bare import specifier
  * (`@/modules/blog/components/BlogNewsSection`), leaving the bundler to pick
- * the file — so `components/Foo`, `components/Foo.tsx` and `components/Foo/`
+ * the file - so `components/Foo`, `components/Foo.tsx` and `components/Foo/`
  * all name the same module. Anything that validates refs against the disk has
  * to apply the same rule or it rejects manifests the build would have loaded
  * fine.
@@ -442,7 +442,7 @@ const MODULE_REF_EXTENSIONS = [".tsx", ".ts", ".jsx", ".js", ".mjs", ".cjs"];
  * carries its extension), then each extension appended, then `index.*` inside
  * a directory of that name.
  *
- * Pure — no filesystem access — so this stays importable from the client
+ * Pure - no filesystem access - so this stays importable from the client
  * bundle alongside the rest of the schema. `checkManifestFileRefs` in
  * `module-ref-resolver.ts` is the filesystem-aware half.
  */

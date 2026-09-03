@@ -118,7 +118,7 @@ export type UrlCheck = { ok: true } | { ok: false; error: string };
  *
  * A module-declared channel is checked against its own host allowlist. The
  * generic channel accepts any public host, so it instead refuses targets that
- * only exist inside the network — an admin-editable URL that core fetches
+ * only exist inside the network - an admin-editable URL that core fetches
  * server-side is an SSRF surface.
  */
 export function validateWebhookUrl(channel: WebhookChannel, rawUrl: string): UrlCheck {

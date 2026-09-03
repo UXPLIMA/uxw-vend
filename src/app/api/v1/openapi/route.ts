@@ -17,7 +17,7 @@ import { isAdmin } from "@/core/lib/permissions";
  *     unnecessary reconnaissance gift.
  *
  * Operators who want a public, read-only catalog can set
- * OPENAPI_PUBLIC=1 to bypass the admin check — this makes explicit what
+ * OPENAPI_PUBLIC=1 to bypass the admin check - this makes explicit what
  * used to be implicit with `Access-Control-Allow-Origin: *`.
  */
 export async function GET() {

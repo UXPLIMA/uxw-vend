@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 /**
  * Maintenance mode is the switch that takes the whole site offline. Its
  * cache lives on globalThis specifically so the proxy bundle and the API
- * route bundle share one object — get that wrong and an admin turning
+ * route bundle share one object - get that wrong and an admin turning
  * maintenance off watches the site stay down. It also has to fail *open*:
  * a database error must never lock visitors out.
  */

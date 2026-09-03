@@ -22,7 +22,7 @@ const intlMiddleware = createIntlMiddleware({
 
 // Routes / method combinations that are 403'd when DEMO_MODE=1.
 // Blacklist (not whitelist) because most writes are part of the demo
-// experience — login, register, vote, post, suggestion, comment, cart,
+// experience - login, register, vote, post, suggestion, comment, cart,
 // preferences. We only block actions that would wreck the demo for the
 // next visitor or cost money.
 function isBlockedInDemo(method: string, pathname: string): boolean {
@@ -43,14 +43,14 @@ function isBlockedInDemo(method: string, pathname: string): boolean {
     // Module install/uninstall/enable
     if (/^\/api\/v1\/modules(?:\/|$)/.test(pathname)) return true;
 
-    // Theme upload/delete/activate (customizer save is fine — that's per-mode tokens)
+    // Theme upload/delete/activate (customizer save is fine - that's per-mode tokens)
     if (pathname === '/api/v1/themes') return true;
     if (pathname.startsWith('/api/v1/themes/upload')) return true;
     if (pathname.startsWith('/api/v1/themes/marketplace/install')) return true;
     if (/^\/api\/v1\/themes\/[^/]+$/.test(pathname) && m === 'DELETE') return true;
     if (pathname === '/api/v1/themes/state') return true;
 
-    // Global settings save — would let a visitor change site name / SEO / CSS
+    // Global settings save - would let a visitor change site name / SEO / CSS
     if (pathname === '/api/v1/settings') return true;
 
     // API keys (could be used to bypass this gate via server-to-server)
@@ -61,11 +61,11 @@ function isBlockedInDemo(method: string, pathname: string): boolean {
     if (pathname.startsWith('/api/v1/admin/email-queue/')) return true;
     if (pathname.startsWith('/api/v1/admin/ip-blocks')) return true;
 
-    // Uploads — disk + bandwidth abuse
+    // Uploads - disk + bandwidth abuse
     if (pathname.startsWith('/api/v1/upload')) return true;
     if (pathname.startsWith('/api/v1/media')) return true;
 
-    // Real payments — Stripe checkout creation costs nothing but webhooks would fire
+    // Real payments - Stripe checkout creation costs nothing but webhooks would fire
     if (pathname.startsWith('/api/v1/store/checkout')) return true;
 
     return false;
@@ -84,11 +84,11 @@ function getModuleForPath(pathname: string): string | null {
 
 /**
  * Resolve a single module's enabled flag. We hit the shared module state
- * cache directly (Redis when available, in-memory fallback) — no internal
+ * cache directly (Redis when available, in-memory fallback) - no internal
  * HTTP round-trip. Next.js 16 runs middleware in Node runtime so direct
  * Prisma reads via getModuleStates are safe here.
  *
- * Unknown module IDs default to "enabled" — a module that has routes in the
+ * Unknown module IDs default to "enabled" - a module that has routes in the
  * registry but no ModuleConfig row is assumed on until an admin toggles it
  * off. Failing open is preferable to black-holing traffic during a DB blip.
  */
@@ -171,7 +171,7 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     // ===== Demo write gate =====
     // On the public demo instance (DEMO_MODE=1) any visitor can log in as
     // the seeded admin. Block the handful of admin actions that would brick
-    // the demo for everyone else — see isBlockedInDemo() for the full list.
+    // the demo for everyone else - see isBlockedInDemo() for the full list.
     if (process.env.DEMO_MODE === '1' && isBlockedInDemo(request.method, pathname)) {
         return NextResponse.json(
             { error: 'This action is disabled in the demo. Spin up your own instance to try it.' },
@@ -240,7 +240,7 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
 
         // The gate used to be one-directional: it forced visitors onto the
         // wizard but never sent them back off it. A live site therefore still
-        // served the wizard at /setup — its steps empty, because every
+        // served the wizard at /setup - its steps empty, because every
         // /api/setup route answers 409 once a user exists.
         if (setupDone && isOnSetup) {
             return NextResponse.redirect(new URL(`/${locale}`, request.url));
@@ -291,7 +291,7 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
 
     // ===== IP blocklist gate =====
     // Block list is cached in-process for 60s. `isIpBlocked` fails open on DB
-    // errors — a DB outage must never lock every visitor out. Skipped until
+    // errors - a DB outage must never lock every visitor out. Skipped until
     // setup completes so a stale rule can't lock the operator out of the
     // initial install screen before they whitelist their own IP.
     if (!isStaticAsset(pathname) && (await isSetupComplete())) {

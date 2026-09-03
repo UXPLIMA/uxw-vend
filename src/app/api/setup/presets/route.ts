@@ -8,7 +8,7 @@ import { parseSetupPresets, CUSTOM_PRESET } from "@/core/lib/setup-presets";
  * Site-type presets for the first-run wizard.
  *
  * Reads `module-marketplace/presets.json` as data, the same way the module
- * catalog is read — core itself names no module. A missing or malformed file
+ * catalog is read - core itself names no module. A missing or malformed file
  * degrades to the manual path rather than blocking setup.
  */
 const PRESETS_PATH = path.join(process.cwd(), "module-marketplace", "presets.json");

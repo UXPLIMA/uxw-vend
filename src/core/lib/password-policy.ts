@@ -71,7 +71,7 @@ export function checkPasswordPolicy(input: unknown): PasswordCheck {
         return { ok: false, reason: "missing_digit", message: "Password must contain at least one number" };
     }
     if (COMMON_PASSWORDS.has(input.trim().toLowerCase())) {
-        return { ok: false, reason: "too_common", message: "Password is too common — pick something more unique" };
+        return { ok: false, reason: "too_common", message: "Password is too common - pick something more unique" };
     }
     return { ok: true };
 }
@@ -80,7 +80,7 @@ export const PASSWORD_POLICY = { MIN_LENGTH, MAX_LENGTH } as const;
 
 /**
  * Optional haveibeenpwned breach check using the k-anonymity range API.
- * Only the first 5 chars of the SHA-1 digest leave the server — the
+ * Only the first 5 chars of the SHA-1 digest leave the server - the
  * response is a list of suffixes and counts, and we look ours up locally.
  *
  * Gated by PASSWORD_BREACH_CHECK=1 so installs can run fully offline.

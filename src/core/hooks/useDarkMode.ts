@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 /**
- * Shared dark mode hook — syncs state across components via storage events.
+ * Shared dark mode hook - syncs state across components via storage events.
  * Single source of truth for dark mode toggle.
  */
 export function useDarkMode() {

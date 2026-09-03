@@ -28,7 +28,7 @@ function matchPattern(path: string, pattern: string): boolean {
 }
 
 function isVisibleOnPage(ann: Announcement, path: string): boolean {
-    // Include check — empty means show everywhere
+    // Include check - empty means show everywhere
     if (ann.includePages) {
         const patterns = ann.includePages.split(",").map(p => p.trim());
         if (!patterns.some(p => matchPattern(path, p))) return false;

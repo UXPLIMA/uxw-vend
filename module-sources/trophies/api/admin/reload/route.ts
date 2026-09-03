@@ -11,7 +11,7 @@ import { registerTrophyListeners } from "../../../lib/trophy-engine";
  * Note: hooks.ts does not currently support listener removal, so calling
  * this multiple times layers listeners on top of each other. Because
  * `awardIfQualified` is idempotent (upsert), duplicate wiring is
- * harmless — only the first listener ever actually writes.
+ * harmless - only the first listener ever actually writes.
  */
 export async function POST() {
     const session = await auth();

@@ -9,7 +9,7 @@
 // algorithm can be rotated later without ambiguous decoder behaviour.
 // Strings missing the prefix are treated as legacy plaintext by
 // decryptSecret(), letting callers transparently migrate values on the
-// next write — see TASK 3 in the schema-hardening pass.
+// next write - see TASK 3 in the schema-hardening pass.
 //
 // Key material
 // ------------
@@ -103,7 +103,7 @@ export function decryptSecret(stored: string): string {
         throw new TypeError("decryptSecret expects a string");
     }
     if (!stored.startsWith(`${VERSION}:`)) {
-        // Legacy plaintext — accept once, caller should re-store encrypted.
+        // Legacy plaintext - accept once, caller should re-store encrypted.
         return stored;
     }
     const parts = stored.split(":");

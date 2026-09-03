@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    // Fire user.2fa.enabled hook — security audit trail, etc.
+    // Fire user.2fa.enabled hook - security audit trail, etc.
     import("@/core/sdk")
         .then(({ doActionAsync }) =>
             doActionAsync("user.2fa.enabled", { userId: session.user!.id })

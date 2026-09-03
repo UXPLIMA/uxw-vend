@@ -3,7 +3,7 @@ import { prisma, rateLimitForRole } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { nanoid } from "nanoid";
 
-// GET /api/v1/referral — Get user's referral code + stats
+// GET /api/v1/referral - Get user's referral code + stats
 export async function GET() {
     const session = await auth();
     if (!session?.user) {
@@ -62,7 +62,7 @@ export async function GET() {
     });
 }
 
-// POST /api/v1/referral — Apply referral code
+// POST /api/v1/referral - Apply referral code
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user) {

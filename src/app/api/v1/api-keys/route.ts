@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         metadata: { name: apiKey.name, permissions: apiKey.permissions, expiresAt: apiKey.expiresAt },
     }).catch(() => {});
 
-    // Return the raw key ONLY on creation — it cannot be retrieved again
+    // Return the raw key ONLY on creation - it cannot be retrieved again
     return NextResponse.json({
         apiKey: { id: apiKey.id, name: apiKey.name, key: rawKey, keyPrefix, permissions: apiKey.permissions, expiresAt: apiKey.expiresAt, createdAt: apiKey.createdAt },
         warning: "Save this key now. It cannot be shown again.",

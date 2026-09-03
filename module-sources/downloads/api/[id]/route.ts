@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Invalid download URL" }, { status: 400 });
     }
 
-    // Granular gate — if any ResourcePermission rows exist for this specific
+    // Granular gate - if any ResourcePermission rows exist for this specific
     // download, require the caller to have been granted access. When no
     // grants exist, the download remains open (existing behavior preserved).
     const restricted = await prisma.resourcePermission.count({

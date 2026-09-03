@@ -129,7 +129,7 @@ function checkManifestSchema(modulePath: string): CheckResult {
 
         // This is the same schema the install, upload and update routes run a
         // manifest through before they touch the disk. Until it was wired in
-        // here, a manifest CI called valid could still be refused on install —
+        // here, a manifest CI called valid could still be refused on install -
         // a ref like `../../src/core/lib/db` passed every check in this script
         // while the routes rejected it outright.
         const issues = parsed.error.issues
@@ -318,7 +318,7 @@ function checkSchemaPrisma(modulePath: string): CheckResult {
     }
 
     // A field typed `User` needs the reverse field on the core User model,
-    // and merge-schemas only emits those from the relations block — without
+    // and merge-schemas only emits those from the relations block - without
     // it the merged schema does not validate. A bare `userId String` column
     // with no `@relation` is a deliberate loose reference (anonymous form
     // submissions, records that outlive their author) and needs nothing.
@@ -547,7 +547,7 @@ function checkApiAuthChecks(modulePath: string): CheckResult {
  * A hook name is a contract with modules that will never import this one, and
  * nothing fails at runtime when the two halves disagree: a listener on a
  * misspelled hook simply never fires. `hooksEmitted` makes this module's half
- * declarative so it can be checked — here against the module's own source, and
+ * declarative so it can be checked - here against the module's own source, and
  * in build-marketplace.sh against every listener in the catalog.
  *
  * Only string literals are matched. A dynamically named hook
@@ -622,8 +622,8 @@ function checkHooksEmitted(modulePath: string): CheckResult {
  *
  * `withTypeScript` exists because `checkTypeScript` shells out to a full
  * `tsc --noEmit` over the whole project and then filters the output down to
- * this module's files. That is tolerable for one module — a third-party author
- * running the command once — but `--all` would pay it 42 times over. In that
+ * this module's files. That is tolerable for one module - a third-party author
+ * running the command once - but `--all` would pay it 42 times over. In that
  * mode `npm run typecheck:modules` is the check that actually covers the tree,
  * and it does so against a Prisma client that has the module models in it,
  * which this one does not.

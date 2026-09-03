@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 /**
  * A broadcast fans one message out to every user on the instance. The two
- * things worth pinning are the recipient filter — sending a role-targeted
- * mail to everyone cannot be recalled — and the terminal status, since a
+ * things worth pinning are the recipient filter - sending a role-targeted
+ * mail to everyone cannot be recalled - and the terminal status, since a
  * run that leaves a row in "sending" forever blocks the cron from ever
  * picking up the next broadcast.
  */
@@ -226,7 +226,7 @@ describe("processQueuedBroadcasts", () => {
 
         await processQueuedBroadcasts();
 
-        // A partial failure is not a failed broadcast — one bad address must
+        // A partial failure is not a failed broadcast - one bad address must
         // not mark the whole run as undelivered.
         expect(finalUpdate()).toMatchObject({
             status: "sent", sentCount: 1, failedCount: 1, lastError: "mailbox full",

@@ -12,7 +12,7 @@ import type { Config } from "@measured/puck";
  *   - render: React component that renders the block on the public page
  *
  * Modules can extend this library by exporting their own block definitions
- * and registering them via getBlockConfig() — see ModuleBlocks below.
+ * and registering them via getBlockConfig() - see ModuleBlocks below.
  */
 
 // ──────────────────── Hero Block ────────────────────
@@ -238,7 +238,7 @@ const CardBlock = {
 };
 
 /**
- * Core block config — register every built-in block here.
+ * Core block config - register every built-in block here.
  * Modules can extend this by merging their own blocks at runtime.
  */
 export type CoreBlockProps = {

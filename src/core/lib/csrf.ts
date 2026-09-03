@@ -4,13 +4,13 @@ import { NextResponse, type NextRequest } from "next/server";
  * Lightweight same-origin CSRF guard for custom API mutation routes.
  *
  * NextAuth already protects its own endpoints (/api/auth/*). This helper is
- * for the dozens of custom state-changing endpoints we own — profile delete,
+ * for the dozens of custom state-changing endpoints we own - profile delete,
  * admin CRUD, API keys, module install/enable, etc.
  *
  * Strategy: verify the request's Origin (or Referer as fallback) matches one
  * of the configured allowed origins. This blocks the common CSRF vector of a
  * cross-site form/fetch submitting with the victim's cookies, because browsers
- * will send the attacker's origin in those headers — not ours.
+ * will send the attacker's origin in those headers - not ours.
  *
  * Allowed origins are resolved from:
  *   - AUTH_URL / NEXTAUTH_URL / NEXT_PUBLIC_APP_URL (prod canonical URL)
@@ -20,7 +20,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Safe-method requests (GET/HEAD/OPTIONS) are allowed through unchanged.
  * Server-to-server callers (no browser) can attach an Origin header pointing
  * at the site to pass, or set CSRF_INTERNAL_SECRET and send it in
- * `x-internal-request` — same pattern the proxy used for module status.
+ * `x-internal-request` - same pattern the proxy used for module status.
  */
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -55,7 +55,7 @@ function resolveAllowedOrigins(request: NextRequest): Set<string> {
         }
     }
 
-    // The origin serving this request is always allowed — behind a reverse
+    // The origin serving this request is always allowed - behind a reverse
     // proxy this reflects the public hostname the client actually hit.
     origins.add(request.nextUrl.origin);
 

@@ -123,7 +123,7 @@ function sanitizeTokenValue(tokenKey: "colors" | "fonts" | "radius" | "space", v
 /**
  * Walk the override payload against the theme manifest and keep only
  * values that pass type-specific sanitization. Unknown groups/fields are
- * silently dropped — the manifest is the source of truth for what the
+ * silently dropped - the manifest is the source of truth for what the
  * user is allowed to override.
  */
 function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, unknown>): Record<string, unknown> {
@@ -158,7 +158,7 @@ function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, un
         if (Object.keys(cleanGroup).length > 0) out[groupKey] = cleanGroup;
     }
 
-    // 3. Optional top-level `custom_css` escape hatch — only allowed when
+    // 3. Optional top-level `custom_css` escape hatch - only allowed when
     // the manifest explicitly declares a `customCss` config group (none do
     // by default). Falls back to the CSS sanitizer for defense-in-depth.
     if (typeof overrides.custom_css === "string" && manifest.settings?.customCss) {

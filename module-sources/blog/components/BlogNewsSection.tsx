@@ -42,7 +42,7 @@ export function BlogNewsSection() {
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
   if (isLoading) return <SkeletonNewsGrid count={4} />;
-  // Don't return null when empty — render a visible empty state so the
+  // Don't return null when empty - render a visible empty state so the
   // homepage doesn't appear blank when blog is the only enabled section
   // and there's no published content yet.
   if (blogPosts.length === 0) {

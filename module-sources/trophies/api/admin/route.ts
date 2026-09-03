@@ -6,8 +6,8 @@ import { auth } from "@/core/sdk/auth";
 /**
  * Admin trophy CRUD.
  *
- * GET  /api/v1/admin/trophies        — list with award counts
- * POST /api/v1/admin/trophies        — create a new trophy
+ * GET  /api/v1/admin/trophies        - list with award counts
+ * POST /api/v1/admin/trophies        - create a new trophy
  *
  * All routes require the caller to pass `isAdmin()`.
  */

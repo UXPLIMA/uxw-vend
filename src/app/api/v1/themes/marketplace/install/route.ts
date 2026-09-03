@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         const manifestPath = path.join(targetDir, "theme.json");
         if (!(await fs.access(manifestPath).then(() => true).catch(() => false))) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Invalid theme — no theme.json" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid theme - no theme.json" }, { status: 400 });
         }
 
         // Regenerate theme registry

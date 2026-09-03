@@ -31,7 +31,7 @@ type CompatManifest = Pick<
 /**
  * Checks a module's declared `coreVersion` against the running core contract.
  *
- * Returns ok for a manifest that declares nothing — every manifest written
+ * Returns ok for a manifest that declares nothing - every manifest written
  * before the field existed implicitly accepts any core.
  */
 export function checkCoreCompatibility(

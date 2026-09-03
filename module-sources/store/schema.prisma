@@ -1,4 +1,4 @@
-// Store Module — Database Models
+// Store Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // @@user-relations-start

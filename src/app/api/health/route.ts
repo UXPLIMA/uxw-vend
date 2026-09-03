@@ -10,9 +10,9 @@ import pkg from "../../../../package.json";
  *
  * Returns a structured snapshot of the platform's critical
  * subsystems. The HTTP status reflects the overall health:
- *   - 200 ok        — every subsystem nominal
- *   - 200 degraded  — DB is fine but a non-critical check failed
- *   - 503 down      — DB is unreachable, the app cannot serve
+ *   - 200 ok        - every subsystem nominal
+ *   - 200 degraded  - DB is fine but a non-critical check failed
+ *   - 503 down      - DB is unreachable, the app cannot serve
  *
  * No auth: standard for k8s/ALB probes. Rate limited to 30/min/IP
  * to prevent abuse and accidental amplification.
@@ -94,9 +94,9 @@ async function checkScheduler(): Promise<{ ok: boolean; staleJobs: number; error
 }
 
 export async function GET(req: Request) {
-    // Public endpoint — rate limit per IP to prevent abuse.
+    // Public endpoint - rate limit per IP to prevent abuse.
     const ip = getClientIP(req.headers);
-    // 120/min/IP — admin observability polls /api/health every 10s, plus
+    // 120/min/IP - admin observability polls /api/health every 10s, plus
     // load-balancer probes, plus incidental curl. 30/min was too tight.
     const allowed = await rateLimitForRoleAsync(`health:${ip}`, { maxRequests: 120, windowMs: 60_000 }, null);
     if (!allowed) {

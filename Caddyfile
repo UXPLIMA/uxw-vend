@@ -8,7 +8,7 @@
 # app publishes its own port and this file is unused.
 
 {
-	# Empty is fine — Let's Encrypt just won't send expiry reminders.
+	# Empty is fine - Let's Encrypt just won't send expiry reminders.
 	email {$TLS_EMAIL}
 }
 

@@ -74,7 +74,7 @@ interface CoreEndpoint {
 }
 
 // Hand-written core endpoints. Keep this list focused on the most
-// important entry points — authoritative surface of the core API.
+// important entry points - authoritative surface of the core API.
 const CORE_ENDPOINTS: CoreEndpoint[] = [
     // --- Auth ---
     {
@@ -514,7 +514,7 @@ function buildPathsFromModules(
                 pathItem[method] = {
                     summary:
                         entry.description ||
-                        `${mod.name} — ${entry.path}`,
+                        `${mod.name} - ${entry.path}`,
                     description: `Module: ${mod.id}`,
                     tags: [mod.id],
                     security: [{ bearerAuth: [] }],
@@ -556,7 +556,7 @@ function generate() {
     const corePaths = buildPathsFromCore();
     const modulePaths = buildPathsFromModules(modules);
 
-    // Merge — core paths win in the event of a collision (should not happen
+    // Merge - core paths win in the event of a collision (should not happen
     // because core uses /auth, /users, etc. and modules use their own prefixes).
     const paths: Record<string, PathItem> = { ...modulePaths, ...corePaths };
 
@@ -564,7 +564,7 @@ function generate() {
         .filter((m) => m.api && m.api.length > 0)
         .map((m) => ({
             name: m.id,
-            description: `${m.name}${m.description ? ` — ${m.description}` : ""}`,
+            description: `${m.name}${m.description ? ` - ${m.description}` : ""}`,
         }));
 
     const spec = {
@@ -616,7 +616,7 @@ function generate() {
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(spec, null, 2));
     const pathCount = Object.keys(paths).length;
     console.log(
-        `[openapi] Wrote ${OUTPUT_FILE} — ${pathCount} paths (${modules.length} modules scanned)`,
+        `[openapi] Wrote ${OUTPUT_FILE} - ${pathCount} paths (${modules.length} modules scanned)`,
     );
 }
 

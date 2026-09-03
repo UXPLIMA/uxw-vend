@@ -26,7 +26,7 @@ export async function getActiveTheme(): Promise<ActiveTheme> {
     ]);
 
     // Start every declared settings group + field at its manifest-level
-    // `default`. DB rows then override — so a theme that ships with field
+    // `default`. DB rows then override - so a theme that ships with field
     // defaults renders them immediately on first install, before the admin
     // has saved anything. Without this step, any component reading
     // useThemeConfig()?.hero?.title on a freshly-switched theme sees

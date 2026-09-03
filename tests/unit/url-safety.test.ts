@@ -45,7 +45,7 @@ describe("hostnameMatchesAllowlist", () => {
     });
 
     // A trailing dot is the fully-qualified form: "discord.com." resolves to the
-    // same host, so rejecting it would be a false negative — and accepting it
+    // same host, so rejecting it would be a false negative - and accepting it
     // without normalising would make "discord.com." miss an exact-match check.
     it("normalises a trailing root dot", () => {
         expect(hostnameMatchesAllowlist("discord.com.", allowed)).toBe(true);

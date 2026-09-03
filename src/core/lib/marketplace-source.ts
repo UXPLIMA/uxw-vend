@@ -11,7 +11,7 @@
  * whatever CI happened to have. See `app-url.ts` for the same constraint.
  *
  * `UXWVEND_MARKETPLACE_BASE` lets a fork serve its own catalogue, and lets an
- * air-gapped install point at an internal mirror. It must be an http(s) URL —
+ * air-gapped install point at an internal mirror. It must be an http(s) URL -
  * these values are interpolated into `fetch()` calls that then unzip whatever
  * comes back, so a `file://` or other scheme here would be a way to read the
  * server's own disk through the module installer.

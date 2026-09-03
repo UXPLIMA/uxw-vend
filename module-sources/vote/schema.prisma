@@ -1,4 +1,4 @@
-// Vote Module — Database Models
+// Vote Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // @@user-relations-start
@@ -27,7 +27,7 @@ model VoteLog {
   voteSite   VoteSite @relation(fields: [voteSiteId], references: [id])
   createdAt  DateTime @default(now())
 
-  // No @@unique([userId, voteSiteId]) — the claim handler stores one row
+  // No @@unique([userId, voteSiteId]) - the claim handler stores one row
   // per vote so the 24h cooldown can be derived from the latest createdAt.
   @@index([userId])
   @@index([voteSiteId])

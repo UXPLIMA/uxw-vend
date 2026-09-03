@@ -30,7 +30,7 @@ interface UpdateInfo {
 /**
  * Compare two semver-ish version strings.
  * Returns positive if a > b, negative if a < b, 0 if equal.
- * Handles "1.2.3", "1.2", "1" — missing parts treated as 0.
+ * Handles "1.2.3", "1.2", "1" - missing parts treated as 0.
  */
 function compareVersions(a: string, b: string): number {
     const ap = a.split(".").map((n) => parseInt(n) || 0);
@@ -91,7 +91,7 @@ export async function GET() {
             const installedVersion = manifest.version || "0.0.0";
 
             const market = marketplaceMap.get(moduleId);
-            if (!market) continue; // Not in marketplace — custom module
+            if (!market) continue; // Not in marketplace - custom module
 
             if (compareVersions(market.version, installedVersion) > 0) {
                 updates.push({

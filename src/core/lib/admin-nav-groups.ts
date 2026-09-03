@@ -12,7 +12,7 @@
  *
  * Module contributions: modules declare `menu[]` in their manifest with
  * an optional `group` field naming the group to join. Items that name no
- * group — or one nothing provides — land in a catch-all bucket that is
+ * group - or one nothing provides - land in a catch-all bucket that is
  * only created when something needs it.
  *
  * Core items live in the `CORE_NAV_GROUPS` constant; `buildNavGroups()`
@@ -293,7 +293,7 @@ export interface ModuleMenuContribution {
 }
 
 export interface BuildNavGroupsOptions {
-    /** Enabled modules only — the caller filters on `ModuleConfig.enabled`. */
+    /** Enabled modules only - the caller filters on `ModuleConfig.enabled`. */
     modules?: ModuleMenuContribution[];
     /** Nav groups declared by enabled modules. */
     navGroups?: ModuleNavGroupDeclaration[];
@@ -353,7 +353,7 @@ function resolveGroup(
  *
  * Core ships only the groups it fills itself. A group declared purely for
  * modules to populate renders as a dead entry in the icon rail when nothing
- * is installed — preventing that is this function's job: sections with no
+ * is installed - preventing that is this function's job: sections with no
  * items, and groups with no sections, never reach the caller.
  *
  * Modules are processed in lexical id order so the rendered sidebar does not
@@ -372,7 +372,7 @@ export function buildNavGroups({
     groups.forEach((group, index) => sortOrder.set(group.id, index));
 
     // Modules may declare groups core does not ship, and several modules may
-    // declare the same one — a storefront and a credits module both belong
+    // declare the same one - a storefront and a credits module both belong
     // under Commerce. The first declaration by module id wins the label and
     // icon; every declaring module still contributes its items.
     // `findNavGroupConflicts` reports disagreements at validation time.
@@ -473,7 +473,7 @@ export function findActiveGroupId(pathname: string, groups: NavGroup[]): string 
             }
         }
 
-        // Item hrefs — covers module-contributed items and
+        // Item hrefs - covers module-contributed items and
         // items in groups that don't declare an explicit pathPrefix
         for (const section of group.sections) {
             for (const item of section.items) {
@@ -525,7 +525,7 @@ export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
 function resolveLucideIcon(name: string | undefined): ComponentType | null {
     if (!name) return null;
     // Typed lookup without coupling admin-nav-groups to every Lucide export
-    // shape — the icon library ships hundreds of components, any of them a
+    // shape - the icon library ships hundreds of components, any of them a
     // valid reference for a theme manifest.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const lib = require("lucide-react") as Record<string, ComponentType>;

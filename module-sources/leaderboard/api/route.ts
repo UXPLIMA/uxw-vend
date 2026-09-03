@@ -21,7 +21,7 @@ async function buildBuyers(limit: number): Promise<LeaderboardEntry[]> {
     });
 
     // Order.userId is nullable (SetNull on user deletion). Filter out
-    // anonymized orders from the leaderboard — there's no user to credit.
+    // anonymized orders from the leaderboard - there's no user to credit.
     const userIds = orders.map((o) => o.userId).filter((id): id is string => id !== null);
     const users = await prisma.user.findMany({
         where: { id: { in: userIds } },

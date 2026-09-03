@@ -11,7 +11,7 @@
 # Re-running it is an upgrade: an existing .env is never overwritten, so
 # secrets and answers survive. See `uxwvend update` for the short form.
 #
-# Flags (all optional — without them the installer asks three questions):
+# Flags (all optional - without them the installer asks three questions):
 #   --dir PATH        install root                        (default /opt/uxwvend)
 #   --domain HOST     public hostname; empty means "use the server IP"
 #   --email ADDR      admin account e-mail
@@ -43,7 +43,7 @@ DRY_RUN=0
 DIR_EXPLICIT=0
 
 # ---------------------------------------------------------------- output ----
-# Colours only when stdout is a terminal — `curl | bash > log` stays readable.
+# Colours only when stdout is a terminal - `curl | bash > log` stays readable.
 if [ -t 1 ]; then
     C_RESET=$'\033[0m'; C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'
     C_RED=$'\033[31m'; C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_CYAN=$'\033[36m'
@@ -135,7 +135,7 @@ install_docker() {
     [ -n "$PKG" ] || die "Docker is missing and this distribution is not apt- or dnf-based.
     Install Docker Engine + the Compose v2 plugin yourself, then re-run this installer:
     https://docs.docker.com/engine/install/"
-    info "Docker not found — installing via get.docker.com"
+    info "Docker not found - installing via get.docker.com"
     if [ "$DRY_RUN" -eq 1 ]; then info "(dry run: skipped)"; return 0; fi
     local script; script="$(mktemp)"
     curl -fsSL https://get.docker.com -o "$script" || die "Could not download the Docker install script. Is this host online?"
@@ -212,7 +212,7 @@ if [ "$IS_UPGRADE" -eq 0 ]; then
     [ -n "$USE_TLS" ] || USE_TLS=0
 
     if [ "$USE_TLS" -eq 1 ] && [ -z "$DOMAIN" ]; then
-        die "TLS needs a domain — Let's Encrypt will not issue a certificate for a bare IP address."
+        die "TLS needs a domain - Let's Encrypt will not issue a certificate for a bare IP address."
     fi
 
     if [ "$USE_TLS" -eq 1 ]; then
@@ -255,7 +255,7 @@ if [ "$IS_UPGRADE" -eq 0 ] && [ "$DRY_RUN" -eq 0 ]; then
             holder="$(port_holder "$p")"
             die "Port $p is already in use${holder:+ by '$holder'}.
     Free it, or pick another port with --port N (HTTP installs only).
-    A TLS install needs 80 and 443 specifically — Let's Encrypt validates over them."
+    A TLS install needs 80 and 443 specifically - Let's Encrypt validates over them."
         fi
     done
     ok "Ports free: $CHECK_PORTS"
@@ -379,7 +379,7 @@ fi
 
 step "Starting uxwVend"
 if [ "$FROM_SOURCE" -eq 1 ]; then
-    info "Building the image from source — this takes a few minutes."
+    info "Building the image from source - this takes a few minutes."
     compose build || die "The image build failed. The output above says why."
 else
     info "Pulling ${IMAGE_DEFAULT}:${IMAGE_VERSION}"
@@ -398,7 +398,7 @@ step "Waiting for the app"
 HEALTH_URL="http://127.0.0.1:$APP_PORT/api/health"
 # A first install boots in well under a minute. Re-running the installer over
 # an existing install is an upgrade, though, and an upgrade on a site with
-# modules recompiles them before the app serves anything — minutes, not
+# modules recompiles them before the app serves anything - minutes, not
 # seconds (see docs/DEPLOYMENT.md, "The Build Lifecycle"). The wait has to
 # cover the slow case or the installer reports a failure for a healthy boot.
 HEALTH_TIMEOUT=900
@@ -410,7 +410,7 @@ while [ "$(date +%s)" -lt "$DEADLINE" ]; do
     if [ "$NOTIFIED" -eq 0 ] && [ "$(date +%s)" -gt $(( DEADLINE - HEALTH_TIMEOUT + 45 )) ]; then
         NOTIFIED=1
         info "Still starting. On an upgrade with modules installed the app
-  recompiles them first — several minutes is normal."
+  recompiles them first - several minutes is normal."
     fi
     sleep 3
 done
@@ -418,7 +418,7 @@ done
 if [ "$HEALTHY" -eq 0 ]; then
     warn "The app did not answer $HEALTH_URL within $HEALTH_TIMEOUT seconds. Last 50 log lines:"
     compose logs --tail=50 2>&1 | sed 's/^/    /' >&2
-    die "Installation did not complete. The stack is still running — inspect it with 'uxwvend logs'."
+    die "Installation did not complete. The stack is still running - inspect it with 'uxwvend logs'."
 fi
 ok "Healthy"
 
@@ -434,7 +434,7 @@ if [ -f "$INSTALL_DIR/uxwvend.cli" ]; then
 else
     # Only reachable when the download of scripts/uxwvend failed; the stack
     # itself is up, so say what is missing instead of implying a broken install.
-    warn "Could not install the 'uxwvend' helper — manage the stack with
+    warn "Could not install the 'uxwvend' helper - manage the stack with
     'cd $INSTALL_DIR && docker compose ...' instead."
 fi
 
@@ -450,7 +450,7 @@ else
     printf '  Admin       %s\n' "$ADMIN_EMAIL"
     printf '  Password    %s%s%s\n' "$C_BOLD" "$ADMIN_PW" "$C_RESET"
     printf '\n  %sChange the password after your first sign-in.%s\n' "$C_YELLOW" "$C_RESET"
-    printf '  It is also stored in %s — back that file up.\n' "$ENV_FILE"
+    printf '  It is also stored in %s - back that file up.\n' "$ENV_FILE"
     if [ -n "$DOMAIN" ] && [ "${USE_TLS:-0}" -eq 1 ]; then
         printf '\n  %sPoint %s at this server before the certificate can be issued.%s\n' "$C_DIM" "$DOMAIN" "$C_RESET"
     fi

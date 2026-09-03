@@ -241,10 +241,10 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             </div>
                                         )}
 
-                                        {/* Slot: above article content — e.g. related products, author box, ad */}
+                                        {/* Slot: above article content - e.g. related products, author box, ad */}
                                         <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />
 
-                                        {/* Content — RichTextEditor stores HTML, sanitize before render */}
+                                        {/* Content - RichTextEditor stores HTML, sanitize before render */}
                                         <div
                                             className="prose prose-lg dark:prose-invert max-w-none"
                                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}

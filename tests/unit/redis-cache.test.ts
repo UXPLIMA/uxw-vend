@@ -306,7 +306,7 @@ describe("cache helpers with Redis available", () => {
 });
 
 // ===========================================================================
-// Fallback behaviour — the point of the module
+// Fallback behaviour - the point of the module
 // ===========================================================================
 
 describe("in-memory fallback", () => {

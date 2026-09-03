@@ -3,8 +3,8 @@
  * Outputs JSON lines in production, pretty-prints in dev.
  *
  * Correlation IDs propagate through an AsyncLocalStorage bound in the
- * proxy middleware (see src/proxy.ts). Any nested log call — even from
- * a module hook running inside doActionAsync — automatically picks up
+ * proxy middleware (see src/proxy.ts). Any nested log call - even from
+ * a module hook running inside doActionAsync - automatically picks up
  * the id of the request that triggered it.
  */
 
@@ -99,7 +99,7 @@ export async function getCorrelationId(): Promise<string> {
 /**
  * Module-level structured logger. Uses AsyncLocalStorage to pick up the
  * active request's correlation id when one is set. Falls back to a fresh
- * uuid outside a request context (e.g. scheduler ticks) — consumers can
+ * uuid outside a request context (e.g. scheduler ticks) - consumers can
  * override with an explicit `correlationId` in the extras bag.
  */
 function logWithContext(level: LogLevel, message: string, extra?: Record<string, unknown>): void {
@@ -121,7 +121,7 @@ export const log = {
     error: (msg: string, extra?: Record<string, unknown>) => logWithContext("error", msg, extra),
 };
 
-/** Create a logger scoped to a correlation ID (sync — pass correlationId for best results) */
+/** Create a logger scoped to a correlation ID (sync - pass correlationId for best results) */
 export function createLogger(correlationId?: string) {
     const cid = correlationId || randomUUID();
 

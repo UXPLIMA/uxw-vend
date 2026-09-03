@@ -9,7 +9,7 @@ import { themeRegistry } from "@/core/generated/theme-registry";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 // Themes shipped in-tree (every key in the generated registry) are the
-// protected set — they can't be deleted via the admin UI.
+// protected set - they can't be deleted via the admin UI.
 const PROTECTED_THEMES = Object.keys(themeRegistry);
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -33,7 +33,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 
     const state = await prisma.themeState.findFirst();
     if (state?.themeId === id) {
-        return NextResponse.json({ error: "Cannot delete the active theme — switch first." }, { status: 409 });
+        return NextResponse.json({ error: "Cannot delete the active theme - switch first." }, { status: 409 });
     }
 
     const themeDir = path.resolve(THEMES_DIR, id);

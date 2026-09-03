@@ -33,7 +33,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
             await prisma.forumPostLike.create({ data: { postId: id, userId } });
             liked = true;
         } catch (err) {
-            // P2002: another concurrent request beat us to the create —
+            // P2002: another concurrent request beat us to the create -
             // state is consistent (one like row exists), report current state.
             const code = (err as { code?: string }).code;
             if (code === "P2002") {

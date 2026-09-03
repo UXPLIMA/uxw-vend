@@ -57,7 +57,7 @@ describe("detectFileType", () => {
     });
 
     it("rejects executable-looking content (MZ header)", () => {
-        // Windows PE / DOS MZ binary — not in our allowlist.
+        // Windows PE / DOS MZ binary - not in our allowlist.
         expect(detectFileType(bytes(0x4d, 0x5a, 0x90, 0x00))).toBeNull();
     });
 

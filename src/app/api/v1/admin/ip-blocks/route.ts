@@ -8,8 +8,8 @@ import { logActivity } from "@/core/lib/activity-log";
 /**
  * Admin API for managing the IP allowlist / blocklist.
  *
- * GET  — list every block (including expired ones) for the admin UI.
- * POST — create a new block. Body matches createSchema below.
+ * GET  - list every block (including expired ones) for the admin UI.
+ * POST - create a new block. Body matches createSchema below.
  */
 
 async function requireAdmin() {

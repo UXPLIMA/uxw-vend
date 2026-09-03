@@ -43,7 +43,7 @@ export function formatDate(
 /**
  * Format relative time (e.g., "2 hours ago"). Locale-aware via
  * Intl.RelativeTimeFormat. Pass the active locale from `useLocale()`
- * (client) or `await getLocale()` (server) — defaults to "en" so
+ * (client) or `await getLocale()` (server) - defaults to "en" so
  * callers that don't have it handy still work.
  */
 export function formatRelativeTime(date: Date | string, locale: string = "en"): string {

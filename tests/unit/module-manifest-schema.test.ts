@@ -11,7 +11,7 @@ const base = {
     coreVersion: "^1.0.0",
 };
 
-describe("moduleManifestSchema — compatibility contract", () => {
+describe("moduleManifestSchema - compatibility contract", () => {
     it("accepts a bare dependency id (pre-contract manifests stay valid)", () => {
         const r = moduleManifestSchema.safeParse({ ...base, dependencies: ["store", "currency"] });
         expect(r.success).toBe(true);
@@ -73,7 +73,7 @@ describe("moduleManifestSchema — compatibility contract", () => {
     });
 });
 
-describe("moduleManifestSchema — scaffold template", () => {
+describe("moduleManifestSchema - scaffold template", () => {
     it("validates once create-module strips the _comment key", () => {
         // Guards the authoring path: `npm run create:module` copies this file
         // and deletes only `_comment`, so anything else the schema rejects here
@@ -142,7 +142,7 @@ describe("hook contracts across the catalog", () => {
 
     it("every hook listener subscribes to a hook something emits", () => {
         // A listener on a hook nobody fires never runs, and nothing anywhere
-        // reports it — not a log line, not a failed build. This is the only
+        // reports it - not a log line, not a failed build. This is the only
         // check that catches a mistyped hook name.
         const emitted = new Set<string>();
         for (const { m } of manifests) {
@@ -176,7 +176,7 @@ describe("hook contracts across the catalog", () => {
     });
 });
 
-describe("moduleManifestSchema — shipped manifests", () => {
+describe("moduleManifestSchema - shipped manifests", () => {
     const dir = path.join(process.cwd(), "module-sources");
     const ids = fs
         .readdirSync(dir)

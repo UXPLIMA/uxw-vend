@@ -5,7 +5,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 
 /**
- * Users widget — total count + 7-day delta.
+ * Users widget - total count + 7-day delta.
  */
 export default async function UsersCountWidget() {
     const t = await getTranslations("admin");

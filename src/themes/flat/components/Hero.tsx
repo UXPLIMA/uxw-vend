@@ -5,7 +5,7 @@ import { useThemeConfig } from "@/core/lib/theme-config-client";
 import { ArrowRight } from "lucide-react";
 
 /**
- * Flat theme hero — centered headline, subtitle, single CTA.
+ * Flat theme hero - centered headline, subtitle, single CTA.
  *
  * Off by default. Admins enable it under Theme → Hero and supply copy.
  * When disabled (or no title set) the component renders nothing, so the

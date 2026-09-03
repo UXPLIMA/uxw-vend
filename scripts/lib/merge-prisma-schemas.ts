@@ -7,11 +7,11 @@
  *    it takes only INSTALLED modules (`src/modules/`). Shipping models for a
  *    module nobody installed would create tables the app never reads.
  *  - `scripts/typecheck-modules.ts` type-checks all of `module-sources/`, so it
- *    needs every module's models present at once — otherwise every reference to
+ *    needs every module's models present at once - otherwise every reference to
  *    a module model is a "does not exist on PrismaClient" error, which is what
  *    the 429-entry baseline used to be.
  *
- * Hence `scope`. Everything else — user-relation splicing, collision checks —
+ * Hence `scope`. Everything else - user-relation splicing, collision checks -
  * is identical, and lives here so the two callers cannot drift.
  */
 
@@ -133,11 +133,11 @@ export function mergeSchemas(root: string, scope: MergeScope): MergeResult {
             const modelName = match[1];
             if (coreModelNames.has(modelName)) {
                 // The merger keeps the core definition and drops the module's
-                // copy, so any field the module tried to add is LOST — which
+                // copy, so any field the module tried to add is LOST - which
                 // surfaces later as "my migration doesn't include my column".
                 warnings.push(
                     `module '${mod.name}' redeclares core model '${modelName}'. The module's definition is ` +
-                        `IGNORED — only the core schema version ships. To add fields or relations to a core ` +
+                        `IGNORED - only the core schema version ships. To add fields or relations to a core ` +
                         `model, use the // @@user-relations-start ... // @@user-relations-end block.`,
                 );
                 continue;

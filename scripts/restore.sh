@@ -24,7 +24,7 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
 fi
 
-# Parse DATABASE_URL into PG* env vars — see backup.sh for the rationale.
+# Parse DATABASE_URL into PG* env vars - see backup.sh for the rationale.
 eval "$(node -e '
     const u = new URL(process.env.DATABASE_URL);
     const out = [];

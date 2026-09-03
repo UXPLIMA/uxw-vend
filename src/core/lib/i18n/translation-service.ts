@@ -36,7 +36,7 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
         } catch { /* fall through */ }
     }
 
-    // 2. Query DB — only core + enabled modules
+    // 2. Query DB - only core + enabled modules
     const enabledModuleIds = await getEnabledModuleIds();
     const allowedModules = ["core", ...enabledModuleIds];
 

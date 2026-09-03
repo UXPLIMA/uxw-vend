@@ -1,4 +1,4 @@
-// Staff Module — Database Models
+// Staff Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // @@user-relations-start

@@ -9,7 +9,7 @@
  *
  * Everything the route touches is mocked: Prisma, the filesystem (so no ZIP is
  * ever extracted into src/modules), and child_process (so no codegen or
- * migration actually runs — the test asserts on the commands instead).
+ * migration actually runs - the test asserts on the commands instead).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -142,7 +142,7 @@ beforeEach(() => {
     activityCreate.mockClear();
 });
 
-describe("/api/setup — install planning", () => {
+describe("/api/setup - install planning", () => {
     it("installs a transitive dependency the operator did not select", async () => {
         const { res, json } = await post(["store"]);
         expect(res.status).toBe(200);

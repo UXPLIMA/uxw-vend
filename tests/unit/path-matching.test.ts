@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  *
  * The API matcher used to build its own regex and turned a `[...rest]`
  * catch-all into the capture group `(?<...rest>…)`, which is not a legal
- * group name — `new RegExp` threw a SyntaxError out of that loop. Nothing
+ * group name - `new RegExp` threw a SyntaxError out of that loop. Nothing
  * in the manifest schema forbids a catch-all under `api`; no first-party
  * module happened to declare one. Both matchers now share
  * `path-pattern.ts`, so they cannot drift apart again.

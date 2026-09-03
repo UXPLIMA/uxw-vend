@@ -18,7 +18,7 @@ interface HealthResponse {
 }
 
 /**
- * Compact KPI card — single overall health status dot + latency hint.
+ * Compact KPI card - single overall health status dot + latency hint.
  * Full breakdown lives on /admin/observability.
  */
 export default function HealthSnapshotWidget() {

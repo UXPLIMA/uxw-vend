@@ -4,7 +4,7 @@
  * `auth.ts` evaluates `NextAuth({...})` at import time, and next-auth's
  * `lib/env.js` does `import "next/server"`. The `next` package publishes no
  * `exports` map, so that specifier is a bare path to Node's ESM resolver and
- * resolves to nothing — fine inside Next's own bundler, fatal anywhere else.
+ * resolves to nothing - fine inside Next's own bundler, fatal anywhere else.
  * Any test that transitively touches auth therefore dies at collection rather
  * than at an assertion.
  *
@@ -31,9 +31,9 @@ const notRouted = () =>
 export const handlers = { GET: notRouted, POST: notRouted };
 
 export const signIn = async () => {
-    throw new Error("signIn is stubbed in tests — mock @/core/lib/auth to exercise it");
+    throw new Error("signIn is stubbed in tests - mock @/core/lib/auth to exercise it");
 };
 
 export const signOut = async () => {
-    throw new Error("signOut is stubbed in tests — mock @/core/lib/auth to exercise it");
+    throw new Error("signOut is stubbed in tests - mock @/core/lib/auth to exercise it");
 };

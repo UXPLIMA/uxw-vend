@@ -7,9 +7,9 @@ import { log } from "./logger";
  * the backup path requires pg_dump on the runtime image and some dev
  * setups (plain Node, no Postgres client) don't ship it.
  *
- *   MODULE_INSTALL_BACKUP=1   — enable pre-install snapshots
+ *   MODULE_INSTALL_BACKUP=1   - enable pre-install snapshots
  *
- * A backup failure must NEVER block the install — we log and continue.
+ * A backup failure must NEVER block the install - we log and continue.
  * If the install itself fails, the operator still has all the tools to
  * back up manually from the admin UI before retrying.
  */

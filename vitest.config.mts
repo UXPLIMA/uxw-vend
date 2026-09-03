@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // `.mts` so Vite loads this as real ESM. As `.ts` it was loaded as CommonJS,
-// which Vite warns about on every single run and plans to stop supporting —
+// which Vite warns about on every single run and plans to stop supporting -
 // hence `import.meta.dirname` rather than `__dirname` below.
 const rootDir = import.meta.dirname;
 
@@ -13,7 +13,7 @@ const rootDir = import.meta.dirname;
  *
  * The platform ships with zero modules, so `src/modules/` is normally empty. A
  * test that imports `@/modules/<id>/...` cannot even be transformed in that
- * state — it fails at collection, not as an assertion. Gating the glob on what
+ * state - it fails at collection, not as an assertion. Gating the glob on what
  * is installed keeps `npm test` green on a clean checkout while still running
  * these tests on a machine where the module is present.
  */
@@ -40,12 +40,12 @@ export default defineConfig({
             provider: 'v8',
             include: ['src/core/lib/**/*.ts'],
             // Only db.ts (a Prisma client singleton, no logic) and auth.ts (the
-            // NextAuth config — can't be imported outside the Next bundler, see
+            // NextAuth config - can't be imported outside the Next bundler, see
             // tests/integration/two-factor-flow.test.ts) are excluded.
             //
-            // The two most security-critical files — permissions.ts (the admin
+            // The two most security-critical files - permissions.ts (the admin
             // authorization gate) and secret-storage.ts (at-rest secret crypto)
-            // — are deliberately NOT excluded so their coverage is measured and
+            // - are deliberately NOT excluded so their coverage is measured and
             // can be enforced. Do not add them here.
             exclude: ['src/core/lib/db.ts', 'src/core/lib/auth.ts'],
             // A ratchet, not a target. Set just under the numbers the suite
@@ -54,7 +54,7 @@ export default defineConfig({
             // lower them to make a build pass.
             //
             // The two security-critical files carry their own floors. That is
-            // the whole reason they are not in `exclude` above — measuring
+            // the whole reason they are not in `exclude` above - measuring
             // them was pointless while nothing enforced the measurement, and
             // for a long time nothing did: `@vitest/coverage-v8` was not even
             // installed, so `npm run test:coverage` failed on the missing
@@ -77,8 +77,8 @@ export default defineConfig({
                 // The install path: the lock that keeps two installs from
                 // racing, and the queue that decides whether a module install
                 // is ever served. Two of the three defects fixed in 0.2.0
-                // lived here — a restart that always threw and a build whose
-                // result nothing recorded — and neither had a test.
+                // lived here - a restart that always threw and a build whose
+                // result nothing recorded - and neither had a test.
                 'src/core/lib/install-lock.ts': {
                     statements: 95, branches: 75, functions: 100, lines: 95,
                 },
@@ -175,7 +175,7 @@ export default defineConfig({
                 },
                 // Re-exported through the module SDK, so `slugify` and
                 // friends are a published contract third-party modules build
-                // on — changing one silently changes their URLs.
+                // on - changing one silently changes their URLs.
                 'src/core/lib/utils.ts': {
                     statements: 100, branches: 95, functions: 100, lines: 100,
                 },
@@ -205,7 +205,7 @@ export default defineConfig({
                     statements: 100, branches: 90, functions: 100, lines: 100,
                 },
                 // Answers "is this module on?" for the admin surface, and
-                // fails *closed* — the opposite of module-cache.ts, which
+                // fails *closed* - the opposite of module-cache.ts, which
                 // fails open. Both defaults are deliberate.
                 'src/core/lib/modules.ts': {
                     statements: 100, branches: 100, functions: 100, lines: 100,
@@ -243,9 +243,9 @@ export default defineConfig({
             // Order matters: Vite tries alias entries in sequence and '@'
             // matches as a prefix, so the specific entry has to come first.
             //
-            // Everything that reaches `@/core/lib/auth` — including any test
+            // Everything that reaches `@/core/lib/auth` - including any test
             // that touches `@/core/sdk/server`, whose `activity-log` re-export
-            // imports it — gets a stub instead. See tests/stubs/core-auth.ts
+            // imports it - gets a stub instead. See tests/stubs/core-auth.ts
             // for why the real module cannot be imported outside Next.
             '@/core/lib/auth': path.resolve(rootDir, 'tests/stubs/core-auth.ts'),
             '@': path.resolve(rootDir, 'src'),

@@ -9,7 +9,7 @@ test.describe("theme v2 acceptance", () => {
         // is the theme library (install, activate, delete) and has never had
         // them.
         await page.goto("/tr/admin/theme/appearance");
-        // Flat (active) declares `primary` and `background` tokens — expect at
+        // Flat (active) declares `primary` and `background` tokens - expect at
         // least one of these as a labeled input. The heading check guarantees
         // we landed on the right page; CardTitle renders an h3, so match by
         // role rather than by tag.
@@ -22,7 +22,7 @@ test.describe("theme v2 acceptance", () => {
     test("/admin/settings/customizer returns 404", async ({ page }) => {
         await login(page);
         const res = await page.goto("/tr/admin/settings/customizer");
-        // Next.js renders the 404 UI with 200 in some cases — check either.
+        // Next.js renders the 404 UI with 200 in some cases - check either.
         const status = res?.status() ?? 0;
         if (status !== 404) {
             await expect(page.locator("text=/404|not found/i").first()).toBeVisible();
@@ -45,7 +45,7 @@ test.describe("theme v2 acceptance", () => {
     });
 
     test("active theme cannot be deleted", async ({ request }) => {
-        // Unauthenticated — still gets a terminal status (403 or 409).
+        // Unauthenticated - still gets a terminal status (403 or 409).
         // Admin would get 409; unauthenticated gets 403. Either proves the
         // endpoint doesn't cheerfully delete.
         const res = await request.delete("/api/v1/themes/flat");

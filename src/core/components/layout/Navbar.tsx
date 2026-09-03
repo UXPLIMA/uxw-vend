@@ -61,7 +61,7 @@ function DefaultNavbar() {
     const adminConfigured = Array.isArray(settings.navbar_links);
 
     const isLinkEnabled = (href: string) => {
-        // Dropdown parent placeholders ("#") — always allowed; children are filtered separately
+        // Dropdown parent placeholders ("#") - always allowed; children are filtered separately
         if (!href || href === "#") return true;
         // External URLs always allowed
         if (href.startsWith('http')) return true;
@@ -75,7 +75,7 @@ function DefaultNavbar() {
         // If admin explicitly configured these links, trust unknown paths
         // (they may point to static pages, external redirects, or custom routes)
         if (adminConfigured) return true;
-        // Auto-generated registry links: unknown internal path not served by any installed module — hide it
+        // Auto-generated registry links: unknown internal path not served by any installed module - hide it
         return false;
     };
 
@@ -191,7 +191,7 @@ function DefaultNavbar() {
 
                         {session?.user ? (
                             <>
-                                {/* Module navbar components (bell, cart, etc.) — from registry */}
+                                {/* Module navbar components (bell, cart, etc.) - from registry */}
                                 {enabledNavbarComponents.map(nc => {
                                     const NavComp = NavbarComponentRegistry[nc.id];
                                     return (

@@ -2,7 +2,7 @@ import { prisma } from "@/core/sdk/server";
 import { randomBytes } from "crypto";
 
 /**
- * Declarative hook listener — wired by module.json hookListeners.
+ * Declarative hook listener - wired by module.json hookListeners.
  *
  * When a new user registers (core `user.registered` action), create a personal
  * one-time 10% welcome coupon. Fails gracefully if the Coupon model isn't

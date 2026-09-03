@@ -4,7 +4,7 @@ import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-// PATCH /api/v1/vote/sites/[id] — Update a vote site (admin)
+// PATCH /api/v1/vote/sites/[id] - Update a vote site (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ site: updated });
 }
 
-// DELETE /api/v1/vote/sites/[id] — Delete a vote site (admin)
+// DELETE /api/v1/vote/sites/[id] - Delete a vote site (admin)
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

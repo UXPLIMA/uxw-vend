@@ -7,19 +7,19 @@ import { log } from "./logger";
  *
  * Two modes of use:
  *
- *   1. queueEmail({...}) — enqueue an EmailJob row and return immediately.
+ *   1. queueEmail({...}) - enqueue an EmailJob row and return immediately.
  *      A core cron (`core:process-email-queue`) drains the queue every
  *      5 minutes with exponential backoff. Use this for anything that
  *      does NOT need to be delivered before the HTTP response returns
  *      (broadcasts, welcome mails, receipts, etc.).
  *
- *   2. sendEmail({...}) — still synchronous for callers that MUST send
+ *   2. sendEmail({...}) - still synchronous for callers that MUST send
  *      immediately (password reset links, 2FA, email verification).
  *      Internally this still logs an EmailJob row for audit purposes
  *      so every outbound message is recorded in one place.
  *
  * When no provider is configured (no RESEND_API_KEY) all functions
- * degrade gracefully to console.log — tests and dev don't need SMTP.
+ * degrade gracefully to console.log - tests and dev don't need SMTP.
  */
 
 const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
@@ -61,7 +61,7 @@ const EMAIL_STRINGS: Record<"en" | "tr", Record<EmailKey, string>> = {
         lockoutIntro: "Someone made too many failed sign-in attempts on your {app} account. We've temporarily locked it as a safety measure.",
         lockoutUnlocks: "The account unlocks at:",
         lockoutWasYou: "If this was you, wait until the lock lifts and try again.",
-        lockoutNotYou: "If this was NOT you, change your password as soon as the account unlocks — someone knows (or is guessing) part of your credentials.",
+        lockoutNotYou: "If this was NOT you, change your password as soon as the account unlocks - someone knows (or is guessing) part of your credentials.",
         lockoutFooter: "{app} security notification.",
         lockoutIpLine: "Attempts came from IP",
     },
@@ -87,7 +87,7 @@ const EMAIL_STRINGS: Record<"en" | "tr", Record<EmailKey, string>> = {
         lockoutIntro: "{app} hesabında çok fazla başarısız giriş denemesi yapıldı. Güvenlik önlemi olarak hesabını geçici olarak kilitledik.",
         lockoutUnlocks: "Hesabın şu zamanda açılacak:",
         lockoutWasYou: "Bu sendin ise, kilit kalkana kadar bekleyip tekrar dene.",
-        lockoutNotYou: "Bu SEN DEĞİLSEN, hesabın açılır açılmaz şifreni değiştir — biri kimlik bilgilerinin bir kısmını biliyor (veya tahmin ediyor).",
+        lockoutNotYou: "Bu SEN DEĞİLSEN, hesabın açılır açılmaz şifreni değiştir - biri kimlik bilgilerinin bir kısmını biliyor (veya tahmin ediyor).",
         lockoutFooter: "{app} güvenlik bildirimi.",
         lockoutIpLine: "Denemeler şu IP'den geldi:",
     },
@@ -115,7 +115,7 @@ function escapeHtml(str: string): string {
 /**
  * Strip CR / LF / NUL from a value before it can reach an SMTP header.
  * Without this, a malicious `subject` field like "Hi\r\nBcc: me@example.com"
- * lets an attacker inject arbitrary recipients — the classic SMTP header
+ * lets an attacker inject arbitrary recipients - the classic SMTP header
  * injection. The Resend SDK normalizes most of this, but we defend at the
  * edge so the invariant holds regardless of the provider in use.
  */
@@ -134,7 +134,7 @@ function validateEmailAddress(addr: string): boolean {
     if (!addr || typeof addr !== "string") return false;
     if (/[\r\n\0,<>"]/.test(addr)) return false;
     if (addr.length > 254) return false;
-    // Minimal shape check — provider does the heavy lifting.
+    // Minimal shape check - provider does the heavy lifting.
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr);
 }
 
@@ -158,7 +158,7 @@ function getEmailEnabled(): boolean {
 }
 
 /**
- * Low-level provider call. Does NOT touch the EmailJob row — callers are
+ * Low-level provider call. Does NOT touch the EmailJob row - callers are
  * responsible for status bookkeeping. Returns true on success.
  */
 async function deliverViaProvider(opts: {
@@ -205,7 +205,7 @@ async function deliverViaProvider(opts: {
 export interface QueueEmailInput {
     to: string;
     subject: string;
-    /** Plain-text body — stored in EmailJob.body for audit. */
+    /** Plain-text body - stored in EmailJob.body for audit. */
     body: string;
     /** Optional HTML body. If omitted, `body` is rendered as-is. */
     html?: string;
@@ -362,7 +362,7 @@ export async function sendEmail(opts: {
         });
         jobId = job.id;
     } catch {
-        // Audit row is best-effort — continue with the send.
+        // Audit row is best-effort - continue with the send.
     }
 
     const result = await deliverViaProvider(opts);
@@ -376,7 +376,7 @@ export async function sendEmail(opts: {
                     : { status: "failed", lastError: result.error },
             });
         } catch {
-            /* swallow — audit failures shouldn't mask the real result */
+            /* swallow - audit failures shouldn't mask the real result */
         }
     }
 
@@ -425,7 +425,7 @@ export async function sendWelcomeEmail(email: string, username: string, locale?:
         return;
     }
 
-    // Welcome is non-urgent — queue it.
+    // Welcome is non-urgent - queue it.
     await queueEmail({
         to: email,
         subject: emailT(locale, "welcomeSubject"),
@@ -471,7 +471,7 @@ export async function sendVerificationEmail(email: string, verifyUrl: string, lo
 /**
  * Sent when an account gets auto-locked after too many failed password
  * attempts. Gives the legitimate owner an early-warning signal that
- * someone is trying to sign in as them — critical for catching slow
+ * someone is trying to sign in as them - critical for catching slow
  * credential-stuffing campaigns that don't trip IP rate limits.
  */
 export async function sendAccountLockoutEmail(opts: {
@@ -486,7 +486,7 @@ export async function sendAccountLockoutEmail(opts: {
         ? `<p style="color: #6b7280;">${emailT(opts.locale, "lockoutIpLine")} <code>${escapeHtml(opts.ip)}</code>.</p>`
         : "";
 
-    // Queue rather than send — this is informational. If the email system
+    // Queue rather than send - this is informational. If the email system
     // is down, nothing is lost; the lock itself has already been armed.
     await queueEmail({
         to: opts.to,

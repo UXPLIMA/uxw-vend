@@ -50,7 +50,7 @@ function DefaultFooter() {
         || (settings.hero_discord_url as string)
         || serverConfig.communityUrl;
 
-    // Build path→module map from registry — zero hardcoded module names
+    // Build path→module map from registry - zero hardcoded module names
     const pathToModule: Record<string, string> = {};
     for (const fl of ModuleFooterLinks) { pathToModule[fl.href] = fl.module; }
     for (const nl of ModuleNavLinks) { pathToModule[nl.href] = nl.module; }
@@ -152,7 +152,7 @@ function DefaultFooter() {
                         </ul>
                     </div>
 
-                    {/* Legal — admin-authored links plus anything modules contribute.
+                    {/* Legal - admin-authored links plus anything modules contribute.
                         Core names no legal page of its own. */}
                     {legalLinks.length > 0 && (
                         <div>

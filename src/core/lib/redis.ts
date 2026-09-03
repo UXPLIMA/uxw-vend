@@ -72,7 +72,7 @@ setInterval(() => {
 }, 60_000);
 
 // ---------------------------------------------------------------------------
-// Cache helpers — always work (Redis or in-memory)
+// Cache helpers - always work (Redis or in-memory)
 // ---------------------------------------------------------------------------
 
 /** Get a cached value by key */

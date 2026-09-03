@@ -229,7 +229,7 @@ export async function removeResourcePermission(params: {
     });
 }
 
-/** List grants for a principal — used by the admin matrix UI. */
+/** List grants for a principal - used by the admin matrix UI. */
 export async function listGrantsForRole(roleId: string) {
     return prisma.resourcePermission.findMany({
         where: { principalType: "role", principalId: roleId },

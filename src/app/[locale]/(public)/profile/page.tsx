@@ -241,7 +241,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Tabs — horizontally scrollable on mobile so they never wrap awkwardly */}
+                {/* Tabs - horizontally scrollable on mobile so they never wrap awkwardly */}
                 <div className="-mx-4 px-4 mb-6 overflow-x-auto">
                     <div
                         className="flex gap-2 w-max"
@@ -266,7 +266,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* Active tab panel — the various activeTab === "X" blocks below
+                {/* Active tab panel - the various activeTab === "X" blocks below
                     are conditionally rendered into this single tabpanel container,
                     so screen readers see the dangling aria-controls IDs resolve. */}
                 <div role="tabpanel" id={`profile-tabpanel-${activeTab}`} aria-labelledby={`profile-tab-${activeTab}`}>

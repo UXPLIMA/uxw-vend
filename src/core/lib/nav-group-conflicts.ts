@@ -40,8 +40,8 @@ export function byDeclaringModule(
 /**
  * Report nav group ids that two modules declare differently.
  *
- * Sharing a group is the normal case — a storefront and a credits module both
- * belong under Commerce — so agreeing declarations are silent. Only a
+ * Sharing a group is the normal case - a storefront and a credits module both
+ * belong under Commerce - so agreeing declarations are silent. Only a
  * disagreement is reported, and as a warning rather than an error: one module
  * spelling a label differently must not brick an install.
  */

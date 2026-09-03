@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * Setup state gates every request on a fresh install. Two failure modes
  * matter and neither was covered: reporting "not complete" on an
  * installed site drops every visitor into the setup wizard, and a
- * database outage must not do that either — hence the deliberate
+ * database outage must not do that either - hence the deliberate
  * fail-safe that returns true when the count query throws.
  */
 

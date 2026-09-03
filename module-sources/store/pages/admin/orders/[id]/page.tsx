@@ -125,7 +125,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                         </CardHeader>
                         <CardContent>
                             <p className="font-medium">{order.user?.username ?? "Deleted user"}</p>
-                            <p className="text-sm text-muted-foreground">{order.user?.email ?? "—"}</p>
+                            <p className="text-sm text-muted-foreground">{order.user?.email ?? "-"}</p>
                         </CardContent>
                     </Card>
 

@@ -15,7 +15,7 @@ interface SearchResult {
     score?: number;
 }
 
-// Admin nav items — kept here so search can find them.
+// Admin nav items - kept here so search can find them.
 // Mirrors AdminSidebar's coreNavDefs labels but flat.
 const STATIC_ADMIN_PAGES: { title: string; href: string; keywords: string[] }[] = [
     { title: "Dashboard", href: "/admin", keywords: ["home", "stats"] },
@@ -44,7 +44,7 @@ function score(text: string, query: string): number {
     return 0;
 }
 
-// GET /api/v1/admin/search?q=... — Cross-module spotlight search
+// GET /api/v1/admin/search?q=... - Cross-module spotlight search
 export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

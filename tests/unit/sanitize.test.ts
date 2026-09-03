@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { sanitizeHtml, sanitizeInline } from "@/core/lib/sanitize";
 
 /**
- * Every piece of user-submitted rich text — blog articles, forum posts,
- * help articles, custom pages, announcements — passes through here on the
+ * Every piece of user-submitted rich text - blog articles, forum posts,
+ * help articles, custom pages, announcements - passes through here on the
  * way into the database. Sanitising on write means a payload that gets past
  * this function is stored, and every later render serves it; there is no
  * second gate downstream to catch it.

@@ -3,7 +3,7 @@
 # uxwVend management CLI. Installed to /usr/local/bin/uxwvend by install.sh.
 #
 # Everything here is a thin, memorable wrapper over the docker compose
-# invocation the installation actually needs — including the compose file
+# invocation the installation actually needs - including the compose file
 # list and the tls profile, which are easy to get wrong by hand and produce
 # confusing results when you do (a forgotten `--profile tls` silently stops
 # Caddy on the next `up`).
@@ -25,7 +25,7 @@ ok()   { printf '%s✓ %s%s\n' "$C_GREEN" "$*" "$C_RESET"; }
 info() { printf '  %s\n' "$*"; }
 
 [ -d "$UXWVEND_DIR" ] || die "No installation at $UXWVEND_DIR. Set UXWVEND_DIR in $CONF."
-[ -f "$UXWVEND_DIR/.env" ] || die "No .env at $UXWVEND_DIR/.env — is this an uxwVend installation?"
+[ -f "$UXWVEND_DIR/.env" ] || die "No .env at $UXWVEND_DIR/.env - is this an uxwVend installation?"
 
 env_get() { grep -E "^$1=" "$UXWVEND_DIR/.env" 2>/dev/null | head -1 | cut -d= -f2- || true; }
 
@@ -42,11 +42,11 @@ compose() { ( cd "$UXWVEND_DIR" && docker compose "${COMPOSE_ARGS[@]}" "$@" ); }
 
 usage() {
     cat <<'USAGE'
-uxwvend — manage this uxwVend installation
+uxwvend - manage this uxwVend installation
 
   uxwvend update [TAG]   pull the newest image (or TAG), migrate, restart
   uxwvend backup         dump the database to <install-dir>/backups
-  uxwvend restore FILE   restore a dump (destructive — asks first)
+  uxwvend restore FILE   restore a dump (destructive - asks first)
   uxwvend logs [SVC]     follow logs; SVC is app, db, redis, caddy or migrate
   uxwvend restart        restart the stack
   uxwvend stop           stop the stack (data is kept)
@@ -81,7 +81,7 @@ update)
     # Up to 15 minutes. Module pages are compiled into the app, so the first
     # boot on a new image recompiles them against the modules in the volume
     # before it serves anything (see scripts/reconcile-build.ts). That is a
-    # full `next build` — minutes on a small VPS, and the reason this wait is
+    # full `next build` - minutes on a small VPS, and the reason this wait is
     # not the 3 minutes it used to be.
     notified=0
     for i in $(seq 1 300); do
@@ -91,7 +91,7 @@ update)
         if [ "$i" -eq 10 ] && [ "$notified" -eq 0 ]; then
             notified=1
             info "Still starting. If you have modules installed, the app is
-  recompiling them for this version — several minutes is normal.
+  recompiling them for this version - several minutes is normal.
   Watch it with: uxwvend logs"
         fi
         sleep 3
@@ -108,7 +108,7 @@ backup)
         | gzip > "$out"
     ok "$out ($(du -h "$out" | cut -f1))"
     printf '\n  %sThis dump does NOT contain .env.%s Secrets encrypted with\n' "$C_YELLOW" "$C_RESET"
-    printf '  SECRET_ENCRYPTION_KEY are unreadable without it — back up\n'
+    printf '  SECRET_ENCRYPTION_KEY are unreadable without it - back up\n'
     printf '  %s separately.\n' "$UXWVEND_DIR/.env"
     ;;
 
@@ -138,7 +138,7 @@ restore)
 
 logs)    compose logs -f --tail=100 "$@" ;;
 restart) compose restart; ok "Restarted" ;;
-stop)    compose stop; ok "Stopped (data kept — 'uxwvend start' brings it back)" ;;
+stop)    compose stop; ok "Stopped (data kept - 'uxwvend start' brings it back)" ;;
 start)   compose up -d; ok "Started" ;;
 
 status)

@@ -16,7 +16,7 @@ import { sanitizeSvgBuffer } from "@/core/lib/svg-sanitizer";
  * (S3, R2, B2, MinIO, GCS, etc.). Core knows nothing about specific providers.
  *
  * The "local" provider below is core's built-in filesystem fallback. It is NOT
- * a module — it is the zero-config default behavior when no provider module
+ * a module - it is the zero-config default behavior when no provider module
  * is installed or active.
  *
  * Modules register themselves via the `storageProviders` field in module.json.
@@ -109,7 +109,7 @@ async function resolveActiveProvider(): Promise<StorageProvider> {
             providerId = (setting.value as { id?: string }).id || null;
         }
     } catch {
-        // ignore — fall through to env / local
+        // ignore - fall through to env / local
     }
 
     if (!providerId) {
@@ -147,7 +147,7 @@ export async function uploadFile(
         throw new Error("Invalid file type");
     }
 
-    // The caller-supplied MIME header is a hint — sniff the actual bytes so
+    // The caller-supplied MIME header is a hint - sniff the actual bytes so
     // a `.exe` renamed to `image/png` cannot slip through the allowlist.
     // Text types (svg, json) are detected by content shape.
     const detected = detectFileType(buffer);
@@ -186,7 +186,7 @@ export async function uploadFile(
         }
     }
 
-    // SVGs can carry <script>, event handlers, and javascript: hrefs —
+    // SVGs can carry <script>, event handlers, and javascript: hrefs -
     // scrub before anyone serves the bytes back to a browser.
     let safeBuffer = buffer;
     if (detected.mime === "image/svg+xml") {

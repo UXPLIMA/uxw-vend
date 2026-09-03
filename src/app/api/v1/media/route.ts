@@ -4,7 +4,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 
 /**
- * GET /api/v1/media — list media items.
+ * GET /api/v1/media - list media items.
  * Query: ?page=1&perPage=24&search=&type=image
  */
 export async function GET(request: NextRequest) {

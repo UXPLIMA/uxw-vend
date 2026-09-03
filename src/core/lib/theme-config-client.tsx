@@ -7,7 +7,7 @@ export type ThemeConfigValue = Record<string, unknown>;
 const ThemeConfigContext = createContext<ThemeConfigValue>({});
 
 export function ThemeConfigProvider({ value, children }: { value: ThemeConfigValue; children: ReactNode }) {
-    // Callers pass a server-resolved snapshot — the reference is stable for
+    // Callers pass a server-resolved snapshot - the reference is stable for
     // the request lifetime, so there's no benefit to a useMemo wrapper here.
     // Dropping it also keeps the react-hooks lint happy without introducing
     // a JSON.stringify dependency expression.

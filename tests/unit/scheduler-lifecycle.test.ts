@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * from a render of the root layout (per-request, per-locale, and never at
  * all for an instance serving only API routes) and is now started once from
  * `src/instrumentation.ts`. That makes its failure modes real for the first
- * time — a ticker that never starts means backups, the email queue, warning
+ * time - a ticker that never starts means backups, the email queue, warning
  * expiry and health alerting all silently stop, and nothing surfaces it.
  *
  * The other half is cluster safety. `claimJob` is the only thing keeping two

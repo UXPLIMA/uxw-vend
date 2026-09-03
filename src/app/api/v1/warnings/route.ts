@@ -4,7 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isStaff } from "@/core/lib/permissions";
 import { issueWarning, listWarnings } from "@/core/lib/warnings";
 
-/** GET ?userId=xxx — list warnings for a user (staff only) */
+/** GET ?userId=xxx - list warnings for a user (staff only) */
 export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id || !(await isStaff(session.user.id, session.user.role))) {
@@ -24,7 +24,7 @@ const issueSchema = z.object({
     expiresAt: z.string().datetime().optional(),
 });
 
-/** POST — issue a warning (staff only) */
+/** POST - issue a warning (staff only) */
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id || !(await isStaff(session.user.id, session.user.role))) {

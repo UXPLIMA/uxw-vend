@@ -35,7 +35,7 @@ class ModuleLoader {
             // imports next/headers.
             console.log(`Loaded ${this.modules.size} modules`);
         } catch {
-            // fs not available (client-side) — return empty
+            // fs not available (client-side) - return empty
         }
 
         return this.modules;
@@ -53,7 +53,7 @@ class ModuleLoader {
             try {
                 parsedJson = JSON.parse(manifestContent);
             } catch (err) {
-                console.warn(`[module-loader] ${dirName}: invalid JSON in module.json — skipping`, err);
+                console.warn(`[module-loader] ${dirName}: invalid JSON in module.json - skipping`, err);
                 return;
             }
 
@@ -62,7 +62,7 @@ class ModuleLoader {
                 const first = result.error.issues[0];
                 const where = first.path.join(".");
                 console.warn(
-                    `[module-loader] ${dirName}: manifest schema invalid${where ? ` at ${where}` : ""} — ${first.message} — skipping`,
+                    `[module-loader] ${dirName}: manifest schema invalid${where ? ` at ${where}` : ""} - ${first.message} - skipping`,
                 );
                 return;
             }

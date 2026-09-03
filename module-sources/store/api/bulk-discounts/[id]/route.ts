@@ -4,7 +4,7 @@ import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-// PATCH /api/v1/store/bulk-discounts/[id] — Update (admin)
+// PATCH /api/v1/store/bulk-discounts/[id] - Update (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ bulkDiscount: updated });
 }
 
-// DELETE /api/v1/store/bulk-discounts/[id] — Delete (admin)
+// DELETE /api/v1/store/bulk-discounts/[id] - Delete (admin)
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

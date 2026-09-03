@@ -124,7 +124,7 @@ export function NotificationPrefsTab() {
                                             </td>
                                             {DEFAULT_CHANNELS.map((channel) => {
                                                 const supported = channels.includes(channel);
-                                                if (!supported) return <td key={channel} className="text-center py-3 px-3 text-muted-foreground">—</td>;
+                                                if (!supported) return <td key={channel} className="text-center py-3 px-3 text-muted-foreground">-</td>;
                                                 const enabled = isEnabled(type.eventType, channel);
                                                 return (
                                                     <td key={channel} className="text-center py-3 px-3">

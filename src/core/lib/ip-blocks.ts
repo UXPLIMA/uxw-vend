@@ -6,7 +6,7 @@ import type { IpBlock } from "@prisma/client";
  *
  * Backed by the IpBlock table. Supports single IPv4 addresses
  * (e.g. "1.2.3.4") and IPv4 CIDR ranges (e.g. "192.168.1.0/24").
- * IPv6 is intentionally not supported — middleware falls back to
+ * IPv6 is intentionally not supported - middleware falls back to
  * "not blocked" for non-IPv4 input.
  *
  * Block scopes:
@@ -14,7 +14,7 @@ import type { IpBlock } from "@prisma/client";
  *   - "admin" : only admin UI / admin API routes
  *   - "api"   : only /api/* endpoints
  *
- * Middleware calls `isIpBlocked()` on every request — the block
+ * Middleware calls `isIpBlocked()` on every request - the block
  * list is cached in-process for CACHE_TTL_MS. If the DB query
  * fails the loader returns the previous cache (or an empty list
  * on cold start) so a DB outage cannot lock everyone out.
@@ -102,7 +102,7 @@ function ipv4ToInt(ip: string): number | null {
  */
 export function ipInCidr(ip: string, cidr: string): boolean {
     if (!cidr.includes("/")) {
-        // Not a CIDR — treat as exact match
+        // Not a CIDR - treat as exact match
         return ip === cidr;
     }
     const [network, prefixStr] = cidr.split("/");

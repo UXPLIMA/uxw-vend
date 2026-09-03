@@ -5,7 +5,7 @@ import { log, prisma } from "@/core/sdk/server";
  *
  * Fetches latest USD-based exchange rates from a free public API and
  * upserts them into the `ExchangeRate` table. Does not touch the
- * admin-managed currency config (stored in Setting) — that preserves
+ * admin-managed currency config (stored in Setting) - that preserves
  * any manual overrides. Consumers that want live rates can read from
  * ExchangeRate; admins that want fixed rates can continue using the
  * Setting-based config.
@@ -16,7 +16,7 @@ export default async function refreshCurrencyRates(): Promise<void> {
     try {
         const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD", {
             headers: { "accept": "application/json" },
-            // Keep this short — we don't want to hang the scheduler.
+            // Keep this short - we don't want to hang the scheduler.
             signal: AbortSignal.timeout(15_000),
         });
 

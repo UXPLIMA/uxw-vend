@@ -25,7 +25,7 @@ export function CurrencySelector() {
                 }
             })
             .catch(() => {
-                /* ignore — fallback below */
+                /* ignore - fallback below */
             });
     }, []);
 

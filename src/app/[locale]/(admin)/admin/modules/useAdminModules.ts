@@ -8,7 +8,7 @@
  * in-flight flags and six filters; interleaved with 300 lines of JSX, neither
  * half was readable.
  *
- * It returns a flat bag rather than a nested one on purpose — the component
+ * It returns a flat bag rather than a nested one on purpose - the component
  * destructures it, so the shape stays a rename away from any change instead of
  * a second layer to keep in sync.
  */

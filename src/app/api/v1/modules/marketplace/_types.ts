@@ -1,4 +1,4 @@
-// Shared types for the marketplace routes. Not a route file — safe to export plain types/helpers.
+// Shared types for the marketplace routes. Not a route file - safe to export plain types/helpers.
 
 export interface MarketplaceModuleStats {
     publicRoutes: number;
@@ -20,7 +20,7 @@ export interface MarketplaceModule {
     screenshots: string[];
     tags: string[];
     zip: string;
-    /** `id` or `id@range` specs — see module-dependencies.parseDependency. */
+    /** `id` or `id@range` specs - see module-dependencies.parseDependency. */
     dependencies: string[];
     conflicts: string[];
     /** Range of CORE_API_VERSION the module accepts; null when unconstrained. */

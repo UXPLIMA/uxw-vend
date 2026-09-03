@@ -24,7 +24,7 @@ git clone https://github.com/UXPLIMA/uxw-vend.git
 cd uxwVend
 npm install
 cp .env.example .env
-# Edit .env — at minimum set DATABASE_URL, AUTH_SECRET, AUTH_URL
+# Edit .env - at minimum set DATABASE_URL, AUTH_SECRET, AUTH_URL
 ```
 
 Push the schema and seed core data:
@@ -55,7 +55,7 @@ src/
   core/                 platform framework (auth, RBAC, i18n, DB, rate limiting, module/theme systems)
   app/                  Next.js App Router pages (all locale-aware under [locale]/)
   app/api/              core REST endpoints + [...path] catch-all that dispatches module APIs
-  modules/              RUNTIME install state (gitignored — populated by admin UI or dev workflow)
+  modules/              RUNTIME install state (gitignored - populated by admin UI or dev workflow)
   themes/               installed themes (flat + pixelcraft ship in-tree)
   proxy.ts              middleware: i18n + module route gating + CSRF
 
@@ -82,7 +82,7 @@ All feature work goes into a module. See [PLUGIN_SDK.md](PLUGIN_SDK.md) for the 
 |---|---|---|
 | `module-sources/<id>/` | Authoritative source for first-party modules | Tracked |
 | `module-marketplace/<id>.zip` | Distributable artifact installed via the marketplace UI | Tracked |
-| `src/modules/<id>/` | Runtime install state — what the running platform sees | **Gitignored** |
+| `src/modules/<id>/` | Runtime install state - what the running platform sees | **Gitignored** |
 
 ### Creating a new module
 
@@ -94,7 +94,7 @@ This copies `module-template/` into `module-sources/my-module/` and replaces pla
 
 Then:
 
-1. Edit `module-sources/my-module/module.json` — keep only the fields you need.
+1. Edit `module-sources/my-module/module.json` - keep only the fields you need.
 2. Edit `module-sources/my-module/schema.prisma` (or delete it if no DB models).
 3. Author pages, API handlers, components.
 4. Validate the manifest:
@@ -110,7 +110,7 @@ Then:
    npm run build:marketplace
    ```
    This rebuilds every ZIP in `module-marketplace/` from `module-sources/` and regenerates `module-marketplace/index.json`.
-7. Install locally — either through the admin marketplace UI, or for fast iteration:
+7. Install locally - either through the admin marketplace UI, or for fast iteration:
    ```bash
    cp -r module-sources/my-module src/modules/my-module
    npx tsx scripts/generate-registry.ts
@@ -133,13 +133,13 @@ orders MyModuleOrder[] @relation("UserMyModuleOrders")
 
 `scripts/merge-schemas.ts` injects these lines into the `User` model at the `// @@MODULE_RELATIONS` marker in `schema.core.prisma`.
 
-Then run `npm run db:merge && npm run db:push`. For schema changes to an already-deployed module, write a SQL migration in `module-sources/<id>/migrations/NNN_description.sql` — see [MIGRATIONS.md](MIGRATIONS.md).
+Then run `npm run db:merge && npm run db:push`. For schema changes to an already-deployed module, write a SQL migration in `module-sources/<id>/migrations/NNN_description.sql` - see [MIGRATIONS.md](MIGRATIONS.md).
 
 ---
 
 ## Theme Development
 
-Themes live in `src/themes/<id>/` with a `theme.json` manifest (`schemaVersion: 2`). Modes (light, dark, any named variant) live inside a single manifest — no separate dark-variant themes and no parent inheritance. v1 manifests are rejected on upload.
+Themes live in `src/themes/<id>/` with a `theme.json` manifest (`schemaVersion: 2`). Modes (light, dark, any named variant) live inside a single manifest - no separate dark-variant themes and no parent inheritance. v1 manifests are rejected on upload.
 
 ### Minimal manifest
 
@@ -186,8 +186,8 @@ To distribute a theme, zip the `<id>/` folder and upload via **Admin > Settings 
 
 Two themes ship in-tree:
 
-- `flat` — baseline. Light + dark modes. No component overrides, no settings.
-- `pixelcraft` — gaming/Minecraft preset. Dark only. Hypixel-style hero with schema-driven settings (title, subtitle, backgroundImage, logoImage, serverIp, ctaText, ctaHref, discordUrl). Declares a `hero.liveStats` slot. Suggests the `store` module.
+- `flat` - baseline. Light + dark modes. No component overrides, no settings.
+- `pixelcraft` - gaming/Minecraft preset. Dark only. Hypixel-style hero with schema-driven settings (title, subtitle, backgroundImage, logoImage, serverIp, ctaText, ctaHref, discordUrl). Declares a `hero.liveStats` slot. Suggests the `store` module.
 
 ---
 
@@ -232,7 +232,7 @@ Modules contribute into these via the `slotContents` manifest field. Themes can 
 
 ### TypeScript
 
-- Strict mode is on. No `any` — use proper types or `unknown`.
+- Strict mode is on. No `any` - use proper types or `unknown`.
 - Use `@/*` for all imports (resolves to `src/*`).
 - Validate API inputs with Zod 4. Read errors via `.issues`, not `.errors`.
 
@@ -240,13 +240,13 @@ Modules contribute into these via the `slotContents` manifest field. Themes can 
 
 - Server components by default. Add `"use client"` only when the component needs hooks, event handlers, or browser APIs.
 - Functional components with hooks only.
-- No `confirm()` or `alert()` — use `useConfirm()` from `@/core/components/ui/confirm-dialog` and `toast` from `sonner`.
-- No emoji in code or UI strings — use Lucide icons exclusively.
+- No `confirm()` or `alert()` - use `useConfirm()` from `@/core/components/ui/confirm-dialog` and `toast` from `sonner`.
+- No emoji in code or UI strings - use Lucide icons exclusively.
 - Sanitize HTML with `dompurify` / `isomorphic-dompurify` before any `dangerouslySetInnerHTML`.
 
 ### Routing and i18n
 
-- Use `Link`, `usePathname`, and `redirect` from `@/core/lib/i18n/navigation` — never `next/link`.
+- Use `Link`, `usePathname`, and `redirect` from `@/core/lib/i18n/navigation` - never `next/link`.
 - Use `useTranslations()` (client) / `getTranslations()` (server) from `next-intl` for all UI text. No hardcoded strings.
 - Active locales: `en`, `tr` (see `src/core/lib/i18n/config.ts`). Translations are read from the `Translation` DB table at request time; seed sources are `messages-core/{en,tr}.json` and each module's `translations` block.
 
@@ -303,11 +303,11 @@ Rules:
 `.github/workflows/build-and-test.yml` runs on every push and PR to `main`. All steps must pass:
 
 1. `npm ci`
-2. Seed `src/modules/` from `module-sources/` (CI only — simulates a fully-installed state so the type checker sees every model)
+2. Seed `src/modules/` from `module-sources/` (CI only - simulates a fully-installed state so the type checker sees every model)
 3. `npx tsx scripts/merge-schemas.ts` (merge Prisma schema + generate client)
 4. `npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/generate-openapi.ts`
 5. `npx tsc --noEmit` (zero errors)
-6. `npm run typecheck:modules` (zero errors — see below)
+6. `npm run typecheck:modules` (zero errors - see below)
 7. `npx tsx scripts/validate-module.ts --all` (every module passes the boundary and manifest gates)
 8. `npm run lint` (zero warnings)
 9. `npm audit --audit-level=high`
@@ -339,7 +339,7 @@ npx tsx scripts/generate-registry.ts
 `tsconfig.json` excludes `module-sources/`: a module imports
 `@/modules/<id>/...` paths that only exist once it is installed, so including
 it would fail every clean checkout. `npm run typecheck:modules` covers it
-instead, and does one thing `tsc` alone cannot — it generates a throwaway
+instead, and does one thing `tsc` alone cannot - it generates a throwaway
 Prisma client from core plus *every* module schema and type-checks against
 that.
 
@@ -445,7 +445,7 @@ npm run build
 ## Pinned dependencies and why
 
 Three dependencies are deliberately held back. Each was attempted, failed, and
-rolled back — twice, in two different sessions, because the reason was not
+rolled back - twice, in two different sessions, because the reason was not
 written down. Verified 2026-09-02; every entry carries the command that
 re-checks it, so nobody has to rediscover the failure by installing it.
 
@@ -463,7 +463,7 @@ contextOrFilename.getFilename is not a function
 before a single file is linted. Only `eslint-plugin-react@7.8.0-rc.0` supports
 ESLint 10, and pinning a linter plugin to a release candidate buys nothing.
 
-Re-check with `npm view eslint-plugin-react@latest peerDependencies` — when the
+Re-check with `npm view eslint-plugin-react@latest peerDependencies` - when the
 stable range includes `^10`, the upgrade is free.
 
 ### `typescript` held at `^6`
@@ -471,7 +471,7 @@ stable range includes `^10`, the upgrade is free.
 `typescript-eslint@8.69.0` declares `typescript: >=4.8.4 <6.1.0`. TypeScript 7
 type-checks this codebase cleanly (`tsc --noEmit` passes), but `npm run lint`
 refuses to run against it. The workaround typescript-eslint documents is a
-second, aliased TypeScript install for the linter alone — two type checkers
+second, aliased TypeScript install for the linter alone - two type checkers
 disagreeing about one codebase is worse than being a major version behind.
 
 Re-check with `npm view typescript-eslint@latest peerDependencies`.
@@ -483,7 +483,7 @@ standing risk in the dependency tree. It is not held back by choice: beta.32
 is the newest v5 release, and the `latest` tag points at v4, a different API.
 There is nowhere better to go.
 
-Re-check with `npm view next-auth dist-tags` — the moment a stable 5.x ships,
+Re-check with `npm view next-auth dist-tags` - the moment a stable 5.x ships,
 upgrading to it takes priority over anything else in this file.
 
 ### Versions forced by `overrides`
@@ -495,7 +495,7 @@ dependency past a published advisory; three re-point a React peer at our own
 `"mysql2": "^3.22.0"` is the one the CI gate depends on: advisory
 GHSA-3f6p-5ww8-9rcr (high) reaches us through the `prisma` CLI's tree, and
 `npm audit --audit-level=high` fails the build without the override. Each
-entry can go when its upstream moves past the advisory on its own — check
+entry can go when its upstream moves past the advisory on its own - check
 with `npm audit` after removing one, never by assumption.
 
 The remaining `react-quill-new` advisories are *low* and below the gate. They
@@ -507,9 +507,9 @@ payload in the database.
 
 ## Cross-references
 
-- [PLUGIN_SDK.md](PLUGIN_SDK.md) — complete `module.json` reference and authoring patterns
-- [MIGRATIONS.md](MIGRATIONS.md) — per-module SQL migrations
-- [API.md](API.md) — REST API surface and module API dispatch
-- [ADMIN_GUIDE.md](ADMIN_GUIDE.md) — admin panel walkthrough
-- [DEPLOYMENT.md](DEPLOYMENT.md) — production deployment
-- [../module-template/README.md](../module-template/README.md) — module starter template
+- [PLUGIN_SDK.md](PLUGIN_SDK.md) - complete `module.json` reference and authoring patterns
+- [MIGRATIONS.md](MIGRATIONS.md) - per-module SQL migrations
+- [API.md](API.md) - REST API surface and module API dispatch
+- [ADMIN_GUIDE.md](ADMIN_GUIDE.md) - admin panel walkthrough
+- [DEPLOYMENT.md](DEPLOYMENT.md) - production deployment
+- [../module-template/README.md](../module-template/README.md) - module starter template

@@ -3,7 +3,7 @@ import { addAction, doAction, applyFilters, addFilter, resetHooks } from "@/core
 
 /**
  * Compile-time tests. Every `@ts-expect-error` below fails `npm run typecheck`
- * if the mistake it describes ever stops being an error — which is the only way
+ * if the mistake it describes ever stops being an error - which is the only way
  * to prove the payload registry is still wired up. The runtime assertions just
  * keep vitest honest about the file executing.
  */
@@ -12,7 +12,7 @@ describe("hook payload registry", () => {
 
     it("types the payload of a declared action", () => {
         let seen = "";
-        // `payload` is typed from UxwVendHookPayloads — no annotation here.
+        // `payload` is typed from UxwVendHookPayloads - no annotation here.
         addAction("user.registered", (payload) => {
             seen = payload.username;
         });

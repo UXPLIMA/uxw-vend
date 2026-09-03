@@ -13,8 +13,8 @@ import { logActivity } from "@/core/lib/activity-log";
 import { resolveWebhookChannel, validateWebhookUrl } from "@/core/lib/webhook-channels";
 
 /**
- * GET  /api/v1/admin/alerting — fetch the current alerting config.
- * POST /api/v1/admin/alerting — replace the alerting config.
+ * GET  /api/v1/admin/alerting - fetch the current alerting config.
+ * POST /api/v1/admin/alerting - replace the alerting config.
  *
  * Config is stored in Setting { key: "health_alerting" }.
  */
@@ -35,7 +35,7 @@ export async function GET() {
     if (guard.error) return guard.error;
 
     const [config, channels] = await Promise.all([loadAlertingConfig(), listAlertingChannels()]);
-    // The admin form renders the channel picker from this list — core has no
+    // The admin form renders the channel picker from this list - core has no
     // built-in vendor list to hardcode into the page.
     return NextResponse.json({ config, channels });
 }

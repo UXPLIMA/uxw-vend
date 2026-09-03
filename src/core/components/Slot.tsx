@@ -6,7 +6,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 
 /**
- * Named slot — any module's template can declare a <Slot name="xxx"> and
+ * Named slot - any module's template can declare a <Slot name="xxx"> and
  * other modules can inject content into it via their manifest.slotContents.
  *
  * Example:

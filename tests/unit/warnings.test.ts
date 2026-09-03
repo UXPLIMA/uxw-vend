@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 /**
  * The warning system decides when a user gets auto-muted or auto-banned:
  * modules subscribe to "user.warning.threshold" and act on it. The
- * crossing test — `total >= threshold && total - points < threshold` —
+ * crossing test - `total >= threshold && total - points < threshold` -
  * is what stops the same threshold firing on every subsequent warning,
  * and it had no coverage at all.
  */
@@ -139,7 +139,7 @@ describe("issueWarning", () => {
     });
 
     it("does not re-fire a threshold already crossed", async () => {
-        // Was 3, now 4 — the 3-point line was crossed by an earlier warning.
+        // Was 3, now 4 - the 3-point line was crossed by an earlier warning.
         userWarning.findMany.mockResolvedValue([{ points: 4 }]);
         await issueWarning({ userId: "u1", issuedById: "mod", reason: "r", points: 1 });
 

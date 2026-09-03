@@ -7,7 +7,7 @@ vi.mock("@/core/lib/redis", () => ({
     isRedisConfigured: () => false,
 }));
 
-// Prisma mock — setting row is controlled per-test.
+// Prisma mock - setting row is controlled per-test.
 const settingFindUnique = vi.fn();
 vi.mock("@/core/lib/db", () => ({
     prisma: {
@@ -178,7 +178,7 @@ describe("rate-limit: rateLimitForRoleAsync", () => {
         expect(await mod.rateLimitForRoleAsync(id, config, "member")).toBe(false);
     });
 
-    it("does not throw on DB error — returns a boolean", async () => {
+    it("does not throw on DB error - returns a boolean", async () => {
         settingFindUnique.mockRejectedValue(new Error("db down"));
         const ok = await mod.rateLimitForRoleAsync(
             "err-" + Date.now(),

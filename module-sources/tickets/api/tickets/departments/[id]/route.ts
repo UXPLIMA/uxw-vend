@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
     if (!existing) return NextResponse.json({ error: "Department not found" }, { status: 404 });
     if (existing._count.tickets > 0) {
-        // Raw Prisma FK errors leaked as 500 before — now return a clear 409.
+        // Raw Prisma FK errors leaked as 500 before - now return a clear 409.
         return NextResponse.json(
             { error: `Cannot delete: department has ${existing._count.tickets} ticket(s). Move them to another department or close them first.`, code: "department_has_tickets" },
             { status: 409 },

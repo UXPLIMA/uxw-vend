@@ -11,7 +11,7 @@ import { rateLimit, getClientIP, rateLimits } from "./rate-limit";
  * Error:   `{ ok: false, error: "human message", code?: "machine_code", details?: unknown }`
  *
  * Legacy endpoints still return ad-hoc `{ error }` / `{ data }` / `{ message }`
- * shapes — these are being migrated incrementally. New code MUST use these
+ * shapes - these are being migrated incrementally. New code MUST use these
  * helpers; prefer `apiError(..., { code: "..." })` so clients can branch on
  * the stable `code` instead of string matching on the message.
  */

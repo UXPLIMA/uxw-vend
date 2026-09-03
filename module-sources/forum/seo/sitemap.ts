@@ -1,5 +1,5 @@
 /**
- * Forum module — sitemap contributor.
+ * Forum module - sitemap contributor.
  *
  * Returns every ForumTopic as a sitemap entry so the core /sitemap.xml
  * endpoint can include them. Core calls this via the generated

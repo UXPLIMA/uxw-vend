@@ -4,7 +4,7 @@ import { checkPasswordPolicy, PASSWORD_POLICY } from "./password-policy";
 // ==================== AUTH SCHEMAS ====================
 
 // Login only checks presence. The strict policy runs on NEW / CHANGED
-// passwords — existing accounts whose password predates the policy bump
+// passwords - existing accounts whose password predates the policy bump
 // must still be able to sign in.
 export const loginSchema = z.object({
     email: z.string().email("Invalid email address"),

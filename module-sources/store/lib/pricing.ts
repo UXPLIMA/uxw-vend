@@ -106,7 +106,7 @@ export function computeOrderPricing(params: {
 
 // Prisma money columns arrive as Decimal objects, not primitives. Every
 // numeric read in computeCouponDiscount already goes through Number(), which
-// coerces a Decimal via its valueOf/toString — so we accept either here to
+// coerces a Decimal via its valueOf/toString - so we accept either here to
 // keep the route's behaviour identical while satisfying the type checker.
 type DecimalLike = number | { toString(): string };
 

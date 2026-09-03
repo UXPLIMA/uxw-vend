@@ -1,6 +1,6 @@
 # Plugin SDK
 
-The reference for module authors. Every behavior a module contributes is declared in `module.json` and wired by code generation — there are no decorators, no runtime registrations, and no entries in core that name a specific module.
+The reference for module authors. Every behavior a module contributes is declared in `module.json` and wired by code generation - there are no decorators, no runtime registrations, and no entries in core that name a specific module.
 
 uxwVend ships with **zero modules**. The 41 first-party modules in `module-marketplace/` are installed at runtime through the admin panel just like any third-party module. Core knows nothing about any of them.
 
@@ -32,9 +32,9 @@ Install via **Admin > Modules > Upload ZIP** or **Marketplace** for production-s
 
 ```
 src/modules/my-module/
-├── module.json                  Required — manifest
-├── schema.prisma                Optional — Prisma models merged at db:merge time
-├── migrations/                  Optional — per-module SQL migrations (NNN_description.sql)
+├── module.json                  Required - manifest
+├── schema.prisma                Optional - Prisma models merged at db:merge time
+├── migrations/                  Optional - per-module SQL migrations (NNN_description.sql)
 ├── pages/
 │   ├── public/page.tsx          Public page component
 │   └── admin/page.tsx           Admin page component
@@ -61,7 +61,7 @@ Only `module.json` is required. Include only the directories your module needs.
 
 ### How file references resolve
 
-Every field below that names a file — `component`, `layout`, `handler` — is
+Every field below that names a file - `component`, `layout`, `handler` - is
 resolved the way an import specifier is, not as a literal path. The registry
 generator strips any `.tsx`/`.ts`/`.jsx`/`.js` extension off the value and
 emits `@/modules/<id>/<ref>`, so all three of these name the same file:
@@ -103,7 +103,7 @@ that runs.
 | `tags` | `string[]` | Free-form search keywords. Falls back to `[category]`. |
 | `hooks.onEnable` / `hooks.onDisable` | `string` | Path to a default-exported handler run when the module is enabled / disabled. Use this to seed default data on install. |
 
-### `routes` — Public pages
+### `routes` - Public pages
 
 Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 
@@ -120,9 +120,9 @@ Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 | `component` | Yes | Path to the page component, relative to the module root. |
 | `layout` | No | Optional layout wrapper component. |
 
-### `adminRoutes` — Admin pages
+### `adminRoutes` - Admin pages
 
-Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sidebar, and header are provided automatically — never re-implement them).
+Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sidebar, and header are provided automatically - never re-implement them).
 
 ```json
 "adminRoutes": [
@@ -131,7 +131,7 @@ Rendered at `/{locale}/admin/{path}` inside the admin layout (auth guard, sideba
 ]
 ```
 
-### `api` — API endpoints
+### `api` - API endpoints
 
 Mounted at `/api/v1/{path}` via the `[...path]` catch-all that resolves `ModuleApiRegistry`.
 
@@ -153,7 +153,7 @@ Mounted at `/api/v1/{path}` via the `[...path]` catch-all that resolves `ModuleA
 | `method` | No | `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, or `ALL`. Defaults to `ALL`. The dispatcher returns 405 if the request method doesn't match. |
 | `description` | No | OpenAPI summary surfaced in the generated spec at `/api/v1/openapi`. |
 
-### `navGroups` — Admin sidebar groups
+### `navGroups` - Admin sidebar groups
 
 ```json
 "navGroups": [
@@ -165,7 +165,7 @@ Creates a group on the admin sidebar rail so `menu` entries can target it with
 `"group": "commerce"`. Core declares no group a module might want to fill, so a
 group that nothing installs simply does not exist.
 
-Several modules may declare the same group — the first one wins and the rest are
+Several modules may declare the same group - the first one wins and the rest are
 ignored, so two commerce modules never fight over it. If they disagree on the
 label or icon, the generator prints a warning naming both modules. A `menu` entry
 pointing at a group nobody declared is not dropped; it lands in a fallback
@@ -174,7 +174,7 @@ pointing at a group nobody declared is not dropped; it lands in a fallback
 `order` places the group on the rail relative to other module groups (core groups
 always come first, the theme group last).
 
-### `menu` — Admin sidebar
+### `menu` - Admin sidebar
 
 ```json
 "menu": [
@@ -185,7 +185,7 @@ always come first, the theme group last).
 
 `path` is relative to `/admin`. `icon` is a Lucide icon name.
 
-### `navLinks` — Public navbar entries
+### `navLinks` - Public navbar entries
 
 ```json
 "navLinks": [
@@ -195,7 +195,7 @@ always come first, the theme group last).
 
 Lower `position` renders further left.
 
-### `footerLinks` — Footer links
+### `footerLinks` - Footer links
 
 ```json
 "footerLinks": [
@@ -205,7 +205,7 @@ Lower `position` renders further left.
 
 `section` is `"quick"` or `"legal"`.
 
-### `navbarComponents` — Navbar right-side widgets
+### `navbarComponents` - Navbar right-side widgets
 
 Icons or controls rendered in the navbar's right-hand area (cart icon, notification bell, currency selector, etc.).
 
@@ -217,7 +217,7 @@ Icons or controls rendered in the navbar's right-hand area (cart icon, notificat
 
 Lower `order` renders further left.
 
-### `footerComponents` — Footer widgets
+### `footerComponents` - Footer widgets
 
 Components rendered next to the language selector in the footer.
 
@@ -227,7 +227,7 @@ Components rendered next to the language selector in the footer.
 ]
 ```
 
-### `layoutComponents` — Per-page components
+### `layoutComponents` - Per-page components
 
 Components rendered on every matching page when the module is enabled (toasts, banners, popups, floating widgets). Use the URL filter to scope.
 
@@ -244,7 +244,7 @@ Components rendered on every matching page when the module is enabled (toasts, b
 
 `include` / `exclude` are glob-style URL patterns. Omit both to render on every route.
 
-### `widgets` — Homepage sidebar widgets
+### `widgets` - Homepage sidebar widgets
 
 ```json
 "widgets": [
@@ -257,7 +257,7 @@ Components rendered on every matching page when the module is enabled (toasts, b
 ]
 ```
 
-### `homepageSections` — Homepage content sections
+### `homepageSections` - Homepage content sections
 
 ```json
 "homepageSections": [
@@ -272,7 +272,7 @@ Components rendered on every matching page when the module is enabled (toasts, b
 
 `type` is `"content"` (main area) or `"widget"` (sidebar).
 
-### `profileTabs` — User profile tabs
+### `profileTabs` - User profile tabs
 
 ```json
 "profileTabs": [
@@ -280,7 +280,7 @@ Components rendered on every matching page when the module is enabled (toasts, b
 ]
 ```
 
-### `dashboardCards` — Admin dashboard stat cards
+### `dashboardCards` - Admin dashboard stat cards
 
 ```json
 "dashboardCards": [
@@ -296,9 +296,9 @@ Components rendered on every matching page when the module is enabled (toasts, b
 ]
 ```
 
-`labelKey` is an i18n key in the `admin` namespace — preferred over `label` when present. `statKey` is the property the dashboard reads from your `statsApi` response to populate the value.
+`labelKey` is an i18n key in the `admin` namespace - preferred over `label` when present. `statKey` is the property the dashboard reads from your `statsApi` response to populate the value.
 
-### `statsApi` — Dashboard data endpoint
+### `statsApi` - Dashboard data endpoint
 
 ```json
 "statsApi": "/my-module/stats"
@@ -306,7 +306,7 @@ Components rendered on every matching page when the module is enabled (toasts, b
 
 The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [statKey: string]: number | string }, sections?: [...] }`. Permission gating is the handler's responsibility.
 
-### `settingsCards` — Admin settings page cards
+### `settingsCards` - Admin settings page cards
 
 ```json
 "settingsCards": [
@@ -320,7 +320,7 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
 ]
 ```
 
-### `authProviders` — OAuth sign-in providers
+### `authProviders` - OAuth sign-in providers
 
 ```json
 "authProviders": [
@@ -328,7 +328,7 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
 ]
 ```
 
-Core ships no OAuth provider. `id` is an Auth.js provider id — the registry
+Core ships no OAuth provider. `id` is an Auth.js provider id - the registry
 generator emits `import from "next-auth/providers/<id>"`, so it must be a
 lowercase slug and must be a provider Auth.js actually ships.
 
@@ -336,7 +336,7 @@ The provider activates only when both named environment variables are set, which
 is what lets an installed-but-unconfigured module contribute nothing. Pair this
 with an `oauthButtons` entry to render the login button.
 
-### `webhookChannels` — Outbound webhook delivery
+### `webhookChannels` - Outbound webhook delivery
 
 ```json
 "webhookChannels": [
@@ -356,7 +356,7 @@ webhook URL may use and which layout the receiver understands:
 
 | `layout` | Body |
 |----------|------|
-| `json` | `{ title, text, content, fields, timestamp }` — neutral |
+| `json` | `{ title, text, content, fields, timestamp }` - neutral |
 | `embed` | `{ content, embeds: [...] }` |
 | `attachment` | `{ text, attachments: [...] }` |
 
@@ -365,7 +365,7 @@ Channels appear in Admin > Settings > Alerting. Core always offers a built-in
 optional, and a channel that omits it inherits core's rule that the URL must be
 https on a public host.
 
-### `oauthButtons` — Login/register OAuth buttons
+### `oauthButtons` - Login/register OAuth buttons
 
 ```json
 "oauthButtons": [
@@ -381,7 +381,7 @@ https on a public host.
 
 `svgIcon` is raw SVG `d` path data (no `<svg>` wrapper). `provider` must match a NextAuth provider ID configured by the module.
 
-### `contextProviders` — React context wrappers
+### `contextProviders` - React context wrappers
 
 Components that wrap the entire app tree. Unlike `layoutComponents` (rendered as siblings), context providers receive `children` and wrap them.
 
@@ -393,7 +393,7 @@ Components that wrap the entire app tree. Unlike `layoutComponents` (rendered as
 
 Lower `order` = outer wrapper.
 
-### `hookListeners` — Action/filter listeners
+### `hookListeners` - Action/filter listeners
 
 WordPress-style hooks wired at build time. Listeners are auto-registered when the module is enabled and removed on disable.
 
@@ -404,14 +404,14 @@ WordPress-style hooks wired at build time. Listeners are auto-registered when th
 ]
 ```
 
-- `type: "action"` — fire and forget. Handler: `(payload, context?) => void | Promise<void>`.
-- `type: "filter"` — value transformation. Handler: `(value, context?) => value | Promise<value>`.
-- `priority` — lower runs earlier. Default 10.
+- `type: "action"` - fire and forget. Handler: `(payload, context?) => void | Promise<void>`.
+- `type: "filter"` - value transformation. Handler: `(value, context?) => value | Promise<value>`.
+- `priority` - lower runs earlier. Default 10.
 - Async listeners have a per-listener timeout (default 5 s, override with `HOOK_LISTENER_TIMEOUT_MS`).
 
-Core-fired actions include `user.registered`, `user.login`, `user.email.verified`, `user.password.changed`, `user.profile.updated`, `user.warning.issued`, `user.warning.threshold`, and the module lifecycle: `module.installed`, `module.uninstalled`, `module.enabled`, `module.disabled`. Their payloads are declared in `src/core/types/hook-payloads.d.ts`. Modules fire their own hooks via `doAction` / `applyFilters` from `@/core/sdk` — and must declare them, see below.
+Core-fired actions include `user.registered`, `user.login`, `user.email.verified`, `user.password.changed`, `user.profile.updated`, `user.warning.issued`, `user.warning.threshold`, and the module lifecycle: `module.installed`, `module.uninstalled`, `module.enabled`, `module.disabled`. Their payloads are declared in `src/core/types/hook-payloads.d.ts`. Modules fire their own hooks via `doAction` / `applyFilters` from `@/core/sdk` - and must declare them, see below.
 
-### `hooksEmitted` — Hooks this module fires
+### `hooksEmitted` - Hooks this module fires
 
 The other half of the contract. Every `doAction` / `applyFilters` call with a literal name must be declared here, and every declaration must correspond to a call:
 
@@ -421,7 +421,7 @@ The other half of the contract. Every `doAction` / `applyFilters` call with a li
 ]
 ```
 
-Why it is mandatory rather than documentation: a hook name is an agreement between two modules that never import each other, and a listener subscribed to a misspelled name does not fail — it silently never runs. Declaring emitters makes that checkable, and three gates do check it:
+Why it is mandatory rather than documentation: a hook name is an agreement between two modules that never import each other, and a listener subscribed to a misspelled name does not fail - it silently never runs. Declaring emitters makes that checkable, and three gates do check it:
 
 | Gate | What it catches |
 |---|---|
@@ -431,7 +431,7 @@ Why it is mandatory rather than documentation: a hook name is an agreement betwe
 
 Hooks with a dynamic name (`doAction(\`${resource}.created\`, …)`) cannot be declared and are not required to be.
 
-### `slotContents` — Slot contributions
+### `slotContents` - Slot contributions
 
 Render components into named `<Slot>` points declared by themes or other modules.
 
@@ -446,9 +446,9 @@ Render components into named `<Slot>` points declared by themes or other modules
 ]
 ```
 
-Core declares a fixed set of canonical slots — the generic `layout.beforeMain`, `layout.afterMain`, `head.extra` plus layout-position slots `layout.top`, `layout.bottom`, `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav` (see `src/core/lib/slot-registry.ts`). Themes can declare additional slots through their `slots[]` array (e.g. `pixelcraft` exposes `hero.liveStats`).
+Core declares a fixed set of canonical slots - the generic `layout.beforeMain`, `layout.afterMain`, `head.extra` plus layout-position slots `layout.top`, `layout.bottom`, `navbar.start`, `navbar.end`, `footer.top`, `mobile.nav` (see `src/core/lib/slot-registry.ts`). Themes can declare additional slots through their `slots[]` array (e.g. `pixelcraft` exposes `hero.liveStats`).
 
-### `pageBlocks` — Page-builder blocks
+### `pageBlocks` - Page-builder blocks
 
 Module-contributed blocks available in the page editor.
 
@@ -458,7 +458,7 @@ Module-contributed blocks available in the page editor.
 ]
 ```
 
-### `cronJobs` — Scheduled tasks
+### `cronJobs` - Scheduled tasks
 
 Periodic tasks run by the core scheduler.
 
@@ -472,7 +472,7 @@ Valid `schedule` keywords: `every-minute`, `every-5-minutes`, `every-15-minutes`
 
 Handler file: `export default async function (): Promise<void>`. Last-run state is recorded in the `CronRun` table.
 
-### `searchProviders` — Site search
+### `searchProviders` - Site search
 
 ```json
 "searchProviders": [
@@ -490,18 +490,18 @@ Handler file: `export default async function (): Promise<void>`. Last-run state 
 Handler: `export default async (query: string) => Promise<SearchResult[]>`. `GET /api/v1/search` merges results from every enabled provider.
 
 `indexes` is optional and asks core to create a GIN `tsvector` index on one of
-your own tables at boot — `CREATE INDEX IF NOT EXISTS "<Table>_fts_idx"`, so it
+your own tables at boot - `CREATE INDEX IF NOT EXISTS "<Table>_fts_idx"`, so it
 is idempotent and costs nothing on later boots. Declare it if your handler runs
 a full-text query; a sequential scan over a growing table is the alternative.
 
 **You declare identifiers, not SQL.** `table` and `columns` must match
 `^[A-Za-z][A-Za-z0-9_]*$` and are rejected at validation time otherwise; core
 builds the `to_tsvector('english', coalesce(...) || ' ' || ...)` expression
-itself. Core previously kept this list hardcoded — four module table names
+itself. Core previously kept this list hardcoded - four module table names
 inside `src/`, which the architecture forbids, and which logged an error for
 every module that was not installed on every boot.
 
-### `webhookReceivers` — Inbound webhooks
+### `webhookReceivers` - Inbound webhooks
 
 Routed by `POST /api/v1/webhook/{provider}`.
 
@@ -520,7 +520,7 @@ When `signatureHeader` + `secretEnv` are set, HMAC-SHA256 verification runs agai
 
 Handler: `export default async (request: Request) => Promise<{ status: number; body?: unknown }>`.
 
-### `notificationTypes` — User notification preferences
+### `notificationTypes` - User notification preferences
 
 Surfaces in the profile preferences grid so users can opt out per channel.
 
@@ -530,7 +530,7 @@ Surfaces in the profile preferences grid so users can opt out per channel.
 ]
 ```
 
-### `storageProviders` — File-storage backends
+### `storageProviders` - File-storage backends
 
 Implement the `StorageProvider` interface from `@/core/sdk/server`. The active provider is selected at runtime via the `storage_active_provider` Setting key (or the `STORAGE_PROVIDER` env var).
 
@@ -542,7 +542,7 @@ Implement the `StorageProvider` interface from `@/core/sdk/server`. The active p
 
 Handler: `export default: StorageProvider`.
 
-### `seoRoutes` — Sitemap contribution
+### `seoRoutes` - Sitemap contribution
 
 ```json
 "seoRoutes": { "handler": "seo/sitemap.ts" }
@@ -550,9 +550,9 @@ Handler: `export default: StorageProvider`.
 
 Handler: `export default async () => Promise<SitemapEntry[]>`.
 
-### `translations` — Bundled i18n strings
+### `translations` - Bundled i18n strings
 
-Synced into the `Translation` DB table on install and removed on uninstall. **Admin-overridden rows survive uninstall** — the sync never overwrites a row that has been manually edited.
+Synced into the `Translation` DB table on install and removed on uninstall. **Admin-overridden rows survive uninstall** - the sync never overwrites a row that has been manually edited.
 
 ```json
 "translations": {
@@ -598,7 +598,7 @@ items MyModuleItem[]
 // @@user-relations-end
 ```
 
-`scripts/merge-schemas.ts` injects these lines into the core `User` model at the `// @@MODULE_RELATIONS` marker. Do not redeclare core models — the merger warns on core-model redeclaration.
+`scripts/merge-schemas.ts` injects these lines into the core `User` model at the `// @@MODULE_RELATIONS` marker. Do not redeclare core models - the merger warns on core-model redeclaration.
 
 After editing the schema:
 
@@ -635,10 +635,10 @@ export default async function MyPage() {
 
 Rules:
 
-- Use `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` — never `next/link`.
-- No hardcoded UI strings — use `useTranslations` (client) or `getTranslations` (server) from `next-intl`.
-- No emojis in UI — use Lucide icons.
-- No `confirm()` / `alert()` — use `useConfirm()` and `toast` from `sonner`.
+- Use `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` - never `next/link`.
+- No hardcoded UI strings - use `useTranslations` (client) or `getTranslations` (server) from `next-intl`.
+- No emojis in UI - use Lucide icons.
+- No `confirm()` / `alert()` - use `useConfirm()` and `toast` from `sonner`.
 
 ### Client page with data fetching
 
@@ -673,7 +673,7 @@ export default function MyPage() {
 
 ### Admin page
 
-Admin pages render inside the admin layout — sidebar, header, and auth guard are already provided. Export your content directly:
+Admin pages render inside the admin layout - sidebar, header, and auth guard are already provided. Export your content directly:
 
 ```tsx
 "use client";
@@ -740,7 +740,7 @@ export async function POST(request: NextRequest) {
     return apiSuccess({ item }, 201);
 }
 
-// DELETE /api/v1/my-module/items/[id] — admin only
+// DELETE /api/v1/my-module/items/[id] - admin only
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await auth();
     if (!session?.user?.id) return apiError("Unauthorized", 401);
@@ -758,7 +758,7 @@ The canonical envelope is `{ ok: true, data }` / `{ ok: false, error, code?, det
 
 ## Core Imports
 
-Modules import core through the **SDK** — `@/core/sdk*`. Core's internal
+Modules import core through the **SDK** - `@/core/sdk*`. Core's internal
 layout (`@/core/lib/*`, `@/core/components/*`) is not part of the contract and
 is free to change;
 reaching into it fails `npm run validate:module`, the marketplace build and
@@ -789,7 +789,7 @@ import { prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { isAdmin, hasPermission, hasResourcePermission } from "@/core/sdk/server";
 
-// Validation (Zod 4 — read .issues, not .errors)
+// Validation (Zod 4 - read .issues, not .errors)
 import { z } from "zod";
 
 // Activity logging
@@ -807,14 +807,14 @@ import { apiSuccess, apiError, apiPaginated, devOnlyDetail } from "@/core/sdk/se
 // Hooks (action/filter system)
 import { doAction, doActionAsync, applyFilters, applyFiltersAsync, addAction, addFilter } from "@/core/sdk";
 
-// i18n — navigation
+// i18n - navigation
 import { Link, usePathname, redirect, useRouter } from "@/core/sdk/navigation";
 
-// i18n — translations
+// i18n - translations
 import { useTranslations } from "next-intl";                       // client
 import { getTranslations } from "next-intl/server";                // server
 
-// Theme config (client only — server reads ThemeState directly)
+// Theme config (client only - server reads ThemeState directly)
 import { useThemeConfig } from "@/core/sdk/theme";
 
 // UI primitives
@@ -828,7 +828,7 @@ import { toast } from "sonner";
 
 The hook system in `src/core/lib/hooks.ts` is WordPress-style, type-safe, and ESM-first.
 
-**Actions** — fire and forget:
+**Actions** - fire and forget:
 
 ```typescript
 import { doAction, doActionAsync } from "@/core/sdk";
@@ -837,7 +837,7 @@ doAction("my-module.item.created", { itemId: item.id, userId });
 await doActionAsync("my-module.order.completed", { orderId });
 ```
 
-**Filters** — value transformation:
+**Filters** - value transformation:
 
 ```typescript
 import { applyFilters, applyFiltersAsync } from "@/core/sdk";
@@ -846,7 +846,7 @@ const processed = applyFilters("post.content", rawHtml, { postId });
 const result    = await applyFiltersAsync("checkout.total", baseTotal, { cart });
 ```
 
-**Registering listeners imperatively** (rarely needed — prefer declaring `hookListeners` in the manifest so the build-time registry can manage them):
+**Registering listeners imperatively** (rarely needed - prefer declaring `hookListeners` in the manifest so the build-time registry can manage them):
 
 ```typescript
 import { addAction, addFilter } from "@/core/sdk";
@@ -874,14 +874,14 @@ export {};
 
 That is a global interface rather than an augmentation of `@/core/sdk` on purpose: interface augmentation has to name the module that *declares* the interface, and modules are not allowed to import `@/core/lib/*`. A global needs no import specifier at all. Use `UxwVendFilterPayloads` for filters.
 
-Consumers get it for free — no import between the two modules:
+Consumers get it for free - no import between the two modules:
 
 ```typescript
 addAction("my-module.item.created", (item) => item.title);   // `item` is typed
 doAction("my-module.item.created", { id, title });            // error: authorId missing
 ```
 
-**Listening to your own hook** — take the signature straight from the contract, so the two cannot drift:
+**Listening to your own hook** - take the signature straight from the contract, so the two cannot drift:
 
 ```typescript
 import type { HookHandlerFor } from "@/core/sdk";
@@ -890,7 +890,7 @@ const onItemCreated: HookHandlerFor<"my-module.item.created", "action"> = async 
 export default onItemCreated;
 ```
 
-**Listening to another module's hook** — declare your own view of the payload instead. The emitting module may not be installed, and a handler that resolves its type through an absent module will not compile:
+**Listening to another module's hook** - declare your own view of the payload instead. The emitting module may not be installed, and a handler that resolves its type through an absent module will not compile:
 
 ```typescript
 interface ItemPayload { title: string }   // only what this listener reads
@@ -899,11 +899,11 @@ export default async function onItemCreated(payload: ItemPayload) { /* … */ }
 
 You are not skipping the check by doing that: `npm run typecheck:modules` generates an assertion per manifest-declared listener and verifies your view against the emitter's declaration whenever both modules are present. A listener may read *fewer* fields than the hook carries, never different ones.
 
-Declaring a payload is optional — an undeclared hook works exactly as before. Declaring one turns a runtime surprise into a build error.
+Declaring a payload is optional - an undeclared hook works exactly as before. Declaring one turns a runtime surprise into a build error.
 
 ---
 
-## Cheat Sheet — Full Manifest
+## Cheat Sheet - Full Manifest
 
 ```json
 {
@@ -956,7 +956,7 @@ Declaring a payload is optional — an undeclared hook works exactly as before. 
 }
 ```
 
-Delete any field you don't use — every UI registration field is optional.
+Delete any field you don't use - every UI registration field is optional.
 
 ---
 
@@ -981,9 +981,9 @@ The ZIP must contain `module.json` at its root.
 
 ### Install paths
 
-- **Admin > Modules > Marketplace** — installs from the bundled catalog (or the configured remote source).
-- **Admin > Modules > Upload ZIP** — uploads an arbitrary `.zip` file.
-- **Local copy** — `cp -r module-sources/my-module src/modules/` then `npx tsx scripts/generate-registry.ts`.
+- **Admin > Modules > Marketplace** - installs from the bundled catalog (or the configured remote source).
+- **Admin > Modules > Upload ZIP** - uploads an arbitrary `.zip` file.
+- **Local copy** - `cp -r module-sources/my-module src/modules/` then `npx tsx scripts/generate-registry.ts`.
 
 The install handler (whichever route fires) follows the same pipeline:
 
@@ -998,7 +998,7 @@ The install handler (whichever route fires) follows the same pipeline:
 9. On any failure: roll back the filesystem and abort. No silent partial installs.
 
 `scheduleBuild()` then fires a debounced background rebuild so the new module's
-bundled code is available — bulk installs in quick succession trigger only one
+bundled code is available - bulk installs in quick succession trigger only one
 rebuild. When the build succeeds it records the fingerprint of the installed
 module set beside the build and replaces the process (SIGTERM, which the
 supervisor answers by starting it again), because `next start` reads its
@@ -1014,7 +1014,7 @@ sentence again before you install one you did not write.
 Module code is compiled into the same Node.js process as core and runs with:
 
 - the same `DATABASE_URL`, so it can read and write every table, including
-  `User`, `Session` and `ApiKey` — not only the tables it declared;
+  `User`, `Session` and `ApiKey` - not only the tables it declared;
 - the same filesystem access as the app user, including `.env` and the
   uploads directory;
 - the same network access, outbound to anywhere;
@@ -1033,7 +1033,7 @@ is not mistaken for isolation:
 |-----------|---------------------------|
 | SDK import boundary (ESLint + `validate-module` + `typecheck:modules`) | Keeps a *cooperating* module off private core internals so upgrades don't break it. Three static gates; a determined module bypasses them at runtime. |
 | `safeCall` (`src/core/lib/module-safe-call.ts`) | Contains a *crash*. A module that throws degrades one feature instead of the request. Not a security boundary. |
-| ZIP validation on install | Rejects path traversal, symlinks and oversized archives — an attack on the *installer*, before any module code runs. |
+| ZIP validation on install | Rejects path traversal, symlinks and oversized archives - an attack on the *installer*, before any module code runs. |
 | Postgres advisory lock | Serializes concurrent installs. Integrity, not security. |
 | Non-root container user | Limits damage to `/app` if a module achieves code execution. |
 
@@ -1045,7 +1045,7 @@ first-party.
 
 If you need to run untrusted third-party extensions, this architecture is the
 wrong one for that, and no amount of manifest validation changes it. That would
-require out-of-process modules with an RPC boundary — a different product.
+require out-of-process modules with an RPC boundary - a different product.
 
 ---
 
@@ -1054,11 +1054,11 @@ require out-of-process modules with an RPC boundary — a different product.
 | Event | What happens |
 |-------|--------------|
 | Install | Files extracted to `src/modules/<id>/`, schema merged, SQL migrations applied, registry regenerated, `ModuleConfig` row created (`enabled: true`), translations synced. |
-| Enable | Module appears in every UI surface — sidebar, navbar, homepage, dashboard, settings, profile. Hook listeners, cron jobs, search providers, webhook receivers, slot contents — all active. |
+| Enable | Module appears in every UI surface - sidebar, navbar, homepage, dashboard, settings, profile. Hook listeners, cron jobs, search providers, webhook receivers, slot contents - all active. |
 | Disable | Module vanishes from all UI surfaces. Listeners, crons, and other runtime contributions removed. DB data preserved. |
-| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated, app rebuilt and restarted. Module translations removed (admin-overridden rows preserved). Module-owned tables are **not** dropped — see the data policy below. |
+| Uninstall | Files deleted, `ModuleConfig` row deleted, registry regenerated, app rebuilt and restarted. Module translations removed (admin-overridden rows preserved). Module-owned tables are **not** dropped - see the data policy below. |
 
-The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled — this was a past footgun and is no longer the case.
+The DB (`ModuleConfig.enabled`) is the single source of truth for whether a module is active. Filesystem presence alone does not mean a module is enabled - this was a past footgun and is no longer the case.
 
 ### What uninstall does to your data
 
@@ -1074,7 +1074,7 @@ deliberate policy, not an omission.
 
 The reasoning: a store module's `Order` table is the shop's accounting record.
 An uninstall is frequently a mistake, a troubleshooting step, or a prelude to
-reinstalling a fixed version — and in all three cases silently dropping the
+reinstalling a fixed version - and in all three cases silently dropping the
 data would be unrecoverable, while keeping it costs disk. Reinstalling the same
 module picks its data back up: `apply-migrations` skips migrations whose
 checksums are already recorded, so the tables are left exactly as they were.
@@ -1099,23 +1099,23 @@ admin can take before uninstalling. The platform will not do it for them.
 
 ## Conventions Checklist
 
-- No `any` types — proper types or `unknown`.
+- No `any` types - proper types or `unknown`.
 - Zod 4: use `.issues`, not `.errors`, on `SafeParseError`.
-- ES imports only — no `require()`.
+- ES imports only - no `require()`.
 - Path alias `@/*` resolves to `src/*`.
-- `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` — never `next/link`.
+- `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation` - never `next/link`.
 - `"use client"` only when the component needs browser APIs, hooks, or event handlers.
-- Lucide icons only — no emoji.
-- `useConfirm()` + `toast` from `sonner` — no `confirm()` / `alert()`.
+- Lucide icons only - no emoji.
+- `useConfirm()` + `toast` from `sonner` - no `confirm()` / `alert()`.
 - API responses: `apiSuccess` / `apiError` / `apiPaginated` from `@/core/sdk/server`.
-- Dark mode: `data-mode="dark"` attribute, CSS variables — no `.dark` class selector.
+- Dark mode: `data-mode="dark"` attribute, CSS variables - no `.dark` class selector.
 
 ---
 
 ## Cross-references
 
-- [API.md](API.md) — REST API conventions, error envelope, rate limiting, webhook + cron dispatch
-- [MIGRATIONS.md](MIGRATIONS.md) — per-module SQL migration system
-- [CONTRIBUTING.md](CONTRIBUTING.md) — development workflow, coding conventions, CI checks
-- [ADMIN_GUIDE.md](ADMIN_GUIDE.md) — admin panel walkthrough
-- [../module-template/README.md](../module-template/README.md) — starter template
+- [API.md](API.md) - REST API conventions, error envelope, rate limiting, webhook + cron dispatch
+- [MIGRATIONS.md](MIGRATIONS.md) - per-module SQL migration system
+- [CONTRIBUTING.md](CONTRIBUTING.md) - development workflow, coding conventions, CI checks
+- [ADMIN_GUIDE.md](ADMIN_GUIDE.md) - admin panel walkthrough
+- [../module-template/README.md](../module-template/README.md) - starter template

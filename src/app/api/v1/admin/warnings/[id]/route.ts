@@ -6,7 +6,7 @@ import { logActivity } from "@/core/lib/activity-log";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-/** PATCH — revoke (soft-disable) a warning by setting isActive=false */
+/** PATCH - revoke (soft-disable) a warning by setting isActive=false */
 export async function PATCH(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
@@ -29,7 +29,7 @@ export async function PATCH(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ warning });
 }
 
-/** DELETE — permanently remove a warning */
+/** DELETE - permanently remove a warning */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {

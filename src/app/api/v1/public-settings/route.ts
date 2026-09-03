@@ -4,7 +4,7 @@ import { cached } from "@/core/lib/cache";
 import { SETTINGS_CACHE, getDurationMs } from "@/core/lib/security-settings";
 
 // Public settings keys that can be read without authentication.
-// Only core platform keys — module-specific settings (Discord widget IDs,
+// Only core platform keys - module-specific settings (Discord widget IDs,
 // hero text, server IPs, etc.) live in their own module's public API.
 // Themes that need extra public values use the theme.json schema-driven
 // settings system (read via useThemeConfig, not from here).
@@ -34,7 +34,7 @@ const PUBLIC_SETTINGS_CACHE_KEY = "public-settings";
 
 // GET /api/v1/public-settings
 export async function GET() {
-    // How long this response may be reused — admin-configurable, clamped.
+    // How long this response may be reused - admin-configurable, clamped.
     const ttlMs = await getDurationMs(SETTINGS_CACHE);
 
     const settingsMap = await cached<Record<string, unknown>>(

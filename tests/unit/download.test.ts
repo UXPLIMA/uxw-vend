@@ -3,7 +3,7 @@ import { downloadFromUrl } from "@/core/lib/download";
 
 /**
  * The point of this helper is that a failed download must not navigate the
- * admin away from the page they were on — the reason it exists instead of
+ * admin away from the page they were on - the reason it exists instead of
  * `window.location.href = url`. That guarantee rests on details the browser
  * does not enforce: the anchor must actually be clicked, and it must be
  * removed again so repeated exports cannot litter the DOM.

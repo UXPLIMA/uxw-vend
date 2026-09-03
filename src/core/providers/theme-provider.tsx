@@ -45,7 +45,7 @@ export function AppThemeProvider({ children, themeId, mode, serverConfig }: AppT
         document.documentElement.setAttribute("data-mode", currentMode);
     }, [activeTheme, currentMode]);
 
-    // Live preview channel — customizer iframe gets overrides via postMessage.
+    // Live preview channel - customizer iframe gets overrides via postMessage.
     // Same-origin check on receive; wildcard NEVER used for postMessage target.
     const [previewOverrides, setPreviewOverrides] = useState<Record<string, unknown> | null>(null);
     useEffect(() => {
@@ -59,7 +59,7 @@ export function AppThemeProvider({ children, themeId, mode, serverConfig }: AppT
         };
         window.addEventListener("message", handler);
         try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, window.location.origin); }
-        catch { /* cross-origin / detached — ignore */ }
+        catch { /* cross-origin / detached - ignore */ }
         return () => window.removeEventListener("message", handler);
     }, []);
 

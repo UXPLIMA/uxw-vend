@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    // Check access — owner, tickets.manage role perm, or granular view grant.
+    // Check access - owner, tickets.manage role perm, or granular view grant.
     if (!(await canAccessTicket(session.user.id, id, "view"))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    // Check access — owner, tickets.manage role perm, or granular view grant
+    // Check access - owner, tickets.manage role perm, or granular view grant
     // (granular viewers are allowed to post replies too).
     if (!(await canAccessTicket(session.user.id, id, "view"))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     // Update ticket status and timestamp.
-    // Only adjust status when the ticket isn't already closed/resolved —
+    // Only adjust status when the ticket isn't already closed/resolved -
     // a reply to a RESOLVED or CLOSED ticket previously auto-reopened
     // it as OPEN, which surprised admins. Now resolved tickets stay
     // resolved unless the admin explicitly reopens via PATCH.
@@ -146,7 +146,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check access — admin bypass, tickets.manage role perm, owner, or
+    // Check access - admin bypass, tickets.manage role perm, owner, or
     // granular edit grant.
     if (!(await canAccessTicket(session.user.id, id, "edit"))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -203,7 +203,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(updated);
 }
 
-// DELETE /api/v1/tickets/[id] — Delete ticket (admin only).
+// DELETE /api/v1/tickets/[id] - Delete ticket (admin only).
 // Cascade-deletes the ticket's messages.
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();

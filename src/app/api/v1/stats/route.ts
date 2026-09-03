@@ -4,7 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { cached } from "@/core/lib/cache";
 
-// GET /api/v1/stats?period=30d — Core stats (Users only, module stats come from module statsApi)
+// GET /api/v1/stats?period=30d - Core stats (Users only, module stats come from module statsApi)
 export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

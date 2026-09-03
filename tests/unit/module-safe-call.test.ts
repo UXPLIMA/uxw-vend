@@ -102,7 +102,7 @@ describe("safeCall", () => {
     });
 
     // The failure mode this guards against: the database is down, the module
-    // throws, and the audit write throws too — turning a contained module bug
+    // throws, and the audit write throws too - turning a contained module bug
     // into an unhandled rejection in the request pipeline.
     it("still returns the fallback when the audit write itself fails", async () => {
         activityLogCreate.mockRejectedValue(new Error("database is down"));

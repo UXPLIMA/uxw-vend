@@ -10,7 +10,7 @@
  *     the old build until the process is replaced.
  *  2. **The operator runs `uxwvend update`.** A new image arrives carrying a
  *     `.next` built from zero modules, while the `modules` volume still holds
- *     the admin's modules — every installed module vanishes from the app.
+ *     the admin's modules - every installed module vanishes from the app.
  *  3. **A build is interrupted** (OOM, `docker kill` mid-install) and leaves
  *     `.next` matching neither the old nor the new module set.
  *
@@ -26,7 +26,7 @@
  *    outlives the container.
  *  - **The generated Prisma client** (`node_modules/.prisma`) lives in the
  *    image layer, so it is reset to the image's copy every time the container
- *    is recreated — losing every module model that was generated into it.
+ *    is recreated - losing every module model that was generated into it.
  *
  * That difference is a bug generator: recreating a container left a build that
  * knew about the blog module and a Prisma client that did not, so every
@@ -36,7 +36,7 @@
  *
  * Known limit: the fingerprint covers each module's id, version and the bytes
  * of its `module.json`. Editing a module's *code* in place without touching
- * its manifest does not change the fingerprint. That is deliberate — install,
+ * its manifest does not change the fingerprint. That is deliberate - install,
  * update and remove all go through the manifest, and hashing every file of
  * every module on every boot would cost more than it protects.
  */
@@ -75,7 +75,7 @@ const SCHEMA_STATE_FILENAME = ".uxwvend-schema-state.json";
  * Baked into the image next to `.next` by the Dockerfile. `.next` itself is a
  * volume in production (so a rebuild survives container replacement), which
  * means the `.next/BUILD_ID` of a freshly pulled image is *not* visible at
- * `/app/.next/BUILD_ID` — the stale volume masks it. This unmasked copy is how
+ * `/app/.next/BUILD_ID` - the stale volume masks it. This unmasked copy is how
  * we notice that the image changed under us.
  */
 const IMAGE_BUILD_ID_FILE = ".uxwvend-image-build-id";
@@ -146,7 +146,7 @@ export function readBuildState(root: string = process.cwd()): BuildState | null 
 
 /**
  * Record that the build now on disk was produced from the module set now on
- * disk. Call this only after a build actually succeeded — writing it earlier
+ * disk. Call this only after a build actually succeeded - writing it earlier
  * would tell the next boot that a broken build is current.
  */
 export function writeBuildState(root: string = process.cwd()): BuildState {
@@ -171,7 +171,7 @@ export function writeBuildState(root: string = process.cwd()): BuildState {
  * The `no-state` case covers a first boot from a fresh image: Docker seeds a
  * new volume from the image layer, so `.next` is the image's build and the
  * state file does not exist yet. That is only drift if modules are already
- * installed — otherwise we adopt the build and record its fingerprint.
+ * installed - otherwise we adopt the build and record its fingerprint.
  */
 export function detectDrift(root: string = process.cwd()): DriftReason | null {
     const buildDir = nextDir(root);

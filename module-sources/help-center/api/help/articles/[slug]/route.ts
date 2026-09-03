@@ -66,7 +66,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true });
 }
 
-// PATCH /api/v1/help/articles/[slug] — Update article (admin)
+// PATCH /api/v1/help/articles/[slug] - Update article (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -88,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ article: updated });
 }
 
-// DELETE /api/v1/help/articles/[slug] — Delete article (admin)
+// DELETE /api/v1/help/articles/[slug] - Delete article (admin)
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

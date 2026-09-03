@@ -19,7 +19,7 @@ const DEFAULT_CONFIG: MaintenanceConfig = {
 };
 
 const SETTING_KEY = "maintenance_mode";
-const CACHE_TTL_MS = 5_000; // 5 seconds — short enough to feel instant after admin save
+const CACHE_TTL_MS = 5_000; // 5 seconds - short enough to feel instant after admin save
 
 // Use globalThis so proxy.ts and API route chunks (separate Turbopack bundles)
 // share the same in-memory cache object. Without this, setMaintenanceConfig()

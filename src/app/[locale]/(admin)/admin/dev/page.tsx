@@ -136,7 +136,7 @@ export default function DevToolsPage() {
                                         <div key={a.name} className="flex items-center gap-3 text-sm py-1">
                                             <code className="font-mono text-xs">{a.name}</code>
                                             <span className="text-xs text-muted-foreground">{a.count} listener{a.count !== 1 ? "s" : ""}</span>
-                                            <span className="text-xs text-muted-foreground">— {a.modules.join(", ")}</span>
+                                            <span className="text-xs text-muted-foreground">- {a.modules.join(", ")}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -155,7 +155,7 @@ export default function DevToolsPage() {
                                         <div key={f.name} className="flex items-center gap-3 text-sm py-1">
                                             <code className="font-mono text-xs">{f.name}</code>
                                             <span className="text-xs text-muted-foreground">{f.count} listener{f.count !== 1 ? "s" : ""}</span>
-                                            <span className="text-xs text-muted-foreground">— {f.modules.join(", ")}</span>
+                                            <span className="text-xs text-muted-foreground">- {f.modules.join(", ")}</span>
                                         </div>
                                     ))}
                                 </div>

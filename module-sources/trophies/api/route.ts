@@ -3,7 +3,7 @@ import { z } from "zod";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
-/** GET — list all trophies (public endpoint, used by profile pages too) */
+/** GET - list all trophies (public endpoint, used by profile pages too) */
 export async function GET() {
     const trophies = await prisma.trophy.findMany({
         orderBy: { points: "desc" },
@@ -21,7 +21,7 @@ const trophySchema = z.object({
     awardOn: z.string().max(100).optional(),
 });
 
-/** POST — create trophy (admin) */
+/** POST - create trophy (admin) */
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {

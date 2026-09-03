@@ -25,7 +25,7 @@ function before(order: string[], a: string, b: string): boolean {
     return order.indexOf(a) < order.indexOf(b) && order.includes(a) && order.includes(b);
 }
 
-describe("resolveInstallPlan — expansion", () => {
+describe("resolveInstallPlan - expansion", () => {
     it("returns an empty plan for an empty selection", () => {
         expect(resolveInstallPlan([], CATALOG)).toEqual({ order: [], autoAdded: [], errors: [] });
     });
@@ -64,7 +64,7 @@ describe("resolveInstallPlan — expansion", () => {
     });
 });
 
-describe("resolveInstallPlan — ordering", () => {
+describe("resolveInstallPlan - ordering", () => {
     it("never places a module before something it depends on", () => {
         const plan = resolveInstallPlan(["wheel", "leaderboard", "stripe-gateway"], CATALOG);
         expect(plan.errors).toEqual([]);
@@ -84,7 +84,7 @@ describe("resolveInstallPlan — ordering", () => {
     });
 });
 
-describe("resolveInstallPlan — errors", () => {
+describe("resolveInstallPlan - errors", () => {
     it("reports an unknown module and names what required it", () => {
         const catalog = [entry("a", ["ghost"])];
         const plan = resolveInstallPlan(["a"], catalog);

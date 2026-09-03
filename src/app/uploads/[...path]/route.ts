@@ -10,7 +10,7 @@ import { Readable } from "stream";
  * Next.js App Router + Turbopack production builds bake the public/
  * directory contents into a manifest at build time. Files written to
  * public/uploads/ *after* the build (e.g. by the admin media library)
- * are NOT served by Next.js' static handler — they fall through to the
+ * are NOT served by Next.js' static handler - they fall through to the
  * catch-all [...slug] page and get rendered as HTML.
  *
  * This route takes the `/uploads/*` URL namespace and streams the file

@@ -41,7 +41,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
         // Safe projection for the full payload. `Payment.metadata` is the
         // raw provider webhook body (can include PANs / PII / tokens) so we
-        // never echo it to the client — only the summary fields go out.
+        // never echo it to the client - only the summary fields go out.
         // The `user.email` field is restricted to admins.
         const order = await prisma.order.findUnique({
             where: { id: ownership.id },

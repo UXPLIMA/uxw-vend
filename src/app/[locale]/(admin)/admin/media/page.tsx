@@ -271,7 +271,7 @@ export default function MediaLibraryPage() {
                 </div>
             )}
 
-            {/* Hidden link for ESLint — admin sidebar will link here */}
+            {/* Hidden link for ESLint - admin sidebar will link here */}
             <Link href="/admin/media" className="hidden">media</Link>
         </>
     );

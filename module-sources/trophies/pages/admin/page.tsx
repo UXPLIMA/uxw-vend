@@ -287,7 +287,7 @@ export default function AdminTrophiesPage() {
                                                 </div>
                                             </td>
                                             <td className="py-2 pr-3 max-w-[240px] truncate text-muted-foreground">
-                                                {row.description || "—"}
+                                                {row.description || "-"}
                                             </td>
                                             <td className="py-2 pr-3 font-medium">{row.points}</td>
                                             <td className="py-2 pr-3">

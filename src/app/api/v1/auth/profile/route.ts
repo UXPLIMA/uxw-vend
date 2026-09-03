@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
         select: { id: true, username: true, avatar: true, locale: true, currency: true },
     });
 
-    // Fire user.profile.updated hook — modules can react (audit, sync, etc.)
+    // Fire user.profile.updated hook - modules can react (audit, sync, etc.)
     import("@/core/lib/hooks")
         .then(({ doActionAsync }) =>
             doActionAsync("user.profile.updated", {

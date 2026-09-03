@@ -18,13 +18,13 @@ import { DoneStep } from "./_steps/DoneStep";
 
 /**
  * Known categories in display order. Anything a module declares that isn't
- * here still renders — it lands in "other" — so core never gates which
+ * here still renders - it lands in "other" - so core never gates which
  * categories exist.
  */
 
 const STEP_IDS = ["welcome", "admin", "site", "type", "theme", "modules", "done"] as const;
 const STEP_ICONS = [Rocket, UserCog, Globe, Compass, Palette, Package, CheckCircle2];
-const LAST_INPUT_STEP = STEP_IDS.length - 1; // "modules" — the step that submits
+const LAST_INPUT_STEP = STEP_IDS.length - 1; // "modules" - the step that submits
 const DONE_STEP = STEP_IDS.length; // 1-based
 
 export default function SetupWizardPage() {
@@ -46,16 +46,16 @@ export default function SetupWizardPage() {
     const [siteDescription, setSiteDescription] = useState("");
     const [defaultLocaleCode, setDefaultLocaleCode] = useState("en");
 
-    // Step 4: Site type — presets are marketplace data, never a list in core.
+    // Step 4: Site type - presets are marketplace data, never a list in core.
     const [presets, setPresets] = useState<PresetOption[]>([]);
     const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
-    // Step 5: Theme — the default id comes from the generated theme registry
+    // Step 5: Theme - the default id comes from the generated theme registry
     // so core never names a specific theme.
     const [themes, setThemes] = useState<ThemeOption[]>([]);
     const [activeTheme, setActiveTheme] = useState<string>(defaultThemeId);
 
-    // Step 6: Modules — populated from the marketplace catalog at mount time.
+    // Step 6: Modules - populated from the marketplace catalog at mount time.
     const [catalog, setCatalog] = useState<ModuleOption[]>([]);
     const [picked, setPicked] = useState<string[]>([]);
 
@@ -70,7 +70,7 @@ export default function SetupWizardPage() {
                 }
             })
             .catch(() => {
-                /* non-fatal — the theme step explains the empty state */
+                /* non-fatal - the theme step explains the empty state */
             });
 
         fetch("/api/setup/presets")
@@ -79,7 +79,7 @@ export default function SetupWizardPage() {
                 if (data?.presets?.length) setPresets(data.presets);
             })
             .catch(() => {
-                /* non-fatal — the site-type step explains the empty state */
+                /* non-fatal - the site-type step explains the empty state */
             });
 
         fetch("/api/v1/modules/marketplace")
@@ -101,12 +101,12 @@ export default function SetupWizardPage() {
                 );
             })
             .catch(() => {
-                /* non-fatal — modules step shows an empty list */
+                /* non-fatal - modules step shows an empty list */
             });
     }, []);
 
-    // Everything the wizard shows about the selection — what will actually be
-    // installed, what got pulled in, and why a combination is refused — comes
+    // Everything the wizard shows about the selection - what will actually be
+    // installed, what got pulled in, and why a combination is refused - comes
     // from the same planner the setup API runs server-side. Two
     // implementations would eventually disagree, and the operator would be
     // shown one thing and given another.
@@ -156,7 +156,7 @@ export default function SetupWizardPage() {
             case 5:
                 return activeTheme.length > 0;
             case 6:
-                // Never let a refused combination reach the API — the server
+                // Never let a refused combination reach the API - the server
                 // would reject it after the admin account is already created.
                 return plan.errors.length === 0;
             default:

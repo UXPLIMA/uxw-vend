@@ -17,7 +17,7 @@ import EmailQueueStatusWidget from "@/core/components/admin/widgets/EmailQueueSt
 export const dynamic = "force-dynamic";
 
 /*
- * Admin dashboard — grouped into distinct visual sections so the grid
+ * Admin dashboard - grouped into distinct visual sections so the grid
  * stays uniform and nothing orphans on its own row.
  *
  *   ┌─ Header ────────────────────────────────────────┐
@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
                 <DashboardCustomizer />
             </div>
 
-            {/* KPI row — core KPIs + module stat cards, uniform 1x1 grid */}
+            {/* KPI row - core KPIs + module stat cards, uniform 1x1 grid */}
             {(visibleKpiWidgets.length > 0 || true) && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {visibleKpiWidgets.map((w) => renderWidget(w.id))}
@@ -99,14 +99,14 @@ export default async function AdminDashboard() {
                 </div>
             )}
 
-            {/* Panel row — larger activity/engagement cards */}
+            {/* Panel row - larger activity/engagement cards */}
             {visiblePanelWidgets.length > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     {visiblePanelWidgets.map((w) => renderWidget(w.id))}
                 </div>
             )}
 
-            {/* Module sections — 2-col panels contributed by modules */}
+            {/* Module sections - 2-col panels contributed by modules */}
             <ModuleSections />
         </div>
     );

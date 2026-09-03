@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 
 /**
- * useLocalDate — returns a date formatter bound to the active next-intl
+ * useLocalDate - returns a date formatter bound to the active next-intl
  * locale. Replaces inline `new Date(x).toLocaleDateString()` calls that
  * default to en-US regardless of the user's chosen language.
  *

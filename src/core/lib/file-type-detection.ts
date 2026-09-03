@@ -1,18 +1,18 @@
 /**
  * Minimal content-sniffing for uploaded files. Trusting the client's MIME
- * header is how you end up shipping `.exe` renamed to `image/png` — every
+ * header is how you end up shipping `.exe` renamed to `image/png` - every
  * uploader (themes, module ZIPs, the admin media library) normalizes on
  * this helper.
  *
  * We match against the canonical magic-byte prefixes of the file formats
- * we actually accept. Unknown bytes always fail — additions go here, not
+ * we actually accept. Unknown bytes always fail - additions go here, not
  * in the caller.
  */
 
 export interface DetectedType {
     /** Canonical MIME type derived from the bytes themselves. */
     mime: string;
-    /** Typical extension for display purposes only — never trusted. */
+    /** Typical extension for display purposes only - never trusted. */
     ext: string;
 }
 
@@ -140,7 +140,7 @@ function looksLikeText(buffer: Buffer, needle: string): boolean {
 
 /**
  * Return the detected type, or null when the bytes don't match anything we
- * allow. Callers that get null MUST reject the upload — do not fall back to
+ * allow. Callers that get null MUST reject the upload - do not fall back to
  * the client-supplied MIME.
  */
 export function detectFileType(buffer: Buffer): DetectedType | null {
@@ -186,7 +186,7 @@ export function detectFileType(buffer: Buffer): DetectedType | null {
         return { mime: "application/zip", ext: "zip" };
     }
 
-    // SVG — text-based. Accept both <?xml prefix and bare <svg.
+    // SVG - text-based. Accept both <?xml prefix and bare <svg.
     if (looksLikeText(buffer, "<?xml") || looksLikeText(buffer, "<svg")) {
         const sample = buffer.slice(0, 4096).toString("utf8").toLowerCase();
         if (sample.includes("<svg")) {
@@ -194,7 +194,7 @@ export function detectFileType(buffer: Buffer): DetectedType | null {
         }
     }
 
-    // JSON — best-effort: valid JSON must start with { or [ (after whitespace).
+    // JSON - best-effort: valid JSON must start with { or [ (after whitespace).
     const firstNonSpace = buffer.slice(0, 64).toString("utf8").trimStart()[0];
     if (firstNonSpace === "{" || firstNonSpace === "[") {
         try {

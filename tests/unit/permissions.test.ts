@@ -1,6 +1,6 @@
 // @vitest-environment node
 /**
- * Unit tests for src/core/lib/permissions.ts — the authorization gate for the
+ * Unit tests for src/core/lib/permissions.ts - the authorization gate for the
  * entire admin surface. Tested as a REAL subject (the functions run unmodified);
  * only the Prisma client is mocked, the same way api-key-auth.test.ts does it.
  *
@@ -16,7 +16,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock prisma — only the methods permissions.ts touches.
+// Mock prisma - only the methods permissions.ts touches.
 const mockUserFindUnique = vi.fn();
 const mockResourceFindMany = vi.fn();
 

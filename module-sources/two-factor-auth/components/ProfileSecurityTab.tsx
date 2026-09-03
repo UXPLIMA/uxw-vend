@@ -44,7 +44,7 @@ export function ProfileSecurityTab() {
                 setRemainingBackupCodes(Number(data.remainingBackupCodes) || 0);
             }
         } catch {
-            // silent — module may not be fully wired, keep defaults
+            // silent - module may not be fully wired, keep defaults
         }
     }, []);
 
@@ -360,7 +360,7 @@ export function ProfileSecurityTab() {
                         </div>
                     )}
 
-                    {/* Enabled idle state — management */}
+                    {/* Enabled idle state - management */}
                     {twoFAEnabled && twoFAStep === "idle" && (
                         <div className="space-y-5">
                             <div

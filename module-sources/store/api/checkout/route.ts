@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         // If the user supplied a coupon code, reject the checkout with a
         // clear error when it doesn't apply (not found / inactive /
         // expired / usage cap / min-purchase). Previously an invalid
-        // code was silently ignored — the customer paid full price with
+        // code was silently ignored - the customer paid full price with
         // no feedback that their code didn't work.
         let couponDiscount = 0;
         if (couponCode) {
@@ -366,7 +366,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });
         }
 
-        // Paid order but Stripe isn't wired — keep the order PENDING and tell
+        // Paid order but Stripe isn't wired - keep the order PENDING and tell
         // the caller. Do NOT grant ownership.
         if (!await getStripeEnabled()) {
             return NextResponse.json(

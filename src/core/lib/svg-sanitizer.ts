@@ -6,7 +6,7 @@
  * inclusion via `<object>` or an `<embed>` does not, and users embed
  * SVGs in rich text).
  *
- * This is a regex-based scrubber — not as thorough as DOMPurify with the
+ * This is a regex-based scrubber - not as thorough as DOMPurify with the
  * XML profile, but zero-dependency and covers the common vectors. It
  * runs on BOTH admin uploads and theme/ZIP extraction.
  */

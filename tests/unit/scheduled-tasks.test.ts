@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 /**
- * The core cron hook point. Its one job — expiring verification tokens —
+ * The core cron hook point. Its one job - expiring verification tokens -
  * is wrapped in a bare catch because the table may not exist on an older
  * schema, and that swallow must not turn into a job that reports success
  * while doing nothing observable.

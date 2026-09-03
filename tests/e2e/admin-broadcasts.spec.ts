@@ -8,7 +8,7 @@ test.describe('Admin broadcasts', () => {
         const response = await page.goto('/en/admin/broadcasts');
         expect(response?.status(), 'broadcasts HTTP status').toBeLessThan(400);
 
-        // The h1 is `sidebar_broadcasts` — "Broadcasts" in en. "Email
+        // The h1 is `sidebar_broadcasts` - "Broadcasts" in en. "Email
         // Broadcasts" is the settings-index card label, not this page.
         const heading = page
             .getByRole('heading', { name: /Broadcasts/i })
@@ -16,7 +16,7 @@ test.describe('Admin broadcasts', () => {
         await expect(heading).toBeVisible();
 
         // Open composer
-        // `common_new` — the button reads "New", not "Compose".
+        // `common_new` - the button reads "New", not "Compose".
         const composeButton = page.getByRole('button', { name: /^New$/i }).first();
         await expect(composeButton).toBeVisible();
         await composeButton.click();
@@ -32,14 +32,14 @@ test.describe('Admin broadcasts', () => {
         await expect(subjectInput).toBeVisible();
         await subjectInput.fill('E2E Test Subject');
 
-        // Rich text editor body — find its editable region
+        // Rich text editor body - find its editable region
         const body = page.locator('[contenteditable="true"]').first();
         if (await body.count()) {
             await body.click();
             await page.keyboard.type('Test body content');
         }
 
-        // Close without sending — click Cancel (the Compose button becomes Cancel)
+        // Close without sending - click Cancel (the Compose button becomes Cancel)
         await page.getByRole('button', { name: /^Cancel$/i }).first().click();
         await expect(page.getByRole('heading', { name: /New Broadcast/i })).toHaveCount(0);
 

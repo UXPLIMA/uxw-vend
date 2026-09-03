@@ -1,5 +1,5 @@
 /**
- * SEO helpers — shared across core pages and module pages.
+ * SEO helpers - shared across core pages and module pages.
  *
  * Provides:
  *   - buildPageMeta(): Next.js Metadata object with OpenGraph + Twitter cards
@@ -62,13 +62,13 @@ async function getSeoSiteInfo(): Promise<SeoSiteInfo> {
             if (r.key === "site_description" && value) siteDescription = value;
         }
     } catch {
-        // DB unavailable (build phase / fresh install) — fall back to defaults
+        // DB unavailable (build phase / fresh install) - fall back to defaults
     }
 
     return { siteName, siteDescription, siteUrl };
 }
 
-/** Synchronous version using only env/serverConfig — safe for non-async callers. */
+/** Synchronous version using only env/serverConfig - safe for non-async callers. */
 function getSeoSiteInfoSync(): SeoSiteInfo {
     return {
         siteName: serverConfig.name,
@@ -80,7 +80,7 @@ function getSeoSiteInfoSync(): SeoSiteInfo {
 /**
  * Build a Next.js Metadata object for a page, populated with OpenGraph and
  * Twitter card data. Use from `generateMetadata()` or as a static `metadata`
- * export. Async to allow reading Settings — await the result.
+ * export. Async to allow reading Settings - await the result.
  */
 export async function buildPageMeta(input: PageMetaInput): Promise<Metadata> {
     const { siteName, siteDescription, siteUrl } = await getSeoSiteInfo();
@@ -119,7 +119,7 @@ export async function buildPageMeta(input: PageMetaInput): Promise<Metadata> {
 }
 
 /**
- * Sync variant of buildPageMeta — uses env/serverConfig only (no DB read).
+ * Sync variant of buildPageMeta - uses env/serverConfig only (no DB read).
  * Useful for pages where `metadata` must be a static export and you cannot
  * await. Callers that want Settings values should use the async version.
  */

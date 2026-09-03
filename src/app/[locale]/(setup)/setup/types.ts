@@ -2,7 +2,7 @@
  * Shapes shared between the setup wizard and its steps.
  *
  * They live here rather than in page.tsx because every step file would
- * otherwise import from the page — a component importing its own parent route
+ * otherwise import from the page - a component importing its own parent route
  * module, which drags the whole wizard into each step's dependency graph.
  */
 

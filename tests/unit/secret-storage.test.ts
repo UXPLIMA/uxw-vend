@@ -1,13 +1,13 @@
 // @vitest-environment node
 /**
- * Unit tests for src/core/lib/secret-storage.ts — AES-256-GCM at-rest secret
+ * Unit tests for src/core/lib/secret-storage.ts - AES-256-GCM at-rest secret
  * encryption. Pure crypto, no DB.
  *
  * The module caches the derived key in a module-level `cachedKey` and reads
  * env vars lazily inside getKey() on first use. To exercise the different
  * key-resolution branches (explicit env key, dev DATABASE_URL fallback,
  * production-missing-throw) we vi.resetModules() and re-import a fresh copy
- * with the desired env in place — otherwise the first test's cached key would
+ * with the desired env in place - otherwise the first test's cached key would
  * bleed into the rest.
  *
  * Coverage:

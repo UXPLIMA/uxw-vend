@@ -21,7 +21,7 @@ export default function SettingsPage() {
     // behind this card is an empty list, so the card itself does not appear.
     const hasWidgets = ModuleWidgets.some((w) => modules[w.module] === true);
 
-    // Core settings — always visible
+    // Core settings - always visible
     const coreSettings = [
         { title: t("settings_general"), description: t("settings_generalDesc"), href: "/admin/settings/general", icon: "Settings", color: "text-slate-500" },
         { title: t("settings_appearance"), description: t("settings_appearanceDesc"), href: "/admin/settings/theme", icon: "Palette", color: "text-purple-500" },

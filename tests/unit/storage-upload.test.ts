@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
- * `uploadFile` is the single funnel every upload passes through — the admin
+ * `uploadFile` is the single funnel every upload passes through - the admin
  * media library, theme archives, module ZIPs. It is the only place that
  * refuses a `.exe` renamed to `image/png`, caps decompression bombs, and
  * scrubs `<script>` out of an SVG before anyone serves the bytes back to a
@@ -140,7 +140,7 @@ describe("uploadFile: content sniffing", () => {
 
     it("treats image/jpg as image/jpeg", async () => {
         const { uploadFile } = await load();
-        // A common client typo, not an attack — rejecting it breaks uploads
+        // A common client typo, not an attack - rejecting it breaks uploads
         // from real browsers.
         await expect(uploadFile(jpeg(), "photo.jpg", "image/jpg")).resolves.toMatchObject({
             url: expect.stringContaining("/uploads/"),

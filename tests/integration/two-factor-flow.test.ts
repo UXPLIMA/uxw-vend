@@ -5,8 +5,8 @@
  * The full Credentials.authorize() path (with bcrypt, lockout, 2FA, backup
  * codes) lives inline in `src/core/lib/auth.ts` and isn't exported as a
  * standalone function. Worse, importing `@/core/lib/auth` in the test env
- * fails outright — NextAuth's runtime can't resolve `next/server` outside the
- * Next bundler — so the inline authorize() cannot be driven directly here.
+ * fails outright - NextAuth's runtime can't resolve `next/server` outside the
+ * Next bundler - so the inline authorize() cannot be driven directly here.
  *
  * Per the test plan, each previously-`it.todo` end-to-end case is therefore
  * implemented as a focused test of the exact helper(s) auth.ts composes for
@@ -151,7 +151,7 @@ describe("2FA: backup-code single-use", () => {
 describe("2FA: credentials.authorize 2FA decision (helper-level)", () => {
     // Each case reproduces the exact branch authorize() takes after a valid
     // password, using the same helpers authorize() imports. (authorize()
-    // itself can't be imported in this env — see file header.)
+    // itself can't be imported in this env - see file header.)
 
     it("rejects login with correct password but wrong 2FA code", async () => {
         const { secret } = makeTotp();
@@ -196,7 +196,7 @@ describe("2FA: credentials.authorize 2FA decision (helper-level)", () => {
             expect(r1.remaining).not.toContain(hashBackupCodeFor(used));
 
             // Replaying the SAME backup code against the persisted (trimmed)
-            // list is rejected — single-use, just like authorize() enforces.
+            // list is rejected - single-use, just like authorize() enforces.
             const r2 = await authorizeTwoFactor({
                 userId: "user-2fa-backup",
                 secret,

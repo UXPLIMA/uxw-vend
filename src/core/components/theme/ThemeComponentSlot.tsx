@@ -8,7 +8,7 @@ import type { ComponentType, ReactNode } from "react";
  * Render a named component, preferring the active theme's override if any.
  * Wrap every core layout component that a theme may legitimately replace.
  *
- * `fallback` is optional — slots whose only purpose is to host an override
+ * `fallback` is optional - slots whose only purpose is to host an override
  * (e.g. theme-owned Hero on a public module page) can omit it and render
  * nothing when no theme provides the named component. Passing a function
  * here only works from another client boundary; RSC pages should either

@@ -27,7 +27,7 @@ test.describe('Admin warnings', () => {
             page.getByRole('heading', { name: /New Warning/i }).first(),
         ).toBeVisible();
 
-        // Type into user search — suggestions may or may not appear depending on data
+        // Type into user search - suggestions may or may not appear depending on data
         const userSearch = page
             .locator('input[placeholder*="username" i], input[autocomplete="off"]')
             .first();

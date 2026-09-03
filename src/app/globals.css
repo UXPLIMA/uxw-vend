@@ -120,7 +120,7 @@ body {
 .animate-float { animation: float 5s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
-/* Dark mode — only legitimate overrides that can't be fixed at component level */
+/* Dark mode - only legitimate overrides that can't be fixed at component level */
 [data-mode="dark"] {
   background-color: var(--uxw-color-background) !important;
   color: var(--uxw-color-foreground) !important;

@@ -9,7 +9,7 @@ import { parseDiffScript, isAdditiveAlterTable, planFromScript } from "../../scr
  * leaves a module's tables in place on purpose, so the database legitimately
  * holds tables the merged schema does not declare, and push answers that
  * either by dropping them (silently, when empty) or by refusing to run at all
- * (when they have rows — which then leaves the module being installed with no
+ * (when they have rows - which then leaves the module being installed with no
  * tables either). Both were reproduced against a real install.
  */
 
@@ -104,7 +104,7 @@ describe("planFromScript", () => {
         expect(plan.skip.map((s) => s.operation)).toEqual(["DropTable"]);
     });
 
-    it("never applies a DropTable — the case that broke uninstall's promise", () => {
+    it("never applies a DropTable - the case that broke uninstall's promise", () => {
         const plan = planFromScript(`-- DropTable\nDROP TABLE "BlogArticle";\n`);
         expect(plan.apply).toEqual([]);
         expect(plan.skip).toHaveLength(1);

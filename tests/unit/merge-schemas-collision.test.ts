@@ -3,7 +3,7 @@
  * scripts/merge-schemas.ts must warn when a module schema redeclares a core
  * model name (e.g. `User`, `Role`). Without this warning, a module author
  * who tries to extend `User` by redeclaring it gets the field SILENTLY
- * dropped — the merger keeps only the core copy.
+ * dropped - the merger keeps only the core copy.
  *
  * The script is a runnable side-effect script (no exported function), so we
  * invoke it as a child process pointing at a throw-away temp project root
@@ -67,17 +67,17 @@ afterEach(() => {
 });
 
 describe("merge-schemas core-model collision warning", () => {
-    // Why 60s (not 30s): this spawns `npx tsx scripts/merge-schemas.ts` COLD —
+    // Why 60s (not 30s): this spawns `npx tsx scripts/merge-schemas.ts` COLD -
     // npx resolves tsx, tsx boots an esbuild-backed TS loader, then the script
     // runs `npx prisma generate` (which fails fast here, but still pays its own
     // cold-start). In isolation that's ~5s, but under the full `npm test` run
     // the box is saturated by ~40 other workers, and a 30s Vitest per-test
-    // timeout RACED the 30s child `timeout` — whichever fired first produced an
+    // timeout RACED the 30s child `timeout` - whichever fired first produced an
     // intermittent failure. The fixes, applied together:
     //   1. Vitest per-test timeout raised to 60s for real headroom.
     //   2. The child `execFileSync` timeout LOWERED to 45s so the child is
     //      always killed (and its buffered stderr surfaced for the assertion)
-    //      strictly BEFORE Vitest's own timeout can abort the test — the two
+    //      strictly BEFORE Vitest's own timeout can abort the test - the two
     //      timeouts no longer race at the same value.
     //   3. `TSX_TSCONFIG_PATH`/`--no-cache` avoided; instead we let tsx use its
     //      on-disk transform cache (warm after the first spawn in the suite),

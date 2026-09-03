@@ -9,7 +9,7 @@
  * This file was called `module-sandbox.ts`, which claimed something it does
  * not do. There is no sandbox here and none anywhere else: module code runs
  * in the same process, with the same database credentials and the same
- * filesystem access as core. This is an error boundary — it contains a
+ * filesystem access as core. This is an error boundary - it contains a
  * *crash*, not a module. See docs/PLUGIN_SDK.md ("The trust model").
  *
  * Example:

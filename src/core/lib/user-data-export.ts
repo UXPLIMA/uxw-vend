@@ -4,7 +4,7 @@ import { ModuleUserDataTables } from "@/core/generated/module-registry";
 /**
  * GDPR-compliant user data export.
  *
- * Collects everything the platform stores about a user — core tables
+ * Collects everything the platform stores about a user - core tables
  * (profile, sessions, warnings, notification prefs, revisions, activity
  * feed, linked accounts) plus a sweep of module-owned tables declared by
  * each module's `userDataExport` manifest entry.
@@ -12,7 +12,7 @@ import { ModuleUserDataTables } from "@/core/generated/module-registry";
  * Per the core motto, this file does NOT hardcode any module model names.
  * It reads the generated `ModuleUserDataTables` registry (aggregated from
  * every installed module's manifest at build time), then probes the
- * runtime Prisma client for each entry — uninstalled modules simply
+ * runtime Prisma client for each entry - uninstalled modules simply
  * contribute nothing to the export without raising errors.
  */
 
@@ -27,7 +27,7 @@ export interface UserDataExport {
     modules: Record<string, unknown>;
 }
 
-// Narrow helper — the generated Prisma client isn't fully typed for us
+// Narrow helper - the generated Prisma client isn't fully typed for us
 // because we look up models by string, so we use a minimal delegate shape
 // and cast once at the boundary. No `any` leaks out of this module.
 interface FindManyDelegate {
@@ -61,7 +61,7 @@ async function safeFindMany(
 }
 
 export async function exportUserData(userId: string): Promise<UserDataExport> {
-    // Core user row — strip secret fields.
+    // Core user row - strip secret fields.
     const userRow = await prisma.user.findUnique({
         where: { id: userId },
         select: {

@@ -19,7 +19,7 @@ export function SuggestedModulesBanner({ themeName, suggestions }: { themeName: 
                 {suggestions.map(s => (
                     <li key={s.id}>
                         <Link href={`/admin/modules?install=${s.id}`} className="underline">{s.id}</Link>
-                        {s.reason ? ` — ${s.reason}` : null}
+                        {s.reason ? ` - ${s.reason}` : null}
                     </li>
                 ))}
             </ul>

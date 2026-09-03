@@ -15,7 +15,7 @@ import {
 
 /**
  * utils.ts is re-exported through the module SDK, so its behaviour is a
- * published contract that third-party modules build on — changing
+ * published contract that third-party modules build on - changing
  * `slugify` silently changes every module URL derived from a title.
  * It sat at 9.5% coverage.
  */
@@ -210,7 +210,7 @@ describe("slugify", () => {
     });
 
     it("is idempotent", () => {
-        const once = slugify("Çiğdem's Café — 2026!");
+        const once = slugify("Çiğdem's Café - 2026!");
         expect(slugify(once)).toBe(once);
     });
 

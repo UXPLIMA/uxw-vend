@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * two ways to be catastrophic and they pull in opposite directions: a CIDR
  * that matches too widely locks the admin out of their own instance, and a
  * database outage that propagates would deny all traffic. The design chose
- * to fail open — that choice needs a test, or the next refactor will quietly
+ * to fail open - that choice needs a test, or the next refactor will quietly
  * reverse it.
  */
 
@@ -68,7 +68,7 @@ describe("ipInCidr", () => {
 
     it("handles the boundary prefixes", async () => {
         const { ipInCidr } = await load();
-        // /0 is everything — an admin typing it locks out the whole internet,
+        // /0 is everything - an admin typing it locks out the whole internet,
         // including themselves, and it must at least behave predictably.
         expect(ipInCidr("8.8.8.8", "0.0.0.0/0")).toBe(true);
         expect(ipInCidr("1.2.3.4", "1.2.3.4/32")).toBe(true);
@@ -313,7 +313,7 @@ describe("block administration", () => {
 
         expect(await listBlocks()).toEqual(rows);
         // Unlike the middleware read, this one must not filter out expired
-        // rows — the admin needs to see and clear them.
+        // rows - the admin needs to see and clear them.
         expect(findManyArgs[0]).toEqual({ orderBy: { createdAt: "desc" } });
     });
 });

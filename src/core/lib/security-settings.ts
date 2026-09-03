@@ -3,7 +3,7 @@
  *
  * These live in `Setting` and are edited on Admin > Settings > General. Each
  * one is clamped here rather than at the form, because the form is not the only
- * writer — the settings API accepts any number, and a stored row survives a UI
+ * writer - the settings API accepts any number, and a stored row survives a UI
  * change.
  *
  * The password minimum is deliberately one-directional: an admin can require

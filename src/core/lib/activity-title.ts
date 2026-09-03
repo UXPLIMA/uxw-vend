@@ -41,6 +41,6 @@ export function localizeActivityTitle(type: string, title: string, t: Translator
         return t.has?.(cfg.key) === false ? title : `${t(cfg.key)} ${entity}`.trim();
     }
     // For prefix-free entries (e.g. user.registered), title is the whole
-    // English sentence — return our translation as-is.
+    // English sentence - return our translation as-is.
     return t.has?.(cfg.key) === false ? title : t(cfg.key);
 }

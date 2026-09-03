@@ -9,7 +9,7 @@ import { isSetupComplete } from "@/core/lib/setup-state";
  * theme step rendered an empty grid and every install silently kept whatever
  * default the client held.
  *
- * Gated on setup being incomplete, like every other route under /api/setup —
+ * Gated on setup being incomplete, like every other route under /api/setup -
  * once a site is live, its theme list is served from the admin API instead.
  */
 export async function GET() {

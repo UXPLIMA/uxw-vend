@@ -4,7 +4,7 @@ import { capturePaypalOrder } from "../../../../lib/paypal";
 import { sendOrderConfirmationEmail } from "../../../../lib/email";
 import { deliverProduct } from "../../../../lib/rcon";
 
-// GET /api/v1/store/checkout/paypal/capture — PayPal return URL after approval
+// GET /api/v1/store/checkout/paypal/capture - PayPal return URL after approval
 export async function GET(request: NextRequest) {
     const orderId = request.nextUrl.searchParams.get("orderId");
     const token = request.nextUrl.searchParams.get("token"); // PayPal order ID

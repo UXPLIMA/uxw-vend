@@ -21,7 +21,7 @@ import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
-// POST /api/v1/modules/marketplace/install — Install a module from marketplace
+// POST /api/v1/modules/marketplace/install - Install a module from marketplace
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }
 
-        // Validate format BEFORE using moduleId in path.join — without
+        // Validate format BEFORE using moduleId in path.join - without
         // this, a value like "../../../tmp/x" would let a crafted ZIP whose
         // manifest declared the same id break out of MODULES_DIR. Every
         // other module route enforces /^[a-z0-9-]+$/; the marketplace
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         // fragments that merge into the core schema, and a half-applied
         // migration is the single most common "why is production broken"
         // scenario. Snapshot fails silently when pg_dump isn't available
-        // (dev boxes, minimal Docker images) — the install still proceeds.
+        // (dev boxes, minimal Docker images) - the install still proceeds.
         await backupBeforeModuleChange("install", moduleId);
 
         // Check available disk space (need at least 100MB free)
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
         if (!hasManifest) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Invalid module — no module.json found" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid module - no module.json found" }, { status: 400 });
         }
 
         // Parse + validate manifest with Zod
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
             manifestJson = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
         } catch {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Invalid module.json — not valid JSON" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid module.json - not valid JSON" }, { status: 400 });
         }
 
         const parsed = moduleManifestSchema.safeParse(manifestJson);
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
             const first = parsed.error.issues[0];
             const where = first.path.join(".");
             return NextResponse.json(
-                { error: `Invalid module.json: ${where ? where + " — " : ""}${first.message}` },
+                { error: `Invalid module.json: ${where ? where + " - " : ""}${first.message}` },
                 { status: 400 },
             );
         }
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Schema merge (sync, lightweight — just merges files)
+        // Schema merge (sync, lightweight - just merges files)
         const schemaPath = path.join(targetDir, "schema.prisma");
         const hasSchema = await fs.access(schemaPath).then(() => true).catch(() => false);
         if (hasSchema) {
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Registry generation (sync, lightweight). This MUST succeed — the
+        // Registry generation (sync, lightweight). This MUST succeed - the
         // proxy gates module routes on the generated route-map, so a stale
         // registry makes a freshly-installed module's pages 404. The
         // deferred build will regenerate it too, but that can't be the
@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
             extractedPath = null;
             const detail = err instanceof Error ? err.message : String(err);
             return NextResponse.json(
-                { error: `Registry generation failed — install rolled back: ${detail}` },
+                { error: `Registry generation failed - install rolled back: ${detail}` },
                 { status: 500 },
             );
         }
@@ -258,12 +258,12 @@ export async function POST(request: NextRequest) {
             await syncModuleTranslations(moduleId, manifest.translations);
         }
 
-        // Schedule deferred build + restart (debounced — waits for more installs)
+        // Schedule deferred build + restart (debounced - waits for more installs)
         // Bulk install: 37 modules call this, but only ONE build runs after all finish
         scheduleBuild();
 
         // HookNames.MODULE_INSTALLED is part of the published contract, so it has to
-        // actually fire — a declared hook nobody emits is a listener that never
+        // actually fire - a declared hook nobody emits is a listener that never
         // runs, with nothing to show for it in any log.
         const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
         await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId });
@@ -282,7 +282,7 @@ export async function POST(request: NextRequest) {
             buildScheduled: true,
         });
     } catch (err: unknown) {
-        // Install failed after extraction — remove the orphan directory so
+        // Install failed after extraction - remove the orphan directory so
         // the next filesystem scan doesn't discover a half-installed module
         // that has no matching DB row.
         if (extractedPath) {

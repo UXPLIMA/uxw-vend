@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// Deletemany mocks — one per table
+// Deletemany mocks - one per table
 const activityFeedItemDeleteMany = vi.fn();
 const webhookLogDeleteMany = vi.fn();
 const cronRunDeleteMany = vi.fn();

@@ -69,10 +69,10 @@ export async function POST(request: NextRequest) {
             // Rollback extracted dir if applicable (preserve existing rollback logic).
             const first = parsed.error.issues[0];
             const hint = first.path[0] === "schemaVersion"
-                ? " (this theme is v1 — upgrade its manifest to schemaVersion 2)"
+                ? " (this theme is v1 - upgrade its manifest to schemaVersion 2)"
                 : "";
             return NextResponse.json(
-                { error: `Invalid theme.json: ${first.path.join(".")} — ${first.message}${hint}` },
+                { error: `Invalid theme.json: ${first.path.join(".")} - ${first.message}${hint}` },
                 { status: 400 },
             );
         }
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Theme failed regeneration", details: devOnlyDetail(e) }, { status: 400 });
         }
 
-        // Filesystem + codegen is the source of truth — no DB row needed.
+        // Filesystem + codegen is the source of truth - no DB row needed.
         // manifestHash is kept for audit logging if needed in future.
         void manifestHash(manifest);
 

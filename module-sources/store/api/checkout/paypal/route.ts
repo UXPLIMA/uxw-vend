@@ -3,7 +3,7 @@ import { prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { createPaypalOrder, getPaypalEnabled } from "../../../lib/paypal";
 
-// POST /api/v1/store/checkout/paypal — Create PayPal order
+// POST /api/v1/store/checkout/paypal - Create PayPal order
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

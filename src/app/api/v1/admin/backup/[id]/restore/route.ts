@@ -9,7 +9,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 /**
  * POST /api/v1/admin/backup/[id]/restore
  *
- * DANGEROUS — replaces the live database with the contents of the backup.
+ * DANGEROUS - replaces the live database with the contents of the backup.
  * Requires BOTH:
  *   - admin role
  *   - one of: `?confirm=true` query OR body `{ confirmText: "RESTORE" }`
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    // Confirmation gate — the URL flag OR the body token
+    // Confirmation gate - the URL flag OR the body token
     const url = new URL(req.url);
     const confirmQuery = url.searchParams.get("confirm") === "true";
 

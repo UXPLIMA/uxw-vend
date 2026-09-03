@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 /**
  * The pre-install snapshot is the only thing standing between a half-applied
  * schema merge and an unrecoverable database. Its whole contract is that it
- * is opt-in and that it can never block an install — a backup helper that
+ * is opt-in and that it can never block an install - a backup helper that
  * throws would turn a recoverable install failure into a broken instance.
  */
 

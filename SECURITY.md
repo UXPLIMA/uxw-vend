@@ -16,9 +16,9 @@ the latest `main` and the most recent tagged release only.
 
 Report privately through one of:
 
-1. **GitHub Security Advisories** (preferred) — open a draft advisory at
+1. **GitHub Security Advisories** (preferred) - open a draft advisory at
    <https://github.com/UXPLIMA/uxw-vend/security/advisories/new>.
-2. **Email** — `siracozmen@protonmail.com` with the subject line
+2. **Email** - `siracozmen@protonmail.com` with the subject line
    `[SECURITY] uxwVend`.
 
 Please include:
@@ -45,14 +45,14 @@ that depend on running with insecure non-default configuration (e.g.
 Also out of scope: **what an installed module can do.** Modules are compiled
 into the same process as core and run with the same database credentials,
 filesystem access and secrets. This is documented, deliberate, and not a
-vulnerability — installing a module is equivalent to installing a dependency,
+vulnerability - installing a module is equivalent to installing a dependency,
 and the manifest's `permissions` key is UI metadata, not an enforced boundary.
 See [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) ("The trust model"). Reports about
-the *install pipeline* — ZIP path traversal, manifest validation bypass,
-privilege checks on the install routes — are firmly in scope.
+the *install pipeline* - ZIP path traversal, manifest validation bypass,
+privilege checks on the install routes - are firmly in scope.
 
 ## Hardening Notes
 
 Production deployments should set `AUTH_SECRET`, `SECRET_ENCRYPTION_KEY` and
-`REDIS_URL` (required — without it the rate limiter fails closed and answers
+`REDIS_URL` (required - without it the rate limiter fails closed and answers
 429), and serve over HTTPS so the secure cookie prefixes activate. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).

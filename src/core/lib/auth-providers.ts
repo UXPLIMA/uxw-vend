@@ -26,7 +26,7 @@
 export type ResolvedProvider = unknown;
 
 export interface DeclaredAuthProvider {
-    /** Auth.js provider id — resolved as `next-auth/providers/<id>`. */
+    /** Auth.js provider id - resolved as `next-auth/providers/<id>`. */
     id: string;
     /** Env var holding the OAuth client id. */
     envIdVar: string;
@@ -71,7 +71,7 @@ export function resolveAuthProviders(
         if (typeof factory !== "function") {
             onWarn(
                 `[auth] Module "${declared.module}" declared auth provider "${declared.id}", ` +
-                    `but next-auth ships no such provider — skipped.`,
+                    `but next-auth ships no such provider - skipped.`,
             );
             continue;
         }

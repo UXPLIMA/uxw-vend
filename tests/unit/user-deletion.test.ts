@@ -104,7 +104,7 @@ describe("softDeleteUser", () => {
 
         expect(result).toEqual({ success: true });
         expect(deleteCalls.map((c) => c.model)).toEqual(ALL_PRIVATE_MODELS);
-        // `message` joins through authorId, not userId — a copy/paste of the
+        // `message` joins through authorId, not userId - a copy/paste of the
         // wrong column would delete nothing and leave DMs behind.
         expect(deleteCalls.find((c) => c.model === "message")!.where).toEqual({ authorId: "usr_1" });
         expect(deleteCalls.find((c) => c.model === "userSession")!.where).toEqual({ userId: "usr_1" });
@@ -160,7 +160,7 @@ describe("softDeleteUser", () => {
 
         // If anonymisation went first and then something threw, the account
         // would already be unreachable while its private data was still
-        // there — the worst of both outcomes.
+        // there - the worst of both outcomes.
         expect(opLog[opLog.length - 1]).toBe("update:user");
         expect(opLog.slice(0, -1).every((op) => op.startsWith("delete:"))).toBe(true);
     });
