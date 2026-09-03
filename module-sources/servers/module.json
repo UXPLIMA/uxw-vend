@@ -108,7 +108,11 @@
         "svr_rconPassword": "RCON Password",
         "svr_rconPasswordPlaceholder": "RCON password",
         "svr_isDefault": "Default Server",
-        "svr_isActive": "Active"
+        "svr_isActive": "Active",
+        "svr_typeHytale": "Hytale",
+        "svr_typeCs2": "Counter-Strike 2",
+        "svr_typeGarrysmod": "Garry's Mod",
+        "svr_typeUnturned": "Unturned"
       },
       "admin": {
         "menu_servers": "Servers",
@@ -169,7 +173,11 @@
         "svr_rconPassword": "RCON Şifresi",
         "svr_rconPasswordPlaceholder": "RCON şifresi",
         "svr_isDefault": "Varsayılan Sunucu",
-        "svr_isActive": "Aktif"
+        "svr_isActive": "Aktif",
+        "svr_typeHytale": "Hytale",
+        "svr_typeCs2": "Counter-Strike 2",
+        "svr_typeGarrysmod": "Garry's Mod",
+        "svr_typeUnturned": "Unturned"
       },
       "admin": {
         "menu_servers": "Sunucular",
