@@ -3,6 +3,7 @@ import { prisma } from "@/core/sdk/server";
 import { capturePaypalOrder } from "../../../../lib/paypal";
 import { sendOrderConfirmationEmail } from "../../../../lib/email";
 import { deliverProduct } from "../../../../lib/delivery";
+import { announceOrderCompleted } from "../../../../lib/order-events";
 
 // GET /api/v1/store/checkout/paypal/capture - PayPal return URL after approval
 export async function GET(request: NextRequest) {
@@ -76,8 +77,7 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        const { doActionAsync } = await import("@/core/sdk");
-        await doActionAsync("store.order.completed", order);
+        await announceOrderCompleted(order.id);
 
         const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3001";
         return NextResponse.redirect(new URL("/store/order-success", baseUrl));

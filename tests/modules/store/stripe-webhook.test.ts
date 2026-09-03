@@ -121,7 +121,8 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
             },
         });
         // Idempotency check sees a PENDING order, then the post-update fetch
-        // returns the full order with items + user.
+        // returns the full order with items + user, and finally the hook
+        // payload is loaded on its own so every listener sees the same shape.
         orderFindUnique
             .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
             .mockResolvedValueOnce({
@@ -137,6 +138,15 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
                 metadata: { playerName: "Steve" },
                 user: { email: "buyer@example.com", username: "Steve" },
                 items: [{ productId: "prod-1", name: "VIP", quantity: 1, metadata: {} }],
+            })
+            .mockResolvedValueOnce({
+                id: "order-1",
+                status: "COMPLETED",
+                orderNumber: "ORD-1",
+                userId: "user-1",
+                total: 42,
+                currency: "USD",
+                items: [{ id: "i1", productId: "prod-1", name: "VIP", quantity: 1, price: 42 }],
             });
         orderUpdate.mockResolvedValue({});
 
@@ -165,10 +175,16 @@ describe("stripe webhook: checkout.session.completed (order flow)", () => {
                 }),
             })
         );
-        // Integrations react through the hook, not through a direct call.
+        // Integrations react through the hook, not through a direct call, and
+        // the payload carries the line items - a module that hands out a
+        // license key needs to know what was bought.
         expect(doActionAsync).toHaveBeenCalledWith(
             "store.order.completed",
-            expect.objectContaining({ id: "order-1", status: "COMPLETED" })
+            expect.objectContaining({
+                id: "order-1",
+                status: "COMPLETED",
+                items: [expect.objectContaining({ productId: "prod-1", quantity: 1 })],
+            })
         );
     });
 

@@ -14,6 +14,17 @@ declare global {
     }
 }
 
+interface StoreOrderItemHookPayload {
+    id: string;
+    /** Null once the product is deleted - OrderItem.productId is optional. */
+    productId: string | null;
+    /** Product name as it was at purchase time, not as it is now. */
+    name: string;
+    quantity: number;
+    /** A Prisma Decimal, like `total`. Convert before showing it. */
+    price: unknown;
+}
+
 interface StoreOrderHookPayload {
     id: string;
     /** Null once the buyer deletes their account - Order.userId is SetNull. */
@@ -24,6 +35,11 @@ interface StoreOrderHookPayload {
     currency?: string;
     paymentMethod?: string | null;
     metadata?: unknown;
+    /**
+     * What was bought. Always present: both order hooks load the order the
+     * same way, through lib/order-events.ts.
+     */
+    items: StoreOrderItemHookPayload[];
 }
 
 export {};
