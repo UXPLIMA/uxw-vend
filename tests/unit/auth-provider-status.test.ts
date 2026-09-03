@@ -98,6 +98,21 @@ describe("GET /api/v1/auth-providers/status", () => {
         expect(row.envVars).toEqual(["AUTH_DEMO_KEY"]);
     });
 
+    it("shows the standard callback URL for a module-built provider that says it uses one", async () => {
+        // Battle.net, Epic Games and Kick are ordinary OAuth providers that
+        // need a third setting, so they are built by their module and still
+        // come back through Auth.js's own callback.
+        declarations.push({
+            id: "demo",
+            factory: "auth/demo.ts",
+            standardCallback: true,
+            envVars: ["AUTH_DEMO_KEY"],
+            module: "demo-auth",
+        });
+        const [row] = await rows();
+        expect(row.callbackUrl).toBe("https://shop.example.com/api/auth/callback/demo");
+    });
+
     it("reports whether a variable is set, never what it holds", async () => {
         process.env.AUTH_DEMO_SECRET = "super-secret-value";
         declarations.push({

@@ -42,6 +42,8 @@ export interface DeclaredAuthProvider {
     envSecretVar?: string;
     /** Module-relative path the generator imported the factory from. Module-supplied only. */
     factory?: string;
+    /** Whether a module-supplied provider rides Auth.js's own `/api/auth/callback/<id>`. */
+    standardCallback?: boolean;
     /** Env vars a module-supplied provider needs, all of which must be set. */
     envVars?: string[];
     /** Module that declared this provider, for diagnostics. */

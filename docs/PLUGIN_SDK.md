@@ -365,9 +365,24 @@ Reach for a factory when Auth.js has no provider for the identity system at all
 one - or when a built-in provider needs more than two credentials, such as
 Battle.net's required region issuer or Apple's signed-JWT secret.
 
+If your factory returns an ordinary Auth.js OAuth provider - built here only
+because it needs a third setting - add `"standardCallback": true`. It says the
+flow still returns through `/api/auth/callback/<id>`, so the settings panel can
+show the admin the redirect URL to register instead of leaving it blank.
+`battlenet-auth` is the example; `steam-auth`, whose flow runs in its own
+routes, leaves it off and documents its own URLs.
+
 Either way the provider stays inactive until every variable it names is set,
 which is what lets an installed-but-unconfigured module contribute nothing.
 Pair this with an `oauthButtons` entry to render the login button.
+
+**What core does with the profile.** Auth.js's user has `name` and `image`;
+core's has `username` (unique) and `avatar`, so the adapter translates between
+them. The display name becomes a username, slugged and suffixed if it is taken,
+and is never overwritten afterwards - the person may have changed it. If your
+provider returns no email address, return `email: null` honestly rather than
+inventing one: core writes a placeholder in the reserved `.invalid` TLD, leaves
+`emailVerified` null, and the user can set a real address from their profile.
 
 A flow that does not begin the way Auth.js expects gives its button an `href`
 instead, and the login page navigates there rather than calling `signIn()`:

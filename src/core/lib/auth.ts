@@ -2,6 +2,7 @@ import crypto from "crypto";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { coreAuthAdapter } from "./auth-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
 import {
@@ -56,7 +57,10 @@ const AUTH_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
 const IS_PROD_COOKIE = AUTH_URL.startsWith("https://");
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-    adapter: PrismaAdapter(prisma),
+    // Core's `User` predates the shape Auth.js documents (`username` and
+    // `avatar`, no `name`/`image`), so the stock adapter is wrapped rather
+    // than used directly. See auth-adapter.ts.
+    adapter: coreAuthAdapter(PrismaAdapter(prisma), prisma),
     session: {
         strategy: "jwt",
         maxAge: 24 * 60 * 60,
