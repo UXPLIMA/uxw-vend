@@ -22,6 +22,25 @@
       ]
     },
     {
+      "id": "hytale",
+      "name": "Hytale server",
+      "description": "Rank and cosmetic sales delivered over RCON, vote rewards, a ban list and player profiles. Delivery needs an RCON mod on the server: Hytale ships without one, and the community mods speak the Source protocol this module already talks.",
+      "icon": "Swords",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "vote",
+        "punishments",
+        "player-profiles",
+        "leaderboard",
+        "discord-auth",
+        "announcements"
+      ]
+    },
+    {
       "id": "rust",
       "name": "Rust server",
       "description": "Kit and VIP sales delivered over RCON, wipe announcements, a ban list and a leaderboard. Players sign in with Steam, the account they already play on.",
@@ -61,7 +80,7 @@
     {
       "id": "cs2",
       "name": "Counter-Strike 2 server",
-      "description": "VIP sales delivered over RCON, live server status, a ban list, a staff roster and a leaderboard, with Steam sign-in throughout.",
+      "description": "VIP and rank sales delivered over RCON, a ban list, a staff roster and a leaderboard, with Steam sign-in throughout.",
       "icon": "Crosshair",
       "theme": "pixelcraft",
       "modules": [
@@ -99,7 +118,7 @@
     {
       "id": "unturned",
       "name": "Unturned server",
-      "description": "The same shape as a Minecraft store: kit and rank sales, server status, vote rewards and a ban list, with Steam sign-in.",
+      "description": "The same shape as a Minecraft store: kit and rank sales delivered over RCON, vote rewards and a ban list, with Steam sign-in.",
       "icon": "Tent",
       "theme": "pixelcraft",
       "modules": [
@@ -117,7 +136,7 @@
     {
       "id": "fivem",
       "name": "FiveM roleplay",
-      "description": "Whitelist applications through custom forms, a staff roster, server status, punishments and a donation store.",
+      "description": "Whitelist applications through custom forms, a staff roster, punishments and a donation store delivered over RCON.",
       "icon": "Car",
       "theme": "pixelcraft",
       "modules": [
