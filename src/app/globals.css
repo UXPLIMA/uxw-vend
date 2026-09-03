@@ -201,7 +201,18 @@ body {
 }
 
 @media (min-width: 64rem) {
-  [data-sidebar-layout]:has(> [data-sidebar]:not(:has(> :not(template)))) > [data-sidebar-main] {
+  /*
+   * Written as "full width, unless" rather than "collapse when empty", because
+   * `:has()` may not be nested inside another `:has()`. The one selector that
+   * says the second thing directly is invalid, and an invalid selector is
+   * dropped without a word: the column hid, the content stayed at two thirds,
+   * and the page still looked off centre.
+   */
+  [data-sidebar-layout] > [data-sidebar-main] {
     grid-column: 1 / -1;
+  }
+
+  [data-sidebar-layout]:has(> [data-sidebar] > :not(template)) > [data-sidebar-main] {
+    grid-column: span 2 / span 2;
   }
 }
