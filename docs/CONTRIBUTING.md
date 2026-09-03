@@ -309,24 +309,36 @@ Rules:
 5. `npx tsc --noEmit` (zero errors)
 6. `npm run typecheck:modules` (zero errors - see below)
 7. `npx tsx scripts/validate-module.ts --all` (every module passes the boundary and manifest gates)
-8. `npm run lint` (zero warnings)
-9. `npm audit --audit-level=high`
-10. `npm test`
-11. `npm run build`
+8. `npx tsx scripts/check-marketplace-sync.ts` (every ZIP matches `module-sources/` and `index.json`)
+9. `npm run check:style` (no em dashes anywhere in the tracked tree)
+10. `npm run lint -- --max-warnings=0` (zero warnings)
+11. `npm audit --audit-level=high`
+12. `npm run test:coverage` (tests pass and coverage stays above the thresholds)
+13. `npm run build`
 
 A second job runs the Playwright suite against a real Postgres and a built
-server, and a third builds the Docker image.
+server, a third builds the Docker image, and a fourth exercises a real module
+install against the built stack.
 
 Run locally before opening a PR:
 
 ```bash
-npm run lint
 npx tsc --noEmit
 npm run typecheck:modules
 npx tsx scripts/validate-module.ts --all
-npm test
+npx tsx scripts/check-marketplace-sync.ts
+npm run check:style
+npm run lint -- --max-warnings=0
+npm run test:coverage
 npm run build
 ```
+
+Steps 8 and 9 are the two that catch people out. Step 8 fails whenever you edit
+anything under `module-sources/` without running `npm run build:marketplace`,
+because the published ZIP is then no longer what the source says it is. Step 9
+fails on an em dash: this project writes hyphens, and the gate reads the whole
+tracked tree because most occurrences turn up in JSON translations, Markdown and
+shell rather than in code ESLint can see.
 
 If you changed a manifest or added/removed routes, also run:
 
@@ -417,7 +429,12 @@ Visit `/admin/modules` and toggle the module on.
 
 ```bash
 npx tsc --noEmit
-npm run lint
+npm run typecheck:modules
+npm run validate:module module-sources/announcements-banner
+npm run build:marketplace                 # then check the ZIP + index.json diff
+npx tsx scripts/check-marketplace-sync.ts
+npm run check:style
+npm run lint -- --max-warnings=0
 npm test
 npm run build
 ```

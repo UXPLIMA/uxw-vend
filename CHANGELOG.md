@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- The default `flat` theme is rebuilt on a neutral gray palette. Its dark mode
+  used Tailwind slate, which measures H222 S47% at the background token and
+  reads as blue rather than gray. Two further problems came out of the audit:
+  `card` and `muted` were the same colour, so cards had no separation from
+  muted fills, and `primary` on `background` sat at 3.45:1, below the WCAG AA
+  floor. Both modes now use a neutral warm gray family with a single blue
+  accent, and every foreground/background pair was measured and passes AA.
+  `primaryForeground` also became an editable token; it was the one brand
+  colour missing from the theme editor.
+- Every em dash in the repository is now a hyphen, 1308 of them across 385
+  files, and `npm run check:style` fails CI if one comes back. The gate reads
+  the whole tracked tree rather than being an ESLint rule, because most
+  occurrences were in JSON translations, Markdown and shell.
+  `scripts/patch-next-agent-rules.ts` rewrites the agent-rules template inside
+  the `next` package, which `next dev` writes into `AGENTS.md` on every start
+  and which would otherwise re-dirty the file after each dev boot.
+- The README leads with the install command and explains, above the module
+  catalog, that module pages are compiled into the Next build, so an install
+  rebuilds the app and replaces the process. That is the fact an operator most
+  needs before deploying and it was documented only in `docs/DEPLOYMENT.md`.
+  The commands section, the docs index and `docs/CONTRIBUTING.md`'s CI
+  checklist were brought back in line with what the repository actually has.
+- The deferred-build diagram in `docs/DEPLOYMENT.md` and `docs/MIGRATIONS.md`
+  omitted `apply-schema-additions`, which has been in the pipeline since it
+  replaced `prisma db push`. Leaving it out made the surrounding text read as
+  if migrations created a new module's tables.
 - The last three CI actions still on the deprecated Node 20 runtime moved to
   their Node 24 majors: `docker/setup-buildx-action` 3→4,
   `docker/build-push-action` 6→7 and `actions/upload-artifact` 4→7. The
@@ -16,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   workflows pass were among the ones the new majors dropped, and
   `build-push-action`'s `digest` output, which the release summary reads, is
   unchanged.
+
+### Removed
+- The `db:migrate:prisma` script. `docs/MIGRATIONS.md` says twice, in bold and
+  again under anti-patterns, never to run `prisma migrate dev` against this
+  repository, and `package.json` offered it as a script anyway. Nothing
+  referenced it.
 
 ## [0.2.1] - 2026-09-02
 
