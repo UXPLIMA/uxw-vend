@@ -101,14 +101,15 @@ Full detail in ["The Build Lifecycle"](docs/DEPLOYMENT.md#the-build-lifecycle).
 
 ## Modules
 
-49 first-party modules ship in `module-marketplace/` as ZIPs with an
+61 first-party modules ship in `module-marketplace/` as ZIPs with an
 `index.json` catalog. Their sources live in `module-sources/<id>/` and are
 tracked in git; the ZIPs are built from those sources by
 `npm run build:marketplace`, and CI fails if the two drift apart.
 
 | Category | Modules |
 |----------|---------|
-| Commerce | credits, currency, leaderboard, license-keys, paypal-gateway, store, stripe-gateway, vote, wheel |
+| Commerce | credits, currency, leaderboard, license-keys, store, vote, wheel |
+| Payment gateways | coinbase-commerce-gateway, coinpayments-gateway, iyzico-gateway, mercadopago-gateway, midtrans-gateway, mollie-gateway, nowpayments-gateway, param-gateway, paymentwall-gateway, paypal-gateway, paysafecard-gateway, paytr-gateway, razorpay-gateway, stripe-gateway |
 | Community | blog, changelog, forum, in-app-notifications, referral, suggestions, trophies |
 | Gaming | downloads, minecraft-link, player-profiles, punishments, servers |
 | Management | announcements, help-center, login-protection, popups, staff, tickets, two-factor-auth |

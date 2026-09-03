@@ -1,0 +1,164 @@
+{
+  "id": "paysafecard-gateway",
+  "name": "paysafecard Gateway",
+  "description": "Take prepaid voucher payments through paysafecard, for buyers with no card or bank account",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Ticket",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "paysafecard",
+      "description": "paysafecard API key and environment.",
+      "href": "/settings/paysafecard",
+      "icon": "Ticket",
+      "color": "text-lime-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "paysafecard Settings",
+      "path": "/settings/paysafecard",
+      "icon": "Ticket"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/paysafecard",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/paysafecard/notify",
+      "handler": "api/notify/route.ts",
+      "description": "paysafecard notification. Reads the payment back, captures it, and reports it through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "paysafecardGateway": {
+        "adm_title": "paysafecard Settings",
+        "adm_subtitle": "Keys for taking payments through paysafecard.",
+        "adm_apiKey": "API Key",
+        "adm_apiKeyDesc": "From your paysafecard dashboard. Point the paysafecard notification URL at /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Sandbox Mode",
+        "adm_sandboxDesc": "Set to true to use the paysafecard test environment."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "paysafecard Gateway",
+        "menu_paysafecard-gateway_paysafecard_settings": "paysafecard Settings"
+      }
+    },
+    "tr": {
+      "paysafecardGateway": {
+        "adm_title": "paysafecard Ayarları",
+        "adm_subtitle": "paysafecard ile ödeme almak için gereken anahtarlar.",
+        "adm_apiKey": "API Anahtarı",
+        "adm_apiKeyDesc": "paysafecard panelinden alınır. paysafecard bildirim adresini /api/v1/paysafecard/notify olarak ayarlayın.",
+        "adm_sandbox": "Test Ortamı",
+        "adm_sandboxDesc": "paysafecard test ortamı için true yazın."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "paysafecard Ödeme",
+        "menu_paysafecard-gateway_paysafecard_settings": "paysafecard Ayarları"
+      }
+    },
+    "de": {
+      "paysafecardGateway": {
+        "adm_title": "paysafecard-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über paysafecard anzunehmen.",
+        "adm_apiKey": "API-Schlüssel",
+        "adm_apiKeyDesc": "Aus Ihrem paysafecard-Dashboard. Richten Sie die paysafecard-Benachrichtigungs-URL auf /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Sandbox-Modus",
+        "adm_sandboxDesc": "true für die paysafecard-Testumgebung."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "paysafecard-Gateway",
+        "menu_paysafecard-gateway_paysafecard_settings": "paysafecard-Einstellungen"
+      }
+    },
+    "es": {
+      "paysafecardGateway": {
+        "adm_title": "Configuración de paysafecard",
+        "adm_subtitle": "Claves para aceptar pagos con paysafecard.",
+        "adm_apiKey": "Clave de API",
+        "adm_apiKeyDesc": "Desde tu panel de paysafecard. Apunta la URL de notificaciones de paysafecard a /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Modo de pruebas",
+        "adm_sandboxDesc": "Escribe true para usar el entorno de pruebas de paysafecard."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "Pasarela paysafecard",
+        "menu_paysafecard-gateway_paysafecard_settings": "Configuración de paysafecard"
+      }
+    },
+    "fr": {
+      "paysafecardGateway": {
+        "adm_title": "Paramètres paysafecard",
+        "adm_subtitle": "Clés pour encaisser des paiements via paysafecard.",
+        "adm_apiKey": "Clé API",
+        "adm_apiKeyDesc": "Depuis votre tableau de bord paysafecard. Faites pointer l'URL de notification paysafecard vers /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Mode bac à sable",
+        "adm_sandboxDesc": "Mettez true pour l'environnement de test paysafecard."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "Passerelle paysafecard",
+        "menu_paysafecard-gateway_paysafecard_settings": "Paramètres paysafecard"
+      }
+    },
+    "ru": {
+      "paysafecardGateway": {
+        "adm_title": "Настройки paysafecard",
+        "adm_subtitle": "Ключи для приёма платежей через paysafecard.",
+        "adm_apiKey": "API-ключ",
+        "adm_apiKeyDesc": "Из панели paysafecard. Укажите в paysafecard адрес уведомлений /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Тестовый режим",
+        "adm_sandboxDesc": "Укажите true для тестовой среды paysafecard."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "Шлюз paysafecard",
+        "menu_paysafecard-gateway_paysafecard_settings": "Настройки paysafecard"
+      }
+    },
+    "pt": {
+      "paysafecardGateway": {
+        "adm_title": "Configurações do paysafecard",
+        "adm_subtitle": "Chaves para receber pagamentos via paysafecard.",
+        "adm_apiKey": "Chave de API",
+        "adm_apiKeyDesc": "No painel do paysafecard. Aponte a URL de notificação do paysafecard para /api/v1/paysafecard/notify.",
+        "adm_sandbox": "Modo de testes",
+        "adm_sandboxDesc": "Defina true para usar o ambiente de testes do paysafecard."
+      },
+      "admin": {
+        "menu_paysafecard-gateway": "Gateway paysafecard",
+        "menu_paysafecard-gateway_paysafecard_settings": "Configurações do paysafecard"
+      }
+    }
+  }
+}

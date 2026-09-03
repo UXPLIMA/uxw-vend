@@ -1,0 +1,165 @@
+{
+  "id": "paymentwall-gateway",
+  "name": "Paymentwall Gateway",
+  "description": "Take local payments, wallets and mobile billing through Paymentwall",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Globe",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "Paymentwall",
+      "description": "Paymentwall project and secret keys.",
+      "href": "/settings/paymentwall",
+      "icon": "Globe",
+      "color": "text-fuchsia-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Paymentwall Settings",
+      "path": "/settings/paymentwall",
+      "icon": "Globe"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/paymentwall",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/paymentwall/pingback",
+      "handler": "api/pingback/route.ts",
+      "method": "GET",
+      "description": "Paymentwall pingback. Verifies the signature and reports the payment through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.refunded",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "paymentwallGateway": {
+        "adm_title": "Paymentwall Settings",
+        "adm_subtitle": "Keys for taking payments through Paymentwall.",
+        "adm_projectKey": "Project Key",
+        "adm_projectKeyDesc": "From your Paymentwall dashboard.",
+        "adm_secretKey": "Secret Key",
+        "adm_secretKeyDesc": "From your Paymentwall dashboard. Point the Paymentwall notification URL at /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Paymentwall Gateway",
+        "menu_paymentwall-gateway_paymentwall_settings": "Paymentwall Settings"
+      }
+    },
+    "tr": {
+      "paymentwallGateway": {
+        "adm_title": "Paymentwall Ayarları",
+        "adm_subtitle": "Paymentwall ile ödeme almak için gereken anahtarlar.",
+        "adm_projectKey": "Proje Anahtarı",
+        "adm_projectKeyDesc": "Paymentwall panelinden alınır.",
+        "adm_secretKey": "Gizli Anahtar",
+        "adm_secretKeyDesc": "Paymentwall panelinden alınır. Paymentwall bildirim adresini /api/v1/paymentwall/pingback olarak ayarlayın."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Paymentwall Ödeme",
+        "menu_paymentwall-gateway_paymentwall_settings": "Paymentwall Ayarları"
+      }
+    },
+    "de": {
+      "paymentwallGateway": {
+        "adm_title": "Paymentwall-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über Paymentwall anzunehmen.",
+        "adm_projectKey": "Projektschlüssel",
+        "adm_projectKeyDesc": "Aus Ihrem Paymentwall-Dashboard.",
+        "adm_secretKey": "Geheimer Schlüssel",
+        "adm_secretKeyDesc": "Aus Ihrem Paymentwall-Dashboard. Richten Sie die Paymentwall-Benachrichtigungs-URL auf /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Paymentwall-Gateway",
+        "menu_paymentwall-gateway_paymentwall_settings": "Paymentwall-Einstellungen"
+      }
+    },
+    "es": {
+      "paymentwallGateway": {
+        "adm_title": "Configuración de Paymentwall",
+        "adm_subtitle": "Claves para aceptar pagos con Paymentwall.",
+        "adm_projectKey": "Clave de proyecto",
+        "adm_projectKeyDesc": "Desde tu panel de Paymentwall.",
+        "adm_secretKey": "Clave secreta",
+        "adm_secretKeyDesc": "Desde tu panel de Paymentwall. Apunta la URL de notificaciones de Paymentwall a /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Pasarela Paymentwall",
+        "menu_paymentwall-gateway_paymentwall_settings": "Configuración de Paymentwall"
+      }
+    },
+    "fr": {
+      "paymentwallGateway": {
+        "adm_title": "Paramètres Paymentwall",
+        "adm_subtitle": "Clés pour encaisser des paiements via Paymentwall.",
+        "adm_projectKey": "Clé de projet",
+        "adm_projectKeyDesc": "Depuis votre tableau de bord Paymentwall.",
+        "adm_secretKey": "Clé secrète",
+        "adm_secretKeyDesc": "Depuis votre tableau de bord Paymentwall. Faites pointer l'URL de notification Paymentwall vers /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Passerelle Paymentwall",
+        "menu_paymentwall-gateway_paymentwall_settings": "Paramètres Paymentwall"
+      }
+    },
+    "ru": {
+      "paymentwallGateway": {
+        "adm_title": "Настройки Paymentwall",
+        "adm_subtitle": "Ключи для приёма платежей через Paymentwall.",
+        "adm_projectKey": "Ключ проекта",
+        "adm_projectKeyDesc": "Из панели Paymentwall.",
+        "adm_secretKey": "Секретный ключ",
+        "adm_secretKeyDesc": "Из панели Paymentwall. Укажите в Paymentwall адрес уведомлений /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Шлюз Paymentwall",
+        "menu_paymentwall-gateway_paymentwall_settings": "Настройки Paymentwall"
+      }
+    },
+    "pt": {
+      "paymentwallGateway": {
+        "adm_title": "Configurações do Paymentwall",
+        "adm_subtitle": "Chaves para receber pagamentos via Paymentwall.",
+        "adm_projectKey": "Chave do projeto",
+        "adm_projectKeyDesc": "No painel do Paymentwall.",
+        "adm_secretKey": "Chave secreta",
+        "adm_secretKeyDesc": "No painel do Paymentwall. Aponte a URL de notificação do Paymentwall para /api/v1/paymentwall/pingback."
+      },
+      "admin": {
+        "menu_paymentwall-gateway": "Gateway Paymentwall",
+        "menu_paymentwall-gateway_paymentwall_settings": "Configurações do Paymentwall"
+      }
+    }
+  }
+}

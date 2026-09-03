@@ -1,0 +1,165 @@
+{
+  "id": "coinpayments-gateway",
+  "name": "CoinPayments Gateway",
+  "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Bitcoin",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "CoinPayments",
+      "description": "CoinPayments merchant id and IPN secret.",
+      "href": "/settings/coinpayments",
+      "icon": "Bitcoin",
+      "color": "text-amber-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "CoinPayments Settings",
+      "path": "/settings/coinpayments",
+      "icon": "Bitcoin"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/coinpayments",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/coinpayments/ipn",
+      "handler": "api/ipn/route.ts",
+      "method": "POST",
+      "description": "CoinPayments IPN. Verifies the HMAC and settles a payment once the coins have arrived."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "coinpaymentsGateway": {
+        "adm_title": "CoinPayments Settings",
+        "adm_subtitle": "Keys for taking payments through CoinPayments.",
+        "adm_merchantId": "Merchant ID",
+        "adm_merchantIdDesc": "From your CoinPayments dashboard.",
+        "adm_ipnSecret": "IPN Secret",
+        "adm_ipnSecretDesc": "From your CoinPayments dashboard. Point the CoinPayments notification URL at /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "CoinPayments Gateway",
+        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Settings"
+      }
+    },
+    "tr": {
+      "coinpaymentsGateway": {
+        "adm_title": "CoinPayments Ayarları",
+        "adm_subtitle": "CoinPayments ile ödeme almak için gereken anahtarlar.",
+        "adm_merchantId": "Üye İşyeri Numarası",
+        "adm_merchantIdDesc": "CoinPayments panelinden alınır.",
+        "adm_ipnSecret": "IPN Gizli Anahtarı",
+        "adm_ipnSecretDesc": "CoinPayments panelinden alınır. CoinPayments bildirim adresini /api/v1/coinpayments/ipn olarak ayarlayın."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "CoinPayments Ödeme",
+        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Ayarları"
+      }
+    },
+    "de": {
+      "coinpaymentsGateway": {
+        "adm_title": "CoinPayments-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über CoinPayments anzunehmen.",
+        "adm_merchantId": "Händler-ID",
+        "adm_merchantIdDesc": "Aus Ihrem CoinPayments-Dashboard.",
+        "adm_ipnSecret": "IPN-Geheimnis",
+        "adm_ipnSecretDesc": "Aus Ihrem CoinPayments-Dashboard. Richten Sie die CoinPayments-Benachrichtigungs-URL auf /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "CoinPayments-Gateway",
+        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments-Einstellungen"
+      }
+    },
+    "es": {
+      "coinpaymentsGateway": {
+        "adm_title": "Configuración de CoinPayments",
+        "adm_subtitle": "Claves para aceptar pagos con CoinPayments.",
+        "adm_merchantId": "ID de comercio",
+        "adm_merchantIdDesc": "Desde tu panel de CoinPayments.",
+        "adm_ipnSecret": "Secreto IPN",
+        "adm_ipnSecretDesc": "Desde tu panel de CoinPayments. Apunta la URL de notificaciones de CoinPayments a /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "Pasarela CoinPayments",
+        "menu_coinpayments-gateway_coinpayments_settings": "Configuración de CoinPayments"
+      }
+    },
+    "fr": {
+      "coinpaymentsGateway": {
+        "adm_title": "Paramètres CoinPayments",
+        "adm_subtitle": "Clés pour encaisser des paiements via CoinPayments.",
+        "adm_merchantId": "Identifiant marchand",
+        "adm_merchantIdDesc": "Depuis votre tableau de bord CoinPayments.",
+        "adm_ipnSecret": "Secret IPN",
+        "adm_ipnSecretDesc": "Depuis votre tableau de bord CoinPayments. Faites pointer l'URL de notification CoinPayments vers /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "Passerelle CoinPayments",
+        "menu_coinpayments-gateway_coinpayments_settings": "Paramètres CoinPayments"
+      }
+    },
+    "ru": {
+      "coinpaymentsGateway": {
+        "adm_title": "Настройки CoinPayments",
+        "adm_subtitle": "Ключи для приёма платежей через CoinPayments.",
+        "adm_merchantId": "ID продавца",
+        "adm_merchantIdDesc": "Из панели CoinPayments.",
+        "adm_ipnSecret": "Секрет IPN",
+        "adm_ipnSecretDesc": "Из панели CoinPayments. Укажите в CoinPayments адрес уведомлений /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "Шлюз CoinPayments",
+        "menu_coinpayments-gateway_coinpayments_settings": "Настройки CoinPayments"
+      }
+    },
+    "pt": {
+      "coinpaymentsGateway": {
+        "adm_title": "Configurações do CoinPayments",
+        "adm_subtitle": "Chaves para receber pagamentos via CoinPayments.",
+        "adm_merchantId": "ID do comerciante",
+        "adm_merchantIdDesc": "No painel do CoinPayments.",
+        "adm_ipnSecret": "Segredo IPN",
+        "adm_ipnSecretDesc": "No painel do CoinPayments. Aponte a URL de notificação do CoinPayments para /api/v1/coinpayments/ipn."
+      },
+      "admin": {
+        "menu_coinpayments-gateway": "Gateway CoinPayments",
+        "menu_coinpayments-gateway_coinpayments_settings": "Configurações do CoinPayments"
+      }
+    }
+  }
+}
