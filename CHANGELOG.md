@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   OpenID 2.0, so the module runs the OpenID half itself and hands Auth.js a
   single-use ticket. Set `AUTH_STEAM_API_KEY`.
 - Sign in with **Roblox, Twitch, GitHub and FACEIT**.
+- **Minecraft account linking** (`minecraft-link`). A player types their in-game
+  name on the site, the server whispers them a six-character code over RCON,
+  and they type it back. No server plugin: the proof is that only that account
+  could read the whisper, and only while it was online. Fires
+  `minecraft.account.linked` / `.unlinked` for other modules to follow.
 
 ### Changed
 - **RCON lives in one place.** The store and servers modules each carried a

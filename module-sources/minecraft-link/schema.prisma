@@ -1,0 +1,39 @@
+// Minecraft Link Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// A website account bound to an in-game Minecraft account.
+//
+// Both sides are unique: one Minecraft account cannot be claimed by two
+// website users, and a user holds at most one binding. Re-linking replaces the
+// row rather than adding a second.
+model MinecraftAccount {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  /** Canonical in-game name at the time of linking. */
+  username  String   @unique
+  /** Mojang UUID when it could be resolved. Survives a rename; the name does not. */
+  uuid      String?  @unique
+  linkedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// A code whispered to a player in game, waiting to be typed back on the site.
+//
+// Possession of the code is the proof: it is only ever delivered to the
+// Minecraft account being claimed, over a private in-game message, and only
+// while that player is online. Stored hashed, valid for a few minutes, and
+// burned after a handful of wrong guesses.
+model MinecraftLinkCode {
+  id        String   @id @default(cuid())
+  userId    String
+  username  String
+  codeHash  String   @unique
+  /** Which server the whisper was sent through, for the operator's benefit. */
+  serverId  String?
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}

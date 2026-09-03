@@ -86,50 +86,50 @@
     },
     "tr": {
       "steamAuth": {
-        "title": "Steam ile Giris",
-        "signInWith": "Steam ile giris yap",
-        "signingIn": "Steam ile giris yapiliyor...",
-        "signInFailed": "Steam girisi tamamlanmadi. Baglantinin suresi dolmus olabilir.",
-        "backToLogin": "Girise don",
-        "adm_title": "Steam ile Giris",
-        "adm_subtitle": "Ziyaretcilerin Steam hesabiyla giris yapmasina izin verin.",
-        "adm_returnToLabel": "Donus adresi",
-        "adm_returnToHelp": "Steam, girisi onaylayan kisiyi buraya geri gonderir. Adres AUTH_URL degiskeninden turetilir, bu yuzden o degiskenin ziyaretcilerin gercekten kullandigi adresle ayni olmasi gerekir.",
-        "adm_realmLabel": "Alan adi",
-        "adm_realmHelp": "Steam'in onay ekraninda gosterdigi site adi. API anahtarini bu alan adina kaydedersiniz.",
-        "adm_emailNote": "Steam hicbir zaman e-posta adresi paylasmaz, bu yuzden bu yolla acilan hesaba posta alamayan gecici bir adres atanir. Bu kullanicilardan profillerinde gercek bir adres tanimlamalarini isteyin."
+        "title": "Steam ile Giriş",
+        "signInWith": "Steam ile giriş yap",
+        "signingIn": "Steam ile giriş yapılıyor...",
+        "signInFailed": "Steam girişi tamamlanmadı. Bağlantının süresi dolmuş olabilir.",
+        "backToLogin": "Girişe dön",
+        "adm_title": "Steam ile Giriş",
+        "adm_subtitle": "Ziyaretçilerin Steam hesabıyla giriş yapmasına izin verin.",
+        "adm_returnToLabel": "Dönüş adresi",
+        "adm_returnToHelp": "Steam, girişi onaylayan kişiyi buraya geri gönderir. Adres AUTH_URL değişkeninden türetilir, bu yüzden o değişkenin ziyaretçilerin gerçekten kullandığı adresle aynı olması gerekir.",
+        "adm_realmLabel": "Alan adı",
+        "adm_realmHelp": "Steam'in onay ekranında gösterdiği site adı. API anahtarını bu alan adına kaydedersiniz.",
+        "adm_emailNote": "Steam hiçbir zaman e-posta adresi paylaşmaz, bu yüzden bu yolla açılan hesaba posta alamayan geçici bir adres atanır. Bu kullanıcılardan profillerinde gerçek bir adres tanımlamalarını isteyin."
       }
     },
     "de": {
       "steamAuth": {
         "title": "Steam-Anmeldung",
         "signInWith": "Mit Steam anmelden",
-        "signingIn": "Anmeldung mit Steam lauft...",
-        "signInFailed": "Die Steam-Anmeldung wurde nicht abgeschlossen. Der Link ist moglicherweise abgelaufen.",
-        "backToLogin": "Zuruck zur Anmeldung",
+        "signingIn": "Anmeldung mit Steam läuft...",
+        "signInFailed": "Die Steam-Anmeldung wurde nicht abgeschlossen. Der Link ist möglicherweise abgelaufen.",
+        "backToLogin": "Zurück zur Anmeldung",
         "adm_title": "Steam-Anmeldung",
-        "adm_subtitle": "Besucher konnen sich mit ihrem Steam-Konto anmelden.",
-        "adm_returnToLabel": "Ruckgabe-URL",
-        "adm_returnToHelp": "Steam schickt Nutzer nach der Bestatigung hierher zuruck. Die Adresse stammt aus AUTH_URL, diese Variable muss also der tatsachlich genutzten Adresse entsprechen.",
+        "adm_subtitle": "Besucher können sich mit ihrem Steam-Konto anmelden.",
+        "adm_returnToLabel": "Rückgabe-URL",
+        "adm_returnToHelp": "Steam schickt Nutzer nach der Bestätigung hierher zurück. Die Adresse stammt aus AUTH_URL, diese Variable muss also der tatsächlich genutzten Adresse entsprechen.",
         "adm_realmLabel": "Domain",
-        "adm_realmHelp": "Der Seitenname, den Steam auf seinem Bestatigungsbildschirm zeigt. Auf diese Domain registrieren Sie den API-Schlussel.",
-        "adm_emailNote": "Steam gibt niemals eine E-Mail-Adresse heraus. Ein so erstelltes Konto erhalt daher eine Platzhalteradresse, die keine Post empfangen kann. Bitten Sie diese Nutzer, im Profil eine echte Adresse zu hinterlegen."
+        "adm_realmHelp": "Der Seitenname, den Steam auf seinem Bestätigungsbildschirm zeigt. Auf diese Domain registrieren Sie den API-Schlüssel.",
+        "adm_emailNote": "Steam gibt niemals eine E-Mail-Adresse heraus. Ein so erstelltes Konto erhält daher eine Platzhalteradresse, die keine Post empfangen kann. Bitten Sie diese Nutzer, im Profil eine echte Adresse zu hinterlegen."
       }
     },
     "es": {
       "steamAuth": {
-        "title": "Inicio de sesion con Steam",
-        "signInWith": "Iniciar sesion con Steam",
-        "signingIn": "Iniciando sesion con Steam...",
-        "signInFailed": "El inicio de sesion con Steam no se completo. Puede que el enlace haya caducado.",
-        "backToLogin": "Volver al inicio de sesion",
-        "adm_title": "Inicio de sesion con Steam",
-        "adm_subtitle": "Permite que los visitantes inicien sesion con su cuenta de Steam.",
+        "title": "Inicio de sesión con Steam",
+        "signInWith": "Iniciar sesión con Steam",
+        "signingIn": "Iniciando sesión con Steam...",
+        "signInFailed": "El inicio de sesión con Steam no se completó. Puede que el enlace haya caducado.",
+        "backToLogin": "Volver al inicio de sesión",
+        "adm_title": "Inicio de sesión con Steam",
+        "adm_subtitle": "Permite que los visitantes inicien sesión con su cuenta de Steam.",
         "adm_returnToLabel": "URL de retorno",
-        "adm_returnToHelp": "Steam devuelve aqui a quien aprueba el acceso. La direccion sale de AUTH_URL, asi que esa variable debe coincidir con la que usan los visitantes.",
+        "adm_returnToHelp": "Steam devuelve aquí a quien aprueba el acceso. La dirección sale de AUTH_URL, así que esa variable debe coincidir con la que usan los visitantes.",
         "adm_realmLabel": "Dominio",
-        "adm_realmHelp": "El nombre del sitio que Steam muestra en su pantalla de aprobacion. Es el dominio con el que registras la clave de API.",
-        "adm_emailNote": "Steam nunca comparte una direccion de correo, asi que una cuenta creada por esta via recibe una direccion provisional que no puede recibir mensajes. Pide a estos usuarios que definan una real en su perfil."
+        "adm_realmHelp": "El nombre del sitio que Steam muestra en su pantalla de aprobación. Es el dominio con el que registras la clave de API.",
+        "adm_emailNote": "Steam nunca comparte una dirección de correo, así que una cuenta creada por esta vía recibe una dirección provisional que no puede recibir mensajes. Pide a estos usuarios que definan una real en su perfil."
       }
     },
     "fr": {
@@ -137,31 +137,31 @@
         "title": "Connexion Steam",
         "signInWith": "Se connecter avec Steam",
         "signingIn": "Connexion avec Steam en cours...",
-        "signInFailed": "La connexion Steam n'a pas abouti. Le lien a peut-etre expire.",
-        "backToLogin": "Retour a la connexion",
+        "signInFailed": "La connexion Steam n'a pas abouti. Le lien a peut-être expiré.",
+        "backToLogin": "Retour à la connexion",
         "adm_title": "Connexion Steam",
         "adm_subtitle": "Permettre aux visiteurs de se connecter avec leur compte Steam.",
         "adm_returnToLabel": "URL de retour",
-        "adm_returnToHelp": "Steam y renvoie les personnes apres validation. L'adresse vient de AUTH_URL, cette variable doit donc correspondre a celle qu'utilisent reellement les visiteurs.",
+        "adm_returnToHelp": "Steam y renvoie les personnes après validation. L'adresse vient de AUTH_URL, cette variable doit donc correspondre à celle qu'utilisent réellement les visiteurs.",
         "adm_realmLabel": "Domaine",
-        "adm_realmHelp": "Le nom de site que Steam affiche sur son ecran de validation. C'est le domaine sur lequel vous enregistrez la cle d'API.",
-        "adm_emailNote": "Steam ne communique jamais d'adresse e-mail : un compte cree ainsi recoit une adresse fictive qui ne peut rien recevoir. Demandez a ces utilisateurs d'en definir une vraie dans leur profil."
+        "adm_realmHelp": "Le nom de site que Steam affiche sur son écran de validation. C'est le domaine sur lequel vous enregistrez la clé d'API.",
+        "adm_emailNote": "Steam ne communique jamais d'adresse e-mail : un compte créé ainsi reçoit une adresse fictive qui ne peut rien recevoir. Demandez à ces utilisateurs d'en définir une vraie dans leur profil."
       }
     },
     "ru": {
       "steamAuth": {
-        "title": "Vhod cherez Steam",
-        "signInWith": "Voyti cherez Steam",
-        "signingIn": "Vypolnyaetsya vhod cherez Steam...",
-        "signInFailed": "Vhod cherez Steam ne zavershilsya. Vozmozhno, ssylka ustarela.",
-        "backToLogin": "Vernutsya k vhodu",
-        "adm_title": "Vhod cherez Steam",
-        "adm_subtitle": "Razreshite posetitelyam vhodit s akkauntom Steam.",
-        "adm_returnToLabel": "Adres vozvrata",
-        "adm_returnToHelp": "Syuda Steam vozvrashchaet polzovatelya posle podtverzhdeniya. Adres beretsya iz AUTH_URL, poetomu eta peremennaya dolzhna sovpadat s adresom, kotorym polzuyutsya posetiteli.",
-        "adm_realmLabel": "Domen",
-        "adm_realmHelp": "Imya sayta, kotoroe Steam pokazyvaet na ekrane podtverzhdeniya. Na etot domen vy registriruete klyuch API.",
-        "adm_emailNote": "Steam nikogda ne peredaet adres pochty, poetomu sozdannyy tak akkaunt poluchaet vremennyy adres, na kotoryy nichego nelzya otpravit. Poprosite takih polzovateley ukazat nastoyashchiy adres v profile."
+        "title": "Вход через Steam",
+        "signInWith": "Войти через Steam",
+        "signingIn": "Выполняется вход через Steam...",
+        "signInFailed": "Вход через Steam не завершился. Возможно, ссылка устарела.",
+        "backToLogin": "Вернуться к входу",
+        "adm_title": "Вход через Steam",
+        "adm_subtitle": "Разрешите посетителям входить с аккаунтом Steam.",
+        "adm_returnToLabel": "Адрес возврата",
+        "adm_returnToHelp": "Сюда Steam возвращает пользователя после подтверждения. Адрес берётся из AUTH_URL, поэтому эта переменная должна совпадать с адресом, которым пользуются посетители.",
+        "adm_realmLabel": "Домен",
+        "adm_realmHelp": "Имя сайта, которое Steam показывает на экране подтверждения. На этот домен вы регистрируете ключ API.",
+        "adm_emailNote": "Steam никогда не передаёт адрес почты, поэтому созданный так аккаунт получает временный адрес, на который ничего нельзя отправить. Попросите таких пользователей указать настоящий адрес в профиле."
       }
     },
     "pt": {
@@ -169,15 +169,15 @@
         "title": "Login com Steam",
         "signInWith": "Entrar com a Steam",
         "signingIn": "A entrar com a Steam...",
-        "signInFailed": "O login com a Steam nao foi concluido. A ligacao pode ter expirado.",
+        "signInFailed": "O login com a Steam não foi concluído. A ligação pode ter expirado.",
         "backToLogin": "Voltar ao login",
         "adm_title": "Login com Steam",
         "adm_subtitle": "Permita que os visitantes entrem com a conta Steam.",
         "adm_returnToLabel": "URL de retorno",
-        "adm_returnToHelp": "A Steam devolve aqui quem aprova o acesso. O endereco vem de AUTH_URL, por isso essa variavel tem de corresponder ao endereco que os visitantes usam.",
-        "adm_realmLabel": "Dominio",
-        "adm_realmHelp": "O nome do site que a Steam mostra no ecra de aprovacao. E o dominio com que regista a chave de API.",
-        "adm_emailNote": "A Steam nunca partilha um endereco de email, por isso uma conta criada assim recebe um endereco provisorio que nao consegue receber mensagens. Peca a estes utilizadores que definam um real no perfil."
+        "adm_returnToHelp": "A Steam devolve aqui quem aprova o acesso. O endereço vem de AUTH_URL, por isso essa variável tem de corresponder ao endereço que os visitantes usam.",
+        "adm_realmLabel": "Domínio",
+        "adm_realmHelp": "O nome do site que a Steam mostra no ecrã de aprovação. É o domínio com que regista a chave de API.",
+        "adm_emailNote": "A Steam nunca partilha um endereço de email, por isso uma conta criada assim recebe um endereço provisório que não consegue receber mensagens. Peça a estes utilizadores que definam um real no perfil."
       }
     }
   }
