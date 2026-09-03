@@ -4,6 +4,8 @@ import { ModuleSeoRoutes, type SitemapEntry } from "@/core/generated/module-seo"
 import { safeCall } from "@/core/lib/module-safe-call";
 import { connection } from "next/server";
 import { resolveAppUrl } from "@/core/lib/app-url";
+import { ModuleRoutes } from "@/core/generated/module-registry";
+import { CORE_STATIC_ROUTES, staticModuleRoutes } from "@/core/lib/sitemap-routes";
 
 // This used to be `export const revalidate = 3600`, which made Next prerender
 // the sitemap at BUILD time and serve that copy for the first hour. In a
@@ -14,20 +16,6 @@ import { resolveAppUrl } from "@/core/lib/app-url";
 // force a DB query per request.
 const SITEMAP_TTL_MS = 3_600_000;
 let sitemapMemo: { at: number; siteUrl: string; entries: MetadataRoute.Sitemap } | null = null;
-
-interface CoreStaticRoute {
-    path: string;
-    changeFrequency: "daily" | "weekly" | "monthly" | "yearly";
-    priority: number;
-}
-
-// Static routes that always exist in core - no module involvement.
-const CORE_STATIC_ROUTES: CoreStaticRoute[] = [
-    { path: "/", changeFrequency: "daily", priority: 1.0 },
-    { path: "/activity", changeFrequency: "daily", priority: 0.6 },
-    { path: "/auth/login", changeFrequency: "yearly", priority: 0.3 },
-    { path: "/auth/register", changeFrequency: "yearly", priority: 0.3 },
-];
 
 function mapChangeFreq(freq: SitemapEntry["changeFreq"]): MetadataRoute.Sitemap[number]["changeFrequency"] {
     return freq;
@@ -72,6 +60,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         enabledStates = {};
     }
 
+    // Every static page an enabled module routes. A module's own contributor
+    // below can still add detail URLs core cannot enumerate, and a duplicate
+    // there simply overwrites this entry's defaults.
+    for (const path of staticModuleRoutes(ModuleRoutes, enabledStates)) {
+        entries.push({
+            url: `${siteUrl}${path}`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.7,
+        });
+    }
+
     for (const seoRoute of ModuleSeoRoutes) {
         if (!enabledStates[seoRoute.module]) continue;
 
@@ -101,6 +101,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
     }
 
-    sitemapMemo = { at: Date.now(), siteUrl, entries };
-    return entries;
+    // A module that lists a page core already published would otherwise appear
+    // twice; the module's own entry wins, since it carries the real lastmod.
+    const deduped = [...new Map(entries.map((e) => [e.url, e])).values()];
+
+    sitemapMemo = { at: Date.now(), siteUrl, entries: deduped };
+    return deduped;
 }
