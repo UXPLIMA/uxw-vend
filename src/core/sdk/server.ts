@@ -71,3 +71,9 @@ export { buildArticleJsonLd } from "@/core/lib/seo";
 // AsyncLocalStorage when there is one and falls back cleanly when there is not.
 // Server-only because logger.ts imports next/headers.
 export { log } from "@/core/lib/logger";
+
+// Canonical public URL of this installation, resolved at runtime. A module
+// that has to hand an external service an absolute callback URL needs this
+// rather than a NEXT_PUBLIC_* var, which `next build` freezes into the
+// prebuilt image for every installation on earth.
+export { resolveAppUrl, resolveAppName } from "@/core/lib/app-url";

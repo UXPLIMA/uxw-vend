@@ -196,3 +196,111 @@ describe("moduleManifestSchema - shipped manifests", () => {
         expect(r.success).toBe(true);
     });
 });
+
+/**
+ * An auth provider is declared one of two ways, and the schema's job is to
+ * make sure a manifest picks one and fills it in. The half-declared shapes
+ * below all used to parse, and each produced a provider that installed
+ * cleanly and then failed at the first sign-in.
+ */
+describe("moduleManifestSchema - auth providers", () => {
+    const parse = (authProviders: unknown) =>
+        moduleManifestSchema.safeParse({ ...base, authProviders });
+
+    it("accepts a provider Auth.js ships, named by its two env vars", () => {
+        expect(
+            parse([{ id: "discord", envIdVar: "AUTH_DISCORD_ID", envSecretVar: "AUTH_DISCORD_SECRET" }]).success,
+        ).toBe(true);
+    });
+
+    it("accepts a module-supplied provider with a factory and its env vars", () => {
+        expect(
+            parse([{ id: "steam", factory: "auth/steam-provider.ts", envVars: ["AUTH_STEAM_API_KEY"] }]).success,
+        ).toBe(true);
+    });
+
+    it("rejects a provider that names only one of the two env vars", () => {
+        expect(parse([{ id: "discord", envIdVar: "AUTH_DISCORD_ID" }]).success).toBe(false);
+        expect(parse([{ id: "discord", envSecretVar: "AUTH_DISCORD_SECRET" }]).success).toBe(false);
+    });
+
+    it("rejects a provider that names neither", () => {
+        expect(parse([{ id: "discord" }]).success).toBe(false);
+    });
+
+    // Without env vars a factory-backed provider has no activation gate, so it
+    // would be built on every install whether it was configured or not.
+    it("rejects a factory with no env vars to gate it", () => {
+        expect(parse([{ id: "steam", factory: "auth/steam-provider.ts" }]).success).toBe(false);
+        expect(parse([{ id: "steam", factory: "auth/steam-provider.ts", envVars: [] }]).success).toBe(false);
+    });
+
+    it("rejects mixing a factory with the built-in credential vars", () => {
+        expect(
+            parse([
+                {
+                    id: "steam",
+                    factory: "auth/steam-provider.ts",
+                    envVars: ["AUTH_STEAM_API_KEY"],
+                    envIdVar: "AUTH_STEAM_ID",
+                    envSecretVar: "AUTH_STEAM_SECRET",
+                },
+            ]).success,
+        ).toBe(false);
+    });
+
+    it("rejects envVars on a provider with no factory", () => {
+        expect(
+            parse([
+                {
+                    id: "discord",
+                    envIdVar: "AUTH_DISCORD_ID",
+                    envSecretVar: "AUTH_DISCORD_SECRET",
+                    envVars: ["AUTH_DISCORD_EXTRA"],
+                },
+            ]).success,
+        ).toBe(false);
+    });
+
+    // The factory path is interpolated into an import specifier by the
+    // registry generator, so it has to stay inside the module's own tree.
+    it("rejects a factory path that escapes the module", () => {
+        expect(parse([{ id: "steam", factory: "../../core/lib/auth", envVars: ["X"] }]).success).toBe(false);
+        expect(parse([{ id: "steam", factory: "/etc/passwd", envVars: ["X"] }]).success).toBe(false);
+    });
+
+    it("rejects an env var name that is not one", () => {
+        expect(parse([{ id: "steam", factory: "auth/p.ts", envVars: ["auth-steam-key"] }]).success).toBe(false);
+    });
+});
+
+/**
+ * A sign-in button normally calls signIn(provider). One that names an href
+ * navigates there instead, which is how a non-OAuth2 flow starts - and is
+ * also a way to point the sign-in button anywhere, if the schema lets it.
+ */
+describe("moduleManifestSchema - oauth button href", () => {
+    const button = (href?: string) => ({
+        id: "steam-login",
+        provider: "steam",
+        label: "Steam",
+        color: "currentColor",
+        svgIcon: "M0 0h24v24H0z",
+        ...(href === undefined ? {} : { href }),
+    });
+    const parse = (href?: string) => moduleManifestSchema.safeParse({ ...base, oauthButtons: [button(href)] });
+
+    it("accepts a button with no href", () => {
+        expect(parse().success).toBe(true);
+    });
+
+    it("accepts a same-origin path", () => {
+        expect(parse("/api/v1/steam-auth/start").success).toBe(true);
+    });
+
+    it("refuses to send the sign-in button off-site", () => {
+        expect(parse("https://evil.example/steal").success).toBe(false);
+        expect(parse("//evil.example/steal").success).toBe(false);
+        expect(parse("javascript:alert(1)").success).toBe(false);
+    });
+});

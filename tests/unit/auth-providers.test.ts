@@ -94,3 +94,90 @@ describe("resolveAuthProviders", () => {
         expect(resolveAuthProviders([], { env: fullEnv, factories: {} })).toEqual([]);
     });
 });
+
+/**
+ * Some identity systems are not OAuth2 at all - Steam speaks OpenID 2.0 - and
+ * some built-in providers need more than a client id and secret. Those modules
+ * ship their own provider builder and name the env vars it needs.
+ */
+const steam: DeclaredAuthProvider = {
+    id: "steam",
+    factory: "auth/steam-provider.ts",
+    envVars: ["AUTH_STEAM_API_KEY"],
+    module: "steam-auth",
+};
+
+describe("resolveAuthProviders with a module-supplied provider", () => {
+    it("passes the declared env vars to the module's builder", () => {
+        const factory = vi.fn((config: unknown) => ({ built: config }));
+        const providers = resolveAuthProviders([steam], {
+            env: { AUTH_STEAM_API_KEY: "key-789" },
+            factories: {},
+            moduleFactories: { steam: factory },
+        });
+
+        expect(providers).toEqual([
+            {
+                built: {
+                    env: { AUTH_STEAM_API_KEY: "key-789" },
+                    allowDangerousEmailAccountLinking: false,
+                },
+            },
+        ]);
+    });
+
+    it("passes only the env vars the manifest asked for", () => {
+        const factory = vi.fn((config: { env: Record<string, string> }) => config);
+        resolveAuthProviders([steam], {
+            env: { AUTH_STEAM_API_KEY: "key-789", DATABASE_URL: "postgres://secret" },
+            factories: {},
+            moduleFactories: { steam: factory },
+        });
+        expect(Object.keys(factory.mock.calls[0][0].env)).toEqual(["AUTH_STEAM_API_KEY"]);
+    });
+
+    it("stays inactive until every declared env var is set", () => {
+        const factory = vi.fn(() => ({ id: "steam" }));
+        const twoVars: DeclaredAuthProvider = { ...steam, envVars: ["AUTH_STEAM_API_KEY", "AUTH_STEAM_REALM"] };
+        const providers = resolveAuthProviders([twoVars], {
+            env: { AUTH_STEAM_API_KEY: "key-789" },
+            factories: {},
+            moduleFactories: { steam: factory },
+        });
+        expect(providers).toEqual([]);
+        expect(factory).not.toHaveBeenCalled();
+    });
+
+    it("does not fall back to the built-in provider map", () => {
+        const builtIn = vi.fn(() => ({ id: "wrong" }));
+        const warnings: string[] = [];
+        const providers = resolveAuthProviders([steam], {
+            env: { AUTH_STEAM_API_KEY: "key-789" },
+            factories: { steam: builtIn },
+            moduleFactories: {},
+            onWarn: (m) => warnings.push(m),
+        });
+        expect(builtIn).not.toHaveBeenCalled();
+        expect(providers).toEqual([]);
+        expect(warnings.join(" ")).toContain("steam-auth");
+    });
+
+    it("never enables dangerous account linking here either", () => {
+        const factory = (config: { allowDangerousEmailAccountLinking: boolean }) => config;
+        const [built] = resolveAuthProviders([steam], {
+            env: { AUTH_STEAM_API_KEY: "key-789" },
+            factories: {},
+            moduleFactories: { steam: factory },
+        }) as unknown as { allowDangerousEmailAccountLinking: boolean }[];
+        expect(built.allowDangerousEmailAccountLinking).toBe(false);
+    });
+
+    it("keeps built-in and module-supplied providers side by side", () => {
+        const providers = resolveAuthProviders([discord, steam], {
+            env: { ...fullEnv, AUTH_STEAM_API_KEY: "key-789" },
+            factories: { discord: () => ({ id: "discord" }) },
+            moduleFactories: { steam: () => ({ id: "steam" }) },
+        });
+        expect(providers).toEqual([{ id: "discord" }, { id: "steam" }]);
+    });
+});

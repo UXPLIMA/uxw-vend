@@ -12,10 +12,16 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.2.0 - `authProviders[].factory` lets a module ship its own sign-in
+ * provider instead of naming one Auth.js already has, `oauthButtons[].href`
+ * lets that provider's button start a flow Auth.js does not know how to
+ * start, and `resolveAppUrl` joins `@/core/sdk/server`. All three are
+ * additions: a manifest written against 1.1.0 is unaffected.
+ *
  * 1.1.0 - `searchProviders[].indexes` lets a module ask core to create its
  * full-text indexes. Requiring `coreVersion` in the manifest landed in the
  * same release but is not a major bump: a module that declared a range still
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.1.0";
+export const CORE_API_VERSION = "1.2.0";

@@ -1,0 +1,233 @@
+{
+  "id": "steam-auth",
+  "name": "Steam Login",
+  "description": "Allow users to sign in with their Steam account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Gamepad2",
+  "adminRoutes": [
+    {
+      "path": "/settings/steam-auth",
+      "component": "pages/admin/settings/steam-auth/page.tsx"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/auth/steam",
+      "component": "pages/auth/steam/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/steam-auth/start",
+      "handler": "api/start/route.ts",
+      "method": "GET",
+      "description": "Redirect the visitor to Steam to approve an OpenID sign-in."
+    },
+    {
+      "path": "/steam-auth/callback",
+      "handler": "api/callback/route.ts",
+      "method": "GET",
+      "description": "Verify Steam's OpenID assertion and hand the browser a single-use sign-in ticket."
+    },
+    {
+      "path": "/steam-auth/status",
+      "handler": "api/status/route.ts",
+      "method": "GET",
+      "description": "Report whether Steam login is configured, and the URLs Steam must be pointed at (admin)."
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Steam Login",
+      "description": "Steam sign-in status and setup.",
+      "href": "/settings/steam-auth",
+      "icon": "Gamepad2",
+      "color": "text-sky-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "steam",
+      "factory": "auth/steam-provider.ts",
+      "envVars": [
+        "AUTH_STEAM_API_KEY"
+      ]
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "steam-login",
+      "provider": "steam",
+      "label": "Steam",
+      "color": "currentColor",
+      "svgIcon": "M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z",
+      "href": "/api/v1/steam-auth/start"
+    }
+  ],
+  "translations": {
+    "en": {
+      "steamAuth": {
+        "title": "Steam Login",
+        "signInWith": "Sign in with Steam",
+        "signingIn": "Signing you in with Steam...",
+        "signInFailed": "Steam sign-in did not complete. The link may have expired.",
+        "backToLogin": "Back to login",
+        "adm_title": "Steam Login",
+        "adm_subtitle": "Let visitors sign in with their Steam account.",
+        "adm_statusTitle": "Configuration",
+        "adm_loading": "Checking configuration...",
+        "adm_statusError": "Could not read the Steam login status.",
+        "adm_configured": "Steam login is active.",
+        "adm_notConfigured": "Steam login is installed but inactive: the API key is not set.",
+        "adm_envVarLabel": "Environment variable",
+        "adm_envVarHelp": "Get a key at steamcommunity.com/dev/apikey, set this variable, and restart the app. Steam login uses an environment variable rather than a saved setting because sign-in providers are assembled at startup.",
+        "adm_returnToLabel": "Return URL",
+        "adm_returnToHelp": "Steam sends people back here after they approve the sign-in. It is derived from AUTH_URL, so that variable has to match the address visitors actually use.",
+        "adm_realmLabel": "Domain",
+        "adm_realmHelp": "The site name Steam shows on its approval screen. This is the domain you register the API key against.",
+        "adm_emailNote": "Steam never shares an email address, so an account created this way gets a placeholder one that can never receive mail. Ask these users to set a real address in their profile."
+      }
+    },
+    "tr": {
+      "steamAuth": {
+        "title": "Steam ile Giris",
+        "signInWith": "Steam ile giris yap",
+        "signingIn": "Steam ile giris yapiliyor...",
+        "signInFailed": "Steam girisi tamamlanmadi. Baglantinin suresi dolmus olabilir.",
+        "backToLogin": "Girise don",
+        "adm_title": "Steam ile Giris",
+        "adm_subtitle": "Ziyaretcilerin Steam hesabiyla giris yapmasina izin verin.",
+        "adm_statusTitle": "Yapilandirma",
+        "adm_loading": "Yapilandirma kontrol ediliyor...",
+        "adm_statusError": "Steam giris durumu okunamadi.",
+        "adm_configured": "Steam girisi aktif.",
+        "adm_notConfigured": "Steam girisi kurulu ama pasif: API anahtari tanimli degil.",
+        "adm_envVarLabel": "Ortam degiskeni",
+        "adm_envVarHelp": "steamcommunity.com/dev/apikey adresinden bir anahtar alin, bu degiskeni tanimlayin ve uygulamayi yeniden baslatin. Giris saglayicilari uygulama acilirken kuruldugu icin Steam girisi kayitli ayar yerine ortam degiskeni kullanir.",
+        "adm_returnToLabel": "Donus adresi",
+        "adm_returnToHelp": "Steam, girisi onaylayan kisiyi buraya geri gonderir. Adres AUTH_URL degiskeninden turetilir, bu yuzden o degiskenin ziyaretcilerin gercekten kullandigi adresle ayni olmasi gerekir.",
+        "adm_realmLabel": "Alan adi",
+        "adm_realmHelp": "Steam'in onay ekraninda gosterdigi site adi. API anahtarini bu alan adina kaydedersiniz.",
+        "adm_emailNote": "Steam hicbir zaman e-posta adresi paylasmaz, bu yuzden bu yolla acilan hesaba posta alamayan gecici bir adres atanir. Bu kullanicilardan profillerinde gercek bir adres tanimlamalarini isteyin."
+      }
+    },
+    "de": {
+      "steamAuth": {
+        "title": "Steam-Anmeldung",
+        "signInWith": "Mit Steam anmelden",
+        "signingIn": "Anmeldung mit Steam lauft...",
+        "signInFailed": "Die Steam-Anmeldung wurde nicht abgeschlossen. Der Link ist moglicherweise abgelaufen.",
+        "backToLogin": "Zuruck zur Anmeldung",
+        "adm_title": "Steam-Anmeldung",
+        "adm_subtitle": "Besucher konnen sich mit ihrem Steam-Konto anmelden.",
+        "adm_statusTitle": "Konfiguration",
+        "adm_loading": "Konfiguration wird gepruft...",
+        "adm_statusError": "Der Status der Steam-Anmeldung konnte nicht gelesen werden.",
+        "adm_configured": "Die Steam-Anmeldung ist aktiv.",
+        "adm_notConfigured": "Die Steam-Anmeldung ist installiert, aber inaktiv: Der API-Schlussel fehlt.",
+        "adm_envVarLabel": "Umgebungsvariable",
+        "adm_envVarHelp": "Holen Sie sich einen Schlussel unter steamcommunity.com/dev/apikey, setzen Sie diese Variable und starten Sie die App neu. Die Steam-Anmeldung nutzt eine Umgebungsvariable statt einer gespeicherten Einstellung, weil Anmeldeanbieter beim Start zusammengestellt werden.",
+        "adm_returnToLabel": "Ruckgabe-URL",
+        "adm_returnToHelp": "Steam schickt Nutzer nach der Bestatigung hierher zuruck. Die Adresse stammt aus AUTH_URL, diese Variable muss also der tatsachlich genutzten Adresse entsprechen.",
+        "adm_realmLabel": "Domain",
+        "adm_realmHelp": "Der Seitenname, den Steam auf seinem Bestatigungsbildschirm zeigt. Auf diese Domain registrieren Sie den API-Schlussel.",
+        "adm_emailNote": "Steam gibt niemals eine E-Mail-Adresse heraus. Ein so erstelltes Konto erhalt daher eine Platzhalteradresse, die keine Post empfangen kann. Bitten Sie diese Nutzer, im Profil eine echte Adresse zu hinterlegen."
+      }
+    },
+    "es": {
+      "steamAuth": {
+        "title": "Inicio de sesion con Steam",
+        "signInWith": "Iniciar sesion con Steam",
+        "signingIn": "Iniciando sesion con Steam...",
+        "signInFailed": "El inicio de sesion con Steam no se completo. Puede que el enlace haya caducado.",
+        "backToLogin": "Volver al inicio de sesion",
+        "adm_title": "Inicio de sesion con Steam",
+        "adm_subtitle": "Permite que los visitantes inicien sesion con su cuenta de Steam.",
+        "adm_statusTitle": "Configuracion",
+        "adm_loading": "Comprobando la configuracion...",
+        "adm_statusError": "No se pudo leer el estado del inicio de sesion con Steam.",
+        "adm_configured": "El inicio de sesion con Steam esta activo.",
+        "adm_notConfigured": "El inicio de sesion con Steam esta instalado pero inactivo: falta la clave de API.",
+        "adm_envVarLabel": "Variable de entorno",
+        "adm_envVarHelp": "Consigue una clave en steamcommunity.com/dev/apikey, define esta variable y reinicia la aplicacion. El inicio de sesion con Steam usa una variable de entorno en lugar de un ajuste guardado porque los proveedores de acceso se montan al arrancar.",
+        "adm_returnToLabel": "URL de retorno",
+        "adm_returnToHelp": "Steam devuelve aqui a quien aprueba el acceso. La direccion sale de AUTH_URL, asi que esa variable debe coincidir con la que usan los visitantes.",
+        "adm_realmLabel": "Dominio",
+        "adm_realmHelp": "El nombre del sitio que Steam muestra en su pantalla de aprobacion. Es el dominio con el que registras la clave de API.",
+        "adm_emailNote": "Steam nunca comparte una direccion de correo, asi que una cuenta creada por esta via recibe una direccion provisional que no puede recibir mensajes. Pide a estos usuarios que definan una real en su perfil."
+      }
+    },
+    "fr": {
+      "steamAuth": {
+        "title": "Connexion Steam",
+        "signInWith": "Se connecter avec Steam",
+        "signingIn": "Connexion avec Steam en cours...",
+        "signInFailed": "La connexion Steam n'a pas abouti. Le lien a peut-etre expire.",
+        "backToLogin": "Retour a la connexion",
+        "adm_title": "Connexion Steam",
+        "adm_subtitle": "Permettre aux visiteurs de se connecter avec leur compte Steam.",
+        "adm_statusTitle": "Configuration",
+        "adm_loading": "Verification de la configuration...",
+        "adm_statusError": "Impossible de lire l'etat de la connexion Steam.",
+        "adm_configured": "La connexion Steam est active.",
+        "adm_notConfigured": "La connexion Steam est installee mais inactive : la cle d'API n'est pas definie.",
+        "adm_envVarLabel": "Variable d'environnement",
+        "adm_envVarHelp": "Obtenez une cle sur steamcommunity.com/dev/apikey, definissez cette variable puis redemarrez l'application. La connexion Steam passe par une variable d'environnement plutot qu'un reglage enregistre, car les fournisseurs de connexion sont assembles au demarrage.",
+        "adm_returnToLabel": "URL de retour",
+        "adm_returnToHelp": "Steam y renvoie les personnes apres validation. L'adresse vient de AUTH_URL, cette variable doit donc correspondre a celle qu'utilisent reellement les visiteurs.",
+        "adm_realmLabel": "Domaine",
+        "adm_realmHelp": "Le nom de site que Steam affiche sur son ecran de validation. C'est le domaine sur lequel vous enregistrez la cle d'API.",
+        "adm_emailNote": "Steam ne communique jamais d'adresse e-mail : un compte cree ainsi recoit une adresse fictive qui ne peut rien recevoir. Demandez a ces utilisateurs d'en definir une vraie dans leur profil."
+      }
+    },
+    "ru": {
+      "steamAuth": {
+        "title": "Vhod cherez Steam",
+        "signInWith": "Voyti cherez Steam",
+        "signingIn": "Vypolnyaetsya vhod cherez Steam...",
+        "signInFailed": "Vhod cherez Steam ne zavershilsya. Vozmozhno, ssylka ustarela.",
+        "backToLogin": "Vernutsya k vhodu",
+        "adm_title": "Vhod cherez Steam",
+        "adm_subtitle": "Razreshite posetitelyam vhodit s akkauntom Steam.",
+        "adm_statusTitle": "Nastroyka",
+        "adm_loading": "Proverka nastroyki...",
+        "adm_statusError": "Ne udalos prochitat sostoyanie vhoda cherez Steam.",
+        "adm_configured": "Vhod cherez Steam aktiven.",
+        "adm_notConfigured": "Vhod cherez Steam ustanovlen, no neaktiven: ne zadan klyuch API.",
+        "adm_envVarLabel": "Peremennaya okruzheniya",
+        "adm_envVarHelp": "Poluchite klyuch na steamcommunity.com/dev/apikey, zadayte etu peremennuyu i perezapustite prilozhenie. Vhod cherez Steam ispolzuet peremennuyu okruzheniya, a ne sohranennuyu nastroyku, potomu chto provaydery vhoda sobirayutsya pri zapuske.",
+        "adm_returnToLabel": "Adres vozvrata",
+        "adm_returnToHelp": "Syuda Steam vozvrashchaet polzovatelya posle podtverzhdeniya. Adres beretsya iz AUTH_URL, poetomu eta peremennaya dolzhna sovpadat s adresom, kotorym polzuyutsya posetiteli.",
+        "adm_realmLabel": "Domen",
+        "adm_realmHelp": "Imya sayta, kotoroe Steam pokazyvaet na ekrane podtverzhdeniya. Na etot domen vy registriruete klyuch API.",
+        "adm_emailNote": "Steam nikogda ne peredaet adres pochty, poetomu sozdannyy tak akkaunt poluchaet vremennyy adres, na kotoryy nichego nelzya otpravit. Poprosite takih polzovateley ukazat nastoyashchiy adres v profile."
+      }
+    },
+    "pt": {
+      "steamAuth": {
+        "title": "Login com Steam",
+        "signInWith": "Entrar com a Steam",
+        "signingIn": "A entrar com a Steam...",
+        "signInFailed": "O login com a Steam nao foi concluido. A ligacao pode ter expirado.",
+        "backToLogin": "Voltar ao login",
+        "adm_title": "Login com Steam",
+        "adm_subtitle": "Permita que os visitantes entrem com a conta Steam.",
+        "adm_statusTitle": "Configuracao",
+        "adm_loading": "A verificar a configuracao...",
+        "adm_statusError": "Nao foi possivel ler o estado do login com a Steam.",
+        "adm_configured": "O login com a Steam esta ativo.",
+        "adm_notConfigured": "O login com a Steam esta instalado mas inativo: falta a chave de API.",
+        "adm_envVarLabel": "Variavel de ambiente",
+        "adm_envVarHelp": "Obtenha uma chave em steamcommunity.com/dev/apikey, defina esta variavel e reinicie a aplicacao. O login com a Steam usa uma variavel de ambiente em vez de uma definicao guardada porque os fornecedores de login sao montados no arranque.",
+        "adm_returnToLabel": "URL de retorno",
+        "adm_returnToHelp": "A Steam devolve aqui quem aprova o acesso. O endereco vem de AUTH_URL, por isso essa variavel tem de corresponder ao endereco que os visitantes usam.",
+        "adm_realmLabel": "Dominio",
+        "adm_realmHelp": "O nome do site que a Steam mostra no ecra de aprovacao. E o dominio com que regista a chave de API.",
+        "adm_emailNote": "A Steam nunca partilha um endereco de email, por isso uma conta criada assim recebe um endereco provisorio que nao consegue receber mensagens. Peca a estes utilizadores que definam um real no perfil."
+      }
+    }
+  }
+}
