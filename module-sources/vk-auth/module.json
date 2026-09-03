@@ -1,0 +1,99 @@
+{
+  "id": "vk-auth",
+  "name": "VK Login",
+  "description": "Allow users to sign in with their VK account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "MessagesSquare",
+  "adminRoutes": [
+    {
+      "path": "/settings/vk-auth",
+      "component": "pages/admin/settings/vk-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "VK OAuth",
+      "description": "VK application credentials.",
+      "href": "/settings/vk-auth",
+      "icon": "MessagesSquare",
+      "color": "text-blue-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "vk",
+      "envIdVar": "AUTH_VK_ID",
+      "envSecretVar": "AUTH_VK_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "vk-login",
+      "provider": "vk",
+      "label": "VK",
+      "color": "#0077FF",
+      "svgIcon": "m9.489.004.729-.003h3.564l.73.003.914.01.433.007.418.011.403.014.388.016.374.021.36.025.345.03.333.033c1.74.196 2.933.616 3.833 1.516.9.9 1.32 2.092 1.516 3.833l.034.333.029.346.025.36.02.373.025.588.012.41.013.644.009.915.004.98-.001 3.313-.003.73-.01.914-.007.433-.011.418-.014.403-.016.388-.021.374-.025.36-.03.345-.033.333c-.196 1.74-.616 2.933-1.516 3.833-.9.9-2.092 1.32-3.833 1.516l-.333.034-.346.029-.36.025-.373.02-.588.025-.41.012-.644.013-.915.009-.98.004-3.313-.001-.73-.003-.914-.01-.433-.007-.418-.011-.403-.014-.388-.016-.374-.021-.36-.025-.345-.03-.333-.033c-1.74-.196-2.933-.616-3.833-1.516-.9-.9-1.32-2.092-1.516-3.833l-.034-.333-.029-.346-.025-.36-.02-.373-.025-.588-.012-.41-.013-.644-.009-.915-.004-.98.001-3.313.003-.73.01-.914.007-.433.011-.418.014-.403.016-.388.021-.374.025-.36.03-.345.033-.333c.196-1.74.616-2.933 1.516-3.833.9-.9 2.092-1.32 3.833-1.516l.333-.034.346-.029.36-.025.373-.02.588-.025.41-.012.644-.013.915-.009ZM6.79 7.3H4.05c.13 6.24 3.25 9.99 8.72 9.99h.31v-3.57c2.01.2 3.53 1.67 4.14 3.57h2.84c-.78-2.84-2.83-4.41-4.11-5.01 1.28-.74 3.08-2.54 3.51-4.98h-2.58c-.56 1.98-2.22 3.78-3.8 3.95V7.3H10.5v6.92c-1.6-.4-3.62-2.34-3.71-6.92Z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "vkAuth": {
+        "adm_title": "VK Login Settings",
+        "adm_subtitle": "Set up VK OAuth sign-in for your site.",
+        "signInWith": "Sign in with VK",
+        "adm_emailNote": "VK only passes on an email address when the account has a confirmed one and the person allows it. Without it the account gets a placeholder address that can never receive mail, and the user can set a real one in their profile."
+      }
+    },
+    "tr": {
+      "vkAuth": {
+        "adm_title": "VK ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için VK ile OAuth girişini yapılandırın.",
+        "signInWith": "VK ile giriş yap",
+        "adm_emailNote": "VK, yalnızca hesapta doğrulanmış bir e-posta varsa ve kişi izin verirse adresi paylaşır. Paylaşılmazsa hesaba posta alamayan geçici bir adres atanır; kullanıcı profilinden gerçek bir adres tanımlayabilir."
+      }
+    },
+    "de": {
+      "vkAuth": {
+        "adm_title": "VK-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über VK für Ihre Seite einrichten.",
+        "signInWith": "Mit VK anmelden",
+        "adm_emailNote": "VK gibt eine E-Mail-Adresse nur weiter, wenn das Konto eine bestätigte hat und die Person zustimmt. Andernfalls erhält das Konto eine Platzhalteradresse, die keine Post empfangen kann; die Person kann im Profil eine echte hinterlegen."
+      }
+    },
+    "es": {
+      "vkAuth": {
+        "adm_title": "Inicio de sesión con VK",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con VK para tu sitio.",
+        "signInWith": "Iniciar sesión con VK",
+        "adm_emailNote": "VK solo entrega una dirección de correo si la cuenta tiene una confirmada y la persona lo permite. Si no, la cuenta recibe una dirección provisional que no puede recibir mensajes y el usuario puede definir una real en su perfil."
+      }
+    },
+    "fr": {
+      "vkAuth": {
+        "adm_title": "Connexion VK",
+        "adm_subtitle": "Configurez la connexion OAuth VK pour votre site.",
+        "signInWith": "Se connecter avec VK",
+        "adm_emailNote": "VK ne transmet une adresse e-mail que si le compte en a une confirmée et que la personne l'autorise. Sinon le compte reçoit une adresse fictive qui ne peut rien recevoir, et l'utilisateur peut en définir une vraie dans son profil."
+      }
+    },
+    "ru": {
+      "vkAuth": {
+        "adm_title": "Вход через VK",
+        "adm_subtitle": "Настройте вход на сайт через VK по OAuth.",
+        "signInWith": "Войти через VK",
+        "adm_emailNote": "VK передаёт адрес почты, только если он подтверждён в аккаунте и человек дал согласие. Иначе аккаунт получает временный адрес, на который ничего нельзя отправить, а пользователь может указать настоящий в профиле."
+      }
+    },
+    "pt": {
+      "vkAuth": {
+        "adm_title": "Início de sessão com VK",
+        "adm_subtitle": "Configure o início de sessão OAuth com VK no seu site.",
+        "signInWith": "Entrar com VK",
+        "adm_emailNote": "O VK só partilha um endereço de email se a conta tiver um confirmado e a pessoa autorizar. Caso contrário a conta recebe um endereço provisório que não consegue receber mensagens, e o utilizador pode definir um real no perfil."
+      }
+    }
+  }
+}
