@@ -11,7 +11,7 @@
     "generate:themes": "npx tsx scripts/generate-theme-registry.ts",
     "build:marketplace": "bash scripts/build-marketplace.sh",
     "db:merge": "npx tsx scripts/merge-schemas.ts",
-    "postinstall": "npx tsx scripts/patch-next-agent-rules.ts && npx tsx scripts/postinstall.ts",
+    "postinstall": "npx tsx scripts/postinstall.ts",
     "patch:next": "npx tsx scripts/patch-next-agent-rules.ts",
     "check:style": "npx tsx scripts/check-no-em-dash.ts",
     "predev": "npm run patch:next && npm run db:merge && npm run generate:themes && npx tsx scripts/generate-registry.ts && npx tsx scripts/generate-openapi.ts",
