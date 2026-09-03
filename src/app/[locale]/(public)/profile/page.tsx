@@ -9,6 +9,7 @@ import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { PasswordInput } from "@/core/components/ui/password-input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, Download, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const modules = useAllModules();
     const t = useTranslations("profile");
+    const authT = useTranslations("auth");
     const commonT = useTranslations("common");
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -439,12 +441,13 @@ export default function ProfilePage() {
                         <div className="space-y-3">
                             <div>
                                 <Label htmlFor={deletePasswordId}>{t("currentPassword")}</Label>
-                                <Input
+                                <PasswordInput
                                     id={deletePasswordId}
-                                    type="password"
                                     value={deletePassword}
                                     onChange={(e) => setDeletePassword(e.target.value)}
                                     autoComplete="current-password"
+                                    showLabel={authT("showPassword")}
+                                    hideLabel={authT("hidePassword")}
                                 />
                             </div>
                             <div>

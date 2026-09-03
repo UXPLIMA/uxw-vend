@@ -5,6 +5,7 @@ import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { Home } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
@@ -125,15 +126,17 @@ export default function RegisterPage() {
                                 <label htmlFor="password" className="text-sm font-medium text-foreground">
                                     {t('password')}
                                 </label>
-                                <Input
+                                <PasswordInput
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
                                     className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary focus:bg-card"
+                                    showLabel={t('showPassword')}
+                                    hideLabel={t('hidePassword')}
                                 />
                             </div>
 
@@ -141,15 +144,17 @@ export default function RegisterPage() {
                                 <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                                     {t('confirmPassword')}
                                 </label>
-                                <Input
+                                <PasswordInput
                                     id="confirmPassword"
                                     name="confirmPassword"
-                                    type="password"
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     required
                                     className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary focus:bg-card"
+                                    showLabel={t('showPassword')}
+                                    hideLabel={t('hidePassword')}
                                 />
                             </div>
 

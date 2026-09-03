@@ -91,8 +91,11 @@ export default function HomePage() {
             </Card>
           );
 
+          // No wrapper element: SidebarLayout supplies the spacing, and an
+          // extra div would keep the column out of `:empty` even when every
+          // widget renders null.
           const sidebarContent = enabledWidgets.length > 0 ? (
-            <div className="space-y-5">
+            <>
               {enabledWidgets.map((w) => {
                 const WidgetComponent = WidgetComponentRegistry[w.id];
                 return (
@@ -101,7 +104,7 @@ export default function HomePage() {
                     </ModuleErrorBoundary>
                 );
               })}
-            </div>
+            </>
           ) : null;
 
           return sidebarContent ? (

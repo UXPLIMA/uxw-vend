@@ -1,6 +1,13 @@
 import crypto from "crypto";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { identifierLookup } from "./login-identifier";
+import {
+    REMEMBERED_MAX_AGE_SECONDS,
+    parseRemember,
+    sessionExpired,
+    sessionExpiresAt,
+} from "./session-lifetime";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { coreAuthAdapter } from "./auth-adapter";
 import bcrypt from "bcryptjs";
@@ -63,7 +70,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: coreAuthAdapter(PrismaAdapter(prisma), prisma),
     session: {
         strategy: "jwt",
-        maxAge: 24 * 60 * 60,
+        // The cookie is issued at the longest lifetime any session can have;
+        // a session the user did not ask to keep is cut short by the
+        // absolute deadline the jwt callback enforces. See session-lifetime.ts.
+        maxAge: REMEMBERED_MAX_AGE_SECONDS,
         // Force a token refresh every hour so role/ban/permission changes
         // propagate within an hour even on dormant sessions.
         updateAge: 60 * 60,
@@ -105,17 +115,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Credentials({
             name: "credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
+                // Named `email` for the accounts and clients that predate
+                // username sign-in; the value may be either. See
+                // login-identifier.ts.
+                email: { label: "Email or username", type: "text" },
                 password: { label: "Password", type: "password" },
                 twoFactorCode: { label: "2FA Code", type: "text" },
+                remember: { label: "Keep me signed in", type: "checkbox" },
             },
             async authorize(credentials, request) {
-                if (!credentials?.email || !credentials?.password) {
+                const lookup = identifierLookup(credentials?.email);
+                if (!lookup || !credentials?.password) {
                     return null;
                 }
 
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email as string },
+                    where: lookup,
                     include: { role: true },
                 });
 
@@ -237,6 +252,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     image: user.avatar,
                     role: user.role?.name || "member",
                     rolePriority: user.role?.priority ?? 0,
+                    remember: parseRemember(credentials.remember),
                 };
             },
         }),
@@ -295,6 +311,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.rolePriority = (user as { rolePriority?: number }).rolePriority ?? 0;
                 // Generate a stable per-login token id for session tracking
                 token.tokenId = crypto.randomUUID();
+                // Only the credentials provider offers the checkbox; an OAuth
+                // sign-in takes the short lifetime, which is what every
+                // session got before "keep me signed in" existed.
+                token.absoluteExpiry = sessionExpiresAt(
+                    (user as { remember?: boolean }).remember === true,
+                );
+            }
+
+            // Enforced on every request, not only on refresh: the cookie now
+            // outlives the un-remembered session by design, so nothing else
+            // would end it.
+            if (sessionExpired(token)) {
+                return null as unknown as typeof token;
             }
 
             // ─── Impersonation: start ───
@@ -424,6 +453,8 @@ declare module "next-auth" {
     interface User {
         role?: string;
         rolePriority?: number;
+        /** Set by the credentials provider from the "keep me signed in" box. */
+        remember?: boolean;
     }
 }
 
@@ -433,6 +464,8 @@ declare module "@auth/core/jwt" {
         role?: string;
         rolePriority?: number;
         tokenId?: string;
+        /** Epoch ms after which this session stops working. See session-lifetime.ts. */
+        absoluteExpiry?: number;
         /** Set while impersonating - holds the real admin's user id. */
         originalUserId?: string;
     }

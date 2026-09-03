@@ -180,3 +180,23 @@ body {
   background: color-mix(in srgb, var(--uxw-color-primary) 10%, transparent);
   font-weight: 500;
 }
+
+/*
+ * Sidebar column collapse.
+ *
+ * StandardSidebarLayout reserves a third of the row for widgets. Widgets that
+ * have no data render null, so the column can come out empty - and an empty
+ * column still takes its share of the grid, which reads as content shoved to
+ * the left. Hiding the column and letting the content span the full row keeps
+ * the page centred. `:empty` ignores comment nodes, so React's Suspense
+ * markers do not count as content.
+ */
+[data-sidebar-layout] > [data-sidebar]:empty {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  [data-sidebar-layout]:has(> [data-sidebar]:empty) > [data-sidebar-main] {
+    grid-column: 1 / -1;
+  }
+}

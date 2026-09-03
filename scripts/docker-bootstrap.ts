@@ -122,6 +122,9 @@ async function main(): Promise<void> {
         // additive pass deliberately will not do.
         pushTolerantOfRetainedTables();
         run("apply-migrations", "npx", ["tsx", "scripts/apply-migrations.ts"]);
+        // Strings are database rows, so a new release's new keys only exist
+        // after this runs. Idempotent, and admin-edited rows are preserved.
+        run("seed-translations", "npx", ["tsx", "scripts/seed-translations.ts"]);
         console.log("[bootstrap] Upgrade complete.");
         return;
     }
@@ -136,6 +139,8 @@ async function main(): Promise<void> {
 
     console.log("[bootstrap] Fresh database - seeding core data…");
     run("seed", "npx", ["tsx", "prisma/seed.ts"]);
+    // Without this every string in the UI renders as its own key.
+    run("seed-translations", "npx", ["tsx", "scripts/seed-translations.ts"]);
     console.log("[bootstrap] Done.");
 }
 

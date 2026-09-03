@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Sign in with a username, not only an email.** Registration asks for both
+  and both are unique, but the login form only ever accepted the email, which
+  left anyone who remembered their username locked out of an account whose
+  password they knew.
+- **"Keep me signed in."** Without it a session lasts a day, as it always has;
+  with it, thirty. The deadline is absolute and stamped on the token itself, so
+  a session started on a shared machine ends whether or not the tab stayed
+  open.
+- **Every password field has a reveal toggle** - login, register, reset,
+  first-run setup and the profile's delete confirmation.
+
+### Added
 - **Six more logins for the rest of the world**: VK and Yandex, Kakao and
   Naver, LINE, and Sign in with Apple. Apple takes a signed token rather than a
   client secret, so that module holds the `.p8` key and mints one at startup
@@ -94,6 +106,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is used; the settings rows are then deleted.
 
 ### Fixed
+- **A fresh install showed raw translation keys.** Module strings live in the
+  `Translation` table, and only the marketplace installer ever wrote them
+  there. Modules chosen in the first-run wizard - which is how most installs
+  get theirs - arrived with none, so the store rendered `store.title` and
+  `store.cartEmpty` instead of words. The wizard now loads each module's
+  strings as it installs it, and the Docker bootstrap seeds core's on both a
+  fresh database and an upgrade, so a new release's new keys exist before
+  anything renders them.
+- **A dependency with a version range always read as missing.** The modules
+  screen compared the whole spec (`store@^2.0.0`) against installed module ids,
+  which never matches, so every payment gateway advertised a missing
+  prerequisite on an install that had the store enabled. The range is now
+  parsed and checked, and a module installed at the wrong version says so
+  rather than claiming to be absent.
+- **An empty widget column pushed the page off centre.** Widgets decide for
+  themselves whether they have anything to show, so a site with no orders yet
+  reserved a third of the homepage for widgets that all rendered nothing. The
+  column now collapses and the content spans the full width, and comes back on
+  its own if a widget later has something to say.
 - **OAuth sign-up could not create an account.** Auth.js's Prisma adapter writes
   the user shape Auth.js documents (`name`, `image`, nothing required beyond
   the email); core's `User` has `username` - required and unique - and

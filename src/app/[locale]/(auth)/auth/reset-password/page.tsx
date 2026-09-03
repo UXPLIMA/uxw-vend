@@ -5,7 +5,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Home, CheckCircle } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import { Input } from "@/core/components/ui/input";
+import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 
 export default function ResetPasswordPage() {
@@ -120,15 +120,17 @@ export default function ResetPasswordPage() {
                                     <label htmlFor="password" className="text-sm font-medium text-foreground">
                                         {t('password')}
                                     </label>
-                                    <Input
+                                    <PasswordInput
                                         id="password"
-                                        type="password"
+                                        autoComplete="new-password"
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                         minLength={6}
                                         className="border-border bg-muted"
+                                        showLabel={t('showPassword')}
+                                        hideLabel={t('hidePassword')}
                                     />
                                 </div>
 
@@ -136,15 +138,17 @@ export default function ResetPasswordPage() {
                                     <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
                                         {t('confirmPassword')}
                                     </label>
-                                    <Input
+                                    <PasswordInput
                                         id="confirmPassword"
-                                        type="password"
+                                        autoComplete="new-password"
                                         placeholder="••••••••"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
                                         minLength={6}
                                         className="border-border bg-muted"
+                                        showLabel={t('showPassword')}
+                                        hideLabel={t('hidePassword')}
                                     />
                                 </div>
 
