@@ -17,7 +17,13 @@ import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 export interface CrudField {
     key: string;
     label: string;
-    type?: "text" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color" | "image" | "urlOrFile" | "richtext";
+    /**
+     * "password" renders a masked <input type="password">. It hides the value
+     * from someone looking over the admin's shoulder; it is not storage
+     * advice, and a field holding a real secret still has to be encrypted on
+     * the way into the database.
+     */
+    type?: "text" | "password" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color" | "image" | "urlOrFile" | "richtext";
     placeholder?: string;
     options?: { value: string; label: string }[];
     defaultValue?: string;

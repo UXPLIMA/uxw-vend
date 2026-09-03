@@ -1,36 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { sendRconCommand, getRconEnabled } from "../../lib/rcon";
+import { sendRconCommand, isRconAvailable } from "../../lib/rcon";
 
-// POST /api/v1/rcon - Send RCON command (admin only)
-export async function POST(request: NextRequest) {
+async function requireAdmin(): Promise<NextResponse | null> {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return null;
+}
 
-    if (!getRconEnabled()) {
-        return NextResponse.json({ error: "RCON not configured" }, { status: 400 });
-    }
+// POST /api/v1/rcon - Send an RCON command (admin only).
+// `serverId` picks a server; without it the command goes to the default one.
+export async function POST(request: NextRequest) {
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
-    const { command } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const command = typeof body.command === "string" ? body.command.trim() : "";
+    const serverId = typeof body.serverId === "string" && body.serverId ? body.serverId : null;
     if (!command) return NextResponse.json({ error: "Command required" }, { status: 400 });
 
     try {
-        const response = await sendRconCommand(command);
-        return NextResponse.json({ response });
+        return NextResponse.json({ response: await sendRconCommand(command, serverId) });
     } catch (err) {
-        return NextResponse.json({
-            error: err instanceof Error ? err.message : "RCON command failed",
-        }, { status: 500 });
+        return NextResponse.json(
+            { error: err instanceof Error ? err.message : "RCON command failed" },
+            { status: 400 },
+        );
     }
 }
 
-// GET /api/v1/rcon - Check RCON status
+// GET /api/v1/rcon - Whether any server on this install can take a command.
 export async function GET() {
-    const session = await auth();
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
-    return NextResponse.json({ enabled: getRconEnabled() });
+    const denied = await requireAdmin();
+    if (denied) return denied;
+    return NextResponse.json({ enabled: await isRconAvailable() });
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/sdk/server";
 import { capturePaypalOrder } from "../../../../lib/paypal";
 import { sendOrderConfirmationEmail } from "../../../../lib/email";
-import { deliverProduct } from "../../../../lib/rcon";
+import { deliverProduct } from "../../../../lib/delivery";
 
 // GET /api/v1/store/checkout/paypal/capture - PayPal return URL after approval
 export async function GET(request: NextRequest) {

@@ -3,7 +3,7 @@ import { generateOrderNumber } from "@/core/sdk";
 import { logActivity, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../lib/stripe";
-import { deliverProduct } from "../../lib/rcon";
+import { deliverProduct } from "../../lib/delivery";
 import {
     computeOrderPricing,
     computeCouponDiscount,
