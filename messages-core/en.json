@@ -1066,7 +1066,8 @@
     "widgets_none": "No widgets yet. Install a module that contributes one.",
     "widgets_fromModule": "Widget from the {module} module",
     "widgets_save": "Save",
-    "widgets_saving": "Saving..."
+    "widgets_saving": "Saving...",
+    "modules_versionMismatch": "wrong version"
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -1163,7 +1164,7 @@
     "creatingAccount": "Creating account...",
     "signInWith": "Sign in with {provider}",
     "orContinueWith": "Or continue with",
-    "invalidCredentials": "Invalid email or password",
+    "invalidCredentials": "Invalid credentials",
     "passwordsDontMatch": "Passwords don't match",
     "genericError": "Something went wrong. Please try again.",
     "forgotSubtitle": "Enter your email to receive a reset link",
@@ -1204,7 +1205,12 @@
     "demoBanner": "Demo account",
     "demoBannerBody": "Some destructive actions are disabled in this public demo.",
     "demoFillCreds": "Fill demo credentials",
-    "registerSuccess": "Account created! You can now sign in."
+    "registerSuccess": "Account created! You can now sign in.",
+    "emailOrUsername": "Email or username",
+    "emailOrUsernamePlaceholder": "you@example.com or yourname",
+    "rememberMe": "Keep me signed in",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "search": {
     "title": "Search",

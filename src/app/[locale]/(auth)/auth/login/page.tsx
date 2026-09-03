@@ -7,6 +7,7 @@ import { Home, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
+import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
@@ -22,6 +23,7 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [needs2FA, setNeeds2FA] = useState(false);
+    const [remember, setRemember] = useState(false);
     const [isDemo, setIsDemo] = useState(false);
     const allModules = useAllModules();
     const oauthButtons = ModuleOauthButtons.filter(b => allModules[b.module] === true);
@@ -46,9 +48,13 @@ export default function LoginPage() {
 
         try {
             const result = await signIn("credentials", {
+                // `email` carries an email address or a username - the server
+                // tells them apart. The field name is part of the provider's
+                // published shape, so it stays as it is.
                 email,
                 password,
                 twoFactorCode: needs2FA ? twoFactorCode : "",
+                remember: remember ? "true" : "false",
                 redirect: false,
             });
 
@@ -149,12 +155,15 @@ export default function LoginPage() {
 
                             <div className="space-y-2">
                                 <label htmlFor="email" className="text-sm font-medium text-foreground">
-                                    {t('email')}
+                                    {t('emailOrUsername')}
                                 </label>
+                                {/* Not type="email": the browser's own
+                                    validation would refuse a username. */}
                                 <Input
                                     id="email"
-                                    type="email"
-                                    placeholder="you@example.com"
+                                    type="text"
+                                    autoComplete="username"
+                                    placeholder={t('emailOrUsernamePlaceholder')}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -166,13 +175,15 @@ export default function LoginPage() {
                                 <label htmlFor="password" className="text-sm font-medium text-foreground">
                                     {t('password')}
                                 </label>
-                                <Input
+                                <PasswordInput
                                     id="password"
-                                    type="password"
+                                    autoComplete="current-password"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
+                                    showLabel={t('showPassword')}
+                                    hideLabel={t('hidePassword')}
                                     className="border-border bg-muted text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary focus:bg-card"
                                 />
                             </div>
@@ -195,7 +206,16 @@ export default function LoginPage() {
                                 </div>
                             )}
 
-                            <div className="flex justify-end">
+                            <div className="flex items-center justify-between gap-3">
+                                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={remember}
+                                        onChange={(e) => setRemember(e.target.checked)}
+                                        className="rounded border-border"
+                                    />
+                                    {t('rememberMe')}
+                                </label>
                                 <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">
                                     {t('forgotPassword')}
                                 </Link>

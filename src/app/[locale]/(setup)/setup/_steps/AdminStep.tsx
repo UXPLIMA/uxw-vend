@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Input } from "@/core/components/ui/input";
+import { PasswordInput } from "@/core/components/ui/password-input";
 
 interface AdminStepProps {
     email: string;
@@ -19,6 +20,7 @@ export function AdminStep({
     setEmail, setUsername, setPassword, setPasswordConfirm,
 }: AdminStepProps) {
     const t = useTranslations("setup.admin");
+    const authT = useTranslations("auth");
     const mismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
     return (
         <div className="space-y-4">
@@ -35,12 +37,12 @@ export function AdminStep({
                 </label>
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("password")}</span>
-                    <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+                    <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" showLabel={authT("showPassword")} hideLabel={authT("hidePassword")} />
                     <span className="text-xs text-muted-foreground">{t("passwordHint")}</span>
                 </label>
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("passwordConfirm")}</span>
-                    <Input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} autoComplete="new-password" />
+                    <PasswordInput value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} autoComplete="new-password" showLabel={authT("showPassword")} hideLabel={authT("hidePassword")} />
                     {mismatch && <span className="text-xs text-red-600">{t("mismatch")}</span>}
                 </label>
             </div>

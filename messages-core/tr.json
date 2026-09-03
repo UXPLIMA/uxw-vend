@@ -1066,7 +1066,8 @@
     "widgets_none": "Henüz bileşen yok. Bileşen sağlayan bir modül kurun.",
     "widgets_fromModule": "{module} modülünden gelen bileşen",
     "widgets_save": "Kaydet",
-    "widgets_saving": "Kaydediliyor..."
+    "widgets_saving": "Kaydediliyor...",
+    "modules_versionMismatch": "sürüm uyumsuz"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",
@@ -1163,7 +1164,7 @@
     "creatingAccount": "Hesap oluşturuluyor...",
     "signInWith": "{provider} ile giriş yap",
     "orContinueWith": "Veya şununla devam et",
-    "invalidCredentials": "Geçersiz e-posta veya şifre",
+    "invalidCredentials": "Geçersiz kullanıcı bilgisi veya şifre",
     "passwordsDontMatch": "Şifreler eşleşmiyor",
     "genericError": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
     "forgotSubtitle": "Sıfırlama bağlantısı almak için e-postanı gir",
@@ -1204,7 +1205,12 @@
     "demoBanner": "Demo hesabı",
     "demoBannerBody": "Bu herkese açık demoda bazı yıkıcı işlemler devre dışı.",
     "demoFillCreds": "Demo bilgilerini doldur",
-    "registerSuccess": "Hesap oluşturuldu! Şimdi giriş yapabilirsin."
+    "registerSuccess": "Hesap oluşturuldu! Şimdi giriş yapabilirsin.",
+    "emailOrUsername": "E-posta veya kullanıcı adı",
+    "emailOrUsernamePlaceholder": "sen@ornek.com veya kullanıcıadın",
+    "rememberMe": "Oturumum açık kalsın",
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle"
   },
   "search": {
     "title": "Arama",

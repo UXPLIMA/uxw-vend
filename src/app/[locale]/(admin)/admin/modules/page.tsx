@@ -7,7 +7,7 @@ import {
     Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { categoryColors } from "./module-display";
+import { categoryColors, resolveDependencyBadge } from "./module-display";
 import type { SortKey } from "./types";
 import { useAdminModules } from "./useAdminModules";
 import { ModuleIcon } from "./ModuleIcon";
@@ -42,7 +42,6 @@ export default function AdminModulesPage() {
         detailModule,
         setDetailModule,
         fileInputRef,
-        installedIds,
         marketplaceById,
         updatesAvailableCount,
         toggleModule,
@@ -182,11 +181,10 @@ export default function AdminModulesPage() {
                                                         <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
                                                         <div className="flex gap-1 flex-wrap">
                                                             {mod.dependencies.map(dep => {
-                                                                const depMod = modules.find(m => m.id === dep);
-                                                                const isInstalled = depMod?.enabled;
+                                                                const badge = resolveDependencyBadge(dep, modules, marketplace);
                                                                 return (
-                                                                    <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isInstalled ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-                                                                        {depMod?.name || dep} {isInstalled ? "" : t("modules_missing")}
+                                                                    <span key={badge.spec} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${badge.satisfied ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                                                                        {badge.label} {badge.satisfied ? "" : badge.versionMismatch ? t("modules_versionMismatch") : t("modules_missing")}
                                                                     </span>
                                                                 );
                                                             })}
@@ -403,10 +401,10 @@ export default function AdminModulesPage() {
                                             <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
                                             <div className="flex gap-1 flex-wrap">
                                                 {mod.dependencies.map((dep: string) => {
-                                                    const depName = marketplace.find(m => m.id === dep)?.name || modules.find(m => m.id === dep)?.name || dep;
+                                                    const badge = resolveDependencyBadge(dep, modules, marketplace);
                                                     return (
-                                                        <span key={dep} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${installedIds.has(dep) ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
-                                                            {depName}
+                                                        <span key={badge.spec} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${badge.satisfied ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                                                            {badge.label}
                                                         </span>
                                                     );
                                                 })}

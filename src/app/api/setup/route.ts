@@ -15,6 +15,8 @@ import {
     type CatalogEntry,
 } from "@/core/lib/module-dependencies";
 import { MODULES_DIR } from "@/core/lib/runtime-paths";
+import { manifestHash } from "@/core/lib/module-install-audit";
+import { syncModuleTranslations } from "@/core/lib/i18n/translation-service";
 
 /**
  * First-run setup API.
@@ -214,16 +216,27 @@ export async function POST(request: NextRequest) {
             // something it depends on.
             for (const moduleId of plan.order) {
                 try {
-                    await installModuleFromLocalMarketplace(moduleId);
+                    const manifest = await installModuleFromLocalMarketplace(moduleId);
+                    const hash = manifestHash(manifest);
                     await prisma.moduleConfig.upsert({
                         where: { id: moduleId },
-                        update: { enabled: true },
+                        update: { enabled: true, name: manifest.name, manifestHash: hash },
                         create: {
                             id: moduleId,
-                            name: moduleId,
+                            name: manifest.name,
                             enabled: true,
+                            manifestHash: hash,
                         },
                     });
+                    // Module strings live in the Translation table, not in a
+                    // bundled JSON file, so a module installed without this
+                    // step renders its raw keys ("store.title") forever. The
+                    // marketplace installer has always done it; the wizard,
+                    // which is how most installs actually get their modules,
+                    // did not.
+                    if (manifest.translations) {
+                        await syncModuleTranslations(moduleId, manifest.translations);
+                    }
                     const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
                     await doActionAsync(HookNames.MODULE_INSTALLED, { moduleId });
 
@@ -369,11 +382,39 @@ async function loadCatalog(): Promise<CatalogEntry[]> {
 }
 
 /**
+ * The parts of a module manifest this route uses. Modules declare far more
+ * than this; the wizard only needs the display name and the strings.
+ */
+interface LocalModuleManifest {
+    name: string;
+    translations?: Record<string, Record<string, unknown>>;
+    [key: string]: unknown;
+}
+
+/**
+ * Reads and minimally validates `module.json` from an extracted module.
+ */
+async function readLocalManifest(moduleId: string, manifestPath: string): Promise<LocalModuleManifest> {
+    const parsed = JSON.parse(await fs.readFile(manifestPath, "utf-8")) as unknown;
+    if (!parsed || typeof parsed !== "object") {
+        throw new Error("module.json is not an object");
+    }
+    const manifest = parsed as LocalModuleManifest;
+    if (typeof manifest.name !== "string" || manifest.name.length === 0) {
+        manifest.name = moduleId;
+    }
+    return manifest;
+}
+
+/**
  * Extracts a marketplace ZIP that already ships with the platform into
  * `src/modules/[id]/`. Uses the same validation rules as the full marketplace
  * installer but skips the GitHub download since we're using local files.
+ *
+ * Returns the module's manifest so the caller can record its name and hash and
+ * load its translations.
  */
-async function installModuleFromLocalMarketplace(moduleId: string): Promise<void> {
+async function installModuleFromLocalMarketplace(moduleId: string): Promise<LocalModuleManifest> {
     if (!/^[a-z0-9-]+$/.test(moduleId)) {
         throw new Error("Invalid module id");
     }
@@ -393,8 +434,9 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<void
         .then(() => true)
         .catch(() => false);
     if (targetExists) {
-        // Already extracted - nothing to do beyond enabling.
-        return;
+        // Already extracted - nothing to unpack, but the caller still needs
+        // the manifest to register the module and load its strings.
+        return readLocalManifest(moduleId, path.join(targetDir, "module.json"));
     }
 
     const buffer = await fs.readFile(zipPath);
@@ -430,5 +472,13 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<void
     if (!hasManifest) {
         await fs.rm(targetDir, { recursive: true, force: true });
         throw new Error("Extracted module missing module.json");
+    }
+
+    try {
+        return await readLocalManifest(moduleId, manifestPath);
+    } catch (err) {
+        // A manifest we cannot parse is not something to install half of.
+        await fs.rm(targetDir, { recursive: true, force: true });
+        throw new Error(`Unreadable module.json: ${err instanceof Error ? err.message : String(err)}`);
     }
 }

@@ -50,13 +50,29 @@ vi.mock("@/core/lib/db", () => {
 });
 
 vi.mock("@/core/lib/setup-state", () => ({ markSetupComplete: () => {} }));
+
+const syncTranslations = vi.fn(async (..._args: unknown[]) => {});
+vi.mock("@/core/lib/i18n/translation-service", () => ({
+    syncModuleTranslations: (...a: unknown[]) => syncTranslations(...a),
+}));
 vi.mock("@/core/lib/module-cache", () => ({ invalidateModuleCache: async () => {} }));
 
 // A minimal in-memory filesystem: the catalog reads real JSON, every ZIP
 // "exists" and is a valid-looking archive, and writes go nowhere.
 vi.mock("fs/promises", () => {
     const readFile = async (p: string) => {
-        if (String(p).endsWith("index.json")) return JSON.stringify(CATALOG);
+        const target = String(p);
+        if (target.endsWith("index.json")) return JSON.stringify(CATALOG);
+        // The route reads each extracted manifest for the module's name and
+        // its translations.
+        if (target.endsWith("module.json")) {
+            const id = target.split("/").slice(-2)[0];
+            return JSON.stringify({
+                id,
+                name: `${id} module`,
+                translations: { en: { [id]: { title: id } } },
+            });
+        }
         // Minimal local ZIP header so the route's magic-byte check passes.
         return Buffer.from([0x50, 0x4b, 0x03, 0x04, ...new Array(64).fill(0)]);
     };
@@ -138,6 +154,7 @@ beforeEach(() => {
     userCount = 0;
     execCalls.length = 0;
     moduleConfigUpsert.mockClear();
+    syncTranslations.mockClear();
     settingUpsert.mockClear();
     activityCreate.mockClear();
 });
@@ -179,6 +196,22 @@ describe("/api/setup - install planning", () => {
         const migrationCalls = execCalls.filter((c) => c.includes("apply-migrations"));
         expect(migrationCalls.some((c) => c.includes("--module=currency"))).toBe(true);
         expect(migrationCalls.some((c) => c.includes("--module=store"))).toBe(true);
+    });
+
+    it("loads each installed module's translations", async () => {
+        // Without this the UI renders raw keys ("store.title") for every
+        // module the wizard installed - module strings are database rows,
+        // not bundled JSON.
+        await post(["store"]);
+        const synced = syncTranslations.mock.calls.map((c) => c[0]);
+        expect(synced).toEqual(["currency", "store"]);
+        expect(syncTranslations.mock.calls[1][1]).toEqual({ en: { store: { title: "store" } } });
+    });
+
+    it("records each module's declared name, not just its id", async () => {
+        await post(["currency"]);
+        const created = (moduleConfigUpsert.mock.calls[0][0] as { create: { name: string } }).create;
+        expect(created.name).toBe("currency module");
     });
 
     it("regenerates the registry once modules are installed", async () => {
