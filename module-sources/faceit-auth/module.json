@@ -1,0 +1,302 @@
+{
+  "id": "faceit-auth",
+  "name": "FACEIT Login",
+  "description": "Allow users to sign in with their FACEIT account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Swords",
+  "adminRoutes": [
+    {
+      "path": "/settings/faceit-auth",
+      "component": "pages/admin/settings/faceit-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "FACEIT OAuth",
+      "description": "FACEIT application credentials.",
+      "href": "/settings/faceit-auth",
+      "icon": "Swords",
+      "color": "text-orange-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "faceit",
+      "envIdVar": "AUTH_FACEIT_ID",
+      "envSecretVar": "AUTH_FACEIT_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "faceit-login",
+      "provider": "faceit",
+      "label": "FACEIT",
+      "color": "#FF5500",
+      "svgIcon": "M23.999 2.705a.167.167 0 00-.312-.1 1141.27 1141.27 0 00-6.053 9.375H.218c-.221 0-.301.282-.11.352 7.227 2.73 17.667 6.836 23.5 9.134.15.06.39-.08.39-.18z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "faceitAuth": {
+        "title": "FACEIT Login",
+        "settings": "FACEIT OAuth Settings",
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter FACEIT application Client ID",
+        "clientSecret": "Client Secret",
+        "clientSecretPlaceholder": "Enter FACEIT application Client Secret",
+        "redirectUri": "Redirect URI",
+        "redirectUriHelp": "Add this URL to your FACEIT application's redirect URIs",
+        "enabled": "FACEIT Login Enabled",
+        "disabled": "FACEIT Login Disabled",
+        "enable": "Enable FACEIT Login",
+        "save": "Save Settings",
+        "saved": "FACEIT OAuth settings saved successfully",
+        "saveError": "Failed to save FACEIT OAuth settings",
+        "signInWith": "Sign in with FACEIT",
+        "linkAccount": "Link FACEIT Account",
+        "unlinkAccount": "Unlink FACEIT Account",
+        "accountLinked": "FACEIT account linked successfully",
+        "accountUnlinked": "FACEIT account unlinked successfully",
+        "linkError": "Failed to link FACEIT account",
+        "description": "Configure FACEIT OAuth credentials for user login",
+        "adm_title": "FACEIT Auth Settings",
+        "adm_subtitle": "Configure FACEIT OAuth2 login for your site",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "Your FACEIT application's Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "Your FACEIT application's Client Secret",
+        "adm_field3Label": "Redirect URI",
+        "adm_field3Desc": "OAuth2 callback URL (must match FACEIT app settings)"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "faceitAuth": {
+        "title": "FACEIT ile Giriş",
+        "settings": "FACEIT OAuth Ayarları",
+        "clientId": "Istemci Kimligi",
+        "clientIdPlaceholder": "FACEIT uygulama Istemci Kimligini girin",
+        "clientSecret": "Istemci Şifresi",
+        "clientSecretPlaceholder": "FACEIT uygulama Istemci Şifresini girin",
+        "redirectUri": "Yonlendirme URI'si",
+        "redirectUriHelp": "Bu URL'yi FACEIT uygulamanizin yonlendirme URI'lerine ekleyin",
+        "enabled": "FACEIT ile Giriş Etkin",
+        "disabled": "FACEIT ile Giriş Devre Disi",
+        "enable": "FACEIT ile Girişi Etkinlestir",
+        "save": "Ayarları Kaydet",
+        "saved": "FACEIT OAuth ayarlari basariyla kaydedildi",
+        "saveError": "FACEIT OAuth ayarlari kaydedilemedi",
+        "signInWith": "FACEIT ile giriş yap",
+        "linkAccount": "FACEIT Hesabini Bagla",
+        "unlinkAccount": "FACEIT Hesabini Ayir",
+        "accountLinked": "FACEIT hesabi basariyla baglandi",
+        "accountUnlinked": "FACEIT hesabi basariyla ayrildi",
+        "linkError": "FACEIT hesabi baglanamadi",
+        "description": "Kullanıcı girişi icin FACEIT OAuth kimlik bilgilerini yapilandirin",
+        "adm_title": "FACEIT Kimlik Doğrulama Ayarları",
+        "adm_subtitle": "Siteniz için FACEIT OAuth2 girişini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "FACEIT uygulamanızın İstemci Kimliği",
+        "adm_field2Label": "İstemci Gizli Anahtarı",
+        "adm_field2Desc": "FACEIT uygulamanızın Gizli Anahtarı",
+        "adm_field3Label": "Yönlendirme URI",
+        "adm_field3Desc": "OAuth2 geri çağırma URL'si (FACEIT uygulama ayarlarıyla eşleşmelidir)"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "faceitAuth": {
+        "title": "FACEIT-Anmeldung",
+        "settings": "FACEIT OAuth-Einstellungen",
+        "clientId": "Client-ID",
+        "clientIdPlaceholder": "FACEIT-Anwendungs-Client-ID eingeben",
+        "clientSecret": "Client-Geheimnis",
+        "clientSecretPlaceholder": "FACEIT-Anwendungs-Client-Geheimnis eingeben",
+        "redirectUri": "Weiterleitungs-URI",
+        "redirectUriHelp": "Fuegen Sie diese URL zu den Weiterleitungs-URIs Ihrer FACEIT-Anwendung hinzu",
+        "enabled": "FACEIT-Anmeldung aktiviert",
+        "disabled": "FACEIT-Anmeldung deaktiviert",
+        "enable": "FACEIT-Anmeldung aktivieren",
+        "save": "Einstellungen speichern",
+        "saved": "FACEIT OAuth-Einstellungen erfolgreich gespeichert",
+        "saveError": "FACEIT OAuth-Einstellungen konnten nicht gespeichert werden",
+        "signInWith": "Mit FACEIT anmelden",
+        "linkAccount": "FACEIT-Konto verknuepfen",
+        "unlinkAccount": "FACEIT-Konto trennen",
+        "accountLinked": "FACEIT-Konto erfolgreich verknuepft",
+        "accountUnlinked": "FACEIT-Konto erfolgreich getrennt",
+        "linkError": "FACEIT-Konto konnte nicht verknuepft werden",
+        "description": "FACEIT OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
+        "adm_title": "FACEIT-Auth-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie FACEIT OAuth2-Login für Ihre Website",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "Die Client-ID Ihrer FACEIT-Anwendung",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "Das Client-Secret Ihrer FACEIT-Anwendung",
+        "adm_field3Label": "Redirect-URI",
+        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den FACEIT-App-Einstellungen übereinstimmen)"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "faceitAuth": {
+        "title": "Inicio de sesion con FACEIT",
+        "settings": "Configuracion de FACEIT OAuth",
+        "clientId": "ID de cliente",
+        "clientIdPlaceholder": "Ingrese el ID de cliente de la aplicacion FACEIT",
+        "clientSecret": "Secreto de cliente",
+        "clientSecretPlaceholder": "Ingrese el secreto de cliente de la aplicacion FACEIT",
+        "redirectUri": "URI de redireccion",
+        "redirectUriHelp": "Agregue esta URL a las URIs de redireccion de su aplicacion FACEIT",
+        "enabled": "Inicio de sesion con FACEIT habilitado",
+        "disabled": "Inicio de sesion con FACEIT deshabilitado",
+        "enable": "Habilitar inicio de sesion con FACEIT",
+        "save": "Guardar configuracion",
+        "saved": "Configuracion de FACEIT OAuth guardada correctamente",
+        "saveError": "Error al guardar la configuracion de FACEIT OAuth",
+        "signInWith": "Iniciar sesion con FACEIT",
+        "linkAccount": "Vincular cuenta de FACEIT",
+        "unlinkAccount": "Desvincular cuenta de FACEIT",
+        "accountLinked": "Cuenta de FACEIT vinculada correctamente",
+        "accountUnlinked": "Cuenta de FACEIT desvinculada correctamente",
+        "linkError": "Error al vincular la cuenta de FACEIT",
+        "description": "Configurar credenciales de FACEIT OAuth para inicio de sesion",
+        "adm_title": "Configuración de auth FACEIT",
+        "adm_subtitle": "Configura el inicio de sesión FACEIT OAuth2 para tu sitio",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "El ID de cliente de tu aplicación FACEIT",
+        "adm_field2Label": "Secreto de Cliente",
+        "adm_field2Desc": "El secreto de cliente de tu aplicación FACEIT",
+        "adm_field3Label": "URI de redirección",
+        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app FACEIT)"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "faceitAuth": {
+        "title": "Connexion FACEIT",
+        "settings": "Parametres FACEIT OAuth",
+        "clientId": "ID client",
+        "clientIdPlaceholder": "Saisissez l'ID client de l'application FACEIT",
+        "clientSecret": "Secret client",
+        "clientSecretPlaceholder": "Saisissez le secret client de l'application FACEIT",
+        "redirectUri": "URI de redirection",
+        "redirectUriHelp": "Ajoutez cette URL aux URIs de redirection de votre application FACEIT",
+        "enabled": "Connexion FACEIT activee",
+        "disabled": "Connexion FACEIT desactivee",
+        "enable": "Activer la connexion FACEIT",
+        "save": "Enregistrer les parametres",
+        "saved": "Parametres FACEIT OAuth enregistres avec succes",
+        "saveError": "Echec de l'enregistrement des parametres FACEIT OAuth",
+        "signInWith": "Se connecter avec FACEIT",
+        "linkAccount": "Lier le compte FACEIT",
+        "unlinkAccount": "Delier le compte FACEIT",
+        "accountLinked": "Compte FACEIT lie avec succes",
+        "accountUnlinked": "Compte FACEIT delie avec succes",
+        "linkError": "Echec de la liaison du compte FACEIT",
+        "description": "Configurer les identifiants FACEIT OAuth pour la connexion",
+        "adm_title": "Paramètres d'auth FACEIT",
+        "adm_subtitle": "Configurez la connexion FACEIT OAuth2 pour votre site",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "L'ID client de votre application FACEIT",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Le secret client de votre application FACEIT",
+        "adm_field3Label": "URI de redirection",
+        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app FACEIT)"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "faceitAuth": {
+        "title": "Вход через FACEIT",
+        "settings": "Настройки FACEIT OAuth",
+        "clientId": "ID клиента",
+        "clientIdPlaceholder": "Введите ID клиента приложения FACEIT",
+        "clientSecret": "Секрет клиента",
+        "clientSecretPlaceholder": "Введите секрет клиента приложения FACEIT",
+        "redirectUri": "URI перенаправления",
+        "redirectUriHelp": "Добавьте этот URL в URI перенаправления вашего приложения FACEIT",
+        "enabled": "Вход через FACEIT включен",
+        "disabled": "Вход через FACEIT отключен",
+        "enable": "Включить вход через FACEIT",
+        "save": "Сохранить настройки",
+        "saved": "Настройки FACEIT OAuth успешно сохранены",
+        "saveError": "Не удалось сохранить настройки FACEIT OAuth",
+        "signInWith": "Войти через FACEIT",
+        "linkAccount": "Привязать аккаунт FACEIT",
+        "unlinkAccount": "Отвязать аккаунт FACEIT",
+        "accountLinked": "Аккаунт FACEIT успешно привязан",
+        "accountUnlinked": "Аккаунт FACEIT успешно отвязан",
+        "linkError": "Не удалось привязать аккаунт FACEIT",
+        "description": "Настроить учетные данные FACEIT OAuth для входа пользователей",
+        "adm_title": "Настройки авторизации FACEIT",
+        "adm_subtitle": "Настройте вход FACEIT OAuth2 для вашего сайта",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента вашего приложения FACEIT",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента вашего приложения FACEIT",
+        "adm_field3Label": "URI перенаправления",
+        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения FACEIT)"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "faceitAuth": {
+        "title": "Login com FACEIT",
+        "settings": "Configuracoes do FACEIT OAuth",
+        "clientId": "ID do cliente",
+        "clientIdPlaceholder": "Insira o ID do cliente do aplicativo FACEIT",
+        "clientSecret": "Segredo do cliente",
+        "clientSecretPlaceholder": "Insira o segredo do cliente do aplicativo FACEIT",
+        "redirectUri": "URI de redirecionamento",
+        "redirectUriHelp": "Adicione esta URL aos URIs de redirecionamento do seu aplicativo FACEIT",
+        "enabled": "Login com FACEIT ativado",
+        "disabled": "Login com FACEIT desativado",
+        "enable": "Ativar login com FACEIT",
+        "save": "Salvar configuracoes",
+        "saved": "Configuracoes do FACEIT OAuth salvas com sucesso",
+        "saveError": "Falha ao salvar configuracoes do FACEIT OAuth",
+        "signInWith": "Entrar com FACEIT",
+        "linkAccount": "Vincular conta do FACEIT",
+        "unlinkAccount": "Desvincular conta do FACEIT",
+        "accountLinked": "Conta do FACEIT vinculada com sucesso",
+        "accountUnlinked": "Conta do FACEIT desvinculada com sucesso",
+        "linkError": "Falha ao vincular conta do FACEIT",
+        "description": "Configurar credenciais do FACEIT OAuth para login de usuarios",
+        "adm_title": "Configurações de auth FACEIT",
+        "adm_subtitle": "Configure o login FACEIT OAuth2 para o seu site",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "O ID do cliente do seu aplicativo FACEIT",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "O segredo do cliente do seu aplicativo FACEIT",
+        "adm_field3Label": "URI de redirecionamento",
+        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app FACEIT)"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}

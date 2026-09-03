@@ -1,0 +1,302 @@
+{
+  "id": "github-auth",
+  "name": "GitHub Login",
+  "description": "Allow users to sign in with their GitHub account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Code2",
+  "adminRoutes": [
+    {
+      "path": "/settings/github-auth",
+      "component": "pages/admin/settings/github-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "GitHub OAuth",
+      "description": "GitHub application credentials.",
+      "href": "/settings/github-auth",
+      "icon": "Code2",
+      "color": "text-foreground"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "github",
+      "envIdVar": "AUTH_GITHUB_ID",
+      "envSecretVar": "AUTH_GITHUB_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "github-login",
+      "provider": "github",
+      "label": "GitHub",
+      "color": "currentColor",
+      "svgIcon": "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+    }
+  ],
+  "translations": {
+    "en": {
+      "githubAuth": {
+        "title": "GitHub Login",
+        "settings": "GitHub OAuth Settings",
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter GitHub application Client ID",
+        "clientSecret": "Client Secret",
+        "clientSecretPlaceholder": "Enter GitHub application Client Secret",
+        "redirectUri": "Redirect URI",
+        "redirectUriHelp": "Add this URL to your GitHub application's redirect URIs",
+        "enabled": "GitHub Login Enabled",
+        "disabled": "GitHub Login Disabled",
+        "enable": "Enable GitHub Login",
+        "save": "Save Settings",
+        "saved": "GitHub OAuth settings saved successfully",
+        "saveError": "Failed to save GitHub OAuth settings",
+        "signInWith": "Sign in with GitHub",
+        "linkAccount": "Link GitHub Account",
+        "unlinkAccount": "Unlink GitHub Account",
+        "accountLinked": "GitHub account linked successfully",
+        "accountUnlinked": "GitHub account unlinked successfully",
+        "linkError": "Failed to link GitHub account",
+        "description": "Configure GitHub OAuth credentials for user login",
+        "adm_title": "GitHub Auth Settings",
+        "adm_subtitle": "Configure GitHub OAuth2 login for your site",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "Your GitHub application's Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "Your GitHub application's Client Secret",
+        "adm_field3Label": "Redirect URI",
+        "adm_field3Desc": "OAuth2 callback URL (must match GitHub app settings)"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "githubAuth": {
+        "title": "GitHub ile Giriş",
+        "settings": "GitHub OAuth Ayarları",
+        "clientId": "Istemci Kimligi",
+        "clientIdPlaceholder": "GitHub uygulama Istemci Kimligini girin",
+        "clientSecret": "Istemci Şifresi",
+        "clientSecretPlaceholder": "GitHub uygulama Istemci Şifresini girin",
+        "redirectUri": "Yonlendirme URI'si",
+        "redirectUriHelp": "Bu URL'yi GitHub uygulamanizin yonlendirme URI'lerine ekleyin",
+        "enabled": "GitHub ile Giriş Etkin",
+        "disabled": "GitHub ile Giriş Devre Disi",
+        "enable": "GitHub ile Girişi Etkinlestir",
+        "save": "Ayarları Kaydet",
+        "saved": "GitHub OAuth ayarlari basariyla kaydedildi",
+        "saveError": "GitHub OAuth ayarlari kaydedilemedi",
+        "signInWith": "GitHub ile giriş yap",
+        "linkAccount": "GitHub Hesabini Bagla",
+        "unlinkAccount": "GitHub Hesabini Ayir",
+        "accountLinked": "GitHub hesabi basariyla baglandi",
+        "accountUnlinked": "GitHub hesabi basariyla ayrildi",
+        "linkError": "GitHub hesabi baglanamadi",
+        "description": "Kullanıcı girişi icin GitHub OAuth kimlik bilgilerini yapilandirin",
+        "adm_title": "GitHub Kimlik Doğrulama Ayarları",
+        "adm_subtitle": "Siteniz için GitHub OAuth2 girişini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "GitHub uygulamanızın İstemci Kimliği",
+        "adm_field2Label": "İstemci Gizli Anahtarı",
+        "adm_field2Desc": "GitHub uygulamanızın Gizli Anahtarı",
+        "adm_field3Label": "Yönlendirme URI",
+        "adm_field3Desc": "OAuth2 geri çağırma URL'si (GitHub uygulama ayarlarıyla eşleşmelidir)"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "githubAuth": {
+        "title": "GitHub-Anmeldung",
+        "settings": "GitHub OAuth-Einstellungen",
+        "clientId": "Client-ID",
+        "clientIdPlaceholder": "GitHub-Anwendungs-Client-ID eingeben",
+        "clientSecret": "Client-Geheimnis",
+        "clientSecretPlaceholder": "GitHub-Anwendungs-Client-Geheimnis eingeben",
+        "redirectUri": "Weiterleitungs-URI",
+        "redirectUriHelp": "Fuegen Sie diese URL zu den Weiterleitungs-URIs Ihrer GitHub-Anwendung hinzu",
+        "enabled": "GitHub-Anmeldung aktiviert",
+        "disabled": "GitHub-Anmeldung deaktiviert",
+        "enable": "GitHub-Anmeldung aktivieren",
+        "save": "Einstellungen speichern",
+        "saved": "GitHub OAuth-Einstellungen erfolgreich gespeichert",
+        "saveError": "GitHub OAuth-Einstellungen konnten nicht gespeichert werden",
+        "signInWith": "Mit GitHub anmelden",
+        "linkAccount": "GitHub-Konto verknuepfen",
+        "unlinkAccount": "GitHub-Konto trennen",
+        "accountLinked": "GitHub-Konto erfolgreich verknuepft",
+        "accountUnlinked": "GitHub-Konto erfolgreich getrennt",
+        "linkError": "GitHub-Konto konnte nicht verknuepft werden",
+        "description": "GitHub OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
+        "adm_title": "GitHub-Auth-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie GitHub OAuth2-Login für Ihre Website",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "Die Client-ID Ihrer GitHub-Anwendung",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "Das Client-Secret Ihrer GitHub-Anwendung",
+        "adm_field3Label": "Redirect-URI",
+        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den GitHub-App-Einstellungen übereinstimmen)"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "githubAuth": {
+        "title": "Inicio de sesion con GitHub",
+        "settings": "Configuracion de GitHub OAuth",
+        "clientId": "ID de cliente",
+        "clientIdPlaceholder": "Ingrese el ID de cliente de la aplicacion GitHub",
+        "clientSecret": "Secreto de cliente",
+        "clientSecretPlaceholder": "Ingrese el secreto de cliente de la aplicacion GitHub",
+        "redirectUri": "URI de redireccion",
+        "redirectUriHelp": "Agregue esta URL a las URIs de redireccion de su aplicacion GitHub",
+        "enabled": "Inicio de sesion con GitHub habilitado",
+        "disabled": "Inicio de sesion con GitHub deshabilitado",
+        "enable": "Habilitar inicio de sesion con GitHub",
+        "save": "Guardar configuracion",
+        "saved": "Configuracion de GitHub OAuth guardada correctamente",
+        "saveError": "Error al guardar la configuracion de GitHub OAuth",
+        "signInWith": "Iniciar sesion con GitHub",
+        "linkAccount": "Vincular cuenta de GitHub",
+        "unlinkAccount": "Desvincular cuenta de GitHub",
+        "accountLinked": "Cuenta de GitHub vinculada correctamente",
+        "accountUnlinked": "Cuenta de GitHub desvinculada correctamente",
+        "linkError": "Error al vincular la cuenta de GitHub",
+        "description": "Configurar credenciales de GitHub OAuth para inicio de sesion",
+        "adm_title": "Configuración de auth GitHub",
+        "adm_subtitle": "Configura el inicio de sesión GitHub OAuth2 para tu sitio",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "El ID de cliente de tu aplicación GitHub",
+        "adm_field2Label": "Secreto de Cliente",
+        "adm_field2Desc": "El secreto de cliente de tu aplicación GitHub",
+        "adm_field3Label": "URI de redirección",
+        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app GitHub)"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "githubAuth": {
+        "title": "Connexion GitHub",
+        "settings": "Parametres GitHub OAuth",
+        "clientId": "ID client",
+        "clientIdPlaceholder": "Saisissez l'ID client de l'application GitHub",
+        "clientSecret": "Secret client",
+        "clientSecretPlaceholder": "Saisissez le secret client de l'application GitHub",
+        "redirectUri": "URI de redirection",
+        "redirectUriHelp": "Ajoutez cette URL aux URIs de redirection de votre application GitHub",
+        "enabled": "Connexion GitHub activee",
+        "disabled": "Connexion GitHub desactivee",
+        "enable": "Activer la connexion GitHub",
+        "save": "Enregistrer les parametres",
+        "saved": "Parametres GitHub OAuth enregistres avec succes",
+        "saveError": "Echec de l'enregistrement des parametres GitHub OAuth",
+        "signInWith": "Se connecter avec GitHub",
+        "linkAccount": "Lier le compte GitHub",
+        "unlinkAccount": "Delier le compte GitHub",
+        "accountLinked": "Compte GitHub lie avec succes",
+        "accountUnlinked": "Compte GitHub delie avec succes",
+        "linkError": "Echec de la liaison du compte GitHub",
+        "description": "Configurer les identifiants GitHub OAuth pour la connexion",
+        "adm_title": "Paramètres d'auth GitHub",
+        "adm_subtitle": "Configurez la connexion GitHub OAuth2 pour votre site",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "L'ID client de votre application GitHub",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Le secret client de votre application GitHub",
+        "adm_field3Label": "URI de redirection",
+        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app GitHub)"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "githubAuth": {
+        "title": "Вход через GitHub",
+        "settings": "Настройки GitHub OAuth",
+        "clientId": "ID клиента",
+        "clientIdPlaceholder": "Введите ID клиента приложения GitHub",
+        "clientSecret": "Секрет клиента",
+        "clientSecretPlaceholder": "Введите секрет клиента приложения GitHub",
+        "redirectUri": "URI перенаправления",
+        "redirectUriHelp": "Добавьте этот URL в URI перенаправления вашего приложения GitHub",
+        "enabled": "Вход через GitHub включен",
+        "disabled": "Вход через GitHub отключен",
+        "enable": "Включить вход через GitHub",
+        "save": "Сохранить настройки",
+        "saved": "Настройки GitHub OAuth успешно сохранены",
+        "saveError": "Не удалось сохранить настройки GitHub OAuth",
+        "signInWith": "Войти через GitHub",
+        "linkAccount": "Привязать аккаунт GitHub",
+        "unlinkAccount": "Отвязать аккаунт GitHub",
+        "accountLinked": "Аккаунт GitHub успешно привязан",
+        "accountUnlinked": "Аккаунт GitHub успешно отвязан",
+        "linkError": "Не удалось привязать аккаунт GitHub",
+        "description": "Настроить учетные данные GitHub OAuth для входа пользователей",
+        "adm_title": "Настройки авторизации GitHub",
+        "adm_subtitle": "Настройте вход GitHub OAuth2 для вашего сайта",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента вашего приложения GitHub",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента вашего приложения GitHub",
+        "adm_field3Label": "URI перенаправления",
+        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения GitHub)"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "githubAuth": {
+        "title": "Login com GitHub",
+        "settings": "Configuracoes do GitHub OAuth",
+        "clientId": "ID do cliente",
+        "clientIdPlaceholder": "Insira o ID do cliente do aplicativo GitHub",
+        "clientSecret": "Segredo do cliente",
+        "clientSecretPlaceholder": "Insira o segredo do cliente do aplicativo GitHub",
+        "redirectUri": "URI de redirecionamento",
+        "redirectUriHelp": "Adicione esta URL aos URIs de redirecionamento do seu aplicativo GitHub",
+        "enabled": "Login com GitHub ativado",
+        "disabled": "Login com GitHub desativado",
+        "enable": "Ativar login com GitHub",
+        "save": "Salvar configuracoes",
+        "saved": "Configuracoes do GitHub OAuth salvas com sucesso",
+        "saveError": "Falha ao salvar configuracoes do GitHub OAuth",
+        "signInWith": "Entrar com GitHub",
+        "linkAccount": "Vincular conta do GitHub",
+        "unlinkAccount": "Desvincular conta do GitHub",
+        "accountLinked": "Conta do GitHub vinculada com sucesso",
+        "accountUnlinked": "Conta do GitHub desvinculada com sucesso",
+        "linkError": "Falha ao vincular conta do GitHub",
+        "description": "Configurar credenciais do GitHub OAuth para login de usuarios",
+        "adm_title": "Configurações de auth GitHub",
+        "adm_subtitle": "Configure o login GitHub OAuth2 para o seu site",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "O ID do cliente do seu aplicativo GitHub",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "O segredo do cliente do seu aplicativo GitHub",
+        "adm_field3Label": "URI de redirecionamento",
+        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app GitHub)"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}
