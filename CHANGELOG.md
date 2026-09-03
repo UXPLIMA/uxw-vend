@@ -26,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   18KB gzipped), the login page from 108KB to 54KB.
 
 ### Fixed
+- **The sitemap listed four URLs and none of the site's content.** Core routes
+  the home and activity screens; everything a visitor comes for is a module
+  page, and a module reached the sitemap only by declaring a `seo`
+  contributor, which none of the first-party ones do. Every static public page
+  an enabled module routes is published now, dynamic paths still being the
+  module's own to enumerate. The two `/auth` entries are gone: robots.txt
+  disallows that prefix, so the sitemap was submitting URLs it had just asked
+  crawlers to skip. Both files read the same lists now, and a test holds them
+  to it.
 - **Creating a vote site returned 404.** The vote admin page posted to
   `/api/v1/vote`, which no manifest declared; the handler lives at
   `/api/v1/vote/sites`. Four other modules had the same class of break: store,
