@@ -34,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   behind an edit and delete UI. All five bugs above were of a kind no gate
   looked for, which is why they shipped.
 - The page builder's card block declared an icon and never drew it.
+- **Every unknown URL answered 200.** The layout's error boundary caught
+  everything thrown below it, including the `notFound()` and `redirect()`
+  signals Next raises by throwing. The 404 page still appeared, but the status
+  line had already gone out as 200, so search engines indexed every mistyped
+  URL as a real page. Both boundaries now rethrow Next's control-flow errors
+  and keep catching real render failures.
 
 ### Added
 - **Sign in with a username, not only an email.** Registration asks for both
