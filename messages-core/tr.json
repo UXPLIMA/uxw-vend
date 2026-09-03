@@ -1306,5 +1306,19 @@
       "failed": "Kurulamayanlar: {modules}",
       "goAdmin": "Yönetim paneline git"
     }
+  },
+  "authProvider": {
+    "back": "Ayarlara don",
+    "loading": "Yapilandirma kontrol ediliyor...",
+    "statusError": "Giris saglayici durumu okunamadi.",
+    "active": "Bu giris yontemi aktif.",
+    "inactive": "Kurulu ama henuz aktif degil: asagidaki kimlik bilgileri eksik.",
+    "envVarsLabel": "Ortam degiskenleri",
+    "envVarsHelp": "Bunlari .env dosyanizda veya konteyner ortaminizda tanimlayip uygulamayi yeniden baslatin. Giris saglayicilari uygulama acilirken kuruldugu icin buradan kaydedilemez.",
+    "callbackLabel": "Yonlendirme adresi",
+    "callbackHelp": "Saglayiciya tam olarak bu adresi kaydedin. Adres AUTH_URL degiskeninden turetilir, bu yuzden o degiskenin ziyaretcilerin gercekten kullandigi adresle ayni olmasi gerekir.",
+    "consoleHelp": "Uygulamayi su adresten olusturun:",
+    "set": "tanimli",
+    "notSet": "tanimli degil"
   }
 }

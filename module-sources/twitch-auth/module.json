@@ -63,13 +63,7 @@
         "linkError": "Failed to link Twitch account",
         "description": "Configure Twitch OAuth credentials for user login",
         "adm_title": "Twitch Auth Settings",
-        "adm_subtitle": "Configure Twitch OAuth2 login for your site",
-        "adm_field1Label": "Client ID",
-        "adm_field1Desc": "Your Twitch application's Client ID",
-        "adm_field2Label": "Client Secret",
-        "adm_field2Desc": "Your Twitch application's Client Secret",
-        "adm_field3Label": "Redirect URI",
-        "adm_field3Desc": "OAuth2 callback URL (must match Twitch app settings)"
+        "adm_subtitle": "Configure Twitch OAuth2 login for your site"
       },
       "admin": {
         "title": "Admin Panel",
@@ -100,13 +94,7 @@
         "linkError": "Twitch hesabi baglanamadi",
         "description": "Kullanıcı girişi icin Twitch OAuth kimlik bilgilerini yapilandirin",
         "adm_title": "Twitch Kimlik Doğrulama Ayarları",
-        "adm_subtitle": "Siteniz için Twitch OAuth2 girişini yapılandırın",
-        "adm_field1Label": "İstemci Kimliği",
-        "adm_field1Desc": "Twitch uygulamanızın İstemci Kimliği",
-        "adm_field2Label": "İstemci Gizli Anahtarı",
-        "adm_field2Desc": "Twitch uygulamanızın Gizli Anahtarı",
-        "adm_field3Label": "Yönlendirme URI",
-        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Twitch uygulama ayarlarıyla eşleşmelidir)"
+        "adm_subtitle": "Siteniz için Twitch OAuth2 girişini yapılandırın"
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -137,13 +125,7 @@
         "linkError": "Twitch-Konto konnte nicht verknuepft werden",
         "description": "Twitch OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
         "adm_title": "Twitch-Auth-Einstellungen",
-        "adm_subtitle": "Konfigurieren Sie Twitch OAuth2-Login für Ihre Website",
-        "adm_field1Label": "Client-ID",
-        "adm_field1Desc": "Die Client-ID Ihrer Twitch-Anwendung",
-        "adm_field2Label": "Client-Secret",
-        "adm_field2Desc": "Das Client-Secret Ihrer Twitch-Anwendung",
-        "adm_field3Label": "Redirect-URI",
-        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Twitch-App-Einstellungen übereinstimmen)"
+        "adm_subtitle": "Konfigurieren Sie Twitch OAuth2-Login für Ihre Website"
       },
       "admin": {
         "title": "Admin-Panel",
@@ -174,13 +156,7 @@
         "linkError": "Error al vincular la cuenta de Twitch",
         "description": "Configurar credenciales de Twitch OAuth para inicio de sesion",
         "adm_title": "Configuración de auth Twitch",
-        "adm_subtitle": "Configura el inicio de sesión Twitch OAuth2 para tu sitio",
-        "adm_field1Label": "ID de Cliente",
-        "adm_field1Desc": "El ID de cliente de tu aplicación Twitch",
-        "adm_field2Label": "Secreto de Cliente",
-        "adm_field2Desc": "El secreto de cliente de tu aplicación Twitch",
-        "adm_field3Label": "URI de redirección",
-        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app Twitch)"
+        "adm_subtitle": "Configura el inicio de sesión Twitch OAuth2 para tu sitio"
       },
       "admin": {
         "title": "Panel de administración",
@@ -211,13 +187,7 @@
         "linkError": "Echec de la liaison du compte Twitch",
         "description": "Configurer les identifiants Twitch OAuth pour la connexion",
         "adm_title": "Paramètres d'auth Twitch",
-        "adm_subtitle": "Configurez la connexion Twitch OAuth2 pour votre site",
-        "adm_field1Label": "ID Client",
-        "adm_field1Desc": "L'ID client de votre application Twitch",
-        "adm_field2Label": "Secret Client",
-        "adm_field2Desc": "Le secret client de votre application Twitch",
-        "adm_field3Label": "URI de redirection",
-        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app Twitch)"
+        "adm_subtitle": "Configurez la connexion Twitch OAuth2 pour votre site"
       },
       "admin": {
         "title": "Panneau d'administration",
@@ -248,13 +218,7 @@
         "linkError": "Не удалось привязать аккаунт Twitch",
         "description": "Настроить учетные данные Twitch OAuth для входа пользователей",
         "adm_title": "Настройки авторизации Twitch",
-        "adm_subtitle": "Настройте вход Twitch OAuth2 для вашего сайта",
-        "adm_field1Label": "ID клиента",
-        "adm_field1Desc": "ID клиента вашего приложения Twitch",
-        "adm_field2Label": "Секрет клиента",
-        "adm_field2Desc": "Секрет клиента вашего приложения Twitch",
-        "adm_field3Label": "URI перенаправления",
-        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения Twitch)"
+        "adm_subtitle": "Настройте вход Twitch OAuth2 для вашего сайта"
       },
       "admin": {
         "title": "Панель администратора",
@@ -285,13 +249,7 @@
         "linkError": "Falha ao vincular conta do Twitch",
         "description": "Configurar credenciais do Twitch OAuth para login de usuarios",
         "adm_title": "Configurações de auth Twitch",
-        "adm_subtitle": "Configure o login Twitch OAuth2 para o seu site",
-        "adm_field1Label": "ID do Cliente",
-        "adm_field1Desc": "O ID do cliente do seu aplicativo Twitch",
-        "adm_field2Label": "Segredo do Cliente",
-        "adm_field2Desc": "O segredo do cliente do seu aplicativo Twitch",
-        "adm_field3Label": "URI de redirecionamento",
-        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app Twitch)"
+        "adm_subtitle": "Configure o login Twitch OAuth2 para o seu site"
       },
       "admin": {
         "title": "Painel de administração",

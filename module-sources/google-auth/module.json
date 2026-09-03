@@ -63,13 +63,7 @@
         "linkError": "Failed to link Google account",
         "description": "Configure Google OAuth credentials for user login",
         "adm_title": "Google Auth Settings",
-        "adm_subtitle": "Configure Google OAuth2 login for your site",
-        "adm_field1Label": "Client ID",
-        "adm_field1Desc": "Your Google application's Client ID",
-        "adm_field2Label": "Client Secret",
-        "adm_field2Desc": "Your Google application's Client Secret",
-        "adm_field3Label": "Redirect URI",
-        "adm_field3Desc": "OAuth2 callback URL (must match Google Cloud Console settings)"
+        "adm_subtitle": "Configure Google OAuth2 login for your site"
       },
       "admin": {
         "title": "Admin Panel",
@@ -100,13 +94,7 @@
         "linkError": "Google hesabi baglanamadi",
         "description": "Kullanıcı girişi icin Google OAuth kimlik bilgilerini yapilandirin",
         "adm_title": "Google Kimlik Doğrulama Ayarları",
-        "adm_subtitle": "Siteniz için Google OAuth2 girişini yapılandırın",
-        "adm_field1Label": "İstemci Kimliği",
-        "adm_field1Desc": "Google uygulamanızın İstemci Kimliği",
-        "adm_field2Label": "İstemci Gizli Anahtarı",
-        "adm_field2Desc": "Google uygulamanızın Gizli Anahtarı",
-        "adm_field3Label": "Yönlendirme URI",
-        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Google Cloud Console ayarlarıyla eşleşmelidir)"
+        "adm_subtitle": "Siteniz için Google OAuth2 girişini yapılandırın"
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -137,13 +125,7 @@
         "linkError": "Google-Konto konnte nicht verknuepft werden",
         "description": "Google OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
         "adm_title": "Google-Auth-Einstellungen",
-        "adm_subtitle": "Konfigurieren Sie Google OAuth2-Login für Ihre Website",
-        "adm_field1Label": "Client-ID",
-        "adm_field1Desc": "Die Client-ID Ihrer Google-Anwendung",
-        "adm_field2Label": "Client-Secret",
-        "adm_field2Desc": "Das Client-Secret Ihrer Google-Anwendung",
-        "adm_field3Label": "Redirect-URI",
-        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Google Cloud Console-Einstellungen übereinstimmen)"
+        "adm_subtitle": "Konfigurieren Sie Google OAuth2-Login für Ihre Website"
       },
       "admin": {
         "title": "Admin-Panel",
@@ -174,13 +156,7 @@
         "linkError": "Error al vincular la cuenta de Google",
         "description": "Configurar credenciales de Google OAuth para inicio de sesion",
         "adm_title": "Configuración de auth Google",
-        "adm_subtitle": "Configura el inicio de sesión Google OAuth2 para tu sitio",
-        "adm_field1Label": "ID de Cliente",
-        "adm_field1Desc": "El ID de cliente de tu aplicación Google",
-        "adm_field2Label": "Secreto de Cliente",
-        "adm_field2Desc": "El secreto de cliente de tu aplicación Google",
-        "adm_field3Label": "URI de redirección",
-        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de Google Cloud Console)"
+        "adm_subtitle": "Configura el inicio de sesión Google OAuth2 para tu sitio"
       },
       "admin": {
         "title": "Panel de administración",
@@ -211,13 +187,7 @@
         "linkError": "Echec de la liaison du compte Google",
         "description": "Configurer les identifiants Google OAuth pour la connexion",
         "adm_title": "Paramètres d'auth Google",
-        "adm_subtitle": "Configurez la connexion Google OAuth2 pour votre site",
-        "adm_field1Label": "ID Client",
-        "adm_field1Desc": "L'ID client de votre application Google",
-        "adm_field2Label": "Secret Client",
-        "adm_field2Desc": "Le secret client de votre application Google",
-        "adm_field3Label": "URI de redirection",
-        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de Google Cloud Console)"
+        "adm_subtitle": "Configurez la connexion Google OAuth2 pour votre site"
       },
       "admin": {
         "title": "Panneau d'administration",
@@ -248,13 +218,7 @@
         "linkError": "Не удалось привязать аккаунт Google",
         "description": "Настроить учетные данные Google OAuth для входа пользователей",
         "adm_title": "Настройки авторизации Google",
-        "adm_subtitle": "Настройте вход Google OAuth2 для вашего сайта",
-        "adm_field1Label": "ID клиента",
-        "adm_field1Desc": "ID клиента вашего приложения Google",
-        "adm_field2Label": "Секрет клиента",
-        "adm_field2Desc": "Секрет клиента вашего приложения Google",
-        "adm_field3Label": "URI перенаправления",
-        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками Google Cloud Console)"
+        "adm_subtitle": "Настройте вход Google OAuth2 для вашего сайта"
       },
       "admin": {
         "title": "Панель администратора",
@@ -285,13 +249,7 @@
         "linkError": "Falha ao vincular conta do Google",
         "description": "Configurar credenciais do Google OAuth para login de usuarios",
         "adm_title": "Configurações de auth Google",
-        "adm_subtitle": "Configure o login Google OAuth2 para o seu site",
-        "adm_field1Label": "ID do Cliente",
-        "adm_field1Desc": "O ID do cliente do seu aplicativo Google",
-        "adm_field2Label": "Segredo do Cliente",
-        "adm_field2Desc": "O segredo do cliente do seu aplicativo Google",
-        "adm_field3Label": "URI de redirecionamento",
-        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do Google Cloud Console)"
+        "adm_subtitle": "Configure o login Google OAuth2 para o seu site"
       },
       "admin": {
         "title": "Painel de administração",

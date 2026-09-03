@@ -63,13 +63,7 @@
         "linkError": "Failed to link GitHub account",
         "description": "Configure GitHub OAuth credentials for user login",
         "adm_title": "GitHub Auth Settings",
-        "adm_subtitle": "Configure GitHub OAuth2 login for your site",
-        "adm_field1Label": "Client ID",
-        "adm_field1Desc": "Your GitHub application's Client ID",
-        "adm_field2Label": "Client Secret",
-        "adm_field2Desc": "Your GitHub application's Client Secret",
-        "adm_field3Label": "Redirect URI",
-        "adm_field3Desc": "OAuth2 callback URL (must match GitHub app settings)"
+        "adm_subtitle": "Configure GitHub OAuth2 login for your site"
       },
       "admin": {
         "title": "Admin Panel",
@@ -100,13 +94,7 @@
         "linkError": "GitHub hesabi baglanamadi",
         "description": "Kullanıcı girişi icin GitHub OAuth kimlik bilgilerini yapilandirin",
         "adm_title": "GitHub Kimlik Doğrulama Ayarları",
-        "adm_subtitle": "Siteniz için GitHub OAuth2 girişini yapılandırın",
-        "adm_field1Label": "İstemci Kimliği",
-        "adm_field1Desc": "GitHub uygulamanızın İstemci Kimliği",
-        "adm_field2Label": "İstemci Gizli Anahtarı",
-        "adm_field2Desc": "GitHub uygulamanızın Gizli Anahtarı",
-        "adm_field3Label": "Yönlendirme URI",
-        "adm_field3Desc": "OAuth2 geri çağırma URL'si (GitHub uygulama ayarlarıyla eşleşmelidir)"
+        "adm_subtitle": "Siteniz için GitHub OAuth2 girişini yapılandırın"
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -137,13 +125,7 @@
         "linkError": "GitHub-Konto konnte nicht verknuepft werden",
         "description": "GitHub OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
         "adm_title": "GitHub-Auth-Einstellungen",
-        "adm_subtitle": "Konfigurieren Sie GitHub OAuth2-Login für Ihre Website",
-        "adm_field1Label": "Client-ID",
-        "adm_field1Desc": "Die Client-ID Ihrer GitHub-Anwendung",
-        "adm_field2Label": "Client-Secret",
-        "adm_field2Desc": "Das Client-Secret Ihrer GitHub-Anwendung",
-        "adm_field3Label": "Redirect-URI",
-        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den GitHub-App-Einstellungen übereinstimmen)"
+        "adm_subtitle": "Konfigurieren Sie GitHub OAuth2-Login für Ihre Website"
       },
       "admin": {
         "title": "Admin-Panel",
@@ -174,13 +156,7 @@
         "linkError": "Error al vincular la cuenta de GitHub",
         "description": "Configurar credenciales de GitHub OAuth para inicio de sesion",
         "adm_title": "Configuración de auth GitHub",
-        "adm_subtitle": "Configura el inicio de sesión GitHub OAuth2 para tu sitio",
-        "adm_field1Label": "ID de Cliente",
-        "adm_field1Desc": "El ID de cliente de tu aplicación GitHub",
-        "adm_field2Label": "Secreto de Cliente",
-        "adm_field2Desc": "El secreto de cliente de tu aplicación GitHub",
-        "adm_field3Label": "URI de redirección",
-        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app GitHub)"
+        "adm_subtitle": "Configura el inicio de sesión GitHub OAuth2 para tu sitio"
       },
       "admin": {
         "title": "Panel de administración",
@@ -211,13 +187,7 @@
         "linkError": "Echec de la liaison du compte GitHub",
         "description": "Configurer les identifiants GitHub OAuth pour la connexion",
         "adm_title": "Paramètres d'auth GitHub",
-        "adm_subtitle": "Configurez la connexion GitHub OAuth2 pour votre site",
-        "adm_field1Label": "ID Client",
-        "adm_field1Desc": "L'ID client de votre application GitHub",
-        "adm_field2Label": "Secret Client",
-        "adm_field2Desc": "Le secret client de votre application GitHub",
-        "adm_field3Label": "URI de redirection",
-        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app GitHub)"
+        "adm_subtitle": "Configurez la connexion GitHub OAuth2 pour votre site"
       },
       "admin": {
         "title": "Panneau d'administration",
@@ -248,13 +218,7 @@
         "linkError": "Не удалось привязать аккаунт GitHub",
         "description": "Настроить учетные данные GitHub OAuth для входа пользователей",
         "adm_title": "Настройки авторизации GitHub",
-        "adm_subtitle": "Настройте вход GitHub OAuth2 для вашего сайта",
-        "adm_field1Label": "ID клиента",
-        "adm_field1Desc": "ID клиента вашего приложения GitHub",
-        "adm_field2Label": "Секрет клиента",
-        "adm_field2Desc": "Секрет клиента вашего приложения GitHub",
-        "adm_field3Label": "URI перенаправления",
-        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения GitHub)"
+        "adm_subtitle": "Настройте вход GitHub OAuth2 для вашего сайта"
       },
       "admin": {
         "title": "Панель администратора",
@@ -285,13 +249,7 @@
         "linkError": "Falha ao vincular conta do GitHub",
         "description": "Configurar credenciais do GitHub OAuth para login de usuarios",
         "adm_title": "Configurações de auth GitHub",
-        "adm_subtitle": "Configure o login GitHub OAuth2 para o seu site",
-        "adm_field1Label": "ID do Cliente",
-        "adm_field1Desc": "O ID do cliente do seu aplicativo GitHub",
-        "adm_field2Label": "Segredo do Cliente",
-        "adm_field2Desc": "O segredo do cliente do seu aplicativo GitHub",
-        "adm_field3Label": "URI de redirecionamento",
-        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app GitHub)"
+        "adm_subtitle": "Configure o login GitHub OAuth2 para o seu site"
       },
       "admin": {
         "title": "Painel de administração",
