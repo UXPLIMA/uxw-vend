@@ -63,13 +63,7 @@
         "linkError": "Failed to link FACEIT account",
         "description": "Configure FACEIT OAuth credentials for user login",
         "adm_title": "FACEIT Auth Settings",
-        "adm_subtitle": "Configure FACEIT OAuth2 login for your site",
-        "adm_field1Label": "Client ID",
-        "adm_field1Desc": "Your FACEIT application's Client ID",
-        "adm_field2Label": "Client Secret",
-        "adm_field2Desc": "Your FACEIT application's Client Secret",
-        "adm_field3Label": "Redirect URI",
-        "adm_field3Desc": "OAuth2 callback URL (must match FACEIT app settings)"
+        "adm_subtitle": "Configure FACEIT OAuth2 login for your site"
       },
       "admin": {
         "title": "Admin Panel",
@@ -100,13 +94,7 @@
         "linkError": "FACEIT hesabi baglanamadi",
         "description": "Kullanıcı girişi icin FACEIT OAuth kimlik bilgilerini yapilandirin",
         "adm_title": "FACEIT Kimlik Doğrulama Ayarları",
-        "adm_subtitle": "Siteniz için FACEIT OAuth2 girişini yapılandırın",
-        "adm_field1Label": "İstemci Kimliği",
-        "adm_field1Desc": "FACEIT uygulamanızın İstemci Kimliği",
-        "adm_field2Label": "İstemci Gizli Anahtarı",
-        "adm_field2Desc": "FACEIT uygulamanızın Gizli Anahtarı",
-        "adm_field3Label": "Yönlendirme URI",
-        "adm_field3Desc": "OAuth2 geri çağırma URL'si (FACEIT uygulama ayarlarıyla eşleşmelidir)"
+        "adm_subtitle": "Siteniz için FACEIT OAuth2 girişini yapılandırın"
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -137,13 +125,7 @@
         "linkError": "FACEIT-Konto konnte nicht verknuepft werden",
         "description": "FACEIT OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
         "adm_title": "FACEIT-Auth-Einstellungen",
-        "adm_subtitle": "Konfigurieren Sie FACEIT OAuth2-Login für Ihre Website",
-        "adm_field1Label": "Client-ID",
-        "adm_field1Desc": "Die Client-ID Ihrer FACEIT-Anwendung",
-        "adm_field2Label": "Client-Secret",
-        "adm_field2Desc": "Das Client-Secret Ihrer FACEIT-Anwendung",
-        "adm_field3Label": "Redirect-URI",
-        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den FACEIT-App-Einstellungen übereinstimmen)"
+        "adm_subtitle": "Konfigurieren Sie FACEIT OAuth2-Login für Ihre Website"
       },
       "admin": {
         "title": "Admin-Panel",
@@ -174,13 +156,7 @@
         "linkError": "Error al vincular la cuenta de FACEIT",
         "description": "Configurar credenciales de FACEIT OAuth para inicio de sesion",
         "adm_title": "Configuración de auth FACEIT",
-        "adm_subtitle": "Configura el inicio de sesión FACEIT OAuth2 para tu sitio",
-        "adm_field1Label": "ID de Cliente",
-        "adm_field1Desc": "El ID de cliente de tu aplicación FACEIT",
-        "adm_field2Label": "Secreto de Cliente",
-        "adm_field2Desc": "El secreto de cliente de tu aplicación FACEIT",
-        "adm_field3Label": "URI de redirección",
-        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app FACEIT)"
+        "adm_subtitle": "Configura el inicio de sesión FACEIT OAuth2 para tu sitio"
       },
       "admin": {
         "title": "Panel de administración",
@@ -211,13 +187,7 @@
         "linkError": "Echec de la liaison du compte FACEIT",
         "description": "Configurer les identifiants FACEIT OAuth pour la connexion",
         "adm_title": "Paramètres d'auth FACEIT",
-        "adm_subtitle": "Configurez la connexion FACEIT OAuth2 pour votre site",
-        "adm_field1Label": "ID Client",
-        "adm_field1Desc": "L'ID client de votre application FACEIT",
-        "adm_field2Label": "Secret Client",
-        "adm_field2Desc": "Le secret client de votre application FACEIT",
-        "adm_field3Label": "URI de redirection",
-        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app FACEIT)"
+        "adm_subtitle": "Configurez la connexion FACEIT OAuth2 pour votre site"
       },
       "admin": {
         "title": "Panneau d'administration",
@@ -248,13 +218,7 @@
         "linkError": "Не удалось привязать аккаунт FACEIT",
         "description": "Настроить учетные данные FACEIT OAuth для входа пользователей",
         "adm_title": "Настройки авторизации FACEIT",
-        "adm_subtitle": "Настройте вход FACEIT OAuth2 для вашего сайта",
-        "adm_field1Label": "ID клиента",
-        "adm_field1Desc": "ID клиента вашего приложения FACEIT",
-        "adm_field2Label": "Секрет клиента",
-        "adm_field2Desc": "Секрет клиента вашего приложения FACEIT",
-        "adm_field3Label": "URI перенаправления",
-        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения FACEIT)"
+        "adm_subtitle": "Настройте вход FACEIT OAuth2 для вашего сайта"
       },
       "admin": {
         "title": "Панель администратора",
@@ -285,13 +249,7 @@
         "linkError": "Falha ao vincular conta do FACEIT",
         "description": "Configurar credenciais do FACEIT OAuth para login de usuarios",
         "adm_title": "Configurações de auth FACEIT",
-        "adm_subtitle": "Configure o login FACEIT OAuth2 para o seu site",
-        "adm_field1Label": "ID do Cliente",
-        "adm_field1Desc": "O ID do cliente do seu aplicativo FACEIT",
-        "adm_field2Label": "Segredo do Cliente",
-        "adm_field2Desc": "O segredo do cliente do seu aplicativo FACEIT",
-        "adm_field3Label": "URI de redirecionamento",
-        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app FACEIT)"
+        "adm_subtitle": "Configure o login FACEIT OAuth2 para o seu site"
       },
       "admin": {
         "title": "Painel de administração",

@@ -1306,5 +1306,19 @@
       "failed": "Could not install: {modules}",
       "goAdmin": "Go to admin panel"
     }
+  },
+  "authProvider": {
+    "back": "Back to settings",
+    "loading": "Checking configuration...",
+    "statusError": "Could not read the sign-in provider status.",
+    "active": "This sign-in method is active.",
+    "inactive": "Installed, but not yet active: the credentials below are missing.",
+    "envVarsLabel": "Environment variables",
+    "envVarsHelp": "Set these in your .env file or your container environment and restart the app. Sign-in providers are assembled when the process starts, which is why they cannot be saved here.",
+    "callbackLabel": "Redirect URL",
+    "callbackHelp": "Register exactly this URL with the provider. It is derived from AUTH_URL, so that variable has to match the address visitors actually use.",
+    "consoleHelp": "Create the application at",
+    "set": "set",
+    "notSet": "not set"
   }
 }

@@ -63,13 +63,7 @@
         "linkError": "Failed to link Discord account",
         "description": "Configure Discord OAuth credentials for user login",
         "adm_title": "Discord Auth Settings",
-        "adm_subtitle": "Configure Discord OAuth2 login for your site",
-        "adm_field1Label": "Client ID",
-        "adm_field1Desc": "Your Discord application's Client ID",
-        "adm_field2Label": "Client Secret",
-        "adm_field2Desc": "Your Discord application's Client Secret",
-        "adm_field3Label": "Redirect URI",
-        "adm_field3Desc": "OAuth2 callback URL (must match Discord app settings)"
+        "adm_subtitle": "Configure Discord OAuth2 login for your site"
       },
       "admin": {
         "title": "Admin Panel",
@@ -100,13 +94,7 @@
         "linkError": "Discord hesabi baglanamadi",
         "description": "Kullanıcı girişi icin Discord OAuth kimlik bilgilerini yapilandirin",
         "adm_title": "Discord Kimlik Doğrulama Ayarları",
-        "adm_subtitle": "Siteniz için Discord OAuth2 girişini yapılandırın",
-        "adm_field1Label": "İstemci Kimliği",
-        "adm_field1Desc": "Discord uygulamanızın İstemci Kimliği",
-        "adm_field2Label": "İstemci Gizli Anahtarı",
-        "adm_field2Desc": "Discord uygulamanızın Gizli Anahtarı",
-        "adm_field3Label": "Yönlendirme URI",
-        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Discord uygulama ayarlarıyla eşleşmelidir)"
+        "adm_subtitle": "Siteniz için Discord OAuth2 girişini yapılandırın"
       },
       "admin": {
         "title": "Yönetim Paneli",
@@ -137,13 +125,7 @@
         "linkError": "Discord-Konto konnte nicht verknuepft werden",
         "description": "Discord OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
         "adm_title": "Discord-Auth-Einstellungen",
-        "adm_subtitle": "Konfigurieren Sie Discord OAuth2-Login für Ihre Website",
-        "adm_field1Label": "Client-ID",
-        "adm_field1Desc": "Die Client-ID Ihrer Discord-Anwendung",
-        "adm_field2Label": "Client-Secret",
-        "adm_field2Desc": "Das Client-Secret Ihrer Discord-Anwendung",
-        "adm_field3Label": "Redirect-URI",
-        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Discord-App-Einstellungen übereinstimmen)"
+        "adm_subtitle": "Konfigurieren Sie Discord OAuth2-Login für Ihre Website"
       },
       "admin": {
         "title": "Admin-Panel",
@@ -174,13 +156,7 @@
         "linkError": "Error al vincular la cuenta de Discord",
         "description": "Configurar credenciales de Discord OAuth para inicio de sesion",
         "adm_title": "Configuración de auth Discord",
-        "adm_subtitle": "Configura el inicio de sesión Discord OAuth2 para tu sitio",
-        "adm_field1Label": "ID de Cliente",
-        "adm_field1Desc": "El ID de cliente de tu aplicación Discord",
-        "adm_field2Label": "Secreto de Cliente",
-        "adm_field2Desc": "El secreto de cliente de tu aplicación Discord",
-        "adm_field3Label": "URI de redirección",
-        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app Discord)"
+        "adm_subtitle": "Configura el inicio de sesión Discord OAuth2 para tu sitio"
       },
       "admin": {
         "title": "Panel de administración",
@@ -211,13 +187,7 @@
         "linkError": "Echec de la liaison du compte Discord",
         "description": "Configurer les identifiants Discord OAuth pour la connexion",
         "adm_title": "Paramètres d'auth Discord",
-        "adm_subtitle": "Configurez la connexion Discord OAuth2 pour votre site",
-        "adm_field1Label": "ID Client",
-        "adm_field1Desc": "L'ID client de votre application Discord",
-        "adm_field2Label": "Secret Client",
-        "adm_field2Desc": "Le secret client de votre application Discord",
-        "adm_field3Label": "URI de redirection",
-        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app Discord)"
+        "adm_subtitle": "Configurez la connexion Discord OAuth2 pour votre site"
       },
       "admin": {
         "title": "Panneau d'administration",
@@ -248,13 +218,7 @@
         "linkError": "Не удалось привязать аккаунт Discord",
         "description": "Настроить учетные данные Discord OAuth для входа пользователей",
         "adm_title": "Настройки авторизации Discord",
-        "adm_subtitle": "Настройте вход Discord OAuth2 для вашего сайта",
-        "adm_field1Label": "ID клиента",
-        "adm_field1Desc": "ID клиента вашего приложения Discord",
-        "adm_field2Label": "Секрет клиента",
-        "adm_field2Desc": "Секрет клиента вашего приложения Discord",
-        "adm_field3Label": "URI перенаправления",
-        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения Discord)"
+        "adm_subtitle": "Настройте вход Discord OAuth2 для вашего сайта"
       },
       "admin": {
         "title": "Панель администратора",
@@ -285,13 +249,7 @@
         "linkError": "Falha ao vincular conta do Discord",
         "description": "Configurar credenciais do Discord OAuth para login de usuarios",
         "adm_title": "Configurações de auth Discord",
-        "adm_subtitle": "Configure o login Discord OAuth2 para o seu site",
-        "adm_field1Label": "ID do Cliente",
-        "adm_field1Desc": "O ID do cliente do seu aplicativo Discord",
-        "adm_field2Label": "Segredo do Cliente",
-        "adm_field2Desc": "O segredo do cliente do seu aplicativo Discord",
-        "adm_field3Label": "URI de redirecionamento",
-        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app Discord)"
+        "adm_subtitle": "Configure o login Discord OAuth2 para o seu site"
       },
       "admin": {
         "title": "Painel de administração",
