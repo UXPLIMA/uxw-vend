@@ -2,7 +2,7 @@
   "id": "slider",
   "name": "Slider",
   "description": "Homepage image carousel and banners",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -28,6 +28,11 @@
       "path": "/slider",
       "handler": "api/route.ts",
       "description": "List homepage slider slides and create new ones (admin)."
+    },
+    {
+      "path": "/slider/[id]",
+      "handler": "api/[id]/route.ts",
+      "description": "Update or delete a slide (admin)."
     }
   ],
   "widgets": [

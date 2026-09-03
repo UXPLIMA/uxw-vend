@@ -1067,7 +1067,15 @@
     "widgets_fromModule": "{module} modülünden gelen bileşen",
     "widgets_save": "Kaydet",
     "widgets_saving": "Kaydediliyor...",
-    "modules_versionMismatch": "sürüm uyumsuz"
+    "modules_versionMismatch": "sürüm uyumsuz",
+    "iconPicker_choose": "Bir simge seçin",
+    "iconPicker_clear": "Simgeyi temizle",
+    "iconPicker_title": "Simge seçici",
+    "iconPicker_search": "Simge ara",
+    "iconPicker_close": "Kapat",
+    "iconPicker_empty": "Bu aramaya uyan simge yok.",
+    "iconPicker_count": "{total} simgeden {shown} tanesi gösteriliyor",
+    "iconPicker_loadMore": "Daha fazla yükle"
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

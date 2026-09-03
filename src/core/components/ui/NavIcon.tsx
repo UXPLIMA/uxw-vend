@@ -1,6 +1,7 @@
 "use client";
 
 import { DynamicIcon } from "lucide-react/dynamic";
+import { toIconSlug } from "@/core/lib/icon-names";
 
 /**
  * Lucide icon resolved by string name. Admin-supplied (navbar editor,
@@ -19,7 +20,7 @@ export function NavIcon({
     className?: string;
 }) {
     if (!name) return null;
-    const kebab = toKebab(name);
+    const kebab = toIconSlug(name);
     // Suspense fallback reserves the icon's layout box (className passes
     // through to it) so there's no width shift while the icon's chunk loads.
     const placeholder = () => <span className={className} aria-hidden="true" />;
@@ -32,10 +33,3 @@ export function NavIcon({
     );
 }
 
-function toKebab(s: string): string {
-    return s
-        .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
-        .toLowerCase()
-        .trim();
-}

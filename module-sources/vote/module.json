@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote System",
   "description": "Vote-for-rewards system with configurable sites and cooldowns",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -36,6 +36,11 @@
       "description": "List vote sites and create new ones (admin)."
     },
     {
+      "path": "/vote/sites/[id]",
+      "handler": "api/sites/[id]/route.ts",
+      "description": "Update or delete a vote site (admin)."
+    },
+    {
       "path": "/vote/claim",
       "handler": "api/claim/route.ts",
       "description": "Claim vote rewards after voting on an external site."
@@ -45,7 +50,10 @@
     "credits"
   ],
   "hooksEmitted": [
-    { "hook": "vote.vote.cast", "type": "action" }
+    {
+      "hook": "vote.vote.cast",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {
@@ -89,7 +97,7 @@
         "adm_field3Label": "Reward",
         "adm_field3Placeholder": "Credits reward amount",
         "adm_field4Label": "Icon",
-        "adm_field4Placeholder": "Lucide icon name",
+        "adm_field4Placeholder": "Choose an icon",
         "adm_field5Label": "Active"
       },
       "admin": {
@@ -140,7 +148,7 @@
         "adm_field3Label": "Ödül",
         "adm_field3Placeholder": "Kredi ödül miktarı",
         "adm_field4Label": "İkon",
-        "adm_field4Placeholder": "Lucide ikon adı",
+        "adm_field4Placeholder": "Bir simge seçin",
         "adm_field5Label": "Aktif"
       },
       "admin": {
@@ -191,7 +199,7 @@
         "adm_field3Label": "Belohnung",
         "adm_field3Placeholder": "Belohnungsbetrag in Credits",
         "adm_field4Label": "Symbol",
-        "adm_field4Placeholder": "Lucide-Symbolname",
+        "adm_field4Placeholder": "Ein Symbol wählen",
         "adm_field5Label": "Aktiv"
       },
       "admin": {
@@ -241,7 +249,7 @@
         "adm_field3Label": "Recompensa",
         "adm_field3Placeholder": "Cantidad de recompensa en créditos",
         "adm_field4Label": "Icono",
-        "adm_field4Placeholder": "Nombre del icono Lucide",
+        "adm_field4Placeholder": "Elige un icono",
         "adm_field5Label": "Activo"
       },
       "admin": {
@@ -291,7 +299,7 @@
         "adm_field3Label": "Récompense",
         "adm_field3Placeholder": "Montant de récompense en crédits",
         "adm_field4Label": "Icône",
-        "adm_field4Placeholder": "Nom de l'icône Lucide",
+        "adm_field4Placeholder": "Choisissez une icône",
         "adm_field5Label": "Actif"
       },
       "admin": {
@@ -341,7 +349,7 @@
         "adm_field3Label": "Награда",
         "adm_field3Placeholder": "Сумма вознаграждения в кредитах",
         "adm_field4Label": "Иконка",
-        "adm_field4Placeholder": "Название иконки Lucide",
+        "adm_field4Placeholder": "Выберите иконку",
         "adm_field5Label": "Активный"
       },
       "admin": {
@@ -391,7 +399,7 @@
         "adm_field3Label": "Recompensa",
         "adm_field3Placeholder": "Quantidade de recompensa em créditos",
         "adm_field4Label": "Ícone",
-        "adm_field4Placeholder": "Nome do ícone Lucide",
+        "adm_field4Placeholder": "Escolha um ícone",
         "adm_field5Label": "Ativo"
       },
       "admin": {

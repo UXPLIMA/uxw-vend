@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 import { FileUpload } from "@/core/components/ui/file-upload";
 import { UrlOrFile } from "@/core/components/ui/url-or-file";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
+import { IconPicker } from "@/core/components/ui/icon-picker";
 
 export interface CrudField {
     key: string;
@@ -23,7 +24,8 @@ export interface CrudField {
      * advice, and a field holding a real secret still has to be encrypted on
      * the way into the database.
      */
-    type?: "text" | "password" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color" | "image" | "urlOrFile" | "richtext";
+    /** "icon" renders the Lucide icon picker and stores the icon's kebab-case name. */
+    type?: "text" | "password" | "number" | "url" | "select" | "textarea" | "toggle" | "datetime" | "color" | "image" | "urlOrFile" | "richtext" | "icon";
     placeholder?: string;
     options?: { value: string; label: string }[];
     defaultValue?: string;
@@ -184,6 +186,8 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 return <UrlOrFile value={val} onChange={onChange} accept={field.accept} placeholder={field.placeholder} />;
             case "richtext":
                 return <RichTextEditor value={val} onChange={onChange} placeholder={field.placeholder} />;
+            case "icon":
+                return <IconPicker value={val} onChange={onChange} placeholder={field.placeholder} />;
             default:
                 return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} />;
         }

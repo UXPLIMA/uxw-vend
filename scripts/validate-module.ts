@@ -657,6 +657,99 @@ function checkHooksEmitted(modulePath: string): CheckResult {
 }
 
 /**
+ * Every API handler on disk must be registered, and every admin CRUD screen
+ * must be able to reach the endpoints it calls.
+ *
+ * A `route.ts` under `api/` does nothing on its own: requests arrive through
+ * `/api/v1/[...path]`, which only knows the routes the manifest declares. Four
+ * modules shipped an `[id]` handler that was never declared, so editing or
+ * deleting from their admin screens answered 404, and the vote module pointed
+ * its screen at `/api/v1/vote` while declaring `/api/v1/vote/sites`, so
+ * creating one did too. Nothing failed at build time and nothing failed in
+ * the tests: the screen and the handler were each fine on their own.
+ *
+ * `AdminCrudPage` lists and creates at `apiPath` and edits and deletes at
+ * `apiPath/{id}`, so both have to exist.
+ */
+function checkApiRoutesWired(modulePath: string): CheckResult {
+    const name = "API routes wired";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { api?: { path: string; handler: string }[] };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const api = manifest.api ?? [];
+    const declaredHandlers = new Set(api.map((a) => a.handler.replace(/\\/g, "/")));
+    const declaredPaths = api.map((a) => `/api/v1${a.path}`);
+    const problems: string[] = [];
+
+    // 1. Handlers on disk that nothing routes to.
+    const apiDir = path.join(modulePath, "api");
+    const onDisk: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) walk(full);
+            else if (entry.name === "route.ts") onDisk.push(path.relative(modulePath, full).replace(/\\/g, "/"));
+        }
+    })(apiDir);
+    for (const handler of onDisk) {
+        if (!declaredHandlers.has(handler)) problems.push(`handler never registered: ${handler}`);
+    }
+
+    // 2. Admin CRUD screens whose endpoints are not declared.
+    const screens: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) walk(full);
+            else if (entry.name.endsWith(".tsx")) screens.push(full);
+        }
+    })(path.join(modulePath, "pages"));
+
+    for (const file of screens) {
+        const content = fs.readFileSync(file, "utf8");
+        if (!content.includes("AdminCrudPage")) continue;
+        const match = /apiPath=["']([^"']+)["']/.exec(content);
+        if (!match) continue;
+        const apiPath = match[1];
+        const where = path.relative(modulePath, file).replace(/\\/g, "/");
+        if (!declaredPaths.includes(apiPath)) {
+            problems.push(`${where}: apiPath ${apiPath} is not a declared route`);
+        }
+        const hasItemRoute = declaredPaths.some((d) => {
+            if (!d.startsWith(`${apiPath}/`)) return false;
+            return /^\[[^\]]+\]$/.test(d.slice(apiPath.length + 1));
+        });
+        if (!hasItemRoute) {
+            problems.push(`${where}: no declared route for ${apiPath}/[id] - edit and delete would 404`);
+        }
+    }
+
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} routing problem(s):\n      ${problems.slice(0, 8).join("\n      ")}${problems.length > 8 ? `\n      ... and ${problems.length - 8} more` : ""}`,
+            suggestion: 'Every api/**/route.ts needs an { "path", "handler" } entry in the manifest, and an AdminCrudPage needs both its collection route and its [id] route declared.',
+        };
+    }
+
+    return {
+        name,
+        passed: true,
+        message: onDisk.length === 0 ? "Ships no API routes" : `${onDisk.length} handler(s) registered`,
+    };
+}
+
+/**
  * Run every check against one module. Returns the failures, if any.
  *
  * `withTypeScript` exists because `checkTypeScript` shells out to a full
@@ -696,6 +789,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
               ]),
         checkNoAnyTypes(modulePath),
         checkApiAuthChecks(modulePath),
+        checkApiRoutesWired(modulePath),
         checkHooksEmitted(modulePath),
     ];
 
