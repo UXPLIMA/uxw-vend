@@ -34,6 +34,12 @@ function run(label: string, cmd: string, args: string[]): void {
     }
 }
 
+// Rewrite the em dashes out of the agent-rules template inside the `next`
+// package, which `next dev` writes into AGENTS.md on every start. Called
+// from here rather than chained onto the postinstall script in
+// package.json: the Dockerfile's deps stage copies only this file, so a
+// second entry point there would break `npm ci` on the missing script.
+run("patch-next", "npx", ["tsx", "scripts/patch-next-agent-rules.ts"]);
 run("merge-schemas", "npx", ["tsx", "scripts/merge-schemas.ts"]);
 run("generate-themes", "npx", ["tsx", "scripts/generate-theme-registry.ts"]);
 run("generate-registry", "npx", ["tsx", "scripts/generate-registry.ts"]);
