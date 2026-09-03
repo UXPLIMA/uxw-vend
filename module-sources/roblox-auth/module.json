@@ -1,0 +1,302 @@
+{
+  "id": "roblox-auth",
+  "name": "Roblox Login",
+  "description": "Allow users to sign in with their Roblox account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Boxes",
+  "adminRoutes": [
+    {
+      "path": "/settings/roblox-auth",
+      "component": "pages/admin/settings/roblox-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Roblox OAuth",
+      "description": "Roblox application credentials.",
+      "href": "/settings/roblox-auth",
+      "icon": "Boxes",
+      "color": "text-foreground"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "roblox",
+      "envIdVar": "AUTH_ROBLOX_ID",
+      "envSecretVar": "AUTH_ROBLOX_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "roblox-login",
+      "provider": "roblox",
+      "label": "Roblox",
+      "color": "currentColor",
+      "svgIcon": "M18.926 23.998 0 18.892 5.075.002 24 5.108ZM15.348 10.09l-5.282-1.453-1.414 5.273 5.282 1.453z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "robloxAuth": {
+        "title": "Roblox Login",
+        "settings": "Roblox OAuth Settings",
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter Roblox application Client ID",
+        "clientSecret": "Client Secret",
+        "clientSecretPlaceholder": "Enter Roblox application Client Secret",
+        "redirectUri": "Redirect URI",
+        "redirectUriHelp": "Add this URL to your Roblox application's redirect URIs",
+        "enabled": "Roblox Login Enabled",
+        "disabled": "Roblox Login Disabled",
+        "enable": "Enable Roblox Login",
+        "save": "Save Settings",
+        "saved": "Roblox OAuth settings saved successfully",
+        "saveError": "Failed to save Roblox OAuth settings",
+        "signInWith": "Sign in with Roblox",
+        "linkAccount": "Link Roblox Account",
+        "unlinkAccount": "Unlink Roblox Account",
+        "accountLinked": "Roblox account linked successfully",
+        "accountUnlinked": "Roblox account unlinked successfully",
+        "linkError": "Failed to link Roblox account",
+        "description": "Configure Roblox OAuth credentials for user login",
+        "adm_title": "Roblox Auth Settings",
+        "adm_subtitle": "Configure Roblox OAuth2 login for your site",
+        "adm_field1Label": "Client ID",
+        "adm_field1Desc": "Your Roblox application's Client ID",
+        "adm_field2Label": "Client Secret",
+        "adm_field2Desc": "Your Roblox application's Client Secret",
+        "adm_field3Label": "Redirect URI",
+        "adm_field3Desc": "OAuth2 callback URL (must match Roblox app settings)"
+      },
+      "admin": {
+        "title": "Admin Panel",
+        "subtitle": "Manage your platform settings and content"
+      }
+    },
+    "tr": {
+      "robloxAuth": {
+        "title": "Roblox ile Giriş",
+        "settings": "Roblox OAuth Ayarları",
+        "clientId": "Istemci Kimligi",
+        "clientIdPlaceholder": "Roblox uygulama Istemci Kimligini girin",
+        "clientSecret": "Istemci Şifresi",
+        "clientSecretPlaceholder": "Roblox uygulama Istemci Şifresini girin",
+        "redirectUri": "Yonlendirme URI'si",
+        "redirectUriHelp": "Bu URL'yi Roblox uygulamanizin yonlendirme URI'lerine ekleyin",
+        "enabled": "Roblox ile Giriş Etkin",
+        "disabled": "Roblox ile Giriş Devre Disi",
+        "enable": "Roblox ile Girişi Etkinlestir",
+        "save": "Ayarları Kaydet",
+        "saved": "Roblox OAuth ayarlari basariyla kaydedildi",
+        "saveError": "Roblox OAuth ayarlari kaydedilemedi",
+        "signInWith": "Roblox ile giriş yap",
+        "linkAccount": "Roblox Hesabini Bagla",
+        "unlinkAccount": "Roblox Hesabini Ayir",
+        "accountLinked": "Roblox hesabi basariyla baglandi",
+        "accountUnlinked": "Roblox hesabi basariyla ayrildi",
+        "linkError": "Roblox hesabi baglanamadi",
+        "description": "Kullanıcı girişi icin Roblox OAuth kimlik bilgilerini yapilandirin",
+        "adm_title": "Roblox Kimlik Doğrulama Ayarları",
+        "adm_subtitle": "Siteniz için Roblox OAuth2 girişini yapılandırın",
+        "adm_field1Label": "İstemci Kimliği",
+        "adm_field1Desc": "Roblox uygulamanızın İstemci Kimliği",
+        "adm_field2Label": "İstemci Gizli Anahtarı",
+        "adm_field2Desc": "Roblox uygulamanızın Gizli Anahtarı",
+        "adm_field3Label": "Yönlendirme URI",
+        "adm_field3Desc": "OAuth2 geri çağırma URL'si (Roblox uygulama ayarlarıyla eşleşmelidir)"
+      },
+      "admin": {
+        "title": "Yönetim Paneli",
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+      }
+    },
+    "de": {
+      "robloxAuth": {
+        "title": "Roblox-Anmeldung",
+        "settings": "Roblox OAuth-Einstellungen",
+        "clientId": "Client-ID",
+        "clientIdPlaceholder": "Roblox-Anwendungs-Client-ID eingeben",
+        "clientSecret": "Client-Geheimnis",
+        "clientSecretPlaceholder": "Roblox-Anwendungs-Client-Geheimnis eingeben",
+        "redirectUri": "Weiterleitungs-URI",
+        "redirectUriHelp": "Fuegen Sie diese URL zu den Weiterleitungs-URIs Ihrer Roblox-Anwendung hinzu",
+        "enabled": "Roblox-Anmeldung aktiviert",
+        "disabled": "Roblox-Anmeldung deaktiviert",
+        "enable": "Roblox-Anmeldung aktivieren",
+        "save": "Einstellungen speichern",
+        "saved": "Roblox OAuth-Einstellungen erfolgreich gespeichert",
+        "saveError": "Roblox OAuth-Einstellungen konnten nicht gespeichert werden",
+        "signInWith": "Mit Roblox anmelden",
+        "linkAccount": "Roblox-Konto verknuepfen",
+        "unlinkAccount": "Roblox-Konto trennen",
+        "accountLinked": "Roblox-Konto erfolgreich verknuepft",
+        "accountUnlinked": "Roblox-Konto erfolgreich getrennt",
+        "linkError": "Roblox-Konto konnte nicht verknuepft werden",
+        "description": "Roblox OAuth-Zugangsdaten fuer die Benutzeranmeldung konfigurieren",
+        "adm_title": "Roblox-Auth-Einstellungen",
+        "adm_subtitle": "Konfigurieren Sie Roblox OAuth2-Login für Ihre Website",
+        "adm_field1Label": "Client-ID",
+        "adm_field1Desc": "Die Client-ID Ihrer Roblox-Anwendung",
+        "adm_field2Label": "Client-Secret",
+        "adm_field2Desc": "Das Client-Secret Ihrer Roblox-Anwendung",
+        "adm_field3Label": "Redirect-URI",
+        "adm_field3Desc": "OAuth2-Callback-URL (muss mit den Roblox-App-Einstellungen übereinstimmen)"
+      },
+      "admin": {
+        "title": "Admin-Panel",
+        "subtitle": "Verwalten Sie Ihre Plattformeinstellungen und Inhalte"
+      }
+    },
+    "es": {
+      "robloxAuth": {
+        "title": "Inicio de sesion con Roblox",
+        "settings": "Configuracion de Roblox OAuth",
+        "clientId": "ID de cliente",
+        "clientIdPlaceholder": "Ingrese el ID de cliente de la aplicacion Roblox",
+        "clientSecret": "Secreto de cliente",
+        "clientSecretPlaceholder": "Ingrese el secreto de cliente de la aplicacion Roblox",
+        "redirectUri": "URI de redireccion",
+        "redirectUriHelp": "Agregue esta URL a las URIs de redireccion de su aplicacion Roblox",
+        "enabled": "Inicio de sesion con Roblox habilitado",
+        "disabled": "Inicio de sesion con Roblox deshabilitado",
+        "enable": "Habilitar inicio de sesion con Roblox",
+        "save": "Guardar configuracion",
+        "saved": "Configuracion de Roblox OAuth guardada correctamente",
+        "saveError": "Error al guardar la configuracion de Roblox OAuth",
+        "signInWith": "Iniciar sesion con Roblox",
+        "linkAccount": "Vincular cuenta de Roblox",
+        "unlinkAccount": "Desvincular cuenta de Roblox",
+        "accountLinked": "Cuenta de Roblox vinculada correctamente",
+        "accountUnlinked": "Cuenta de Roblox desvinculada correctamente",
+        "linkError": "Error al vincular la cuenta de Roblox",
+        "description": "Configurar credenciales de Roblox OAuth para inicio de sesion",
+        "adm_title": "Configuración de auth Roblox",
+        "adm_subtitle": "Configura el inicio de sesión Roblox OAuth2 para tu sitio",
+        "adm_field1Label": "ID de Cliente",
+        "adm_field1Desc": "El ID de cliente de tu aplicación Roblox",
+        "adm_field2Label": "Secreto de Cliente",
+        "adm_field2Desc": "El secreto de cliente de tu aplicación Roblox",
+        "adm_field3Label": "URI de redirección",
+        "adm_field3Desc": "URL de callback OAuth2 (debe coincidir con la configuración de la app Roblox)"
+      },
+      "admin": {
+        "title": "Panel de administración",
+        "subtitle": "Gestiona la configuración y el contenido de tu plataforma"
+      }
+    },
+    "fr": {
+      "robloxAuth": {
+        "title": "Connexion Roblox",
+        "settings": "Parametres Roblox OAuth",
+        "clientId": "ID client",
+        "clientIdPlaceholder": "Saisissez l'ID client de l'application Roblox",
+        "clientSecret": "Secret client",
+        "clientSecretPlaceholder": "Saisissez le secret client de l'application Roblox",
+        "redirectUri": "URI de redirection",
+        "redirectUriHelp": "Ajoutez cette URL aux URIs de redirection de votre application Roblox",
+        "enabled": "Connexion Roblox activee",
+        "disabled": "Connexion Roblox desactivee",
+        "enable": "Activer la connexion Roblox",
+        "save": "Enregistrer les parametres",
+        "saved": "Parametres Roblox OAuth enregistres avec succes",
+        "saveError": "Echec de l'enregistrement des parametres Roblox OAuth",
+        "signInWith": "Se connecter avec Roblox",
+        "linkAccount": "Lier le compte Roblox",
+        "unlinkAccount": "Delier le compte Roblox",
+        "accountLinked": "Compte Roblox lie avec succes",
+        "accountUnlinked": "Compte Roblox delie avec succes",
+        "linkError": "Echec de la liaison du compte Roblox",
+        "description": "Configurer les identifiants Roblox OAuth pour la connexion",
+        "adm_title": "Paramètres d'auth Roblox",
+        "adm_subtitle": "Configurez la connexion Roblox OAuth2 pour votre site",
+        "adm_field1Label": "ID Client",
+        "adm_field1Desc": "L'ID client de votre application Roblox",
+        "adm_field2Label": "Secret Client",
+        "adm_field2Desc": "Le secret client de votre application Roblox",
+        "adm_field3Label": "URI de redirection",
+        "adm_field3Desc": "URL de callback OAuth2 (doit correspondre aux paramètres de l'app Roblox)"
+      },
+      "admin": {
+        "title": "Panneau d'administration",
+        "subtitle": "Gérez les paramètres et le contenu de votre plateforme"
+      }
+    },
+    "ru": {
+      "robloxAuth": {
+        "title": "Вход через Roblox",
+        "settings": "Настройки Roblox OAuth",
+        "clientId": "ID клиента",
+        "clientIdPlaceholder": "Введите ID клиента приложения Roblox",
+        "clientSecret": "Секрет клиента",
+        "clientSecretPlaceholder": "Введите секрет клиента приложения Roblox",
+        "redirectUri": "URI перенаправления",
+        "redirectUriHelp": "Добавьте этот URL в URI перенаправления вашего приложения Roblox",
+        "enabled": "Вход через Roblox включен",
+        "disabled": "Вход через Roblox отключен",
+        "enable": "Включить вход через Roblox",
+        "save": "Сохранить настройки",
+        "saved": "Настройки Roblox OAuth успешно сохранены",
+        "saveError": "Не удалось сохранить настройки Roblox OAuth",
+        "signInWith": "Войти через Roblox",
+        "linkAccount": "Привязать аккаунт Roblox",
+        "unlinkAccount": "Отвязать аккаунт Roblox",
+        "accountLinked": "Аккаунт Roblox успешно привязан",
+        "accountUnlinked": "Аккаунт Roblox успешно отвязан",
+        "linkError": "Не удалось привязать аккаунт Roblox",
+        "description": "Настроить учетные данные Roblox OAuth для входа пользователей",
+        "adm_title": "Настройки авторизации Roblox",
+        "adm_subtitle": "Настройте вход Roblox OAuth2 для вашего сайта",
+        "adm_field1Label": "ID клиента",
+        "adm_field1Desc": "ID клиента вашего приложения Roblox",
+        "adm_field2Label": "Секрет клиента",
+        "adm_field2Desc": "Секрет клиента вашего приложения Roblox",
+        "adm_field3Label": "URI перенаправления",
+        "adm_field3Desc": "URL обратного вызова OAuth2 (должен совпадать с настройками приложения Roblox)"
+      },
+      "admin": {
+        "title": "Панель администратора",
+        "subtitle": "Управляйте настройками и контентом вашей платформы"
+      }
+    },
+    "pt": {
+      "robloxAuth": {
+        "title": "Login com Roblox",
+        "settings": "Configuracoes do Roblox OAuth",
+        "clientId": "ID do cliente",
+        "clientIdPlaceholder": "Insira o ID do cliente do aplicativo Roblox",
+        "clientSecret": "Segredo do cliente",
+        "clientSecretPlaceholder": "Insira o segredo do cliente do aplicativo Roblox",
+        "redirectUri": "URI de redirecionamento",
+        "redirectUriHelp": "Adicione esta URL aos URIs de redirecionamento do seu aplicativo Roblox",
+        "enabled": "Login com Roblox ativado",
+        "disabled": "Login com Roblox desativado",
+        "enable": "Ativar login com Roblox",
+        "save": "Salvar configuracoes",
+        "saved": "Configuracoes do Roblox OAuth salvas com sucesso",
+        "saveError": "Falha ao salvar configuracoes do Roblox OAuth",
+        "signInWith": "Entrar com Roblox",
+        "linkAccount": "Vincular conta do Roblox",
+        "unlinkAccount": "Desvincular conta do Roblox",
+        "accountLinked": "Conta do Roblox vinculada com sucesso",
+        "accountUnlinked": "Conta do Roblox desvinculada com sucesso",
+        "linkError": "Falha ao vincular conta do Roblox",
+        "description": "Configurar credenciais do Roblox OAuth para login de usuarios",
+        "adm_title": "Configurações de auth Roblox",
+        "adm_subtitle": "Configure o login Roblox OAuth2 para o seu site",
+        "adm_field1Label": "ID do Cliente",
+        "adm_field1Desc": "O ID do cliente do seu aplicativo Roblox",
+        "adm_field2Label": "Segredo do Cliente",
+        "adm_field2Desc": "O segredo do cliente do seu aplicativo Roblox",
+        "adm_field3Label": "URI de redirecionamento",
+        "adm_field3Desc": "URL de callback OAuth2 (deve corresponder às configurações do app Roblox)"
+      },
+      "admin": {
+        "title": "Painel de administração",
+        "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
+      }
+    }
+  }
+}
