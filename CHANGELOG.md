@@ -57,6 +57,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   games, and FiveM's `dynamic.json`. No third party in the middle, every server
   asked in parallel, answers cached for twenty seconds. Hytale reports itself
   as not queryable rather than as down, because it ships no status protocol.
+- **The module validator's TypeScript check passed everything.** It compiled
+  against the main tsconfig, which excludes `module-sources/` outright, so the
+  program contained none of the files being validated. It now runs the same
+  typecheck as `npm run typecheck:modules`, and a module kept outside
+  `module-sources/` is reported as skipped instead of passed.
 - **Sign-in modules asked for credentials they could not use.** Six of them
   offered a form for a client id and secret, saved it to the settings table
   under keys nothing reads, and reported success - Auth.js assembles its
