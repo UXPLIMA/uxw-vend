@@ -12,7 +12,8 @@
 import { spawnSync } from "child_process";
 import fs from "fs";
 
-const EM_DASH = "—";
+// Built from its code point so this file does not trip its own gate.
+const EM_DASH = String.fromCharCode(0x2014);
 
 function trackedFiles(): string[] {
     const result = spawnSync("git", ["ls-files", "-z"], { encoding: "utf-8", maxBuffer: 64 * 1024 * 1024 });
