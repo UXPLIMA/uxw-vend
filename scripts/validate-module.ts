@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
+import { spawnSync } from "child_process";
 import { moduleManifestSchema } from "../src/core/lib/module-manifest-schema";
 import { checkManifestFileRefs } from "../src/core/lib/module-ref-resolver";
 
@@ -359,8 +359,32 @@ function checkSchemaPrisma(modulePath: string): CheckResult {
     };
 }
 
+/**
+ * One `typecheck:modules` run, shared by every module this process validates.
+ *
+ * That script is the only thing that can type-check module code: it builds a
+ * throwaway Prisma client from every module schema and compiles against
+ * `tsconfig.modules.json`. Running plain `tsc --project tsconfig.json` here
+ * instead, as this check used to, could not work - the main tsconfig excludes
+ * `module-sources/` entirely, so the program contained none of the files being
+ * validated and the check reported a pass no matter what was in them. It let a
+ * bad SDK import through that the real gate caught minutes later.
+ */
+let modulesTypecheck: { output: string } | null = null;
+
+function runModulesTypecheck(): string {
+    if (!modulesTypecheck) {
+        const result = spawnSync("npx", ["tsx", "scripts/typecheck-modules.ts"], {
+            cwd: ROOT,
+            encoding: "utf8",
+            timeout: 600000,
+        });
+        modulesTypecheck = { output: `${result.stdout ?? ""}${result.stderr ?? ""}` };
+    }
+    return modulesTypecheck.output;
+}
+
 function checkTypeScript(modulePath: string): CheckResult {
-    // Run tsc --noEmit on the module files
     const tsFiles: string[] = [];
 
     function walkFiles(dir: string): void {
@@ -382,24 +406,23 @@ function checkTypeScript(modulePath: string): CheckResult {
         return { name: "TypeScript compilation", passed: true, message: "No TypeScript files" };
     }
 
+    // The typecheck compiles `module-sources/`, so a module kept anywhere else
+    // cannot be reached from here. Saying so is the honest answer; claiming a
+    // pass is what the old version did.
+    const relModulePath = path.relative(ROOT, modulePath).split(path.sep).join("/");
+    if (!relModulePath.startsWith("module-sources/")) {
+        return {
+            name: "TypeScript compilation",
+            passed: true,
+            message: "Skipped - only modules under module-sources/ can be type-checked",
+        };
+    }
+
     try {
-        const tsconfigPath = path.join(ROOT, "tsconfig.json");
-        if (!fs.existsSync(tsconfigPath)) {
-            return { name: "TypeScript compilation", passed: true, message: "No tsconfig.json in project root (skipped)" };
-        }
-
-        // Use --project (can't mix with file args), but filter output to only our module files
-        const output = execSync(`npx tsc --noEmit --project "${tsconfigPath}" 2>&1 || true`, {
-            cwd: ROOT,
-            timeout: 60000,
-            encoding: "utf8",
-        });
-
-        // Filter errors to only those in our module path
-        const relModulePath = path.relative(ROOT, modulePath);
+        const output = runModulesTypecheck();
         const errorLines = output
             .split("\n")
-            .filter((line: string) => line.includes("error TS") && line.includes(relModulePath));
+            .filter((line: string) => line.includes("error TS") && line.includes(`${relModulePath}/`));
 
         if (errorLines.length > 0) {
             const shown = errorLines.slice(0, 5);
@@ -413,14 +436,11 @@ function checkTypeScript(modulePath: string): CheckResult {
 
         return { name: "TypeScript compilation", passed: true, message: `${tsFiles.length} file(s) pass` };
     } catch (err) {
-        const output = err instanceof Error && "stdout" in err ? String((err as NodeJS.ErrnoException & { stdout: string }).stdout) : String(err);
-        const errorLines = output.split("\n").filter((l: string) => l.includes("error TS")).slice(0, 5);
-
         return {
             name: "TypeScript compilation",
             passed: false,
-            message: `TypeScript errors:\n      ${errorLines.join("\n      ")}${errorLines.length >= 5 ? "\n      ..." : ""}`,
-            suggestion: "Fix the TypeScript errors shown above.",
+            message: `Could not run the module typecheck: ${err instanceof Error ? err.message : String(err)}`,
+            suggestion: "Run `npm run typecheck:modules` directly to see what went wrong.",
         };
     }
 }
