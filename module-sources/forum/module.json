@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -60,6 +60,11 @@
       "description": "List forum categories and create new ones (admin)."
     },
     {
+      "path": "/forum/categories/[id]",
+      "handler": "api/categories/[id]/route.ts",
+      "description": "Update or delete a forum category (admin)."
+    },
+    {
       "path": "/forum/topics",
       "handler": "api/topics/route.ts",
       "description": "List forum topics and create a new topic."
@@ -103,12 +108,30 @@
   ],
   "statsApi": "/forum/stats",
   "hooksEmitted": [
-    { "hook": "forum.post.created", "type": "action" },
-    { "hook": "forum.post.deleted", "type": "action" },
-    { "hook": "forum.post.updated", "type": "action" },
-    { "hook": "forum.topic.created", "type": "action" },
-    { "hook": "forum.topic.deleted", "type": "action" },
-    { "hook": "forum.topic.updated", "type": "action" }
+    {
+      "hook": "forum.post.created",
+      "type": "action"
+    },
+    {
+      "hook": "forum.post.deleted",
+      "type": "action"
+    },
+    {
+      "hook": "forum.post.updated",
+      "type": "action"
+    },
+    {
+      "hook": "forum.topic.created",
+      "type": "action"
+    },
+    {
+      "hook": "forum.topic.deleted",
+      "type": "action"
+    },
+    {
+      "hook": "forum.topic.updated",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {
@@ -852,7 +875,13 @@
       "handler": "search/handler.ts",
       "icon": "MessageSquare",
       "indexes": [
-        { "table": "ForumTopic", "columns": ["title", "content"] }
+        {
+          "table": "ForumTopic",
+          "columns": [
+            "title",
+            "content"
+          ]
+        }
       ]
     }
   ],

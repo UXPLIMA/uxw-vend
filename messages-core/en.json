@@ -1067,7 +1067,15 @@
     "widgets_fromModule": "Widget from the {module} module",
     "widgets_save": "Save",
     "widgets_saving": "Saving...",
-    "modules_versionMismatch": "wrong version"
+    "modules_versionMismatch": "wrong version",
+    "iconPicker_choose": "Choose an icon",
+    "iconPicker_clear": "Clear icon",
+    "iconPicker_title": "Icon picker",
+    "iconPicker_search": "Search icons",
+    "iconPicker_close": "Close",
+    "iconPicker_empty": "No icon matches that search.",
+    "iconPicker_count": "Showing {shown} of {total}",
+    "iconPicker_loadMore": "Load more"
   },
   "footer": {
     "quickLinks": "Quick Links",

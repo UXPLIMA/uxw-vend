@@ -12,7 +12,7 @@ import { invalidateSettingsCache } from "@/core/hooks/useSiteSettings";
 import { useTranslations } from "next-intl";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
-import { NavIcon } from "@/core/components/ui/NavIcon";
+import { IconPicker } from "@/core/components/ui/icon-picker";
 
 interface NavChild {
     label: string;
@@ -148,15 +148,11 @@ export default function NavbarSettingsPage() {
                                         {!isDropdown && (
                                             <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1 min-w-0" />
                                         )}
-                                        <div className="flex items-center gap-1.5 w-48 flex-shrink-0 rounded-md border border-input bg-background pl-2.5">
-                                            <NavIcon name={link.icon} className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                            <Input
-                                                value={link.icon || ""}
-                                                onChange={(e) => updateLink(i, "icon", e.target.value)}
-                                                placeholder="e.g. ShoppingBag"
-                                                className="border-0 bg-transparent shadow-none focus-visible:ring-0 px-1 h-8 min-w-0"
-                                            />
-                                        </div>
+                                        <IconPicker
+                                            value={link.icon || ""}
+                                            onChange={(v) => updateLink(i, "icon", v)}
+                                            className="w-48 flex-shrink-0"
+                                        />
                                         {isDropdown && (
                                             <Button variant="ghost" size="sm" onClick={() => setExpandedDropdown(isExpanded ? null : i)}>
                                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -208,12 +204,12 @@ export default function NavbarSettingsPage() {
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">
                 <p>
                     <strong>{t("navbar_icons")}</strong>{" "}
-                    Any Lucide icon name works (e.g. <code>Home</code>, <code>ShoppingBag</code>, <code>Newspaper</code>, <code>Gamepad2</code>).
-                    Browse the full set at{" "}
+                    Click the icon field to pick one from the full Lucide set, or search it by name.
+                    The same icons are previewed at{" "}
                     <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                         lucide.dev/icons <ExternalLink className="w-3 h-3" />
                     </a>
-                    {" "}- copy the name and paste it in. PascalCase or kebab-case both work. Leave empty for no icon.
+                    {" "}- clear the field for no icon.
                 </p>
                 <p>
                     <strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.

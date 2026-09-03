@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Icons are picked from a list, not typed from memory.** Every icon field in
+  the admin - the navbar editor, a module's CRUD form, a module settings form,
+  the page builder's card block - now opens a searchable dialog of the whole
+  Lucide set with each icon drawn next to its name. The old fields were plain
+  text boxes: an admin had to already know a name from lucide.dev, and a typo
+  rendered nothing at all with no error to say why. `AdminCrudPage` and
+  `SettingsForm` take `type: "icon"` for it, so a module gets the picker by
+  naming a field type rather than by shipping a component.
+
+### Fixed
+- **Creating a vote site returned 404.** The vote admin page posted to
+  `/api/v1/vote`, which no manifest declared; the handler lives at
+  `/api/v1/vote/sites`. Four other modules had the same class of break: store,
+  forum, help-center and vote declared a collection route but no `[id]` route,
+  so every edit and delete from those admin pages 404'd, and slider had an
+  `[id]` handler on disk that no manifest declared - unreachable, since module
+  requests are dispatched from the manifest and not from the filesystem.
+- **The slider admin could not see an inactive slide.** Its list endpoint
+  filtered to active slides for everyone, including the admin whose job is to
+  turn one back on.
+- **`validate-module` now checks that API routes are wired.** It fails a module
+  whose `api/**/route.ts` no manifest declares, whose `AdminCrudPage` posts to
+  an undeclared path, or that has a collection route with no `[id]` route
+  behind an edit and delete UI. All five bugs above were of a kind no gate
+  looked for, which is why they shipped.
+- The page builder's card block declared an icon and never drew it.
+
+### Added
 - **Sign in with a username, not only an email.** Registration asks for both
   and both are unique, but the login form only ever accepted the email, which
   left anyone who remembered their username locked out of an account whose

@@ -7,13 +7,15 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { FileUpload } from "@/core/components/ui/file-upload";
+import { IconPicker } from "@/core/components/ui/icon-picker";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export interface SettingsField {
     key: string;
     label: string;
-    type?: "text" | "password" | "number" | "url" | "email" | "textarea" | "image" | "select" | "date";
+    /** "icon" renders the Lucide icon picker and stores the icon's kebab-case name. */
+    type?: "text" | "password" | "number" | "url" | "email" | "textarea" | "image" | "select" | "date" | "icon";
     placeholder?: string;
     description?: string;
     defaultValue?: string;
@@ -111,6 +113,12 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         value={values[field.key] || null}
                                         onChange={(v) => setValues({ ...values, [field.key]: v || "" })}
                                         accept={field.accept || "image/*"}
+                                    />
+                                ) : field.type === "icon" ? (
+                                    <IconPicker
+                                        value={values[field.key] || ""}
+                                        onChange={(v) => setValues({ ...values, [field.key]: v })}
+                                        placeholder={field.placeholder}
                                     />
                                 ) : field.type === "select" ? (
                                     <select

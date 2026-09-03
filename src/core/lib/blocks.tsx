@@ -2,6 +2,14 @@
 
 import React from "react";
 import type { Config } from "@measured/puck";
+import dynamic from "next/dynamic";
+import { NavIcon } from "@/core/components/ui/NavIcon";
+
+/** Editor-only: keeps the picker (and lucide's whole name table) off public pages. */
+const LazyIconPicker = dynamic(
+    () => import("@/core/components/ui/icon-picker").then((m) => m.IconPicker),
+    { ssr: false },
+);
 
 /**
  * Core block library for the Puck-based page builder.
@@ -224,12 +232,22 @@ const CardBlock = {
     fields: {
         title: { type: "text" as const, label: "Title" },
         description: { type: "textarea" as const, label: "Description" },
-        icon: { type: "text" as const, label: "Lucide icon name (optional)" },
+        // A Puck "custom" field so the inspector shows the same icon picker the
+        // rest of the admin uses. The picker is loaded on demand: this module
+        // is also on the public render path, where the inspector never mounts.
+        icon: {
+            type: "custom" as const,
+            label: "Icon",
+            render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+                <LazyIconPicker value={value} onChange={onChange} />
+            ),
+        },
     },
     defaultProps: { title: "Feature", description: "Describe a feature here", icon: "" },
-    render: ({ title, description }: { title: string; description: string }) => (
+    render: ({ title, description, icon }: { title: string; description: string; icon?: string }) => (
         <div className="container mx-auto px-4 py-4">
             <div className="bg-card border border-border rounded-lg p-6">
+                <NavIcon name={icon} className="w-6 h-6 text-primary mb-3" />
                 <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
                 <p className="text-muted-foreground">{description}</p>
             </div>

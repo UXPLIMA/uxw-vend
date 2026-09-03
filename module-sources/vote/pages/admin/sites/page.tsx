@@ -9,7 +9,7 @@ export default function Page() {
         <AdminCrudPage
             title={t("adm_title")}
             subtitle={t("adm_subtitle")}
-            apiPath="/api/v1/vote"
+            apiPath="/api/v1/vote/sites"
             listKey="sites"
             displayField="name"
             secondaryField="url"
@@ -17,7 +17,7 @@ export default function Page() {
                 { key: "name", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
                 { key: "url", label: t("adm_field2Label"), type: "url", required: true, placeholder: t("adm_field2Placeholder") },
                 { key: "reward", label: t("adm_field3Label"), type: "number", placeholder: t("adm_field3Placeholder"), defaultValue: "10" },
-                { key: "icon", label: t("adm_field4Label"), placeholder: t("adm_field4Placeholder") },
+                { key: "icon", label: t("adm_field4Label"), type: "icon", placeholder: t("adm_field4Placeholder") },
                 { key: "isActive", label: t("adm_field5Label"), type: "toggle", defaultValue: "true" },
             ]}
         />

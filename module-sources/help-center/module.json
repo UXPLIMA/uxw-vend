@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -58,10 +58,18 @@
       "path": "/help/categories",
       "handler": "api/help/categories/route.ts",
       "description": "List help center categories and create new ones (admin)."
+    },
+    {
+      "path": "/help/categories/[id]",
+      "handler": "api/help/categories/[id]/route.ts",
+      "description": "Update or delete a help centre category (admin)."
     }
   ],
   "hooksEmitted": [
-    { "hook": "helpcenter.article.created", "type": "action" }
+    {
+      "hook": "helpcenter.article.created",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {
@@ -705,7 +713,13 @@
       "handler": "search/handler.ts",
       "icon": "BookOpen",
       "indexes": [
-        { "table": "HelpArticle", "columns": ["title", "content"] }
+        {
+          "table": "HelpArticle",
+          "columns": [
+            "title",
+            "content"
+          ]
+        }
       ]
     }
   ],

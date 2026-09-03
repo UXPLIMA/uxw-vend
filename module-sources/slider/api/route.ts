@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
+// GET /api/v1/slider - Slides for the homepage widget, or every slide for
+// the admin screen. An admin that only ever saw the active ones had no way
+// back to a slide they had just switched off.
 export async function GET() {
+    const session = await auth();
+    const admin = session?.user?.id ? await isAdmin(session.user.id) : false;
     const items = await prisma.sliderItem.findMany({
-        where: { isActive: true },
+        where: admin ? {} : { isActive: true },
         orderBy: { order: "asc" },
     });
     return NextResponse.json({ items });
