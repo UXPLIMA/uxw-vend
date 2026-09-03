@@ -12,7 +12,8 @@ import fs from "fs";
 import path from "path";
 
 const TARGET = path.join(process.cwd(), "node_modules", "next", "dist", "server", "lib", "generate-agent-files.js");
-const EM_DASH = "—";
+// Built from its code point so this file does not trip its own gate.
+const EM_DASH = String.fromCharCode(0x2014);
 
 if (!fs.existsSync(TARGET)) {
     // Next is not installed yet, or moved the file in an upgrade. Not fatal:
