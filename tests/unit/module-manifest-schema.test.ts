@@ -160,19 +160,50 @@ describe("hook contracts across the catalog", () => {
         expect(unresolved).toEqual([]);
     });
 
-    it("no two modules claim the same hook name", () => {
-        // Two emitters for one name means two payload shapes behind one
-        // contract, and whichever listener loads second silently wins.
+    it("no two modules announce the same event", () => {
+        // An action is a notification, and its payload belongs to whoever
+        // fires it. Two modules firing one name means two shapes behind one
+        // contract, and a listener has no way to tell which it just got.
+        //
+        // A filter is the other direction: a question, whose shape belongs to
+        // whoever answers it. Several modules can ask the same question -
+        // store and minecraft-link both ask "server.command" - and the module
+        // that answers declares the payload once. Requiring a single caller
+        // there would mean the second module to need a capability has to
+        // invent a second name for it.
         const owners = new Map<string, string>();
         const clashes: string[] = [];
         for (const { id, m } of manifests) {
             for (const h of m.hooksEmitted ?? []) {
+                if (h.type === "filter") continue;
                 const existing = owners.get(h.hook);
                 if (existing && existing !== id) clashes.push(`"${h.hook}": ${existing} and ${id}`);
                 else owners.set(h.hook, id);
             }
         }
         expect(clashes).toEqual([]);
+    });
+
+    it("a hook is either an event or a question, never both", () => {
+        // The same name declared as an action by one module and a filter by
+        // another is two contracts wearing one name. Whichever listener is
+        // registered gets called through the wrong dispatcher and either
+        // never fires or drops the value it was meant to transform.
+        const kinds = new Map<string, Map<string, string[]>>();
+        for (const { id, m } of manifests) {
+            for (const h of [...(m.hooksEmitted ?? []), ...(m.hookListeners ?? [])]) {
+                const byKind = kinds.get(h.hook) ?? new Map<string, string[]>();
+                byKind.set(h.type, [...(byKind.get(h.type) ?? []), id]);
+                kinds.set(h.hook, byKind);
+            }
+        }
+
+        const mixed = [...kinds.entries()]
+            .filter(([, byKind]) => byKind.size > 1)
+            .map(([hook, byKind]) =>
+                `"${hook}": ${[...byKind.entries()].map(([kind, ids]) => `${kind} in ${ids.join(", ")}`).join("; ")}`,
+            );
+        expect(mixed).toEqual([]);
     });
 });
 

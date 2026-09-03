@@ -1,0 +1,303 @@
+{
+  "id": "minecraft-link",
+  "name": "Minecraft Link",
+  "description": "Let players prove they own an in-game Minecraft account by reading a code whispered to them on the server",
+  "version": "1.0.0",
+  "coreVersion": "^1.2.0",
+  "category": "gaming",
+  "author": "uxwVend",
+  "icon": "Link2",
+  "dependencies": [
+    "servers"
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/minecraft-link",
+      "component": "pages/admin/settings/minecraft-link/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Minecraft Link",
+      "description": "How linking codes reach a player in game.",
+      "href": "/settings/minecraft-link",
+      "icon": "Link2",
+      "color": "text-emerald-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/minecraft-link",
+      "handler": "api/link/route.ts",
+      "description": "Read the caller's Minecraft link, request a code for a name, or unlink."
+    },
+    {
+      "path": "/minecraft-link/confirm",
+      "handler": "api/link/confirm/route.ts",
+      "method": "POST",
+      "description": "Redeem a whispered code and bind the Minecraft account to the caller."
+    }
+  ],
+  "profileTabs": [
+    {
+      "id": "ProfileMinecraftTab",
+      "label": "Minecraft",
+      "component": "components/ProfileMinecraftTab",
+      "order": 40
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "minecraft.account.linked",
+      "type": "action"
+    },
+    {
+      "hook": "minecraft.account.unlinked",
+      "type": "action"
+    },
+    {
+      "hook": "server.command",
+      "type": "filter"
+    }
+  ],
+  "translations": {
+    "en": {
+      "minecraftLink": {
+        "title": "Minecraft account",
+        "loading": "Loading...",
+        "intro": "Link your Minecraft account by typing your in-game name below. Join the server first: the code is whispered to you in game.",
+        "usernameLabel": "In-game name",
+        "sendCode": "Send me a code",
+        "codeSent": "A code was whispered to {username} in game.",
+        "codeWhispered": "Check your in-game chat. A code was whispered to {username}; it is valid for five minutes.",
+        "codeLabel": "Code",
+        "confirm": "Link account",
+        "startOver": "Use a different name",
+        "linked": "Linked to {username}.",
+        "linkedAs": "Linked to",
+        "unlink": "Unlink",
+        "unlinkTitle": "Unlink this account?",
+        "unlinkConfirm": "Your website account will no longer be tied to this Minecraft account. You can link it again at any time.",
+        "unlinked": "Account unlinked.",
+        "err_invalid_username": "That is not a valid Minecraft name.",
+        "err_already_linked": "That Minecraft account is already linked to someone.",
+        "err_no_server": "No game server is configured on this site yet. Ask an administrator.",
+        "err_player_offline": "You are not on the server right now. Join it, then try again.",
+        "err_whisper_failed": "The server could not be reached. Try again shortly.",
+        "err_not_found": "That code does not match. Check your in-game chat.",
+        "err_expired": "That code has expired. Request a new one.",
+        "err_too_many_attempts": "Too many wrong codes. Request a new one.",
+        "err_code_required": "Enter the code you were whispered.",
+        "err_unknown": "Something went wrong. Try again.",
+        "adm_title": "Minecraft Link",
+        "adm_subtitle": "How the linking code is delivered to a player in game.",
+        "adm_field1Label": "Whisper command",
+        "adm_field1Desc": "Run to send a player their code. {player} and {message} are substituted. Defaults to Minecraft's tell command; change it for a proxy or a plugin that handles private messages differently."
+      }
+    },
+    "tr": {
+      "minecraftLink": {
+        "title": "Minecraft hesabı",
+        "loading": "Yükleniyor...",
+        "intro": "Minecraft hesabını bağlamak için oyun içi adını yaz. Önce sunucuya gir: kod sana oyun içinde fısıldanır.",
+        "usernameLabel": "Oyun içi ad",
+        "sendCode": "Bana kod gönder",
+        "codeSent": "{username} adına oyun içinde bir kod fısıldandı.",
+        "codeWhispered": "Oyun içi sohbeti kontrol et. {username} adına bir kod fısıldandı; beş dakika geçerli.",
+        "codeLabel": "Kod",
+        "confirm": "Hesabı bağla",
+        "startOver": "Başka bir ad kullan",
+        "linked": "{username} ile bağlandı.",
+        "linkedAs": "Bağlı hesap",
+        "unlink": "Bağlantıyı kaldır",
+        "unlinkTitle": "Bağlantı kaldırılsın mı?",
+        "unlinkConfirm": "Site hesabın artık bu Minecraft hesabına bağlı olmayacak. İstediğin zaman tekrar bağlayabilirsin.",
+        "unlinked": "Bağlantı kaldırıldı.",
+        "err_invalid_username": "Bu geçerli bir Minecraft adı değil.",
+        "err_already_linked": "Bu Minecraft hesabı zaten başka birine bağlı.",
+        "err_no_server": "Bu sitede henüz bir oyun sunucusu tanımlı değil. Bir yöneticiye sor.",
+        "err_player_offline": "Şu anda sunucuda değilsin. Önce gir, sonra tekrar dene.",
+        "err_whisper_failed": "Sunucuya ulaşılamadı. Birazdan tekrar dene.",
+        "err_not_found": "Kod eşleşmedi. Oyun içi sohbeti kontrol et.",
+        "err_expired": "Kodun süresi doldu. Yeni bir kod iste.",
+        "err_too_many_attempts": "Çok fazla yanlış kod girildi. Yeni bir kod iste.",
+        "err_code_required": "Sana fısıldanan kodu gir.",
+        "err_unknown": "Bir şeyler ters gitti. Tekrar dene.",
+        "adm_title": "Minecraft Bağlama",
+        "adm_subtitle": "Bağlama kodunun oyuncuya oyun içinde nasıl ileteceği.",
+        "adm_field1Label": "Fısıltı komutu",
+        "adm_field1Desc": "Oyuncuya kodunu göndermek için çalıştırılır. {player} ve {message} yerine geçer. Varsayılan Minecraft tell komutudur; proxy veya özel mesajları farklı işleyen bir eklenti kullanıyorsan değiştir."
+      }
+    },
+    "de": {
+      "minecraftLink": {
+        "title": "Minecraft-Konto",
+        "loading": "Wird geladen...",
+        "intro": "Verknüpfe dein Minecraft-Konto, indem du deinen Ingame-Namen eingibst. Betritt zuerst den Server: der Code wird dir im Spiel zugeflüstert.",
+        "usernameLabel": "Ingame-Name",
+        "sendCode": "Code senden",
+        "codeSent": "{username} wurde im Spiel ein Code zugeflüstert.",
+        "codeWhispered": "Sieh in den Ingame-Chat. {username} wurde ein Code zugeflüstert; er gilt fünf Minuten.",
+        "codeLabel": "Code",
+        "confirm": "Konto verknüpfen",
+        "startOver": "Anderen Namen verwenden",
+        "linked": "Mit {username} verknüpft.",
+        "linkedAs": "Verknüpft mit",
+        "unlink": "Verknüpfung lösen",
+        "unlinkTitle": "Verknüpfung lösen?",
+        "unlinkConfirm": "Dein Website-Konto ist dann nicht mehr mit diesem Minecraft-Konto verbunden. Du kannst es jederzeit erneut verknüpfen.",
+        "unlinked": "Verknüpfung gelöst.",
+        "err_invalid_username": "Das ist kein gültiger Minecraft-Name.",
+        "err_already_linked": "Dieses Minecraft-Konto ist bereits verknüpft.",
+        "err_no_server": "Auf dieser Seite ist noch kein Spielserver eingerichtet. Frage eine Administratorin oder einen Administrator.",
+        "err_player_offline": "Du bist gerade nicht auf dem Server. Betritt ihn und versuche es erneut.",
+        "err_whisper_failed": "Der Server war nicht erreichbar. Versuche es gleich noch einmal.",
+        "err_not_found": "Der Code passt nicht. Sieh in den Ingame-Chat.",
+        "err_expired": "Der Code ist abgelaufen. Fordere einen neuen an.",
+        "err_too_many_attempts": "Zu viele falsche Codes. Fordere einen neuen an.",
+        "err_code_required": "Gib den zugeflüsterten Code ein.",
+        "err_unknown": "Etwas ist schiefgelaufen. Versuche es erneut.",
+        "adm_title": "Minecraft-Verknüpfung",
+        "adm_subtitle": "Wie der Verknüpfungscode einem Spieler im Spiel zugestellt wird.",
+        "adm_field1Label": "Flüsterbefehl",
+        "adm_field1Desc": "Wird ausgeführt, um einem Spieler den Code zu schicken. {player} und {message} werden ersetzt. Standard ist der tell-Befehl von Minecraft; ändere ihn für einen Proxy oder ein Plugin, das private Nachrichten anders behandelt."
+      }
+    },
+    "es": {
+      "minecraftLink": {
+        "title": "Cuenta de Minecraft",
+        "loading": "Cargando...",
+        "intro": "Vincula tu cuenta de Minecraft escribiendo tu nombre dentro del juego. Entra al servidor primero: el código se te susurra en el juego.",
+        "usernameLabel": "Nombre en el juego",
+        "sendCode": "Enviarme un codigo",
+        "codeSent": "Se susurró un código a {username} en el juego.",
+        "codeWhispered": "Mira el chat del juego. Se susurró un código a {username}; vale cinco minutos.",
+        "codeLabel": "Código",
+        "confirm": "Vincular cuenta",
+        "startOver": "Usar otro nombre",
+        "linked": "Vinculada a {username}.",
+        "linkedAs": "Vinculada a",
+        "unlink": "Desvincular",
+        "unlinkTitle": "¿Desvincular esta cuenta?",
+        "unlinkConfirm": "Tu cuenta del sitio dejará de estar ligada a esta cuenta de Minecraft. Puedes volver a vincularla cuando quieras.",
+        "unlinked": "Cuenta desvinculada.",
+        "err_invalid_username": "Ese no es un nombre de Minecraft válido.",
+        "err_already_linked": "Esa cuenta de Minecraft ya está vinculada a alguien.",
+        "err_no_server": "Todavía no hay ningún servidor configurado en este sitio. Pregunta a un administrador.",
+        "err_player_offline": "Ahora mismo no estás en el servidor. Entra e inténtalo otra vez.",
+        "err_whisper_failed": "No se pudo contactar con el servidor. Inténtalo en un momento.",
+        "err_not_found": "Ese código no coincide. Mira el chat del juego.",
+        "err_expired": "Ese código ha caducado. Pide uno nuevo.",
+        "err_too_many_attempts": "Demasiados códigos incorrectos. Pide uno nuevo.",
+        "err_code_required": "Escribe el código que te susurraron.",
+        "err_unknown": "Algo salió mal. Inténtalo de nuevo.",
+        "adm_title": "Vinculación de Minecraft",
+        "adm_subtitle": "Cómo se entrega el código de vinculación a un jugador dentro del juego.",
+        "adm_field1Label": "Comando de susurro",
+        "adm_field1Desc": "Se ejecuta para enviar su código a un jugador. {player} y {message} se sustituyen. Por defecto usa el comando tell de Minecraft; cámbialo para un proxy o un plugin que maneje los mensajes privados de otra forma."
+      }
+    },
+    "fr": {
+      "minecraftLink": {
+        "title": "Compte Minecraft",
+        "loading": "Chargement...",
+        "intro": "Associez votre compte Minecraft en saisissant votre nom en jeu. Rejoignez d'abord le serveur : le code vous est chuchoté en jeu.",
+        "usernameLabel": "Nom en jeu",
+        "sendCode": "M'envoyer un code",
+        "codeSent": "Un code a été chuchoté à {username} en jeu.",
+        "codeWhispered": "Regardez le chat en jeu. Un code a été chuchoté à {username} ; il est valable cinq minutes.",
+        "codeLabel": "Code",
+        "confirm": "Associer le compte",
+        "startOver": "Utiliser un autre nom",
+        "linked": "Associé à {username}.",
+        "linkedAs": "Associé à",
+        "unlink": "Dissocier",
+        "unlinkTitle": "Dissocier ce compte ?",
+        "unlinkConfirm": "Votre compte du site ne sera plus lié à ce compte Minecraft. Vous pourrez l'associer à nouveau quand vous voudrez.",
+        "unlinked": "Compte dissocié.",
+        "err_invalid_username": "Ce n'est pas un nom Minecraft valide.",
+        "err_already_linked": "Ce compte Minecraft est déjà associé à quelqu'un.",
+        "err_no_server": "Aucun serveur de jeu n'est encore configuré sur ce site. Demandez à un administrateur.",
+        "err_player_offline": "Vous n'êtes pas sur le serveur en ce moment. Rejoignez-le puis réessayez.",
+        "err_whisper_failed": "Le serveur n'a pas pu être joint. Réessayez dans un instant.",
+        "err_not_found": "Ce code ne correspond pas. Regardez le chat en jeu.",
+        "err_expired": "Ce code a expiré. Demandez-en un nouveau.",
+        "err_too_many_attempts": "Trop de codes erronés. Demandez-en un nouveau.",
+        "err_code_required": "Saisissez le code qui vous a été chuchoté.",
+        "err_unknown": "Quelque chose s'est mal passé. Réessayez.",
+        "adm_title": "Association Minecraft",
+        "adm_subtitle": "Comment le code d'association est remis à un joueur en jeu.",
+        "adm_field1Label": "Commande de chuchotement",
+        "adm_field1Desc": "Exécutée pour envoyer son code à un joueur. {player} et {message} sont remplacés. Par défaut la commande tell de Minecraft ; changez-la pour un proxy ou un plugin qui gère autrement les messages privés."
+      }
+    },
+    "ru": {
+      "minecraftLink": {
+        "title": "Аккаунт Minecraft",
+        "loading": "Загрузка...",
+        "intro": "Привяжите аккаунт Minecraft, указав свой игровой ник. Сначала зайдите на сервер: код придёт вам в игре личным сообщением.",
+        "usernameLabel": "Игровой ник",
+        "sendCode": "Прислать код",
+        "codeSent": "Код отправлен игроку {username} в игре.",
+        "codeWhispered": "Проверьте игровой чат. Код отправлен игроку {username}; он действует пять минут.",
+        "codeLabel": "Код",
+        "confirm": "Привязать аккаунт",
+        "startOver": "Указать другой ник",
+        "linked": "Привязан к {username}.",
+        "linkedAs": "Привязан к",
+        "unlink": "Отвязать",
+        "unlinkTitle": "Отвязать этот аккаунт?",
+        "unlinkConfirm": "Ваш аккаунт на сайте больше не будет связан с этим аккаунтом Minecraft. Привязать заново можно в любой момент.",
+        "unlinked": "Аккаунт отвязан.",
+        "err_invalid_username": "Это недопустимый ник Minecraft.",
+        "err_already_linked": "Этот аккаунт Minecraft уже привязан к кому-то.",
+        "err_no_server": "На сайте пока не настроен ни один игровой сервер. Обратитесь к администратору.",
+        "err_player_offline": "Сейчас вас нет на сервере. Зайдите и попробуйте снова.",
+        "err_whisper_failed": "Не удалось связаться с сервером. Попробуйте через минуту.",
+        "err_not_found": "Код не совпадает. Проверьте игровой чат.",
+        "err_expired": "Срок действия кода истёк. Запросите новый.",
+        "err_too_many_attempts": "Слишком много неверных попыток. Запросите новый код.",
+        "err_code_required": "Введите код, который вам прислали.",
+        "err_unknown": "Что-то пошло не так. Попробуйте снова.",
+        "adm_title": "Привязка Minecraft",
+        "adm_subtitle": "Как код привязки доставляется игроку в игре.",
+        "adm_field1Label": "Команда личного сообщения",
+        "adm_field1Desc": "Выполняется, чтобы отправить игроку его код. {player} и {message} подставляются. По умолчанию команда tell из Minecraft; измените её для прокси или плагина, который обрабатывает личные сообщения иначе."
+      }
+    },
+    "pt": {
+      "minecraftLink": {
+        "title": "Conta Minecraft",
+        "loading": "A carregar...",
+        "intro": "Associe a sua conta Minecraft escrevendo o seu nome dentro do jogo. Entre primeiro no servidor: o código é sussurrado no jogo.",
+        "usernameLabel": "Nome no jogo",
+        "sendCode": "Enviar-me um codigo",
+        "codeSent": "Foi sussurrado um código a {username} no jogo.",
+        "codeWhispered": "Veja o chat do jogo. Foi sussurrado um código a {username}; é válido durante cinco minutos.",
+        "codeLabel": "Código",
+        "confirm": "Associar conta",
+        "startOver": "Usar outro nome",
+        "linked": "Associada a {username}.",
+        "linkedAs": "Associada a",
+        "unlink": "Desassociar",
+        "unlinkTitle": "Desassociar esta conta?",
+        "unlinkConfirm": "A sua conta do site deixará de estar ligada a esta conta Minecraft. Pode associá-la de novo quando quiser.",
+        "unlinked": "Conta desassociada.",
+        "err_invalid_username": "Esse não é um nome Minecraft válido.",
+        "err_already_linked": "Essa conta Minecraft já está associada a alguém.",
+        "err_no_server": "Ainda não há nenhum servidor configurado neste site. Fale com um administrador.",
+        "err_player_offline": "Neste momento não está no servidor. Entre e tente de novo.",
+        "err_whisper_failed": "Não foi possível contactar o servidor. Tente daqui a pouco.",
+        "err_not_found": "Esse código não corresponde. Veja o chat do jogo.",
+        "err_expired": "Esse código expirou. Peça um novo.",
+        "err_too_many_attempts": "Demasiados códigos errados. Peça um novo.",
+        "err_code_required": "Escreva o código que lhe foi sussurrado.",
+        "err_unknown": "Algo correu mal. Tente novamente.",
+        "adm_title": "Associação Minecraft",
+        "adm_subtitle": "Como o código de associação é entregue a um jogador dentro do jogo.",
+        "adm_field1Label": "Comando de sussurro",
+        "adm_field1Desc": "Executado para enviar o código a um jogador. {player} e {message} são substituídos. Por omissão usa o comando tell do Minecraft; altere-o para um proxy ou um plugin que trate as mensagens privadas de outra forma."
+      }
+    }
+  }
+}
