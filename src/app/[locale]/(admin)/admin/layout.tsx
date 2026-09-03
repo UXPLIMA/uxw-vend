@@ -1,5 +1,7 @@
 
 import { redirect } from "next/navigation";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
@@ -38,7 +40,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
     const { themeId } = await getActiveTheme();
 
+    // The locale layout drops the admin namespace from what it sends to the
+    // browser, since no public page renders it. This is where it comes back,
+    // for the one tree that does. See core/lib/i18n/message-scopes.ts.
+    const messages = await getMessages();
+
     return (
+        <NextIntlClientProvider messages={messages}>
         <div className="min-h-screen bg-background" suppressHydrationWarning>
             <AdminSidebar
                 userName={session.user.name || ""}
@@ -70,5 +78,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </main>
             <AdminSpotlight />
         </div>
+        </NextIntlClientProvider>
     );
 }

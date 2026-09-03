@@ -50,3 +50,22 @@ describe("catch-all segments", () => {
         expect(dirs.length).toBeGreaterThan(0);
     });
 });
+
+/**
+ * The admin namespace is roughly four fifths of the core catalogue and was
+ * being serialised into every public page. The locale layout trims it; the
+ * admin layout puts it back for the tree that renders it. Either half missing
+ * is a bug that only shows up as a broken admin panel or a fat public page.
+ */
+describe("admin message scoping", () => {
+    it("trims the admin namespace in the locale layout", () => {
+        const layout = fs.readFileSync(path.join(root, "src/app/[locale]/layout.tsx"), "utf8");
+        expect(layout).toContain("withoutAdminNamespaces(messages)");
+    });
+
+    it("re-provides the full catalogue in the admin layout", () => {
+        const layout = fs.readFileSync(path.join(root, "src/app/[locale]/(admin)/admin/layout.tsx"), "utf8");
+        expect(layout).toContain("NextIntlClientProvider");
+        expect(layout).toContain("await getMessages()");
+    });
+});
