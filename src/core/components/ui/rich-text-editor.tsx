@@ -90,13 +90,13 @@ export function RichTextEditor({
                 .rich-text-editor .ql-toolbar {
                     border-top-left-radius: 0.375rem;
                     border-top-right-radius: 0.375rem;
-                    background: #f8fafc;
+                    background: var(--uxw-color-muted);
                 }
                 .rich-text-editor .ql-editor {
                     min-height: 280px;
                 }
                 .rich-text-editor .ql-editor.ql-blank::before {
-                    color: #9ca3af;
+                    color: var(--uxw-color-mutedForeground);
                     font-style: normal;
                 }
             `}</style>
