@@ -19,6 +19,7 @@
  * merges module items in and prunes whatever ends up empty.
  */
 
+import { adminHref } from "@/core/lib/admin-path";
 import type { ComponentType } from "react";
 import {
     byDeclaringModule,
@@ -410,7 +411,7 @@ export function buildNavGroups({
             const group = resolveGroup(entry.group, groups, byId, sortOrder, translate);
             const labelKey = `menu_${mod.id}_${entry.label.replace(/\s+/g, "_").toLowerCase()}`;
             const item: NavItem = {
-                href: `/admin${entry.path.startsWith("/") ? entry.path : "/" + entry.path}`,
+                href: adminHref(entry.path),
                 label: translate(labelKey, entry.label),
                 icon: resolveIcon(entry.icon),
             };
@@ -505,7 +506,7 @@ export function buildThemeNavGroup(activeThemeId: string): NavGroup | null {
         { label: "Appearance", href: "/admin/theme/appearance", icon: Palette },
         ...themeItems.map((i: ThemeAdminNavItem) => ({
             label: i.label,
-            href: "/admin" + (i.path.startsWith("/") ? i.path : "/" + i.path),
+            href: adminHref(i.path),
             icon: resolveLucideIcon(i.icon) ?? Palette,
         })),
     ];

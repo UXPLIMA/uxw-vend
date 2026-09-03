@@ -120,6 +120,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   prerequisite on an install that had the store enabled. The range is now
   parsed and checked, and a module installed at the wrong version says so
   rather than claiming to be absent.
+- **Admin search linked to `/admin/admin/...`.** The spotlight built a result's
+  URL by putting `/admin` in front of a module route's path, which the registry
+  already stores with the prefix on it, so every module page found through
+  search led to a 404. Five modules also wrote the prefix into their own
+  `settingsCards[].href`. One function now builds these URLs, the manifest
+  schema refuses an admin path that carries its own prefix, and the five
+  manifests are corrected.
 - **The leaderboard and player profiles only compiled with a forum.** Both read
   the forum module's tables directly, and the leaderboard read the vote
   module's, without depending on either - so on any install that left one out,

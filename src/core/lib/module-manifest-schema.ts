@@ -57,9 +57,23 @@ const routePath = z.string().min(1).max(512).regex(
 
 const iconName = z.string().min(1).max(64).regex(SAFE_SLUG, "Icon must be a Lucide name");
 
+/**
+ * A path inside the admin panel, written without the `/admin` prefix.
+ *
+ * Core adds the prefix (see `adminHref`), so a manifest that includes it too
+ * produces `/admin/admin/...`: a link to a page that does not exist, from a
+ * menu or a search result for one that does. Five first-party modules had it
+ * that way and nothing said so, because only the spotlight ever built a URL
+ * from `settingsCards[].href`.
+ */
+const panelRelativePath = routePath.refine(
+    (p) => p !== "/admin" && !p.startsWith("/admin/"),
+    { message: "Admin paths are relative to the panel: drop the leading /admin" },
+);
+
 const menuItem = z.object({
     label: z.string().min(1).max(100),
-    path: routePath,
+    path: panelRelativePath,
     icon: iconName.optional(),
     group: z.string().min(1).max(64).regex(/^[a-z][a-z0-9-]*$/).optional(),
 });
@@ -71,7 +85,7 @@ const routeEntry = z.object({
 });
 
 const adminRouteEntry = z.object({
-    path: routePath,
+    path: panelRelativePath,
     component: relativePath("component"),
 });
 
@@ -402,7 +416,7 @@ const layoutComponent = z.object({
 const settingsCard = z.object({
     title: z.string().min(1).max(100),
     description: z.string().max(500),
-    href: routePath,
+    href: panelRelativePath,
     icon: iconName,
     color: z.string().min(1).max(64),
 });

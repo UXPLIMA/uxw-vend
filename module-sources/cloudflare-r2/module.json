@@ -2,7 +2,7 @@
   "id": "cloudflare-r2",
   "name": "Cloudflare R2 Storage",
   "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -34,7 +34,7 @@
     {
       "title": "Cloudflare R2 Storage",
       "description": "Configure R2 bucket for file uploads (S3-compatible)",
-      "href": "/admin/storage/cloudflare-r2",
+      "href": "/storage/cloudflare-r2",
       "icon": "Cloud",
       "color": "text-orange-500"
     }
