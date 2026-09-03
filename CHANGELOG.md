@@ -7,7 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Modules can ship their own sign-in provider. `authProviders` takes a
+  `factory` plus the env vars that gate it, instead of naming a provider
+  Auth.js already has, and `oauthButtons` takes a same-origin `href` for a flow
+  Auth.js cannot start. `CORE_API_VERSION` 1.1.0 -> 1.2.0.
+- **Steam login** (`steam-auth`), the first module built on that. Steam speaks
+  OpenID 2.0, so the module runs the OpenID half itself and hands Auth.js a
+  single-use ticket. Set `AUTH_STEAM_API_KEY`.
+- Sign in with **Roblox, Twitch, GitHub and FACEIT**.
+
+### Changed
+- **RCON lives in one place.** The store and servers modules each carried a
+  copy of the client, and the copies had drifted. The servers module owns it
+  now and answers a `server.command` filter; the store asks through that hook
+  and reports "no installed module can reach a game server" when nothing does.
+- **RCON is configured per server.** The global `rcon_host` / `rcon_port` /
+  `rcon_password` settings are gone - they held a second copy of the password
+  in plaintext and could only describe one server. An install still carrying
+  them has them moved onto a `GameServer` row, encrypted, the first time RCON
+  is used; the settings rows are then deleted.
+
 ### Fixed
+- **Sign-in modules asked for credentials they could not use.** Six of them
+  offered a form for a client id and secret, saved it to the settings table
+  under keys nothing reads, and reported success - Auth.js assembles its
+  providers from the environment at startup. They share one read-only setup
+  panel now, and a test fails if a sign-in module grows a credentials form
+  again.
 - **No module could be picked during first-run setup.** The wizard's module
   step fetched `/api/v1/modules/marketplace`, and the setup gate in `proxy.ts`
   answers every path outside `/api/setup` with 503 until a user exists. The

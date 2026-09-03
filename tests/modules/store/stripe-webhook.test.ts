@@ -7,7 +7,7 @@
  *   - the store Stripe lib (getStripe / getStripeWebhookSecret) so we can
  *     inject a fake `stripe.webhooks.constructEvent`
  *   - @/core/lib/db (prisma) with in-memory order/payment/credit state
- *   - the store email + rcon libs and core discord sender (fire-and-forget)
+ *   - the store email + delivery libs and core discord sender (fire-and-forget)
  *
  * Coverage:
  *   (a) missing `stripe-signature` header  -> 400
@@ -30,7 +30,7 @@ vi.mock("@/modules/store/lib/stripe", () => ({
 vi.mock("@/modules/store/lib/email", () => ({
     sendOrderConfirmationEmail: vi.fn(async () => {}),
 }));
-vi.mock("@/modules/store/lib/rcon", () => ({
+vi.mock("@/modules/store/lib/delivery", () => ({
     deliverProduct: vi.fn(async () => {}),
 }));
 const doActionAsync = vi.fn<(...a: unknown[]) => Promise<void>>(async () => {});

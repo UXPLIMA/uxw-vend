@@ -441,9 +441,22 @@
     "currency"
   ],
   "hooksEmitted": [
-    { "hook": "store.order.completed", "type": "action" },
-    { "hook": "store.order.created", "type": "action" },
-    { "hook": "store.product.created", "type": "action" }
+    {
+      "hook": "server.command",
+      "type": "filter"
+    },
+    {
+      "hook": "store.order.completed",
+      "type": "action"
+    },
+    {
+      "hook": "store.order.created",
+      "type": "action"
+    },
+    {
+      "hook": "store.product.created",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {
@@ -3394,7 +3407,14 @@
       "handler": "search/handler.ts",
       "icon": "ShoppingBag",
       "indexes": [
-        { "table": "Product", "columns": ["name", "shortDesc", "description"] }
+        {
+          "table": "Product",
+          "columns": [
+            "name",
+            "shortDesc",
+            "description"
+          ]
+        }
       ]
     }
   ],

@@ -33,7 +33,7 @@ export default function Page() {
                 { key: "port", label: t("svr_port"), type: "number", defaultValue: "25565" },
                 { key: "queryPort", label: t("svr_queryPort"), type: "number", placeholder: t("svr_queryPortPlaceholder") },
                 { key: "rconPort", label: t("svr_rconPort"), type: "number", placeholder: t("svr_rconPortPlaceholder") },
-                { key: "rconPassword", label: t("svr_rconPassword"), type: "text", placeholder: t("svr_rconPasswordPlaceholder") },
+                { key: "rconPassword", label: t("svr_rconPassword"), type: "password", placeholder: t("svr_rconPasswordPlaceholder") },
                 { key: "isDefault", label: t("svr_isDefault"), type: "toggle", defaultValue: "false" },
                 { key: "isActive", label: t("svr_isActive"), type: "toggle", defaultValue: "true" },
             ]}

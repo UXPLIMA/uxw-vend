@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { deliverProduct } from "../../../lib/rcon";
+import { deliverProduct } from "../../../lib/delivery";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
