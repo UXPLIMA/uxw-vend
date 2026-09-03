@@ -3,11 +3,11 @@
 //
 // The merged schema + registry files are never committed to git because they
 // are a function of schema.core.prisma + whatever modules are installed in
-// src/modules/. On a fresh clone those artifacts are missing — this script
+// src/modules/. On a fresh clone those artifacts are missing - this script
 // ensures the repo is usable immediately after `npm install`.
 //
 // Set SKIP_POSTINSTALL=1 (or CI=1 for images that run `npm run build` anyway)
-// to bypass — e.g. Docker layer caching or CI environments that call the
+// to bypass - e.g. Docker layer caching or CI environments that call the
 // individual scripts explicitly.
 
 import { spawnSync } from "child_process";

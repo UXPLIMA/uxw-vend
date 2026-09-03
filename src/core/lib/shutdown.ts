@@ -28,7 +28,7 @@ let shuttingDown = false;
 
 /**
  * Register a cleanup callback. Safe to call multiple times with the same
- * name — later registrations replace the earlier one so hot-reload / test
+ * name - later registrations replace the earlier one so hot-reload / test
  * re-imports don't stack duplicates.
  */
 export function onShutdown(name: string, fn: ShutdownCallback): void {
@@ -43,7 +43,7 @@ export function onShutdown(name: string, fn: ShutdownCallback): void {
 /**
  * Execute all registered callbacks in reverse order. Each runs inside its
  * own try/catch so one broken handler can't leave later ones uncalled.
- * Callers should not invoke this directly — the signal handler does.
+ * Callers should not invoke this directly - the signal handler does.
  */
 async function runShutdown(signal: string): Promise<void> {
     if (shuttingDown) return;
@@ -65,7 +65,7 @@ async function runShutdown(signal: string): Promise<void> {
 
 /**
  * Install SIGTERM / SIGINT handlers exactly once per process. Call from
- * any server-entry module — the install flag makes repeat calls cheap.
+ * any server-entry module - the install flag makes repeat calls cheap.
  * A max-grace timeout guards against a buggy handler that hangs: we
  * force-exit after N seconds so PM2 doesn't have to SIGKILL us.
  */

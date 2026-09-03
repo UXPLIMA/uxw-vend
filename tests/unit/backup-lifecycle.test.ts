@@ -8,8 +8,8 @@ import zlib from "zlib";
  * This file covers what actually spawns processes: taking a dump, restoring
  * one, and rotating the rest away.
  *
- * Restore is the most destructive operation the platform has — pg_dump's
- * `--clean --if-exists` header drops every table before it reloads them —
+ * Restore is the most destructive operation the platform has - pg_dump's
+ * `--clean --if-exists` header drops every table before it reloads them -
  * and it runs during an incident, when nobody is in a position to debug it.
  * Rotation is destructive too, just quietly: deleting the wrong side of the
  * retention window throws away the backups an operator is about to need.
@@ -197,7 +197,7 @@ describe("createBackup", () => {
         expect(meta.filename).toMatch(/^uxwvend-scheduled-[0-9TZ-]+\.sql\.gz$/);
         expect(meta.id).toBe(meta.filename.replace(".sql.gz", ""));
         expect(meta.type).toBe("scheduled");
-        // gzip magic number — the file on disk is actually compressed.
+        // gzip magic number - the file on disk is actually compressed.
         const written = Buffer.concat(writtenChunks);
         expect(written[0]).toBe(0x1f);
         expect(written[1]).toBe(0x8b);

@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — active theme configuration.
+ * uxwVend module SDK - active theme configuration.
  *
  * Its own entry point because `useThemeConfig` is a React context hook: it can
  * only be called from a client component, and folding it into the isomorphic

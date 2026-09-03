@@ -42,7 +42,7 @@ export default function NavbarSettingsPage() {
                 if (Array.isArray(navLinks)) {
                     setLinks(navLinks);
                 } else {
-                    // No override yet — seed the editor with what the navbar is
+                    // No override yet - seed the editor with what the navbar is
                     // currently rendering from the module registry, so the
                     // admin sees real state and can edit from there.
                     const registry = ModuleNavLinks
@@ -213,7 +213,7 @@ export default function NavbarSettingsPage() {
                     <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                         lucide.dev/icons <ExternalLink className="w-3 h-3" />
                     </a>
-                    {" "}— copy the name and paste it in. PascalCase or kebab-case both work. Leave empty for no icon.
+                    {" "}- copy the name and paste it in. PascalCase or kebab-case both work. Leave empty for no icon.
                 </p>
                 <p>
                     <strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.

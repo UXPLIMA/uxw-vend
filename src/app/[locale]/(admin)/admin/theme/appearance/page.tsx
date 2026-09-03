@@ -12,7 +12,7 @@ import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 
 /**
- * Active theme's appearance editor — color tokens + mode toggle.
+ * Active theme's appearance editor - color tokens + mode toggle.
  *
  * This page is scoped to whichever theme is currently active. The
  * multi-theme library (picker, install, delete) lives at
@@ -94,7 +94,7 @@ export default function ActiveThemeAppearancePage() {
             <div>
                 <h1 className="text-2xl font-semibold flex items-center gap-2">
                     <Palette className="w-5 h-5" />
-                    {activeTheme.name} — {t("theme_appearanceTitle")}
+                    {activeTheme.name} - {t("theme_appearanceTitle")}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
                     {t("theme_appearanceSubtitle")}

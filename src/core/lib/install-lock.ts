@@ -4,15 +4,15 @@
  * after all pending installs complete.
  *
  * Scenarios handled:
- * 1. Bulk install (37 modules) — build runs ONCE at the end, not 37 times
- * 2. Concurrent install requests — queued, not rejected
- * 3. Build already running — waits for completion
- * 4. Restart debounce — a single process replacement after the build
- * 5. Partial install failure — does not block other installs
+ * 1. Bulk install (37 modules) - build runs ONCE at the end, not 37 times
+ * 2. Concurrent install requests - queued, not rejected
+ * 3. Build already running - waits for completion
+ * 4. Restart debounce - a single process replacement after the build
+ * 5. Partial install failure - does not block other installs
  *
- * The lock itself is a Postgres advisory lock, so a second process — a
+ * The lock itself is a Postgres advisory lock, so a second process - a
  * lingering old container during a deploy, or an operator running a script
- * against the same database — cannot start an install while one is underway.
+ * against the same database - cannot start an install while one is underway.
  * The in-process flag is kept as a fast path so concurrent requests to this
  * process can early-reject without a round trip.
  *
@@ -35,7 +35,7 @@ const execFileAsync = promisify(execFile);
  * and open responses are allowed to complete inside the grace window.
  *
  * The short delay lets the HTTP response that triggered the install reach the
- * admin's browser first — without it the request that installed a module dies
+ * admin's browser first - without it the request that installed a module dies
  * with the process and the UI reports a failure for a build that succeeded.
  */
 function requestRestart(): void {
@@ -48,7 +48,7 @@ function requestRestart(): void {
     }, RESTART_GRACE_MS).unref();
 }
 
-// Advisory lock key — arbitrary constant. Postgres session-level advisory
+// Advisory lock key - arbitrary constant. Postgres session-level advisory
 // locks are identified by a bigint; any app-wide constant works as long as
 // nothing else in the schema reuses the same value. Use a BigInt literal:
 // the hex value exceeds Number.MAX_SAFE_INTEGER, so a plain `number` would
@@ -68,7 +68,7 @@ const RESTART_GRACE_MS = 2000;  // Let the triggering HTTP response flush first
 // and release are guaranteed to execute on the same Postgres session.
 // Prisma's own connection pool can recycle connections between calls, which
 // makes pg_advisory_unlock a no-op when the release lands on a different
-// connection — the lock then leaks until the original session is closed.
+// connection - the lock then leaks until the original session is closed.
 // Lazily required via eval("require") to keep Turbopack from bundling pg.
 type LockClient = {
     query<T>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
@@ -93,13 +93,13 @@ export function isInstalling(): boolean {
 }
 
 /**
- * Acquire install lock — returns release function or null if another
+ * Acquire install lock - returns release function or null if another
  * install is already running (either in this worker or another one).
  *
  * Holds a dedicated pg client checked out from a single-purpose pool so
  * pg_try_advisory_lock and pg_advisory_unlock run on the same Postgres
  * session. Without this, Prisma's pool may release the unlock on a
- * different physical connection — making it a silent no-op while the
+ * different physical connection - making it a silent no-op while the
  * lock continues to be held by the original session.
  */
 export async function acquireInstallLock(): Promise<(() => void) | null> {
@@ -130,7 +130,7 @@ export async function acquireInstallLock(): Promise<(() => void) | null> {
         };
     } catch (err) {
         if (client) { try { client.release(); } catch { /* noop */ } }
-        // DB unreachable — fall back to in-process lock so single-worker
+        // DB unreachable - fall back to in-process lock so single-worker
         // setups (no Postgres yet, e.g. during initial setup wizard)
         // still get some mutual exclusion.
         console.error("[install-lock] advisory lock failed, falling back to in-process:", err);
@@ -149,7 +149,7 @@ declare const __non_webpack_require__: NodeRequire;
  */
 export function scheduleBuild(): void {
     // Dev mode: Turbopack handles recompile, skip the production build
-    // pipeline. `NEXT_DEV` was a typo — Next.js sets NODE_ENV=development
+    // pipeline. `NEXT_DEV` was a typo - Next.js sets NODE_ENV=development
     // during `next dev`, not a custom NEXT_DEV flag, so the old check
     // was a no-op and full builds ran even while the dev server was up.
     if (process.env.NODE_ENV !== "production") return;
@@ -192,8 +192,8 @@ export function scheduleBuild(): void {
             //    docs/MIGRATIONS.md says migrations are for altering a
             //    module's schema *after* it is deployed and that the schema
             //    itself is what creates the tables on first install. This
-            //    step used to be absent — the comment on step 3 read
-            //    "replaces db push" — so installing any of those modules one
+            //    step used to be absent - the comment on step 3 read
+            //    "replaces db push" - so installing any of those modules one
             //    at a time left it enabled with none of its tables: every one
             //    of its API routes answered 500 with Prisma P2021 and its
             //    cron job logged the same error once a minute, forever. Bulk
@@ -204,7 +204,7 @@ export function scheduleBuild(): void {
             //    obvious choice and was the first thing tried. It reconciles
             //    the *whole* database to the merged schema, and uninstall
             //    deliberately leaves a module's tables behind so a reinstall
-            //    keeps the admin's data — so after any uninstall the database
+            //    keeps the admin's data - so after any uninstall the database
             //    legitimately holds tables the schema no longer mentions, and
             //    push either drops them silently or refuses to run at all.
             //    scripts/apply-schema-additions.ts asks Prisma for the same
@@ -229,7 +229,7 @@ export function scheduleBuild(): void {
                 });
             }
 
-            // 3. Apply per-module SQL migrations — schema changes a module
+            // 3. Apply per-module SQL migrations - schema changes a module
             //    shipped after its initial release.
             try {
                 await execFileAsync("npx", ["tsx", "scripts/apply-migrations.ts"], {
@@ -273,7 +273,7 @@ export function scheduleBuild(): void {
             //    Rebuilding underneath it changes nothing the running process
             //    can see, so an install is not live until the process is
             //    replaced. This used to call `npx pm2 restart uxwvend` inside
-            //    a try/catch — and pm2 is in neither the image nor
+            //    a try/catch - and pm2 is in neither the image nor
             //    package.json, so the call always threw and was always
             //    swallowed. Every module install rebuilt and then served the
             //    old build.
@@ -281,12 +281,12 @@ export function scheduleBuild(): void {
             //    Raising SIGTERM on ourselves is the portable replacement: it
             //    runs the shutdown registry (draining Prisma, clearing the
             //    scheduler interval) and exits, and every supervisor this
-            //    project supports treats that as "start me again" —
+            //    project supports treats that as "start me again" -
             //    docker-compose `restart: unless-stopped`, systemd
             //    `Restart=always`, and pm2 if an operator does use it.
             requestRestart();
         } catch (err) {
-            // Non-fatal: build failed — will need a manual rebuild.
+            // Non-fatal: build failed - will need a manual rebuild.
             log.error("install-lock: build failed", {
                 step: "build",
                 error: err instanceof Error ? err.message : String(err),

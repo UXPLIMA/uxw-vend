@@ -101,7 +101,7 @@ function release(triple: Version): ParsedVersion {
 
 /**
  * Turns one comparator token into a bounded interval. Returns null when the
- * token is not valid syntax — callers must treat that as "reject", never as
+ * token is not valid syntax - callers must treat that as "reject", never as
  * "matches".
  */
 function parseComparator(token: string): Constraint | null {
@@ -119,7 +119,7 @@ function parseComparator(token: string): Constraint | null {
     const pre = m[5] ? m[5].split(".") : null;
 
     if (WILDCARD.has(rawMajor)) {
-        // `x`, `x.y.z` — unbounded regardless of operator.
+        // `x`, `x.y.z` - unbounded regardless of operator.
         return {};
     }
 
@@ -141,7 +141,7 @@ function parseComparator(token: string): Constraint | null {
             return { hi: { version: base, inclusive: true } };
         case "^": {
             // Caret allows changes that do not modify the left-most non-zero
-            // element — npm semantics, including the 0.x special cases.
+            // element - npm semantics, including the 0.x special cases.
             let hi: Version;
             if (major !== 0) hi = [major + 1, 0, 0];
             else if (minorGiven && minor !== 0) hi = [0, minor + 1, 0];
@@ -226,7 +226,7 @@ function satisfiesConstraint(v: ParsedVersion, c: Constraint): boolean {
  *
  * Fails closed: an unparseable version or range returns false. A caller that
  * needs to distinguish "incompatible" from "malformed" must call
- * `isValidRange` first — which is exactly what manifest validation does.
+ * `isValidRange` first - which is exactly what manifest validation does.
  */
 export function satisfiesRange(version: string, range: string): boolean {
     const v = parseFull(version);

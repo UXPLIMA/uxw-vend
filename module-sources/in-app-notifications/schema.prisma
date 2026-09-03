@@ -1,4 +1,4 @@
-// Notifications Module — Database Models
+// Notifications Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // @@user-relations-start

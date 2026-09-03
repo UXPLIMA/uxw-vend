@@ -94,7 +94,7 @@ for name in sorted(os.listdir(SOURCES_DIR)):
     manifest_tags = m.get("tags")
     tags = [str(t) for t in manifest_tags] if isinstance(manifest_tags, list) and manifest_tags else [cat]
 
-    # Screenshots are curated content, not generated — carry them across rebuilds.
+    # Screenshots are curated content, not generated - carry them across rebuilds.
     screenshots = []
     existing_path = os.path.join(OUTPUT_DIR, "index.json")
     if os.path.isfile(existing_path):
@@ -135,7 +135,7 @@ for name in sorted(os.listdir(SOURCES_DIR)):
         },
     })
 
-# A listener on a hook nothing emits never fires, and nothing reports it — not
+# A listener on a hook nothing emits never fires, and nothing reports it - not
 # at build time, not at runtime, not in a log. Checking the whole catalog at
 # once is the only place where both halves of the contract are visible.
 unknown_hooks = [

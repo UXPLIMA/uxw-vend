@@ -73,7 +73,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
             {value && (
                 <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3">
                     {isImage ? (
-                        // Uploaded/user-provided URLs may be local or external — use plain img tag
+                        // Uploaded/user-provided URLs may be local or external - use plain img tag
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={value}

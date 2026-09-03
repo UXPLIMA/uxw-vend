@@ -57,11 +57,11 @@ export async function sendDiscordWebhook(
 
     if (!url) return;
 
-    // Validate webhook domain — only post to official Discord hosts so a
+    // Validate webhook domain - only post to official Discord hosts so a
     // tampered setting value can't be used to exfiltrate payloads (SSRF).
     try {
         const urlObj = new URL(url);
-        // Exact-or-subdomain match — endsWith("discord.com") alone would also
+        // Exact-or-subdomain match - endsWith("discord.com") alone would also
         // accept "evildiscord.com" / "discord.com.attacker.test" (SSRF bypass).
         const host = urlObj.hostname.toLowerCase().replace(/\.$/, "");
         const onDiscord = ["discord.com", "discordapp.com"].some((d) => host === d || host.endsWith("." + d));

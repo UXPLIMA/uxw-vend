@@ -164,7 +164,7 @@ describe("queueEmail", () => {
 });
 
 // ===========================================================================
-// processEmailQueue — claiming
+// processEmailQueue - claiming
 // ===========================================================================
 
 describe("processEmailQueue claiming", () => {
@@ -224,7 +224,7 @@ describe("processEmailQueue claiming", () => {
 });
 
 // ===========================================================================
-// processEmailQueue — delivery outcomes
+// processEmailQueue - delivery outcomes
 // ===========================================================================
 
 describe("processEmailQueue delivery", () => {
@@ -344,7 +344,7 @@ describe("processEmailQueue delivery", () => {
 });
 
 // ===========================================================================
-// Header injection — the reason this file exists
+// Header injection - the reason this file exists
 // ===========================================================================
 
 describe("recipient validation", () => {

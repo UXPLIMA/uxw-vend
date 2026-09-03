@@ -2,7 +2,7 @@
  * Sanitize admin-supplied custom CSS so it can safely be rendered into a
  * `<style>` tag that every visitor loads. Admin is trusted, but the admin
  * account can be compromised and custom CSS is persisted in the public
- * settings blob — so we still have to defend downstream visitors from
+ * settings blob - so we still have to defend downstream visitors from
  * XSS / clickjacking injected through this field.
  *
  * The aggressive rule: CSS has no legitimate need for `<` or `>` in the
@@ -20,7 +20,7 @@ export function sanitizeCustomCss(input: unknown): string {
 
     return input
         // Angle brackets have no legitimate CSS use and are the primary
-        // break-out vector — drop them entirely.
+        // break-out vector - drop them entirely.
         .replace(/[<>]/g, "")
         // Block `javascript:` URIs in any context (url(), cursor, etc.)
         .replace(/javascript\s*:/gi, "")

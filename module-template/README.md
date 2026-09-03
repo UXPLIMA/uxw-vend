@@ -16,7 +16,7 @@ Arguments:
 
 | Position | Value | Required | Default |
 |----------|-------|----------|---------|
-| 1 | Module ID | Yes | — (lowercase, letters/digits/hyphens, starts with a letter, no double hyphens) |
+| 1 | Module ID | Yes | - (lowercase, letters/digits/hyphens, starts with a letter, no double hyphens) |
 | 2 | Display name | No | Title-cased from the ID |
 | 3 | Description | No | `"<Name> module for uxwVend"` |
 
@@ -46,7 +46,7 @@ The script:
 
 ```
 my-module/
-├── module.json              Complete manifest with every common field — delete what you don't need
+├── module.json              Complete manifest with every common field - delete what you don't need
 ├── schema.prisma            Example Prisma model with @@user-relations marker block
 ├── api/
 │   └── route.ts             Example handler with GET (paginated list) + POST (admin-only create)
@@ -57,7 +57,7 @@ my-module/
 │   └── ExampleWidget.tsx    Generic reusable component (used by layoutComponents / navbarComponents demo)
 ├── widgets/
 │   └── ExampleWidget.tsx    Homepage sidebar widget component
-└── messages/                Locale JSON files (en / tr / de) — translations are ALSO inline in module.json
+└── messages/                Locale JSON files (en / tr / de) - translations are ALSO inline in module.json
     ├── en.json
     ├── tr.json
     └── de.json
@@ -67,7 +67,7 @@ Only `module.json` is required. Delete any directory or file you don't need.
 
 ---
 
-## module.json — what to keep, what to delete
+## module.json - what to keep, what to delete
 
 The template manifest enumerates every common UI registration so you can see all the options in one place. Remove fields you don't use.
 
@@ -148,7 +148,7 @@ Naming rules:
 - Use `cuid()` for primary keys.
 - Add `@@index` for frequently queried fields.
 
-To add fields on the core `User` model, declare them inside the marker block — `scripts/merge-schemas.ts` injects them into the core schema at the `// @@MODULE_RELATIONS` marker.
+To add fields on the core `User` model, declare them inside the marker block - `scripts/merge-schemas.ts` injects them into the core schema at the `// @@MODULE_RELATIONS` marker.
 
 After editing the schema:
 
@@ -169,8 +169,8 @@ If your module has no database models, delete `schema.prisma` entirely.
 # 1. Scaffold
 npm run create:module my-module "My Module" "What it does"
 
-# 2. Edit module.json — keep only the fields you need
-# 3. Edit schema.prisma — define your models (or delete the file)
+# 2. Edit module.json - keep only the fields you need
+# 3. Edit schema.prisma - define your models (or delete the file)
 
 # 4. Merge schema and push to DB (skip if no schema)
 npm run db:merge && npm run db:push
@@ -178,7 +178,7 @@ npm run db:merge && npm run db:push
 # 5. Validate the manifest
 npm run validate:module module-sources/my-module
 
-# 6. Install locally — fast path (bypass the marketplace UI)
+# 6. Install locally - fast path (bypass the marketplace UI)
 cp -r module-sources/my-module src/modules/my-module
 npx tsx scripts/generate-registry.ts
 
@@ -201,16 +201,16 @@ npm run build:marketplace
 
 ## Conventions (quick reference)
 
-- **Server components by default** — add `"use client"` only when needed.
-- **No hardcoded UI strings** — use `useTranslations()` (`next-intl`) or declare `translations` in `module.json`.
-- **Auth checks** — admin pages call `isAdmin()` from `@/core/sdk/server`; write API endpoints verify `session.user.id` + `hasPermission()`.
-- **Imports** — the SDK (`@/core/sdk`, `/server`, `/auth`, `/navigation`, `/blocks`, `/theme`, `/ui`, `/layout`, `/admin`) for core, relative paths within the module. Reaching into `@/core/lib/*` or `@/core/components/*` fails `npm run validate:module`.
-- **No `any`** — TypeScript strict mode.
-- **No `confirm()` / `alert()`** — use `useConfirm()` + `toast` from `sonner`.
-- **No emojis in UI** — Lucide icons only.
-- **API responses** — `{ ok: true, data }` / `{ ok: false, error, code?, details? }` via `apiSuccess` / `apiError` / `apiPaginated` from `@/core/sdk/server`.
-- **Zod 4** — read validation issues from `.issues`, not `.errors`.
-- **Routing** — `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation`, not `next/link`.
+- **Server components by default** - add `"use client"` only when needed.
+- **No hardcoded UI strings** - use `useTranslations()` (`next-intl`) or declare `translations` in `module.json`.
+- **Auth checks** - admin pages call `isAdmin()` from `@/core/sdk/server`; write API endpoints verify `session.user.id` + `hasPermission()`.
+- **Imports** - the SDK (`@/core/sdk`, `/server`, `/auth`, `/navigation`, `/blocks`, `/theme`, `/ui`, `/layout`, `/admin`) for core, relative paths within the module. Reaching into `@/core/lib/*` or `@/core/components/*` fails `npm run validate:module`.
+- **No `any`** - TypeScript strict mode.
+- **No `confirm()` / `alert()`** - use `useConfirm()` + `toast` from `sonner`.
+- **No emojis in UI** - Lucide icons only.
+- **API responses** - `{ ok: true, data }` / `{ ok: false, error, code?, details? }` via `apiSuccess` / `apiError` / `apiPaginated` from `@/core/sdk/server`.
+- **Zod 4** - read validation issues from `.issues`, not `.errors`.
+- **Routing** - `Link`, `usePathname`, `redirect` from `@/core/sdk/navigation`, not `next/link`.
 
 ---
 
@@ -238,7 +238,7 @@ Commit the source tree under `module-sources/<id>/`, the generated `module-marke
 
 ## See also
 
-- [../docs/PLUGIN_SDK.md](../docs/PLUGIN_SDK.md) — complete `module.json` reference and authoring patterns
-- [../docs/MIGRATIONS.md](../docs/MIGRATIONS.md) — per-module SQL migrations
-- [../docs/API.md](../docs/API.md) — REST API conventions for module handlers
-- [../docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md) — workflow and coding conventions
+- [../docs/PLUGIN_SDK.md](../docs/PLUGIN_SDK.md) - complete `module.json` reference and authoring patterns
+- [../docs/MIGRATIONS.md](../docs/MIGRATIONS.md) - per-module SQL migrations
+- [../docs/API.md](../docs/API.md) - REST API conventions for module handlers
+- [../docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md) - workflow and coding conventions

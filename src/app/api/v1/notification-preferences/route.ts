@@ -4,7 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { setPreference, getUserPreferences } from "@/core/lib/notif-prefs";
 import { ModuleNotificationTypes } from "@/core/generated/module-notification-types";
 
-/** GET — list current user's prefs + the available event types */
+/** GET - list current user's prefs + the available event types */
 export async function GET() {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -22,7 +22,7 @@ const updateSchema = z.object({
     enabled: z.boolean(),
 });
 
-/** POST — update one preference */
+/** POST - update one preference */
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -76,13 +76,13 @@ export default function LoginPage() {
                             const status = await statusRes.json();
                             const remaining = Number(status?.remainingBackupCodes) || 0;
                             if (remaining <= 3) {
-                                toast.warning(`${remaining} backup codes remaining — regenerate at /profile if low`);
+                                toast.warning(`${remaining} backup codes remaining - regenerate at /profile if low`);
                             } else {
-                                toast.info(`${remaining} backup codes remaining — regenerate at /profile if low`);
+                                toast.info(`${remaining} backup codes remaining - regenerate at /profile if low`);
                             }
                         }
                     } catch {
-                        // silent — not critical
+                        // silent - not critical
                     }
                 }
                 router.push("/");
@@ -218,7 +218,7 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            {/* OAuth buttons — from installed modules */}
+                            {/* OAuth buttons - from installed modules */}
                             {oauthButtons.length > 0 && (
                                     <div className={`grid ${oauthButtons.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-3`}>
                                         {oauthButtons.map(btn => (

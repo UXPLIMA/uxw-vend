@@ -8,8 +8,8 @@ const analyzeBundles = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'tr
 const isDev = process.env.NODE_ENV === 'development';
 
 // Hosts allowed to pull Next's dev-only /_next/* resources (client chunks,
-// the HMR websocket). Next rejects a bare '*' on purpose — its matcher
-// refuses any wildcard that would match a whole host — so an allowlist of
+// the HMR websocket). Next rejects a bare '*' on purpose - its matcher
+// refuses any wildcard that would match a whole host - so an allowlist of
 // '*' silently blocks EVERY non-localhost origin with a 403, which reads as
 // "the page renders but never hydrates". List real hosts instead, derived
 // from the same env URLs src/core/lib/csrf.ts trusts, plus
@@ -21,7 +21,7 @@ function devOriginHosts(): string[] {
     try {
       hosts.add(new URL(raw).hostname);
     } catch {
-      // Ignore malformed URLs — the app surfaces those elsewhere.
+      // Ignore malformed URLs - the app surfaces those elsewhere.
     }
   }
   for (const part of (process.env.NEXT_DEV_ALLOWED_ORIGINS ?? '').split(',')) {
@@ -58,7 +58,7 @@ const nextConfig: NextConfig = {
     //  - style-src keeps 'unsafe-inline' because Tailwind JIT injects CSS via
     //    inline <style> during hydration. Moving to a nonce needs matching
     //    middleware threading and is tracked separately.
-    //  - script-src drops 'unsafe-eval' from the *production* policy — Next.js
+    //  - script-src drops 'unsafe-eval' from the *production* policy - Next.js
     //    16 / React 19 no longer need eval() at runtime there. React's
     //    DEVELOPMENT build does eval() (callstack reconstruction across
     //    environments, Turbopack HMR), so dev adds it back or the client
@@ -106,7 +106,7 @@ const nextConfig: NextConfig = {
       { key: 'X-DNS-Prefetch-Control', value: 'on' },
       // Block Flash / Acrobat cross-domain policy file lookups.
       { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
-      // Spectre / cross-origin process isolation — strong defaults that
+      // Spectre / cross-origin process isolation - strong defaults that
       // don't break current pages. Revisit if modules embed third-party
       // widgets that need postMessage access across origins.
       { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },

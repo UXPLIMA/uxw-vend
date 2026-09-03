@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * getModuleStates is consulted during SSR and during `next build`'s
  * static-collection phase, where DATABASE_URL may not resolve at all. It
  * therefore has to treat an unreachable database as "no states known" and
- * let consumers default to enabled — returning false there would 404 every
+ * let consumers default to enabled - returning false there would 404 every
  * module the moment the database blinked. Nothing tested that.
  */
 
@@ -115,7 +115,7 @@ describe("getModuleStates", () => {
 
     it("serves a cached empty map instead of re-querying", async () => {
         // An empty map is only ever cached after a *successful* read, so it
-        // means "there are genuinely no rows" — not "the read failed".
+        // means "there are genuinely no rows" - not "the read failed".
         cacheGetJSON.mockResolvedValue({});
 
         await expect(getModuleStates()).resolves.toEqual({});

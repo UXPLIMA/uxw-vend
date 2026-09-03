@@ -3,8 +3,8 @@
  *
  * The admin screens used to do this with `window.location.href = url`, which
  * works only because the endpoint sets `Content-Disposition: attachment`. When
- * it doesn't — an expired session redirecting to the login page, a 500 that
- * renders an error body — the browser navigates away and the admin loses the
+ * it doesn't - an expired session redirecting to the login page, a 500 that
+ * renders an error body - the browser navigates away and the admin loses the
  * page they were on, along with any filter state.
  *
  * A synthetic anchor click asks for the same download without ever committing

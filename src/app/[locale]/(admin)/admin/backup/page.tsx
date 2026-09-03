@@ -45,7 +45,7 @@ function formatBytes(bytes: number): string {
 }
 
 function formatDate(value: string | null): string {
-    if (!value) return "—";
+    if (!value) return "-";
     return new Date(value).toLocaleString("tr-TR");
 }
 

@@ -6,13 +6,13 @@ import { Slot } from "@/core/components/Slot";
 import { Copy, Check, Gamepad2 } from "lucide-react";
 
 /**
- * PixelCraft hero — three-column gaming banner.
+ * PixelCraft hero - three-column gaming banner.
  *
  *   [ server IP cell ]  [ center logo ]  [ discord cell ]
  *
  * Each side cell exposes a `<Slot />` above its label so an analytics
- * module (typically mc-stats) can inject a live counter — "24 448
- * PLAYERS ONLINE", "950 MEMBERS ONLINE" — without the theme knowing
+ * module (typically mc-stats) can inject a live counter - "24 448
+ * PLAYERS ONLINE", "950 MEMBERS ONLINE" - without the theme knowing
  * about the module. If nothing fills the slot, the cell degrades to
  * just the static label.
  *
@@ -21,7 +21,7 @@ import { Copy, Check, Gamepad2 } from "lucide-react";
  * stretch evenly.
  */
 export default function Hero() {
-    // useThemeConfig returns a dotted-path getter, not the raw object —
+    // useThemeConfig returns a dotted-path getter, not the raw object -
     // don't cast it to a record.
     const get = useThemeConfig();
     const bgImage = get<string>("hero.backgroundImage", "") ?? "";
@@ -36,7 +36,7 @@ export default function Hero() {
             await navigator.clipboard.writeText(serverIp);
             setCopied(true);
             setTimeout(() => setCopied(false), 1600);
-        } catch { /* clipboard unavailable — ignore */ }
+        } catch { /* clipboard unavailable - ignore */ }
     };
 
     return (

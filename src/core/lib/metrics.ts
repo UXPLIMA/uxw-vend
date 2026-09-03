@@ -1,7 +1,7 @@
 /**
  * Lightweight in-memory request metrics collector.
  * Stores rolling window of request stats for admin dashboard.
- * Resets on server restart — not persistent.
+ * Resets on server restart - not persistent.
  */
 
 interface RequestMetric {

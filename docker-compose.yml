@@ -9,12 +9,12 @@
 # POSTGRES_PASSWORD and AUTH_SECRET, then `docker compose up -d`.
 #
 # Companion files:
-#   docker-compose.build.yml — build the image from source instead of pulling
-#   docker-compose.debug.yml — republish Postgres/Redis on 127.0.0.1
+#   docker-compose.build.yml - build the image from source instead of pulling
+#   docker-compose.debug.yml - republish Postgres/Redis on 127.0.0.1
 #
 # Named volumes persist DB rows, Redis state, uploads, installed modules, the
 # compiled app and backups across restarts. `docker compose down -v` wipes all
-# of it — including the build, which the next boot then recreates.
+# of it - including the build, which the next boot then recreates.
 
 services:
   db:
@@ -45,7 +45,7 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redisdata:/data
-    # No `ports:` — same reasoning as db. Redis has no password here; its only
+    # No `ports:` - same reasoning as db. Redis has no password here; its only
     # protection is being unreachable from outside the compose network.
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -95,7 +95,7 @@ services:
       AUTH_URL: ${AUTH_URL:-http://localhost:3001}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
     # APP_BIND_ADDR is 127.0.0.1 when Caddy terminates TLS in front of the
-    # app — the container must not also be reachable directly on :3001.
+    # app - the container must not also be reachable directly on :3001.
     # Without TLS the installer leaves it at 0.0.0.0 and publishes APP_PORT.
     ports:
       - "${APP_BIND_ADDR:-0.0.0.0}:${APP_PORT:-3001}:3001"
@@ -109,7 +109,7 @@ services:
       # DB backups written by the automated-backup cron + admin UI.
       - backups:/app/backups
       # The compiled app. Module pages are compiled into the Next build, so
-      # installing a module rebuilds it — and that rebuild has to outlive the
+      # installing a module rebuilds it - and that rebuild has to outlive the
       # container or it would be redone on every restart. Docker seeds this
       # volume from the image on first creation, so a fresh install starts
       # with the image's build and never rebuilds at all.
@@ -130,7 +130,7 @@ services:
 
   # TLS terminator. Enabled only with `--profile tls`, which the installer
   # passes when the operator supplied a domain. Caddy obtains and renews a
-  # Let's Encrypt certificate on its own — no certbot timer to forget.
+  # Let's Encrypt certificate on its own - no certbot timer to forget.
   caddy:
     image: caddy:2-alpine
     profiles: ["tls"]

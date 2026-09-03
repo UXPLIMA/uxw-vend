@@ -2,12 +2,12 @@
  * Seed core translations from messages-core/*.json into the Translation table.
  * Also seeds translations from all installed modules' module.json manifests.
  *
- * Idempotent — safe to run multiple times. Upserts, never duplicates.
+ * Idempotent - safe to run multiple times. Upserts, never duplicates.
  *
  * Usage: npx tsx scripts/seed-translations.ts
  */
 
-// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// Reads DATABASE_URL from .env - this script is run directly via tsx,
 // outside Next.js, which is what normally loads the env file.
 import "dotenv/config";
 import fs from "fs";

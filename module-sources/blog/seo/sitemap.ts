@@ -1,5 +1,5 @@
 /**
- * Blog module — sitemap contributor.
+ * Blog module - sitemap contributor.
  *
  * Returns every published BlogArticle as a sitemap entry so the core
  * /sitemap.xml endpoint can include them. Core calls this via the

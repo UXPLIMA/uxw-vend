@@ -25,7 +25,7 @@ function verifyHmac(payload: string, signature: string, secret: string): boolean
 
 /**
  * Max age of a webhook delivery we'll accept. Without this, a captured
- * valid signature can be replayed forever — the HMAC alone only proves
+ * valid signature can be replayed forever - the HMAC alone only proves
  * the sender knew the secret, not that the event is fresh. Tunable via
  * WEBHOOK_REPLAY_WINDOW_MS; default 5 minutes matches Stripe / GitHub.
  */
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // public endpoint.
     if (!hasHmacConfig && !handlerVerifies) {
         console.error(
-            `[webhook] ${provider}: refusing dispatch — manifest provides neither signatureHeader+secretEnv nor verifiesInHandler`,
+            `[webhook] ${provider}: refusing dispatch - manifest provides neither signatureHeader+secretEnv nor verifiesInHandler`,
         );
         return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
     }
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (!sig) {
             return NextResponse.json({ error: "Missing signature" }, { status: 401 });
         }
-        // Optional timestamp freshness check — when the manifest advertises a
+        // Optional timestamp freshness check - when the manifest advertises a
         // timestampHeader, refuse anything older than REPLAY_WINDOW_MS so a
         // captured valid signature can't be replayed indefinitely.
         if (entry.timestampHeader) {

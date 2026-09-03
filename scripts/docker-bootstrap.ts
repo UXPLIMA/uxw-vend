@@ -4,11 +4,11 @@
 // on every `up`. It has two jobs, decided by whether the core `User` table
 // already exists:
 //
-//   FRESH database  — merge schemas, push, and seed the 3 roles + core
+//   FRESH database  - merge schemas, push, and seed the 3 roles + core
 //                     permissions + admin user, so `install.sh` yields a
 //                     working login out of the box.
 //
-//   EXISTING database — run the upgrade sequence documented in
+//   EXISTING database - run the upgrade sequence documented in
 //                     docs/DEPLOYMENT.md ("Upgrades") and docs/MIGRATIONS.md:
 //                     merge-schemas -> apply-schema-additions -> db push ->
 //                     apply-migrations. It used to return early here, which
@@ -17,7 +17,7 @@
 //                     silently broken. Seeding is NEVER repeated.
 //
 // merge-schemas reads src/modules, so the `migrate` service mounts the same
-// `modules` volume the app does — otherwise the merged schema would be
+// `modules` volume the app does - otherwise the merged schema would be
 // core-only and `db push` would try to drop every table the installed
 // modules own.
 //
@@ -25,7 +25,7 @@
 // (`depends_on: service_completed_successfully`). That is deliberate: a
 // running app on a mismatched schema is worse than a stopped one.
 
-// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// Reads DATABASE_URL from .env - this script is run directly via tsx,
 // outside Next.js, which is what normally loads the env file.
 import "dotenv/config";
 import { Pool } from "pg";
@@ -58,7 +58,7 @@ function run(label: string, cmd: string, args: string[]): void {
  * reinstall keeps the admin's data. `db push` wants to remove every table the
  * merged schema no longer declares, and when one of them is not empty it
  * stops with "Use the --accept-data-loss flag" and a non-zero exit. Treating
- * that as fatal — which it was — means an operator who ever uninstalled a
+ * that as fatal - which it was - means an operator who ever uninstalled a
  * module with data in it cannot start the app again after an upgrade: the
  * migrate service fails, and `depends_on: service_completed_successfully`
  * keeps the app down with it.
@@ -79,7 +79,7 @@ function pushTolerantOfRetainedTables(): void {
 
     if (output.includes("--accept-data-loss")) {
         console.warn(
-            "[bootstrap] db push declined to drop tables that still hold rows — " +
+            "[bootstrap] db push declined to drop tables that still hold rows - " +
             "these are almost certainly from a module you uninstalled, and they are kept. " +
             "The schema is otherwise up to date; drop them by hand if you want them gone.",
         );
@@ -112,7 +112,7 @@ async function main(): Promise<void> {
     run("merge-schemas", "npx", ["tsx", "scripts/merge-schemas.ts"]);
 
     if (initialized) {
-        console.log("[bootstrap] Existing database — upgrading…");
+        console.log("[bootstrap] Existing database - upgrading…");
         // Additive first, and unconditionally: this is the half that cannot
         // fail for a reason the operator should have to think about, and it
         // guarantees every new table and column exists before anything else
@@ -134,7 +134,7 @@ async function main(): Promise<void> {
     // `prisma generate`, so there is nothing to skip.
     run("prisma db push", "npx", ["prisma", "db", "push"]);
 
-    console.log("[bootstrap] Fresh database — seeding core data…");
+    console.log("[bootstrap] Fresh database - seeding core data…");
     run("seed", "npx", ["tsx", "prisma/seed.ts"]);
     console.log("[bootstrap] Done.");
 }

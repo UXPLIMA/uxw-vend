@@ -5,7 +5,7 @@ import { auth } from "@/core/lib/auth";
 
 /**
  * GET /api/v1/activity-feed
- * Public — returns recent isPublic feed items.
+ * Public - returns recent isPublic feed items.
  * Query: ?limit=20&before=<iso-date>&userId=<id>&scope=mine
  *
  * When `scope=mine` is set AND the caller is authenticated, the response

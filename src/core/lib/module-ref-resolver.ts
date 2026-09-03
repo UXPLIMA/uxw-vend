@@ -9,7 +9,7 @@ import {
 /**
  * Filesystem-aware half of manifest ref validation.
  *
- * Every path that accepts a module — marketplace install, ZIP upload, update —
+ * Every path that accepts a module - marketplace install, ZIP upload, update -
  * has to confirm the files a manifest names are actually in the payload before
  * it commits anything to disk. Each of those three routes used to inline its
  * own copy of the check, and `scripts/validate-module.ts` (the CI gate) had a
@@ -17,7 +17,7 @@ import {
  *
  *   - The routes compared the ref to the disk verbatim, so a manifest saying
  *     `components/BlogNewsSection` was rejected even though
- *     `components/BlogNewsSection.tsx` sat right there — the extensionless
+ *     `components/BlogNewsSection.tsx` sat right there - the extensionless
  *     form the registry generator not only accepts but strips down to.
  *   - The CI gate was extension-tolerant, but only for five of the twenty-one
  *     keys that can carry a ref, and it checked `routes`/`adminRoutes`/`api`
@@ -46,7 +46,7 @@ function isFile(p: string): boolean {
 /**
  * Check every file a manifest references against `moduleRoot`.
  *
- * `moduleRoot` is wherever the module currently lives — the extracted target
+ * `moduleRoot` is wherever the module currently lives - the extracted target
  * directory, the staging directory of an update, or `module-sources/<id>` when
  * the caller is the CI gate.
  */

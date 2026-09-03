@@ -3,7 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 
 /**
- * GET — list current user's active sessions.
+ * GET - list current user's active sessions.
  * Excludes expired and revoked rows.
  */
 export async function GET() {

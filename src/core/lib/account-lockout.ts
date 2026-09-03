@@ -12,7 +12,7 @@ import { prisma } from "./db";
  * same "invalid credentials" signal so the attacker gets no information
  * about why the attempt failed.
  *
- * A successful login always resets the counter — legitimate users who
+ * A successful login always resets the counter - legitimate users who
  * mistype twice then get it right never see the lock.
  */
 
@@ -97,7 +97,7 @@ export async function registerFailedLogin(
 
         // Fire an early-warning email the first time we cross the threshold
         // within a window. Subsequent attempts while already locked don't
-        // re-send — that would turn a slow brute-force into an email bomb.
+        // re-send - that would turn a slow brute-force into an email bomb.
         if (shouldLock && !alreadyLocked && existing.email) {
             try {
                 const { sendAccountLockoutEmail } = await import("./email");

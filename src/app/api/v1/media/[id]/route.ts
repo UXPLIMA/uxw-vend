@@ -7,7 +7,7 @@ import { prisma } from "@/core/lib/db";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-/** PATCH /api/v1/media/[id] — update alt text */
+/** PATCH /api/v1/media/[id] - update alt text */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
@@ -24,7 +24,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(item);
 }
 
-/** DELETE /api/v1/media/[id] — delete record + file from disk (local only) */
+/** DELETE /api/v1/media/[id] - delete record + file from disk (local only) */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
@@ -41,7 +41,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             const localPath = path.join(process.cwd(), "public", item.url);
             await fs.unlink(localPath);
         } catch {
-            // File may already be gone — non-fatal
+            // File may already be gone - non-fatal
         }
     }
 

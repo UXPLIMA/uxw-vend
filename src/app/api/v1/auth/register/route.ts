@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         const breach = await checkPasswordBreach(password);
         if (!breach.ok) {
             return NextResponse.json(
-                { error: "This password has appeared in a known data breach — pick something else." },
+                { error: "This password has appeared in a known data breach - pick something else." },
                 { status: 400 },
             );
         }
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Default role lookup — upsert so two concurrent first-time registrations
+        // Default role lookup - upsert so two concurrent first-time registrations
         // can't both try to INSERT role "member" and one fail with P2002 on
         // name unique (which would have been reported back as "email taken").
         const defaultRole = await prisma.role.upsert({
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         sendWelcomeEmail(email, username, userLocale).catch(console.error);
         logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch(console.error);
 
-        // Fire user.registered hook action — modules can react (welcome coupons, etc.)
+        // Fire user.registered hook action - modules can react (welcome coupons, etc.)
         import("@/core/lib/hooks")
             .then(({ doActionAsync }) =>
                 doActionAsync("user.registered", {

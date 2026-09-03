@@ -9,7 +9,7 @@ import { doActionAsync } from "@/core/lib/hooks";
  * non-expired, isActive warnings to compute the user's current standing.
  *
  * When points cross thresholds, an action hook is fired so other modules
- * (or admins) can react — e.g. auto-mute at 5 points, auto-ban at 10.
+ * (or admins) can react - e.g. auto-mute at 5 points, auto-ban at 10.
  * Listen via:
  *   addAction("user.warning.threshold", ({ userId, points, threshold }) => ...)
  */

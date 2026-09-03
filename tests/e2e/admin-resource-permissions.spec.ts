@@ -35,7 +35,7 @@ test.describe('Admin resource permissions', () => {
         await cancelButton.click();
         await expect(page.getByRole('heading', { name: /New Grant/i })).toHaveCount(0);
 
-        // Page still stable — heading still visible
+        // Page still stable - heading still visible
         await expect(heading).toBeVisible();
     });
 });

@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Site-type presets for the first-run wizard.
  *
- * Presets live in `module-marketplace/presets.json` — catalog data, read the
+ * Presets live in `module-marketplace/presets.json` - catalog data, read the
  * same way `index.json` is. Core names no module: if this file listed the
  * bundles itself, "core knows nothing about any module" would stop being true
  * the moment a preset mentioned `store`.
@@ -17,7 +17,7 @@ const presetSchema = z.object({
     description: z.string().max(500).default(""),
     /** Lucide icon name, rendered by the wizard. */
     icon: z.string().min(1).max(64).regex(/^[A-Za-z0-9]+$/).optional(),
-    /** Theme to preselect. A suggestion — the theme step still opens. */
+    /** Theme to preselect. A suggestion - the theme step still opens. */
     theme: z.string().min(1).max(64).regex(SAFE_ID).optional(),
     modules: z.array(z.string().regex(SAFE_ID)).max(50).default([]),
 });
@@ -45,7 +45,7 @@ export const CUSTOM_PRESET: SetupPreset = {
 export interface ParsePresetsOptions {
     /**
      * Module ids that actually exist in the catalog. Ids outside it are
-     * dropped from each preset rather than failing the parse — a preset that
+     * dropped from each preset rather than failing the parse - a preset that
      * names a module this deployment doesn't ship should install what it can,
      * not break the wizard.
      */

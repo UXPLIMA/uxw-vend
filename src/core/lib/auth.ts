@@ -15,7 +15,7 @@ import type { Provider } from "next-auth/providers";
 import { ModuleAuthProviders, ModuleAuthProviderFactories } from "@/core/generated/module-auth-providers";
 import { resolveAuthProviders } from "./auth-providers";
 
-// OAuth providers come from installed modules only — core names none. A module
+// OAuth providers come from installed modules only - core names none. A module
 // declares `authProviders` in its manifest, the registry generator collects the
 // declarations, and the provider activates once its env vars are set.
 const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
@@ -34,7 +34,7 @@ const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
 // CSRF on cross-site POSTs while still allowing OAuth redirects
 // (which arrive as top-level GETs) to carry the session.
 //
-// We do NOT set `__Host-` — it bans the Domain attribute AND requires
+// We do NOT set `__Host-` - it bans the Domain attribute AND requires
 // Path=/. Auth.js's defaults meet those requirements, but using the
 // explicit __Host- prefix name inside the cookies config confuses the
 // Auth.js cookie-reading path in dev (HTTP localhost) because the
@@ -118,7 +118,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     throw new Error("BANNED");
                 }
 
-                // Account-level lockout check — short-circuits before bcrypt
+                // Account-level lockout check - short-circuits before bcrypt
                 // so a locked account can't be brute-forced and can't be
                 // used to fingerprint valid emails via response-time delta.
                 const lockStatus = getLockoutStatus(user);
@@ -131,7 +131,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     user.password
                 );
 
-                // Resolve caller IP once — reused across failure paths so
+                // Resolve caller IP once - reused across failure paths so
                 // TRUSTED_PROXY_IPS handling lives in one place (getClientIP).
                 const reqHeaders = (request as Request | undefined)?.headers;
                 const ip = reqHeaders ? getClientIP(reqHeaders) : undefined;
@@ -145,7 +145,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
-                // 2FA check — only if fields exist on user (added by two-factor-auth module)
+                // 2FA check - only if fields exist on user (added by two-factor-auth module)
                 const userAny = user as Record<string, unknown>;
                 if (userAny.twoFactorEnabled && userAny.twoFactorSecret) {
                     // Dynamic import to avoid hard dependency on two-factor module
@@ -175,7 +175,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             try {
                                 const parsed = JSON.parse(userAny.backupCodes as string);
                                 if (Array.isArray(parsed)) backupCodes = parsed;
-                            } catch { /* corrupt row — treat as no backup codes */ }
+                            } catch { /* corrupt row - treat as no backup codes */ }
                         }
                         const { valid, remaining } = verifyBackupCode(twoFactorCode, backupCodes);
 
@@ -197,13 +197,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     }
                 }
 
-                // Clear any residual failed-login counter — this login
+                // Clear any residual failed-login counter - this login
                 // succeeded, so any lockout from earlier failures (including
                 // stale rows from an old attempt) should be reset before the
                 // session is minted.
                 await resetFailedLogins(user.id);
 
-                // Fire user.login hook — modules can react to successful credential auth.
+                // Fire user.login hook - modules can react to successful credential auth.
                 // Extract ip + userAgent from the incoming Request (best-effort).
                 try {
                     const headers = (request as Request | undefined)?.headers;
@@ -340,7 +340,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             // Refresh role + ban status from DB on every token refresh.
             //
-            // When impersonating, we check the impersonated user (token.id) —
+            // When impersonating, we check the impersonated user (token.id) -
             // if they become banned/deleted the impersonation session ends
             // immediately, not at the next manual update(). When not
             // impersonating, this also refreshes the admin's own role so a
@@ -367,7 +367,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 // Double-check the original admin identity during impersonation
-                // — if the admin has been banned / demoted since starting the
+                // - if the admin has been banned / demoted since starting the
                 // impersonation, we must NOT let them keep acting as someone else.
                 if (token.originalUserId) {
                     const realAdmin = await prisma.user.findUnique({
@@ -424,7 +424,7 @@ declare module "@auth/core/jwt" {
         role?: string;
         rolePriority?: number;
         tokenId?: string;
-        /** Set while impersonating — holds the real admin's user id. */
+        /** Set while impersonating - holds the real admin's user id. */
         originalUserId?: string;
     }
 }

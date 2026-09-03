@@ -11,9 +11,9 @@ import { prisma } from "./db";
  * shared across PM2 workers; otherwise falls back to an in-process Map.
  *
  * Public API:
- *   rateLimit                   — low-level hit against the active backend
- *   rateLimitForRole            — applies per-role multiplier; returns full result
- *   rateLimitForRoleAsync       — boolean-returning variant; transparently
+ *   rateLimit                   - low-level hit against the active backend
+ *   rateLimitForRole            - applies per-role multiplier; returns full result
+ *   rateLimitForRoleAsync       - boolean-returning variant; transparently
  *                                 falls back to memory on transient Redis failure
  */
 
@@ -83,7 +83,7 @@ function warnRedisFallback(reason: string): void {
     const now = Date.now();
     if (now - lastRedisFallbackWarnAt < 30_000) return;
     lastRedisFallbackWarnAt = now;
-    console.error(`[rate-limit] Redis unavailable (${reason}) — serving requests with in-memory fallback. Counts are NOT shared across workers.`);
+    console.error(`[rate-limit] Redis unavailable (${reason}) - serving requests with in-memory fallback. Counts are NOT shared across workers.`);
 }
 
 export const RedisBackend: RateLimitBackend = {
@@ -133,7 +133,7 @@ export const RedisBackend: RateLimitBackend = {
  * compile when REDIS_URL is only present at runtime.
  *
  * Production requires Redis, and denies every rate-limited request until it
- * has it — including /api/health, so the site reads as down rather than as
+ * has it - including /api/health, so the site reads as down rather than as
  * quietly unprotected. Two reasons, both still true now that a single app
  * process is the only supported topology:
  *
@@ -165,8 +165,8 @@ function getActiveBackend(): RateLimitBackend {
             prodMisconfigLoggedAt = now;
             console.error(
                 "[rate-limit] REDIS_URL is required in production. " +
-                "The in-memory backend resets on every restart — including the restart a " +
-                "module install performs — so limits are bypassable on demand. " +
+                "The in-memory backend resets on every restart - including the restart a " +
+                "module install performs - so limits are bypassable on demand. " +
                 "Set REDIS_URL, or ALLOW_MEMORY_RATE_LIMIT=1 to accept that. " +
                 "Every rate-limited request, /api/health included, is denied until then.",
             );
@@ -208,7 +208,7 @@ export async function rateLimit(
 }
 
 // Comma-separated direct-peer IPs that may set forwarded headers.
-// Without this set, anything goes — set TRUSTED_PROXY_IPS in production.
+// Without this set, anything goes - set TRUSTED_PROXY_IPS in production.
 const TRUSTED_PROXY_IPS: Set<string> | null = process.env.TRUSTED_PROXY_IPS
     ? new Set(process.env.TRUSTED_PROXY_IPS.split(",").map(ip => ip.trim()))
     : null;
@@ -217,7 +217,7 @@ const TRUSTED_PROXY_IPS: Set<string> | null = process.env.TRUSTED_PROXY_IPS
  * Resolve the real client IP from request headers.
  *
  * When TRUSTED_PROXY_IPS is set, `x-forwarded-for` is only honored if the
- * direct peer (x-real-ip) is in the trusted list — this blocks header
+ * direct peer (x-real-ip) is in the trusted list - this blocks header
  * injection spoofing from unauthorised origins.
  */
 export function getClientIP(headers: Headers): string {
@@ -243,10 +243,10 @@ export const rateLimits = {
 
 // ===== Per-role multipliers =====
 // Stored in Setting "rate_limit_role_multipliers" as { role: number }.
-//   0       — unlimited (skip rate limit entirely)
-//   1       — base limit (default when no entry exists)
-//   >1      — multiply base limit (e.g. 5 = 5x more requests allowed)
-//   0..100  — accepted range, validated on write
+//   0       - unlimited (skip rate limit entirely)
+//   1       - base limit (default when no entry exists)
+//   >1      - multiply base limit (e.g. 5 = 5x more requests allowed)
+//   0..100  - accepted range, validated on write
 // Cached in-process for 60s; call invalidateRoleMultiplierCache after edits.
 
 export const ROLE_MULTIPLIER_SETTING_KEY = "rate_limit_role_multipliers";

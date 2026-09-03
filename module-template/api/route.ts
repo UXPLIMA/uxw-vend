@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
-// GET /api/v1/my-module/items — List items (public)
+// GET /api/v1/my-module/items - List items (public)
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     });
 }
 
-// POST /api/v1/my-module/items — Create item (admin only)
+// POST /api/v1/my-module/items - Create item (admin only)
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {

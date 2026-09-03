@@ -1,5 +1,5 @@
 /**
- * Help Center module — sitemap contributor.
+ * Help Center module - sitemap contributor.
  *
  * Returns every active HelpArticle as a sitemap entry. Core calls this
  * via the generated ModuleSeoRoutes registry when the help-center module

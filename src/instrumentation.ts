@@ -5,7 +5,7 @@
  * request is handled. That is the correct home for process-wide setup, and it
  * is why this file exists: hook, scheduler and search-index bootstrap used to
  * hang off the root layout, which meant they ran on a *render*. A render is
- * the wrong trigger for process setup — it is per-request, per-locale, and it
+ * the wrong trigger for process setup - it is per-request, per-locale, and it
  * never runs at all for a request that terminates in the proxy or in an API
  * route, so a container serving only `/api/...` had no scheduler.
  *
@@ -15,7 +15,7 @@
 
 export async function register(): Promise<void> {
     // `register` is invoked in every runtime Next compiles for. The edge
-    // runtime has no Prisma, no timers we want, and no filesystem — the whole
+    // runtime has no Prisma, no timers we want, and no filesystem - the whole
     // bootstrap belongs to the Node.js server only.
     if (process.env.NEXT_RUNTIME !== "nodejs") return;
 

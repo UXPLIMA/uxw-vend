@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
  * its own would fight with it over the port. CI starts the server itself and
  * points `E2E_BASE_URL` at it.
  *
- * `retries` stays at 0 and `workers` at 1 — these tests share one database and
+ * `retries` stays at 0 and `workers` at 1 - these tests share one database and
  * one admin session, so parallelism makes them flake rather than run faster.
  */
 export default defineConfig({

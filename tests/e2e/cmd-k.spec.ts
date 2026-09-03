@@ -28,7 +28,7 @@ test.describe('Admin Cmd+K spotlight', () => {
             .first();
         await expect(usersResult).toBeVisible({ timeout: 10_000 });
 
-        // Press Enter on the focused spotlight input — this triggers router.push.
+        // Press Enter on the focused spotlight input - this triggers router.push.
         await spotlightInput.press('Enter');
 
         await page.waitForURL(/\/admin\/users/, { timeout: 10_000 });

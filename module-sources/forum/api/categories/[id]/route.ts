@@ -4,7 +4,7 @@ import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-// PATCH /api/v1/forum/categories/[id] — Update a category (admin)
+// PATCH /api/v1/forum/categories/[id] - Update a category (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,8 +28,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ category: updated });
 }
 
-// DELETE /api/v1/forum/categories/[id] — Delete a category (admin).
-// Refuses if the category still has topics — admin must move/delete them
+// DELETE /api/v1/forum/categories/[id] - Delete a category (admin).
+// Refuses if the category still has topics - admin must move/delete them
 // first or set isActive=false to hide instead.
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();

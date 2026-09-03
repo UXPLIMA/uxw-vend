@@ -3,7 +3,7 @@
  * onto the public SDK (`@/core/sdk*`).
  *
  * Run with `--dry-run` first. Anything the mapping doesn't cover is printed as
- * an unmapped symbol rather than guessed at — that report is the signal that
+ * an unmapped symbol rather than guessed at - that report is the signal that
  * the SDK is missing something, and the whole point of doing this as a codemod
  * instead of by hand.
  *
@@ -166,7 +166,7 @@ function renderImports(byEntry: Map<Entry, Specifier[]>): string {
     const missing = [...byEntry.keys()].filter((e) => !order.includes(e));
     if (missing.length > 0) {
         throw new Error(
-            `renderImports has no ordering for: ${missing.join(", ")} — add them to \`order\`.`,
+            `renderImports has no ordering for: ${missing.join(", ")} - add them to \`order\`.`,
         );
     }
     return order
@@ -324,7 +324,7 @@ function main(): void {
             if (!grouped.has(key)) grouped.set(key, new Set());
             grouped.get(key)!.add(u.file);
         }
-        console.log(`\n${grouped.size} symbol(s) have no SDK mapping — statements left untouched:`);
+        console.log(`\n${grouped.size} symbol(s) have no SDK mapping - statements left untouched:`);
         for (const [key, filesFor] of [...grouped].sort()) {
             const [lib, symbol] = key.split("::");
             const path = lib.startsWith("components:")

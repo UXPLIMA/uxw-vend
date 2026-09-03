@@ -3,7 +3,7 @@ import type { HookHandlerFor } from "@/core/sdk";
 
 /**
  * Records a private ActivityFeedItem when a store order is completed.
- * Order details stay private to the user — feed entry is not public.
+ * Order details stay private to the user - feed entry is not public.
  * Wired via the store manifest's `hookListeners` entry on `store.order.completed`.
  */
 const onStoreOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = async (payload) => {

@@ -48,7 +48,7 @@ const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {
     // Early rejection: if anyone already exists, reply without reading the
-    // body. This is a fast path only — the real race protection is the
+    // body. This is a fast path only - the real race protection is the
     // advisory-locked transaction below.
     let existingUsers = 0;
     try {
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
     const data = parsed.data;
 
-    // Hash the password outside the transaction — bcrypt is CPU-heavy and
+    // Hash the password outside the transaction - bcrypt is CPU-heavy and
     // the advisory-locked transaction below should hold the lock for as
     // little time as possible.
     const hashed = await bcrypt.hash(data.admin.password, 12);
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
                 // Refuse the module set rather than install part of it. The
                 // admin account and settings above are already committed, so
                 // the operator can re-run just the module step from the admin
-                // panel — a half-installed site is the worse outcome.
+                // panel - a half-installed site is the worse outcome.
                 markSetupComplete();
                 return NextResponse.json(
                     {
@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
                 });
                 // Create the tables the merged schema declares. Only one of
                 // the twenty-six modules that ship a schema.prisma also ships
-                // a migrations/ directory — per docs/MIGRATIONS.md, migrations
+                // a migrations/ directory - per docs/MIGRATIONS.md, migrations
                 // cover changes *after* a module's initial release, and the
                 // schema is what creates the tables the first time. Without
                 // this, every module the wizard installs comes up enabled and
@@ -276,7 +276,7 @@ export async function POST(request: NextRequest) {
                 /* non-fatal */
             }
             // Per-module SQL migrations. Setup never ran these, so a module
-            // shipping migrations installed with none of its tables — the
+            // shipping migrations installed with none of its tables - the
             // module then failed at first use with a Prisma error rather than
             // anything the operator could act on.
             for (const moduleId of installedModules) {
@@ -337,7 +337,7 @@ export async function POST(request: NextRequest) {
 /**
  * Reads the shipped marketplace catalog for dependency planning.
  *
- * Returns an empty catalog when the file is unreadable — `resolveInstallPlan`
+ * Returns an empty catalog when the file is unreadable - `resolveInstallPlan`
  * then reports every requested module as unknown, which is the honest outcome:
  * without a catalog we cannot know what a module needs.
  */
@@ -393,7 +393,7 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<void
         .then(() => true)
         .catch(() => false);
     if (targetExists) {
-        // Already extracted — nothing to do beyond enabling.
+        // Already extracted - nothing to do beyond enabling.
         return;
     }
 

@@ -72,7 +72,7 @@ interface DashboardSection {
 }
 
 /**
- * Shared data-fetch hook — one call to /api/v1/modules + each enabled
+ * Shared data-fetch hook - one call to /api/v1/modules + each enabled
  * module's statsApi endpoint. All three dashboard subcomponents below
  * read from the same hook so we only hit the network once per render.
  */
@@ -273,7 +273,7 @@ export function DashboardAnalytics() {
 }
 
 /**
- * Legacy wrapper — still exported for components that import it directly.
+ * Legacy wrapper - still exported for components that import it directly.
  * New dashboard layout composes the three pieces independently.
  */
 export function DashboardClient() {

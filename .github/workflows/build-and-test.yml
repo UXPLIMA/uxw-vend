@@ -31,7 +31,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        # Skip the postinstall regeneration here — we do it explicitly below
+        # Skip the postinstall regeneration here - we do it explicitly below
         # AFTER populating src/modules so the registry + Prisma client reflect
         # the full set of first-party modules.
         env:
@@ -42,7 +42,7 @@ jobs:
       # .gitignore + docs/CONTRIBUTING.md). For the type check to see module-
       # contributed Prisma models (WebhookLog, BlogComment, StoreProduct, …)
       # and module-registered routes, we seed src/modules/ from the tracked
-      # module-sources/ directory — the same files the marketplace ZIPs are
+      # module-sources/ directory - the same files the marketplace ZIPs are
       # built from.
       - name: Seed src/modules/ from module-sources
         run: |
@@ -71,22 +71,27 @@ jobs:
         run: npm run typecheck:modules
 
       # The SDK boundary, manifest shape and hook declarations are enforced
-      # here, not by ESLint — ESLint cannot see inside a third-party ZIP, and
+      # here, not by ESLint - ESLint cannot see inside a third-party ZIP, and
       # this is the same check that runs on install.
       - name: Validate module manifests
         run: npx tsx scripts/validate-module.ts --all
 
       # module-marketplace/ is a build artifact that is nonetheless committed,
       # and until this gate existed nothing compared it against the sources it
-      # is built from. Four modules — blog, forum, help-center, store — shipped
+      # is built from. Four modules - blog, forum, help-center, store - shipped
       # the entire 0.2.0 cycle without the searchProviders[].indexes block
       # their sources had gained, so a marketplace install never created their
       # GIN full-text indexes and every site search seq-scanned those tables.
       - name: Marketplace ZIPs match module-sources
         run: npx tsx scripts/check-marketplace-sync.ts
 
+      # House style: hyphens, never em dashes. ESLint only sees TS/JS, and
+      # these turn up in JSON translations, Markdown and .env samples too.
+      - name: No em dashes
+        run: npm run check:style
+
       - name: Lint
-        # The `--` separator is required — otherwise npm swallows the flag
+        # The `--` separator is required - otherwise npm swallows the flag
         # and eslint doesn't see it.
         run: npm run lint -- --max-warnings=0
 
@@ -95,7 +100,7 @@ jobs:
 
       # `test:coverage` runs the same suite and additionally enforces the
       # thresholds in vitest.config.mts. Running plain `npm test` here left
-      # the coverage config as decoration — and the provider it needs was
+      # the coverage config as decoration - and the provider it needs was
       # missing from the lockfile entirely, so the script could not run at all.
       - name: Unit tests + coverage thresholds
         run: npm run test:coverage
@@ -108,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     # Boots the real image with the real compose stack and drives the module
     # lifecycle end to end. Every previous gate ran against the source tree,
-    # so nothing tested the artifact people actually install — and two release
+    # so nothing tested the artifact people actually install - and two release
     # blockers lived exactly there: an install rebuilt but kept serving the old
     # build, and installed modules disappeared after `uxwvend update`.
     steps:
@@ -148,7 +153,7 @@ jobs:
         run: ./.github/scripts/wait-for-health.sh 180
 
       # A path served only by the blog module. Before the module exists the
-      # API catch-all has no route for it, so this is a 404 — the baseline the
+      # API catch-all has no route for it, so this is a 404 - the baseline the
       # post-install assertion is measured against.
       - name: Blog API is absent before install
         run: |
@@ -214,7 +219,7 @@ jobs:
           # `down` removes the containers, so these logs are only from this boot.
           docker compose logs app > /tmp/app-logs.txt 2>&1
           if grep -q 'rebuild required' /tmp/app-logs.txt; then
-            echo "rebuilt again with nothing changed — the build volume is not persisting"
+            echo "rebuilt again with nothing changed - the build volume is not persisting"
             exit 1
           fi
           # node_modules came back from the image layer, so the generated
@@ -254,7 +259,7 @@ jobs:
           --health-retries 10
 
       # Not optional. With NODE_ENV=production and no REDIS_URL the rate
-      # limiter fails closed and answers every request with 429 — the server
+      # limiter fails closed and answers every request with 429 - the server
       # never reports healthy and the suite cannot start. `redis` was also a
       # dependency no install actually had until recently, so exercising the
       # real backend here is what keeps that from regressing. The

@@ -12,7 +12,7 @@ import path from "path";
  * is what would feed a Puck editor once one is wired up.
  *
  * The spec does NOT attempt to drive a Puck editor end-to-end because no
- * admin editor surface exists — that would be testing vapor.
+ * admin editor surface exists - that would be testing vapor.
  */
 test.describe("Puck blocks registration", () => {
     test("module-blocks.ts contains expected module contributions", async () => {

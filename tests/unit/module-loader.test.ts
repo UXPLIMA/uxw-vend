@@ -7,7 +7,7 @@ import path from "path";
 /**
  * The loader is the boundary between untrusted files on disk and the
  * module registry. A malformed manifest must remove exactly one module,
- * never take the scan down with it — every module after the offender
+ * never take the scan down with it - every module after the offender
  * would vanish too, and the failure would look like "my module
  * disappeared" rather than "module X is invalid".
  *
@@ -231,7 +231,7 @@ describe("lazy initialisation", () => {
         const { moduleLoader } = await load();
         moduleLoader.getModules();
 
-        // A module appearing on disk afterwards is invisible until restart —
+        // A module appearing on disk afterwards is invisible until restart -
         // which is exactly why installing one rebuilds and restarts.
         writeModule("blog", { ...VALID, id: "blog" });
 

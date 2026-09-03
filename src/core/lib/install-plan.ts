@@ -1,5 +1,5 @@
 /**
- * Install planning — pure functions over a module catalog.
+ * Install planning - pure functions over a module catalog.
  *
  * Split out of `module-dependencies.ts` because that file imports Prisma:
  * the setup wizard runs this planner in the browser to show which
@@ -15,7 +15,7 @@ import { satisfiesRange } from "./semver-range";
 
 export interface ParsedDependency {
     id: string;
-    /** Absent means "any installed version" — the pre-contract behaviour. */
+    /** Absent means "any installed version" - the pre-contract behaviour. */
     range?: string;
 }
 
@@ -53,7 +53,7 @@ export type InstallPlanError =
 export interface InstallPlan {
     /** Topologically sorted: a module never precedes something it depends on. */
     order: string[];
-    /** Pulled in transitively — the operator did not select these. */
+    /** Pulled in transitively - the operator did not select these. */
     autoAdded: string[];
     errors: InstallPlanError[];
 }
@@ -66,7 +66,7 @@ export interface InstallPlan {
  *
  * `autoAdded` exists so the UI can tell the operator what it is about to
  * install on their behalf. Expanding a selection silently is the failure this
- * function exists to prevent — the point is not just to get the order right,
+ * function exists to prevent - the point is not just to get the order right,
  * but to make the expansion visible.
  */
 export function resolveInstallPlan(

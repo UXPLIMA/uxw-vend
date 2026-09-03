@@ -62,7 +62,7 @@
       },
       "suggestions": {
         "adm_title": "Suggestion Moderation",
-        "adm_subtitle": "Triage user suggestions — change status, delete spam, see vote counts.",
+        "adm_subtitle": "Triage user suggestions - change status, delete spam, see vote counts.",
         "adm_filterAll": "All",
         "adm_filterOpen": "Open",
         "adm_filterPlanned": "Planned",
@@ -124,7 +124,7 @@
       },
       "suggestions": {
         "adm_title": "Öneri Moderasyonu",
-        "adm_subtitle": "Kullanıcı önerilerini değerlendir — durum değiştir, spam'i sil, oy sayılarını gör.",
+        "adm_subtitle": "Kullanıcı önerilerini değerlendir - durum değiştir, spam'i sil, oy sayılarını gör.",
         "adm_filterAll": "Tümü",
         "adm_filterOpen": "Açık",
         "adm_filterPlanned": "Planlanmış",

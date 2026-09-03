@@ -1,4 +1,4 @@
-// Slider Module — Database Models
+// Slider Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // ==================== SLIDER ====================

@@ -51,7 +51,7 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
-/** Fresh module instance — the memory Map and the warn latch are module scope. */
+/** Fresh module instance - the memory Map and the warn latch are module scope. */
 async function load(redisConfigured = false): Promise<CacheModule> {
     isRedisConfigured.mockReturnValue(redisConfigured);
     vi.resetModules();

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/core/sdk/server";
 
-// GET /api/v1/discord-widget — Public: returns the configured Discord server ID
+// GET /api/v1/discord-widget - Public: returns the configured Discord server ID
 // for the homepage widget iframe. Anyone visiting the public homepage needs this,
 // so no auth is required. Cached for 60s.
 let cache: { serverId: string; expiresAt: number } | null = null;

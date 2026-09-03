@@ -46,7 +46,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 modules={modules}
                 activeThemeId={themeId}
             />
-            {/* Main content — cleared 56 (icon rail) + 224 (context sidebar) = 280px */}
+            {/* Main content - cleared 56 (icon rail) + 224 (context sidebar) = 280px */}
             <main
                 id="main-content"
                 tabIndex={-1}

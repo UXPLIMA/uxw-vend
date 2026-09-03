@@ -1,5 +1,5 @@
 /**
- * Module config cache — uses Redis when available, in-memory fallback.
+ * Module config cache - uses Redis when available, in-memory fallback.
  * Called from API routes and server components (NOT proxy/middleware).
  */
 
@@ -14,11 +14,11 @@ export async function getModuleStates(): Promise<Record<string, boolean>> {
     const cached = await cacheGetJSON<Record<string, boolean>>(CACHE_KEY);
     if (cached) return cached;
 
-    // Cache miss — query DB. Must fail soft: this helper is called from
+    // Cache miss - query DB. Must fail soft: this helper is called from
     // the proxy middleware on every request, from module-provider during
     // SSR, and (crucially) during `next build`'s static-collection phase
     // where DATABASE_URL may not be reachable at all. Treat an unavailable
-    // DB as "no explicit states known" — consumers default to enabled.
+    // DB as "no explicit states known" - consumers default to enabled.
     let configs: Array<{ id: string; enabled: boolean }> = [];
     try {
         configs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
@@ -39,7 +39,7 @@ export async function getModuleStates(): Promise<Record<string, boolean>> {
  * Whether one module is currently enabled.
  *
  * This is what a module should call to gate its own endpoints. The alternative
- * — `moduleSystem.isEnabled()` — reports false until something has called
+ * - `moduleSystem.isEnabled()` - reports false until something has called
  * `moduleSystem.initialize()`, which pushed modules into re-initialising a
  * shared singleton on every request just to answer this question.
  *

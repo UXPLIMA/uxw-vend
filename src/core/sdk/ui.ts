@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — shared UI primitives.
+ * uxwVend module SDK - shared UI primitives.
  *
  * Client components. These are the pieces that make a module's screens look
  * like the rest of the admin panel; a module that hand-rolls its own buttons

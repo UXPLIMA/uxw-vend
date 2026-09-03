@@ -5,7 +5,7 @@ import { addAction } from "@/core/lib/hooks";
  * Cross-module activity feed.
  *
  * Subscribes to common hook events and writes ActivityFeedItem rows.
- * The feed is intentionally simple — modules can also write directly to
+ * The feed is intentionally simple - modules can also write directly to
  * ActivityFeedItem if they need richer data.
  *
  * registerActivityFeedListeners() is called once at server bootstrap
@@ -33,7 +33,7 @@ export function registerActivityFeedListeners(): void {
         } catch { /* non-fatal */ }
     });
 
-    // Profile updates — private (only visible to the user in their own feed)
+    // Profile updates - private (only visible to the user in their own feed)
     addAction("user.profile.updated", async (payload) => {
         try {
             const user = await prisma.user.findUnique({
@@ -52,7 +52,7 @@ export function registerActivityFeedListeners(): void {
         } catch { /* non-fatal */ }
     });
 
-    // 2FA enabled — private security audit trail
+    // 2FA enabled - private security audit trail
     addAction("user.2fa.enabled", async (payload: { userId: string }) => {
         try {
             await prisma.activityFeedItem.create({
@@ -67,7 +67,7 @@ export function registerActivityFeedListeners(): void {
         } catch { /* non-fatal */ }
     });
 
-    // 2FA disabled — private security audit trail
+    // 2FA disabled - private security audit trail
     addAction("user.2fa.disabled", async (payload: { userId: string }) => {
         try {
             await prisma.activityFeedItem.create({

@@ -139,7 +139,7 @@ export default function ThemeSettingsPage() {
         );
     };
 
-    // Built-in themes ship in-tree — every key in the generated registry.
+    // Built-in themes ship in-tree - every key in the generated registry.
     const builtInThemes = Object.keys(themeRegistry);
 
     // Marketplace
@@ -225,7 +225,7 @@ export default function ThemeSettingsPage() {
                 </div>
             )}
 
-            {/* Mode toggle — only visible when there is more than one mode */}
+            {/* Mode toggle - only visible when there is more than one mode */}
             {modes.length > 1 && (
                 <div className="flex gap-2">
                     {modes.map(m => (
@@ -290,7 +290,7 @@ export default function ThemeSettingsPage() {
                                     <span>v{theme.version || '1.0.0'}</span>
                                     <div className="flex items-center gap-2">
                                         {!isBuiltIn && <span className="text-blue-500">Custom</span>}
-                                        <span>{theme.modes?.default ?? "—"}</span>
+                                        <span>{theme.modes?.default ?? "-"}</span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -322,7 +322,7 @@ export default function ThemeSettingsPage() {
                                                     {theme.name}
                                                     {theme.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
                                                 </h4>
-                                                <p className="text-xs text-muted-foreground">v{theme.version} — {theme.type}</p>
+                                                <p className="text-xs text-muted-foreground">v{theme.version} - {theme.type}</p>
                                             </div>
                                         </div>
                                         <p className="text-xs text-muted-foreground mb-3">{theme.description}</p>

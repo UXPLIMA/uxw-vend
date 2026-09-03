@@ -1,4 +1,4 @@
-// Downloads Module — Database Models
+// Downloads Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // ==================== DOWNLOAD CENTER ====================

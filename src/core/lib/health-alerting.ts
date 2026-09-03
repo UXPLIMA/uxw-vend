@@ -31,7 +31,7 @@ import {
  *     "alertOn": ["degraded", "down"]
  *   }
  *
- * The "last notified" state is in-process only — survives across
+ * The "last notified" state is in-process only - survives across
  * cron ticks but resets on server restart. This is intentional:
  * on restart we want to re-announce the current state.
  */
@@ -154,10 +154,10 @@ const COLORS = {
 
 function formatMessage(status: HealthStatus, snapshot: HealthSnapshot, recovery: boolean): string {
     if (recovery) {
-        return `Health recovered — platform is back to ${status}.`;
+        return `Health recovered - platform is back to ${status}.`;
     }
-    if (status === "down") return "Platform is DOWN — critical subsystem failure.";
-    if (status === "degraded") return "Platform is DEGRADED — a non-critical check failed.";
+    if (status === "down") return "Platform is DOWN - critical subsystem failure.";
+    if (status === "degraded") return "Platform is DEGRADED - a non-critical check failed.";
     return `Platform status: ${status}.`;
 }
 
@@ -257,7 +257,7 @@ function shouldNotify(
         return { notify: true, recovery: false };
     }
 
-    // Still in the same bad state — debounce re-notification.
+    // Still in the same bad state - debounce re-notification.
     if (prev === newStatus && newStatus !== "ok") {
         if (!state.lastNotifiedAt) return { notify: true, recovery: false };
         const elapsed = Date.now() - state.lastNotifiedAt.getTime();

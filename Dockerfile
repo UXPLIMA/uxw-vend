@@ -2,9 +2,9 @@
 # Multi-stage build for uxwVend. Node 24 matches package.json engines.node.
 #
 # Stages:
-#   deps    — install every dep (dev + prod) so the builder can compile TS.
-#   builder — runs prisma generate + next build, produces .next + generated files.
-#   runner  — minimal runtime with a non-root user and a HEALTHCHECK that
+#   deps    - install every dep (dev + prod) so the builder can compile TS.
+#   builder - runs prisma generate + next build, produces .next + generated files.
+#   runner  - minimal runtime with a non-root user and a HEALTHCHECK that
 #             probes /api/health.
 #
 # Runtime notes:
@@ -12,10 +12,10 @@
 #     installed, matching the "fresh install" motto. An admin installs
 #     modules from module-marketplace/*.zip via the admin UI after boot.
 #   - HEALTHCHECK uses wget (Alpine ships BusyBox wget) to hit the probe
-#     endpoint — any 200/degraded response keeps the container healthy.
+#     endpoint - any 200/degraded response keeps the container healthy.
 #   - The runner can re-run `next build` in place (on module install, and at
 #     boot via scripts/reconcile-build.ts). Everything `next build` reads must
-#     therefore be present in this stage, not just what `next start` reads —
+#     therefore be present in this stage, not just what `next start` reads -
 #     that is why postcss.config.mjs and src/instrumentation.ts are copied
 #     below. Omitting postcss.config.mjs is silent: the rebuild succeeds and
 #     ships a stylesheet that Tailwind never processed.
@@ -43,8 +43,8 @@ COPY . .
 # `npm prune --omit=dev` at the end drops the test and lint toolchain (vitest,
 # playwright, jsdom, eslint and their trees) from the node_modules the runner
 # inherits. It can only drop that much because the packages the *runtime* build
-# needs — typescript, tailwind, tsx, prisma, dotenv, the @types, and the
-# bundle analyzer next.config.ts imports at the top level — are declared
+# needs - typescript, tailwind, tsx, prisma, dotenv, the @types, and the
+# bundle analyzer next.config.ts imports at the top level - are declared
 # as real dependencies rather than devDependencies. That is not bookkeeping:
 # this image rebuilds itself when a module is installed, so those packages are
 # needed in production, and calling them "dev" was the inaccurate part.
@@ -67,7 +67,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 --ingroup nodejs nextjs
 
-# Minimal runtime surface — the builder's .next, the generated Prisma
+# Minimal runtime surface - the builder's .next, the generated Prisma
 # client, marketplace ZIPs, and the scripts the runtime still invokes
 # (generate-registry runs on module install, merge-schemas on module
 # schema updates, apply-migrations on module install).
@@ -107,7 +107,7 @@ RUN mkdir -p src/modules && chown -R nextjs:nodejs src/modules
 
 # WORKDIR creates /app owned by root. `next build` writes next-env.d.ts and
 # touches tsconfig.json at the project root, so the rebuild path needs the
-# directory itself writable — not just its contents. Only the directory entry;
+# directory itself writable - not just its contents. Only the directory entry;
 # the copied trees above already carry the right owner.
 RUN chown nextjs:nodejs /app
 
@@ -116,13 +116,13 @@ EXPOSE 3001
 
 # start-period covers a boot-time rebuild. reconcile-build.ts rebuilds before
 # the server binds when the image changed under an installed module set, and a
-# full `next build` on a small VPS runs several minutes — a 60s grace window
+# full `next build` on a small VPS runs several minutes - a 60s grace window
 # would mark the container unhealthy while it was doing exactly the right thing.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=600s --retries=3 \
     CMD wget -qO- http://127.0.0.1:3001/api/health >/dev/null || exit 1
 
 # The entrypoint reconciles the build against the installed modules and then
 # `exec`s the server, so `next start` still ends up as PID 1 and the shutdown
-# registry still sees SIGTERM. The `exec` is what makes the shell safe here —
+# registry still sees SIGTERM. The `exec` is what makes the shell safe here -
 # a wrapper that forks instead would swallow the signal.
 CMD ["/app/scripts/docker-entrypoint.sh"]

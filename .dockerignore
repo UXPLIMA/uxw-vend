@@ -13,14 +13,14 @@ coverage/
 .vscode/
 .idea/
 
-# Runtime state — never bake into the image.
+# Runtime state - never bake into the image.
 src/modules/*
 !src/modules/.gitkeep
 public/uploads/*
 !public/uploads/.gitkeep
 messages/
 
-# Generated output — builder regenerates them.
+# Generated output - builder regenerates them.
 prisma/schema.prisma
 src/core/generated/
 src/generated/

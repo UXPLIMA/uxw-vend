@@ -149,7 +149,7 @@ export function NotificationBell() {
                                                 type="button"
                                                 onClick={() => { if (!n.isRead) markRead(n.id); }}
                                                 className="w-full text-left"
-                                                aria-label={n.isRead ? n.title : `${n.title} — ${t("markRead")}`}
+                                                aria-label={n.isRead ? n.title : `${n.title} - ${t("markRead")}`}
                                             >
                                                 {body}
                                             </button>

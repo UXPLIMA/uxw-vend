@@ -9,7 +9,7 @@ import { invalidate } from "@/core/lib/cache";
 import { sanitizeCustomCss, CSS_SANITIZED_SETTING_KEYS } from "@/core/lib/css-sanitizer";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
-// Value is a Json column — accept any JSON-serializable value (string, number, boolean, array, object, null)
+// Value is a Json column - accept any JSON-serializable value (string, number, boolean, array, object, null)
 // Max serialized size: 100KB to prevent abuse
 const settingsBodySchema = z.record(settingKeySchema, z.unknown()).refine(
     (data) => JSON.stringify(data).length <= 100_000,
@@ -21,7 +21,7 @@ const settingsBodySchema = z.record(settingKeySchema, z.unknown()).refine(
 // (or a compromised account) could otherwise inflate the anonymous response
 // to tens of MB. Keys not listed here fall back to the 100KB overall cap.
 const PER_KEY_STRING_LIMITS: Record<string, number> = {
-    custom_css: 200_000,      // 200KB — stylesheets can be legitimately big
+    custom_css: 200_000,      // 200KB - stylesheets can be legitimately big
     site_name: 100,
     site_description: 500,
     site_email: 254,

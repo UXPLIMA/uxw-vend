@@ -1,4 +1,4 @@
-// Help Center Module — Database Models
+// Help Center Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // ==================== HELP CENTER MODULE ====================

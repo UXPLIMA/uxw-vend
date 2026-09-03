@@ -61,7 +61,7 @@ export default function PageBuilderPage(props: PageProps) {
                         setData({ root: { props: {} }, content: [] } as unknown as Data);
                     }
                 } catch {
-                    // Content is HTML, not Puck JSON — start with empty builder
+                    // Content is HTML, not Puck JSON - start with empty builder
                     setData({ root: { props: {} }, content: [] } as unknown as Data);
                 }
             })

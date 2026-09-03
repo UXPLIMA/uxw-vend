@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
-// GET /api/v1/referral/stats — Admin referral stats
+// GET /api/v1/referral/stats - Admin referral stats
 export async function GET() {
     const session = await auth();
     if (!session?.user || !(await isAdmin(session.user.id))) {
@@ -66,7 +66,7 @@ export async function GET() {
     });
 }
 
-// POST /api/v1/referral/stats — Update referral settings (admin)
+// POST /api/v1/referral/stats - Update referral settings (admin)
 export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user || !(await isAdmin(session.user.id))) {

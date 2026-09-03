@@ -9,7 +9,7 @@ const eslintConfig = defineConfig([
     // React 19 added a family of stricter hook rules (set-state-in-effect,
     // purity, no-deriving-state-in-effects, etc.) that didn't exist when
     // this codebase was authored. The rewrites they want are functional
-    // refactors — not a safe automated sweep. Until the dedicated React 19
+    // refactors - not a safe automated sweep. Until the dedicated React 19
     // migration pass lands, these rules stay off so legitimate pre-existing
     // `useEffect(() => { setState(...) }, [deps])` flows don't drown every
     // other lint signal.
@@ -33,7 +33,7 @@ const eslintConfig = defineConfig([
         },
     },
     // CommonJS bootstrap files (PM2 ecosystem config, etc.) use require() by
-    // spec — disable the TS "no-require-imports" rule for .cjs only.
+    // spec - disable the TS "no-require-imports" rule for .cjs only.
     {
         files: ["**/*.cjs"],
         rules: {
@@ -43,7 +43,7 @@ const eslintConfig = defineConfig([
     // Underscore-prefixed identifiers are the conventional opt-out for
     // "intentionally unused" (params we keep for interface shape, catch
     // bindings we don't inspect, destructured keys we skip). The TS rule
-    // doesn't honor that by default — configure it explicitly.
+    // doesn't honor that by default - configure it explicitly.
     {
         rules: {
             "@typescript-eslint/no-unused-vars": [
@@ -57,7 +57,7 @@ const eslintConfig = defineConfig([
             ],
         },
     },
-    // Module sources are NOT subject to the core platform's lint bar — each
+    // Module sources are NOT subject to the core platform's lint bar - each
     // module has its own quality profile, which is why every stylistic rule is
     // switched off below. Exactly one rule is enforced, and it is
     // architectural rather than stylistic: a module must import core through
@@ -104,16 +104,16 @@ const eslintConfig = defineConfig([
         "out/**",
         "build/**",
         "next-env.d.ts",
-        // Generated artifacts — never owned by humans.
+        // Generated artifacts - never owned by humans.
         "src/core/generated/**",
         // Throwaway Prisma client built by scripts/typecheck-modules.ts.
         ".typecheck-modules/**",
         "src/generated/**",
         // The installed runtime copy of a module is generated state, never
-        // hand-edited — lint the authoritative source instead.
+        // hand-edited - lint the authoritative source instead.
         "src/modules/**",
         // v8 coverage report. Gitignored, but present on any machine that has
-        // run `npm run test:coverage` — and its vendored HTML helpers carry
+        // run `npm run test:coverage` - and its vendored HTML helpers carry
         // eslint-disable directives that trip --max-warnings=0. CI only
         // avoided this because it lints before it runs the suite.
         "coverage/**",

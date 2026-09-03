@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  * channel is spammed until it is muted, and a malformed Setting row must
  * degrade to "disabled" rather than throw inside a cron tick.
  *
- * The webhook-channels module is used for real rather than mocked — the
+ * The webhook-channels module is used for real rather than mocked - the
  * URL validation it performs (https only, no private hosts) is part of
  * what is being checked here.
  */

@@ -5,7 +5,7 @@ import { prisma } from "@/core/lib/db";
 
 type RouteParams = { params: Promise<{ conversationId: string }> };
 
-/** GET — fetch all messages in a conversation + mark as read */
+/** GET - fetch all messages in a conversation + mark as read */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -39,7 +39,7 @@ const replySchema = z.object({
     body: z.string().min(1).max(10000),
 });
 
-/** POST — reply to an existing conversation */
+/** POST - reply to an existing conversation */
 export async function POST(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

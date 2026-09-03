@@ -15,7 +15,7 @@
  *  - Stub global.fetch to return a valid ZIP body
  *  - Mock child_process.execFileSync so scripts/generate-registry.ts throws
  *  - Use MODULES_DIR pointed at a temp dir via the route's module-internal path
- *    (we can't easily override MODULES_DIR — so we just let it use the real
+ *    (we can't easily override MODULES_DIR - so we just let it use the real
  *    src/modules dir but use a randomized moduleId that won't collide and
  *    then verify the dir disappears after the call).
  */
@@ -90,7 +90,7 @@ vi.mock("child_process", async () => {
             if (cmdLine.includes("generate-registry")) {
                 throw new Error("simulated codegen failure");
             }
-            // Schema merge — also a no-op, succeed silently
+            // Schema merge - also a no-op, succeed silently
             return Buffer.from("");
         }),
     };

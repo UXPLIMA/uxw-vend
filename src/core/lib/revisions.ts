@@ -35,7 +35,7 @@ export async function recordRevision(
             },
         });
     } catch (err) {
-        // Non-fatal — revisions are best-effort. Don't break the actual mutation.
+        // Non-fatal - revisions are best-effort. Don't break the actual mutation.
         console.error(`[revisions] Failed to record ${resource}/${resourceId}:`, err);
     }
 }

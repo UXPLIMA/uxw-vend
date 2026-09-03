@@ -1,4 +1,4 @@
-// Reads DATABASE_URL from .env — this script is run directly via tsx,
+// Reads DATABASE_URL from .env - this script is run directly via tsx,
 // outside Next.js, which is what normally loads the env file.
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
@@ -73,7 +73,7 @@ async function main() {
             console.log("   Password: the SEED_ADMIN_PASSWORD you supplied.\n");
         }
     } else {
-        console.log(`   Admin account ${adminEmail} already existed — password left unchanged.\n`);
+        console.log(`   Admin account ${adminEmail} already existed - password left unchanged.\n`);
     }
 }
 

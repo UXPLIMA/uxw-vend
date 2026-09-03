@@ -34,7 +34,7 @@ export async function POST(_request: NextRequest) {
     // Delete existing tokens
     await prisma.verificationToken.deleteMany({ where: { identifier: user.email } });
 
-    // Create token (24h). Store only the SHA-256 digest — a DB dump
+    // Create token (24h). Store only the SHA-256 digest - a DB dump
     // exposes hashes, not usable verification tokens. The plaintext token
     // is only ever in the outbound email URL. Same pattern as forgot-password.
     const token = randomBytes(32).toString("hex");
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         where: { identifier_token: { identifier: email, token: tokenHash } },
     });
 
-    // Fire user.email.verified hook — look up user id for payload
+    // Fire user.email.verified hook - look up user id for payload
     try {
         const verifiedUser = await prisma.user.findUnique({
             where: { email },

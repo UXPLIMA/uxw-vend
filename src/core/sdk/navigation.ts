@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — locale-aware navigation.
+ * uxwVend module SDK - locale-aware navigation.
  *
  * These are the next-intl wrappers, not the bare `next/link` and
  * `next/navigation` primitives: they carry the active locale prefix, so a

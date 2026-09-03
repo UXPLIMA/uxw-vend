@@ -4,7 +4,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 
 /**
  * Lucide icon resolved by string name. Admin-supplied (navbar editor,
- * module manifests) so it must accept any valid Lucide identifier —
+ * module manifests) so it must accept any valid Lucide identifier -
  * not a hardcoded whitelist. Names are case-insensitive: both
  * "ShoppingBag" and "shopping-bag" map to the same icon.
  *

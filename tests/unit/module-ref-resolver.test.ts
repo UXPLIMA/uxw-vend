@@ -10,7 +10,7 @@ import type { ValidatedModuleManifest } from "@/core/lib/module-manifest-schema"
 /**
  * The bug these cover: the install/upload/update routes compared a manifest
  * ref to the disk verbatim, so `components/Foo` was "missing" while
- * `components/Foo.tsx` sat next to it — the extensionless form the registry
+ * `components/Foo.tsx` sat next to it - the extensionless form the registry
  * generator strips every ref down to. Fourteen of forty-two first-party
  * modules were un-installable because of it.
  */
@@ -70,7 +70,7 @@ describe("manifestRefCandidates", () => {
 });
 
 describe("checkManifestFileRefs", () => {
-    it("accepts an extensionless ref backed by a .tsx file — the case that broke 14 modules", () => {
+    it("accepts an extensionless ref backed by a .tsx file - the case that broke 14 modules", () => {
         touch("components/BlogNewsSection.tsx");
         const res = checkManifestFileRefs(root, manifest({
             homepageSections: [{ id: "s", component: "components/BlogNewsSection" }],

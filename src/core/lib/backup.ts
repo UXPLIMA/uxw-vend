@@ -11,7 +11,7 @@
  *   e.g. uxwvend-manual-2026-04-08T12-34-56-789Z.sql.gz
  *
  * The `id` used by the public API is the filename WITHOUT the `.sql.gz`
- * extension — deterministic, collision-free, and safe to use in URLs.
+ * extension - deterministic, collision-free, and safe to use in URLs.
  */
 
 import { spawn } from "child_process";

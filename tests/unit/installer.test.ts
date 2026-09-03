@@ -9,7 +9,7 @@ const INSTALLER = path.join(REPO, "install.sh");
 
 /**
  * Runs install.sh in --dry-run mode, which performs every computation the
- * real install does — OS detection, secret generation, .env rendering — but
+ * real install does - OS detection, secret generation, .env rendering - but
  * writes only into the directory given here and touches nothing else on the
  * host. Docker is never contacted.
  */

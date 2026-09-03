@@ -12,7 +12,7 @@ const STORAGE_KEY = "uxwvend.admin.updateBanner.dismissedFor";
 
 /**
  * Client wrapper that owns the dismiss state for the admin update banner.
- * A dismissal is remembered per-count — when the number of available updates
+ * A dismissal is remembered per-count - when the number of available updates
  * changes the banner reappears, nudging the admin to take another look.
  */
 export function UpdateBannerDismiss({ count, children }: Props) {
@@ -26,7 +26,7 @@ export function UpdateBannerDismiss({ count, children }: Props) {
             } else {
                 setDismissed(false);
             }
-        } catch { /* localStorage unavailable — show banner */ }
+        } catch { /* localStorage unavailable - show banner */ }
     }, [count]);
 
     if (dismissed) return null;

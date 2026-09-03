@@ -1,4 +1,4 @@
-// Webhook Logs Module — Database Models
+// Webhook Logs Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
 // ==================== WEBHOOK LOGS ====================

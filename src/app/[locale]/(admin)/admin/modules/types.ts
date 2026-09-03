@@ -1,6 +1,6 @@
 /**
  * Row shapes for the modules screen: what the install API returns and what the
- * marketplace catalogue returns. Separate on purpose — an installed module has
+ * marketplace catalogue returns. Separate on purpose - an installed module has
  * runtime state (enabled, version on disk) that a catalogue entry never has.
  */
 

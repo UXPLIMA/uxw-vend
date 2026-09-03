@@ -27,7 +27,7 @@ describe("checkPasswordBreach", () => {
     it("rejects a password whose SHA-1 suffix appears in the HIBP response", async () => {
         process.env.PASSWORD_BREACH_CHECK = "1";
 
-        // SHA-1 of "password" — upper-case hex.
+        // SHA-1 of "password" - upper-case hex.
         const hash = "5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8";
         const prefix = hash.slice(0, 5);
         const suffix = hash.slice(5);

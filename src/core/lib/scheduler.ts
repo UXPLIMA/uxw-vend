@@ -21,8 +21,8 @@ import { log } from "./logger";
  *   every-month       → 30 d
  *
  * Jobs are registered by:
- *   - Core (built-in: revision pruning, etc.) — registered in this file
- *   - Modules — picked up from manifest.cronJobs at server bootstrap
+ *   - Core (built-in: revision pruning, etc.) - registered in this file
+ *   - Modules - picked up from manifest.cronJobs at server bootstrap
  *
  * Multi-process safety: each tick first tries to atomically claim the job
  * slot via an INSERT ... ON CONFLICT DO UPDATE WHERE "lastRunAt" is stale.
@@ -270,7 +270,7 @@ export async function bootstrapScheduler(): Promise<void> {
             }
         }
     } catch {
-        // module-crons.ts may not exist on first build — silently continue
+        // module-crons.ts may not exist on first build - silently continue
     }
 
     log.info("scheduler started", { jobs: registeredJobs.size, tickIntervalMs: 60_000 });

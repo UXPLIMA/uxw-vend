@@ -36,7 +36,7 @@ function loadManifests(): LoadedManifest[] {
         try {
             raw = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
         } catch (err) {
-            console.error(`[registry] ${moduleName}: invalid JSON in module.json —`, (err as Error).message);
+            console.error(`[registry] ${moduleName}: invalid JSON in module.json -`, (err as Error).message);
             continue;
         }
 
@@ -44,12 +44,12 @@ function loadManifests(): LoadedManifest[] {
         if (!parsed.success) {
             const first = parsed.error.issues[0];
             const where = first.path.join('.');
-            console.error(`[registry] ${moduleName}: manifest schema invalid${where ? ` at ${where}` : ''} — ${first.message}`);
+            console.error(`[registry] ${moduleName}: manifest schema invalid${where ? ` at ${where}` : ''} - ${first.message}`);
             continue;
         }
 
         if (parsed.data.id !== moduleName) {
-            console.error(`[registry] ${moduleName}: manifest id "${parsed.data.id}" does not match directory name — skipping`);
+            console.error(`[registry] ${moduleName}: manifest id "${parsed.data.id}" does not match directory name - skipping`);
             continue;
         }
 
@@ -106,7 +106,7 @@ function generateRegistry() {
 
     mapping += `};\n`;
     apiMapping += `};\n\n`;
-    // Route tables are plain data — no imports, safe anywhere.
+    // Route tables are plain data - no imports, safe anywhere.
     let routeData = `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
@@ -192,7 +192,7 @@ function generateRegistry() {
             });
         });
 
-        // Legacy aliases — lets unmodified modules contribute to canonical slots.
+        // Legacy aliases - lets unmodified modules contribute to canonical slots.
         manifest.homepageSections?.forEach((s, i) => {
             slotEntries.push({
                 name: s.type === "widget" ? "home.sidebar" : "home.afterHero",
@@ -269,7 +269,7 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
     widgetRegistry += `// Activity-feed title localization entries contributed by modules.\n`;
     widgetRegistry += `export const ModuleActivityTitles: { type: string; prefix: string; key: string; module: string }[] = ${JSON.stringify(allActivityTitles, null, 2)};\n\n`;
-    widgetRegistry += `// RBAC resource strings modules own — surfaced in the admin permission matrix (flattened + deduped).\n`;
+    widgetRegistry += `// RBAC resource strings modules own - surfaced in the admin permission matrix (flattened + deduped).\n`;
     widgetRegistry += `export const ModulePermissionResources: string[] = ${JSON.stringify([...new Set(allPermissionResources)], null, 2)};\n\n`;
 
     let profileTabImports = emitDynamicRegistry('Profile tab component registry', 'ProfileTabRegistry', allProfileTabs);
@@ -292,7 +292,7 @@ function generateRegistry() {
     let footerImports = emitDynamicRegistry('Footer component registry (rendered in site footer)', 'FooterComponentRegistry', allFooterComponents);
     footerImports += `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
 
-    let contextImports = '// Context provider registry — wraps children, used for React contexts\n';
+    let contextImports = '// Context provider registry - wraps children, used for React contexts\n';
     contextImports += `export const ContextProviderRegistry: Record<string, ComponentType<any>> = {\n`;
     for (const cp of allContextProviders) {
         const importPath = buildImportPath(cp.component, cp.module);
@@ -302,7 +302,7 @@ function generateRegistry() {
     contextImports += '};\n\n';
     contextImports += `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
 
-    let slotImports = emitDynamicRegistry("Slot content registry — modules injecting into other modules' named slots", 'SlotContentRegistry', allSlotContents);
+    let slotImports = emitDynamicRegistry("Slot content registry - modules injecting into other modules' named slots", 'SlotContentRegistry', allSlotContents);
     slotImports += `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
 
     const content = imports + routeData + '\n\n' + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + slotImports + widgetRegistry;
@@ -314,14 +314,14 @@ function generateRegistry() {
 
     // The API handler map lives in its own file, and deliberately so.
     //
-    // module-registry.tsx is reachable from client components — the locale
+    // module-registry.tsx is reachable from client components - the locale
     // layout renders ModuleContextProviders out of it. Every entry below is
     // a module API route: server-only code that reaches the database, the
     // filesystem and the logger. Emitting them into the same module put
     // those route files in the browser graph, where `fs/promises`,
     // `async_hooks` and `next/headers` do not exist, and `next build` failed
     // on any installation that had modules. A lazy `() => import(...)` is
-    // not enough — the bundler still has to trace it.
+    // not enough - the bundler still has to trace it.
     //
     // Only src/app/api/v1/[...path]/route.ts consumes this.
     // Module page components go in their own file for the same reason as the
@@ -343,7 +343,7 @@ function generateRegistry() {
     console.log(`Generated module API registry at ${API_FILE}`);
 
     const slotOutPath = path.join(path.dirname(OUTPUT_FILE), 'slot-registry.tsx');
-    let slotContent = '// Auto-generated by scripts/generate-registry.ts — do not edit.\n';
+    let slotContent = '// Auto-generated by scripts/generate-registry.ts - do not edit.\n';
     slotContent += '/* eslint-disable */\n';
     slotContent += "import dynamic from 'next/dynamic';\n";
     slotContent += "import type { ComponentType } from 'react';\n\n";
@@ -392,7 +392,7 @@ function generateRegistry() {
     const safeAuthProviders = allAuthProviders.filter((p) => {
         if (!PROVIDER_ID.test(p.id)) {
             console.warn(
-                `[registry] module "${p.module}" declared an unsafe auth provider id "${p.id}" — skipped.`,
+                `[registry] module "${p.module}" declared an unsafe auth provider id "${p.id}" - skipped.`,
             );
             return false;
         }
@@ -424,7 +424,7 @@ function generateRegistry() {
     fs.writeFileSync(AUTH_FILE, authContent);
 
     const HOOKS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-hooks.ts');
-    let hooksContent = '// Auto-generated hook listener registry — server only\n\n';
+    let hooksContent = '// Auto-generated hook listener registry - server only\n\n';
     hooksContent += `export const ModuleHookListeners: { hook: string; type: "action" | "filter"; module: string; priority?: number; loader: () => Promise<{ default: (...args: unknown[]) => unknown }> }[] = [\n`;
     for (const hl of allHookListeners) {
         const handlerPath = hl.handler.replace(/\.tsx?$/, '');
@@ -511,7 +511,7 @@ function generateRegistry() {
     fs.writeFileSync(WEBHOOKS_FILE, webhooksContent);
 
     const SEO_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-seo.ts');
-    let seoContent = '// Auto-generated module SEO sitemap registry — server only\n\n';
+    let seoContent = '// Auto-generated module SEO sitemap registry - server only\n\n';
     seoContent += 'export interface SitemapEntry {\n';
     seoContent += '    url: string;\n';
     seoContent += '    lastModified?: Date;\n';
@@ -533,7 +533,7 @@ function generateRegistry() {
     fs.writeFileSync(NOTIFTYPES_FILE, notifTypesContent);
 
     const MODERATION_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-moderation.ts');
-    let moderationContent = '// Auto-generated moderation provider registry — server only\n\n';
+    let moderationContent = '// Auto-generated moderation provider registry - server only\n\n';
     moderationContent += "export interface ModerationItem {\n";
     moderationContent += "    id: string;\n";
     moderationContent += "    author: { id: string; username: string } | null;\n";

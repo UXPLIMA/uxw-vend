@@ -24,12 +24,12 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 function formatDate(value: string | null): string {
-    if (!value) return "—";
+    if (!value) return "-";
     return new Date(value).toLocaleString("tr-TR");
 }
 
 function formatDuration(ms: number | null): string {
-    if (ms === null || ms === undefined) return "—";
+    if (ms === null || ms === undefined) return "-";
     if (ms < 1000) return `${ms}ms`;
     return `${(ms / 1000).toFixed(2)}s`;
 }
@@ -152,7 +152,7 @@ export default function CronAdminPage() {
                                                             {job.lastStatus}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-muted-foreground">—</span>
+                                                        <span className="text-muted-foreground">-</span>
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">{formatDuration(job.lastRunMs)}</td>

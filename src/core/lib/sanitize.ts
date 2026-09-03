@@ -7,14 +7,14 @@ import DOMPurify from "isomorphic-dompurify";
  * articles, custom pages, changelog entries, announcements) MUST be passed
  * through one of these helpers at WRITE time (in the create/update API
  * handler), BEFORE the value is persisted to the database. Sanitizing on
- * write — rather than on read — prevents stored XSS payloads from ever
+ * write - rather than on read - prevents stored XSS payloads from ever
  * reaching the database in the first place.
  *
  * Never render untrusted HTML via `dangerouslySetInnerHTML` without first
  * passing it through `sanitizeHtml` (or `sanitizeInline` for one-line fields).
  */
 
-// Allowed HTML tags for rich content. Keep conservative — users cannot inject
+// Allowed HTML tags for rich content. Keep conservative - users cannot inject
 // scripts, iframes, forms, or any JS-executing element.
 const ALLOWED_TAGS = [
     "p", "br", "strong", "em", "u", "s", "b", "i",
@@ -42,7 +42,7 @@ export function sanitizeHtml(dirty: string): string {
 }
 
 /**
- * Stricter variant — for places that should only accept plain text plus minimal
+ * Stricter variant - for places that should only accept plain text plus minimal
  * inline formatting (titles, short blurbs, inline description fields).
  */
 export function sanitizeInline(dirty: string): string {

@@ -115,7 +115,7 @@ export async function PATCH(request: NextRequest) {
 
     const wantEnabled = enabled ?? true;
 
-    // Single DB query for all module configs — used for dependency/conflict resolution
+    // Single DB query for all module configs - used for dependency/conflict resolution
     const allConfigs = await prisma.moduleConfig.findMany();
     const configMap = new Map(allConfigs.map(c => [c.id, c]));
     const allDefs = moduleSystem.getDefinitions();
@@ -260,8 +260,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (hookError) {
-        // State change is already persisted — we don't revert because
-        // that's its own class of problem (partial cleanup) — but the
+        // State change is already persisted - we don't revert because
+        // that's its own class of problem (partial cleanup) - but the
         // admin gets a clear signal that the hook didn't complete.
         return NextResponse.json({
             ...updated,

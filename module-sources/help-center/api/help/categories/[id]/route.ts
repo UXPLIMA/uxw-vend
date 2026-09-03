@@ -4,7 +4,7 @@ import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-// PATCH /api/v1/help/categories/[id] — Update category (admin)
+// PATCH /api/v1/help/categories/[id] - Update category (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ category: updated });
 }
 
-// DELETE /api/v1/help/categories/[id] — Delete category (admin).
+// DELETE /api/v1/help/categories/[id] - Delete category (admin).
 // Refuses if the category still has articles.
 export async function DELETE(_: NextRequest, { params }: RouteParams) {
     const session = await auth();

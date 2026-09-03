@@ -17,7 +17,7 @@ import { log, prisma } from "@/core/sdk/server";
  * whose threshold is met. Upserts are idempotent.
  *
  * If the DB query fails at bootstrap (e.g. migrations not yet applied,
- * transient DB hiccup) the engine returns an empty ruleset — core knows
+ * transient DB hiccup) the engine returns an empty ruleset - core knows
  * nothing about which modules' events should award trophies. Admins seed
  * their own trophy rules through the admin UI.
  *
@@ -41,7 +41,7 @@ interface TrophyRule {
  * so an admin can edit or delete them freely afterwards without them coming
  * back. Rules reference other modules' events (forum, vote, store,
  * suggestions); if those modules are not installed the rule simply never
- * fires — the module is fully self-contained and core stays module-agnostic.
+ * fires - the module is fully self-contained and core stays module-agnostic.
  */
 const DEFAULT_TROPHIES = [
     { id: "first-post", name: "First Post", description: "Started your very first forum topic.", icon: "MessageSquare", color: "#3b82f6", points: 5, awardOn: "forum.topic.created:1", ruleType: "event-count", ruleEvent: "forum.topic.created", ruleThreshold: 1, isActive: true },
@@ -52,13 +52,13 @@ const DEFAULT_TROPHIES = [
 ];
 
 /**
- * Seed the starter trophies, but ONLY when the table is empty — i.e. the very
+ * Seed the starter trophies, but ONLY when the table is empty - i.e. the very
  * first boot after install. Once any trophy exists (including admin-created
  * ones) this is a no-op, so deleting a default trophy makes it stay deleted.
  * Idempotent and non-fatal: a DB hiccup just skips the seed for this boot.
  *
  * This lives in the module (not core) so core ships zero knowledge of any
- * module's default data — installing the module is what creates them.
+ * module's default data - installing the module is what creates them.
  */
 export async function seedDefaultTrophies(): Promise<void> {
     try {
@@ -87,7 +87,7 @@ async function qualifies(userId: string, rule: TrophyRule): Promise<boolean> {
 async function awardIfQualified(userId: string, rule: TrophyRule): Promise<void> {
     if (!(await qualifies(userId, rule))) return;
     try {
-        // Ensure trophy row exists — do not crash if it was deleted mid-flight.
+        // Ensure trophy row exists - do not crash if it was deleted mid-flight.
         const trophy = await prisma.trophy.findUnique({
             where: { id: rule.trophyId },
             select: { id: true, isActive: true },
@@ -106,7 +106,7 @@ async function awardIfQualified(userId: string, rule: TrophyRule): Promise<void>
 
 /**
  * Load the current active ruleset from the DB. Returns an empty list and
- * logs a warning if the query fails — core does not ship any module-aware
+ * logs a warning if the query fails - core does not ship any module-aware
  * fallback rules.
  */
 async function loadRules(): Promise<TrophyRule[]> {
@@ -161,7 +161,7 @@ export async function registerTrophyListeners(force = false): Promise<void> {
 
     for (const [event, eventRules] of byEvent.entries()) {
         // `event` comes from the database, so it is never a literal the payload
-        // registry can resolve — the shape this rule engine reads is annotated
+        // registry can resolve - the shape this rule engine reads is annotated
         // on the parameter instead.
         addAction(event, async (payload: { userId?: string; authorId?: string }) => {
             const userId = payload.userId || payload.authorId;

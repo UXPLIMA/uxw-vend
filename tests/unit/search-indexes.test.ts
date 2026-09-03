@@ -6,7 +6,7 @@ import { ftsExpression } from "../../scripts/ensure-search-indexes";
 
 /**
  * Core used to carry `BlogArticle`, `ForumTopic`, `HelpArticle` and `Product`
- * in a hardcoded array in scripts/ensure-search-indexes.ts — four module
+ * in a hardcoded array in scripts/ensure-search-indexes.ts - four module
  * tables named in core, and an error line per uninstalled module on every
  * boot. The module that owns the table declares the index now, and these
  * cases are what keeps that safe.

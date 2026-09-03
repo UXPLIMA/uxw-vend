@@ -71,7 +71,7 @@ function PageContent({ page }: { page: CustomPage }) {
             puckData = parsed as Data;
         }
     } catch {
-        // Not JSON — fall through to HTML render
+        // Not JSON - fall through to HTML render
     }
 
     useEffect(() => {

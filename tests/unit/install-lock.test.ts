@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
  *
  * 1. `getLockPool()` reaches `pg` through `eval("require")` so Turbopack
  *    never bundles it. That bypasses the ESM mock graph, so `vi.mock("pg")`
- *    would do nothing — the stub is installed on the real CJS module object
+ *    would do nothing - the stub is installed on the real CJS module object
  *    instead, and restored afterwards.
  * 2. The module holds process-wide state (`installing`, `buildRunning`,
  *    `buildScheduled`, the memoised pool), so every test re-imports it after
@@ -142,7 +142,7 @@ describe("acquireInstallLock", () => {
 
         const [key] = pg.clients[0].queries[0].params as string[];
         expect(typeof key).toBe("string");
-        // 0x7578774d6f64496e — larger than Number.MAX_SAFE_INTEGER, so a
+        // 0x7578774d6f64496e - larger than Number.MAX_SAFE_INTEGER, so a
         // float round-trip would produce a different lock id per worker and
         // silently break mutual exclusion.
         expect(key).toBe(BigInt("0x7578774d6f64496e").toString());
@@ -299,7 +299,7 @@ describe("scheduleBuild", () => {
         await drainBuild();
 
         // Schema additions sit between the merge and the migrations because
-        // migrations only alter a module's schema after its initial release —
+        // migrations only alter a module's schema after its initial release -
         // the schema itself is what creates its tables the first time. Without
         // this step, installing one of the twenty-five schema-bearing modules
         // that ship no migrations/ left it enabled and tableless.

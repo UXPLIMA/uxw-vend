@@ -8,7 +8,7 @@ import { ModuleSearchIndexes } from "@/core/generated/module-search";
  *
  * The table list is generated from module manifests, not written here. It used
  * to be a hardcoded array naming `BlogArticle`, `ForumTopic`, `HelpArticle`
- * and `Product` — four module tables named in core, which is the one thing
+ * and `Product` - four module tables named in core, which is the one thing
  * this project's architecture forbids, and which logged an error per
  * uninstalled module on every single boot.
  *

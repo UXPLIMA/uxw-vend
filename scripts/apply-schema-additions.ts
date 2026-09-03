@@ -2,8 +2,8 @@
  * Additive-only schema sync.
  *
  * The problem this exists to solve: installing a module at runtime has to
- * create that module's tables, and `prisma db push` — the tool the design
- * originally reached for — cannot do that safely on a live database.
+ * create that module's tables, and `prisma db push` - the tool the design
+ * originally reached for - cannot do that safely on a live database.
  *
  * `db push` reconciles the whole database to the merged schema, which means it
  * also removes anything the schema no longer declares. Uninstall deliberately
@@ -25,7 +25,7 @@
  * statement with the operation that produced it (`-- CreateTable`,
  * `-- DropTable`, `-- AlterTable`, …), so the filter reads those annotations
  * instead of parsing SQL. Anything not provably additive is skipped and
- * named in the log — destructive and altering changes are what a module's
+ * named in the log - destructive and altering changes are what a module's
  * `migrations/` directory is for, and `docs/MIGRATIONS.md` says so.
  *
  * Usage:
@@ -38,7 +38,7 @@ import { execFileSync } from "child_process";
 import { prisma } from "../src/core/lib/db";
 
 /**
- * Operations that only ever add. `AlterTable` is deliberately absent — it is
+ * Operations that only ever add. `AlterTable` is deliberately absent - it is
  * handled separately below, because Prisma emits both `ADD COLUMN` and
  * `DROP COLUMN` under that one annotation.
  */

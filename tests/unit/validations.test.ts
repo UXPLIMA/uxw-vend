@@ -9,7 +9,7 @@ import {
 } from '@/core/lib/validations';
 
 describe('loginSchema', () => {
-    // Login intentionally relaxed — legacy accounts whose passwords predate
+    // Login intentionally relaxed - legacy accounts whose passwords predate
     // the current policy must still be able to sign in. Full policy applies
     // to registration + password change + reset.
     it('accepts valid credentials', () => {

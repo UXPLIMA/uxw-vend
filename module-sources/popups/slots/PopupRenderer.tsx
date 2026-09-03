@@ -17,7 +17,7 @@ interface ActivePopup {
  * the module's public API. Dismissal state is persisted in localStorage
  * per popup id so users don't see the same popup twice.
  *
- * Rendering no-ops when the popups module is not installed — the slot
+ * Rendering no-ops when the popups module is not installed - the slot
  * registry simply doesn't contain this entry in that case.
  */
 export default function PopupRenderer() {

@@ -49,7 +49,7 @@ async function getServerRconConfig(serverId: string): Promise<RconConfig | null>
     }
 }
 
-/** Resolve RCON config — specific server if serverId given, else default */
+/** Resolve RCON config - specific server if serverId given, else default */
 async function resolveRconConfig(serverId?: string | null): Promise<RconConfig | null> {
     if (serverId) {
         const serverConfig = await getServerRconConfig(serverId);
@@ -85,7 +85,7 @@ function sanitizeRconArg(input: string): string {
     return input.replace(/[^a-zA-Z0-9_\-. ]/g, '');
 }
 
-/** Execute product delivery commands — routes each command to its target server */
+/** Execute product delivery commands - routes each command to its target server */
 export async function deliverProduct(params: {
     playerName: string;
     productName: string;

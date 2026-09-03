@@ -195,7 +195,7 @@
         "readMore": "Read More",
         "previous": "Previous",
         "next": "Next",
-        "empty": "No posts yet — check back soon."
+        "empty": "No posts yet - check back soon."
       },
       "admin": {
         "blogArticles": "Blog Articles",
@@ -302,7 +302,7 @@
         "readMore": "Devamını Oku",
         "previous": "Önceki",
         "next": "Sonraki",
-        "empty": "Henüz gönderi yok — yakında tekrar bakın."
+        "empty": "Henüz gönderi yok - yakında tekrar bakın."
       },
       "admin": {
         "blogArticles": "Blog Makaleleri",

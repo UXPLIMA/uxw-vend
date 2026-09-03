@@ -8,8 +8,8 @@ import { prisma } from "@/core/lib/db";
  * everything when no preference has been saved.
  *
  * Available widgets come from two sources:
- *   1. CORE_WIDGETS — hardcoded core list (users, activity, health, etc.)
- *   2. ModuleDashboardCards — contributed from installed module manifests
+ *   1. CORE_WIDGETS - hardcoded core list (users, activity, health, etc.)
+ *   2. ModuleDashboardCards - contributed from installed module manifests
  */
 
 export interface DashboardWidget {
@@ -57,7 +57,7 @@ export async function getAvailableWidgets(): Promise<AvailableWidget[]> {
             });
         }
     } catch {
-        // Registry not available — only core widgets
+        // Registry not available - only core widgets
     }
     return core;
 }

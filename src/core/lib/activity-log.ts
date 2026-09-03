@@ -4,7 +4,7 @@ import { auth } from "@/core/lib/auth";
 
 /**
  * Record a single audit event. The schema stores `metadata` as a Json
- * column — previous versions cast the object to string which round-tripped
+ * column - previous versions cast the object to string which round-tripped
  * as a stringified blob rather than a queryable JSON document, making
  * downstream `prisma.activityLog.findMany({ where: { metadata: { path: [...], ... } } })`
  * queries fail silently. Now the object is handed to Prisma directly so
@@ -44,7 +44,7 @@ export async function logActivity(params: {
             } catch {
                 // `auth()` can throw outside a request context (e.g. cron,
                 // background tasks). In that case there's no impersonation
-                // to unwind — record the event as-is.
+                // to unwind - record the event as-is.
             }
         }
 

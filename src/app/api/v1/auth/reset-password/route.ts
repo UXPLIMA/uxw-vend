@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         const breach = await checkPasswordBreach(password);
         if (!breach.ok) {
             return NextResponse.json(
-                { error: "This password has appeared in a known data breach — pick something else." },
+                { error: "This password has appeared in a known data breach - pick something else." },
                 { status: 400 },
             );
         }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
         // Atomically consume the token. `deleteMany` runs as a single SQL
         // statement, so two concurrent requests racing on the same token
-        // cannot both see `count = 1` — exactly one wins, the other gets 0
+        // cannot both see `count = 1` - exactly one wins, the other gets 0
         // and is rejected as an invalid token. This replaces the previous
         // findFirst → update → deleteMany pattern that allowed a narrow
         // window for the same token to be used twice.

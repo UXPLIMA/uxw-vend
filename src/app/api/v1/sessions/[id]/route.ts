@@ -4,7 +4,7 @@ import { prisma } from "@/core/lib/db";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-/** DELETE — revoke a specific session (must belong to current user) */
+/** DELETE - revoke a specific session (must belong to current user) */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

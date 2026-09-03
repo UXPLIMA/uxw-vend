@@ -210,7 +210,7 @@ export default function AdminPunishmentsPage() {
                                 <tr key={p.id} className="border-t">
                                     <td className="px-4 py-2 font-medium">{p.playerName}</td>
                                     <td className="px-4 py-2">{TYPE_OPTIONS.includes(p.type) ? t(p.type) : p.type}</td>
-                                    <td className="px-4 py-2 text-muted-foreground">{p.reason || "—"}</td>
+                                    <td className="px-4 py-2 text-muted-foreground">{p.reason || "-"}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{new Date(p.createdAt).toLocaleString(__dateTag)}</td>
                                     <td className="px-4 py-2">
                                         {p.active ? (

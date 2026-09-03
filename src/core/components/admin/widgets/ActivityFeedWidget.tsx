@@ -6,7 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { localizeActivityTitle } from "@/core/lib/activity-title";
 
 /**
- * Activity feed widget — 5 most recent public feed items.
+ * Activity feed widget - 5 most recent public feed items.
  */
 export default async function ActivityFeedWidget() {
     const t = await getTranslations("admin");

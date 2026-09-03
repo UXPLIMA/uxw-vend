@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — session access.
+ * uxwVend module SDK - session access.
  *
  * Its own entry point because importing it pulls the whole Auth.js
  * configuration (providers, adapter, callbacks). A module file that only needs

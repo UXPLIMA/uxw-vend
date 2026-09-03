@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         try {
             manifestJson = JSON.parse(manifestRaw);
         } catch {
-            return NextResponse.json({ error: "Invalid module.json — not valid JSON" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid module.json - not valid JSON" }, { status: 400 });
         }
 
         const parsed = moduleManifestSchema.safeParse(manifestJson);
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             const first = parsed.error.issues[0];
             const where = first.path.join(".");
             return NextResponse.json(
-                { error: `Invalid module.json: ${where ? where + " — " : ""}${first.message}` },
+                { error: `Invalid module.json: ${where ? where + " - " : ""}${first.message}` },
                 { status: 400 },
             );
         }
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
             await fs.rm(targetDir, { recursive: true, force: true });
             createdTargetDir = null;
             const detail = process.env.NODE_ENV !== "production" ? ": " + (err instanceof Error ? err.message : "Unknown error") : "";
-            return NextResponse.json({ error: "Module has errors — registry generation failed" + detail }, { status: 400 });
+            return NextResponse.json({ error: "Module has errors - registry generation failed" + detail }, { status: 400 });
         }
 
         const installedAt = new Date();
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
         // Invalidate the module-state cache so the proxy and request handlers
         // see the freshly-installed module immediately. Without this, the
         // 30-second cache TTL leaves the new module's routes 404-ing until
-        // the next refresh — surprising for a synchronous "install" response.
+        // the next refresh - surprising for a synchronous "install" response.
         await invalidateModuleCache().catch(() => {});
 
         // Sync the module's declared translations so admin/UI strings are

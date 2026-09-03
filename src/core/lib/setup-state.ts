@@ -21,7 +21,7 @@ export async function isSetupComplete(): Promise<boolean> {
 
     const now = Date.now();
     if (now - lastCheck < CHECK_INTERVAL_MS) {
-        // Throttled — assume not yet complete until the next scheduled poll.
+        // Throttled - assume not yet complete until the next scheduled poll.
         return false;
     }
     lastCheck = now;

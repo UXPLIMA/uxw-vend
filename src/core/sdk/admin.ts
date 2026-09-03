@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — admin scaffolds.
+ * uxwVend module SDK - admin scaffolds.
  *
  * `AdminCrudPage` and `SettingsForm` render a complete list/create/edit screen
  * or a settings panel from a field description, so a module's admin route is

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 /**
  * The shutdown registry is what makes `requestRestart()` in install-lock.ts
  * safe: SIGTERM has to drain Prisma and clear the scheduler interval before
- * the process goes away. A bug here is unrecoverable in production — it
+ * the process goes away. A bug here is unrecoverable in production - it
  * shows up as a hung container that the supervisor SIGKILLs, or as a
  * connection pool that is already exhausted on the next boot.
  *
@@ -97,7 +97,7 @@ describe("shutdown registry", () => {
         handlers.get("SIGTERM")!("SIGTERM");
         await vi.waitFor(() => expect(order).toHaveLength(2));
 
-        // Re-registering must not promote "a" to the end of the list —
+        // Re-registering must not promote "a" to the end of the list -
         // unwind order encodes init order, not last-write order.
         expect(order).toEqual(["b", "a2"]);
     });
@@ -191,7 +191,7 @@ describe("shutdown registry", () => {
         mod.installShutdownHandlers();
         mod.installShutdownHandlers();
 
-        // Two calls total — SIGTERM and SIGINT — not six. Repeat calls from
+        // Two calls total - SIGTERM and SIGINT - not six. Repeat calls from
         // several server-entry modules must stay cheap.
         expect(process.once).toHaveBeenCalledTimes(2);
     });

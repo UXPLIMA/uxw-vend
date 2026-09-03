@@ -18,8 +18,8 @@ export interface ModuleManifest {
         icon?: string; // Icon name from Lucide
         // Which admin nav group to attach this item to (see
         // admin-nav-groups.ts). May name a core group, or one declared in
-        // `navGroups` by this or any other module. Omit — or name a group
-        // nothing provides — to land in the generic "modules" bucket.
+        // `navGroups` by this or any other module. Omit - or name a group
+        // nothing provides - to land in the generic "modules" bucket.
         group?: string;
     }[];
     routes?: {
@@ -50,11 +50,11 @@ export interface ModuleManifest {
      * against. Omitted means unconstrained.
      */
     coreVersion: string;
-    /** Marketplace grouping slug. Free-form — core owns no category list. */
+    /** Marketplace grouping slug. Free-form - core owns no category list. */
     category?: string;
     tags?: string[];
 
-    // Module translations — merged into core messages at runtime
+    // Module translations - merged into core messages at runtime
     translations?: {
         [locale: string]: Record<string, string | Record<string, string>>;
     };
@@ -84,7 +84,7 @@ export interface ModuleManifest {
         section?: "quick" | "legal";
     }[];
 
-    // Profile tabs — modules add their own tabs to user profile
+    // Profile tabs - modules add their own tabs to user profile
     profileTabs?: {
         id: string;
         label: string;
@@ -94,7 +94,7 @@ export interface ModuleManifest {
 
     // Admin nav groups this module contributes to the sidebar rail. Declaring
     // a group does not create it on its own: a group with no items is never
-    // rendered. Several modules may declare the same group — they share it,
+    // rendered. Several modules may declare the same group - they share it,
     // and the declaration from the lexically-first module id supplies the
     // label and icon.
     navGroups?: {
@@ -125,7 +125,7 @@ export interface ModuleManifest {
         urlPlaceholder?: string; // Example URL shown in the admin form
     }[];
 
-    // OAuth login buttons — rendered on login/register pages
+    // OAuth login buttons - rendered on login/register pages
     oauthButtons?: {
         id: string;
         provider: string;        // NextAuth provider ID e.g. "discord"
@@ -134,14 +134,14 @@ export interface ModuleManifest {
         svgIcon: string;         // SVG path data for icon
     }[];
 
-    // Navbar components — rendered in navbar's right side (e.g. cart icon, notification bell)
+    // Navbar components - rendered in navbar's right side (e.g. cart icon, notification bell)
     navbarComponents?: {
         id: string;
         component: string;   // path to component
         order: number;        // render order (lower = left)
     }[];
 
-    // Footer components — rendered in the footer (e.g. currency selector next to language)
+    // Footer components - rendered in the footer (e.g. currency selector next to language)
     footerComponents?: {
         id: string;
         component: string;   // path to component
@@ -149,7 +149,7 @@ export interface ModuleManifest {
         order?: number;      // render order (lower = first)
     }[];
 
-    // Storage providers — implement the StorageProvider interface from @/core/lib/storage
+    // Storage providers - implement the StorageProvider interface from @/core/lib/storage
     // Used by core's file upload system. Multiple providers can coexist; the active one is
     // selected via the `storage_active_provider` Setting key (or STORAGE_PROVIDER env var).
     storageProviders?: {
@@ -158,7 +158,7 @@ export interface ModuleManifest {
         handler: string;     // path to file exporting `default: StorageProvider`
     }[];
 
-    // Context providers — React components that wrap the entire app tree.
+    // Context providers - React components that wrap the entire app tree.
     // Use for context (CurrencyProvider, ThemeProvider, etc.) that descendants need to consume.
     // Unlike layoutComponents (rendered as siblings), contextProviders WRAP children.
     contextProviders?: {
@@ -167,7 +167,7 @@ export interface ModuleManifest {
         order?: number;      // wrap order (lower = outer)
     }[];
 
-    // Hook listeners — actions/filters the module subscribes to.
+    // Hook listeners - actions/filters the module subscribes to.
     // Each entry points to a file exporting default: (payload, context?) => ... (or returns new value for filters).
     // Wired into a build-time registry so listeners are bundled as static imports.
     // Listeners are automatically registered when the module is enabled and removed on disable.
@@ -189,7 +189,7 @@ export interface ModuleManifest {
         description?: string; // what it means / when it fires
     }[];
 
-    // Slot contributions — React components that render into named <Slot>
+    // Slot contributions - React components that render into named <Slot>
     // points declared by other modules (or by core templates). Used by the
     // module-extends-module mechanism.
     slotContents?: {
@@ -199,7 +199,7 @@ export interface ModuleManifest {
         order?: number;       // render order within the slot (lower first)
     }[];
 
-    // Page-builder blocks — custom Puck blocks the module contributes.
+    // Page-builder blocks - custom Puck blocks the module contributes.
     // Each entry points to a module file that exports a Puck-compatible
     // ComponentConfig as its default export. Merged into the page editor
     // and renderer at build time.
@@ -209,7 +209,7 @@ export interface ModuleManifest {
         component: string;    // path to the file relative to module root
     }[];
 
-    // Cron jobs — periodic tasks run by the core scheduler.
+    // Cron jobs - periodic tasks run by the core scheduler.
     // Schedule keywords: every-minute | every-5-minutes | every-15-minutes
     //                    every-hour | every-day | every-week | every-month
     cronJobs?: {
@@ -218,7 +218,7 @@ export interface ModuleManifest {
         handler: string;      // path to file exporting default async fn
     }[];
 
-    // Public search providers — handlers the /search endpoint queries
+    // Public search providers - handlers the /search endpoint queries
     // when a user searches the site. Handler default-exports an async
     // function: (query: string) => Promise<SearchResult[]>
     searchProviders?: {
@@ -227,12 +227,12 @@ export interface ModuleManifest {
         handler: string;      // path to file exporting default async fn
         icon?: string;        // Lucide icon name shown on the result group card
         // Full-text indexes core should create on this module's own tables.
-        // Plain identifiers only — core builds the tsvector expression, so a
+        // Plain identifiers only - core builds the tsvector expression, so a
         // module never supplies SQL.
         indexes?: { table: string; columns: string[] }[];
     }[];
 
-    // Activity-feed title localization — modules that emit activity events
+    // Activity-feed title localization - modules that emit activity events
     // declare how to localize their English-formatted titles. Core strips
     // `prefix` from the stored title and substitutes the translation under
     // the "activity" namespace `key`. Keeps core ignorant of module events.
@@ -246,29 +246,29 @@ export interface ModuleManifest {
     // in the admin permission matrix so admins can grant/deny per resource.
     permissionResources?: string[];
 
-    // Inbound webhook receivers — external services can POST to
+    // Inbound webhook receivers - external services can POST to
     // /api/v1/webhook/<provider> and the dispatcher routes to the
     // matching handler. Handler default-exports:
     //   (request: Request) => Promise<{ status: number; body?: unknown }>
     // Optional signatureHeader + secretEnv enables HMAC verification.
     webhookReceivers?: {
-        provider: string;     // unique slug — used in the URL
+        provider: string;     // unique slug - used in the URL
         handler: string;      // path to file exporting default async fn
         signatureHeader?: string;  // e.g. "stripe-signature"
         secretEnv?: string;        // env var holding the shared secret
     }[];
 
-    // User-facing notification types — surfaces in the profile preferences
+    // User-facing notification types - surfaces in the profile preferences
     // grid so users can opt out of specific event types per channel.
     // Modules contribute their event types here so users see them.
     notificationTypes?: {
         eventType: string;    // matches the hook name, e.g. "blog.article.created"
         label: string;        // human-readable label
         description?: string;
-        channels?: string[];  // ["email", "inapp"] — default both
+        channels?: string[];  // ["email", "inapp"] - default both
     }[];
 
-    // Layout components — rendered on every page when module is enabled
+    // Layout components - rendered on every page when module is enabled
     layoutComponents?: {
         id: string;
         component: string;
@@ -276,7 +276,7 @@ export interface ModuleManifest {
         exclude?: string[];   // URL patterns to hide on (e.g. ["/admin/*"])
     }[];
 
-    // Settings page cards — modules add their own settings buttons
+    // Settings page cards - modules add their own settings buttons
     settingsCards?: {
         title: string;
         description: string;
@@ -285,17 +285,17 @@ export interface ModuleManifest {
         color: string;        // Tailwind color class e.g. "text-red-500"
     }[];
 
-    // Dashboard integration — module provides its own stats
+    // Dashboard integration - module provides its own stats
     statsApi?: string;  // e.g. "/store/stats" → GET /api/v1/store/stats returns { cards: [...], sections: [...] }
 
-    // SEO sitemap contributor — module decides which of its URLs should
+    // SEO sitemap contributor - module decides which of its URLs should
     // appear in the sitemap. Handler default-exports an async function:
     //   () => Promise<SitemapEntry[]>
     seoRoutes?: {
         handler: string;   // path to file exporting default async fn
     };
 
-    // Homepage sections — modules register their own content areas
+    // Homepage sections - modules register their own content areas
     homepageSections?: {
         id: string;
         type: "content" | "widget";   // content = main area, widget = sidebar
@@ -306,14 +306,14 @@ export interface ModuleManifest {
     dashboardCards?: {
         id: string;
         label: string;
-        labelKey?: string;  // i18n key (admin namespace) — preferred over `label` when present
+        labelKey?: string;  // i18n key (admin namespace) - preferred over `label` when present
         icon: string;
         href: string;
         color: string;
         statKey: string;
     }[];
 
-    // GDPR user-data-export contributions — tables to dump into the
+    // GDPR user-data-export contributions - tables to dump into the
     // user's personal data export. Each entry maps a Prisma delegate to
     // the column holding the user FK and a grouping key under modules.<key>
     // in the exported JSON. Tables whose delegate isn't on the runtime
@@ -324,7 +324,7 @@ export interface ModuleManifest {
         column: string;  // FK column to user id (e.g. "authorId")
     }[];
 
-    // Moderation queue contributors — modules that own moderatable
+    // Moderation queue contributors - modules that own moderatable
     // content (comments, posts, suggestions) plug into the unified
     // admin moderation view. Handler default-exports an object:
     //   { list(skip, take), count(), bulkUpdate(ids, action) }
@@ -341,7 +341,7 @@ export interface ModuleManifest {
 
 /**
  * A module discovered on the filesystem. `enabled` is deliberately NOT
- * part of this type — the DB (`ModuleConfig.enabled`, surfaced via
+ * part of this type - the DB (`ModuleConfig.enabled`, surfaced via
  * `getModuleStates()` in `module-cache.ts`) is the single source of truth
  * for whether a module is active. Past versions hardcoded `enabled: true`
  * here and fooled consumers into treating filesystem presence as activation.

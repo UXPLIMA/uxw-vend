@@ -5,8 +5,8 @@ import { prisma } from "./db";
  *
  * We do NOT hard-delete the User row because many module tables hold
  * non-nullable FKs to users (forum posts, blog articles, orders). Hard
- * delete would either cascade those away — destroying the public record
- * and breaking audit history — or fail entirely.
+ * delete would either cascade those away - destroying the public record
+ * and breaking audit history - or fail entirely.
  *
  * Instead we anonymise the User row in place and then prune a small set
  * of tables that are explicitly "private and not audit-relevant":
@@ -15,7 +15,7 @@ import { prisma } from "./db";
  * (warnings, activity feed, forum posts, orders, tickets) is kept; its
  * join back to the user now resolves to the anonymised row.
  *
- * This file knows nothing about any specific module — it only touches
+ * This file knows nothing about any specific module - it only touches
  * models exposed by the generated Prisma client and wraps each delete in
  * try/catch so an uninstalled module never breaks the flow.
  */

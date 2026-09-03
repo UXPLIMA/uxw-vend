@@ -5,7 +5,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 
 /**
- * Email queue status widget — pending/failed counts.
+ * Email queue status widget - pending/failed counts.
  */
 export default async function EmailQueueStatusWidget() {
     const t = await getTranslations("admin");

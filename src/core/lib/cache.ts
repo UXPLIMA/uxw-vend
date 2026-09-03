@@ -3,14 +3,14 @@
  *
  * Selection:
  *   - If REDIS_URL is set, we try the Redis backend first and transparently
- *     fall back to the in-memory backend on any error (defensive — a flaky
+ *     fall back to the in-memory backend on any error (defensive - a flaky
  *     Redis can never take down a request).
  *   - Otherwise the MemoryCacheBackend is used for the life of the process.
  *
  * Public API:
- *   - getCacheBackend()              — returns the currently preferred backend
- *   - cached(key, ttlMs, loader)     — read-through cache wrapper
- *   - invalidate(keyOrPrefix)        — delete one key; pass "prefix:*" to
+ *   - getCacheBackend()              - returns the currently preferred backend
+ *   - cached(key, ttlMs, loader)     - read-through cache wrapper
+ *   - invalidate(keyOrPrefix)        - delete one key; pass "prefix:*" to
  *                                      delete all matching keys
  *
  * Keys use a colon hierarchy (e.g. "trophies:public", "leaderboard:buyers:10").
@@ -28,7 +28,7 @@ export interface CacheBackend {
 }
 
 // ---------------------------------------------------------------------------
-// Memory backend — process-local Map. Always available, used as fallback.
+// Memory backend - process-local Map. Always available, used as fallback.
 // ---------------------------------------------------------------------------
 
 interface MemoryEntry {
@@ -71,7 +71,7 @@ export const MemoryCacheBackend: CacheBackend = {
 };
 
 // ---------------------------------------------------------------------------
-// Redis backend — SCAN + DEL for safe production-grade prefix invalidation.
+// Redis backend - SCAN + DEL for safe production-grade prefix invalidation.
 // ---------------------------------------------------------------------------
 
 const CACHE_PREFIX = "uxw:cache:";
@@ -172,7 +172,7 @@ export async function getCacheBackend(): Promise<CacheBackend> {
  * Returns the cached value if present; otherwise invokes `loader`, stores
  * the result for `ttlMs`, and returns it.
  *
- * Stampede protection is intentionally *not* implemented — a concurrent
+ * Stampede protection is intentionally *not* implemented - a concurrent
  * miss simply causes a double load. Much simpler, and the workloads this
  * helper targets are cheap read queries where two fetches cost nothing.
  *
@@ -188,7 +188,7 @@ export async function cached<T>(
     if (hit !== null) return hit;
 
     const fresh = await loader();
-    // Never cache `null` or `undefined` — we use `null` as the "miss" sentinel.
+    // Never cache `null` or `undefined` - we use `null` as the "miss" sentinel.
     if (fresh !== null && fresh !== undefined) {
         await backend.set<T>(key, fresh, ttlMs);
     }

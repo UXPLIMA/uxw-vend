@@ -3,7 +3,7 @@
  *
  * `module-marketplace/` holds ZIPs and an index.json built from
  * `module-sources/` by scripts/build-marketplace.sh. Both are committed, and
- * until this check existed nothing compared one against the other — so a
+ * until this check existed nothing compared one against the other - so a
  * module edited without a rebuild kept shipping its old code to every user
  * who installed it from the in-app marketplace.
  *
@@ -41,14 +41,14 @@ function fail(message: string): void {
 
 /**
  * Read a JSON file, reporting a parse failure as a problem rather than a
- * stack trace — a malformed manifest is exactly the kind of thing this
+ * stack trace - a malformed manifest is exactly the kind of thing this
  * check exists to name.
  */
 function readJson<T>(file: string, label: string): T | null {
     try {
         return JSON.parse(fs.readFileSync(file, "utf-8")) as T;
     } catch (err) {
-        fail(`${label}: ${file.replace(ROOT + path.sep, "")} is not valid JSON — ${(err as Error).message}`);
+        fail(`${label}: ${file.replace(ROOT + path.sep, "")} is not valid JSON - ${(err as Error).message}`);
         return null;
     }
 }
@@ -110,7 +110,7 @@ function compareModule(id: string): void {
 
 function main(): void {
     if (!fs.existsSync(SOURCES_DIR)) {
-        console.error("module-sources/ not found — run from the repository root.");
+        console.error("module-sources/ not found - run from the repository root.");
         process.exit(1);
     }
 

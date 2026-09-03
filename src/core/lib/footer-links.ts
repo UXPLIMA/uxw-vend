@@ -21,8 +21,8 @@ const MAX_LINKS = 20;
 const MAX_LABEL = 64;
 
 /**
- * Internal paths only, or absolute http(s). Everything else — `javascript:`,
- * `data:`, `mailto:`, and protocol-relative `//host` — is dropped.
+ * Internal paths only, or absolute http(s). Everything else - `javascript:`,
+ * `data:`, `mailto:`, and protocol-relative `//host` - is dropped.
  */
 function classifyHref(href: string): { href: string; external: boolean } | null {
     if (href.startsWith("//")) return null;

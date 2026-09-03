@@ -37,7 +37,7 @@ async function resolveRecipients(filter: BroadcastFilter): Promise<{ id: string;
     return users.filter((u) => !!u.email);
 }
 
-/** Queue a broadcast for delivery — sets status to "queued" and counts recipients. */
+/** Queue a broadcast for delivery - sets status to "queued" and counts recipients. */
 export async function queueBroadcast(broadcastId: string): Promise<{ totalCount: number }> {
     const broadcast = await prisma.emailBroadcast.findUnique({ where: { id: broadcastId } });
     if (!broadcast) throw new Error("Broadcast not found");

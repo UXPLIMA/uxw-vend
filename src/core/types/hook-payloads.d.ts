@@ -1,5 +1,5 @@
 /**
- * The hook payload registry — the typed half of the cross-module contract.
+ * The hook payload registry - the typed half of the cross-module contract.
  *
  * A hook is an agreement between two modules that never import each other: the
  * emitter picks a name and a payload shape, the listener has to guess both.
@@ -10,7 +10,7 @@
  *
  * ── Why globals rather than `declare module "@/core/lib/hooks"` ──
  * Interface augmentation has to name the module that DECLARES the interface,
- * and modules are forbidden from importing `@/core/lib/*` — they see core only
+ * and modules are forbidden from importing `@/core/lib/*` - they see core only
  * through `@/core/sdk`, which re-exports and therefore cannot be the
  * augmentation target. A global interface is reachable from any file without an
  * import specifier, which is exactly what a plugin host needs. The `UxwVend`
@@ -27,8 +27,8 @@
  *     }
  *     export {};
  *
- * Consumers then get the payload typed for free — `addAction("store.order.created",
- * (order) => …)` infers `order` — with no import between the two modules. When
+ * Consumers then get the payload typed for free - `addAction("store.order.created",
+ * (order) => …)` infers `order` - with no import between the two modules. When
  * the emitting module is not installed its declaration is absent, the name is
  * unknown, and the payload falls back to `unknown`: the compile-time story
  * matches the runtime one.

@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — server-only surface.
+ * uxwVend module SDK - server-only surface.
  *
  * Every symbol here reaches the database, the filesystem, or Node crypto, so
  * importing it from a `"use client"` file fails the build. Client code wants
@@ -67,7 +67,7 @@ export { sendEmail, queueEmail } from "@/core/lib/email";
 export { buildArticleJsonLd } from "@/core/lib/seo";
 
 // Structured logging. A module's cron jobs and hook listeners run outside any
-// request, and `log` handles that — it reads the correlation id from
+// request, and `log` handles that - it reads the correlation id from
 // AsyncLocalStorage when there is one and falls back cleanly when there is not.
 // Server-only because logger.ts imports next/headers.
 export { log } from "@/core/lib/logger";

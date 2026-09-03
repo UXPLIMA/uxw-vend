@@ -106,7 +106,7 @@ async function applyModuleMigrations(
             if (existingChecksum !== checksum) {
                 result.errors.push({
                     migration: file,
-                    error: `Checksum mismatch — file was modified after it was applied. Do not edit applied migrations; write a new one instead.`,
+                    error: `Checksum mismatch - file was modified after it was applied. Do not edit applied migrations; write a new one instead.`,
                 });
                 return result; // Abort this module
             }
@@ -149,7 +149,7 @@ async function applyModuleMigrations(
             const message = err instanceof Error ? err.message : String(err);
             result.errors.push({ migration: file, error: message });
             console.error(`  FAILED ${moduleId}/${file}: ${message}`);
-            return result; // Abort this module on first failure — do not skip ahead
+            return result; // Abort this module on first failure - do not skip ahead
         }
     }
 

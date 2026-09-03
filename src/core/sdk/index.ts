@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK — isomorphic surface.
+ * uxwVend module SDK - isomorphic surface.
  *
  * This is the supported import path for modules. `@/core/lib/*` is core's
  * internal layout and modules must not reach into it: core refactors freely
@@ -9,19 +9,19 @@
  * Every symbol is listed explicitly rather than re-exported with `export *`,
  * so widening the public surface is a visible diff someone has to approve.
  *
- * Entry points are split by runtime, not by topic — a barrel that mixed them
+ * Entry points are split by runtime, not by topic - a barrel that mixed them
  * would drag `prisma` into a client bundle the moment a component imported
  * `formatDate`.
  *
  * This file in particular stays dependency-light on purpose: `clsx`,
  * `tailwind-merge` and a hook bus with no imports at all. The project declares
  * no `sideEffects: false`, so a bundler cannot drop unused re-exports from a
- * barrel — anything heavy added here is paid for by every client component
+ * barrel - anything heavy added here is paid for by every client component
  * that imports `formatDate`. `sanitizeHtml` lives in `/server` for exactly
  * that reason: it pulls `isomorphic-dompurify`, and no module uses it from
  * client code.
  *
- *   `@/core/sdk`             this file — safe in server AND client code
+ *   `@/core/sdk`             this file - safe in server AND client code
  *   `@/core/sdk/server`      server-only: database, permissions, crypto, I/O
  *   `@/core/sdk/auth`        the Auth.js session helper
  *   `@/core/sdk/navigation`  locale-aware client navigation
@@ -57,7 +57,7 @@ export {
 } from "@/core/lib/hooks";
 
 /**
- * Hook typing helpers. `HookHandlerFor` is the one module authors reach for —
+ * Hook typing helpers. `HookHandlerFor` is the one module authors reach for -
  * it types a `hookListeners` handler from the hook's declared payload:
  *
  *     const onOrderCreated: HookHandlerFor<"store.order.created", "action"> =

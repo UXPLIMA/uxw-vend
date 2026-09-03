@@ -4,7 +4,7 @@ import { hasPermission, hasResourcePermission, prisma } from "@/core/sdk/server"
  * Determine whether a user may perform an action on a ticket.
  *
  * Access is granted if ANY of the following is true:
- *   1. The user owns the ticket (ticket.userId === userId) — for view/edit only.
+ *   1. The user owns the ticket (ticket.userId === userId) - for view/edit only.
  *   2. The user's role has the `tickets.manage` permission.
  *   3. A granular ResourcePermission row exists for the user on this ticket
  *      (resource = "tickets.ticket", resourceId = ticketId, action = action).
@@ -16,7 +16,7 @@ export async function canAccessTicket(
 ): Promise<boolean> {
     if (!userId) return false;
 
-    // 1. Ownership — owners can view/edit their own tickets but not delete.
+    // 1. Ownership - owners can view/edit their own tickets but not delete.
     if (action !== "delete") {
         const ticket = await prisma.ticket.findUnique({
             where: { id: ticketId },

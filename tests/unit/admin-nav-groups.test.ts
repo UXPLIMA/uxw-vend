@@ -101,7 +101,7 @@ describe("buildNavGroups", () => {
 
     it("drops a module's contributions once it is no longer enabled", () => {
         // The caller passes only enabled modules, so a disabled module simply
-        // stops appearing — and its group must go with it.
+        // stops appearing - and its group must go with it.
         const withModule = buildNavGroups({ modules: [{ id: "vote", menu: [menuItem("/vote", "Vote")] }] });
         expect(withModule.find((g) => g.id === FALLBACK_NAV_GROUP_ID)).toBeDefined();
 

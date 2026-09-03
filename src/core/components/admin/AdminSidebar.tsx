@@ -37,7 +37,7 @@ interface AdminSidebarProps {
     userEmail?: string;
     modules?: SidebarModule[];
     /**
-     * Active theme id — used to build the dynamic "Theme" nav group on the
+     * Active theme id - used to build the dynamic "Theme" nav group on the
      * client. Passing the id (a string) rather than the full NavGroup keeps
      * us on the serializable side of the RSC boundary; the built group
      * contains icon ComponentTypes (from lucide-react) which Next rejects
@@ -72,7 +72,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
     // Merge module menus into the nav groups. `buildNavGroups` owns the
     // merge and the pruning, so anything that arrives here has items to show.
     const groups: NavGroup[] = useMemo(() => {
-        // Only groups declared by a module that is actually installed here —
+        // Only groups declared by a module that is actually installed here -
         // the registry lists every module's declaration, installed or not.
         const enabled = new Set(modules.map((m) => m.id));
         return buildNavGroups({
@@ -98,7 +98,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
         setUserSelection(null);
     }, [pathname]);
 
-    // The selected group can disappear underneath us — a module disabled in
+    // The selected group can disappear underneath us - a module disabled in
     // another tab drops its group from the merge. Fall back to the dashboard
     // rather than rendering an empty shell.
     const effectiveGroupId = userSelection || pathDerivedId;
@@ -193,7 +193,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r" />
                             )}
                         </button>
-                        {/* CSS tooltip — appears to the right on hover */}
+                        {/* CSS tooltip - appears to the right on hover */}
                         <span
                             role="tooltip"
                             className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium whitespace-nowrap shadow-lg opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 z-50"

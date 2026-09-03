@@ -25,7 +25,7 @@ import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
-// POST /api/v1/modules/update — Update an installed module from marketplace
+// POST /api/v1/modules/update - Update an installed module from marketplace
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
         if (!exists) {
-            return NextResponse.json({ error: "Module not installed — use install instead" }, { status: 404 });
+            return NextResponse.json({ error: "Module not installed - use install instead" }, { status: 404 });
         }
 
         // Opt-in pre-update DB snapshot (MODULE_INSTALL_BACKUP=1). Module
@@ -114,14 +114,14 @@ export async function POST(request: NextRequest) {
             const manifestPath = path.join(stageDir, "module.json");
             const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
             if (!hasManifest) {
-                return NextResponse.json({ error: "Invalid module update — no module.json found" }, { status: 400 });
+                return NextResponse.json({ error: "Invalid module update - no module.json found" }, { status: 400 });
             }
 
             let manifestJson: unknown;
             try {
                 manifestJson = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
             } catch {
-                return NextResponse.json({ error: "Invalid module.json — not valid JSON" }, { status: 400 });
+                return NextResponse.json({ error: "Invalid module.json - not valid JSON" }, { status: 400 });
             }
 
             const parsed = moduleManifestSchema.safeParse(manifestJson);
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
                 const first = parsed.error.issues[0];
                 const where = first.path.join(".");
                 return NextResponse.json(
-                    { error: `Invalid module.json: ${where ? where + " — " : ""}${first.message}` },
+                    { error: `Invalid module.json: ${where ? where + " - " : ""}${first.message}` },
                     { status: 400 },
                 );
             }
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            // Stage looks clean — back up current, swap in new
+            // Stage looks clean - back up current, swap in new
             await fs.cp(targetDir, backupDir, { recursive: true });
             await fs.rm(targetDir, { recursive: true, force: true });
             await fs.cp(stageDir, targetDir, { recursive: true });
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
                     stdio: "pipe",
                 });
             } catch (regErr: unknown) {
-                // Registry failed — restore backup and re-run registry with old version
+                // Registry failed - restore backup and re-run registry with old version
                 await fs.rm(targetDir, { recursive: true, force: true });
                 await fs.cp(backupDir, targetDir, { recursive: true });
                 try {

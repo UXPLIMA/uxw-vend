@@ -6,7 +6,7 @@ import { prisma } from "@/core/sdk/server";
 // admin UI writes there) and fall back to process.env.STRIPE_* for
 // installs that configure via env. The first non-empty value wins.
 //
-// We cache the resolved credentials for the request lifetime — Settings
+// We cache the resolved credentials for the request lifetime - Settings
 // reads are cheap but called from hot paths, and stripe.com latency
 // dominates any local cache miss anyway.
 
@@ -45,7 +45,7 @@ async function resolveStripe(): Promise<Stripe | null> {
     // Pinned deliberately, and NOT bumped when the SDK is. `stripe` narrows
     // `apiVersion` to whatever version that SDK release was generated against
     // (22.6.0 wants 2026-08-26.dahlia), so a routine dependency update would
-    // otherwise silently change which Stripe API this store talks to — new
+    // otherwise silently change which Stripe API this store talks to - new
     // webhook payload shapes and checkout behaviour arriving as a side effect
     // of `npm update`, on the payments path, untested.
     //

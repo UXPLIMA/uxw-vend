@@ -133,7 +133,7 @@ describe("detectDrift", () => {
     });
 
     // The `uxwvend update` case: the modules volume and the .next volume both
-    // survive, so the module set matches — but the build belongs to the image
+    // survive, so the module set matches - but the build belongs to the image
     // that was just replaced.
     it("reports drift when the image changed under an unchanged module set", () => {
         makeBuild();
@@ -183,7 +183,7 @@ describe("writeBuildState", () => {
     });
 });
 
-// The Prisma client lives in node_modules — an image layer — while the build
+// The Prisma client lives in node_modules - an image layer - while the build
 // lives in a volume. Recreating a container therefore reverts the client to
 // its zero-module version while keeping a build that expects every module, and
 // every module query fails with `undefined.findMany`. This is why the two
@@ -218,7 +218,7 @@ describe("detectSchemaDrift", () => {
         writeBuildState(root);
         writeSchemaState(root);
 
-        // Container recreated: node_modules — and the marker in it — is gone.
+        // Container recreated: node_modules - and the marker in it - is gone.
         fs.rmSync(path.join(root, "node_modules"), { recursive: true, force: true });
 
         expect(detectDrift(root)).toBeNull();

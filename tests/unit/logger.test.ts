@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
- * logger.ts was at 9.6%. It has two entirely separate output paths — a
+ * logger.ts was at 9.6%. It has two entirely separate output paths - a
  * coloured console line in dev and a JSON line to stdout/stderr in
- * production — and only one of them ever runs locally, so a break in the
+ * production - and only one of them ever runs locally, so a break in the
  * production path would surface as "the log aggregator is empty" long
  * after deploy. The level filter and the AsyncLocalStorage correlation-id
  * propagation were likewise unverified.

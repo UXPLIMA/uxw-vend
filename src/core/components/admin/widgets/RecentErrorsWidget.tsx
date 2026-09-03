@@ -5,7 +5,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 
 /**
- * Compact KPI card — recent cron error count only.
+ * Compact KPI card - recent cron error count only.
  * Full list lives on /admin/cron and /admin/observability.
  */
 export default async function RecentErrorsWidget() {

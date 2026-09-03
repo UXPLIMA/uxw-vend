@@ -34,7 +34,7 @@ describe("isValidRange", () => {
     });
 });
 
-describe("satisfiesRange — caret", () => {
+describe("satisfiesRange - caret", () => {
     it("allows minor and patch below the next major", () => {
         expect(satisfiesRange("1.2.3", "^1.2.3")).toBe(true);
         expect(satisfiesRange("1.9.9", "^1.2.3")).toBe(true);
@@ -59,7 +59,7 @@ describe("satisfiesRange — caret", () => {
     });
 });
 
-describe("satisfiesRange — tilde, comparators, exact", () => {
+describe("satisfiesRange - tilde, comparators, exact", () => {
     it("confines tilde to the patch line when a minor is given", () => {
         expect(satisfiesRange("1.2.9", "~1.2.3")).toBe(true);
         expect(satisfiesRange("1.3.0", "~1.2.3")).toBe(false);
@@ -88,7 +88,7 @@ describe("satisfiesRange — tilde, comparators, exact", () => {
     });
 });
 
-describe("satisfiesRange — composition", () => {
+describe("satisfiesRange - composition", () => {
     it("ANDs space-separated comparators", () => {
         expect(satisfiesRange("1.5.0", ">=1.2.3 <2.0.0")).toBe(true);
         expect(satisfiesRange("2.0.1", ">=1.2.3 <2.0.0")).toBe(false);
@@ -109,7 +109,7 @@ describe("satisfiesRange — composition", () => {
     });
 });
 
-describe("satisfiesRange — prerelease ordering", () => {
+describe("satisfiesRange - prerelease ordering", () => {
     it("sorts a prerelease below its release", () => {
         expect(satisfiesRange("1.0.0-beta", ">=1.0.0")).toBe(false);
         expect(satisfiesRange("1.0.0", ">=1.0.0-beta")).toBe(true);
@@ -122,7 +122,7 @@ describe("satisfiesRange — prerelease ordering", () => {
     });
 });
 
-describe("satisfiesRange — failure mode", () => {
+describe("satisfiesRange - failure mode", () => {
     it("fails closed on a malformed range instead of matching", () => {
         expect(satisfiesRange("1.2.3", "garbage")).toBe(false);
         expect(satisfiesRange("1.2.3", "")).toBe(false);

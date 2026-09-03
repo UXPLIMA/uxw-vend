@@ -4,7 +4,7 @@ import { randomBytes, createHash, timingSafeEqual } from "crypto";
 import { cacheGet, cacheSet } from "./redis";
 import { resolveAppName } from "./app-url";
 
-// Runtime-resolved — see app-url.ts. This is the issuer shown in the
+// Runtime-resolved - see app-url.ts. This is the issuer shown in the
 // user's authenticator app, so it must reflect the operator's brand.
 const APP_NAME = resolveAppName();
 
@@ -39,7 +39,7 @@ export function verifyToken(secret: string, token: string): boolean {
 /**
  * Verify a TOTP and atomically mark it consumed so the same code cannot
  * be replayed within the validity window. RFC 6238 requires used codes
- * be rejected — without this, an intercepted code is reusable for up to
+ * be rejected - without this, an intercepted code is reusable for up to
  * the configured window (here ~90s with window=1).
  *
  * Falls back to the in-memory cache backend when Redis is unavailable
@@ -92,7 +92,7 @@ export function hashBackupCode(code: string): string {
  * Verify a backup code against the stored hash list. Comparison uses
  * crypto.timingSafeEqual so a short-circuit on string comparison cannot
  * reveal which hash matched first. On success the matching hash is removed
- * so callers can persist `remaining` — codes are strictly single-use.
+ * so callers can persist `remaining` - codes are strictly single-use.
  */
 export function verifyBackupCode(code: string, hashedCodes: string[]): { valid: boolean; remaining: string[] } {
     const hash = hashBackupCode(code);

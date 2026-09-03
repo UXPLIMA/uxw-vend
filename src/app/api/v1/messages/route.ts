@@ -4,7 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 
 /**
- * GET — list current user's conversations with last message preview
+ * GET - list current user's conversations with last message preview
  *       and unread count
  */
 export async function GET() {
@@ -81,7 +81,7 @@ const startSchema = z.object({
 });
 
 /**
- * POST — start a new conversation with a recipient (or reuse the existing
+ * POST - start a new conversation with a recipient (or reuse the existing
  * 1:1 conversation between the two users)
  */
 export async function POST(request: NextRequest) {

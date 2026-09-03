@@ -23,7 +23,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Snapshot the previous content before edit (subset — posts can be large)
+    // Snapshot the previous content before edit (subset - posts can be large)
     const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision(
         "forum.post",
@@ -64,7 +64,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Snapshot the deleted post for potential restore (subset — posts can be large)
+    // Snapshot the deleted post for potential restore (subset - posts can be large)
     const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision(
         "forum.post",

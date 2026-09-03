@@ -3,7 +3,7 @@
 #   docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d
 #
 # Both bind to 127.0.0.1 ONLY, so they stay unreachable from the network even
-# while this override is active — reach them through an SSH tunnel:
+# while this override is active - reach them through an SSH tunnel:
 #
 #   ssh -L 5432:127.0.0.1:5432 you@server
 #

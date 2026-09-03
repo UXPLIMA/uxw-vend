@@ -27,7 +27,7 @@ interface Grant {
     allow: boolean;
 }
 
-// RBAC resources to show in the matrix — contributed by installed modules
+// RBAC resources to show in the matrix - contributed by installed modules
 // via their `permissionResources` manifest field (registry-driven). The
 // admin can extend this with custom grants below.
 const COMMON_RESOURCES = ModulePermissionResources;
@@ -205,7 +205,7 @@ export default function PermissionsMatrixPage() {
                                                             }`}
                                                             title={t("permissions_clickHint")}
                                                         >
-                                                            {state === "allow" ? `✓ ${t("permissions_allow")}` : state === "deny" ? `✗ ${t("permissions_deny")}` : "—"}
+                                                            {state === "allow" ? `✓ ${t("permissions_allow")}` : state === "deny" ? `✗ ${t("permissions_deny")}` : "-"}
                                                         </button>
                                                     </td>
                                                 );

@@ -47,7 +47,7 @@ function ensureDefaults(
     };
 }
 
-// GET /api/v1/modules/marketplace — list modules from the local index
+// GET /api/v1/modules/marketplace - list modules from the local index
 export async function GET() {
     const cache = getCachedMarketplace();
     if (cache.index && Date.now() - cache.time < MARKETPLACE_CACHE_TTL_MS) {

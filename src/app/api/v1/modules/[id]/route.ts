@@ -45,7 +45,7 @@ export async function DELETE(
 
         const exists = await fs.access(moduleDir).then(() => true).catch(() => false);
         if (!exists) {
-            // Even with no directory, clean up orphan DB rows — a previous
+            // Even with no directory, clean up orphan DB rows - a previous
             // failed install may have left a ModuleConfig row behind.
             await prisma.moduleConfig.deleteMany({ where: { id: moduleId } }).catch(() => {});
             await invalidateModuleCache().catch(() => {});
@@ -55,7 +55,7 @@ export async function DELETE(
         // Opt-in pre-uninstall snapshot (MODULE_INSTALL_BACKUP=1). Even
         // though we preserve module-owned tables for reinstall, the
         // registry regen + build may still brick runtime state on a bad
-        // module — a snapshot buys the operator a clean rollback.
+        // module - a snapshot buys the operator a clean rollback.
         await backupBeforeModuleChange("uninstall", moduleId);
 
         await fs.rm(moduleDir, { recursive: true, force: true });
@@ -87,7 +87,7 @@ export async function DELETE(
             // admin's browser would have given up on.
             scheduleBuild();
         } catch (err) {
-            // Registry/build failure is non-fatal for uninstall — the module
+            // Registry/build failure is non-fatal for uninstall - the module
             // files are already gone and the DB row is cleared. But the
             // generated registry may still reference the deleted module's
             // imports, which would brick the next build. Log loudly and
@@ -97,7 +97,7 @@ export async function DELETE(
         }
 
         // HookNames.MODULE_UNINSTALLED is part of the published contract, so it has to
-        // actually fire — a declared hook nobody emits is a listener that never
+        // actually fire - a declared hook nobody emits is a listener that never
         // runs, with nothing to show for it in any log.
         const { doActionAsync, HookNames } = await import("@/core/lib/hooks");
         await doActionAsync(HookNames.MODULE_UNINSTALLED, { moduleId });
@@ -111,7 +111,7 @@ export async function DELETE(
 
         return NextResponse.json({
             message: "Module deleted successfully",
-            ...(registryNeedsRebuild ? { warning: "Module files removed but registry regeneration failed — run `npm run build` to clean up generated imports." } : {}),
+            ...(registryNeedsRebuild ? { warning: "Module files removed but registry regeneration failed - run `npm run build` to clean up generated imports." } : {}),
         });
     } catch (err: unknown) {
         return NextResponse.json(

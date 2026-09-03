@@ -14,7 +14,7 @@ const KEYS = [
 let saved: Record<string, string | undefined> = {};
 
 // The module reads process.env at call time, not import time, so a plain
-// re-import is enough — no module registry reset needed.
+// re-import is enough - no module registry reset needed.
 async function load() {
     return await import("@/core/lib/app-url");
 }
@@ -89,7 +89,7 @@ describe("routes that publish the canonical URL", () => {
     // A prerendered route bakes in whatever AUTH_URL CI had, so every
     // installation would publish `http://localhost:3001`. Touching a
     // request-time API opts them out of that. If someone drops the
-    // `connection()` call, this test is the only thing that will notice —
+    // `connection()` call, this test is the only thing that will notice -
     // the build still succeeds and the wrong host only shows up in production.
     const read = (rel: string) =>
         fs.readFileSync(path.resolve(__dirname, "../..", rel), "utf8");

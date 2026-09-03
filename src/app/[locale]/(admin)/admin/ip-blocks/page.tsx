@@ -243,7 +243,7 @@ export default function IpBlocksPage() {
                                                 <td className="p-3 font-mono">{b.ip}</td>
                                                 <td className="p-3">{scopeLabel(b.scope)}</td>
                                                 <td className="p-3 text-muted-foreground max-w-xs truncate">
-                                                    {b.reason || "—"}
+                                                    {b.reason || "-"}
                                                 </td>
                                                 <td className="p-3 text-muted-foreground">
                                                     {b.expiresAt ? (

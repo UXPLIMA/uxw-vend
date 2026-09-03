@@ -44,7 +44,7 @@ type ActionColor = {
 };
 
 function classifyAction(action: string): ActionColor {
-    // Highest sensitivity — purple
+    // Highest sensitivity - purple
     if (
         action.startsWith("backup.") ||
         action.endsWith(".restore") ||
@@ -108,7 +108,7 @@ function truncate(str: string, max = 80): string {
 function MetadataCell({ metadata }: { metadata: unknown }) {
     const [expanded, setExpanded] = useState(false);
     if (metadata == null || metadata === "") {
-        return <span className="text-muted-foreground">—</span>;
+        return <span className="text-muted-foreground">-</span>;
     }
     const json = JSON.stringify(metadata, null, 2);
     const single = JSON.stringify(metadata);
@@ -391,7 +391,7 @@ export default function AuditLogPage() {
                                                                 : ""}
                                                         </code>
                                                     ) : (
-                                                        "—"
+                                                        "-"
                                                     )}
                                                 </td>
                                                 <td className="py-2 px-4 align-top">

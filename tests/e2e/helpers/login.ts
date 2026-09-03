@@ -5,7 +5,7 @@ import type { Page } from '@playwright/test';
  * as the identifier.
  *
  * Read from the environment because `prisma/seed.ts` generates a random
- * password unless `SEED_ADMIN_PASSWORD` is set — hardcoding one here meant the
+ * password unless `SEED_ADMIN_PASSWORD` is set - hardcoding one here meant the
  * suite only ever passed against a developer's hand-made account, which is why
  * it could not run in CI. CI seeds with these same two variables.
  *
@@ -19,7 +19,7 @@ export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'admin123';
 /**
  * Logs a user in via the /tr/auth/login page.
  *
- * The `username` parameter is accepted for API compatibility — if it looks
+ * The `username` parameter is accepted for API compatibility - if it looks
  * like an email it's used as-is, otherwise the default admin email is used
  * (the login form is email-based in this project).
  */

@@ -6,7 +6,7 @@ import { prisma } from "@/core/lib/db";
 import { queueBroadcast } from "@/core/lib/broadcasts";
 import { logActivity } from "@/core/lib/activity-log";
 
-/** GET — list broadcasts (admin) */
+/** GET - list broadcasts (admin) */
 export async function GET() {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
@@ -32,7 +32,7 @@ const createSchema = z.object({
     sendNow: z.boolean().default(false),
 });
 
-/** POST — create + optionally queue (admin) */
+/** POST - create + optionally queue (admin) */
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {

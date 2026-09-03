@@ -17,7 +17,7 @@ export function AdminBreadcrumb() {
     // Strip /admin prefix and split
     const raw = pathname.replace(/^\/+/, "");
     const parts = raw.split("/").filter(Boolean);
-    // parts[0] is "admin" — drop it
+    // parts[0] is "admin" - drop it
     const crumbs = parts.slice(1);
 
     const titleize = (slug: string) => {

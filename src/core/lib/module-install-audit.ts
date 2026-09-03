@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 /**
  * Deterministic checksum of the manifest bytes a module was installed
  * with. We hash the canonical JSON payload (keys sorted) so a reformat
- * that doesn't change semantics still produces the same digest — only a
+ * that doesn't change semantics still produces the same digest - only a
  * real content change moves the hash.
  */
 export function manifestHash(manifest: unknown): string {

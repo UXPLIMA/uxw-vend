@@ -86,7 +86,7 @@ export default async function RootLayout({
   // [data-theme][data-mode] { --uxw-color-X: ... } with the manifest
   // defaults; we append a same-specificity block with the admin's overrides
   // so the later declaration wins the cascade. Values reach here only after
-  // HEX-only sanitization in the customization API — safe to interpolate.
+  // HEX-only sanitization in the customization API - safe to interpolate.
   const overrideColors = ((active.tokenOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors) ?? {};
   const overrideEntries = Object.entries(overrideColors).filter(
     ([, v]) => typeof v === "string" && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v),

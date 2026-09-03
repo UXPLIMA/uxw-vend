@@ -101,7 +101,7 @@ describe("trophy-engine: registerTrophyListeners", () => {
         trophyFindMany.mockRejectedValue(new Error("db down"));
         await engine.registerTrophyListeners();
         const actions = hooks.listActions();
-        // Core ships zero module-aware fallback rules — admin seeds via UI.
+        // Core ships zero module-aware fallback rules - admin seeds via UI.
         expect(actions.length).toBe(0);
         // The engine logs a warning on DB failure; we mute it so test stderr
         // stays clean but assert it actually fired so the safety net is real.

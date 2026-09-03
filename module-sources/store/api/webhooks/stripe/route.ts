@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
             });
             if (!order) break;
             // Order.userId is nullable (SetNull on user deletion) but at this
-            // point in the checkout flow the row was just paid for — if the
+            // point in the checkout flow the row was just paid for - if the
             // user has already been deleted there's nothing to deliver.
             if (!order.userId || !order.user) {
-                console.warn(`[stripe] Order ${order.id} completed but user is null — skipping ownership grant`);
+                console.warn(`[stripe] Order ${order.id} completed but user is null - skipping ownership grant`);
                 break;
             }
             const buyerId = order.userId;

@@ -27,7 +27,7 @@ interface StatsData {
 }
 
 /**
- * Dashboard charts — only shows core data (Users).
+ * Dashboard charts - only shows core data (Users).
  * Module-specific charts (Revenue, Orders) come from module statsApi via DashboardClient.
  */
 export function DashboardCharts() {
