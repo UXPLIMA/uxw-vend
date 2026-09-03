@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "id": "flat",
   "name": "Flat",
-  "description": "Default light theme — clean, minimal, neutral.",
+  "description": "Default theme. Neutral gray surfaces, a single blue accent, WCAG AA in both modes.",
   "version": "1.0.0",
   "author": "uxwVend",
   "modes": {
@@ -12,18 +12,19 @@
         "tokens": {
           "colors": {
             "primary": "#2563eb",
-            "secondary": "#64748b",
-            "accent": "#f59e0b",
+            "primaryForeground": "#ffffff",
+            "secondary": "#6b6862",
+            "accent": "#b45309",
             "background": "#ffffff",
-            "foreground": "#0f172a",
-            "muted": "#f1f5f9",
-            "mutedForeground": "#64748b",
-            "border": "#e2e8f0",
+            "foreground": "#1c1b19",
+            "muted": "#f5f4f2",
+            "mutedForeground": "#6b6862",
+            "border": "#e4e2de",
             "card": "#ffffff",
-            "cardForeground": "#0f172a",
-            "destructive": "#ef4444",
-            "success": "#16a34a",
-            "warning": "#f59e0b"
+            "cardForeground": "#1c1b19",
+            "destructive": "#b91c1c",
+            "success": "#15803d",
+            "warning": "#b45309"
           },
           "fonts": {
             "heading": "Inter, system-ui, sans-serif",
@@ -35,19 +36,20 @@
       "dark": {
         "tokens": {
           "colors": {
-            "primary": "#2563eb",
-            "secondary": "#64748b",
-            "accent": "#f59e0b",
-            "background": "#0f172a",
-            "foreground": "#f8fafc",
-            "muted": "#1e293b",
-            "mutedForeground": "#94a3b8",
-            "border": "#334155",
-            "card": "#1e293b",
-            "cardForeground": "#f8fafc",
-            "destructive": "#ef4444",
-            "success": "#16a34a",
-            "warning": "#f59e0b"
+            "primary": "#5191f8",
+            "primaryForeground": "#0b0a09",
+            "secondary": "#a3a09a",
+            "accent": "#fbbf24",
+            "background": "#171614",
+            "foreground": "#f6f5f4",
+            "muted": "#2c2b28",
+            "mutedForeground": "#a8a59f",
+            "border": "#403e3a",
+            "card": "#21201e",
+            "cardForeground": "#f6f5f4",
+            "destructive": "#f87171",
+            "success": "#4ade80",
+            "warning": "#fbbf24"
           },
           "fonts": {
             "heading": "Inter, system-ui, sans-serif",
@@ -111,6 +113,10 @@
       "warning": {
         "type": "color",
         "group": "State"
+      },
+      "primaryForeground": {
+        "type": "color",
+        "group": "Brand"
       }
     },
     "fonts": {
