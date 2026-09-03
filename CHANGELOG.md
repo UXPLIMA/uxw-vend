@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   catalogue for itself. The homepage went from 120KB to 65KB of HTML (32KB to
   18KB gzipped), the login page from 108KB to 54KB.
 
+### Added
+- **`routes[].noindex` in a module manifest.** Keeps a page out of
+  `sitemap.xml` and marks it `noindex` for crawlers, for the pages meant to be
+  walked through rather than found. The store's cart and order confirmation
+  set it. `CORE_API_VERSION` unchanged: this is an optional field on an
+  existing entry, and a manifest that omits it behaves exactly as before.
+
 ### Fixed
 - **The sitemap listed four URLs and none of the site's content.** Core routes
   the home and activity screens; everything a visitor comes for is a module

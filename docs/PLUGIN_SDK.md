@@ -110,7 +110,8 @@ Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 ```json
 "routes": [
     { "path": "/my-page", "component": "pages/public/page.tsx" },
-    { "path": "/my-page/[id]", "component": "pages/public/detail.tsx", "layout": "pages/public/layout.tsx" }
+    { "path": "/my-page/[id]", "component": "pages/public/detail.tsx", "layout": "pages/public/layout.tsx" },
+    { "path": "/my-page/checkout", "component": "pages/public/checkout.tsx", "noindex": true }
 ]
 ```
 
@@ -119,6 +120,12 @@ Rendered at `/{locale}/{path}` via the `[...slug]` catch-all.
 | `path` | Yes | URL path under `/[locale]`. Supports dynamic segments (`[id]`, `[...params]`). |
 | `component` | Yes | Path to the page component, relative to the module root. |
 | `layout` | No | Optional layout wrapper component. |
+| `noindex` | No | Keeps the page out of `sitemap.xml` and marks it `noindex` for crawlers. Use it for pages meant to be walked through rather than found: a cart, an order confirmation, anything whose content belongs to one visitor. |
+
+Every static route a module declares is published in `sitemap.xml` while the
+module is enabled, so a public page needs no extra wiring to be found. Dynamic
+paths are the exception: core knows the pattern and not the values, so a module
+that wants its detail pages listed contributes them through its `seo` entry.
 
 ### `adminRoutes` - Admin pages
 

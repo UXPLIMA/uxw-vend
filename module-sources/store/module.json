@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -114,7 +114,8 @@
     },
     {
       "path": "/store/cart",
-      "component": "pages/public/cart/page.tsx"
+      "component": "pages/public/cart/page.tsx",
+      "noindex": true
     },
     {
       "path": "/store/product/[...params]",
@@ -122,7 +123,8 @@
     },
     {
       "path": "/store/order-success",
-      "component": "pages/public/order-success/page.tsx"
+      "component": "pages/public/order-success/page.tsx",
+      "noindex": true
     },
     {
       "path": "/store/vip",

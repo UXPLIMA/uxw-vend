@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
+import { ModuleRoutes } from "@/core/generated/module-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
 
@@ -28,11 +29,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (c) => c.toUpperCase()) || "Page";
     const url = "/" + (slug?.join("/") || "");
-    return buildPageMeta({
+    const meta = await buildPageMeta({
         title: last,
         url,
         type: "article",
     });
+
+    // A module can mark a route `noindex` in its manifest: a cart, an order
+    // confirmation, anything whose content belongs to one visitor. The same
+    // flag keeps the page out of the sitemap.
+    const match = matchModuleRoute(slug);
+    const route = match ? ModuleRoutes.find((r) => r.key === match.key) : undefined;
+    if (route?.noindex) {
+        return { ...meta, robots: { index: false, follow: true } };
+    }
+    return meta;
 }
 
 export default async function DynamicModulePage(props: PageProps) {
