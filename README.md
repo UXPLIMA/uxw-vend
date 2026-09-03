@@ -101,7 +101,7 @@ Full detail in ["The Build Lifecycle"](docs/DEPLOYMENT.md#the-build-lifecycle).
 
 ## Modules
 
-61 first-party modules ship in `module-marketplace/` as ZIPs with an
+72 first-party modules ship in `module-marketplace/` as ZIPs with an
 `index.json` catalog. Their sources live in `module-sources/<id>/` and are
 tracked in git; the ZIPs are built from those sources by
 `npm run build:marketplace`, and CI fails if the two drift apart.
@@ -114,7 +114,8 @@ tracked in git; the ZIPs are built from those sources by
 | Gaming | downloads, minecraft-link, player-profiles, punishments, servers |
 | Management | announcements, help-center, login-protection, popups, staff, tickets, two-factor-auth |
 | Content | cookie-consent, custom-forms, custom-pages, email-templates, seo, slider |
-| Integration | cloudflare-r2, cloudflare-turnstile, csv-import-export, discord-auth, discord-integration, discord-widget, faceit-auth, github-auth, google-analytics, google-auth, resend-provider, roblox-auth, steam-auth, twitch-auth, webhook-logs |
+| Sign-in | battlenet-auth, discord-auth, epicgames-auth, facebook-auth, faceit-auth, github-auth, google-auth, instagram-auth, kick-auth, microsoft-auth, patreon-auth, reddit-auth, roblox-auth, spotify-auth, steam-auth, tiktok-auth, twitch-auth, x-auth |
+| Integration | cloudflare-r2, cloudflare-turnstile, csv-import-export, discord-integration, discord-widget, google-analytics, resend-provider, webhook-logs |
 
 A `module.json` declares everything the module contributes: routes, admin
 routes, API endpoints, sidebar menu, dashboard cards, widgets, navbar/footer/

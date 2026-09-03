@@ -1,0 +1,92 @@
+{
+  "id": "patreon-auth",
+  "name": "Patreon Login",
+  "description": "Allow users to sign in with their Patreon account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Heart",
+  "adminRoutes": [
+    {
+      "path": "/settings/patreon-auth",
+      "component": "pages/admin/settings/patreon-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Patreon OAuth",
+      "description": "Patreon application credentials.",
+      "href": "/settings/patreon-auth",
+      "icon": "Heart",
+      "color": "text-rose-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "patreon",
+      "envIdVar": "AUTH_PATREON_ID",
+      "envSecretVar": "AUTH_PATREON_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "patreon-login",
+      "provider": "patreon",
+      "label": "Patreon",
+      "color": "#FF424D",
+      "svgIcon": "M22.957 7.21c-.004-3.064-2.391-5.576-5.191-6.482-3.478-1.125-8.064-.962-11.384.604C2.357 3.231 1.093 7.391 1.046 11.54c-.039 3.411.302 12.396 5.369 12.46 3.765.047 4.326-4.804 6.068-7.141 1.24-1.662 2.836-2.132 4.801-2.618 3.376-.836 5.678-3.501 5.673-7.031Z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "patreonAuth": {
+        "adm_title": "Patreon Login Settings",
+        "adm_subtitle": "Set up Patreon OAuth sign-in for your site.",
+        "signInWith": "Sign in with Patreon"
+      }
+    },
+    "tr": {
+      "patreonAuth": {
+        "adm_title": "Patreon ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Patreon ile OAuth girişini yapılandırın.",
+        "signInWith": "Patreon ile giriş yap"
+      }
+    },
+    "de": {
+      "patreonAuth": {
+        "adm_title": "Patreon-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Patreon für Ihre Seite einrichten.",
+        "signInWith": "Mit Patreon anmelden"
+      }
+    },
+    "es": {
+      "patreonAuth": {
+        "adm_title": "Inicio de sesión con Patreon",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Patreon para tu sitio.",
+        "signInWith": "Iniciar sesión con Patreon"
+      }
+    },
+    "fr": {
+      "patreonAuth": {
+        "adm_title": "Connexion Patreon",
+        "adm_subtitle": "Configurez la connexion OAuth Patreon pour votre site.",
+        "signInWith": "Se connecter avec Patreon"
+      }
+    },
+    "ru": {
+      "patreonAuth": {
+        "adm_title": "Вход через Patreon",
+        "adm_subtitle": "Настройте вход на сайт через Patreon по OAuth.",
+        "signInWith": "Войти через Patreon"
+      }
+    },
+    "pt": {
+      "patreonAuth": {
+        "adm_title": "Início de sessão com Patreon",
+        "adm_subtitle": "Configure o início de sessão OAuth com Patreon no seu site.",
+        "signInWith": "Entrar com Patreon"
+      }
+    }
+  }
+}
