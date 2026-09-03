@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The last three CI actions still on the deprecated Node 20 runtime moved to
+  their Node 24 majors: `docker/setup-buildx-action` 3→4,
+  `docker/build-push-action` 6→7 and `actions/upload-artifact` 4→7. The
+  release run for 0.2.1 flagged them — the runner was already forcing them
+  onto Node 24, so this only removes the warning. None of the inputs these
+  workflows pass were among the ones the new majors dropped, and
+  `build-push-action`'s `digest` output, which the release summary reads, is
+  unchanged.
+
 ## [0.2.1] - 2026-09-02
 
 ### Fixed
