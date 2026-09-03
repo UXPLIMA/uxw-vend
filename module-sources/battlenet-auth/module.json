@@ -1,0 +1,111 @@
+{
+  "id": "battlenet-auth",
+  "name": "Battle.net Login",
+  "description": "Allow users to sign in with their Battle.net account",
+  "version": "1.0.0",
+  "coreVersion": "^1.4.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Swords",
+  "adminRoutes": [
+    {
+      "path": "/settings/battlenet-auth",
+      "component": "pages/admin/settings/battlenet-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Battle.net OAuth",
+      "description": "Battle.net application credentials and region.",
+      "href": "/settings/battlenet-auth",
+      "icon": "Swords",
+      "color": "text-sky-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "battlenet",
+      "factory": "auth/battlenet-provider.ts",
+      "standardCallback": true,
+      "envVars": [
+        "AUTH_BATTLENET_ID",
+        "AUTH_BATTLENET_SECRET",
+        "AUTH_BATTLENET_ISSUER"
+      ]
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "battlenet-login",
+      "provider": "battlenet",
+      "label": "Battle.net",
+      "color": "#148EFF",
+      "svgIcon": "M18.94 8.296C15.9 6.892 11.534 6 7.426 6.332c.206-1.36.714-2.308 1.548-2.508 1.148-.275 2.4.48 3.594 1.854.782.102 1.71.28 2.355.429C12.747 2.013 9.828-.282 7.607.565c-1.688.644-2.553 2.97-2.448 6.094-2.2.468-3.915 1.3-5.013 2.495-.056.065-.181.227-.137.305.034.058.146-.008.194-.04 1.274-.89 2.904-1.373 5.027-1.676.303 3.333 1.713 7.56 4.055 10.952-1.28.502-2.356.536-2.946-.087-.812-.856-.784-2.318-.19-4.04a26.764 26.764 0 0 1-.807-2.254c-2.459 3.934-2.986 7.61-1.143 9.11 1.402 1.14 3.847.725 6.502-.926 1.505 1.672 3.083 2.74 4.667 3.094.084.015.287.043.332-.034.034-.06-.08-.124-.131-.149-1.408-.657-2.64-1.828-3.964-3.515 2.735-1.929 5.691-5.263 7.457-8.988 1.076.86 1.64 1.773 1.398 2.595-.336 1.131-1.615 1.84-3.403 2.185a27.697 27.697 0 0 1-1.548 1.826c4.634.16 8.08-1.22 8.458-3.565.286-1.786-1.295-3.696-4.053-5.17.696-2.139.832-4.04.346-5.588-.029-.08-.106-.27-.196-.27-.068 0-.067.13-.063.187.135 1.547-.263 3.2-1.062 5.19zm-8.533 9.869c-1.96-3.145-3.09-6.849-3.082-10.594 3.702-.124 7.474.748 10.714 2.627-1.743 3.269-4.385 6.1-7.633 7.966h.001z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "battlenetAuth": {
+        "adm_title": "Battle.net Login Settings",
+        "adm_subtitle": "Set up Battle.net OAuth sign-in for your site.",
+        "signInWith": "Sign in with Battle.net",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER picks the region and has to be one of https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn or https://www.battlenet.com.cn/oauth. Sign-in stays off until it holds one of them.",
+        "adm_emailNote": "Battle.net does not share an email address, so an account created this way gets a placeholder one that can never receive mail. Ask these users to set a real address in their profile."
+      }
+    },
+    "tr": {
+      "battlenetAuth": {
+        "adm_title": "Battle.net ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Battle.net ile OAuth girişini yapılandırın.",
+        "signInWith": "Battle.net ile giriş yap",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER bölgeyi seçer ve şu adreslerden biri olmalıdır: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn veya https://www.battlenet.com.cn/oauth. Bu değer bunlardan biri olmadıkça giriş açılmaz.",
+        "adm_emailNote": "Battle.net e-posta adresi paylaşmaz, bu yüzden bu yolla açılan hesaba posta alamayan geçici bir adres atanır. Bu kullanıcılardan profillerinde gerçek bir adres tanımlamalarını isteyin."
+      }
+    },
+    "de": {
+      "battlenetAuth": {
+        "adm_title": "Battle.net-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Battle.net für Ihre Seite einrichten.",
+        "signInWith": "Mit Battle.net anmelden",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER wählt die Region und muss einer dieser Werte sein: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn oder https://www.battlenet.com.cn/oauth. Ohne einen davon bleibt die Anmeldung aus.",
+        "adm_emailNote": "Battle.net gibt keine E-Mail-Adresse heraus. Ein so erstelltes Konto erhält daher eine Platzhalteradresse, die keine Post empfangen kann. Bitten Sie diese Nutzer, im Profil eine echte Adresse zu hinterlegen."
+      }
+    },
+    "es": {
+      "battlenetAuth": {
+        "adm_title": "Inicio de sesión con Battle.net",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Battle.net para tu sitio.",
+        "signInWith": "Iniciar sesión con Battle.net",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER elige la región y tiene que ser uno de https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn o https://www.battlenet.com.cn/oauth. El inicio de sesión no se activa hasta que contenga uno de ellos.",
+        "adm_emailNote": "Battle.net no comparte ninguna dirección de correo, así que una cuenta creada por esta vía recibe una dirección provisional que no puede recibir mensajes. Pide a estos usuarios que definan una real en su perfil."
+      }
+    },
+    "fr": {
+      "battlenetAuth": {
+        "adm_title": "Connexion Battle.net",
+        "adm_subtitle": "Configurez la connexion OAuth Battle.net pour votre site.",
+        "signInWith": "Se connecter avec Battle.net",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER choisit la région et doit valoir https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn ou https://www.battlenet.com.cn/oauth. Tant que ce n'est pas le cas, la connexion reste inactive.",
+        "adm_emailNote": "Battle.net ne communique aucune adresse e-mail : un compte créé ainsi reçoit une adresse fictive qui ne peut rien recevoir. Demandez à ces utilisateurs d'en définir une vraie dans leur profil."
+      }
+    },
+    "ru": {
+      "battlenetAuth": {
+        "adm_title": "Вход через Battle.net",
+        "adm_subtitle": "Настройте вход на сайт через Battle.net по OAuth.",
+        "signInWith": "Войти через Battle.net",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER задаёт регион и должен быть одним из: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn или https://www.battlenet.com.cn/oauth. Пока значение другое, вход не включается.",
+        "adm_emailNote": "Battle.net не передаёт адрес почты, поэтому созданный так аккаунт получает временный адрес, на который ничего нельзя отправить. Попросите таких пользователей указать настоящий адрес в профиле."
+      }
+    },
+    "pt": {
+      "battlenetAuth": {
+        "adm_title": "Início de sessão com Battle.net",
+        "adm_subtitle": "Configure o início de sessão OAuth com Battle.net no seu site.",
+        "signInWith": "Entrar com Battle.net",
+        "adm_issuerNote": "AUTH_BATTLENET_ISSUER escolhe a região e tem de ser um de https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn ou https://www.battlenet.com.cn/oauth. Enquanto não for, o início de sessão fica desligado.",
+        "adm_emailNote": "O Battle.net não partilha um endereço de email, por isso uma conta criada assim recebe um endereço provisório que não consegue receber mensagens. Peça a estes utilizadores que definam um real no perfil."
+      }
+    }
+  }
+}

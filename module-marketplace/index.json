@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-03",
-  "updatedAt": "2026-09-03T16:10:38Z",
+  "updatedAt": "2026-09-03T16:53:30Z",
   "modules": [
     {
       "id": "announcements",
@@ -13,7 +13,7 @@
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -37,6 +37,35 @@
       }
     },
     {
+      "id": "battlenet-auth",
+      "name": "Battle.net Login",
+      "description": "Allow users to sign in with their Battle.net account",
+      "version": "1.0.0",
+      "coreVersion": "^1.4.0",
+      "author": "uxwVend",
+      "icon": "Swords",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "battlenet-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "blog",
       "name": "Blog Module",
       "description": "News and announcements system",
@@ -46,7 +75,7 @@
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -84,7 +113,7 @@
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -117,7 +146,7 @@
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -146,7 +175,7 @@
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -175,7 +204,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -212,7 +241,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -249,7 +278,7 @@
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -278,7 +307,7 @@
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -309,7 +338,7 @@
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -338,7 +367,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -367,7 +396,7 @@
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -401,7 +430,7 @@
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -430,7 +459,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -459,7 +488,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -495,7 +524,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -526,7 +555,7 @@
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -557,12 +586,70 @@
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
       ],
       "zip": "email-templates.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "epicgames-auth",
+      "name": "Epic Games Login",
+      "description": "Allow users to sign in with their Epic Games account",
+      "version": "1.0.0",
+      "coreVersion": "^1.4.0",
+      "author": "uxwVend",
+      "icon": "Gamepad2",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "epicgames-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "facebook-auth",
+      "name": "Facebook Login",
+      "description": "Allow users to sign in with their Facebook account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "Users",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "facebook-auth.zip",
       "dependencies": [],
       "conflicts": [],
       "hooks": {
@@ -586,7 +673,7 @@
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -615,7 +702,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -651,7 +738,7 @@
       "icon": "Code2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -680,7 +767,7 @@
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -709,7 +796,7 @@
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -738,7 +825,7 @@
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -769,7 +856,7 @@
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -789,6 +876,35 @@
       }
     },
     {
+      "id": "instagram-auth",
+      "name": "Instagram Login",
+      "description": "Allow users to sign in with their Instagram account",
+      "version": "1.0.0",
+      "coreVersion": "^1.4.0",
+      "author": "uxwVend",
+      "icon": "Camera",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "instagram-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "iyzico-gateway",
       "name": "iyzico Payment Gateway",
       "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
@@ -798,7 +914,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -825,6 +941,35 @@
       }
     },
     {
+      "id": "kick-auth",
+      "name": "Kick Login",
+      "description": "Allow users to sign in with their Kick account",
+      "version": "1.0.0",
+      "coreVersion": "^1.4.0",
+      "author": "uxwVend",
+      "icon": "Radio",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "kick-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "leaderboard",
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
@@ -834,7 +979,7 @@
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -865,7 +1010,7 @@
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -898,7 +1043,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -927,7 +1072,7 @@
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -956,6 +1101,35 @@
       }
     },
     {
+      "id": "microsoft-auth",
+      "name": "Microsoft and Xbox Login",
+      "description": "Allow users to sign in with their Microsoft or Xbox account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "Gamepad2",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "microsoft-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "midtrans-gateway",
       "name": "Midtrans Gateway",
       "description": "Take bank transfer, e-wallet, convenience store and card payments in Indonesia through Midtrans",
@@ -965,7 +1139,7 @@
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1003,7 +1177,7 @@
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1038,7 +1212,7 @@
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1076,7 +1250,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1114,7 +1288,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1142,6 +1316,35 @@
       }
     },
     {
+      "id": "patreon-auth",
+      "name": "Patreon Login",
+      "description": "Allow users to sign in with their Patreon account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "Heart",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "patreon-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "paymentwall-gateway",
       "name": "Paymentwall Gateway",
       "description": "Take local payments, wallets and mobile billing through Paymentwall",
@@ -1151,7 +1354,7 @@
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1188,7 +1391,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1224,7 +1427,7 @@
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1261,7 +1464,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1298,7 +1501,7 @@
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1327,7 +1530,7 @@
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1356,7 +1559,7 @@
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1388,7 +1591,7 @@
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1417,6 +1620,35 @@
       }
     },
     {
+      "id": "reddit-auth",
+      "name": "Reddit Login",
+      "description": "Allow users to sign in with their Reddit account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "MessageCircle",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "reddit-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "referral",
       "name": "Referral System",
       "description": "Earn credits by referring new users",
@@ -1426,7 +1658,7 @@
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1459,7 +1691,7 @@
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1490,7 +1722,7 @@
       "icon": "Boxes",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1519,7 +1751,7 @@
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1548,7 +1780,7 @@
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1579,7 +1811,7 @@
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1599,6 +1831,35 @@
       }
     },
     {
+      "id": "spotify-auth",
+      "name": "Spotify Login",
+      "description": "Allow users to sign in with their Spotify account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "Music",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "spotify-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "staff",
       "name": "Staff",
       "description": "Staff member listing and applications",
@@ -1608,7 +1869,7 @@
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1637,7 +1898,7 @@
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1666,7 +1927,7 @@
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1711,7 +1972,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1750,7 +2011,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1786,7 +2047,7 @@
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1811,6 +2072,35 @@
       }
     },
     {
+      "id": "tiktok-auth",
+      "name": "TikTok Login",
+      "description": "Allow users to sign in with their TikTok account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "Video",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "tiktok-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
       "id": "trophies",
       "name": "Trophies",
       "description": "Achievement badges with rule-based auto-award engine",
@@ -1820,7 +2110,7 @@
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1851,7 +2141,7 @@
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1880,7 +2170,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1912,7 +2202,7 @@
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1945,7 +2235,7 @@
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1974,7 +2264,7 @@
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T16:10:38Z",
+      "updatedAt": "2026-09-03T16:53:30Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1995,6 +2285,35 @@
         "publicRoutes": 1,
         "adminRoutes": 1,
         "apiRoutes": 3,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "x-auth",
+      "name": "X Login",
+      "description": "Allow users to sign in with their X (Twitter) account",
+      "version": "1.0.0",
+      "coreVersion": "^1.0.0",
+      "author": "uxwVend",
+      "icon": "AtSign",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:53:30Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "x-auth.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 0,
         "widgets": 0
       }
     }

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Eleven more ways to sign in**, each its own module: Battle.net, Epic Games
+  and Xbox/Microsoft for games; Patreon, Kick, Reddit and Spotify for creators;
+  Facebook, X, TikTok and Instagram for social accounts. Battle.net, Epic
+  Games, Kick and Instagram build their own provider - a region issuer, two
+  hosts, OAuth 2.1 with mandatory PKCE, and an API Meta replaced - and the rest
+  name one Auth.js already ships.
 - `authProviders[].standardCallback` lets a module that builds its own provider
   say that provider still returns through Auth.js's own callback, so the admin
   panel can show the redirect URL to register instead of nothing.

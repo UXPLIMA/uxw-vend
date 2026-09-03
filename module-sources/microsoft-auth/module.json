@@ -1,0 +1,99 @@
+{
+  "id": "microsoft-auth",
+  "name": "Microsoft and Xbox Login",
+  "description": "Allow users to sign in with their Microsoft or Xbox account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Gamepad2",
+  "adminRoutes": [
+    {
+      "path": "/settings/microsoft-auth",
+      "component": "pages/admin/settings/microsoft-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Microsoft OAuth",
+      "description": "Microsoft Entra application credentials.",
+      "href": "/settings/microsoft-auth",
+      "icon": "Gamepad2",
+      "color": "text-green-600"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "microsoft-entra-id",
+      "envIdVar": "AUTH_MICROSOFT_ENTRA_ID_ID",
+      "envSecretVar": "AUTH_MICROSOFT_ENTRA_ID_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "microsoft-login",
+      "provider": "microsoft-entra-id",
+      "label": "Microsoft",
+      "color": "#107C10",
+      "svgIcon": "M4.102 21.033C6.211 22.881 8.977 24 12 24c3.026 0 5.789-1.119 7.902-2.967 1.877-1.912-4.316-8.709-7.902-11.417-3.582 2.708-9.779 9.505-7.898 11.417zm11.16-14.406c2.5 2.961 7.484 10.313 6.076 12.912C23.002 17.48 24 14.861 24 12.004c0-3.34-1.365-6.362-3.57-8.536 0 0-.027-.022-.082-.042-.063-.022-.152-.045-.281-.045-.592 0-1.985.434-4.805 3.246zM3.654 3.426c-.057.02-.082.041-.086.042C1.365 5.642 0 8.664 0 12.004c0 2.854.998 5.473 2.661 7.533-1.401-2.605 3.579-9.951 6.08-12.91-2.82-2.813-4.216-3.245-4.806-3.245-.131 0-.223.021-.281.046v-.002zM12 3.551S9.055 1.828 6.755 1.746c-.903-.033-1.454.295-1.521.339C7.379.646 9.659 0 11.984 0H12c2.334 0 4.605.646 6.766 2.085-.068-.046-.615-.372-1.52-.339C14.946 1.828 12 3.545 12 3.545v.006z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "microsoftAuth": {
+        "adm_title": "Microsoft Login Settings",
+        "adm_subtitle": "Set up Microsoft OAuth sign-in for your site.",
+        "signInWith": "Sign in with Microsoft",
+        "adm_tenantNote": "A single-tenant application also needs AUTH_MICROSOFT_ENTRA_ID_ISSUER set to https://login.microsoftonline.com/<tenant-id>/v2.0. Left unset, sign-in runs against the shared /common/ endpoint, which accepts any Microsoft or Xbox account."
+      }
+    },
+    "tr": {
+      "microsoftAuth": {
+        "adm_title": "Microsoft ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Microsoft ile OAuth girişini yapılandırın.",
+        "signInWith": "Microsoft ile giriş yap",
+        "adm_tenantNote": "Tek kiracılı (single-tenant) bir uygulama için ayrıca AUTH_MICROSOFT_ENTRA_ID_ISSUER değişkenini https://login.microsoftonline.com/<tenant-id>/v2.0 olarak ayarlayın. Boş bırakılırsa giriş, her Microsoft veya Xbox hesabını kabul eden ortak /common/ uç noktası üzerinden yapılır."
+      }
+    },
+    "de": {
+      "microsoftAuth": {
+        "adm_title": "Microsoft-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Microsoft für Ihre Seite einrichten.",
+        "signInWith": "Mit Microsoft anmelden",
+        "adm_tenantNote": "Eine Single-Tenant-Anwendung braucht zusätzlich AUTH_MICROSOFT_ENTRA_ID_ISSUER mit https://login.microsoftonline.com/<tenant-id>/v2.0. Ohne diesen Wert läuft die Anmeldung über den gemeinsamen /common/-Endpunkt, der jedes Microsoft- oder Xbox-Konto akzeptiert."
+      }
+    },
+    "es": {
+      "microsoftAuth": {
+        "adm_title": "Inicio de sesión con Microsoft",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Microsoft para tu sitio.",
+        "signInWith": "Iniciar sesión con Microsoft",
+        "adm_tenantNote": "Una aplicación de un solo inquilino necesita además AUTH_MICROSOFT_ENTRA_ID_ISSUER con https://login.microsoftonline.com/<tenant-id>/v2.0. Sin ese valor, el acceso usa el extremo compartido /common/, que acepta cualquier cuenta de Microsoft o Xbox."
+      }
+    },
+    "fr": {
+      "microsoftAuth": {
+        "adm_title": "Connexion Microsoft",
+        "adm_subtitle": "Configurez la connexion OAuth Microsoft pour votre site.",
+        "signInWith": "Se connecter avec Microsoft",
+        "adm_tenantNote": "Une application mono-locataire a aussi besoin de AUTH_MICROSOFT_ENTRA_ID_ISSUER réglée sur https://login.microsoftonline.com/<tenant-id>/v2.0. Sans cette valeur, la connexion passe par le point d'entrée partagé /common/, qui accepte n'importe quel compte Microsoft ou Xbox."
+      }
+    },
+    "ru": {
+      "microsoftAuth": {
+        "adm_title": "Вход через Microsoft",
+        "adm_subtitle": "Настройте вход на сайт через Microsoft по OAuth.",
+        "signInWith": "Войти через Microsoft",
+        "adm_tenantNote": "Приложению с одним арендатором нужна ещё переменная AUTH_MICROSOFT_ENTRA_ID_ISSUER со значением https://login.microsoftonline.com/<tenant-id>/v2.0. Без неё вход идёт через общий эндпоинт /common/, который принимает любой аккаунт Microsoft или Xbox."
+      }
+    },
+    "pt": {
+      "microsoftAuth": {
+        "adm_title": "Início de sessão com Microsoft",
+        "adm_subtitle": "Configure o início de sessão OAuth com Microsoft no seu site.",
+        "signInWith": "Entrar com Microsoft",
+        "adm_tenantNote": "Uma aplicação de inquilino único precisa ainda de AUTH_MICROSOFT_ENTRA_ID_ISSUER com https://login.microsoftonline.com/<tenant-id>/v2.0. Sem esse valor, o início de sessão usa o ponto partilhado /common/, que aceita qualquer conta Microsoft ou Xbox."
+      }
+    }
+  }
+}

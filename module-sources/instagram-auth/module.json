@@ -1,0 +1,110 @@
+{
+  "id": "instagram-auth",
+  "name": "Instagram Login",
+  "description": "Allow users to sign in with their Instagram account",
+  "version": "1.0.0",
+  "coreVersion": "^1.4.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Camera",
+  "adminRoutes": [
+    {
+      "path": "/settings/instagram-auth",
+      "component": "pages/admin/settings/instagram-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Instagram OAuth",
+      "description": "Instagram application credentials.",
+      "href": "/settings/instagram-auth",
+      "icon": "Camera",
+      "color": "text-pink-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "instagram",
+      "factory": "auth/instagram-provider.ts",
+      "standardCallback": true,
+      "envVars": [
+        "AUTH_INSTAGRAM_ID",
+        "AUTH_INSTAGRAM_SECRET"
+      ]
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "instagram-login",
+      "provider": "instagram",
+      "label": "Instagram",
+      "color": "#E4405F",
+      "svgIcon": "M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"
+    }
+  ],
+  "translations": {
+    "en": {
+      "instagramAuth": {
+        "adm_title": "Instagram Login Settings",
+        "adm_subtitle": "Set up Instagram OAuth sign-in for your site.",
+        "signInWith": "Sign in with Instagram",
+        "adm_apiNote": "Instagram's old Basic Display API was shut down in December 2024, so this uses Instagram API with Instagram Login. Create an app of that type in the Meta developer console and register the redirect URL above on it.",
+        "adm_accountNote": "Only professional accounts (business or creator) can sign in this way, and Instagram shares no email address, so these accounts get a placeholder one that can never receive mail."
+      }
+    },
+    "tr": {
+      "instagramAuth": {
+        "adm_title": "Instagram ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Instagram ile OAuth girişini yapılandırın.",
+        "signInWith": "Instagram ile giriş yap",
+        "adm_apiNote": "Instagram'ın eski Basic Display API'si Aralık 2024'te kapatıldı; bu modül yerine gelen Instagram Login API'sini kullanır. Meta geliştirici konsolunda bu türde bir uygulama oluşturun ve yukarıdaki dönüş adresini ona kaydedin.",
+        "adm_accountNote": "Bu yolla yalnızca profesyonel hesaplar (işletme veya içerik üretici) giriş yapabilir. Instagram e-posta adresi paylaşmadığı için bu hesaplara posta alamayan geçici bir adres atanır."
+      }
+    },
+    "de": {
+      "instagramAuth": {
+        "adm_title": "Instagram-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Instagram für Ihre Seite einrichten.",
+        "signInWith": "Mit Instagram anmelden",
+        "adm_apiNote": "Instagrams alte Basic Display API wurde im Dezember 2024 abgeschaltet, daher wird hier Instagram API with Instagram Login verwendet. Legen Sie in der Meta-Entwicklerkonsole eine App dieses Typs an und tragen Sie die obige Redirect-URL dort ein.",
+        "adm_accountNote": "Nur professionelle Konten (Business oder Creator) können sich so anmelden, und Instagram gibt keine E-Mail-Adresse heraus - diese Konten erhalten daher eine Platzhalteradresse, die keine Post empfangen kann."
+      }
+    },
+    "es": {
+      "instagramAuth": {
+        "adm_title": "Inicio de sesión con Instagram",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Instagram para tu sitio.",
+        "signInWith": "Iniciar sesión con Instagram",
+        "adm_apiNote": "La antigua Basic Display API de Instagram se cerró en diciembre de 2024, así que esto usa Instagram API with Instagram Login. Crea una app de ese tipo en la consola de desarrolladores de Meta y registra en ella la URL de redirección de arriba.",
+        "adm_accountNote": "Solo las cuentas profesionales (de empresa o creador) pueden iniciar sesión así, y como Instagram no comparte ninguna dirección de correo, estas cuentas reciben una provisional que no puede recibir mensajes."
+      }
+    },
+    "fr": {
+      "instagramAuth": {
+        "adm_title": "Connexion Instagram",
+        "adm_subtitle": "Configurez la connexion OAuth Instagram pour votre site.",
+        "signInWith": "Se connecter avec Instagram",
+        "adm_apiNote": "L'ancienne Basic Display API d'Instagram a été fermée en décembre 2024 : ce module utilise donc Instagram API with Instagram Login. Créez une application de ce type dans la console développeur Meta et enregistrez-y l'URL de redirection ci-dessus.",
+        "adm_accountNote": "Seuls les comptes professionnels (entreprise ou créateur) peuvent se connecter ainsi, et Instagram ne communique aucune adresse e-mail : ces comptes reçoivent donc une adresse fictive qui ne peut rien recevoir."
+      }
+    },
+    "ru": {
+      "instagramAuth": {
+        "adm_title": "Вход через Instagram",
+        "adm_subtitle": "Настройте вход на сайт через Instagram по OAuth.",
+        "signInWith": "Войти через Instagram",
+        "adm_apiNote": "Старый Basic Display API Instagram отключили в декабре 2024 года, поэтому здесь используется Instagram API with Instagram Login. Создайте приложение этого типа в консоли разработчика Meta и добавьте в него указанный выше адрес возврата.",
+        "adm_accountNote": "Так войти могут только профессиональные аккаунты (бизнес или автор), а адрес почты Instagram не передаёт, поэтому такие аккаунты получают временный адрес, на который ничего нельзя отправить."
+      }
+    },
+    "pt": {
+      "instagramAuth": {
+        "adm_title": "Início de sessão com Instagram",
+        "adm_subtitle": "Configure o início de sessão OAuth com Instagram no seu site.",
+        "signInWith": "Entrar com Instagram",
+        "adm_apiNote": "A antiga Basic Display API do Instagram foi encerrada em dezembro de 2024, por isso este módulo usa a Instagram API with Instagram Login. Crie uma aplicação desse tipo na consola de programador da Meta e registe nela o URL de redirecionamento acima.",
+        "adm_accountNote": "Só contas profissionais (empresa ou criador) podem entrar assim e, como o Instagram não partilha nenhum endereço de email, estas contas recebem um endereço provisório que não consegue receber mensagens."
+      }
+    }
+  }
+}

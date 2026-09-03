@@ -1,0 +1,92 @@
+{
+  "id": "x-auth",
+  "name": "X Login",
+  "description": "Allow users to sign in with their X (Twitter) account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "AtSign",
+  "adminRoutes": [
+    {
+      "path": "/settings/x-auth",
+      "component": "pages/admin/settings/x-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "X OAuth",
+      "description": "X (Twitter) application credentials.",
+      "href": "/settings/x-auth",
+      "icon": "AtSign",
+      "color": "text-foreground"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "twitter",
+      "envIdVar": "AUTH_TWITTER_ID",
+      "envSecretVar": "AUTH_TWITTER_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "x-login",
+      "provider": "twitter",
+      "label": "X",
+      "color": "currentColor",
+      "svgIcon": "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "xAuth": {
+        "adm_title": "X Login Settings",
+        "adm_subtitle": "Set up X OAuth sign-in for your site.",
+        "signInWith": "Sign in with X"
+      }
+    },
+    "tr": {
+      "xAuth": {
+        "adm_title": "X ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için X ile OAuth girişini yapılandırın.",
+        "signInWith": "X ile giriş yap"
+      }
+    },
+    "de": {
+      "xAuth": {
+        "adm_title": "X-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über X für Ihre Seite einrichten.",
+        "signInWith": "Mit X anmelden"
+      }
+    },
+    "es": {
+      "xAuth": {
+        "adm_title": "Inicio de sesión con X",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con X para tu sitio.",
+        "signInWith": "Iniciar sesión con X"
+      }
+    },
+    "fr": {
+      "xAuth": {
+        "adm_title": "Connexion X",
+        "adm_subtitle": "Configurez la connexion OAuth X pour votre site.",
+        "signInWith": "Se connecter avec X"
+      }
+    },
+    "ru": {
+      "xAuth": {
+        "adm_title": "Вход через X",
+        "adm_subtitle": "Настройте вход на сайт через X по OAuth.",
+        "signInWith": "Войти через X"
+      }
+    },
+    "pt": {
+      "xAuth": {
+        "adm_title": "Início de sessão com X",
+        "adm_subtitle": "Configure o início de sessão OAuth com X no seu site.",
+        "signInWith": "Entrar com X"
+      }
+    }
+  }
+}
