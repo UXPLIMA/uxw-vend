@@ -7,14 +7,11 @@
  * refused" into "the order failed", which is the wrong outcome for a payment
  * that already went through.
  */
+import type { HookHandlerFor } from "@/core/sdk";
 import { log } from "@/core/sdk/server";
 import { sendRconCommand } from "../lib/rcon";
 
-export default async function runServerCommand(
-    _current: ServerCommandResult,
-    context?: unknown,
-): Promise<ServerCommandResult> {
-    const request = context as ServerCommandRequest | undefined;
+const runServerCommand: HookHandlerFor<"server.command", "filter"> = async (_current, request) => {
     if (!request?.command) {
         return { handled: false, ok: false, output: null, error: "No command given" };
     }
@@ -27,4 +24,6 @@ export default async function runServerCommand(
         log.warn("[servers] a server command failed", { error: message, serverId: request.serverId ?? null });
         return { handled: true, ok: false, output: null, error: message };
     }
-}
+};
+
+export default runServerCommand;

@@ -1,0 +1,24 @@
+// Stripe Gateway Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// What Stripe calls the things this site already has names for.
+//
+// The mapping lives here rather than as columns on the store's tables: a
+// gateway keeps its own bookkeeping, so uninstalling it takes its Stripe ids
+// with it and leaves the products and accounts untouched.
+
+model StripeCustomer {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  customerId String   @unique
+  createdAt  DateTime @default(now())
+}
+
+model StripePrice {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  priceId   String
+  /// Recreated when the product's price or interval changes.
+  signature String
+  createdAt DateTime @default(now())
+}

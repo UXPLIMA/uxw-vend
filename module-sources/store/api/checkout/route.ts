@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
 import { logActivity, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { stripe, getStripe, getStripeEnabled, getStripeWebhookSecret } from "../../lib/stripe";
 import { deliverProduct } from "../../lib/delivery";
+import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import {
     computeOrderPricing,
@@ -23,7 +23,11 @@ const checkoutSchema = z.object({
     creatorCode: z.string().optional(),
     variables: z.record(z.string(), z.record(z.string(), z.string())).optional(),
     notes: z.string().optional(),
-    paymentMethod: z.enum(["stripe", "credits"], { message: "Invalid payment method" }).default("stripe"),
+    // Any installed gateway's id, or "credits" for the wallet the store runs
+    // itself. Checked against the installed gateways below rather than against
+    // a list written here: the whole point of the payment contract is that
+    // this file does not know which gateways exist.
+    paymentMethod: z.string().min(1).max(32).default("stripe"),
 });
 
 // POST /api/v1/store/checkout - Create checkout session
@@ -299,7 +303,7 @@ export async function POST(request: NextRequest) {
                 total,
                 currency: currency.toUpperCase(),
                 notes,
-                paymentMethod: "stripe",
+                paymentMethod,
                 metadata: { playerName, variables: variables || {}, creatorCode: creatorCodeRecord?.code || null },
                 items: { create: orderItems },
             },
@@ -330,7 +334,7 @@ export async function POST(request: NextRequest) {
         // ── Clear cart ──
         await prisma.cartItem.deleteMany({ where: { userId: session.user.id } });
 
-        // ── Audit log + Discord ──
+        // ── Audit log ──
         logActivity({
             userId: session.user.id,
             action: "order.created",
@@ -342,11 +346,9 @@ export async function POST(request: NextRequest) {
         await announceOrderCreated(order.id);
 
         // ── Free order: complete & grant immediately ──
-        // CRITICAL: separated from the "Stripe missing" path. If a paid order
-        // arrives but Stripe isn't configured, refuse it (503) instead of
-        // silently giving the product away. Previously both conditions were
-        // OR'd together, which let any paid checkout succeed for free when
-        // STRIPE_SECRET_KEY was unset.
+        // CRITICAL: separated from the "no gateway" path below. If a paid
+        // order arrives and no gateway can take it, refuse it instead of
+        // silently giving the product away.
         if (total <= 0) {
             await prisma.order.update({ where: { id: order.id }, data: { status: "COMPLETED" } });
 
@@ -365,152 +367,81 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });
         }
 
-        // Paid order but Stripe isn't wired - keep the order PENDING and tell
-        // the caller. Do NOT grant ownership.
-        if (!await getStripeEnabled()) {
+        // A paid order whose gateway is not installed or not configured stays
+        // PENDING, and nothing is granted.
+        if (!(await isPaymentProviderAvailable(paymentMethod, currency))) {
             return NextResponse.json(
-                { error: "Payments are not configured. Ask an administrator to set up Stripe before purchasing.", code: "payment_not_configured" },
+                {
+                    error: "That payment method is not available. Ask an administrator to set up a payment gateway.",
+                    code: "payment_not_configured",
+                },
                 { status: 503 },
             );
         }
 
-        // ── Create Stripe Checkout Session ──
-        const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3001";
-
-        // ── Subscription checkout flow ──
-        if (isSubscriptionCheckout) {
-            const subProduct = subscriptionProducts[0];
-            const subItem = items[0];
-
-            // Get or create Stripe customer
-            const user = await prisma.user.findUnique({
-                where: { id: session.user.id },
-                select: { stripeCustomerId: true, email: true, username: true },
-            });
-
-            let customerId = user?.stripeCustomerId;
-            if (!customerId) {
-                const customer = await (await getStripe()).customers.create({
-                    email: user?.email || undefined,
-                    name: user?.username || undefined,
-                    metadata: { userId: session.user.id },
-                });
-                customerId = customer.id;
-                await prisma.user.update({
-                    where: { id: session.user.id },
-                    data: { stripeCustomerId: customerId },
-                });
-            }
-
-            // Get or create Stripe price
-            let priceId = subProduct.stripePriceId;
-            if (!priceId) {
-                const interval = (subProduct.subscriptionInterval as "month" | "year") || "month";
-                const intervalCount = subProduct.subscriptionIntervalCount || 1;
-
-                const stripePrice = await (await getStripe()).prices.create({
-                    unit_amount: Math.round(Number(subProduct.price) * 100),
-                    currency,
-                    recurring: {
-                        interval,
-                        interval_count: intervalCount,
-                    },
-                    product_data: { name: subProduct.name },
-                });
-                priceId = stripePrice.id;
-
-                // Save the price ID back for reuse
-                await prisma.product.update({
-                    where: { id: subProduct.id },
-                    data: { stripePriceId: priceId },
-                });
-            }
-
-            const subParams: Record<string, unknown> = {
-                mode: "subscription",
-                customer: customerId,
-                payment_method_types: ["card"],
-                line_items: [{ price: priceId, quantity: subItem.quantity }],
-                metadata: { orderId: order.id, userId: session.user.id, productId: subProduct.id, playerName },
-                subscription_data: {
-                    metadata: { orderId: order.id, userId: session.user.id, productId: subProduct.id, playerName },
-                },
-                success_url: `${baseUrl}/store/order-success`,
-                cancel_url: `${baseUrl}/store/cart?order=cancelled`,
-            };
-
-            if (totalDiscount > 0) {
-                const stripeCoupon = await (await getStripe()).coupons.create({
-                    amount_off: Math.round(totalDiscount * 100),
-                    currency,
-                    duration: "once",
-                });
-                subParams.discounts = [{ coupon: stripeCoupon.id }];
-            }
-
-            const stripeClient = await getStripe();
-            const checkoutSession = await stripeClient.checkout.sessions.create(
-                subParams as Parameters<typeof stripeClient.checkout.sessions.create>[0]
-            );
-
-            await prisma.order.update({
-                where: { id: order.id },
-                data: { paymentId: checkoutSession.id },
-            });
-
-            return NextResponse.json({ order, redirect: checkoutSession.url }, { status: 201 });
-        }
-
-        // ── Standard payment checkout flow ──
-        const lineItems = orderItems.map((item) => ({
-            price_data: {
-                currency,
-                product_data: { name: item.name },
-                unit_amount: Math.round(item.price * 100),
-            },
-            quantity: item.quantity,
-        }));
-
-        // Tax as separate line item
-        if (tax > 0) {
-            lineItems.push({
-                price_data: {
-                    currency,
-                    product_data: { name: `Tax (${taxRate}%)` },
-                    unit_amount: Math.round(tax * 100),
-                },
-                quantity: 1,
-            });
-        }
-
-        // Discount via Stripe coupon (not negative line item -- Stripe rejects those)
-        const stripeParams: Record<string, unknown> = {
-            mode: "payment",
-            payment_method_types: ["card"],
-            line_items: lineItems,
-            metadata: { orderId: order.id, userId: session.user.id, playerName },
-            success_url: `${baseUrl}/store/order-success`,
-            cancel_url: `${baseUrl}/store/cart?order=cancelled`,
-        };
-
-        if (totalDiscount > 0) {
-            const stripeCoupon = await (await getStripe()).coupons.create({
-                amount_off: Math.round(totalDiscount * 100),
-                currency,
-                duration: "once",
-            });
-            stripeParams.discounts = [{ coupon: stripeCoupon.id }];
-        }
-
-        const stripeClient = await getStripe();
-        const checkoutSession = await stripeClient.checkout.sessions.create(stripeParams as Parameters<typeof stripeClient.checkout.sessions.create>[0]);
-
-        await prisma.order.update({
-            where: { id: order.id },
-            data: { paymentId: checkoutSession.id },
+        const buyer = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { email: true, username: true },
         });
 
-        return NextResponse.json({ order, redirect: checkoutSession.url }, { status: 201 });
+        const lines = orderItems.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            unitAmount: item.price,
+        }));
+        if (tax > 0) {
+            lines.push({ name: `Tax (${taxRate}%)`, quantity: 1, unitAmount: tax });
+        }
+
+        const subProduct = isSubscriptionCheckout ? subscriptionProducts[0] : null;
+
+        const payment = await startPaymentSession({
+            provider: paymentMethod,
+            kind: subProduct ? "subscription" : "order",
+            reference: order.id,
+            amount: total,
+            currency,
+            description: `Order ${order.orderNumber}`,
+            lines,
+            customer: {
+                userId: session.user.id,
+                email: buyer?.email ?? null,
+                name: buyer?.username ?? null,
+            },
+            // The discount travels as a total, not as a negative line: most
+            // gateways reject a negative amount outright.
+            metadata: {
+                orderId: order.id,
+                userId: session.user.id,
+                playerName,
+                ...(totalDiscount > 0 ? { discount: totalDiscount.toFixed(2) } : {}),
+            },
+            ...(subProduct
+                ? {
+                      recurring: {
+                          interval: (subProduct.subscriptionInterval as "month" | "year") || "month",
+                          intervalCount: subProduct.subscriptionIntervalCount || 1,
+                          productId: subProduct.id,
+                      },
+                  }
+                : {}),
+        });
+
+        if (!payment.handled || !payment.redirectUrl) {
+            return NextResponse.json(
+                {
+                    error: payment.error ?? "The payment could not be started. Try again shortly.",
+                    code: payment.handled ? "payment_failed" : "payment_not_configured",
+                },
+                { status: payment.handled ? 502 : 503 },
+            );
+        }
+
+        if (payment.reference) {
+            await prisma.order.update({ where: { id: order.id }, data: { paymentId: payment.reference } });
+        }
+
+        return NextResponse.json({ order, redirect: payment.redirectUrl }, { status: 201 });
     } catch (error) {
         console.error("Checkout error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

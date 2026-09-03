@@ -7,7 +7,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useCurrency } from "../../../lib/currency-context";
-import { Loader2, Check, X, CreditCard, Wallet, Coins, ShoppingCart } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface CartItem {
@@ -23,10 +24,33 @@ interface CartItem {
     };
 }
 
+/** One installed gateway, as `/store/payment-providers` describes it. */
+interface PaymentProvider {
+    id: string;
+    label: string;
+    description?: string;
+    icon?: string;
+}
+
 interface CartData {
     items: CartItem[];
     itemCount: number;
     total: number;
+}
+
+type IconComponent = React.ComponentType<{ className?: string }>;
+
+/**
+ * Draws the Lucide icon a gateway named in its `payment.providers` answer.
+ *
+ * The name comes from an installed module, so it is trusted but not
+ * guaranteed to exist: a typo falls back to a card rather than crashing the
+ * checkout page.
+ */
+function ProviderIcon({ name }: { name?: string }) {
+    const lib = LucideIcons as unknown as Record<string, IconComponent>;
+    const Icon = (name && lib[name]) || CreditCard;
+    return <Icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />;
 }
 
 export default function CartPage() {
@@ -45,27 +69,35 @@ export default function CartPage() {
     const [creatorCodeInput, setCreatorCodeInput] = useState("");
     const [creatorApplied, setCreatorApplied] = useState<{ code: string; discountPercent: number; creator: string } | null>(null);
     const [creatorError, setCreatorError] = useState<string | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | "credits">("stripe");
-    const [paymentConfig, setPaymentConfig] = useState<{ stripe: boolean; paypal: boolean; credits: boolean }>({ stripe: false, paypal: false, credits: false });
+    // The gateway ids come from whichever gateway modules are installed, so
+    // this is a plain string rather than a union the store would have to know.
+    const [paymentMethod, setPaymentMethod] = useState<string>("");
+    const [providers, setProviders] = useState<PaymentProvider[]>([]);
+    const [creditsAvailable, setCreditsAvailable] = useState(false);
     const [creditBalance, setCreditBalance] = useState<number>(0);
 
     useEffect(() => {
         fetchCart();
-        // Detect available payment methods
-        fetch("/api/v1/store/checkout/paypal", { method: "OPTIONS" })
-            .then(() => {
-                // PayPal endpoint exists; check if configured via a lightweight probe
-                setPaymentConfig(prev => ({ ...prev, paypal: true }));
+        // Which gateways are installed and configured is a question only the
+        // server can answer - it is the sum of the payment.providers filter.
+        fetch("/api/v1/store/payment-providers")
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                const list: PaymentProvider[] = Array.isArray(data?.providers) ? data.providers : [];
+                setProviders(list);
+                setPaymentMethod(prev => prev || list[0]?.id || "");
             })
             .catch(() => {});
-        // Credits availability: always enable, fetch balance
-        setPaymentConfig(prev => ({ ...prev, credits: true }));
+        // The wallet is a module too: no credits endpoint, no credits button.
         fetch("/api/v1/credits")
             .then(r => r.ok ? r.json() : null)
-            .then(data => { if (data?.balance !== undefined) setCreditBalance(Number(data.balance)); })
+            .then(data => {
+                if (data?.balance === undefined) return;
+                setCreditsAvailable(true);
+                setCreditBalance(Number(data.balance));
+                setPaymentMethod(prev => prev || "credits");
+            })
             .catch(() => {});
-        // Stripe is the default, always show
-        setPaymentConfig(prev => ({ ...prev, stripe: true }));
     }, []);
 
     const fetchCart = async () => {
@@ -182,7 +214,7 @@ export default function CartPage() {
                     playerName: playerName.trim(),
                     couponCode: couponApplied || undefined,
                     creatorCode: creatorApplied?.code || undefined,
-                    paymentMethod: paymentMethod === "paypal" ? "stripe" : paymentMethod,
+                    paymentMethod,
                 }),
             });
 
@@ -193,28 +225,8 @@ export default function CartPage() {
                 return;
             }
 
-            // Step 2: Route to the selected payment method
-            if (paymentMethod === "paypal" && data.order?.id) {
-                // Create PayPal order and redirect to PayPal approval
-                const ppRes = await fetch("/api/v1/store/checkout/paypal", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ orderId: data.order.id }),
-                });
-                const ppData = await ppRes.json();
-                if (!ppRes.ok) {
-                    setCheckoutError(ppData.error || (t.has("err_paypalFailed") ? t("err_paypalFailed") : "PayPal checkout failed"));
-                    return;
-                }
-                if (ppData.approveUrl) {
-                    window.location.href = ppData.approveUrl;
-                    return;
-                }
-                setCheckoutError(t.has("err_paypalApprovalUrl") ? t("err_paypalApprovalUrl") : "Failed to get PayPal approval URL");
-                return;
-            }
-
-            // Stripe: redirect to Stripe checkout
+            // Step 2: follow the gateway. Which one it was is not this page's
+            // business - the checkout route answers with a URL or with nothing.
             if (data.redirect) {
                 window.location.href = data.redirect;
                 return;
@@ -440,51 +452,32 @@ export default function CartPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{t('paymentMethod')}</label>
                                         <div className="grid gap-2">
-                                            {paymentConfig.stripe && (
+                                            {providers.map((provider) => (
                                                 <button
+                                                    key={provider.id}
                                                     type="button"
-                                                    onClick={() => setPaymentMethod("stripe")}
+                                                    onClick={() => setPaymentMethod(provider.id)}
                                                     className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
-                                                        paymentMethod === "stripe"
+                                                        paymentMethod === provider.id
                                                             ? "border-primary bg-primary/5 ring-1 ring-primary"
                                                             : "border-border hover:border-muted-foreground"
                                                     }`}
                                                 >
-                                                    <CreditCard className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                                                    <ProviderIcon name={provider.icon} />
                                                     <div className="flex-1">
-                                                        <span className="text-sm font-medium">{t('payWithCard')}</span>
-                                                        <p className="text-xs text-muted-foreground">{t('payWithStripe')}</p>
+                                                        <span className="text-sm font-medium">{provider.label}</span>
+                                                        {provider.description && (
+                                                            <p className="text-xs text-muted-foreground">{provider.description}</p>
+                                                        )}
                                                     </div>
                                                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                                        paymentMethod === "stripe" ? "border-primary" : "border-muted-foreground"
+                                                        paymentMethod === provider.id ? "border-primary" : "border-muted-foreground"
                                                     }`}>
-                                                        {paymentMethod === "stripe" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                                                        {paymentMethod === provider.id && <div className="w-2 h-2 rounded-full bg-primary" />}
                                                     </div>
                                                 </button>
-                                            )}
-                                            {paymentConfig.paypal && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPaymentMethod("paypal")}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
-                                                        paymentMethod === "paypal"
-                                                            ? "border-primary bg-primary/5 ring-1 ring-primary"
-                                                            : "border-border hover:border-muted-foreground"
-                                                    }`}
-                                                >
-                                                    <Wallet className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                                                    <div className="flex-1">
-                                                        <span className="text-sm font-medium">{t('payWithPaypal')}</span>
-                                                        <p className="text-xs text-muted-foreground">{t('payWithPaypalDesc')}</p>
-                                                    </div>
-                                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                                        paymentMethod === "paypal" ? "border-primary" : "border-muted-foreground"
-                                                    }`}>
-                                                        {paymentMethod === "paypal" && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                                    </div>
-                                                </button>
-                                            )}
-                                            {paymentConfig.credits && (
+                                            ))}
+                                            {creditsAvailable && (
                                                 <button
                                                     type="button"
                                                     onClick={() => setPaymentMethod("credits")}
@@ -511,6 +504,9 @@ export default function CartPage() {
                                                     </div>
                                                 </button>
                                             )}
+                                            {providers.length === 0 && !creditsAvailable && (
+                                                <p className="text-sm text-muted-foreground">{t('noPaymentMethods')}</p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -522,7 +518,7 @@ export default function CartPage() {
                                         className="w-full"
                                         size="lg"
                                         onClick={handleCheckout}
-                                        disabled={checkingOut || !playerName.trim()}
+                                        disabled={checkingOut || !playerName.trim() || !paymentMethod}
                                     >
                                         {checkingOut ? (
                                             <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('processing')}</>

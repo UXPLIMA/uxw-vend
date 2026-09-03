@@ -1,5 +1,20 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { addAction, doAction, applyFilters, addFilter, resetHooks } from "@/core/lib/hooks";
+import type { HookHandlerFor } from "@/core/lib/hooks";
+
+/**
+ * A filter that declares both halves of its contract, the way the payment
+ * hooks do. Declared here rather than borrowed from an installed module so the
+ * registry can be tested without one.
+ */
+declare global {
+    interface UxwVendFilterPayloads {
+        "test.ctx.chain": string;
+    }
+    interface UxwVendFilterContexts {
+        "test.ctx.chain": { locale: string };
+    }
+}
 
 /**
  * Compile-time tests. Every `@ts-expect-error` below fails `npm run typecheck`
@@ -50,5 +65,31 @@ describe("hook payload registry", () => {
         // Undeclared name: the value type comes from the argument.
         const n: number = applyFilters("ad.hoc.chain", 5);
         expect(n).toBe(5);
+    });
+
+    it("types the context of a filter that declares one", () => {
+        addFilter("test.ctx.chain", (value: string, context?: { locale: string }) =>
+            `${value}:${context?.locale ?? "none"}`,
+        );
+
+        expect(applyFilters("test.ctx.chain", "hi", { locale: "tr" })).toBe("hi:tr");
+
+        // @ts-expect-error - the context is not optional once it is declared
+        applyFilters("test.ctx.chain", "hi");
+        // @ts-expect-error - and it has to be the declared shape
+        applyFilters("test.ctx.chain", "hi", { locale: 5 });
+
+        // A manifest handler gets the context typed, with no cast: this used to
+        // be `unknown`, so every listener read it through one and nothing
+        // checked the cast.
+        const handler: HookHandlerFor<"test.ctx.chain", "filter"> = (value, context) =>
+            `${value}:${context.locale}`;
+        expect(handler("x", { locale: "en" })).toBe("x:en");
+    });
+
+    it("leaves the context of an undeclared filter optional and unknown", () => {
+        // No entry in UxwVendFilterContexts: passing one is still allowed, and
+        // omitting it still compiles.
+        expect(applyFilters("ad.hoc.chain", 5, { anything: true })).toBe(5);
     });
 });

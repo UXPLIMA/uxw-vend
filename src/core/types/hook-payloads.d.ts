@@ -63,9 +63,7 @@ interface UxwVendHookPayloads {
 }
 
 /**
- * The same registry for filters. The value flowing through the chain is typed;
- * the optional context argument stays per-call-site, because a filter's context
- * varies with where it is applied.
+ * The same registry for filters: the value that flows through the chain.
  */
 interface UxwVendFilterPayloads {
     "page.title": string;
@@ -76,3 +74,20 @@ interface UxwVendFilterPayloads {
     "email.subject": string;
     "email.body": string;
 }
+
+/**
+ * What a filter is asked *about*, as opposed to the value it returns.
+ *
+ * A filter that asks a question needs both halves typed. `payment.session`
+ * carries a result through the chain and an order to pay for alongside it, and
+ * a gateway that misreads the second half fails at runtime on a path only two
+ * particular modules reach. Declaring the context here types it at the call
+ * site and in every listener.
+ *
+ * Filters with nothing to say about their context simply do not appear, and
+ * their context stays `unknown` as before.
+ */
+// Core declares no contexts of its own: every entry so far belongs to a module,
+// and an empty interface here is the point - it exists to be merged into.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface UxwVendFilterContexts {}

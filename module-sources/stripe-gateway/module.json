@@ -1,14 +1,14 @@
 {
   "id": "stripe-gateway",
   "name": "Stripe Payment Gateway",
-  "description": "Accept payments via Stripe (credit cards, Apple Pay, Google Pay)",
-  "version": "1.0.0",
-  "coreVersion": "^1.0.0",
+  "description": "Take card, Apple Pay and Google Pay payments through Stripe, including subscriptions",
+  "version": "2.0.0",
+  "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
   "icon": "CreditCard",
   "dependencies": [
-    "store"
+    "store@^2.0.0"
   ],
   "settingsCards": [
     {
@@ -308,5 +308,43 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  }
+  },
+  "api": [
+    {
+      "path": "/webhooks/stripe",
+      "handler": "api/webhook/route.ts",
+      "method": "POST",
+      "description": "Stripe webhook receiver. Verifies the signature and reports payments through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.refunded",
+      "type": "filter"
+    },
+    {
+      "hook": "subscription.changed",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ]
 }

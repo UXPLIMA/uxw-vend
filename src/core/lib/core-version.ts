@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.3.0 - `FilterContext`, and the typed context registry
+ * `UxwVendFilterContexts` behind it. A filter that declares a context now has
+ * both halves of its contract checked, at the call site and in every listener;
+ * a filter that declares none behaves exactly as it did, so this is an
+ * addition rather than a break.
+ *
  * 1.2.0 - `authProviders[].factory` lets a module ship its own sign-in
  * provider instead of naming one Auth.js already has, `oauthButtons[].href`
  * lets that provider's button start a flow Auth.js does not know how to
@@ -24,4 +30,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.2.0";
+export const CORE_API_VERSION = "1.3.0";
