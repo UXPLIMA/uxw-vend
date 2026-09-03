@@ -39,6 +39,8 @@ export interface RouteLike {
     path: string;
     module: string;
     isAdmin?: boolean;
+    /** The module asked for this page to stay out of search results. */
+    noindex?: boolean;
 }
 
 /**
@@ -55,6 +57,7 @@ export function staticModuleRoutes(
     const paths = new Set<string>();
     for (const route of routes) {
         if (route.isAdmin) continue;
+        if (route.noindex) continue;
         if (enabled[route.module] !== true) continue;
         if (!route.path.startsWith("/")) continue;
         if (route.path.includes("[")) continue;

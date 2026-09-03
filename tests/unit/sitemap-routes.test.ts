@@ -83,3 +83,15 @@ describe("robots.txt and the sitemap", () => {
         expect([...DISALLOWED_PREFIXES]).toEqual(["/admin", "/api", "/auth", "/profile"]);
     });
 });
+
+describe("noindex routes", () => {
+    const enabled = { store: true };
+    const routes = [
+        { path: "/store", module: "store" },
+        { path: "/store/cart", module: "store", noindex: true },
+    ];
+
+    it("keeps a route the module marked noindex out of the sitemap", () => {
+        expect(staticModuleRoutes(routes, enabled)).toEqual(["/store"]);
+    });
+});

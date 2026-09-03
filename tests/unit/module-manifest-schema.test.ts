@@ -398,3 +398,30 @@ describe("moduleManifestSchema - admin paths are panel-relative", () => {
         });
     }
 });
+
+describe("route noindex flag", () => {
+    it("accepts a route that opts out of indexing", () => {
+        const result = moduleManifestSchema.safeParse({
+            ...base,
+            routes: [{ path: "/shop/cart", component: "pages/public/cart/page.tsx", noindex: true }],
+        });
+        expect(result.success).toBe(true);
+    });
+
+    it("leaves the flag off when a route does not set it", () => {
+        const result = moduleManifestSchema.safeParse({
+            ...base,
+            routes: [{ path: "/shop", component: "pages/public/page.tsx" }],
+        });
+        expect(result.success).toBe(true);
+        if (result.success) expect(result.data.routes?.[0].noindex).toBeUndefined();
+    });
+
+    it("rejects a non-boolean flag", () => {
+        const result = moduleManifestSchema.safeParse({
+            ...base,
+            routes: [{ path: "/shop", component: "pages/public/page.tsx", noindex: "yes" }],
+        });
+        expect(result.success).toBe(false);
+    });
+});

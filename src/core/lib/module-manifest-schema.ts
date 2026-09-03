@@ -82,6 +82,12 @@ const routeEntry = z.object({
     path: routePath,
     component: relativePath("component"),
     layout: relativePath("layout").optional(),
+    /**
+     * Keeps the page out of the sitemap and marks it `noindex` for crawlers.
+     * For the pages that exist to be walked through rather than found: a cart,
+     * an order confirmation, anything whose content belongs to one visitor.
+     */
+    noindex: z.boolean().optional(),
 });
 
 const adminRouteEntry = z.object({
