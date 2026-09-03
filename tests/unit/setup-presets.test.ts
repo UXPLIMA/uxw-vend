@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import { parseSetupPresets, CUSTOM_PRESET } from "@/core/lib/setup-presets";
+import { resolveInstallPlan } from "@/core/lib/install-plan";
 
 const valid = {
     version: "1.0.0",
@@ -73,7 +74,15 @@ describe("shipped presets.json", () => {
     );
     const catalog = JSON.parse(
         fs.readFileSync(path.join(root, "module-marketplace", "index.json"), "utf8"),
-    ) as { modules: Array<{ id: string }> };
+    ) as {
+        modules: Array<{
+            id: string;
+            version?: string;
+            dependencies?: string[];
+            conflicts?: string[];
+            coreVersion?: string | null;
+        }>;
+    };
     const knownModuleIds = catalog.modules.map((m) => m.id);
 
     it("parses without any warning", () => {
@@ -111,6 +120,25 @@ describe("shipped presets.json", () => {
         for (const p of presetsRaw.presets as Array<{ id: string; theme?: string }>) {
             if (!p.theme) continue;
             expect(themeIds, `${p.id} -> ${p.theme}`).toContain(p.theme);
+        }
+    });
+
+    // A preset is a one-click install. Naming a module whose own dependency is
+    // missing, or two modules that refuse to sit together, turns that click
+    // into an error the operator cannot do anything about.
+    it("installs cleanly, dependencies and all", () => {
+        const entries = catalog.modules.map((m) => ({
+            id: m.id,
+            version: m.version ?? "0.0.0",
+            dependencies: m.dependencies ?? [],
+            conflicts: m.conflicts ?? [],
+            ...(m.coreVersion ? { coreVersion: m.coreVersion } : {}),
+        }));
+
+        for (const preset of presetsRaw.presets as Array<{ id: string; modules: string[] }>) {
+            if (preset.modules.length === 0) continue;
+            const plan = resolveInstallPlan(preset.modules, entries);
+            expect(plan.errors, `${preset.id}: ${JSON.stringify(plan.errors)}`).toEqual([]);
         }
     });
 });
