@@ -34,7 +34,6 @@
     "db:migrate": "npx tsx scripts/apply-migrations.ts",
     "db:migrate:bootstrap": "npx tsx scripts/apply-migrations.ts --bootstrap",
     "db:migrate:dry": "npx tsx scripts/apply-migrations.ts --dry-run",
-    "db:migrate:prisma": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:backup": "bash scripts/backup.sh",

@@ -4,7 +4,7 @@
 
 uxwVend uses two distinct schema management mechanisms. Understanding when each applies is critical.
 
-### 1. Core schema — `prisma db push`
+### 1. Core schema - `prisma db push`
 
 The core schema (`prisma/schema.core.prisma`) and its merged output (`prisma/schema.prisma`) are managed with **`prisma db push`**, not `prisma migrate`. There is no `prisma/migrations/` directory for core.
 
@@ -24,7 +24,7 @@ npm run db:push      # applies the diff to the database
 
 **Never run `prisma migrate dev` or `prisma migrate deploy` against this repository.** The project does not use Prisma's migration engine.
 
-### 2. Module schema changes — SQL migrations
+### 2. Module schema changes - SQL migrations
 
 When an installed module needs to alter its database schema after initial deployment (add a column, rename a field, create a new table), it uses the **per-module SQL migration system** described in the rest of this document.
 
@@ -47,7 +47,7 @@ module-sources/<module-id>/
 
 - File names follow the pattern `NNN_description.sql` where `NNN` is a zero-padded sequence number.
 - Each file is a single atomic migration. The runner wraps every file in a database transaction.
-- Do not add `BEGIN` / `COMMIT` inside the file — the runner handles transaction boundaries.
+- Do not add `BEGIN` / `COMMIT` inside the file - the runner handles transaction boundaries.
 - SQL dialect is PostgreSQL.
 
 ### Tracking table
@@ -66,7 +66,7 @@ ModuleMigration
   @@unique([moduleId, migrationName])
 ```
 
-The `@@unique([moduleId, migrationName])` constraint ensures idempotency — a migration file can never be applied twice for the same module.
+The `@@unique([moduleId, migrationName])` constraint ensures idempotency - a migration file can never be applied twice for the same module.
 
 ### Runner: `scripts/apply-migrations.ts`
 
@@ -78,7 +78,7 @@ The runner is also aliased as `npm run db:migrate`.
 2. List `.sql` files sorted by filename.
 3. For each file, compute the SHA-256 checksum and look up the `ModuleMigration` record.
 4. **Already applied + checksum matches** → skip (up to date).
-5. **Already applied + checksum mismatch** → **abort with an error**. An applied migration was modified. This is a bug — write a new forward migration instead.
+5. **Already applied + checksum mismatch** → **abort with an error**. An applied migration was modified. This is a bug - write a new forward migration instead.
 6. **Not yet applied** → execute inside a transaction, then record the `ModuleMigration` row with the checksum and execution time.
 7. On any error, abort processing for that module. Do not skip ahead to the next migration file.
 
@@ -122,15 +122,15 @@ npm run db:migrate:bootstrap   # bootstrap all
 
 ### When to write a SQL migration
 
-Write a migration whenever you need to change the database schema of an already-deployed module — adding a column, renaming a field, creating a new table, adding an index, seeding lookup data, etc.
+Write a migration whenever you need to change the database schema of an already-deployed module - adding a column, renaming a field, creating a new table, adding an index, seeding lookup data, etc.
 
 For a **brand new module** that has never been deployed, you do not need a migration at all: the module's `schema.prisma` is merged into the core schema on install, and `scripts/apply-schema-additions.ts` creates the tables it declares. Write `001_init.sql` only if you want the module to be installable by the bootstrap path on a database that predates it.
 
 ### Why the install path does not run `prisma db push`
 
-`db push` reconciles the entire database to the merged schema, which means it also removes whatever the schema stops declaring. Uninstalling a module deliberately leaves its tables in place so a reinstall keeps the admin's data, so after any uninstall the database legitimately holds tables the schema no longer mentions — and `db push` has only two answers to that, both wrong: it drops the leftover table silently when it is empty, and it refuses to run at all when it has rows (`Use the --accept-data-loss flag`), which leaves the module being installed with no tables either.
+`db push` reconciles the entire database to the merged schema, which means it also removes whatever the schema stops declaring. Uninstalling a module deliberately leaves its tables in place so a reinstall keeps the admin's data, so after any uninstall the database legitimately holds tables the schema no longer mentions - and `db push` has only two answers to that, both wrong: it drops the leftover table silently when it is empty, and it refuses to run at all when it has rows (`Use the --accept-data-loss flag`), which leaves the module being installed with no tables either.
 
-So the install path asks Prisma for the same diff via `prisma migrate diff --script` and runs only the statements that add: `CreateEnum`, `CreateTable`, `CreateIndex`, `AddForeignKey`, and an `AlterTable` that neither drops nor retypes a column. Prisma annotates every statement in that script with the operation that produced it, so the filter reads annotations rather than parsing SQL. Everything else is skipped and named in the log — dropping a column, renaming a table, changing a type are what your module's `migrations/` directory is for.
+So the install path asks Prisma for the same diff via `prisma migrate diff --script` and runs only the statements that add: `CreateEnum`, `CreateTable`, `CreateIndex`, `AddForeignKey`, and an `AlterTable` that neither drops nor retypes a column. Prisma annotates every statement in that script with the operation that produced it, so the filter reads annotations rather than parsing SQL. Everything else is skipped and named in the log - dropping a column, renaming a table, changing a type are what your module's `migrations/` directory is for.
 
 `prisma db push` is still the right tool for a fresh database, where there is nothing to lose, and that is where the Docker bootstrap uses it.
 
@@ -198,9 +198,17 @@ On subsequent module updates, the same flow runs. New migration files in the upd
 After one or more module installs, `scheduleBuild()` fires a debounced background job:
 
 ```
-db:merge → apply-migrations (all) → generate-registry → npm run build
-         → record the build fingerprint → SIGTERM (the supervisor restarts us)
+db:merge → apply-schema-additions → apply-migrations (all) → generate-registry
+         → npm run build → record the build fingerprint
+         → SIGTERM (the supervisor restarts us)
 ```
+
+The schema step comes before migrations because it is what creates the tables in
+the first place: twenty-five of the twenty-six modules that ship a
+`schema.prisma` ship no `migrations/` directory, since migrations exist to alter
+a module's schema *after* release. Migrations then run on top. See ["Why the
+install path does not run `prisma db push`"](#why-the-install-path-does-not-run-prisma-db-push)
+for why that step is not a push.
 
 The 3-second debounce ensures bulk installs (e.g., installing five modules in
 quick succession) trigger only one rebuild.
@@ -208,7 +216,7 @@ quick succession) trigger only one rebuild.
 The last step is not optional. `next start` reads its route and build manifests
 once, at boot, so a rebuild underneath a running process changes nothing that
 process can serve. Replacing the process is what makes the module live. It used
-to be `pm2 restart uxwvend` inside a swallowing try/catch — and pm2 is in
+to be `pm2 restart uxwvend` inside a swallowing try/catch - and pm2 is in
 neither the Docker image nor `package.json`, so it never ran and every install
 silently kept serving the old build. Raising `SIGTERM` on ourselves works for
 every supervisor the project supports (compose `restart: unless-stopped`,
@@ -239,7 +247,7 @@ If you are adding the migration system to a module that already has tables in a 
 
 **Abort-on-first-error per module.** If migration `002_add_slug.sql` fails, the runner does not attempt `003_rename_field.sql`. Skipping ahead in sequence could leave the schema in an inconsistent state.
 
-**Advisory lock on install.** The module install route acquires a PostgreSQL advisory lock (`pg_try_advisory_lock`) so two installs cannot race each other — whether they arrive as concurrent requests to one process or from a second process during a deploy.
+**Advisory lock on install.** The module install route acquires a PostgreSQL advisory lock (`pg_try_advisory_lock`) so two installs cannot race each other - whether they arrive as concurrent requests to one process or from a second process during a deploy.
 
 ---
 
@@ -293,7 +301,7 @@ orders StoreOrder[] @relation("UserOrders")
 
 ## Conflict Avoidance
 
-Each module has its own migration sequence — two modules both having a `001_init.sql` is fine because they are keyed by `moduleId + migrationName`.
+Each module has its own migration sequence - two modules both having a `001_init.sql` is fine because they are keyed by `moduleId + migrationName`.
 
 The only real conflict scenario is two modules defining a Prisma model with the same name. `merge-schemas.ts` detects this as a collision and aborts the merge before any migration can run. Fix it by renaming one of the models.
 
