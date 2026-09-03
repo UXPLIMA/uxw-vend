@@ -25,20 +25,30 @@ export default function LeaderboardPage() {
     const [activeTab, setActiveTab] = useState("buyers");
     const [entries, setEntries] = useState<LeaderEntry[]>([]);
     const [loading, setLoading] = useState(true);
+    // Which boards this site can fill. Votes and forum posts come from other
+    // modules, so a site without them would otherwise show a tab that is
+    // permanently empty. The API reports what it has; until it answers, only
+    // the board every install has is offered.
+    const [sources, setSources] = useState<string[]>(["buyers"]);
     const { formatPrice } = useCurrency();
 
-    const tabs = [
+    const allTabs = [
         { id: "buyers", label: t("topBuyers"), icon: Crown },
         { id: "voters", label: t("topVoters"), icon: Medal },
         { id: "forum", label: t("mostActive"), icon: Trophy },
     ];
+    const tabs = allTabs.filter((tab) => sources.includes(tab.id));
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/api/v1/leaderboard?type=${activeTab}&limit=20`)
             .then((r) => r.json())
-            .then((d) => { setEntries(d.leaderboard || []); setLoading(false); })
+            .then((d) => {
+                setEntries(d.leaderboard || []);
+                if (Array.isArray(d.sources)) setSources(d.sources);
+                setLoading(false);
+            })
             .catch(() => setLoading(false));
     }, [activeTab]);
 

@@ -15,8 +15,8 @@ interface SidebarLayoutProps {
  * of widgets can still end up with an empty column. Reserving a third of the
  * page for it leaves the content visibly pushed to the left on a fresh
  * install. The `data-sidebar` / `data-sidebar-main` hooks let globals.css
- * collapse the column with `:empty` + `:has()` instead, which stays correct
- * when a widget fills in later on the client.
+ * collapse the column instead, and bring it back the moment a widget has
+ * something to render.
  */
 export default function StandardSidebarLayout({ children, sidebar }: SidebarLayoutProps) {
     return (

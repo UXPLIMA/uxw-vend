@@ -120,6 +120,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   prerequisite on an install that had the store enabled. The range is now
   parsed and checked, and a module installed at the wrong version says so
   rather than claiming to be absent.
+- **The leaderboard and player profiles only compiled with a forum.** Both read
+  the forum module's tables directly, and the leaderboard read the vote
+  module's, without depending on either - so on any install that left one out,
+  Prisma's client had no such model and the whole app failed to build. Both now
+  ask for those tables in a way that can come back empty, the leaderboard
+  offers only the boards its site can fill, and a profile reports only the
+  statistics it can actually count rather than a row of zeroes.
 - **An empty widget column pushed the page off centre.** Widgets decide for
   themselves whether they have anything to show, so a site with no orders yet
   reserved a third of the homepage for widgets that all rendered nothing. The
