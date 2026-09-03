@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Six more logins for the rest of the world**: VK and Yandex, Kakao and
+  Naver, LINE, and Sign in with Apple. Apple takes a signed token rather than a
+  client secret, so that module holds the `.p8` key and mints one at startup
+  instead of asking an admin to paste in a token that silently expires after
+  six months.
 - **Eleven more ways to sign in**, each its own module: Battle.net, Epic Games
   and Xbox/Microsoft for games; Patreon, Kick, Reddit and Spotify for creators;
   Facebook, X, TikTok and Instagram for social accounts. Battle.net, Epic

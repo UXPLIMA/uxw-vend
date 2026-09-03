@@ -1,0 +1,112 @@
+{
+  "id": "apple-auth",
+  "name": "Apple Login",
+  "description": "Allow users to sign in with their Apple account",
+  "version": "1.0.0",
+  "coreVersion": "^1.4.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Apple",
+  "adminRoutes": [
+    {
+      "path": "/settings/apple-auth",
+      "component": "pages/admin/settings/apple-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Sign in with Apple",
+      "description": "Apple Services ID and signing key.",
+      "href": "/settings/apple-auth",
+      "icon": "Apple",
+      "color": "text-zinc-400"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "apple",
+      "factory": "auth/apple-provider.ts",
+      "standardCallback": true,
+      "envVars": [
+        "AUTH_APPLE_ID",
+        "AUTH_APPLE_TEAM_ID",
+        "AUTH_APPLE_KEY_ID",
+        "AUTH_APPLE_PRIVATE_KEY"
+      ]
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "apple-login",
+      "provider": "apple",
+      "label": "Apple",
+      "color": "currentColor",
+      "svgIcon": "M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+    }
+  ],
+  "translations": {
+    "en": {
+      "appleAuth": {
+        "adm_title": "Apple Login Settings",
+        "adm_subtitle": "Set up Apple OAuth sign-in for your site.",
+        "signInWith": "Sign in with Apple",
+        "adm_keyNote": "Apple has no client secret: it takes a short-lived token you sign yourself. Give it the Services ID as AUTH_APPLE_ID, the team and key identifiers, and the contents of the .p8 key file as AUTH_APPLE_PRIVATE_KEY - newlines may be written as \\n. The token is minted when the site starts and is valid for six months, so a restart within that window is all the rotation Apple needs.",
+        "adm_nameNote": "Apple sends the person's name only the first time they approve your site, and it lets them hide their address behind a private relay. Both are normal: the account keeps whatever arrived, and the user can change it in their profile."
+      }
+    },
+    "tr": {
+      "appleAuth": {
+        "adm_title": "Apple ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Apple ile OAuth girişini yapılandırın.",
+        "signInWith": "Apple ile giriş yap",
+        "adm_keyNote": "Apple'da client secret yoktur: kendi imzaladığınız kısa ömürlü bir jeton ister. AUTH_APPLE_ID olarak Services ID'yi, ekip ve anahtar kimliklerini, AUTH_APPLE_PRIVATE_KEY olarak da .p8 dosyasının içeriğini verin; satır sonları \\n olarak yazılabilir. Jeton site açılırken üretilir ve altı ay geçerlidir, yani bu süre içinde bir yeniden başlatma Apple'ın istediği tüm yenilemedir.",
+        "adm_nameNote": "Apple, kişinin adını yalnızca sitenizi ilk onayladığında gönderir ve adresini özel bir yönlendirme arkasına gizlemesine izin verir. İkisi de normaldir: hesap gelen bilgiyle açılır, kullanıcı profilinden değiştirebilir."
+      }
+    },
+    "de": {
+      "appleAuth": {
+        "adm_title": "Apple-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Apple für Ihre Seite einrichten.",
+        "signInWith": "Mit Apple anmelden",
+        "adm_keyNote": "Apple hat kein Client Secret, sondern erwartet ein kurzlebiges Token, das Sie selbst signieren. Hinterlegen Sie die Services ID als AUTH_APPLE_ID, die Team- und Key-Kennungen sowie den Inhalt der .p8-Datei als AUTH_APPLE_PRIVATE_KEY - Zeilenumbrüche dürfen als \\n geschrieben werden. Das Token wird beim Start erzeugt und gilt sechs Monate; ein Neustart in dieser Zeit genügt Apple als Rotation.",
+        "adm_nameNote": "Apple sendet den Namen nur beim ersten Zustimmen und erlaubt es, die Adresse hinter einem privaten Relay zu verbergen. Beides ist normal: Das Konto behält, was ankam, und die Person kann es im Profil ändern."
+      }
+    },
+    "es": {
+      "appleAuth": {
+        "adm_title": "Inicio de sesión con Apple",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Apple para tu sitio.",
+        "signInWith": "Iniciar sesión con Apple",
+        "adm_keyNote": "Apple no usa un secreto de cliente: espera un token de vida corta que firmas tú. Indica el Services ID como AUTH_APPLE_ID, los identificadores de equipo y de clave, y el contenido del archivo .p8 como AUTH_APPLE_PRIVATE_KEY; los saltos de línea pueden escribirse como \\n. El token se genera al arrancar el sitio y vale seis meses, así que un reinicio dentro de ese plazo es toda la rotación que Apple pide.",
+        "adm_nameNote": "Apple envía el nombre solo la primera vez que la persona aprueba tu sitio y le permite ocultar su dirección tras un relay privado. Ambas cosas son normales: la cuenta conserva lo que llegó y el usuario puede cambiarlo en su perfil."
+      }
+    },
+    "fr": {
+      "appleAuth": {
+        "adm_title": "Connexion Apple",
+        "adm_subtitle": "Configurez la connexion OAuth Apple pour votre site.",
+        "signInWith": "Se connecter avec Apple",
+        "adm_keyNote": "Apple n'a pas de secret client : il attend un jeton de courte durée que vous signez vous-même. Donnez le Services ID dans AUTH_APPLE_ID, les identifiants d'équipe et de clé, et le contenu du fichier .p8 dans AUTH_APPLE_PRIVATE_KEY - les retours à la ligne peuvent s'écrire \\n. Le jeton est produit au démarrage du site et vaut six mois : un redémarrage dans ce délai suffit comme rotation.",
+        "adm_nameNote": "Apple n'envoie le nom que la première fois que la personne approuve votre site, et lui permet de masquer son adresse derrière un relais privé. C'est normal : le compte garde ce qui est arrivé et l'utilisateur peut le modifier dans son profil."
+      }
+    },
+    "ru": {
+      "appleAuth": {
+        "adm_title": "Вход через Apple",
+        "adm_subtitle": "Настройте вход на сайт через Apple по OAuth.",
+        "signInWith": "Войти через Apple",
+        "adm_keyNote": "У Apple нет client secret: он ждёт короткоживущий токен, который вы подписываете сами. Укажите Services ID в AUTH_APPLE_ID, идентификаторы команды и ключа, а содержимое файла .p8 - в AUTH_APPLE_PRIVATE_KEY; переносы строк можно записать как \\n. Токен создаётся при запуске сайта и действует шесть месяцев, так что перезапуск в этот срок и есть вся нужная Apple ротация.",
+        "adm_nameNote": "Apple присылает имя только при первом подтверждении вашего сайта и разрешает скрыть адрес за приватным ретранслятором. И то и другое нормально: аккаунт сохраняет пришедшее, а пользователь может изменить это в профиле."
+      }
+    },
+    "pt": {
+      "appleAuth": {
+        "adm_title": "Início de sessão com Apple",
+        "adm_subtitle": "Configure o início de sessão OAuth com Apple no seu site.",
+        "signInWith": "Entrar com Apple",
+        "adm_keyNote": "A Apple não usa um segredo de cliente: espera um token de vida curta que assina você mesmo. Indique o Services ID em AUTH_APPLE_ID, os identificadores de equipa e de chave, e o conteúdo do ficheiro .p8 em AUTH_APPLE_PRIVATE_KEY - as quebras de linha podem ser escritas como \\n. O token é gerado no arranque do site e vale seis meses, por isso um reinício dentro desse prazo é toda a rotação que a Apple pede.",
+        "adm_nameNote": "A Apple envia o nome apenas na primeira vez que a pessoa aprova o seu site e permite-lhe esconder o endereço atrás de um relay privado. Ambas as coisas são normais: a conta guarda o que chegou e o utilizador pode alterá-lo no perfil."
+      }
+    }
+  }
+}

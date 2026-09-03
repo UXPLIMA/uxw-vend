@@ -1,0 +1,99 @@
+{
+  "id": "naver-auth",
+  "name": "Naver Login",
+  "description": "Allow users to sign in with their Naver account",
+  "version": "1.0.0",
+  "coreVersion": "^1.0.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "Compass",
+  "adminRoutes": [
+    {
+      "path": "/settings/naver-auth",
+      "component": "pages/admin/settings/naver-auth/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Naver OAuth",
+      "description": "Naver application credentials.",
+      "href": "/settings/naver-auth",
+      "icon": "Compass",
+      "color": "text-green-500"
+    }
+  ],
+  "authProviders": [
+    {
+      "id": "naver",
+      "envIdVar": "AUTH_NAVER_ID",
+      "envSecretVar": "AUTH_NAVER_SECRET"
+    }
+  ],
+  "oauthButtons": [
+    {
+      "id": "naver-login",
+      "provider": "naver",
+      "label": "Naver",
+      "color": "#03C75A",
+      "svgIcon": "M16.273 12.845 7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727v12.845Z"
+    }
+  ],
+  "translations": {
+    "en": {
+      "naverAuth": {
+        "adm_title": "Naver Login Settings",
+        "adm_subtitle": "Set up Naver OAuth sign-in for your site.",
+        "signInWith": "Sign in with Naver",
+        "adm_reviewNote": "Naver reviews an application before it may serve users outside the developer's own account, so a new integration works for you immediately and for everyone else once it is approved."
+      }
+    },
+    "tr": {
+      "naverAuth": {
+        "adm_title": "Naver ile Giriş Ayarları",
+        "adm_subtitle": "Siteniz için Naver ile OAuth girişini yapılandırın.",
+        "signInWith": "Naver ile giriş yap",
+        "adm_reviewNote": "Naver, bir uygulamanın geliştirici hesabı dışındaki kullanıcılara hizmet vermesini incelemeye tabi tutar; yeni bir entegrasyon sizde hemen, herkeste ise onaydan sonra çalışır."
+      }
+    },
+    "de": {
+      "naverAuth": {
+        "adm_title": "Naver-Anmeldung",
+        "adm_subtitle": "OAuth-Anmeldung über Naver für Ihre Seite einrichten.",
+        "signInWith": "Mit Naver anmelden",
+        "adm_reviewNote": "Naver prüft eine Anwendung, bevor sie Nutzer ausserhalb des Entwicklerkontos bedienen darf: Eine neue Integration funktioniert bei Ihnen sofort und für alle anderen nach der Freigabe."
+      }
+    },
+    "es": {
+      "naverAuth": {
+        "adm_title": "Inicio de sesión con Naver",
+        "adm_subtitle": "Configura el inicio de sesión OAuth con Naver para tu sitio.",
+        "signInWith": "Iniciar sesión con Naver",
+        "adm_reviewNote": "Naver revisa la aplicación antes de que pueda atender a usuarios ajenos a la cuenta del desarrollador, así que una integración nueva te funciona de inmediato y al resto tras la aprobación."
+      }
+    },
+    "fr": {
+      "naverAuth": {
+        "adm_title": "Connexion Naver",
+        "adm_subtitle": "Configurez la connexion OAuth Naver pour votre site.",
+        "signInWith": "Se connecter avec Naver",
+        "adm_reviewNote": "Naver examine une application avant qu'elle puisse servir des utilisateurs hors du compte développeur : une nouvelle intégration fonctionne tout de suite pour vous, et pour les autres une fois approuvée."
+      }
+    },
+    "ru": {
+      "naverAuth": {
+        "adm_title": "Вход через Naver",
+        "adm_subtitle": "Настройте вход на сайт через Naver по OAuth.",
+        "signInWith": "Войти через Naver",
+        "adm_reviewNote": "Naver проверяет приложение, прежде чем оно сможет обслуживать пользователей за пределами аккаунта разработчика: новая интеграция сразу работает у вас и у остальных после одобрения."
+      }
+    },
+    "pt": {
+      "naverAuth": {
+        "adm_title": "Início de sessão com Naver",
+        "adm_subtitle": "Configure o início de sessão OAuth com Naver no seu site.",
+        "signInWith": "Entrar com Naver",
+        "adm_reviewNote": "A Naver revê a aplicação antes de esta poder servir utilizadores fora da conta do programador, por isso uma integração nova funciona já consigo e para os restantes depois da aprovação."
+      }
+    }
+  }
+}
