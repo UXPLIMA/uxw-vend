@@ -495,6 +495,9 @@ function checkNoAnyTypes(modulePath: string): CheckResult {
     return { name: "No 'any' types", passed: true, message: "No 'any' types found" };
 }
 
+/** `@provider-callback:` followed by an actual reason, not just the marker. */
+const PROVIDER_CALLBACK = /@provider-callback:[ \t]*\S+/;
+
 function checkApiAuthChecks(modulePath: string): CheckResult {
     function walkFiles(dir: string): string[] {
         const results: string[] = [];
@@ -542,7 +545,20 @@ function checkApiAuthChecks(modulePath: string): CheckResult {
                 // than a session check for that endpoint. Both markers below
                 // are signature verification and cannot appear by accident.
                 content.includes("webhooks.constructEvent(") ||
-                content.includes("timingSafeEqual(");
+                content.includes("timingSafeEqual(") ||
+                // Not every provider signs its callbacks. Several answer the
+                // question the other way round: the callback carries nothing
+                // but an opaque id, and the route asks the provider's API,
+                // with the site's own credentials, what that id is worth. That
+                // is authentication too, and it leaves no marker in the source
+                // this check could recognise - so the route says so itself,
+                // with a reason:
+                //
+                //     // @provider-callback: Mollie posts only a payment id;
+                //     // the status is read back from Mollie with our API key.
+                //
+                // The reason is required. A bare marker is not a bypass.
+                PROVIDER_CALLBACK.test(content);
 
             if (!hasAuthCheck) {
                 const relPath = path.relative(modulePath, file);
@@ -556,7 +572,10 @@ function checkApiAuthChecks(modulePath: string): CheckResult {
             name: "API auth checks",
             passed: false,
             message: `${violations.length} write endpoint(s) without auth:\n      ${violations.join("\n      ")}`,
-            suggestion: "Add auth checks (auth(), isAdmin(), etc.) to POST/PUT/DELETE/PATCH handlers.",
+            suggestion:
+                "Add auth checks (auth(), isAdmin(), etc.) to POST/PUT/DELETE/PATCH handlers. " +
+                "A provider callback that verifies by calling the provider back marks itself " +
+                "'@provider-callback: <why>' instead.",
         };
     }
 

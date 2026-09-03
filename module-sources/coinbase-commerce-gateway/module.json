@@ -1,0 +1,165 @@
+{
+  "id": "coinbase-commerce-gateway",
+  "name": "Coinbase Commerce Gateway",
+  "description": "Take Bitcoin, Ethereum, USDC and other crypto payments through Coinbase Commerce",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Bitcoin",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "Coinbase Commerce",
+      "description": "Coinbase Commerce API key and webhook secret.",
+      "href": "/settings/coinbase-commerce",
+      "icon": "Bitcoin",
+      "color": "text-blue-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Coinbase Commerce Settings",
+      "path": "/settings/coinbase-commerce",
+      "icon": "Bitcoin"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/coinbase-commerce",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/coinbase-commerce/webhook",
+      "handler": "api/webhook/route.ts",
+      "method": "POST",
+      "description": "Coinbase Commerce webhook. Verifies the signature and settles a charge once it is confirmed."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Coinbase Commerce Settings",
+        "adm_subtitle": "Keys for taking payments through Coinbase Commerce.",
+        "adm_apiKey": "API Key",
+        "adm_apiKeyDesc": "From your Coinbase Commerce dashboard.",
+        "adm_webhookSecret": "Webhook Secret",
+        "adm_webhookSecretDesc": "From your Coinbase Commerce dashboard. Point the Coinbase Commerce notification URL at /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Coinbase Commerce Gateway",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Coinbase Commerce Settings"
+      }
+    },
+    "tr": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Coinbase Commerce Ayarları",
+        "adm_subtitle": "Coinbase Commerce ile ödeme almak için gereken anahtarlar.",
+        "adm_apiKey": "API Anahtarı",
+        "adm_apiKeyDesc": "Coinbase Commerce panelinden alınır.",
+        "adm_webhookSecret": "Webhook Gizli Anahtarı",
+        "adm_webhookSecretDesc": "Coinbase Commerce panelinden alınır. Coinbase Commerce bildirim adresini /api/v1/coinbase-commerce/webhook olarak ayarlayın."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Coinbase Commerce Ödeme",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Coinbase Commerce Ayarları"
+      }
+    },
+    "de": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Coinbase Commerce-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über Coinbase Commerce anzunehmen.",
+        "adm_apiKey": "API-Schlüssel",
+        "adm_apiKeyDesc": "Aus Ihrem Coinbase Commerce-Dashboard.",
+        "adm_webhookSecret": "Webhook-Signaturschlüssel",
+        "adm_webhookSecretDesc": "Aus Ihrem Coinbase Commerce-Dashboard. Richten Sie die Coinbase Commerce-Benachrichtigungs-URL auf /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Coinbase Commerce-Gateway",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Coinbase Commerce-Einstellungen"
+      }
+    },
+    "es": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Configuración de Coinbase Commerce",
+        "adm_subtitle": "Claves para aceptar pagos con Coinbase Commerce.",
+        "adm_apiKey": "Clave de API",
+        "adm_apiKeyDesc": "Desde tu panel de Coinbase Commerce.",
+        "adm_webhookSecret": "Secreto del webhook",
+        "adm_webhookSecretDesc": "Desde tu panel de Coinbase Commerce. Apunta la URL de notificaciones de Coinbase Commerce a /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Pasarela Coinbase Commerce",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Configuración de Coinbase Commerce"
+      }
+    },
+    "fr": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Paramètres Coinbase Commerce",
+        "adm_subtitle": "Clés pour encaisser des paiements via Coinbase Commerce.",
+        "adm_apiKey": "Clé API",
+        "adm_apiKeyDesc": "Depuis votre tableau de bord Coinbase Commerce.",
+        "adm_webhookSecret": "Secret du webhook",
+        "adm_webhookSecretDesc": "Depuis votre tableau de bord Coinbase Commerce. Faites pointer l'URL de notification Coinbase Commerce vers /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Passerelle Coinbase Commerce",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Paramètres Coinbase Commerce"
+      }
+    },
+    "ru": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Настройки Coinbase Commerce",
+        "adm_subtitle": "Ключи для приёма платежей через Coinbase Commerce.",
+        "adm_apiKey": "API-ключ",
+        "adm_apiKeyDesc": "Из панели Coinbase Commerce.",
+        "adm_webhookSecret": "Секрет вебхука",
+        "adm_webhookSecretDesc": "Из панели Coinbase Commerce. Укажите в Coinbase Commerce адрес уведомлений /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Шлюз Coinbase Commerce",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Настройки Coinbase Commerce"
+      }
+    },
+    "pt": {
+      "coinbaseCommerceGateway": {
+        "adm_title": "Configurações do Coinbase Commerce",
+        "adm_subtitle": "Chaves para receber pagamentos via Coinbase Commerce.",
+        "adm_apiKey": "Chave de API",
+        "adm_apiKeyDesc": "No painel do Coinbase Commerce.",
+        "adm_webhookSecret": "Segredo do webhook",
+        "adm_webhookSecretDesc": "No painel do Coinbase Commerce. Aponte a URL de notificação do Coinbase Commerce para /api/v1/coinbase-commerce/webhook."
+      },
+      "admin": {
+        "menu_coinbase-commerce-gateway": "Gateway Coinbase Commerce",
+        "menu_coinbase-commerce-gateway_coinbase_commerce_settings": "Configurações do Coinbase Commerce"
+      }
+    }
+  }
+}

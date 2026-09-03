@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `subscription.changed` - and knows nothing about who answers. The four a
   gateway fires are filters rather than actions so a webhook nobody handled
   fails and the provider retries, instead of being acknowledged and lost.
+- **Twelve more payment gateways**, each a module of its own: iyzico, PayTR and
+  Param for Turkey; Coinbase Commerce, NOWPayments and CoinPayments for crypto;
+  Mollie, paysafecard and Paymentwall for Europe; Razorpay, Mercado Pago and
+  Midtrans for India, Latin America and Indonesia. Each offers itself only in
+  the currencies it can actually settle, so a lira order does not draw a button
+  that would refuse it, and each verifies its own callbacks: an HMAC where the
+  provider signs one, and a read-back with the site's own credentials where it
+  does not.
 - Filters can declare what they are asked *about*, not just what flows through
   them. `UxwVendFilterContexts` types the second half of a filter contract at
   the call site and in every listener; filters that declare nothing behave
@@ -43,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   owner can read one back.
 
 ### Changed
+- `npm run validate:module` lets a provider callback that authenticates by
+  calling the provider back say so, with `@provider-callback: <why>`. The auth
+  check knew how to recognise a signature check and nothing else, which is a
+  gap for Mollie and Mercado Pago, whose callbacks carry only an id.
 - **`stripe-gateway` and `paypal-gateway` are real modules.** They were a
   manifest and a settings page while the store did the work; they now own their
   own keys, their own tables and their own webhooks, and the store owns

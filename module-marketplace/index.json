@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-03",
-  "updatedAt": "2026-09-03T15:40:23Z",
+  "updatedAt": "2026-09-03T16:10:38Z",
   "modules": [
     {
       "id": "announcements",
@@ -13,7 +13,7 @@
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -46,7 +46,7 @@
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -84,7 +84,7 @@
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -117,7 +117,7 @@
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -146,7 +146,7 @@
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -166,6 +166,80 @@
       }
     },
     {
+      "id": "coinbase-commerce-gateway",
+      "name": "Coinbase Commerce Gateway",
+      "description": "Take Bitcoin, Ethereum, USDC and other crypto payments through Coinbase Commerce",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Bitcoin",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "coinbase-commerce-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "coinpayments-gateway",
+      "name": "CoinPayments Gateway",
+      "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Bitcoin",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "coinpayments-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "cookie-consent",
       "name": "Cookie Consent",
       "description": "GDPR cookie consent banner",
@@ -175,7 +249,7 @@
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -204,7 +278,7 @@
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -235,7 +309,7 @@
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -264,7 +338,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -293,7 +367,7 @@
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -327,7 +401,7 @@
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -356,7 +430,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -385,7 +459,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -421,7 +495,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -452,7 +526,7 @@
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -483,7 +557,7 @@
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -512,7 +586,7 @@
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -541,7 +615,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -577,7 +651,7 @@
       "icon": "Code2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -606,7 +680,7 @@
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -635,7 +709,7 @@
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -664,7 +738,7 @@
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -695,7 +769,7 @@
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -715,6 +789,42 @@
       }
     },
     {
+      "id": "iyzico-gateway",
+      "name": "iyzico Payment Gateway",
+      "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "CreditCard",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "iyzico-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "leaderboard",
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
@@ -724,7 +834,7 @@
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -755,7 +865,7 @@
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -788,7 +898,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -808,6 +918,82 @@
       }
     },
     {
+      "id": "mercadopago-gateway",
+      "name": "Mercado Pago Gateway",
+      "description": "Take card, Pix, boleto and cash payments across Latin America through Mercado Pago",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Wallet",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "mercadopago-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "midtrans-gateway",
+      "name": "Midtrans Gateway",
+      "description": "Take bank transfer, e-wallet, convenience store and card payments in Indonesia through Midtrans",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Smartphone",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "midtrans-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "minecraft-link",
       "name": "Minecraft Link",
       "description": "Let players prove they own an in-game Minecraft account by reading a code whispered to them on the server",
@@ -817,7 +1003,7 @@
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -843,6 +1029,156 @@
       }
     },
     {
+      "id": "mollie-gateway",
+      "name": "Mollie Payment Gateway",
+      "description": "Take iDEAL, Bancontact, SEPA and card payments through Mollie",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Landmark",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "mollie-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "nowpayments-gateway",
+      "name": "NOWPayments Gateway",
+      "description": "Take payments in 200+ cryptocurrencies through NOWPayments",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Bitcoin",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "nowpayments-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "param-gateway",
+      "name": "Param Payment Gateway",
+      "description": "Take Turkish card and instalment payments through Param (TurkPos)",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "CreditCard",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "param-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "paymentwall-gateway",
+      "name": "Paymentwall Gateway",
+      "description": "Take local payments, wallets and mobile billing through Paymentwall",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Globe",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "paymentwall-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "paypal-gateway",
       "name": "PayPal Payment Gateway",
       "description": "Take payments through PayPal, with a balance or a linked card",
@@ -852,7 +1188,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -879,6 +1215,80 @@
       }
     },
     {
+      "id": "paysafecard-gateway",
+      "name": "paysafecard Gateway",
+      "description": "Take prepaid voucher payments through paysafecard, for buyers with no card or bank account",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Ticket",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "paysafecard-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "paytr-gateway",
+      "name": "PayTR Payment Gateway",
+      "description": "Take Turkish card, instalment and bank transfer payments through PayTR",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "CreditCard",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "paytr-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "player-profiles",
       "name": "Player Profiles",
       "description": "Public player profile pages",
@@ -888,7 +1298,7 @@
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -917,7 +1327,7 @@
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -946,7 +1356,7 @@
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -969,6 +1379,44 @@
       }
     },
     {
+      "id": "razorpay-gateway",
+      "name": "Razorpay Gateway",
+      "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
+      "version": "1.0.0",
+      "coreVersion": "^1.3.0",
+      "author": "uxwVend",
+      "icon": "Smartphone",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-03T16:10:38Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "razorpay-gateway.zip",
+      "dependencies": [
+        "store@^2.0.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.settled",
+          "payment.voided",
+          "payment.refunded"
+        ],
+        "listens": [
+          "payment.providers",
+          "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
       "id": "referral",
       "name": "Referral System",
       "description": "Earn credits by referring new users",
@@ -978,7 +1426,7 @@
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1011,7 +1459,7 @@
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1042,7 +1490,7 @@
       "icon": "Boxes",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1071,7 +1519,7 @@
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1100,7 +1548,7 @@
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1131,7 +1579,7 @@
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1160,7 +1608,7 @@
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1189,7 +1637,7 @@
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1218,7 +1666,7 @@
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1263,7 +1711,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1302,7 +1750,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1338,7 +1786,7 @@
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1372,7 +1820,7 @@
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1403,7 +1851,7 @@
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1432,7 +1880,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1464,7 +1912,7 @@
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1497,7 +1945,7 @@
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1526,7 +1974,7 @@
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-03T15:40:23Z",
+      "updatedAt": "2026-09-03T16:10:38Z",
       "screenshots": [],
       "tags": [
         "commerce"

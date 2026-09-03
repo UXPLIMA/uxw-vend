@@ -1,0 +1,207 @@
+{
+  "id": "param-gateway",
+  "name": "Param Payment Gateway",
+  "description": "Take Turkish card and instalment payments through Param (TurkPos)",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "CreditCard",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "Param",
+      "description": "Param terminal credentials and mode.",
+      "href": "/settings/param",
+      "icon": "CreditCard",
+      "color": "text-sky-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Param Settings",
+      "path": "/settings/param",
+      "icon": "CreditCard"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/param",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/param/callback",
+      "handler": "api/callback/route.ts",
+      "method": "POST",
+      "description": "Where Param posts the result of a payment. Reads the payment back from Param before settling it."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "paramGateway": {
+        "adm_title": "Param Settings",
+        "adm_subtitle": "Keys for taking payments through Param.",
+        "adm_clientCode": "Client Code",
+        "adm_clientCodeDesc": "From your Param dashboard.",
+        "adm_clientUser": "Client Username",
+        "adm_clientUserDesc": "From your Param dashboard.",
+        "adm_clientPass": "Client Password",
+        "adm_clientPassDesc": "From your Param dashboard.",
+        "adm_guid": "Terminal GUID",
+        "adm_guidDesc": "From your Param dashboard.",
+        "adm_sandbox": "Sandbox Mode",
+        "adm_sandboxDesc": "Set to true to use the Param test environment."
+      },
+      "admin": {
+        "menu_param-gateway": "Param Gateway",
+        "menu_param-gateway_param_settings": "Param Settings"
+      }
+    },
+    "tr": {
+      "paramGateway": {
+        "adm_title": "Param Ayarları",
+        "adm_subtitle": "Param ile ödeme almak için gereken anahtarlar.",
+        "adm_clientCode": "Müşteri Kodu",
+        "adm_clientCodeDesc": "Param panelinden alınır.",
+        "adm_clientUser": "Müşteri Kullanıcı Adı",
+        "adm_clientUserDesc": "Param panelinden alınır.",
+        "adm_clientPass": "Müşteri Şifresi",
+        "adm_clientPassDesc": "Param panelinden alınır.",
+        "adm_guid": "Terminal GUID",
+        "adm_guidDesc": "Param panelinden alınır.",
+        "adm_sandbox": "Test Ortamı",
+        "adm_sandboxDesc": "Param test ortamı için true yazın."
+      },
+      "admin": {
+        "menu_param-gateway": "Param Ödeme",
+        "menu_param-gateway_param_settings": "Param Ayarları"
+      }
+    },
+    "de": {
+      "paramGateway": {
+        "adm_title": "Param-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über Param anzunehmen.",
+        "adm_clientCode": "Kundennummer",
+        "adm_clientCodeDesc": "Aus Ihrem Param-Dashboard.",
+        "adm_clientUser": "Kunden-Benutzername",
+        "adm_clientUserDesc": "Aus Ihrem Param-Dashboard.",
+        "adm_clientPass": "Kunden-Passwort",
+        "adm_clientPassDesc": "Aus Ihrem Param-Dashboard.",
+        "adm_guid": "Terminal-GUID",
+        "adm_guidDesc": "Aus Ihrem Param-Dashboard.",
+        "adm_sandbox": "Sandbox-Modus",
+        "adm_sandboxDesc": "true für die Param-Testumgebung."
+      },
+      "admin": {
+        "menu_param-gateway": "Param-Gateway",
+        "menu_param-gateway_param_settings": "Param-Einstellungen"
+      }
+    },
+    "es": {
+      "paramGateway": {
+        "adm_title": "Configuración de Param",
+        "adm_subtitle": "Claves para aceptar pagos con Param.",
+        "adm_clientCode": "Código de cliente",
+        "adm_clientCodeDesc": "Desde tu panel de Param.",
+        "adm_clientUser": "Usuario de cliente",
+        "adm_clientUserDesc": "Desde tu panel de Param.",
+        "adm_clientPass": "Contraseña de cliente",
+        "adm_clientPassDesc": "Desde tu panel de Param.",
+        "adm_guid": "GUID del terminal",
+        "adm_guidDesc": "Desde tu panel de Param.",
+        "adm_sandbox": "Modo de pruebas",
+        "adm_sandboxDesc": "Escribe true para usar el entorno de pruebas de Param."
+      },
+      "admin": {
+        "menu_param-gateway": "Pasarela Param",
+        "menu_param-gateway_param_settings": "Configuración de Param"
+      }
+    },
+    "fr": {
+      "paramGateway": {
+        "adm_title": "Paramètres Param",
+        "adm_subtitle": "Clés pour encaisser des paiements via Param.",
+        "adm_clientCode": "Code client",
+        "adm_clientCodeDesc": "Depuis votre tableau de bord Param.",
+        "adm_clientUser": "Nom d'utilisateur client",
+        "adm_clientUserDesc": "Depuis votre tableau de bord Param.",
+        "adm_clientPass": "Mot de passe client",
+        "adm_clientPassDesc": "Depuis votre tableau de bord Param.",
+        "adm_guid": "GUID du terminal",
+        "adm_guidDesc": "Depuis votre tableau de bord Param.",
+        "adm_sandbox": "Mode bac à sable",
+        "adm_sandboxDesc": "Mettez true pour l'environnement de test Param."
+      },
+      "admin": {
+        "menu_param-gateway": "Passerelle Param",
+        "menu_param-gateway_param_settings": "Paramètres Param"
+      }
+    },
+    "ru": {
+      "paramGateway": {
+        "adm_title": "Настройки Param",
+        "adm_subtitle": "Ключи для приёма платежей через Param.",
+        "adm_clientCode": "Код клиента",
+        "adm_clientCodeDesc": "Из панели Param.",
+        "adm_clientUser": "Имя пользователя клиента",
+        "adm_clientUserDesc": "Из панели Param.",
+        "adm_clientPass": "Пароль клиента",
+        "adm_clientPassDesc": "Из панели Param.",
+        "adm_guid": "GUID терминала",
+        "adm_guidDesc": "Из панели Param.",
+        "adm_sandbox": "Тестовый режим",
+        "adm_sandboxDesc": "Укажите true для тестовой среды Param."
+      },
+      "admin": {
+        "menu_param-gateway": "Шлюз Param",
+        "menu_param-gateway_param_settings": "Настройки Param"
+      }
+    },
+    "pt": {
+      "paramGateway": {
+        "adm_title": "Configurações do Param",
+        "adm_subtitle": "Chaves para receber pagamentos via Param.",
+        "adm_clientCode": "Código do cliente",
+        "adm_clientCodeDesc": "No painel do Param.",
+        "adm_clientUser": "Utilizador do cliente",
+        "adm_clientUserDesc": "No painel do Param.",
+        "adm_clientPass": "Palavra-passe do cliente",
+        "adm_clientPassDesc": "No painel do Param.",
+        "adm_guid": "GUID do terminal",
+        "adm_guidDesc": "No painel do Param.",
+        "adm_sandbox": "Modo de testes",
+        "adm_sandboxDesc": "Defina true para usar o ambiente de testes do Param."
+      },
+      "admin": {
+        "menu_param-gateway": "Gateway Param",
+        "menu_param-gateway_param_settings": "Configurações do Param"
+      }
+    }
+  }
+}

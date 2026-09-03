@@ -1,0 +1,169 @@
+{
+  "id": "mercadopago-gateway",
+  "name": "Mercado Pago Gateway",
+  "description": "Take card, Pix, boleto and cash payments across Latin America through Mercado Pago",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Wallet",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "Mercado Pago",
+      "description": "Mercado Pago access token and webhook secret.",
+      "href": "/settings/mercadopago",
+      "icon": "Wallet",
+      "color": "text-yellow-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "Mercado Pago Settings",
+      "path": "/settings/mercadopago",
+      "icon": "Wallet"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/mercadopago",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/mercadopago/webhook",
+      "handler": "api/webhook/route.ts",
+      "method": "POST",
+      "description": "Mercado Pago notification. Reads the payment back and reports it through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.refunded",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "mercadopagoGateway": {
+        "adm_title": "Mercado Pago Settings",
+        "adm_subtitle": "Keys for taking payments through Mercado Pago.",
+        "adm_accessToken": "Access Token",
+        "adm_accessTokenDesc": "From your Mercado Pago dashboard.",
+        "adm_webhookSecret": "Webhook Secret",
+        "adm_webhookSecretDesc": "From your Mercado Pago dashboard. Point the Mercado Pago notification URL at /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Mercado Pago Gateway",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Mercado Pago Settings"
+      }
+    },
+    "tr": {
+      "mercadopagoGateway": {
+        "adm_title": "Mercado Pago Ayarları",
+        "adm_subtitle": "Mercado Pago ile ödeme almak için gereken anahtarlar.",
+        "adm_accessToken": "Erişim Anahtarı",
+        "adm_accessTokenDesc": "Mercado Pago panelinden alınır.",
+        "adm_webhookSecret": "Webhook Gizli Anahtarı",
+        "adm_webhookSecretDesc": "Mercado Pago panelinden alınır. Mercado Pago bildirim adresini /api/v1/mercadopago/webhook olarak ayarlayın."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Mercado Pago Ödeme",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Mercado Pago Ayarları"
+      }
+    },
+    "de": {
+      "mercadopagoGateway": {
+        "adm_title": "Mercado Pago-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über Mercado Pago anzunehmen.",
+        "adm_accessToken": "Zugriffstoken",
+        "adm_accessTokenDesc": "Aus Ihrem Mercado Pago-Dashboard.",
+        "adm_webhookSecret": "Webhook-Signaturschlüssel",
+        "adm_webhookSecretDesc": "Aus Ihrem Mercado Pago-Dashboard. Richten Sie die Mercado Pago-Benachrichtigungs-URL auf /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Mercado Pago-Gateway",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Mercado Pago-Einstellungen"
+      }
+    },
+    "es": {
+      "mercadopagoGateway": {
+        "adm_title": "Configuración de Mercado Pago",
+        "adm_subtitle": "Claves para aceptar pagos con Mercado Pago.",
+        "adm_accessToken": "Token de acceso",
+        "adm_accessTokenDesc": "Desde tu panel de Mercado Pago.",
+        "adm_webhookSecret": "Secreto del webhook",
+        "adm_webhookSecretDesc": "Desde tu panel de Mercado Pago. Apunta la URL de notificaciones de Mercado Pago a /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Pasarela Mercado Pago",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Configuración de Mercado Pago"
+      }
+    },
+    "fr": {
+      "mercadopagoGateway": {
+        "adm_title": "Paramètres Mercado Pago",
+        "adm_subtitle": "Clés pour encaisser des paiements via Mercado Pago.",
+        "adm_accessToken": "Jeton d'accès",
+        "adm_accessTokenDesc": "Depuis votre tableau de bord Mercado Pago.",
+        "adm_webhookSecret": "Secret du webhook",
+        "adm_webhookSecretDesc": "Depuis votre tableau de bord Mercado Pago. Faites pointer l'URL de notification Mercado Pago vers /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Passerelle Mercado Pago",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Paramètres Mercado Pago"
+      }
+    },
+    "ru": {
+      "mercadopagoGateway": {
+        "adm_title": "Настройки Mercado Pago",
+        "adm_subtitle": "Ключи для приёма платежей через Mercado Pago.",
+        "adm_accessToken": "Токен доступа",
+        "adm_accessTokenDesc": "Из панели Mercado Pago.",
+        "adm_webhookSecret": "Секрет вебхука",
+        "adm_webhookSecretDesc": "Из панели Mercado Pago. Укажите в Mercado Pago адрес уведомлений /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Шлюз Mercado Pago",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Настройки Mercado Pago"
+      }
+    },
+    "pt": {
+      "mercadopagoGateway": {
+        "adm_title": "Configurações do Mercado Pago",
+        "adm_subtitle": "Chaves para receber pagamentos via Mercado Pago.",
+        "adm_accessToken": "Token de acesso",
+        "adm_accessTokenDesc": "No painel do Mercado Pago.",
+        "adm_webhookSecret": "Segredo do webhook",
+        "adm_webhookSecretDesc": "No painel do Mercado Pago. Aponte a URL de notificação do Mercado Pago para /api/v1/mercadopago/webhook."
+      },
+      "admin": {
+        "menu_mercadopago-gateway": "Gateway Mercado Pago",
+        "menu_mercadopago-gateway_mercado_pago_settings": "Configurações do Mercado Pago"
+      }
+    }
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "id": "paytr-gateway",
+  "name": "PayTR Payment Gateway",
+  "description": "Take Turkish card, instalment and bank transfer payments through PayTR",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "CreditCard",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "PayTR",
+      "description": "PayTR merchant credentials and mode.",
+      "href": "/settings/paytr",
+      "icon": "CreditCard",
+      "color": "text-orange-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "PayTR Settings",
+      "path": "/settings/paytr",
+      "icon": "CreditCard"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/paytr",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/paytr/callback",
+      "handler": "api/callback/route.ts",
+      "method": "POST",
+      "description": "PayTR payment notification. Verifies the hash and reports the payment through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "paytrGateway": {
+        "adm_title": "PayTR Settings",
+        "adm_subtitle": "Keys for taking payments through PayTR.",
+        "adm_merchantId": "Merchant ID",
+        "adm_merchantIdDesc": "From your PayTR dashboard.",
+        "adm_merchantKey": "Merchant Key",
+        "adm_merchantKeyDesc": "From your PayTR dashboard.",
+        "adm_merchantSalt": "Merchant Salt",
+        "adm_merchantSaltDesc": "From your PayTR dashboard. Point the PayTR notification URL at /api/v1/paytr/callback.",
+        "adm_sandbox": "Sandbox Mode",
+        "adm_sandboxDesc": "Set to true to use the PayTR test environment."
+      },
+      "admin": {
+        "menu_paytr-gateway": "PayTR Gateway",
+        "menu_paytr-gateway_paytr_settings": "PayTR Settings"
+      }
+    },
+    "tr": {
+      "paytrGateway": {
+        "adm_title": "PayTR Ayarları",
+        "adm_subtitle": "PayTR ile ödeme almak için gereken anahtarlar.",
+        "adm_merchantId": "Üye İşyeri Numarası",
+        "adm_merchantIdDesc": "PayTR panelinden alınır.",
+        "adm_merchantKey": "Üye İşyeri Anahtarı",
+        "adm_merchantKeyDesc": "PayTR panelinden alınır.",
+        "adm_merchantSalt": "Üye İşyeri Salt Değeri",
+        "adm_merchantSaltDesc": "PayTR panelinden alınır. PayTR bildirim adresini /api/v1/paytr/callback olarak ayarlayın.",
+        "adm_sandbox": "Test Ortamı",
+        "adm_sandboxDesc": "PayTR test ortamı için true yazın."
+      },
+      "admin": {
+        "menu_paytr-gateway": "PayTR Ödeme",
+        "menu_paytr-gateway_paytr_settings": "PayTR Ayarları"
+      }
+    },
+    "de": {
+      "paytrGateway": {
+        "adm_title": "PayTR-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über PayTR anzunehmen.",
+        "adm_merchantId": "Händler-ID",
+        "adm_merchantIdDesc": "Aus Ihrem PayTR-Dashboard.",
+        "adm_merchantKey": "Händlerschlüssel",
+        "adm_merchantKeyDesc": "Aus Ihrem PayTR-Dashboard.",
+        "adm_merchantSalt": "Händler-Salt",
+        "adm_merchantSaltDesc": "Aus Ihrem PayTR-Dashboard. Richten Sie die PayTR-Benachrichtigungs-URL auf /api/v1/paytr/callback.",
+        "adm_sandbox": "Sandbox-Modus",
+        "adm_sandboxDesc": "true für die PayTR-Testumgebung."
+      },
+      "admin": {
+        "menu_paytr-gateway": "PayTR-Gateway",
+        "menu_paytr-gateway_paytr_settings": "PayTR-Einstellungen"
+      }
+    },
+    "es": {
+      "paytrGateway": {
+        "adm_title": "Configuración de PayTR",
+        "adm_subtitle": "Claves para aceptar pagos con PayTR.",
+        "adm_merchantId": "ID de comercio",
+        "adm_merchantIdDesc": "Desde tu panel de PayTR.",
+        "adm_merchantKey": "Clave de comercio",
+        "adm_merchantKeyDesc": "Desde tu panel de PayTR.",
+        "adm_merchantSalt": "Salt de comercio",
+        "adm_merchantSaltDesc": "Desde tu panel de PayTR. Apunta la URL de notificaciones de PayTR a /api/v1/paytr/callback.",
+        "adm_sandbox": "Modo de pruebas",
+        "adm_sandboxDesc": "Escribe true para usar el entorno de pruebas de PayTR."
+      },
+      "admin": {
+        "menu_paytr-gateway": "Pasarela PayTR",
+        "menu_paytr-gateway_paytr_settings": "Configuración de PayTR"
+      }
+    },
+    "fr": {
+      "paytrGateway": {
+        "adm_title": "Paramètres PayTR",
+        "adm_subtitle": "Clés pour encaisser des paiements via PayTR.",
+        "adm_merchantId": "Identifiant marchand",
+        "adm_merchantIdDesc": "Depuis votre tableau de bord PayTR.",
+        "adm_merchantKey": "Clé marchand",
+        "adm_merchantKeyDesc": "Depuis votre tableau de bord PayTR.",
+        "adm_merchantSalt": "Salt marchand",
+        "adm_merchantSaltDesc": "Depuis votre tableau de bord PayTR. Faites pointer l'URL de notification PayTR vers /api/v1/paytr/callback.",
+        "adm_sandbox": "Mode bac à sable",
+        "adm_sandboxDesc": "Mettez true pour l'environnement de test PayTR."
+      },
+      "admin": {
+        "menu_paytr-gateway": "Passerelle PayTR",
+        "menu_paytr-gateway_paytr_settings": "Paramètres PayTR"
+      }
+    },
+    "ru": {
+      "paytrGateway": {
+        "adm_title": "Настройки PayTR",
+        "adm_subtitle": "Ключи для приёма платежей через PayTR.",
+        "adm_merchantId": "ID продавца",
+        "adm_merchantIdDesc": "Из панели PayTR.",
+        "adm_merchantKey": "Ключ продавца",
+        "adm_merchantKeyDesc": "Из панели PayTR.",
+        "adm_merchantSalt": "Salt продавца",
+        "adm_merchantSaltDesc": "Из панели PayTR. Укажите в PayTR адрес уведомлений /api/v1/paytr/callback.",
+        "adm_sandbox": "Тестовый режим",
+        "adm_sandboxDesc": "Укажите true для тестовой среды PayTR."
+      },
+      "admin": {
+        "menu_paytr-gateway": "Шлюз PayTR",
+        "menu_paytr-gateway_paytr_settings": "Настройки PayTR"
+      }
+    },
+    "pt": {
+      "paytrGateway": {
+        "adm_title": "Configurações do PayTR",
+        "adm_subtitle": "Chaves para receber pagamentos via PayTR.",
+        "adm_merchantId": "ID do comerciante",
+        "adm_merchantIdDesc": "No painel do PayTR.",
+        "adm_merchantKey": "Chave do comerciante",
+        "adm_merchantKeyDesc": "No painel do PayTR.",
+        "adm_merchantSalt": "Salt do comerciante",
+        "adm_merchantSaltDesc": "No painel do PayTR. Aponte a URL de notificação do PayTR para /api/v1/paytr/callback.",
+        "adm_sandbox": "Modo de testes",
+        "adm_sandboxDesc": "Defina true para usar o ambiente de testes do PayTR."
+      },
+      "admin": {
+        "menu_paytr-gateway": "Gateway PayTR",
+        "menu_paytr-gateway_paytr_settings": "Configurações do PayTR"
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "id": "nowpayments-gateway",
+  "name": "NOWPayments Gateway",
+  "description": "Take payments in 200+ cryptocurrencies through NOWPayments",
+  "version": "1.0.0",
+  "coreVersion": "^1.3.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Bitcoin",
+  "dependencies": [
+    "store@^2.0.0"
+  ],
+  "settingsCards": [
+    {
+      "title": "NOWPayments",
+      "description": "NOWPayments API key and IPN secret.",
+      "href": "/settings/nowpayments",
+      "icon": "Bitcoin",
+      "color": "text-cyan-500"
+    }
+  ],
+  "menu": [
+    {
+      "label": "NOWPayments Settings",
+      "path": "/settings/nowpayments",
+      "icon": "Bitcoin"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/nowpayments",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "api": [
+    {
+      "path": "/nowpayments/ipn",
+      "handler": "api/ipn/route.ts",
+      "method": "POST",
+      "description": "NOWPayments IPN. Verifies the signature and settles a payment once it is final."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.refunded",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "nowpaymentsGateway": {
+        "adm_title": "NOWPayments Settings",
+        "adm_subtitle": "Keys for taking payments through NOWPayments.",
+        "adm_apiKey": "API Key",
+        "adm_apiKeyDesc": "From your NOWPayments dashboard.",
+        "adm_ipnSecret": "IPN Secret",
+        "adm_ipnSecretDesc": "From your NOWPayments dashboard. Point the NOWPayments notification URL at /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "NOWPayments Gateway",
+        "menu_nowpayments-gateway_nowpayments_settings": "NOWPayments Settings"
+      }
+    },
+    "tr": {
+      "nowpaymentsGateway": {
+        "adm_title": "NOWPayments Ayarları",
+        "adm_subtitle": "NOWPayments ile ödeme almak için gereken anahtarlar.",
+        "adm_apiKey": "API Anahtarı",
+        "adm_apiKeyDesc": "NOWPayments panelinden alınır.",
+        "adm_ipnSecret": "IPN Gizli Anahtarı",
+        "adm_ipnSecretDesc": "NOWPayments panelinden alınır. NOWPayments bildirim adresini /api/v1/nowpayments/ipn olarak ayarlayın."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "NOWPayments Ödeme",
+        "menu_nowpayments-gateway_nowpayments_settings": "NOWPayments Ayarları"
+      }
+    },
+    "de": {
+      "nowpaymentsGateway": {
+        "adm_title": "NOWPayments-Einstellungen",
+        "adm_subtitle": "Schlüssel, um Zahlungen über NOWPayments anzunehmen.",
+        "adm_apiKey": "API-Schlüssel",
+        "adm_apiKeyDesc": "Aus Ihrem NOWPayments-Dashboard.",
+        "adm_ipnSecret": "IPN-Geheimnis",
+        "adm_ipnSecretDesc": "Aus Ihrem NOWPayments-Dashboard. Richten Sie die NOWPayments-Benachrichtigungs-URL auf /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "NOWPayments-Gateway",
+        "menu_nowpayments-gateway_nowpayments_settings": "NOWPayments-Einstellungen"
+      }
+    },
+    "es": {
+      "nowpaymentsGateway": {
+        "adm_title": "Configuración de NOWPayments",
+        "adm_subtitle": "Claves para aceptar pagos con NOWPayments.",
+        "adm_apiKey": "Clave de API",
+        "adm_apiKeyDesc": "Desde tu panel de NOWPayments.",
+        "adm_ipnSecret": "Secreto IPN",
+        "adm_ipnSecretDesc": "Desde tu panel de NOWPayments. Apunta la URL de notificaciones de NOWPayments a /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "Pasarela NOWPayments",
+        "menu_nowpayments-gateway_nowpayments_settings": "Configuración de NOWPayments"
+      }
+    },
+    "fr": {
+      "nowpaymentsGateway": {
+        "adm_title": "Paramètres NOWPayments",
+        "adm_subtitle": "Clés pour encaisser des paiements via NOWPayments.",
+        "adm_apiKey": "Clé API",
+        "adm_apiKeyDesc": "Depuis votre tableau de bord NOWPayments.",
+        "adm_ipnSecret": "Secret IPN",
+        "adm_ipnSecretDesc": "Depuis votre tableau de bord NOWPayments. Faites pointer l'URL de notification NOWPayments vers /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "Passerelle NOWPayments",
+        "menu_nowpayments-gateway_nowpayments_settings": "Paramètres NOWPayments"
+      }
+    },
+    "ru": {
+      "nowpaymentsGateway": {
+        "adm_title": "Настройки NOWPayments",
+        "adm_subtitle": "Ключи для приёма платежей через NOWPayments.",
+        "adm_apiKey": "API-ключ",
+        "adm_apiKeyDesc": "Из панели NOWPayments.",
+        "adm_ipnSecret": "Секрет IPN",
+        "adm_ipnSecretDesc": "Из панели NOWPayments. Укажите в NOWPayments адрес уведомлений /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "Шлюз NOWPayments",
+        "menu_nowpayments-gateway_nowpayments_settings": "Настройки NOWPayments"
+      }
+    },
+    "pt": {
+      "nowpaymentsGateway": {
+        "adm_title": "Configurações do NOWPayments",
+        "adm_subtitle": "Chaves para receber pagamentos via NOWPayments.",
+        "adm_apiKey": "Chave de API",
+        "adm_apiKeyDesc": "No painel do NOWPayments.",
+        "adm_ipnSecret": "Segredo IPN",
+        "adm_ipnSecretDesc": "No painel do NOWPayments. Aponte a URL de notificação do NOWPayments para /api/v1/nowpayments/ipn."
+      },
+      "admin": {
+        "menu_nowpayments-gateway": "Gateway NOWPayments",
+        "menu_nowpayments-gateway_nowpayments_settings": "Configurações do NOWPayments"
+      }
+    }
+  }
+}
