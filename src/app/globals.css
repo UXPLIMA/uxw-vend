@@ -188,15 +188,20 @@ body {
  * have no data render null, so the column can come out empty - and an empty
  * column still takes its share of the grid, which reads as content shoved to
  * the left. Hiding the column and letting the content span the full row keeps
- * the page centred. `:empty` ignores comment nodes, so React's Suspense
- * markers do not count as content.
+ * the page centred, and both come back on their own the moment a widget has
+ * something to say.
+ *
+ * "Empty" here means no child that draws anything. Comment nodes never count,
+ * and `<template>` is excluded explicitly because that is what React streams
+ * in place of a Suspense boundary it has not resolved yet: a plain `:empty`
+ * would leave the column reserved until hydration and then collapse it.
  */
-[data-sidebar-layout] > [data-sidebar]:empty {
+[data-sidebar-layout] > [data-sidebar]:not(:has(> :not(template))) {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  [data-sidebar-layout]:has(> [data-sidebar]:empty) > [data-sidebar-main] {
+  [data-sidebar-layout]:has(> [data-sidebar]:not(:has(> :not(template)))) > [data-sidebar-main] {
     grid-column: 1 / -1;
   }
 }

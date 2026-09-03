@@ -16,7 +16,9 @@ interface Player {
     avatar: string | null;
     createdAt: string;
     role: { name: string; displayName: string; color: string | null } | null;
-    _count: { orders: number; topics: number; posts: number; comments: number; suggestions: number };
+    // Only the statistics this install can actually count. A module that is
+    // not installed contributes no key at all, so nothing renders a zero for it.
+    _count: Record<string, number | undefined>;
     recentTopics: { id: string; title: string; slug: string; createdAt: string }[];
     linkedAccounts: { provider: string; username: string | null }[];
 }
@@ -105,7 +107,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                                 { key: "posts", label: t.has("stat_posts") ? t("stat_posts") : "Posts", value: player._count.posts, icon: FileText },
                                 { key: "comments", label: t.has("stat_comments") ? t("stat_comments") : "Comments", value: player._count.comments, icon: FileText },
                                 { key: "suggestions", label: t.has("stat_suggestions") ? t("stat_suggestions") : "Suggestions", value: player._count.suggestions, icon: ThumbsUp },
-                            ].map((s) => (
+                            ].filter((s): s is typeof s & { value: number } => s.value !== undefined).map((s) => (
                                 <Card key={s.key}>
                                     <CardContent className="p-3 text-center">
                                         <s.icon className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
