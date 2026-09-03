@@ -30,6 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   owner can read one back.
 
 ### Changed
+- **Eleven setup presets**, covering Minecraft, Rust, ARK, CS2, Garry's Mod,
+  Unturned, FiveM, Roblox, an online store, digital products, and picking
+  modules by hand. The game presets now name the sign-in module that game's
+  players actually have, and the digital-products preset installs the new
+  license keys module. A test resolves every preset through the installer, so
+  a preset can no longer name a module whose dependency is missing.
 - **RCON lives in one place.** The store and servers modules each carried a
   copy of the client, and the copies had drifted. The servers module owns it
   now and answers a `server.command` filter; the store asks through that hook

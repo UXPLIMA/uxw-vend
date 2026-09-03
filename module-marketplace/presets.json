@@ -1,10 +1,10 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "presets": [
     {
       "id": "minecraft",
       "name": "Minecraft server",
-      "description": "Rank and VIP sales, live server status over RCON, vote rewards, a public ban list and player profiles.",
+      "description": "Rank and VIP sales delivered over RCON, live server status, in-game account linking, vote rewards, a public ban list and player profiles.",
       "icon": "Blocks",
       "theme": "pixelcraft",
       "modules": [
@@ -12,6 +12,7 @@
         "credits",
         "stripe-gateway",
         "servers",
+        "minecraft-link",
         "vote",
         "punishments",
         "player-profiles",
@@ -21,21 +22,96 @@
       ]
     },
     {
-      "id": "roblox",
-      "name": "Roblox game",
-      "description": "Game pass and currency sales with trophies and a leaderboard. No RCON: Roblox has no server console to talk to.",
-      "icon": "Boxes",
+      "id": "rust",
+      "name": "Rust server",
+      "description": "Kit and VIP sales delivered over RCON, wipe announcements, a ban list and a leaderboard. Players sign in with Steam, the account they already play on.",
+      "icon": "Hammer",
       "theme": "pixelcraft",
       "modules": [
         "store",
         "credits",
         "stripe-gateway",
+        "servers",
+        "steam-auth",
         "vote",
-        "trophies",
-        "leaderboard",
+        "punishments",
         "player-profiles",
-        "discord-auth",
+        "leaderboard",
         "announcements"
+      ]
+    },
+    {
+      "id": "ark",
+      "name": "ARK server",
+      "description": "Shop items and perks delivered over RCON, cluster and wipe announcements, a ban list and Steam sign-in.",
+      "icon": "Bone",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "steam-auth",
+        "vote",
+        "punishments",
+        "player-profiles",
+        "announcements"
+      ]
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2 server",
+      "description": "VIP sales delivered over RCON, live server status, a ban list, a staff roster and a leaderboard, with Steam sign-in throughout.",
+      "icon": "Crosshair",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "steam-auth",
+        "punishments",
+        "player-profiles",
+        "leaderboard",
+        "staff",
+        "announcements"
+      ]
+    },
+    {
+      "id": "garrys-mod",
+      "name": "Garry's Mod server",
+      "description": "Rank sales delivered over RCON, support tickets, a staff roster and a ban list. Steam sign-in, because a Gmod player already has an account.",
+      "icon": "Wrench",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "steam-auth",
+        "punishments",
+        "player-profiles",
+        "tickets",
+        "staff",
+        "announcements"
+      ]
+    },
+    {
+      "id": "unturned",
+      "name": "Unturned server",
+      "description": "The same shape as a Minecraft store: kit and rank sales, server status, vote rewards and a ban list, with Steam sign-in.",
+      "icon": "Tent",
+      "theme": "pixelcraft",
+      "modules": [
+        "store",
+        "credits",
+        "stripe-gateway",
+        "servers",
+        "steam-auth",
+        "vote",
+        "punishments",
+        "player-profiles",
+        "leaderboard"
       ]
     },
     {
@@ -59,21 +135,22 @@
       ]
     },
     {
-      "id": "unturned",
-      "name": "Unturned server",
-      "description": "The same shape as a Minecraft store: kit and rank sales, server status, vote rewards and a ban list.",
-      "icon": "Tent",
+      "id": "roblox",
+      "name": "Roblox game",
+      "description": "Game pass and currency sales with trophies and a leaderboard, and Roblox sign-in. No RCON: Roblox has no server console to talk to.",
+      "icon": "Boxes",
       "theme": "pixelcraft",
       "modules": [
         "store",
         "credits",
         "stripe-gateway",
-        "servers",
         "vote",
-        "punishments",
-        "player-profiles",
+        "trophies",
         "leaderboard",
-        "discord-auth"
+        "player-profiles",
+        "roblox-auth",
+        "discord-auth",
+        "announcements"
       ]
     },
     {
@@ -97,41 +174,24 @@
       ]
     },
     {
-      "id": "license-sales",
-      "name": "License sales",
-      "description": "Sell licensed products with gated downloads, a help centre and support tickets. Two-factor is on because a buyer account holds their purchases.",
+      "id": "digital-products",
+      "name": "Digital products",
+      "description": "Sell software and licensed downloads: license keys issued on purchase, gated downloads, release notes, a knowledge base and support tickets. Two-factor is on because a buyer account holds their keys.",
       "icon": "KeyRound",
       "theme": "flat",
       "modules": [
         "store",
         "stripe-gateway",
         "paypal-gateway",
-        "downloads",
-        "tickets",
-        "help-center",
-        "custom-pages",
-        "seo",
-        "email-templates",
-        "two-factor-auth"
-      ]
-    },
-    {
-      "id": "software-sales",
-      "name": "Software sales",
-      "description": "A download centre, release notes, a searchable knowledge base and support tickets around a paid product.",
-      "icon": "Package",
-      "theme": "flat",
-      "modules": [
-        "store",
-        "stripe-gateway",
-        "paypal-gateway",
+        "license-keys",
         "downloads",
         "changelog",
         "help-center",
         "tickets",
         "custom-pages",
         "seo",
-        "email-templates"
+        "email-templates",
+        "two-factor-auth"
       ]
     },
     {
