@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The server panel knows Hytale, CS2, Garry's Mod and Unturned as server
+  types, alongside the Minecraft, FiveM, Rust, ARK and CS:GO it already had.
 - Modules can ship their own sign-in provider. `authProviders` takes a
   `factory` plus the env vars that gate it, instead of naming a provider
   Auth.js already has, and `oauthButtons` takes a same-origin `href` for a flow
@@ -47,6 +49,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is used; the settings rows are then deleted.
 
 ### Fixed
+- **Server status only ever described one Minecraft server.** It asked
+  mcsrvstat.us about a host kept in the settings table, ignoring the
+  `GameServer` rows the admin panel edits, so a site with a Rust server showed
+  offline forever. Status now reads those rows and speaks the protocol the
+  server speaks: Minecraft's Server List Ping, A2S_INFO over UDP for the Source
+  games, and FiveM's `dynamic.json`. No third party in the middle, every server
+  asked in parallel, answers cached for twenty seconds. Hytale reports itself
+  as not queryable rather than as down, because it ships no status protocol.
 - **Sign-in modules asked for credentials they could not use.** Six of them
   offered a form for a client id and secret, saved it to the settings table
   under keys nothing reads, and reported success - Auth.js assembles its
