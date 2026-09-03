@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.4.0 - `authProviders[].standardCallback` lets a module that builds its own
+ * provider say the provider still returns through Auth.js's own callback, so
+ * the admin panel can show the redirect URL to register. Nothing else needs
+ * it: a built-in provider always has that URL, and a module running its own
+ * flow documents its own.
+ *
  * 1.3.0 - `FilterContext`, and the typed context registry
  * `UxwVendFilterContexts` behind it. A filter that declares a context now has
  * both halves of its contract checked, at the call site and in every listener;
@@ -30,4 +36,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.3.0";
+export const CORE_API_VERSION = "1.4.0";

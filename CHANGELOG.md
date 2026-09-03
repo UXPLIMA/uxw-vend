@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `authProviders[].standardCallback` lets a module that builds its own provider
+  say that provider still returns through Auth.js's own callback, so the admin
+  panel can show the redirect URL to register instead of nothing.
+  `CORE_API_VERSION` 1.3.0 -> 1.4.0.
 - **Payments are a contract, not a branch.** The store used to carry Stripe and
   PayPal itself, which is why "write your own gateway" was not true. It now
   asks through six filters - `payment.providers`, `payment.session`,
@@ -79,6 +83,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is used; the settings rows are then deleted.
 
 ### Fixed
+- **OAuth sign-up could not create an account.** Auth.js's Prisma adapter writes
+  the user shape Auth.js documents (`name`, `image`, nothing required beyond
+  the email); core's `User` has `username` - required and unique - and
+  `avatar`, and neither `name` nor `image`, so the insert was rejected and
+  every first sign-in through an OAuth provider failed. The adapter is now
+  wrapped: the display name becomes a unique username, the picture becomes the
+  avatar, and a provider that hands over no email address (Battle.net, Epic,
+  Kick, Reddit, TikTok, Instagram, X) gets a placeholder in the reserved
+  `.invalid` TLD, which is what steam-auth already did for itself. Fields a
+  provider returns that core has no column for - GitHub's
+  `refresh_token_expires_in` is the usual one - no longer break account
+  linking.
+
 - **Server status only ever described one Minecraft server.** It asked
   mcsrvstat.us about a host kept in the settings table, ignoring the
   `GameServer` rows the admin panel edits, so a site with a Rust server showed

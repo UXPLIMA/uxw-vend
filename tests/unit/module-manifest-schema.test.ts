@@ -280,6 +280,34 @@ describe("moduleManifestSchema - auth providers", () => {
         ).toBe(false);
     });
 
+    it("accepts standardCallback on a module-built OAuth provider", () => {
+        expect(
+            parse([
+                {
+                    id: "battlenet",
+                    factory: "auth/battlenet-provider.ts",
+                    standardCallback: true,
+                    envVars: ["AUTH_BATTLENET_ID", "AUTH_BATTLENET_SECRET", "AUTH_BATTLENET_ISSUER"],
+                },
+            ]).success,
+        ).toBe(true);
+    });
+
+    // A built-in provider always uses that URL, so saying so would be a
+    // manifest claiming something it does not control.
+    it("rejects standardCallback on a provider with no factory", () => {
+        expect(
+            parse([
+                {
+                    id: "discord",
+                    envIdVar: "AUTH_DISCORD_ID",
+                    envSecretVar: "AUTH_DISCORD_SECRET",
+                    standardCallback: true,
+                },
+            ]).success,
+        ).toBe(false);
+    });
+
     it("rejects envVars on a provider with no factory", () => {
         expect(
             parse([

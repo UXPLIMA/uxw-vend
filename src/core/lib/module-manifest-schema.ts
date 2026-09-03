@@ -191,6 +191,14 @@ const authProvider = z
             .optional(),
         /** Module-relative path to a file whose default export builds the provider. */
         factory: relativePath("factory").optional(),
+        /**
+         * Set when a module-supplied provider is an ordinary Auth.js OAuth
+         * provider - built here only because it needs more than a client id and
+         * secret - so its redirect URL is the usual `/api/auth/callback/<id>`
+         * and the admin panel can show it. A provider whose flow runs in the
+         * module's own routes leaves this off and documents its URLs itself.
+         */
+        standardCallback: z.boolean().optional(),
         /** Env vars a module-supplied provider needs. All must be set for it to activate. */
         envVars: z
             .array(z.string().min(1).max(128).regex(ENV_VAR_NAME, "envVars entries must be env var names"))
@@ -218,6 +226,14 @@ const authProvider = z
         }
         if (value.envVars) {
             ctx.addIssue({ code: "custom", message: "envVars only applies to an auth provider with a factory" });
+        }
+        if (value.standardCallback !== undefined) {
+            ctx.addIssue({
+                code: "custom",
+                message:
+                    "standardCallback only applies to an auth provider with a factory - a built-in " +
+                    "provider already uses the standard callback URL",
+            });
         }
         if (!value.envIdVar || !value.envSecretVar) {
             ctx.addIssue({

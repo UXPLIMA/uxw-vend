@@ -122,7 +122,7 @@ function generateRegistry() {
     const allSettingsCards: ManifestItem[] = [];
     const allOauthButtons: ManifestItem[] = [];
     const allNavGroups: ModuleNavGroupDeclaration[] = [];
-    const allAuthProviders: ({ id: string; envIdVar?: string; envSecretVar?: string; factory?: string; envVars?: string[]; module: string })[] = [];
+    const allAuthProviders: ({ id: string; envIdVar?: string; envSecretVar?: string; factory?: string; standardCallback?: boolean; envVars?: string[]; module: string })[] = [];
     const allWebhookChannels: ({ id: string; label: string; layout: string; hosts?: string[]; urlPlaceholder?: string; module: string })[] = [];
     const allProfileTabs: ({ id: string; label: string; component: string; order: number; module: string })[] = [];
     const allStorageProviders: ({ id: string; name: string; handler: string; module: string })[] = [];
@@ -439,7 +439,7 @@ function generateRegistry() {
     authContent += '// the env vars it names are set.\n';
     if (authProviderImports.length > 0) authContent += `${authProviderImports.join('\n')}\n`;
     authContent += '\n';
-    authContent += `export const ModuleAuthProviders: { id: string; envIdVar?: string; envSecretVar?: string; factory?: string; envVars?: string[]; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
+    authContent += `export const ModuleAuthProviders: { id: string; envIdVar?: string; envSecretVar?: string; factory?: string; standardCallback?: boolean; envVars?: string[]; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
     authContent += '// Providers Auth.js ships. Each one takes a client id and secret and\n';
     authContent += '// nothing else.\n';
     authContent += 'export const ModuleAuthProviderFactories: Record<string, (config: {\n';

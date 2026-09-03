@@ -24,9 +24,10 @@ export interface AuthProviderStatus {
     missing: string[];
     configured: boolean;
     /**
-     * The redirect URL to register with the provider. Only meaningful for a
-     * provider Auth.js ships - a module that builds its own decides where its
-     * flow returns to and documents that itself.
+     * The redirect URL to register with the provider. A provider Auth.js ships
+     * always has one; a module-supplied provider has one only if it said so
+     * with `standardCallback`, because a module that runs its own flow decides
+     * where that flow returns to and documents it itself.
      */
     callbackUrl: string | null;
 }
@@ -48,7 +49,10 @@ export async function GET() {
             envVars,
             missing,
             configured: envVars.length > 0 && missing.length === 0,
-            callbackUrl: declared.factory ? null : `${appUrl}/api/auth/callback/${declared.id}`,
+            callbackUrl:
+                !declared.factory || declared.standardCallback
+                    ? `${appUrl}/api/auth/callback/${declared.id}`
+                    : null,
         };
     });
 
