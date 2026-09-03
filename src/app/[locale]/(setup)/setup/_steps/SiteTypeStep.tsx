@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { NavIcon } from "@/core/components/ui/NavIcon";
 import type { PresetOption } from "../types";
 
 interface SiteTypeStepProps {
@@ -30,7 +31,10 @@ export function SiteTypeStep({ presets, selected, onSelect }: SiteTypeStepProps)
                                     active ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
                                 }`}
                             >
-                                <div className="font-medium text-foreground">{p.name}</div>
+                                <div className="flex items-center gap-2">
+                                    <NavIcon name={p.icon} className="w-4 h-4 shrink-0 text-primary" />
+                                    <span className="font-medium text-foreground">{p.name}</span>
+                                </div>
                                 {p.description && (
                                     <div className="text-xs text-muted-foreground mt-1">{p.description}</div>
                                 )}
