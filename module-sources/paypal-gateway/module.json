@@ -1,14 +1,14 @@
 {
   "id": "paypal-gateway",
   "name": "PayPal Payment Gateway",
-  "description": "Accept payments via PayPal",
-  "version": "1.0.0",
-  "coreVersion": "^1.0.0",
+  "description": "Take payments through PayPal, with a balance or a linked card",
+  "version": "2.0.0",
+  "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
   "icon": "DollarSign",
   "dependencies": [
-    "store"
+    "store@^2.0.0"
   ],
   "settingsCards": [
     {
@@ -273,5 +273,31 @@
         "subtitle": "Gerencie as configurações e o conteúdo da sua plataforma"
       }
     }
-  }
+  },
+  "api": [
+    {
+      "path": "/paypal/capture",
+      "handler": "api/capture/route.ts",
+      "method": "GET",
+      "description": "Where PayPal returns the buyer. Captures the payment and reports it through the payment contract."
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.settled",
+      "type": "filter"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ]
 }

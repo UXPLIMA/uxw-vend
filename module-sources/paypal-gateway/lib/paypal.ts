@@ -1,6 +1,9 @@
 /**
  * PayPal REST API v2 integration.
  *
+ * Lives in the gateway module rather than in the store: the store knows what
+ * an order costs, not what PayPal is.
+ *
  * Credentials are read from the `paypal_client_id`, `paypal_client_secret`,
  * `paypal_mode` Settings rows (admin UI source of truth) with
  * `process.env.PAYPAL_*` as fallback. The first non-empty value wins.
@@ -73,7 +76,9 @@ async function getAccessToken(): Promise<string> {
 export async function createPaypalOrder(params: {
     amount: number;
     currency?: string;
-    orderId: string;
+    /** The store's reference for what is being paid for. */
+    reference: string;
+    brandName: string;
     returnUrl: string;
     cancelUrl: string;
 }): Promise<{ id: string; approveUrl: string }> {
@@ -89,7 +94,7 @@ export async function createPaypalOrder(params: {
         body: JSON.stringify({
             intent: "CAPTURE",
             purchase_units: [{
-                reference_id: params.orderId,
+                reference_id: params.reference,
                 amount: {
                     currency_code: params.currency || "USD",
                     value: params.amount.toFixed(2),
@@ -98,7 +103,7 @@ export async function createPaypalOrder(params: {
             application_context: {
                 return_url: params.returnUrl,
                 cancel_url: params.cancelUrl,
-                brand_name: process.env.NEXT_PUBLIC_APP_NAME || "uxwVend",
+                brand_name: params.brandName,
             },
         }),
     });

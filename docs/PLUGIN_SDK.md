@@ -946,7 +946,66 @@ export default async function onItemCreated(payload: ItemPayload) { /* … */ }
 
 You are not skipping the check by doing that: `npm run typecheck:modules` generates an assertion per manifest-declared listener and verifies your view against the emitter's declaration whenever both modules are present. A listener may read *fewer* fields than the hook carries, never different ones.
 
+**Typing the context** - a filter has two halves: the value that flows through the chain, and the thing being asked about. Declare the second in `UxwVendFilterContexts`, next to the value:
+
+```typescript
+declare global {
+    interface UxwVendFilterPayloads {
+        "my-module.quote": { amount: number } | null;
+    }
+    interface UxwVendFilterContexts {
+        "my-module.quote": { productId: string; currency: string };
+    }
+}
+```
+
+A filter that declares a context must be passed one, and every listener receives it typed - no cast, and no `context?: unknown`. A filter that declares none behaves as it always did: the context stays optional and `unknown`.
+
 Declaring a payload is optional - an undeclared hook works exactly as before. Declaring one turns a runtime surprise into a build error.
+
+---
+
+## Taking payments
+
+A payment gateway is a module. The store knows what an order costs and what to hand over once it is paid for; it knows nothing about Stripe, PayPal or iyzico, and asks through six filters declared in `module-sources/store/hooks.d.ts`. Writing a gateway means answering two of them and firing the rest.
+
+| Hook | Direction | Meaning |
+|------|-----------|---------|
+| `payment.providers` | store asks, gateway answers | Which gateways can take this currency right now. Answer only when you are configured: a button that fails after the buyer clicks it is worse than no button. |
+| `payment.session` | store asks, gateway answers | Start a payment for `request.provider`, return where to send the buyer. Ignore the call when the id is not yours. |
+| `payment.settled` | gateway asks, store answers | The money arrived. The store grants what was bought and answers `handled`. |
+| `payment.voided` | gateway asks, store answers | The session expired or the buyer backed out. |
+| `payment.refunded` | gateway asks, store answers | The money went back. |
+| `subscription.changed` | gateway asks, store answers | A recurring plan started, renewed or ended. |
+
+The last four are filters rather than actions on purpose. A gateway needs to know whether anybody recorded the payment: a webhook nothing handled must be **failed**, so the provider retries, rather than acknowledged and lost. `PaymentOutcome` says which happened - `handled: false` means nobody recorded it, `duplicate: true` means it was already settled and the webhook should be acknowledged.
+
+A minimal gateway is four files:
+
+```typescript
+// hooks/on-payment-providers.ts
+const onPaymentProviders: HookHandlerFor<"payment.providers", "filter"> = async (providers) => {
+    if (!(await isConfigured())) return providers;
+    return [...providers, { id: "mypay", label: "MyPay", icon: "CreditCard" }];
+};
+
+// hooks/on-payment-session.ts
+const onPaymentSession: HookHandlerFor<"payment.session", "filter"> = async (result, request) => {
+    if (result.handled || request.provider !== "mypay") return result;
+    const payment = await createRemotePayment(request);   // amount, currency, lines, successUrl…
+    return { handled: true, redirectUrl: payment.url, reference: payment.id, error: null };
+};
+
+// api/webhook/route.ts - verify the signature, then:
+const outcome = await applyFiltersAsync("payment.settled", UNHANDLED, {
+    kind: "order", reference, provider: "mypay", providerRef, amount, currency,
+});
+return outcome.handled ? ok() : failSoTheProviderRetries();
+```
+
+Plus `module.json`, declaring `store@^2.0.0` as a dependency, `payment.providers` / `payment.session` in `hookListeners`, and whichever of the four you fire in `hooksEmitted`. `module-sources/stripe-gateway` (webhooks, subscriptions) and `module-sources/paypal-gateway` (return-URL capture, no webhook) are the two worked examples.
+
+Carry `request.reference` through the provider and back: it is how the store recognises the order. Never grant anything yourself, and never write to the store's tables - a gateway that does is a gateway that has to be rewritten when the store changes.
 
 ---
 

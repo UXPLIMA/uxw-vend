@@ -71,6 +71,7 @@ export {
 export type {
     ActionPayload,
     FilterValue,
+    FilterContext,
     HookHandlerFor,
     AssertHookHandler,
     Expect,

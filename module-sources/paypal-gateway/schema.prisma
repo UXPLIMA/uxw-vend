@@ -1,0 +1,29 @@
+// PayPal Gateway Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// A payment PayPal has been asked to take but has not confirmed yet.
+//
+// This row exists so the return URL does not have to carry where to send the
+// buyer afterwards. A URL the buyer can edit is a URL the buyer can point
+// anywhere, and "come back to this page when you are done paying" is exactly
+// the shape of an open redirect. The row also makes capture idempotent: a
+// reloaded return URL finds a payment already captured.
+
+model PaypalPayment {
+  id            String   @id @default(cuid())
+  /// PayPal's id for the order it is holding.
+  paypalOrderId String   @unique
+  /// The store's reference: an order id, or a buyer id for a wallet top-up.
+  reference     String
+  kind          String   @default("order")
+  amount        Decimal  @db.Decimal(10, 2)
+  currency      String   @default("USD")
+  successUrl    String
+  cancelUrl     String
+  status        String   @default("PENDING")
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([reference])
+}

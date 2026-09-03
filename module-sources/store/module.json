@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -21,6 +21,26 @@
       "hook": "store.order.completed",
       "type": "action",
       "handler": "hooks/on-order-completed.ts"
+    },
+    {
+      "hook": "payment.settled",
+      "type": "filter",
+      "handler": "hooks/on-payment-settled.ts"
+    },
+    {
+      "hook": "payment.voided",
+      "type": "filter",
+      "handler": "hooks/on-payment-voided.ts"
+    },
+    {
+      "hook": "payment.refunded",
+      "type": "filter",
+      "handler": "hooks/on-payment-refunded.ts"
+    },
+    {
+      "hook": "subscription.changed",
+      "type": "filter",
+      "handler": "hooks/on-subscription-changed.ts"
     }
   ],
   "defaultConfig": {
@@ -261,11 +281,6 @@
       "description": "Get store widget statistics for homepage display."
     },
     {
-      "path": "/webhooks/stripe",
-      "handler": "api/webhooks/stripe/route.ts",
-      "description": "Stripe webhook endpoint for payment events."
-    },
-    {
       "path": "/chest/[id]",
       "handler": "api/chest/[id]/route.ts",
       "description": "Open a loot chest and receive rewards."
@@ -346,29 +361,20 @@
       "description": "Redeem a gift code for the current user."
     },
     {
-      "path": "/store/webhooks/stripe",
-      "handler": "api/webhooks/stripe/route.ts",
-      "description": "Stripe webhook endpoint for payment events."
-    },
-    {
       "path": "/store/community-goal",
       "handler": "api/community-goal/route.ts",
       "description": "Get current community goal progress or update the goal (admin)."
     },
     {
-      "path": "/store/checkout/paypal",
-      "handler": "api/checkout/paypal/route.ts",
-      "description": "Create a PayPal checkout order for the current cart."
-    },
-    {
-      "path": "/store/checkout/paypal/capture",
-      "handler": "api/checkout/paypal/capture/route.ts",
-      "description": "Capture a PayPal payment after approval."
-    },
-    {
       "path": "/store/credits/buy",
       "handler": "api/credits/buy/route.ts",
       "description": "Buy store credits via the configured payment gateway."
+    },
+    {
+      "path": "/store/payment-providers",
+      "handler": "api/payment-providers/route.ts",
+      "method": "GET",
+      "description": "The payment gateways installed and configured on this site."
     }
   ],
   "dashboardCards": [
@@ -456,6 +462,14 @@
     {
       "hook": "store.product.created",
       "type": "action"
+    },
+    {
+      "hook": "payment.providers",
+      "type": "filter"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter"
     }
   ],
   "translations": {
@@ -499,10 +513,7 @@
         "myOrders": "My Orders",
         "continueShopping": "Continue Shopping",
         "paymentMethod": "Payment Method",
-        "payWithCard": "Credit / Debit Card",
-        "payWithStripe": "Pay securely with Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Pay with your PayPal account",
+        "noPaymentMethods": "No payment method is available right now.",
         "payWithCredits": "Store Credits",
         "payWithCreditsDesc": "Pay with your credit balance",
         "noSubCategories": "No sub-categories. Viewing products directly...",
@@ -686,12 +697,6 @@
         "loginRequired": "Please log in to continue",
         "paymentsTitle": "Payment settings",
         "paymentsSubtitle": "Configure Stripe and tax for store checkout",
-        "paymentsStripePublicKey": "Stripe public key",
-        "paymentsStripePublicKeyDesc": "Found in your Stripe dashboard under Developers → API keys.",
-        "paymentsStripeSecretKey": "Stripe secret key",
-        "paymentsStripeSecretKeyDesc": "Kept server-side only. Used to create payment intents.",
-        "paymentsStripeWebhookSecret": "Stripe webhook signing secret",
-        "paymentsStripeWebhookSecretDesc": "Set the endpoint URL in Stripe to /api/v1/store/checkout/webhook and paste the signing secret here.",
         "paymentsDefaultCurrency": "Default currency",
         "paymentsDefaultCurrencyDesc": "Three-letter ISO code (e.g. usd, eur, gbp).",
         "paymentsTaxRate": "Tax rate (%)",
@@ -918,8 +923,6 @@
         "err_invalidCreatorCode": "Invalid creator code",
         "err_validateCreatorCode": "Failed to validate creator code",
         "err_checkoutFailed": "Checkout failed",
-        "err_paypalFailed": "PayPal checkout failed",
-        "err_paypalApprovalUrl": "Failed to get PayPal approval URL",
         "err_generic": "Something went wrong. Please try again.",
         "livePurchase": "Someone purchased an item",
         "livePurchaseDetail": "{username} purchased {product}",
@@ -999,10 +1002,7 @@
         "myOrders": "Siparişlerim",
         "continueShopping": "Alışverişe Devam Et",
         "paymentMethod": "Ödeme Yöntemi",
-        "payWithCard": "Kredi / Banka Kartı",
-        "payWithStripe": "Stripe ile güvenli ödeme",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "PayPal hesabınızla ödeyin",
+        "noPaymentMethods": "Şu anda kullanılabilir bir ödeme yöntemi yok.",
         "payWithCredits": "Mağaza Kredisi",
         "payWithCreditsDesc": "Kredi bakiyenizle ödeyin",
         "noSubCategories": "Alt kategori yok. Ürünler doğrudan gösteriliyor...",
@@ -1186,12 +1186,6 @@
         "loginRequired": "Devam etmek için giriş yapın",
         "paymentsTitle": "Ödeme ayarları",
         "paymentsSubtitle": "Mağaza ödemesi için Stripe ve vergi ayarları",
-        "paymentsStripePublicKey": "Stripe public key",
-        "paymentsStripePublicKeyDesc": "Stripe panelinde Developers → API keys altında.",
-        "paymentsStripeSecretKey": "Stripe secret key",
-        "paymentsStripeSecretKeyDesc": "Sadece sunucuda saklanır. Payment intent oluşturmak için kullanılır.",
-        "paymentsStripeWebhookSecret": "Stripe webhook signing secret",
-        "paymentsStripeWebhookSecretDesc": "Stripe'da endpoint URL olarak /api/v1/store/checkout/webhook ekleyin, signing secret'i buraya yapıştırın.",
         "paymentsDefaultCurrency": "Varsayılan para birimi",
         "paymentsDefaultCurrencyDesc": "Üç harfli ISO kodu (örn. usd, eur, gbp).",
         "paymentsTaxRate": "Vergi oranı (%)",
@@ -1418,8 +1412,6 @@
         "err_invalidCreatorCode": "Geçersiz içerik üretici kodu",
         "err_validateCreatorCode": "Kod doğrulanamadı",
         "err_checkoutFailed": "Ödeme başarısız",
-        "err_paypalFailed": "PayPal ödemesi başarısız",
-        "err_paypalApprovalUrl": "PayPal onay bağlantısı alınamadı",
         "err_generic": "Bir şeyler ters gitti. Lütfen tekrar dene.",
         "livePurchase": "Biri bir ürün satın aldı",
         "livePurchaseDetail": "{username} satın aldı: {product}",
@@ -1499,10 +1491,7 @@
         "myOrders": "Meine Bestellungen",
         "continueShopping": "Weiter einkaufen",
         "paymentMethod": "Zahlungsmethode",
-        "payWithCard": "Kredit-/Debitkarte",
-        "payWithStripe": "Sicher bezahlen mit Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Mit Ihrem PayPal-Konto bezahlen",
+        "noPaymentMethods": "Derzeit ist keine Zahlungsmethode verfügbar.",
         "payWithCredits": "Shop-Guthaben",
         "payWithCreditsDesc": "Mit Ihrem Guthaben bezahlen",
         "noSubCategories": "Keine Unterkategorien. Produkte werden direkt angezeigt...",
@@ -1887,10 +1876,7 @@
         "myOrders": "Mis pedidos",
         "continueShopping": "Seguir comprando",
         "paymentMethod": "Metodo de pago",
-        "payWithCard": "Tarjeta de credito / debito",
-        "payWithStripe": "Pagar de forma segura con Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Pagar con tu cuenta de PayPal",
+        "noPaymentMethods": "No hay ningún método de pago disponible.",
         "payWithCredits": "Creditos de tienda",
         "payWithCreditsDesc": "Pagar con tu saldo de creditos",
         "noSubCategories": "Sin subcategorias. Mostrando productos directamente...",
@@ -2275,10 +2261,7 @@
         "myOrders": "Mes commandes",
         "continueShopping": "Continuer les achats",
         "paymentMethod": "Methode de paiement",
-        "payWithCard": "Carte de credit / debit",
-        "payWithStripe": "Payer en toute securite avec Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Payer avec votre compte PayPal",
+        "noPaymentMethods": "Aucun moyen de paiement n'est disponible.",
         "payWithCredits": "Credits boutique",
         "payWithCreditsDesc": "Payer avec votre solde de credits",
         "noSubCategories": "Pas de sous-categories. Affichage direct des produits...",
@@ -2663,10 +2646,7 @@
         "myOrders": "Мои заказы",
         "continueShopping": "Продолжить покупки",
         "paymentMethod": "Способ оплаты",
-        "payWithCard": "Кредитная / дебетовая карта",
-        "payWithStripe": "Безопасная оплата через Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Оплатить через PayPal",
+        "noPaymentMethods": "Сейчас нет доступных способов оплаты.",
         "payWithCredits": "Кредиты магазина",
         "payWithCreditsDesc": "Оплатить кредитами",
         "noSubCategories": "Нет подкатегорий. Показываем товары напрямую...",
@@ -3051,10 +3031,7 @@
         "myOrders": "Meus pedidos",
         "continueShopping": "Continuar comprando",
         "paymentMethod": "Metodo de pagamento",
-        "payWithCard": "Cartao de credito / debito",
-        "payWithStripe": "Pagar com seguranca via Stripe",
-        "payWithPaypal": "PayPal",
-        "payWithPaypalDesc": "Pagar com sua conta PayPal",
+        "noPaymentMethods": "Nenhum método de pagamento está disponível.",
         "payWithCredits": "Creditos da loja",
         "payWithCreditsDesc": "Pagar com seu saldo de creditos",
         "noSubCategories": "Sem subcategorias. Mostrando produtos diretamente...",

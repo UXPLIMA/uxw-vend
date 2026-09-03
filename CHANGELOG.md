@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Payments are a contract, not a branch.** The store used to carry Stripe and
+  PayPal itself, which is why "write your own gateway" was not true. It now
+  asks through six filters - `payment.providers`, `payment.session`,
+  `payment.settled`, `payment.voided`, `payment.refunded` and
+  `subscription.changed` - and knows nothing about who answers. The four a
+  gateway fires are filters rather than actions so a webhook nobody handled
+  fails and the provider retries, instead of being acknowledged and lost.
+- Filters can declare what they are asked *about*, not just what flows through
+  them. `UxwVendFilterContexts` types the second half of a filter contract at
+  the call site and in every listener; filters that declare nothing behave
+  exactly as before. `CORE_API_VERSION` 1.2.0 -> 1.3.0.
 - The server panel knows Hytale, CS2, Garry's Mod and Unturned as server
   types, alongside the Minecraft, FiveM, Rust, ARK and CS:GO it already had.
 - Modules can ship their own sign-in provider. `authProviders` takes a
@@ -32,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   owner can read one back.
 
 ### Changed
+- **`stripe-gateway` and `paypal-gateway` are real modules.** They were a
+  manifest and a settings page while the store did the work; they now own their
+  own keys, their own tables and their own webhooks, and the store owns
+  settling an order once somebody reports the money. Removing a gateway removes
+  its payment method from the checkout, which is what installing modules is
+  supposed to mean. The checkout page draws its buttons from whatever answers
+  `payment.providers`, so a third gateway needs no change to the store.
 - **Twelve setup presets**, covering Minecraft, Hytale, Rust, ARK, CS2,
   Garry's Mod, Unturned, FiveM, Roblox, an online store, digital products, and
   picking modules by hand. The game presets now name the sign-in module that game's

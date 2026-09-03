@@ -36,6 +36,34 @@ export type ActionPayload<K extends string> =
 export type FilterValue<K extends string> =
     K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : unknown;
 
+/**
+ * What a filter is asked about, or `unknown` when the hook does not say.
+ *
+ * A filter has two halves: the value that flows through the chain, and the
+ * thing being asked about. Only the first used to be typed, so a listener read
+ * its context through a cast and nothing checked the cast. Hooks that declare
+ * a context in `UxwVendFilterContexts` get both halves checked, at the call
+ * site and in every listener; the rest behave exactly as before.
+ */
+export type FilterContext<K extends string> =
+    K extends keyof UxwVendFilterContexts ? UxwVendFilterContexts[K] : unknown;
+
+/**
+ * The trailing argument of `applyFilters`/`applyFiltersAsync`.
+ *
+ * A hook that declares a context must be passed one - the whole point of
+ * declaring it is that listeners can then read it without a guard. A hook that
+ * declares none keeps the old optional `unknown`.
+ */
+export type FilterContextArg<K extends string> =
+    K extends keyof UxwVendFilterContexts ? [context: UxwVendFilterContexts[K]] : [context?: unknown];
+
+/** The listener shape for a filter, with its context typed and required. */
+export type FilterHandler<K extends string> =
+    K extends keyof UxwVendFilterContexts
+        ? (value: FilterValue<K>, context: UxwVendFilterContexts[K]) => FilterValue<K> | Promise<FilterValue<K>>
+        : AsyncFilterListener<FilterValue<K>>;
+
 interface Registration {
     listener: (...args: unknown[]) => unknown;
     priority: number;
@@ -187,8 +215,9 @@ export function removeFilter<T, C = unknown>(name: string, listener: FilterListe
 export function applyFilters<K extends string, V extends FilterValue<K>>(
     name: K,
     value: V,
-    context?: unknown,
+    ...rest: FilterContextArg<K>
 ): K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V {
+    const context = rest[0];
     const list = filterRegistry.get(name);
     if (!list || list.length === 0) return value as never;
     let result = value;
@@ -207,8 +236,9 @@ export function applyFilters<K extends string, V extends FilterValue<K>>(
 export async function applyFiltersAsync<K extends string, V extends FilterValue<K>>(
     name: K,
     value: V,
-    context?: unknown,
+    ...rest: FilterContextArg<K>
 ): Promise<K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V> {
+    const context = rest[0];
     const list = filterRegistry.get(name);
     if (!list || list.length === 0) return value as never;
     let result = value;
@@ -239,7 +269,7 @@ export async function applyFiltersAsync<K extends string, V extends FilterValue<
 export type HookHandlerFor<K extends string, T extends "action" | "filter"> =
     T extends "action"
         ? AsyncActionListener<ActionPayload<K>>
-        : AsyncFilterListener<FilterValue<K>>;
+        : FilterHandler<K>;
 
 type DeclaredNames<T extends "action" | "filter"> =
     T extends "action" ? keyof UxwVendHookPayloads : keyof UxwVendFilterPayloads;

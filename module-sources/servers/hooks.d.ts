@@ -41,6 +41,11 @@ declare global {
     interface UxwVendFilterPayloads {
         "server.command": ServerCommandResult;
     }
+
+    /** The question, as opposed to the answer above. */
+    interface UxwVendFilterContexts {
+        "server.command": ServerCommandRequest;
+    }
 }
 
 export {};
