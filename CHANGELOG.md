@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SettingsForm` take `type: "icon"` for it, so a module gets the picker by
   naming a field type rather than by shipping a component.
 
+### Changed
+- **A public page no longer ships the admin panel's copy.** The locale layout
+  handed the whole message catalogue to the client provider, and the `admin`
+  namespace is around four fifths of it: every visitor downloaded 42KB of
+  strings for screens they cannot open. The admin tree re-provides the full
+  catalogue for itself. The homepage went from 120KB to 65KB of HTML (32KB to
+  18KB gzipped), the login page from 108KB to 54KB.
+
 ### Fixed
 - **Creating a vote site returned 404.** The vote admin page posted to
   `/api/v1/vote`, which no manifest declared; the handler lives at

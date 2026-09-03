@@ -4,6 +4,7 @@ import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { withoutAdminNamespaces } from "@/core/lib/i18n/message-scopes";
 import { SessionProvider } from "next-auth/react";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
@@ -111,7 +112,7 @@ export default async function RootLayout({
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
       >
         <SessionProvider>
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider messages={withoutAdminNamespaces(messages)}>
               <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>
                 <ModuleProvider moduleStates={moduleStates}>
                 <ModuleContextProviders>
