@@ -307,6 +307,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository, and `package.json` offered it as a script anyway. Nothing
   referenced it.
 
+### Security
+- **Four modules served their admin analytics to anyone who asked.** `blog`,
+  `forum`, `tickets` and `store` each declare a `statsApi` that the admin
+  dashboard reads, and none of the four handlers checked who was calling. An
+  unauthenticated `GET /api/v1/store/stats` returned lifetime revenue, order
+  counts and the newest orders with the customer usernames on them; forum
+  returned recent topics with their authors, and tickets returned open support
+  tickets with usernames and departments. All four call `isAdmin()` now and
+  answer 401 to a signed-out caller, 403 to a signed-in non-admin. Module
+  versions: blog 1.0.1, forum 1.0.2, tickets 1.0.1, store 2.0.3.
+- **`validate-module` now checks that a `statsApi` is admin only.** The
+  existing auth gate only inspected the write methods, so a route whose entire
+  job is reading admin data walked past it every time. A module that declares
+  `statsApi` and reaches the handler without `isAdmin()`, `isStaff()` or
+  `hasPermission()` fails the gate, and a unit test applies the same rule to
+  `module-sources/` so `npm test` alone catches a regression.
+
 ## [0.2.1] - 2026-09-02
 
 ### Fixed

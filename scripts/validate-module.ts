@@ -671,6 +671,61 @@ function checkHooksEmitted(modulePath: string): CheckResult {
  * `AdminCrudPage` lists and creates at `apiPath` and edits and deletes at
  * `apiPath/{id}`, so both have to exist.
  */
+/**
+ * A module's `statsApi` feeds the admin dashboard and the analytics screen -
+ * order counts, revenue, the latest support tickets with the usernames on
+ * them. It is admin data by definition, and the route serving it is a plain
+ * GET, which `checkApiAuthChecks` above does not look at: that check only
+ * asks about writes. Four first-party modules shipped this endpoint open, so
+ * anyone could read a shop's daily revenue without logging in.
+ */
+function checkStatsApiAuth(modulePath: string): CheckResult {
+    const name = "Stats API is admin only";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { statsApi?: string; api?: { path: string; handler: string }[] };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const statsPath = manifest.statsApi;
+    if (!statsPath) return { name, passed: true, message: "No stats API declared" };
+
+    const entry = (manifest.api ?? []).find((a) => a.path === statsPath);
+    if (!entry) {
+        return {
+            name,
+            passed: false,
+            message: `statsApi "${statsPath}" is not one of the module's declared api routes`,
+        };
+    }
+
+    const handlerPath = path.join(modulePath, entry.handler);
+    if (!fs.existsSync(handlerPath)) {
+        return { name, passed: false, message: `statsApi handler is missing: ${entry.handler}` };
+    }
+
+    const content = fs.readFileSync(handlerPath, "utf8");
+    const guarded =
+        content.includes("isAdmin(") ||
+        content.includes("isStaff(") ||
+        content.includes("hasPermission(");
+    if (!guarded) {
+        return {
+            name,
+            passed: false,
+            message:
+                `${entry.handler} serves the admin dashboard but checks nobody - ` +
+                `an anonymous GET reads it. Call isAdmin() (or hasPermission()) before answering.`,
+        };
+    }
+
+    return { name, passed: true, message: `${entry.handler} checks for an admin` };
+}
+
 function checkApiRoutesWired(modulePath: string): CheckResult {
     const name = "API routes wired";
     const manifestPath = path.join(modulePath, "module.json");
@@ -790,6 +845,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkNoAnyTypes(modulePath),
         checkApiAuthChecks(modulePath),
         checkApiRoutesWired(modulePath),
+        checkStatsApiAuth(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

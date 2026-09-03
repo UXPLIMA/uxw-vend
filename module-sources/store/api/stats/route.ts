@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatCurrency } from "@/core/sdk";
-import { prisma } from "@/core/sdk/server";
+import { isAdmin, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
 
 /**
  * Store stats endpoint.
@@ -15,7 +16,22 @@ import { prisma } from "@/core/sdk/server";
  * Accepts ?period=7|30|90|365 to match the analytics date range picker.
  * Defaults to 30 days.
  */
+/**
+ * The dashboard and analytics screens are the only callers, and both are
+ * behind the admin panel. Without this the endpoint answered anyone: an
+ * anonymous request read the numbers straight out of the database.
+ */
+async function requireAdmin(): Promise<NextResponse | null> {
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return null;
+}
+
 export async function GET(request: NextRequest) {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const period = Math.min(
         365,
         Math.max(1, parseInt(request.nextUrl.searchParams.get("period") || "30", 10) || 30),
