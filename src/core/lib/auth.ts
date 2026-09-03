@@ -12,7 +12,11 @@ import {
 import { getClientIP } from "./rate-limit";
 
 import type { Provider } from "next-auth/providers";
-import { ModuleAuthProviders, ModuleAuthProviderFactories } from "@/core/generated/module-auth-providers";
+import {
+    ModuleAuthProviders,
+    ModuleAuthProviderFactories,
+    ModuleOwnAuthProviderFactories,
+} from "@/core/generated/module-auth-providers";
 import { resolveAuthProviders } from "./auth-providers";
 
 // OAuth providers come from installed modules only - core names none. A module
@@ -20,6 +24,7 @@ import { resolveAuthProviders } from "./auth-providers";
 // declarations, and the provider activates once its env vars are set.
 const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
     factories: ModuleAuthProviderFactories,
+    moduleFactories: ModuleOwnAuthProviderFactories,
 }) as Provider[];
 
 // Session cookie hardening.

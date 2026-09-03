@@ -1,0 +1,21 @@
+// Steam Login Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// One-time ticket handed to the browser after Steam verifies an identity.
+//
+// The Steam callback arrives as a plain browser redirect and cannot mint a
+// session by itself, so it parks the verified Steam id here and sends the
+// browser to a page that trades the ticket for a real Auth.js sign-in.
+//
+// Only the SHA-256 of the token is stored: a leaked database dump then holds
+// no usable tickets. Rows are deleted the moment they are used, and expire
+// after a couple of minutes either way.
+model SteamLoginTicket {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  steamId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}

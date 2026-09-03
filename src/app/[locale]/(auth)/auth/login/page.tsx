@@ -223,7 +223,20 @@ export default function LoginPage() {
                                     <div className={`grid ${oauthButtons.length === 1 ? "grid-cols-1" : "grid-cols-2"} gap-3`}>
                                         {oauthButtons.map(btn => (
                                             <Button key={btn.id} type="button" variant="outline"
-                                                onClick={() => signIn(btn.provider, { callbackUrl: "/" })}
+                                                // A provider that does not start its flow the Auth.js way
+                                                // (Steam opens an OpenID 2.0 redirect) names its own entry
+                                                // route in the manifest; everything else goes through signIn.
+                                                // The manifest schema already forbids an off-site href; this
+                                                // is the second look, because getting it wrong points the
+                                                // sign-in button at somebody else's login form.
+                                                onClick={() => {
+                                                    const href = btn.href ?? "";
+                                                    if (href.startsWith("/") && !href.startsWith("//")) {
+                                                        window.location.href = href;
+                                                    } else {
+                                                        signIn(btn.provider, { callbackUrl: "/" });
+                                                    }
+                                                }}
                                                 className="border-border text-foreground hover:bg-muted">
                                                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill={btn.color}>
                                                     {btn.svgIcon.includes("|")

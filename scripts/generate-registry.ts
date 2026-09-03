@@ -122,7 +122,7 @@ function generateRegistry() {
     const allSettingsCards: ManifestItem[] = [];
     const allOauthButtons: ManifestItem[] = [];
     const allNavGroups: ModuleNavGroupDeclaration[] = [];
-    const allAuthProviders: ({ id: string; envIdVar: string; envSecretVar: string; module: string })[] = [];
+    const allAuthProviders: ({ id: string; envIdVar?: string; envSecretVar?: string; factory?: string; envVars?: string[]; module: string })[] = [];
     const allWebhookChannels: ({ id: string; label: string; layout: string; hosts?: string[]; urlPlaceholder?: string; module: string })[] = [];
     const allProfileTabs: ({ id: string; label: string; component: string; order: number; module: string })[] = [];
     const allStorageProviders: ({ id: string; name: string; handler: string; module: string })[] = [];
@@ -276,7 +276,7 @@ function generateRegistry() {
     profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
 
     widgetRegistry += profileTabImports;
-    widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; href?: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
     widgetRegistry += `// Admin nav groups declared by modules. A group with no items is never rendered.\n`;
     widgetRegistry += `export const ModuleNavGroups: { id: string; label: string; icon?: string; order?: number; module: string }[] = ${JSON.stringify(allNavGroups, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n\n`;
@@ -386,6 +386,12 @@ function generateRegistry() {
     // The id is interpolated into an import specifier here, so it is re-checked
     // even though the manifest schema already enforces the same slug rule.
     const PROVIDER_ID = /^[a-z0-9][a-z0-9-]*$/;
+    // A module-supplied provider's factory path is interpolated into an import
+    // specifier too, so it gets the same second look: in-tree, relative, no
+    // traversal. The manifest schema already enforces this; a manifest that
+    // reached codegen without passing validation must not be the one chance to
+    // catch it.
+    const FACTORY_PATH = /^[A-Za-z0-9_][A-Za-z0-9_\-./]*$/;
     const authProviderImports: string[] = [];
     const authProviderEntries: string[] = [];
     const seenProviderIds = new Set<string>();
@@ -396,14 +402,34 @@ function generateRegistry() {
             );
             return false;
         }
+        if (p.factory !== undefined) {
+            const factory = String(p.factory);
+            if (!FACTORY_PATH.test(factory) || factory.split('/').includes('..')) {
+                console.warn(
+                    `[registry] module "${p.module}" declared an unsafe auth provider factory ` +
+                        `"${factory}" - skipped.`,
+                );
+                return false;
+            }
+        }
         return true;
     });
+    const moduleProviderEntries: string[] = [];
     for (const provider of safeAuthProviders) {
         if (seenProviderIds.has(provider.id)) continue;
         seenProviderIds.add(provider.id);
         const local = `AuthProvider_${provider.id.replace(/-/g, '_')}`;
-        authProviderImports.push(`import ${local} from "next-auth/providers/${provider.id}";`);
-        authProviderEntries.push(`    ${JSON.stringify(provider.id)}: ${local},`);
+        if (provider.factory) {
+            // Module-supplied provider: the file lives in the module's own tree
+            // and is imported through the same `@/modules/<name>/...` alias
+            // every other module ref uses.
+            const factoryPath = String(provider.factory).replace(/\.tsx?$/, '');
+            authProviderImports.push(`import ${local} from "@/modules/${provider.module}/${factoryPath}";`);
+            moduleProviderEntries.push(`    ${JSON.stringify(provider.id)}: ${local},`);
+        } else {
+            authProviderImports.push(`import ${local} from "next-auth/providers/${provider.id}";`);
+            authProviderEntries.push(`    ${JSON.stringify(provider.id)}: ${local},`);
+        }
     }
 
     const AUTH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-auth-providers.ts');
@@ -413,13 +439,23 @@ function generateRegistry() {
     authContent += '// the env vars it names are set.\n';
     if (authProviderImports.length > 0) authContent += `${authProviderImports.join('\n')}\n`;
     authContent += '\n';
-    authContent += `export const ModuleAuthProviders: { id: string; envIdVar: string; envSecretVar: string; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
+    authContent += `export const ModuleAuthProviders: { id: string; envIdVar?: string; envSecretVar?: string; factory?: string; envVars?: string[]; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
+    authContent += '// Providers Auth.js ships. Each one takes a client id and secret and\n';
+    authContent += '// nothing else.\n';
     authContent += 'export const ModuleAuthProviderFactories: Record<string, (config: {\n';
     authContent += '    clientId: string;\n';
     authContent += '    clientSecret: string;\n';
     authContent += '    allowDangerousEmailAccountLinking: boolean;\n';
     authContent += '}) => unknown> = {\n';
     authContent += authProviderEntries.length > 0 ? `${authProviderEntries.join('\n')}\n` : '';
+    authContent += '};\n\n';
+    authContent += '// Providers a module built itself. Each one receives the env vars its\n';
+    authContent += '// manifest declared, already checked to be present and non-empty.\n';
+    authContent += 'export const ModuleOwnAuthProviderFactories: Record<string, (config: {\n';
+    authContent += '    env: Record<string, string>;\n';
+    authContent += '    allowDangerousEmailAccountLinking: boolean;\n';
+    authContent += '}) => unknown> = {\n';
+    authContent += moduleProviderEntries.length > 0 ? `${moduleProviderEntries.join('\n')}\n` : '';
     authContent += '};\n';
     fs.writeFileSync(AUTH_FILE, authContent);
 

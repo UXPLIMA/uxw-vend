@@ -320,7 +320,13 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
 ]
 ```
 
-### `authProviders` - OAuth sign-in providers
+### `authProviders` - sign-in providers
+
+Core ships no sign-in provider beyond email and password. A module contributes
+one in either of two shapes.
+
+**A provider Auth.js already ships.** Name the two environment variables that
+hold its credentials:
 
 ```json
 "authProviders": [
@@ -328,13 +334,54 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
 ]
 ```
 
-Core ships no OAuth provider. `id` is an Auth.js provider id - the registry
-generator emits `import from "next-auth/providers/<id>"`, so it must be a
-lowercase slug and must be a provider Auth.js actually ships.
+`id` is the Auth.js provider id - the registry generator emits
+`import from "next-auth/providers/<id>"`, so it must be a lowercase slug and
+must be a provider Auth.js actually ships. The provider receives exactly a
+client id and a secret.
 
-The provider activates only when both named environment variables are set, which
-is what lets an installed-but-unconfigured module contribute nothing. Pair this
-with an `oauthButtons` entry to render the login button.
+**A provider you build yourself.** Point `factory` at a file in your module and
+list the environment variables it needs:
+
+```json
+"authProviders": [
+    { "id": "steam", "factory": "auth/steam-provider.ts", "envVars": ["AUTH_STEAM_API_KEY"] }
+]
+```
+
+The file's default export is called with `{ env, allowDangerousEmailAccountLinking }`,
+where `env` holds exactly the variables you named, each already checked to be
+present and non-empty:
+
+```ts
+import Credentials from "next-auth/providers/credentials";
+
+export default function steamProvider({ env }: { env: Record<string, string> }) {
+    return Credentials({ id: "steam", name: "Steam", /* ... */ });
+}
+```
+
+Reach for a factory when Auth.js has no provider for the identity system at all
+- Steam speaks OpenID 2.0 rather than OAuth2, which is why `steam-auth` ships
+one - or when a built-in provider needs more than two credentials, such as
+Battle.net's required region issuer or Apple's signed-JWT secret.
+
+Either way the provider stays inactive until every variable it names is set,
+which is what lets an installed-but-unconfigured module contribute nothing.
+Pair this with an `oauthButtons` entry to render the login button.
+
+A flow that does not begin the way Auth.js expects gives its button an `href`
+instead, and the login page navigates there rather than calling `signIn()`:
+
+```json
+"oauthButtons": [
+    { "id": "steam-login", "provider": "steam", "label": "Steam",
+      "color": "currentColor", "svgIcon": "M11.9...", "href": "/api/v1/steam-auth/start" }
+]
+```
+
+`href` must be a same-origin path. Anything else - an absolute URL, a
+protocol-relative one - is rejected by manifest validation, because it would
+aim the sign-in button at another site.
 
 ### `webhookChannels` - Outbound webhook delivery
 
@@ -767,7 +814,7 @@ ESLint.
 | Entry point | Use from | Contents |
 |-------------|----------|----------|
 | `@/core/sdk` | server **and** client | formatting, slugs, the hook bus |
-| `@/core/sdk/server` | server only | `prisma`, permissions, rate limiting, cache, secrets, activity log, revisions, uploads, 2FA, email, API envelope, `isModuleEnabled` |
+| `@/core/sdk/server` | server only | `prisma`, permissions, rate limiting, cache, secrets, activity log, revisions, uploads, 2FA, email, API envelope, `isModuleEnabled`, `resolveAppUrl` |
 | `@/core/sdk/auth` | server only | `auth()` session lookup |
 | `@/core/sdk/navigation` | client | locale-aware `Link`, `useRouter`, `redirect`, `usePathname` |
 | `@/core/sdk/blocks` | client | `buildMergedBlockConfig` (Puck) |
@@ -937,7 +984,7 @@ Declaring a payload is optional - an undeclared hook works exactly as before. De
     "settingsCards":     [{ "title": "My Settings", "description": "...", "href": "/my-settings", "icon": "Settings", "color": "text-gray-500" }],
     "navGroups":         [{ "id": "my-group", "label": "My Group", "icon": "Package", "order": 10 }],
     "authProviders":     [{ "id": "my-provider", "envIdVar": "AUTH_MY_ID", "envSecretVar": "AUTH_MY_SECRET" }],
-    "oauthButtons":      [{ "id": "my-login", "provider": "my-provider", "label": "My Login", "color": "#000000", "svgIcon": "M12..." }],
+    "oauthButtons":      [{ "id": "my-login", "provider": "my-provider", "label": "My Login", "color": "#000000", "svgIcon": "M12...", "href": "/api/v1/my-provider/start" }],
     "webhookChannels":   [{ "id": "my-chat", "label": "My Chat", "layout": "embed", "hosts": ["hooks.example.com"] }],
     "contextProviders":  [{ "id": "MyProvider", "component": "providers/MyProvider", "order": 10 }],
     "hookListeners":     [{ "hook": "user.registered", "type": "action", "handler": "hooks/on-user.ts", "priority": 10 }],

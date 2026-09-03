@@ -115,6 +115,26 @@ const oauthButton = z.object({
     label: z.string().min(1).max(100),
     color: z.string().min(1).max(32),
     svgIcon: z.string().min(1).max(8192),
+    /**
+     * Send the visitor here instead of calling `signIn(provider)`.
+     *
+     * Auth.js starts a login by POSTing to its own signin endpoint, which
+     * suits OAuth2 and nothing else. A provider that opens its flow some
+     * other way - Steam hands you an OpenID 2.0 redirect - points the button
+     * at its own entry route instead. Same-origin only: an absolute URL here
+     * would let a manifest aim the sign-in button at any site it likes, and
+     * so would a protocol-relative one, which is why a second leading slash
+     * is rejected too.
+     */
+    href: z
+        .string()
+        .min(1)
+        .max(200)
+        .regex(
+            /^\/(?![/\\])[A-Za-z0-9\-._~!$&'()*+,;=:@%/]*$/,
+            "href must be a same-origin path starting with a single /",
+        )
+        .optional(),
 });
 
 const navGroup = z.object({
@@ -138,11 +158,74 @@ const webhookChannel = z.object({
 // The provider id is interpolated into a `next-auth/providers/<id>` import, so
 // it is held to the strict slug rule rather than the looser SAFE_SLUG used for
 // display-only ids - a "/" or ".." here would escape the providers directory.
-const authProvider = z.object({
-    id: z.string().min(1).max(64).regex(SAFE_ID, "Auth provider id must be a lowercase slug"),
-    envIdVar: z.string().min(1).max(128).regex(/^[A-Z][A-Z0-9_]*$/, "envIdVar must be an env var name"),
-    envSecretVar: z.string().min(1).max(128).regex(/^[A-Z][A-Z0-9_]*$/, "envSecretVar must be an env var name"),
-});
+const ENV_VAR_NAME = /^[A-Z][A-Z0-9_]*$/;
+
+/**
+ * An identity provider a module contributes to the sign-in page.
+ *
+ * Two shapes, and which one you get depends on whether Auth.js already ships
+ * the provider:
+ *
+ * - **Built in.** Give `envIdVar` and `envSecretVar`. The id resolves as
+ *   `next-auth/providers/<id>` and receives exactly a client id and secret.
+ *   This covers every ordinary OAuth2 login.
+ * - **Module supplied.** Give `factory` and `envVars`. The module ships the
+ *   provider itself, from a file in its own tree, and names the env vars it
+ *   needs. This is the only way to reach an identity system Auth.js does not
+ *   ship - Steam speaks OpenID 2.0, not OAuth2 - and it is also the way to
+ *   configure a built-in that needs more than two credentials, such as
+ *   Battle.net's required region issuer or Apple's signed-JWT secret.
+ *
+ * Either way the provider stays inactive until every env var it names is set,
+ * so an installed but unconfigured module contributes nothing.
+ */
+const authProvider = z
+    .object({
+        id: z.string().min(1).max(64).regex(SAFE_ID, "Auth provider id must be a lowercase slug"),
+        envIdVar: z.string().min(1).max(128).regex(ENV_VAR_NAME, "envIdVar must be an env var name").optional(),
+        envSecretVar: z
+            .string()
+            .min(1)
+            .max(128)
+            .regex(ENV_VAR_NAME, "envSecretVar must be an env var name")
+            .optional(),
+        /** Module-relative path to a file whose default export builds the provider. */
+        factory: relativePath("factory").optional(),
+        /** Env vars a module-supplied provider needs. All must be set for it to activate. */
+        envVars: z
+            .array(z.string().min(1).max(128).regex(ENV_VAR_NAME, "envVars entries must be env var names"))
+            .min(1)
+            .max(10)
+            .optional(),
+    })
+    .superRefine((value, ctx) => {
+        if (value.factory) {
+            if (!value.envVars) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "an auth provider with a factory must also declare envVars",
+                });
+            }
+            if (value.envIdVar || value.envSecretVar) {
+                ctx.addIssue({
+                    code: "custom",
+                    message:
+                        "an auth provider with a factory takes its credentials from envVars, " +
+                        "not envIdVar/envSecretVar",
+                });
+            }
+            return;
+        }
+        if (value.envVars) {
+            ctx.addIssue({ code: "custom", message: "envVars only applies to an auth provider with a factory" });
+        }
+        if (!value.envIdVar || !value.envSecretVar) {
+            ctx.addIssue({
+                code: "custom",
+                message: "an auth provider without a factory needs both envIdVar and envSecretVar",
+            });
+        }
+    });
 
 const navbarComponent = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
@@ -481,6 +564,7 @@ export function collectManifestFileRefs(m: ValidatedModuleManifest): string[] {
     push(m.hooks?.onDisable);
     push(m.seoRoutes?.handler);
     m.moderationProviders?.forEach((r) => push(r.handler));
+    m.authProviders?.forEach((r) => push(r.factory));
 
     return [...new Set(refs)];
 }
