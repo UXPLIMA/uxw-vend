@@ -34,12 +34,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   behind an edit and delete UI. All five bugs above were of a kind no gate
   looked for, which is why they shipped.
 - The page builder's card block declared an icon and never drew it.
-- **Every unknown URL answered 200.** The layout's error boundary caught
-  everything thrown below it, including the `notFound()` and `redirect()`
-  signals Next raises by throwing. The 404 page still appeared, but the status
-  line had already gone out as 200, so search engines indexed every mistyped
-  URL as a real page. Both boundaries now rethrow Next's control-flow errors
-  and keep catching real render failures.
+- **Every unknown URL answered 200, and so did every crash.** Next commits the
+  status line when it flushes the shell, and two things were putting the whole
+  page inside a Suspense boundary that flushed first: the generated context
+  provider registry loaded each module's provider through `next/dynamic` (a
+  provider wraps the page, so its boundary contained the entire document), and
+  the two catch-all segments carried a `loading.tsx`. A `notFound()` after that
+  point could no longer set 404, a thrown error could no longer set 500, and
+  the admin redirect for a signed-out visitor went out as 200. Context
+  providers are now imported statically, both catch-all `loading.tsx` files are
+  gone, and a test guards each shape. The catch-all pages lose their skeleton
+  while a module page loads; a correct status is worth more.
+- The root `not-found.tsx` called `notFound()` on itself, asking the router to
+  render the page that was already rendering. It renders a plain 404 now, with
+  no locale to translate it into that far out of the tree.
+- **The layout's error boundaries swallowed Next's control-flow signals.** `notFound()` and `redirect()`
+  are raised by throwing, and both boundaries caught them like any other
+  failure. They rethrow those now and keep catching real render failures.
 
 ### Added
 - **Sign in with a username, not only an email.** Registration asks for both

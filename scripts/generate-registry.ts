@@ -292,20 +292,39 @@ function generateRegistry() {
     let footerImports = emitDynamicRegistry('Footer component registry (rendered in site footer)', 'FooterComponentRegistry', allFooterComponents);
     footerImports += `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
 
+    // Context providers are the one registry that must be imported statically.
+    // `next/dynamic` wraps its component in a Suspense boundary, and these
+    // providers WRAP the page, so the whole document ends up inside that
+    // boundary: React flushes the shell before the page renders, the response
+    // is committed as 200, and a later `notFound()` or a thrown error can no
+    // longer set a status. Every 404 on the site was a soft 404 because of it.
+    let contextProviderImports = '';
     let contextImports = '// Context provider registry - wraps children, used for React contexts\n';
+    contextImports += '// Statically imported on purpose: see scripts/generate-registry.ts.\n';
     contextImports += `export const ContextProviderRegistry: Record<string, ComponentType<any>> = {\n`;
-    for (const cp of allContextProviders) {
+    allContextProviders.forEach((cp, index) => {
         const importPath = buildImportPath(cp.component, cp.module);
         const baseName = toComponentName(path.basename(importPath));
-        contextImports += `  '${cp.id}': dynamic(() => import('${importPath}').then((mod: Record<string, unknown>) => (mod['${cp.id}'] ?? mod.${baseName} ?? mod.default ?? mod) as ComponentType<any>), { ssr: true, loading: () => null }),\n`;
-    }
+        const ns = `ContextProviderModule${index}`;
+        contextProviderImports += `import * as ${ns} from '${importPath}';\n`;
+        contextImports += `  '${cp.id}': pickContextProvider(${ns} as unknown as Record<string, unknown>, '${cp.id}', '${baseName}'),\n`;
+    });
+    if (contextProviderImports) contextProviderImports += '\n';
     contextImports += '};\n\n';
     contextImports += `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
+
+    const contextProviderHelper = allContextProviders.length > 0
+        ? `// Resolves the provider a module exported, whatever it named it.\n` +
+          `function pickContextProvider(mod: Record<string, unknown>, id: string, baseName: string): ComponentType<any> {\n` +
+          `    return (mod[id] ?? mod[baseName] ?? mod.default ?? mod) as ComponentType<any>;\n` +
+          `}\n\n`
+        : '';
+    contextImports = contextProviderHelper + contextImports;
 
     let slotImports = emitDynamicRegistry("Slot content registry - modules injecting into other modules' named slots", 'SlotContentRegistry', allSlotContents);
     slotImports += `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
 
-    const content = imports + routeData + '\n\n' + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + slotImports + widgetRegistry;
+    const content = imports + contextProviderImports + routeData + '\n\n' + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + slotImports + widgetRegistry;
 
     const dir = path.dirname(OUTPUT_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
