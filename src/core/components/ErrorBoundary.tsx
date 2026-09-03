@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { unstable_rethrow } from "next/navigation";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 
@@ -21,10 +22,16 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     }
 
     static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+        // `notFound()`, `redirect()` and friends signal by throwing. Catching
+        // one here swallows the signal: the server had already committed a 200
+        // by the time the not-found page appeared, so every unknown URL was a
+        // soft 404 that search engines happily indexed.
+        unstable_rethrow(error);
         return { hasError: true, error };
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        unstable_rethrow(error);
         // Report to server
         fetch("/api/v1/error-report", {
             method: "POST",

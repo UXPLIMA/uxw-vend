@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { unstable_rethrow } from "next/navigation";
 
 interface Props {
     children: React.ReactNode;
@@ -22,11 +23,16 @@ export class ModuleErrorBoundary extends React.Component<Props, State> {
         this.state = { hasError: false };
     }
 
-    static getDerivedStateFromError(): State {
+    static getDerivedStateFromError(error: Error): State {
+        // A module component that calls `notFound()` or `redirect()` signals by
+        // throwing. Swallowing that here turns the signal into an inline
+        // "failed to load" box on a page that still answers 200.
+        unstable_rethrow(error);
         return { hasError: true };
     }
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
+        unstable_rethrow(error);
         console.error("[ModuleErrorBoundary] Component failed to render:", error, info.componentStack);
     }
 
