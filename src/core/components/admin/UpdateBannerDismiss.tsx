@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowUpCircle, X } from "lucide-react";
 
 interface Props {
@@ -16,6 +17,7 @@ const STORAGE_KEY = "uxwvend.admin.updateBanner.dismissedFor";
  * changes the banner reappears, nudging the admin to take another look.
  */
 export function UpdateBannerDismiss({ count, children }: Props) {
+    const t = useTranslations("admin");
     const [dismissed, setDismissed] = useState(false);
 
     useEffect(() => {
@@ -51,7 +53,7 @@ export function UpdateBannerDismiss({ count, children }: Props) {
             <button
                 type="button"
                 onClick={dismiss}
-                aria-label="Dismiss update notification"
+                aria-label={t("updates_dismiss")}
                 className="flex-shrink-0 rounded p-1 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/40"
             >
                 <X className="w-4 h-4" />

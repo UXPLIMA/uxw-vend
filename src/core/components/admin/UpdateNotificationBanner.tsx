@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/core/lib/i18n/navigation";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
@@ -81,6 +82,7 @@ async function countAvailableUpdates(): Promise<number> {
  * the marketplace. Falls back to rendering nothing on any failure.
  */
 export async function UpdateNotificationBanner() {
+    const t = await getTranslations("admin");
     const session = await auth();
     if (!session?.user?.id) return null;
     if (!(await isAdmin(session.user.id, session.user.role))) return null;
@@ -103,7 +105,7 @@ export async function UpdateNotificationBanner() {
                 href="/admin/modules?filter=updates"
                 className="underline font-semibold hover:no-underline"
             >
-                View
+                {t("updates_view")}
             </Link>
         </UpdateBannerDismiss>
     );

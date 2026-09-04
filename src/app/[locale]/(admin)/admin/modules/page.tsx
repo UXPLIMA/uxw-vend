@@ -101,7 +101,7 @@ export default function AdminModulesPage() {
                             </span>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => setUpdatesOnly(false)}>
-                            <X className="w-3 h-3 mr-1" /> Clear filter
+                            <X className="w-3 h-3 mr-1" /> {t("modules_clearFilter")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -284,7 +284,7 @@ export default function AdminModulesPage() {
                                     {selectedModules.size === filteredMarketplace.length ? t("modules_deselectAll") : t("modules_selectAll")}
                                 </Button>
                             )}
-                            <label className="text-xs text-muted-foreground">Sort:</label>
+                            <label className="text-xs text-muted-foreground">{t("modules_sort")}</label>
                             <select
                                 value={sortKey}
                                 onChange={(e) => setSortKey(e.target.value as SortKey)}
@@ -314,7 +314,7 @@ export default function AdminModulesPage() {
                     {allTags.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1.5">
                             <TagIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground mr-1">Tags:</span>
+                            <span className="text-xs text-muted-foreground mr-1">{t("modules_tags")}</span>
                             {allTags.map((tag) => {
                                 const active = selectedTags.has(tag);
                                 return (

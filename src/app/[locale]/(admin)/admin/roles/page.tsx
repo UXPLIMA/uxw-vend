@@ -209,7 +209,7 @@ export default function AdminRolesPage() {
                                     <Input
                                         value={form.displayName}
                                         onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-                                        placeholder="Moderator"
+                                        placeholder={t("roles_namePlaceholder")}
                                         required
                                     />
                                 </div>
@@ -299,7 +299,7 @@ export default function AdminRolesPage() {
                                 </div>
                                 <div className="flex gap-1">
                                     <Button variant="ghost" size="sm" onClick={() => startEdit(role)}>
-                                        Edit
+                                        {t("crud_edit")}
                                     </Button>
                                     {role.name !== "admin" && role.name !== "member" && (
                                         <Button

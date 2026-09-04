@@ -161,7 +161,7 @@ export default function WidgetSettingsPage() {
                                     size="sm"
                                     onClick={() => toggle(widget.id)}
                                 >
-                                    {widgetConfig[widget.id] ? <><Eye className="w-3 h-3 mr-1" /> Visible</> : <><EyeOff className="w-3 h-3 mr-1" /> Hidden</>}
+                                    {widgetConfig[widget.id] ? <><Eye className="w-3 h-3 mr-1" /> {t("widgets_visible")}</> : <><EyeOff className="w-3 h-3 mr-1" /> {t("widgets_hidden")}</>}
                                 </Button>
                             </div>
                         ))}

@@ -19,6 +19,7 @@ const typeIcons: Record<string, typeof User> = {
 
 export function AdminSearch() {
     const t = useTranslations("common");
+    const at = useTranslations("admin");
 
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
@@ -53,7 +54,7 @@ export function AdminSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => results.length > 0 && setOpen(true)}
-                    placeholder="Search..."
+                    placeholder={at("search_placeholder")}
                     className="w-full pl-9 pr-8 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
                 {query && (
