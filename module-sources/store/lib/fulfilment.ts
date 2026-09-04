@@ -20,63 +20,102 @@ function failed(error: string): PaymentOutcome {
 }
 
 /**
+ * The ledger row id for one credit purchase.
+ *
+ * Deterministic on purpose: it is the idempotency key for a top-up, enforced
+ * by the primary key rather than by a search that two callers can both lose.
+ */
+function creditLedgerId(provider: string, providerRef: string): string {
+    return `credit:${provider}:${providerRef}`;
+}
+
+/**
  * Settles an order.
  *
  * Ownership is granted here and nowhere earlier: an order is created PENDING
  * at checkout and stays that way until a gateway says it was paid for.
  */
 export async function settleOrder(settlement: PaymentSettlement): Promise<PaymentOutcome> {
-    const existing = await prisma.order.findUnique({ where: { id: settlement.reference } });
-    if (!existing) return failed("unknown order");
-    // Webhooks retry, and a buyer can reload a return URL. Both arrive here.
-    if (existing.status === "COMPLETED") return ALREADY;
-
-    await prisma.order.update({
-        where: { id: existing.id },
-        data: {
-            status: "COMPLETED",
-            paymentMethod: settlement.provider,
-            paymentId: settlement.providerRef,
-        },
-    });
-
     const order = await prisma.order.findUnique({
-        where: { id: existing.id },
+        where: { id: settlement.reference },
         include: { user: { select: { email: true, username: true } }, items: true },
     });
-    if (!order) return failed("order vanished mid-settlement");
+    if (!order) return failed("unknown order");
+    // Webhooks retry, and a buyer can reload a return URL. Both arrive here.
+    if (order.status === "COMPLETED") return ALREADY;
 
     // Order.userId is nullable: the account can be deleted between paying and
     // the webhook landing. The order is still paid, so it stays COMPLETED, but
     // there is nobody left to grant anything to.
-    if (!order.userId || !order.user) {
-        log.warn("[store] order paid for by an account that no longer exists", { orderId: order.id });
-        await recordPayment(settlement);
-        return OK;
-    }
-
     const buyerId = order.userId;
     const buyer = order.user;
+    const granted = buyerId ? order.items.filter((item) => item.productId) : [];
+    const productIds = [...new Set(granted.map((item) => item.productId as string))];
 
-    for (const item of order.items) {
-        if (!item.productId) continue;
-        await prisma.chestItem.create({
+    // Marking the order paid, granting what was bought and recording the
+    // payment are one transaction or none of them.
+    //
+    // They used to run one after another. A process that died between the
+    // status update and the grants left a buyer who had paid with a COMPLETED
+    // order and an empty chest - and the duplicate guard above then refused
+    // every webhook retry that would have fixed it, permanently.
+    //
+    // The status precondition is the other half. The read above is a
+    // snapshot: a gateway retry and a reloaded return URL arriving together
+    // both saw PENDING, both passed it, and both granted the same order. A
+    // transaction does not close that on its own, exactly as it does not for
+    // the credit balance at checkout; the condition in the `where` does, by
+    // leaving the second one with nothing to update.
+    const settled = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.order.updateMany({
+            where: { id: order.id, status: { not: "COMPLETED" } },
             data: {
-                userId: buyerId,
-                productId: item.productId,
-                productName: item.name,
-                quantity: item.quantity,
-                orderId: order.id,
+                status: "COMPLETED",
+                paymentMethod: settlement.provider,
+                paymentId: settlement.providerRef,
             },
         });
-        await prisma.ownedProduct.upsert({
-            where: { userId_productId: { userId: buyerId, productId: item.productId } },
-            update: {},
-            create: { userId: buyerId, productId: item.productId, orderId: order.id },
-        });
-    }
+        if (claimed.count === 0) return false;
 
-    await recordPayment(settlement);
+        if (buyerId && granted.length > 0) {
+            await tx.chestItem.createMany({
+                data: granted.map((item) => ({
+                    userId: buyerId,
+                    productId: item.productId as string,
+                    productName: item.name,
+                    quantity: item.quantity,
+                    orderId: order.id,
+                })),
+            });
+            // One row per product, however many of it was bought: the unique
+            // key is (userId, productId), and owning it twice means nothing.
+            await tx.ownedProduct.createMany({
+                data: productIds.map((productId) => ({ userId: buyerId, productId, orderId: order.id })),
+                skipDuplicates: true,
+            });
+        }
+
+        await tx.payment.create({
+            data: {
+                orderId: settlement.reference,
+                provider: settlement.provider,
+                providerId: settlement.providerRef,
+                amount: settlement.amount,
+                currency: settlement.currency.toLowerCase(),
+                status: "COMPLETED",
+                ...(settlement.metadata ? { metadata: settlement.metadata } : {}),
+            },
+        });
+        return true;
+    });
+
+    // Another delivery of the same payment got there first.
+    if (!settled) return ALREADY;
+
+    if (!buyerId || !buyer) {
+        log.warn("[store] order paid for by an account that no longer exists", { orderId: order.id });
+        return OK;
+    }
 
     // Neither of these may hold up the answer to the gateway: the order is
     // paid and granted either way, and a webhook left waiting gets retried.
@@ -90,13 +129,25 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
         buyer.username ||
         "Player";
 
-    for (const item of order.items) {
-        if (!item.productId) continue;
-        const commands = await prisma.productCommand.findMany({
-            where: { productId: item.productId },
-            orderBy: { order: "asc" },
-        });
-        if (commands.length === 0) continue;
+    // One query for every product's commands rather than one per item: an
+    // order of twelve things was twelve round trips before the buyer got a
+    // reply, and a gateway webhook has a timeout.
+    const commandRows = productIds.length
+        ? await prisma.productCommand.findMany({
+              where: { productId: { in: productIds } },
+              orderBy: { order: "asc" },
+          })
+        : [];
+    const commandsByProduct = new Map<string, typeof commandRows>();
+    for (const row of commandRows) {
+        const list = commandsByProduct.get(row.productId);
+        if (list) list.push(row);
+        else commandsByProduct.set(row.productId, [row]);
+    }
+
+    for (const item of granted) {
+        const commands = commandsByProduct.get(item.productId as string);
+        if (!commands || commands.length === 0) continue;
 
         const itemVars = (item.metadata as Record<string, unknown>)?.variables as
             | Record<string, string>
@@ -115,19 +166,6 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
     return OK;
 }
 
-async function recordPayment(settlement: PaymentSettlement): Promise<void> {
-    await prisma.payment.create({
-        data: {
-            orderId: settlement.reference,
-            provider: settlement.provider,
-            providerId: settlement.providerRef,
-            amount: settlement.amount,
-            currency: settlement.currency.toLowerCase(),
-            status: "COMPLETED",
-            ...(settlement.metadata ? { metadata: settlement.metadata } : {}),
-        },
-    });
-}
 
 /**
  * Settles a wallet top-up.
@@ -141,24 +179,39 @@ export async function settleCredits(settlement: PaymentSettlement): Promise<Paym
     const credits = Number(settlement.metadata?.creditAmount ?? 0);
     if (!userId || !(credits > 0)) return failed("credit purchase is missing its amount or buyer");
 
-    // The provider's own id for the money is unique, so a retried webhook
-    // finds the transaction it already wrote.
-    const already = await prisma.creditTransaction.findFirst({
-        where: { userId, type: "credit_purchase", description: { contains: settlement.providerRef } },
-    });
+    // The gateway's own id for the money is the idempotency key, and the
+    // ledger row's primary key is where it is enforced.
+    //
+    // Looking for the row first and writing after did not close anything: a
+    // gateway retry and a reloaded return URL arriving together both found no
+    // row - the search was `description: { contains: … }`, a scan of the whole
+    // ledger at that - and both credited the account. Giving the row a
+    // deterministic id makes the second insert a duplicate key, and the
+    // transaction takes the balance increment down with it.
+    const ledgerId = creditLedgerId(settlement.provider, settlement.providerRef);
+    const already = await prisma.creditTransaction.findUnique({ where: { id: ledgerId } });
     if (already) return ALREADY;
 
-    await prisma.$transaction([
-        prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } }),
-        prisma.creditTransaction.create({
-            data: {
-                userId,
-                amount: credits,
-                type: "credit_purchase",
-                description: `Purchased ${credits} credits via ${settlement.provider} (${settlement.providerRef})`,
-            },
-        }),
-    ]);
+    try {
+        await prisma.$transaction([
+            prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } }),
+            prisma.creditTransaction.create({
+                data: {
+                    id: ledgerId,
+                    userId,
+                    amount: credits,
+                    type: "credit_purchase",
+                    description: `Purchased ${credits} credits via ${settlement.provider} (${settlement.providerRef})`,
+                },
+            }),
+        ]);
+    } catch (error) {
+        // P2002 is the unique constraint: the other delivery won the race.
+        if (error && typeof error === "object" && "code" in error && (error as { code: unknown }).code === "P2002") {
+            return ALREADY;
+        }
+        throw error;
+    }
 
     return OK;
 }
@@ -202,14 +255,25 @@ export async function applySubscriptionChange(change: SubscriptionChange): Promi
     if (change.ended) {
         if (!existing) return failed("unknown subscription");
         if (existing.status === "canceled") return ALREADY;
-        await prisma.subscription.update({
-            where: { id: existing.id },
-            data: { status: "canceled", canceledAt: new Date() },
+
+        // Cancelling the plan and taking the product back are one step. Done
+        // in sequence, a process that died between them left the plan
+        // cancelled and the product still owned - and the guard above then
+        // answered every retry with ALREADY, so the subscriber kept what they
+        // had stopped paying for. The condition in the `where` is what makes
+        // two "ended" events arriving together safe.
+        const ended = await prisma.$transaction(async (tx) => {
+            const claimed = await tx.subscription.updateMany({
+                where: { id: existing.id, status: { not: "canceled" } },
+                data: { status: "canceled", canceledAt: new Date() },
+            });
+            if (claimed.count === 0) return false;
+            await tx.ownedProduct.deleteMany({
+                where: { userId: existing.userId, productId: existing.productId },
+            });
+            return true;
         });
-        await prisma.ownedProduct.deleteMany({
-            where: { userId: existing.userId, productId: existing.productId },
-        });
-        return OK;
+        return ended ? OK : ALREADY;
     }
 
     const periodEnd = change.currentPeriodEnd ? new Date(change.currentPeriodEnd) : null;
@@ -222,19 +286,26 @@ export async function applySubscriptionChange(change: SubscriptionChange): Promi
         return OK;
     }
 
-    await prisma.subscription.create({
-        data: {
-            userId: change.userId,
-            productId: change.productId,
-            stripeSubscriptionId: change.providerRef,
-            status: change.status,
-            currentPeriodEnd: periodEnd ?? new Date(),
-        },
-    });
-    await prisma.ownedProduct.upsert({
-        where: { userId_productId: { userId: change.userId, productId: change.productId } },
-        update: {},
-        create: { userId: change.userId, productId: change.productId },
+    // Same again in the other direction: a new plan and the product it grants
+    // arrive together or not at all. Written in sequence, a failure in between
+    // left a subscription row with nothing granted, and the retry found that
+    // row, took the branch above, and only updated its status - so the
+    // subscriber paid every month for a product they never received.
+    await prisma.$transaction(async (tx) => {
+        await tx.subscription.create({
+            data: {
+                userId: change.userId,
+                productId: change.productId,
+                stripeSubscriptionId: change.providerRef,
+                status: change.status,
+                currentPeriodEnd: periodEnd ?? new Date(),
+            },
+        });
+        await tx.ownedProduct.upsert({
+            where: { userId_productId: { userId: change.userId, productId: change.productId } },
+            update: {},
+            create: { userId: change.userId, productId: change.productId },
+        });
     });
     return OK;
 }

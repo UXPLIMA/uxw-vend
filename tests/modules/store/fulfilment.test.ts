@@ -14,22 +14,77 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+/**
+ * Every model method is one `vi.fn`, reachable through two clients: `db`, the
+ * module-level one, and the transaction client the `$transaction` callback is
+ * handed. They share the mock so `toHaveBeenCalledWith` reads the same either
+ * way, and `calls` records which client was used - because reaching for the
+ * module-level client inside a transaction callback runs outside the
+ * transaction and looks identical in the source.
+ */
+interface Call {
+    op: string;
+    args: Record<string, unknown>;
+    viaTx: boolean;
+}
+const calls: Call[] = [];
+
 const db = {
-    order: { findUnique: vi.fn(), update: vi.fn(async () => ({})) },
-    chestItem: { create: vi.fn(async () => ({})) },
-    ownedProduct: { upsert: vi.fn(async () => ({})), deleteMany: vi.fn(async () => ({})) },
+    order: {
+        findUnique: vi.fn(),
+        update: vi.fn(async () => ({})),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+    },
+    chestItem: { create: vi.fn(async () => ({})), createMany: vi.fn(async () => ({ count: 1 })) },
+    ownedProduct: {
+        upsert: vi.fn(async () => ({})),
+        createMany: vi.fn(async () => ({ count: 1 })),
+        deleteMany: vi.fn(async () => ({})),
+    },
     payment: { create: vi.fn(async () => ({})), findFirst: vi.fn(), update: vi.fn(async () => ({})) },
     productCommand: { findMany: vi.fn(async () => []) },
     user: { update: vi.fn(async () => ({})) },
-    creditTransaction: { findFirst: vi.fn(async () => null), create: vi.fn(async () => ({})) },
-    subscription: { findFirst: vi.fn(), update: vi.fn(async () => ({})), create: vi.fn(async () => ({})) },
-    // The real client runs these atomically; the promises are already built by
-    // the caller, so awaiting them is the same set of writes in the same order.
-    $transaction: vi.fn(async (ops: Promise<unknown>[]) => Promise.all(ops)),
+    creditTransaction: { findUnique: vi.fn(async () => null), create: vi.fn(async () => ({})) },
+    subscription: {
+        findFirst: vi.fn(),
+        update: vi.fn(async () => ({})),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+        create: vi.fn(async () => ({})),
+    },
+    // The real client runs a callback's writes atomically, and builds the
+    // array form's promises before it ever sees them; either way the same
+    // writes happen in the same order.
+    $transaction: vi.fn(async (arg: unknown) => {
+        if (typeof arg === "function") return await (arg as (tx: unknown) => Promise<unknown>)(txClient);
+        return await Promise.all(arg as Promise<unknown>[]);
+    }),
 };
 
+/** Wraps every model method so the client it came through is recorded. */
+function trace(client: Record<string, Record<string, unknown>>, viaTx: boolean) {
+    const out: Record<string, Record<string, unknown>> = {};
+    for (const [model, methods] of Object.entries(client)) {
+        if (typeof methods !== "object" || methods === null) continue;
+        out[model] = {};
+        for (const [name, fn] of Object.entries(methods)) {
+            out[model][name] = async (args: Record<string, unknown>) => {
+                calls.push({ op: `${model}.${name}`, args, viaTx });
+                return await (fn as (a: unknown) => Promise<unknown>)(args);
+            };
+        }
+    }
+    return out;
+}
+
+const models = Object.fromEntries(Object.entries(db).filter(([k]) => k !== "$transaction")) as Record<
+    string,
+    Record<string, unknown>
+>;
+const txClient = trace(models, true);
+const prismaClient = { ...trace(models, false), $transaction: db.$transaction };
+
 vi.mock("@/core/sdk/server", () => ({
-    prisma: db,
+    prisma: prismaClient,
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
@@ -68,32 +123,36 @@ const paidOrder = {
 
 beforeEach(() => {
     vi.clearAllMocks();
+    calls.length = 0;
     db.order.update.mockResolvedValue({});
+    db.order.updateMany.mockResolvedValue({ count: 1 });
+    db.subscription.updateMany.mockResolvedValue({ count: 1 });
+    db.chestItem.createMany.mockResolvedValue({ count: 1 });
+    db.ownedProduct.createMany.mockResolvedValue({ count: 1 });
     db.productCommand.findMany.mockResolvedValue([]);
-    db.creditTransaction.findFirst.mockResolvedValue(null);
+    db.creditTransaction.findUnique.mockResolvedValue(null);
 });
 
 describe("settleOrder", () => {
     it("completes the order, grants what was bought and records the payment", async () => {
-        db.order.findUnique
-            .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
-            .mockResolvedValueOnce(paidOrder);
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING" });
 
         const outcome = await settleOrder(settlement);
 
         expect(outcome).toEqual({ handled: true, duplicate: false, error: null });
-        expect(db.order.update).toHaveBeenCalledWith(
-            expect.objectContaining({
-                where: { id: "order-1" },
-                data: expect.objectContaining({
-                    status: "COMPLETED",
-                    paymentMethod: "stripe",
-                    paymentId: "pi_123",
-                }),
+        // Claimed with a condition, not a bare update: the read above is a
+        // snapshot, and a gateway retry racing a reloaded return URL would
+        // otherwise pass it twice and grant the order twice.
+        expect(db.order.updateMany).toHaveBeenCalledWith({
+            where: { id: "order-1", status: { not: "COMPLETED" } },
+            data: expect.objectContaining({
+                status: "COMPLETED",
+                paymentMethod: "stripe",
+                paymentId: "pi_123",
             }),
-        );
-        expect(db.chestItem.create).toHaveBeenCalledTimes(1);
-        expect(db.ownedProduct.upsert).toHaveBeenCalledTimes(1);
+        });
+        expect(db.chestItem.createMany).toHaveBeenCalledTimes(1);
+        expect(db.ownedProduct.createMany).toHaveBeenCalledTimes(1);
         expect(db.payment.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 data: expect.objectContaining({
@@ -111,13 +170,11 @@ describe("settleOrder", () => {
     });
 
     it("records the payment method the money actually came through", async () => {
-        db.order.findUnique
-            .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
-            .mockResolvedValueOnce(paidOrder);
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING" });
 
         await settleOrder({ ...settlement, provider: "paypal", providerRef: "PAY-9" });
 
-        expect(db.order.update).toHaveBeenCalledWith(
+        expect(db.order.updateMany).toHaveBeenCalledWith(
             expect.objectContaining({
                 data: expect.objectContaining({ paymentMethod: "paypal", paymentId: "PAY-9" }),
             }),
@@ -130,8 +187,8 @@ describe("settleOrder", () => {
         const outcome = await settleOrder(settlement);
 
         expect(outcome).toEqual({ handled: true, duplicate: true, error: null });
-        expect(db.order.update).not.toHaveBeenCalled();
-        expect(db.chestItem.create).not.toHaveBeenCalled();
+        expect(db.order.updateMany).not.toHaveBeenCalled();
+        expect(db.chestItem.createMany).not.toHaveBeenCalled();
         expect(db.payment.create).not.toHaveBeenCalled();
         expect(announceOrderCompleted).not.toHaveBeenCalled();
     });
@@ -146,30 +203,104 @@ describe("settleOrder", () => {
 
         expect(outcome.handled).toBe(true);
         expect(outcome.error).toMatch(/unknown order/i);
-        expect(db.order.update).not.toHaveBeenCalled();
+        expect(db.order.updateMany).not.toHaveBeenCalled();
     });
 
     // The order is paid either way. There is simply nobody left to grant to.
     it("keeps a paid order completed when the buyer's account is gone", async () => {
-        db.order.findUnique
-            .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
-            .mockResolvedValueOnce({ ...paidOrder, userId: null, user: null });
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING", userId: null, user: null });
 
         const outcome = await settleOrder(settlement);
 
         expect(outcome.handled).toBe(true);
         expect(db.payment.create).toHaveBeenCalledTimes(1);
-        expect(db.chestItem.create).not.toHaveBeenCalled();
+        expect(db.chestItem.createMany).not.toHaveBeenCalled();
         expect(sendOrderConfirmationEmail).not.toHaveBeenCalled();
+    });
+
+    /**
+     * The order was marked COMPLETED, then re-read, then granted a row at a
+     * time, then paid - four sets of round trips after it already said it was
+     * paid. A process that died in between left a buyer who had paid with a
+     * COMPLETED order and an empty chest, and the duplicate guard above then
+     * refused every retry that would have fixed it.
+     */
+    it("completes, grants and records the payment through one transaction client", async () => {
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING" });
+
+        await settleOrder(settlement);
+
+        expect(calls.filter((c) => c.viaTx).map((c) => c.op)).toEqual([
+            "order.updateMany",
+            "chestItem.createMany",
+            "ownedProduct.createMany",
+            "payment.create",
+        ]);
+        // Anything that completes or grants through the module-level client
+        // runs outside the transaction, however it is spelled.
+        const outside = calls.filter((c) => !c.viaTx).map((c) => c.op);
+        for (const op of ["order.update", "order.updateMany", "chestItem.create", "chestItem.createMany", "ownedProduct.upsert", "ownedProduct.createMany", "payment.create"]) {
+            expect(outside, `${op} must not run outside the transaction`).not.toContain(op);
+        }
+    });
+
+    it("grants nothing when another delivery of the same payment won the claim", async () => {
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING" });
+        db.order.updateMany.mockResolvedValueOnce({ count: 0 });
+
+        const outcome = await settleOrder(settlement);
+
+        expect(outcome).toEqual({ handled: true, duplicate: true, error: null });
+        expect(calls.map((c) => c.op)).toEqual(["order.findUnique", "order.updateMany"]);
+        expect(announceOrderCompleted).not.toHaveBeenCalled();
+    });
+
+    it("writes one ownership row per product however many lines bought it", async () => {
+        db.order.findUnique.mockResolvedValueOnce({
+            ...paidOrder,
+            status: "PENDING",
+            items: [
+                { id: "i1", productId: "prod-1", name: "VIP", quantity: 1, metadata: {} },
+                { id: "i2", productId: "prod-1", name: "VIP", quantity: 2, metadata: {} },
+                { id: "i3", productId: "prod-2", name: "Kit", quantity: 1, metadata: {} },
+            ],
+        });
+
+        await settleOrder(settlement);
+
+        const chest = calls.find((c) => c.op === "chestItem.createMany")!;
+        const owned = calls.find((c) => c.op === "ownedProduct.createMany")!;
+        expect((chest.args.data as unknown[]).length).toBe(3);
+        expect((owned.args.data as { productId: string }[]).map((r) => r.productId)).toEqual(["prod-1", "prod-2"]);
+        expect(owned.args.skipDuplicates).toBe(true);
+    });
+
+    // Twelve line items used to be twelve queries before the gateway got its
+    // answer, and a webhook has a timeout.
+    it("reads the delivery commands once for the whole order", async () => {
+        db.order.findUnique.mockResolvedValueOnce({
+            ...paidOrder,
+            status: "PENDING",
+            items: [
+                { id: "i1", productId: "prod-1", name: "VIP", quantity: 1, metadata: {} },
+                { id: "i2", productId: "prod-2", name: "Kit", quantity: 1, metadata: {} },
+            ],
+        });
+
+        await settleOrder(settlement);
+
+        const queries = calls.filter((c) => c.op === "productCommand.findMany");
+        expect(queries.length).toBe(1);
+        expect(queries[0].args.where).toEqual({ productId: { in: ["prod-1", "prod-2"] } });
     });
 
     // A webhook left waiting is a webhook that gets retried, so the slow parts
     // are started and not awaited.
     it("does not make the gateway wait for the email or the delivery commands", async () => {
-        db.order.findUnique
-            .mockResolvedValueOnce({ id: "order-1", status: "PENDING" })
-            .mockResolvedValueOnce(paidOrder);
-        db.productCommand.findMany.mockResolvedValue([{ command: "give {player} vip", serverId: "srv-1", order: 0 }]);
+        db.order.findUnique.mockResolvedValueOnce({ ...paidOrder, status: "PENDING" });
+        db.productCommand.findMany.mockResolvedValue([
+            { productId: "prod-1", command: "give {player} vip", serverId: "srv-1", order: 0 },
+        ]);
         sendOrderConfirmationEmail.mockRejectedValueOnce(new Error("smtp down"));
 
         const outcome = await settleOrder(settlement);
@@ -205,12 +336,46 @@ describe("settleCredits", () => {
     });
 
     it("does not grant twice when the same payment is reported again", async () => {
-        db.creditTransaction.findFirst.mockResolvedValueOnce({ id: "tx-1" });
+        db.creditTransaction.findUnique.mockResolvedValueOnce({ id: "credit:stripe:pi_credit" });
 
         const outcome = await settleCredits(topUp);
 
         expect(outcome).toEqual({ handled: true, duplicate: true, error: null });
         expect(db.user.update).not.toHaveBeenCalled();
+    });
+
+    /**
+     * The duplicate check used to be `findFirst` on
+     * `description: { contains: providerRef }` - a scan of the whole ledger,
+     * and a read that two concurrent deliveries both lose: neither found a
+     * row and both credited the account. The row's primary key is the
+     * idempotency key now.
+     */
+    it("keys the ledger row on the gateway's own reference", async () => {
+        await settleCredits(topUp);
+
+        expect(db.creditTransaction.findUnique).toHaveBeenCalledWith({
+            where: { id: "credit:stripe:pi_credit" },
+        });
+        expect(db.creditTransaction.create).toHaveBeenCalledWith(
+            expect.objectContaining({ data: expect.objectContaining({ id: "credit:stripe:pi_credit" }) }),
+        );
+    });
+
+    it("treats a duplicate key from a concurrent delivery as already settled", async () => {
+        db.creditTransaction.create.mockRejectedValueOnce(
+            Object.assign(new Error("Unique constraint failed"), { code: "P2002" }),
+        );
+
+        expect(await settleCredits(topUp)).toEqual({ handled: true, duplicate: true, error: null });
+    });
+
+    it("does not swallow a failure that is not a duplicate", async () => {
+        db.creditTransaction.create.mockRejectedValueOnce(
+            Object.assign(new Error("connection lost"), { code: "P1001" }),
+        );
+
+        await expect(settleCredits(topUp)).rejects.toThrow("connection lost");
     });
 
     it("refuses a top-up with no buyer or no amount", async () => {
@@ -322,6 +487,51 @@ describe("applySubscriptionChange", () => {
         expect(db.ownedProduct.deleteMany).toHaveBeenCalledWith({
             where: { userId: "user-1", productId: "prod-1" },
         });
+    });
+
+    // A plan and the product it pays for arrive together or not at all. Written
+    // in sequence, a failure in between left a subscription row with nothing
+    // granted - and the retry found that row, took the renewal branch, and
+    // only updated its status, so the subscriber paid every month for nothing.
+    it("starts the plan and grants the product in one transaction", async () => {
+        db.subscription.findFirst.mockResolvedValueOnce(null);
+
+        await applySubscriptionChange(change);
+
+        expect(calls.filter((c) => c.viaTx).map((c) => c.op)).toEqual([
+            "subscription.create",
+            "ownedProduct.upsert",
+        ]);
+    });
+
+    // And the same going out: a cancelled plan whose ownership row survived
+    // left the subscriber with what they had stopped paying for, forever,
+    // because the replay guard answered every retry with "already done".
+    it("cancels the plan and withdraws the product in one transaction, conditionally", async () => {
+        db.subscription.findFirst.mockResolvedValueOnce({ id: "sub-row", status: "active", userId: "user-1", productId: "prod-1" });
+
+        await applySubscriptionChange({ ...change, status: "canceled", ended: true });
+
+        expect(db.subscription.updateMany).toHaveBeenCalledWith({
+            where: { id: "sub-row", status: { not: "canceled" } },
+            data: expect.objectContaining({ status: "canceled" }),
+        });
+        expect(calls.filter((c) => c.viaTx).map((c) => c.op)).toEqual([
+            "subscription.updateMany",
+            "ownedProduct.deleteMany",
+        ]);
+    });
+
+    it("withdraws nothing when another cancellation event won the claim", async () => {
+        db.subscription.findFirst.mockResolvedValueOnce({ id: "sub-row", status: "active", userId: "user-1", productId: "prod-1" });
+        db.subscription.updateMany.mockResolvedValueOnce({ count: 0 });
+
+        expect(await applySubscriptionChange({ ...change, ended: true })).toEqual({
+            handled: true,
+            duplicate: true,
+            error: null,
+        });
+        expect(db.ownedProduct.deleteMany).not.toHaveBeenCalled();
     });
 
     it("is safe to replay a cancellation", async () => {
