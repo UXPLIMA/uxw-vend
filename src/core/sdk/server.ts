@@ -77,6 +77,13 @@ export {
 // --- API response envelope ---
 export { apiSuccess, apiError, apiPaginated, devOnlyDetail, withRateLimit } from "@/core/lib/api-utils";
 
+// --- Charts ---
+// A per-day count the database computes. Five stats screens read every row in
+// the window and bucketed it in JavaScript, so the work grew with the site's
+// history to produce at most 366 numbers.
+export { dailySeries, dayLabels } from "@/core/lib/daily-series";
+export type { DailySeriesOptions, DailySeriesRow } from "@/core/lib/daily-series";
+
 // --- Request bodies ---
 // `readJsonBody` returns the parsed body, or the 400 to return when the body
 // is not JSON. A route that calls `request.json()` directly answers a

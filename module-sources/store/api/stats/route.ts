@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatCurrency } from "@/core/sdk";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { dailySeries, dayLabels, isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /**
@@ -55,29 +55,23 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - period);
     startDate.setHours(0, 0, 0, 0);
 
-    const completedInWindow = await prisma.order.findMany({
-        where: { status: "COMPLETED", createdAt: { gte: startDate } },
-        select: { createdAt: true, total: true },
-        orderBy: { createdAt: "asc" },
+    // Grouped by the database, counts and revenue in one pass. This used to
+    // read every completed order in the window - up to a year of them - to
+    // produce one number per day.
+    const series = await dailySeries({
+        table: "Order",
+        since: startDate,
+        sumColumn: "total",
+        equals: { status: "COMPLETED" },
     });
 
-    const labels: string[] = [];
-    const ordersByDay: Record<string, number> = {};
-    const revenueByDay: Record<string, number> = {};
-    for (let i = 0; i <= period; i++) {
-        const d = new Date(startDate);
-        d.setDate(d.getDate() + i);
-        const key = d.toISOString().split("T")[0];
-        labels.push(key);
-        ordersByDay[key] = 0;
-        revenueByDay[key] = 0;
-    }
-    for (const o of completedInWindow) {
-        const key = o.createdAt.toISOString().split("T")[0];
-        if (key in ordersByDay) {
-            ordersByDay[key] += 1;
-            revenueByDay[key] += Number(o.total);
-        }
+    const labels = dayLabels(startDate, period);
+    const ordersByDay: Record<string, number> = Object.fromEntries(labels.map((k) => [k, 0]));
+    const revenueByDay: Record<string, number> = Object.fromEntries(labels.map((k) => [k, 0]));
+    for (const row of series) {
+        if (!(row.day in ordersByDay)) continue;
+        ordersByDay[row.day] = row.count;
+        revenueByDay[row.day] = row.sum;
     }
 
     return NextResponse.json({

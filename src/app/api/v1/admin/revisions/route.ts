@@ -39,9 +39,11 @@ export async function GET(request: NextRequest) {
             },
         }),
         prisma.revision.count({ where }),
-        prisma.revision.findMany({
-            distinct: ["resource"],
-            select: { resource: true },
+        // The filter dropdown wants the distinct resource names, not the rows
+        // that carry them. `findMany({ distinct })` reads the table; `groupBy`
+        // is a GROUP BY the database answers from the index.
+        prisma.revision.groupBy({
+            by: ["resource"],
             orderBy: { resource: "asc" },
         }),
     ]);
