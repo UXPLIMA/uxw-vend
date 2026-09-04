@@ -109,9 +109,9 @@ export default function TicketDetailPage({ params }: PageProps) {
                 <Navbar />
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground mb-4">Please login to view this ticket</p>
+                        <p className="text-muted-foreground mb-4">{t("loginToView")}</p>
                         <Link href="/auth/login">
-                            <Button>Login</Button>
+                            <Button>{t("login")}</Button>
                         </Link>
                     </div>
                 </main>
@@ -128,45 +128,45 @@ export default function TicketDetailPage({ params }: PageProps) {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">Home</Link>
+                    <Link href="/" className="hover:text-blue-600">{t("home")}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/support" className="hover:text-blue-600">Support</Link>
+                    <Link href="/support" className="hover:text-blue-600">{t("support")}</Link>
                     <span className="mx-2">/</span>
-                    <span className="text-foreground">Ticket</span>
+                    <span className="text-foreground">{t("ticket")}</span>
                 </div>
 
                 {loading ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground">Loading ticket...</p>
+                        <p className="text-muted-foreground">{t("loadingTicket")}</p>
                     </div>
                 ) : error ? (
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-red-500 mb-4">{error}</p>
                         <Link href="/support">
-                            <Button variant="outline">Back to Support</Button>
+                            <Button variant="outline">{t("backToSupport")}</Button>
                         </Link>
                     </div>
                 ) : ticket ? (
                     <StandardSidebarLayout sidebar={(
                                 <div className="space-y-4">
                                     <div className="bg-card rounded-xl border border-border p-4">
-                                        <h3 className="font-bold text-foreground mb-3">Ticket Info</h3>
+                                        <h3 className="font-bold text-foreground mb-3">{t("ticketInfo")}</h3>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Created</span>
+                                                <span className="text-muted-foreground">{t("createdAt")}</span>
                                                 <span className="text-foreground">{relativeTime(ticket.createdAt)}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Updated</span>
+                                                <span className="text-muted-foreground">{t("updatedAt")}</span>
                                                 <span className="text-foreground">{relativeTime(ticket.updatedAt)}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Messages</span>
+                                                <span className="text-muted-foreground">{t("messages")}</span>
                                                 <span className="text-foreground">{ticket.messages.length}</span>
                                             </div>
                                             {ticket.assignedTo && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">Assigned to</span>
+                                                    <span className="text-muted-foreground">{t("assignedTo")}</span>
                                                     <span className="text-foreground">{ticket.assignedTo.username}</span>
                                                 </div>
                                             )}
@@ -184,10 +184,10 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                 {ticket.status.replace(/_/g, " ")}
                                             </span>
                                             <span className="text-muted-foreground">
-                                                Priority: <strong>{ticket.priority}</strong>
+                                                {t("priority")}: <strong>{ticket.priority}</strong>
                                             </span>
                                             <span className="text-muted-foreground">
-                                                Department: <strong>{ticket.department.name}</strong>
+                                                {t("department")}: <strong>{ticket.department.name}</strong>
                                             </span>
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium text-foreground">{message.user.username}</span>
                                                             {message.isStaffReply && (
-                                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">Staff</span>
+                                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">{t("staff")}</span>
                                                             )}
                                                         </div>
                                                         <span className="text-xs text-muted-foreground">{relativeTime(message.createdAt)}</span>
@@ -233,7 +233,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                 <Textarea
                                                     value={reply}
                                                     onChange={(e) => setReply(e.target.value)}
-                                                    placeholder="Write your reply..."
+                                                    placeholder={t("replyPlaceholder")}
                                                     rows={4}
                                                     className="mb-3"
                                                 />

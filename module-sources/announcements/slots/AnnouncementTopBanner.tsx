@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Megaphone, X } from "lucide-react";
 
 interface Announcement {
@@ -17,6 +18,7 @@ interface Announcement {
  * in localStorage.
  */
 export default function AnnouncementTopBanner() {
+    const t = useTranslations("announcements");
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 
     useEffect(() => {
@@ -78,7 +80,7 @@ export default function AnnouncementTopBanner() {
                     type="button"
                     onClick={dismiss}
                     className="flex-shrink-0 p-1 rounded hover:bg-black/10 dark:hover:bg-white/10"
-                    aria-label="Dismiss announcement"
+                    aria-label={t("dismiss")}
                 >
                     <X className="w-3.5 h-3.5" />
                 </button>

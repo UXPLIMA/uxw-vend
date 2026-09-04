@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
 import { Loader2, UserPlus, Users, Coins, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ interface ReferralData {
 }
 
 export function ReferralTab() {
+    const t = useTranslations("referral");
     const [data, setData] = useState<ReferralData | null>(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
@@ -56,7 +57,7 @@ export function ReferralTab() {
     if (!data) {
         return (
             <p className="text-center text-muted-foreground py-8">
-                Failed to load referral data
+                {t("failedToLoad")}
             </p>
         );
     }
@@ -68,7 +69,7 @@ export function ReferralTab() {
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                         <UserPlus className="w-4 h-4" />
-                        Your Referral Link
+                        {t("yourLink")}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -91,21 +92,21 @@ export function ReferralTab() {
                     <CardContent className="p-3 text-center">
                         <Users className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                         <p className="text-lg font-bold">{data.stats.totalReferrals}</p>
-                        <p className="text-xs text-muted-foreground">Referrals</p>
+                        <p className="text-xs text-muted-foreground">{t("referralCount")}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-3 text-center">
                         <Check className="w-5 h-5 text-green-500 mx-auto mb-1" />
                         <p className="text-lg font-bold">{data.stats.completedReferrals}</p>
-                        <p className="text-xs text-muted-foreground">Completed</p>
+                        <p className="text-xs text-muted-foreground">{t("completedReferrals")}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-3 text-center">
                         <Coins className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
                         <p className="text-lg font-bold">{(Number(data.stats.creditsEarned) || 0).toFixed(2)}</p>
-                        <p className="text-xs text-muted-foreground">Credits</p>
+                        <p className="text-xs text-muted-foreground">{t("creditsEarned")}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -114,7 +115,7 @@ export function ReferralTab() {
             {data.referrals.length > 0 && (
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Recent Referrals</CardTitle>
+                        <CardTitle className="text-base">{t("referralHistory")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">

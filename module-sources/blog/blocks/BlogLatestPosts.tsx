@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 
 /**
@@ -26,6 +27,7 @@ interface ArticleSummary {
 }
 
 function BlogLatestPostsRender({ count, categoryId, heading }: BlogLatestPostsProps): React.ReactElement {
+    const t = useTranslations("blog");
     const [articles, setArticles] = useState<ArticleSummary[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -62,7 +64,7 @@ function BlogLatestPostsRender({ count, categoryId, heading }: BlogLatestPostsPr
                     ))}
                 </div>
             ) : articles.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No articles yet.</div>
+                <div className="text-muted-foreground text-sm">{t("noArticles")}</div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {articles.map((a) => {

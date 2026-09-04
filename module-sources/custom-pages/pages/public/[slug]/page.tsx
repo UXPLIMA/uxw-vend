@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useTranslations } from "next-intl";
 import DOMPurify from "dompurify";
 import { Render, type Data, type Config } from "@measured/puck";
 import "@measured/puck/puck.css";
@@ -22,6 +23,7 @@ interface CustomPage {
 }
 
 export default function CustomPageView({ params }: PageProps) {
+    const t = useTranslations("customPages");
     const { slug } = use(params);
     const [page, setPage] = useState<CustomPage | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export default function CustomPageView({ params }: PageProps) {
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
                 ) : notFound ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">Page not found</CardContent></Card>
+                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("pageNotFound")}</CardContent></Card>
                 ) : page ? (
                     <PageContent page={page} />
                 ) : null}

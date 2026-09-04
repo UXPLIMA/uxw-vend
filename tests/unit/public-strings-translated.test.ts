@@ -32,8 +32,23 @@ const PUBLIC_SURFACE = [
     "src/core/components/homepage",
 ];
 
+/**
+ * A module's own visitor-facing surface, which no gate watched either. The
+ * whole of the public ticket page was in English, as were the referral tab
+ * on a user's profile, the custom page 404, the announcement dismiss button,
+ * the store's payment-goal banner and four page-builder blocks' empty
+ * states. Most of those keys already existed in every locale of the module's
+ * manifest; the components had simply never been wired to them.
+ */
+const MODULE_SURFACE = ["pages/public", "blocks", "slots", "widgets", "components"];
+
 /** Proper nouns. A brand is spelled the same in every locale. */
-const BRAND_NAMES = new Set(["Facebook", "Instagram", "X (Twitter)", "YouTube", "Discord", "Twitch", "TikTok"]);
+const BRAND_NAMES = new Set([
+    "Facebook", "Instagram", "X (Twitter)", "YouTube", "Discord", "Twitch", "TikTok",
+    // Reached once the scan covers the modules. A game, two payment
+    // providers, and the example username every Minecraft screenshot uses.
+    "Twitter", "Minecraft", "Stripe", "PayPal", "Notch",
+]);
 
 function tsxFiles(dir: string, out: string[] = []): string[] {
     if (!fs.existsSync(dir)) return out;
@@ -72,11 +87,34 @@ function englishLiterals(file: string): string[] {
     return found.map((hit) => `${path.relative(root, file)} -> ${hit}`);
 }
 
+function moduleSurfaceFiles(): string[] {
+    const sources = path.join(root, "module-sources");
+    if (!fs.existsSync(sources)) return [];
+    return fs
+        .readdirSync(sources, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .flatMap((mod) =>
+            MODULE_SURFACE.flatMap((sub) => tsxFiles(path.join(sources, mod.name, sub))),
+        );
+}
+
 describe("the public surface", () => {
     const files = PUBLIC_SURFACE.flatMap((dir) => tsxFiles(path.join(root, dir)));
 
     it("covers the pages and the chrome a visitor sees", () => {
         expect(files.length).toBeGreaterThan(5);
+    });
+
+    it("has no English baked into it", () => {
+        expect(files.flatMap(englishLiterals)).toEqual([]);
+    });
+});
+
+describe("the modules' public surface", () => {
+    const files = moduleSurfaceFiles();
+
+    it("covers every module's pages, blocks, slots, widgets and components", () => {
+        expect(files.length).toBeGreaterThan(50);
     });
 
     it("has no English baked into it", () => {
