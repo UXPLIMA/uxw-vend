@@ -45,9 +45,9 @@ export default function HealthSnapshotWidget() {
         status === "down" ? "text-red-500" :
         "text-muted-foreground";
     const statusLabel =
-        status === "ok" ? (t.has("health_ok") ? t("health_ok") : "Healthy") :
-        status === "degraded" ? (t.has("health_degraded") ? t("health_degraded") : "Degraded") :
-        status === "down" ? (t.has("health_down") ? t("health_down") : "Down") :
+        status === "ok" ? (t("health_ok")) :
+        status === "degraded" ? (t("health_degraded")) :
+        status === "down" ? (t("health_down")) :
         t("widget_loading");
     const latency = data?.checks?.database?.latencyMs;
 

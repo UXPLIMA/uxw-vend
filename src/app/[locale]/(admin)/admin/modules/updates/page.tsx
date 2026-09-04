@@ -34,13 +34,13 @@ export default function ModuleUpdatesPage() {
             const res = await fetch("/api/v1/modules/updates");
             const data = await res.json();
             if (!res.ok) {
-                setError(data.error || (t.has("moduleUpdates_checkFailed") ? t("moduleUpdates_checkFailed") : "Failed to check"));
+                setError(data.error || (t("moduleUpdates_checkFailed")));
                 return;
             }
             setUpdates(data.updates || []);
             setCheckedAt(data.checkedAt || null);
         } catch {
-            setError(t.has("moduleUpdates_networkError") ? t("moduleUpdates_networkError") : "Network error");
+            setError(t("moduleUpdates_networkError"));
         } finally {
             setLoading(false);
         }
@@ -58,17 +58,15 @@ export default function ModuleUpdatesPage() {
             });
             if (res.ok) {
                 toast.success(
-                    t.has("moduleUpdates_updatedToast")
-                        ? t("moduleUpdates_updatedToast", { name: moduleId })
-                        : `${moduleId} updated`,
+                    t("moduleUpdates_updatedToast", { name: moduleId }),
                 );
                 setUpdated((s) => new Set(s).add(moduleId));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t.has("moduleUpdates_updateFailed") ? t("moduleUpdates_updateFailed") : "Update failed"));
+                toast.error(data.error || (t("moduleUpdates_updateFailed")));
             }
         } catch {
-            toast.error(t.has("moduleUpdates_networkError") ? t("moduleUpdates_networkError") : "Network error");
+            toast.error(t("moduleUpdates_networkError"));
         } finally {
             setUpdating((s) => {
                 const next = new Set(s);
@@ -88,23 +86,21 @@ export default function ModuleUpdatesPage() {
                 <Link href="/admin/modules"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold">
-                        {t.has("moduleUpdates_title") ? t("moduleUpdates_title") : "Module Updates"}
+                        {t("moduleUpdates_title")}
                     </h1>
                     <p className="text-muted-foreground">
                         {updates.length === 0
-                            ? (t.has("moduleUpdates_allUpToDate") ? t("moduleUpdates_allUpToDate") : "All installed modules are up to date")
-                            : (t.has("moduleUpdates_count")
-                                ? t("moduleUpdates_count", { count: updates.length })
-                                : `${updates.length} update${updates.length === 1 ? "" : "s"} available`)}
+                            ? (t("moduleUpdates_allUpToDate"))
+                            : (t("moduleUpdates_count", { count: updates.length }))}
                         {checkedAt && (
                             <span className="ml-2 text-xs">
-                                · {t.has("moduleUpdates_checkedAt") ? t("moduleUpdates_checkedAt", { date: new Date(checkedAt).toLocaleString(__dateTag) }) : `checked ${new Date(checkedAt).toLocaleString(__dateTag)}`}
+                                · {t("moduleUpdates_checkedAt", { date: new Date(checkedAt).toLocaleString(__dateTag) })}
                             </span>
                         )}
                     </p>
                 </div>
                 <Button variant="outline" onClick={fetchUpdates}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> {t.has("moduleUpdates_recheck") ? t("moduleUpdates_recheck") : "Re-check"}
+                    <RefreshCw className="w-4 h-4 mr-2" /> {t("moduleUpdates_recheck")}
                 </Button>
             </div>
 
@@ -121,7 +117,7 @@ export default function ModuleUpdatesPage() {
                 <Card>
                     <CardContent className="py-12 text-center">
                         <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                        <p className="text-muted-foreground">{t.has("moduleUpdates_allUpToDate") ? t("moduleUpdates_allUpToDate") : "All modules are up to date."}</p>
+                        <p className="text-muted-foreground">{t("moduleUpdates_allUpToDate")}</p>
                     </CardContent>
                 </Card>
             ) : (
@@ -155,11 +151,11 @@ export default function ModuleUpdatesPage() {
                                             size="sm"
                                         >
                                             {isUpdating ? (
-                                                <><Loader2 className="w-3 h-3 mr-2 animate-spin" /> {t.has("moduleUpdates_updating") ? t("moduleUpdates_updating") : "Updating…"}</>
+                                                <><Loader2 className="w-3 h-3 mr-2 animate-spin" /> {t("moduleUpdates_updating")}</>
                                             ) : isDone ? (
-                                                <><Check className="w-3 h-3 mr-2" /> {t.has("moduleUpdates_done") ? t("moduleUpdates_done") : "Done"}</>
+                                                <><Check className="w-3 h-3 mr-2" /> {t("moduleUpdates_done")}</>
                                             ) : (
-                                                <><Download className="w-3 h-3 mr-2" /> {t.has("moduleUpdates_update") ? t("moduleUpdates_update") : "Update"}</>
+                                                <><Download className="w-3 h-3 mr-2" /> {t("moduleUpdates_update")}</>
                                             )}
                                         </Button>
                                     </div>

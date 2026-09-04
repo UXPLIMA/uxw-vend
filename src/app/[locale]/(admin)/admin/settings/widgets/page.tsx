@@ -110,7 +110,7 @@ export default function WidgetSettingsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ widget_visibility: widgetConfig, widget_order: widgetOrder }),
         });
-        toast.success("Widget settings saved");
+        toast.success(t("widgets_saved"));
         setSaving(false);
     };
 

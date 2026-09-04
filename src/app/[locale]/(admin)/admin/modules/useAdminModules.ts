@@ -119,7 +119,7 @@ export function useAdminModules() {
             formData.append("file", file);
             const res = await fetch("/api/v1/modules/upload", { method: "POST", body: formData });
             const data = await res.json();
-            if (res.ok) { toast.success(`"${data.module?.name}" installed`); fetchModules(); }
+            if (res.ok) { toast.success(t("modules_uploadedToast", { name: data.module?.name ?? "" })); fetchModules(); }
             else toast.error(data.error || t("modules_uploadFailed"));
         } catch { toast.error(t("modules_uploadFailed")); }
         finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
@@ -133,7 +133,7 @@ export function useAdminModules() {
         try {
             const res = await fetch(`/api/v1/modules/${moduleId}`, { method: "DELETE" });
             const data = await res.json();
-            if (res.ok) { toast.success(`"${moduleName}" deleted`); fetchModules(); }
+            if (res.ok) { toast.success(t("modules_deletedToast", { name: moduleName })); fetchModules(); }
             else toast.error(data.error || t("modules_deleteFailed"));
         } catch { toast.error(t("modules_deleteFailed")); }
         finally { setDeleting(null); }
@@ -152,7 +152,7 @@ export function useAdminModules() {
             });
             const data = await res.json();
             if (res.ok) {
-                toast.success(`"${mod.name}" updated to v${data.module?.version ?? mpMod.version}`);
+                toast.success(t("modules_updatedToast", { name: mod.name, version: data.module?.version ?? mpMod.version }));
                 fetchModules();
             } else {
                 toast.error(data.error || t("modules_updateFailed"));
@@ -169,9 +169,9 @@ export function useAdminModules() {
         const ok = await confirm({ title: t("modules_installTitle"), message: t("modules_installConfirm", { name: mod.name, version: mod.version }), confirmText: t("common_install") });
         if (!ok) return;
         setInstalling(mod.id);
-        setInstallProgress({ name: mod.name, step: t.has("modules_stepDownloading") ? t("modules_stepDownloading") : "Downloading…" });
+        setInstallProgress({ name: mod.name, step: t("modules_stepDownloading") });
         try {
-            setInstallProgress({ name: mod.name, step: t.has("modules_stepInstalling") ? t("modules_stepInstalling") : "Installing…" });
+            setInstallProgress({ name: mod.name, step: t("modules_stepInstalling") });
             const res = await fetch("/api/v1/modules/marketplace/install", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -179,12 +179,8 @@ export function useAdminModules() {
             });
             const data = await res.json();
             if (res.ok) {
-                setInstallProgress({ name: mod.name, step: t.has("modules_stepDone") ? t("modules_stepDone") : "Done!" });
-                toast.success(
-                    t.has("modules_installedToast")
-                        ? t("modules_installedToast", { name: mod.name })
-                        : `"${mod.name}" installed and enabled`,
-                );
+                setInstallProgress({ name: mod.name, step: t("modules_stepDone") });
+                toast.success(t("modules_installedToast", { name: mod.name }));
                 fetchModules();
                 fetchMarketplace();
             } else {
@@ -214,13 +210,13 @@ export function useAdminModules() {
 
         const ok = await confirm({
             title: t("modules_bulkInstall"),
-            message: `Install ${toInstall.length} modules? This may take a few minutes as the system will rebuild after all modules are installed.`,
-            confirmText: `Install ${toInstall.length} modules`,
+            message: t("modules_bulkConfirm", { count: toInstall.length }),
+            confirmText: t("modules_bulkInstall"),
         });
         if (!ok) return;
 
         setBulkInstalling(true);
-        setBulkProgress({ current: 0, total: toInstall.length, name: t.has("modules_stepPreparing") ? t("modules_stepPreparing") : "Preparing…" });
+        setBulkProgress({ current: 0, total: toInstall.length, name: t("modules_stepPreparing") });
 
         try {
             const res = await fetch("/api/v1/modules/marketplace/bulk-install", {
@@ -233,10 +229,16 @@ export function useAdminModules() {
             const data = await res.json();
 
             if (res.ok) {
-                toast.success(`${data.installed}/${data.total} modules installed`);
+                toast.success(t("modules_bulkResult", { installed: data.installed, total: data.total }));
+                // The server pulls in dependencies the operator did not tick,
+                // so `total` can exceed what they selected. Say which.
+                const autoAdded: string[] = data.autoAdded ?? [];
+                if (autoAdded.length > 0) {
+                    toast.info(t("modules_bulkAutoAdded", { names: autoAdded.join(", ") }));
+                }
                 if (data.failed > 0) {
-                    const failedNames = data.results.filter((r: { status: string }) => r.status === "failed").map((r: { name: string; error?: string }) => r.name).join(", ");
-                    toast.error(`Failed: ${failedNames}`);
+                    const failedNames = data.results.filter((r: { status: string }) => r.status === "failed").map((r: { name: string }) => r.name).join(", ");
+                    toast.error(t("modules_bulkFailedList", { names: failedNames }));
                 }
             } else {
                 toast.error(data.error || t("modules_bulkFailed"));

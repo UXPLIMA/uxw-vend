@@ -108,10 +108,10 @@ export default function ObservabilityPage() {
             <div className="flex items-start justify-between">
                 <div>
                     <h1 className="text-xl font-semibold">
-                        {t.has("observability_title") ? t("observability_title") : "Observability"}
+                        {t("observability_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        {t.has("observability_subtitle") ? t("observability_subtitle") : "Platform health and metrics"}
+                        {t("observability_subtitle")}
                         {health?.version && <span className="ml-2 text-xs">v{health.version}</span>}
                     </p>
                 </div>
@@ -119,7 +119,7 @@ export default function ObservabilityPage() {
                     {refreshing && <Loader2 className="w-3 h-3 animate-spin" />}
                     {lastRefresh && (
                         <span>
-                            {t.has("observability_lastRefresh") ? t("observability_lastRefresh") : "Last refresh"}: {lastRefresh.toLocaleTimeString("tr-TR")}
+                            {t("observability_lastRefresh")}: {lastRefresh.toLocaleTimeString("tr-TR")}
                         </span>
                     )}
                 </div>
@@ -131,7 +131,7 @@ export default function ObservabilityPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm flex items-center gap-2">
                             <Database className="w-4 h-4 text-blue-500" />
-                            {t.has("observability_database") ? t("observability_database") : "Database"}
+                            {t("observability_database")}
                             <StatusDot ok={health?.checks.database.ok ?? false} />
                         </CardTitle>
                     </CardHeader>
@@ -140,7 +140,7 @@ export default function ObservabilityPage() {
                             <div>
                                 <span className="font-mono text-lg">{health.checks.database.latencyMs}ms</span>
                                 <p className="text-xs text-muted-foreground">
-                                    {t.has("observability_latency") ? t("observability_latency") : "query latency"}
+                                    {t("observability_latency")}
                                 </p>
                             </div>
                         ) : (
@@ -163,7 +163,7 @@ export default function ObservabilityPage() {
                     <CardContent className="text-sm">
                         {health?.checks.redis.enabled === false ? (
                             <p className="text-xs text-muted-foreground">
-                                {t.has("observability_notConfigured") ? t("observability_notConfigured") : "not configured"}
+                                {t("observability_notConfigured")}
                             </p>
                         ) : health?.checks.redis.ok ? (
                             <p className="text-xs text-emerald-500">connected</p>
@@ -177,7 +177,7 @@ export default function ObservabilityPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm flex items-center gap-2">
                             <Mail className="w-4 h-4 text-rose-500" />
-                            {t.has("observability_emailQueue") ? t("observability_emailQueue") : "Email Queue"}
+                            {t("observability_emailQueue")}
                             <StatusDot ok={health?.checks.emailQueue.ok ?? false} />
                         </CardTitle>
                     </CardHeader>
@@ -197,7 +197,7 @@ export default function ObservabilityPage() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm flex items-center gap-2">
                             <Clock className="w-4 h-4 text-amber-500" />
-                            {t.has("observability_scheduler") ? t("observability_scheduler") : "Scheduler"}
+                            {t("observability_scheduler")}
                             <StatusDot ok={health?.checks.scheduler.ok ?? false} />
                         </CardTitle>
                     </CardHeader>
@@ -205,7 +205,7 @@ export default function ObservabilityPage() {
                         <div>
                             <span className="font-mono text-lg">{health?.checks.scheduler.staleJobs ?? 0}</span>
                             <p className="text-xs text-muted-foreground">
-                                {t.has("observability_staleJobs") ? t("observability_staleJobs") : "stale jobs"}
+                                {t("observability_staleJobs")}
                             </p>
                         </div>
                     </CardContent>
@@ -219,13 +219,13 @@ export default function ObservabilityPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm flex items-center gap-2">
                                 <Activity className="w-4 h-4 text-emerald-500" />
-                                {t.has("observability_activity24h") ? t("observability_activity24h") : "Activity (24h)"}
+                                {t("observability_activity24h")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <span className="font-mono text-2xl">{stats.activityFeed.last24h}</span>
                             <p className="text-xs text-muted-foreground">
-                                {t.has("observability_activity7d") ? t("observability_activity7d") : "7d"}: {stats.activityFeed.last7d}
+                                {t("observability_activity7d")}: {stats.activityFeed.last7d}
                             </p>
                         </CardContent>
                     </Card>
@@ -233,7 +233,7 @@ export default function ObservabilityPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm flex items-center gap-2">
                                 <Users className="w-4 h-4 text-blue-500" />
-                                {t.has("observability_users") ? t("observability_users") : "Users"}
+                                {t("observability_users")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -244,7 +244,7 @@ export default function ObservabilityPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm flex items-center gap-2">
                                 <Puzzle className="w-4 h-4 text-purple-500" />
-                                {t.has("observability_modules") ? t("observability_modules") : "Enabled Modules"}
+                                {t("observability_modules")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -255,7 +255,7 @@ export default function ObservabilityPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm flex items-center gap-2">
                                 <History className="w-4 h-4 text-cyan-500" />
-                                {t.has("observability_revisions") ? t("observability_revisions") : "Revisions"}
+                                {t("observability_revisions")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -271,13 +271,13 @@ export default function ObservabilityPage() {
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                             <AlertCircle className="w-4 h-4 text-rose-500" />
-                            {t.has("observability_recentErrors") ? t("observability_recentErrors") : "Recent Cron Errors"}
+                            {t("observability_recentErrors")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {errors.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                {t.has("observability_noErrors") ? t("observability_noErrors") : "No recent errors"}
+                                {t("observability_noErrors")}
                             </p>
                         ) : (
                             <ul className="space-y-2 text-sm">
@@ -301,13 +301,13 @@ export default function ObservabilityPage() {
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                             <Mail className="w-4 h-4 text-rose-500" />
-                            {t.has("observability_failedEmails") ? t("observability_failedEmails") : "Failed Emails"}
+                            {t("observability_failedEmails")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {emails.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                {t.has("observability_noFailedEmails") ? t("observability_noFailedEmails") : "No failed emails"}
+                                {t("observability_noFailedEmails")}
                             </p>
                         ) : (
                             <ul className="space-y-2 text-sm">

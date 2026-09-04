@@ -151,7 +151,7 @@ export default function AdminRolesPage() {
             }
             fetchRoles();
         } catch {
-            toast.error("Failed to delete role");
+            toast.error(t("roles_deleteFailed"));
         }
     };
 

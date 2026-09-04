@@ -147,7 +147,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         if (!ok) return;
         const res = await fetch(`${apiPath}/${id}`, { method: "DELETE" });
         if (res.ok) { toast.success(ct("crud_deleted")); fetchItems(); }
-        else toast.error("Failed to delete");
+        else toast.error(ct("crud_deleteFailed"));
     };
 
     const renderField = (field: CrudField) => {
