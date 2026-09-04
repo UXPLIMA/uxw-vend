@@ -981,6 +981,55 @@ function readStringLiteral(source: string, start: number): string | null {
     return null;
 }
 
+/**
+ * A handler that checks a secret the caller supplied has to have a ceiling.
+ *
+ * `bcrypt.compare` and `verifyToken` both answer "was this guess right?", and
+ * an endpoint that answers that without a limit is a guessing loop: the
+ * two-factor module's disable, verify and regenerate-codes routes all took an
+ * unlimited number of password and TOTP attempts, and the store's gift-code
+ * redeem walked a 32-bit code space for credits.
+ *
+ * The limiter has to be `rateLimitStrict`, not `rateLimitForRole`: role
+ * multipliers scale a budget and a multiplier of 0 removes it, which is right
+ * for throughput and wrong for a brute-force ceiling.
+ */
+function checkSecretChecksLimited(modulePath: string): CheckResult {
+    const name = "Secret checks are rate limited";
+    const comparesSecret = /bcrypt\.compare\(|verifyToken\(/;
+    const offenders: string[] = [];
+
+    const apiDir = path.join(modulePath, "api");
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                walk(full);
+                continue;
+            }
+            if (entry.name !== "route.ts") continue;
+            const content = fs.readFileSync(full, "utf8");
+            if (!comparesSecret.test(content)) continue;
+            if (content.includes("rateLimitStrict(")) continue;
+            offenders.push(path.relative(modulePath, full).replace(/\\/g, "/"));
+        }
+    })(apiDir);
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} handler(s) check a secret with no ceiling: ${offenders.join(", ")}`,
+            suggestion:
+                "Call rateLimitStrict() before comparing the secret. rateLimitForRole is the wrong tool here: " +
+                "a role multiplier of 0 lifts the limit entirely, and a brute-force ceiling has to hold for every role.",
+        };
+    }
+
+    return { name, passed: true, message: "Every secret check has a ceiling" };
+}
+
 function checkModuleFetchPaths(modulePath: string): CheckResult {
     const name = "Fetched API paths exist";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1176,6 +1225,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkTranslationKeys(modulePath),
         checkAdminKeyPrefix(modulePath),
         checkModuleFetchPaths(modulePath),
+        checkSecretChecksLimited(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

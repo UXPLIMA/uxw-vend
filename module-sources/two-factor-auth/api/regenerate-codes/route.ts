@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { generateBackupCodes, prisma, verifyToken } from "@/core/sdk/server";
+import { generateBackupCodes, prisma, rateLimitStrict, verifyToken } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/regenerate-codes - Regenerate backup codes
@@ -9,6 +9,19 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Same guessing loop as disable, and the prize is a fresh set of backup
+    // codes for the account.
+    const rl = await rateLimitStrict(`2fa-regenerate:${session.user.id}`, {
+        maxRequests: 5,
+        windowMs: 15 * 60 * 1000,
+    });
+    if (!rl.success) {
+        return NextResponse.json(
+            { error: "Too many attempts. Try again later." },
+            { status: 429 },
+        );
     }
 
     let body: { password?: string; token?: string } = {};

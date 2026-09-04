@@ -46,6 +46,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   set it. `CORE_API_VERSION` unchanged: this is an optional field on an
   existing entry, and a manifest that omits it behaves exactly as before.
 
+### Security
+- **Five endpoints answered "was this guess right?" without a ceiling.** The
+  profile route's password-change branch compared the current password with
+  `bcrypt.compare` on every request, unlimited: an online password oracle
+  against a stolen session, and a bcrypt round at cost 12 of CPU per request
+  besides. The account-deletion route beside it has always had that ceiling.
+  The two-factor module's disable, verify and regenerate-codes routes took
+  unlimited password and TOTP attempts against a secret that never changes.
+  All five are capped per user now.
+- **A gift code could be walked.** Redeeming took unlimited attempts and the
+  reply says whether a code exists, over a code space of `randomBytes(4)` -
+  32 bits, and each hit is worth credits. Redemption is capped at 10 per 15
+  minutes and new codes carry 64 bits.
+- **`rateLimitStrict` is what a module reaches for now.** The SDK exposed only
+  `rateLimitForRole`, which scales its budget by the caller's role and treats
+  a multiplier of 0 as unlimited. That is right for throughput and wrong for a
+  brute-force ceiling, which has to hold for every role. `validate-module`
+  fails a handler that compares a secret without one, and the same rule runs
+  over core under `npm test`.
+
 ### Fixed
 - **Blog comments never loaded and could not be posted.** `CommentSection`
   fetched `/api/v1/blog/${id}/comments`, a path the manifest never declared.

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/sdk/server";
+import { prisma, rateLimitStrict } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
@@ -7,6 +7,20 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // A gift code is a bearer secret worth credits, and the reply says
+    // whether a guess exists. Without a ceiling, working through the code
+    // space is only a matter of time.
+    const rl = await rateLimitStrict(`gift-redeem:${session.user.id}`, {
+        maxRequests: 10,
+        windowMs: 15 * 60 * 1000,
+    });
+    if (!rl.success) {
+        return NextResponse.json(
+            { error: "Too many attempts. Try again later." },
+            { status: 429 },
+        );
     }
 
     const { code } = await request.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma, verifyToken } from "@/core/sdk/server";
+import { prisma, rateLimitStrict, verifyToken } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/disable - Disable 2FA
@@ -9,6 +9,20 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Both branches below check a secret the caller supplies, so this is a
+    // guessing loop unless something closes it. Strict: an operator's role
+    // multipliers must not be able to lift a brute-force ceiling.
+    const rl = await rateLimitStrict(`2fa-disable:${session.user.id}`, {
+        maxRequests: 5,
+        windowMs: 15 * 60 * 1000,
+    });
+    if (!rl.success) {
+        return NextResponse.json(
+            { error: "Too many attempts. Try again later." },
+            { status: 429 },
+        );
     }
 
     let body: { token?: string; password?: string } = {};
