@@ -127,6 +127,7 @@ export default function CurrencyAdminPage() {
                                 <div className="col-span-2">
                                     <Label>{t("currencyCode")}</Label>
                                     <Input
+                                        aria-label={t("currencyCode")}
                                         value={cur.code}
                                         onChange={(e) => updateCurrency(idx, { code: e.target.value.toUpperCase() })}
                                         placeholder="USD"
@@ -135,6 +136,7 @@ export default function CurrencyAdminPage() {
                                 <div className="col-span-3">
                                     <Label>{t("currencyName")}</Label>
                                     <Input
+                                        aria-label={t("currencyName")}
                                         value={cur.name}
                                         onChange={(e) => updateCurrency(idx, { name: e.target.value })}
                                         placeholder="US Dollar"
@@ -143,6 +145,7 @@ export default function CurrencyAdminPage() {
                                 <div className="col-span-2">
                                     <Label>{t("symbol")}</Label>
                                     <Input
+                                        aria-label={t("symbol")}
                                         value={cur.symbol}
                                         onChange={(e) => updateCurrency(idx, { symbol: e.target.value })}
                                         placeholder="$"
@@ -151,6 +154,7 @@ export default function CurrencyAdminPage() {
                                 <div className="col-span-2">
                                     <Label>{t("exchangeRate")}</Label>
                                     <Input
+                                        aria-label={t("exchangeRate")}
                                         type="number"
                                         step="0.0001"
                                         value={cur.rate}

@@ -232,11 +232,12 @@ export default function SetupWizardPage() {
                     <CardContent className="space-y-4">
                         <div>
                             <Label>{t("setup_siteName")}</Label>
-                            <Input value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} />
+                            <Input aria-label={t("setup_siteName")} value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} />
                         </div>
                         <div>
                             <Label>{t("setup_description")}</Label>
                             <Textarea
+                                aria-label={t("setup_description")}
                                 value={form.siteDescription}
                                 onChange={(e) => setForm({ ...form, siteDescription: e.target.value })}
                                 placeholder={t("setup_describePlaceholder")}
@@ -264,11 +265,11 @@ export default function SetupWizardPage() {
                         </div>
                         <div>
                             <Label>{t("setup_serverIp")}</Label>
-                            <Input value={form.serverIp} onChange={(e) => setForm({ ...form, serverIp: e.target.value })} placeholder="play.example.com" />
+                            <Input aria-label={t("setup_serverIp")} value={form.serverIp} onChange={(e) => setForm({ ...form, serverIp: e.target.value })} placeholder="play.example.com" />
                         </div>
                         <div>
                             <Label>{t("setup_contactEmail")}</Label>
-                            <Input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder="admin@example.com" />
+                            <Input aria-label={t("setup_contactEmail")} type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder="admin@example.com" />
                         </div>
                         <div className="flex justify-between pt-4">
                             <Button variant="outline" onClick={() => setStep(0)}><ArrowLeft className="w-4 h-4 mr-2" /> {t("setup_back")}</Button>

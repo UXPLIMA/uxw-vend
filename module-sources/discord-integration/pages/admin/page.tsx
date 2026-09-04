@@ -129,6 +129,7 @@ export default function DiscordSettingsPage() {
                                         <Label className="font-medium">{t(event.labelKey)}</Label>
                                         <p className="text-xs text-muted-foreground mb-2">{t(event.descKey)}</p>
                                         <Input
+                                            aria-label={t(event.labelKey)}
                                             value={webhooks[event.key]}
                                             onChange={(e) => setWebhooks({ ...webhooks, [event.key]: e.target.value })}
                                             placeholder="https://discord.com/api/webhooks/..."

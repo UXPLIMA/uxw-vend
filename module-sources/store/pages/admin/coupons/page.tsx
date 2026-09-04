@@ -196,6 +196,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{`${t("adm_code")} *`}</Label>
                                     <Input
+                                        aria-label={t("adm_code")}
                                         value={form.code}
                                         onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
                                         placeholder="SUMMER2024"
@@ -206,6 +207,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{t("adm_type")}</Label>
                                     <select
+                                        aria-label={t("adm_type")}
                                         value={form.type}
                                         onChange={(e) => setForm({ ...form, type: e.target.value as "PERCENTAGE" | "FIXED" })}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -217,6 +219,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{`${t("adm_value")} *`}</Label>
                                     <Input
+                                        aria-label={t("adm_value")}
                                         type="number"
                                         step="0.01"
                                         min="0"
@@ -231,6 +234,7 @@ export default function AdminCouponsPage() {
                             <div>
                                 <Label>{t("adm_description")}</Label>
                                 <Input
+                                    aria-label={t("adm_description")}
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                                     placeholder="Summer sale discount"
@@ -241,6 +245,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{t("adm_minPurchase")}</Label>
                                     <Input
+                                        aria-label={t("adm_minPurchase")}
                                         type="number"
                                         step="0.01"
                                         min="0"
@@ -252,6 +257,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{t("adm_maxDiscount")}</Label>
                                     <Input
+                                        aria-label={t("adm_maxDiscount")}
                                         type="number"
                                         step="0.01"
                                         min="0"
@@ -263,6 +269,7 @@ export default function AdminCouponsPage() {
                                 <div>
                                     <Label>{t("adm_usageLimit")}</Label>
                                     <Input
+                                        aria-label={t("adm_usageLimit")}
                                         type="number"
                                         min="1"
                                         value={form.usageLimit}
@@ -275,6 +282,7 @@ export default function AdminCouponsPage() {
                             <div>
                                 <Label>{t("adm_expiresAt")}</Label>
                                 <Input
+                                    aria-label={t("adm_expiresAt")}
                                     type="datetime-local"
                                     value={form.expiresAt}
                                     onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}

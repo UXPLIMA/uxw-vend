@@ -418,6 +418,7 @@ export default function CartPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{t('playerName')} <span className="text-destructive">*</span></label>
                                         <Input
+                                            aria-label={t('playerName')}
                                             placeholder={t('playerNamePlaceholder')}
                                             value={playerName}
                                             onChange={(e) => setPlayerName(e.target.value)}

@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A hundred and fifty form controls had no name a screen reader could
+  read.** Each sat under a `<label>` or `<Label>` carrying no `htmlFor` and
+  wrapping nothing, next to an input carrying no `id` and no `aria-label`.
+  The text was on the screen and the association was not, so the whole of the
+  SEO settings, the site settings, the role editor, the warning form, the
+  setup wizard, the audit log filters, the IP block form, the store's coupon,
+  category and gift-code screens, the cart's player-name field and the
+  product page's per-variable inputs announced as "edit text, blank". Twelve
+  labels in the same codebase were written correctly, so the rule was known
+  and simply not applied. Every control is named now, and a gate walks the
+  app, the shared components and all seventy-eight modules to keep it that
+  way. The fix uses `aria-label` rather than `htmlFor` and `id` because a
+  third of these render inside a `.map()`, where a single id would be
+  emitted once per row; `htmlFor` stays welcome anywhere else.
+- **The admin spotlight removed its focus ring and put nothing back.** A
+  keyboard user tabbing between the search field and its close button had no
+  way to see where they were. It has a focus-visible ring and a name now, and
+  the gate fails any `outline-none` without a replacement.
+- **The two-factor module guarded four strings against keys that exist.**
+  `t.has("currentPassword") ? t("currentPassword") : "Current password"` and
+  three more like it carried untranslated English branches that every locale
+  in the manifest already made unreachable.
 - **Auth failures were answered in English, whatever language the page was
   in.** Every endpoint under `/api/v1/auth` replied with an English sentence
   and nothing else, and every screen wrote that sentence straight into the

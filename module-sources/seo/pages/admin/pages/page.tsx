@@ -296,6 +296,7 @@ export default function SeoPageOverridesPage() {
                             <div>
                                 <Label className="text-foreground">{`${t("adm_urlPath")} *`}</Label>
                                 <Input
+                                    aria-label={t("adm_urlPath")}
                                     value={form.path}
                                     onChange={(e) => updateField("path", e.target.value)}
                                     placeholder="/about"
@@ -313,6 +314,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">{t("adm_metaTitle")}</Label>
                                         <Input
+                                            aria-label={t("adm_metaTitle")}
                                             value={form.metaTitle}
                                             onChange={(e) => updateField("metaTitle", e.target.value)}
                                             placeholder="Page Title"
@@ -324,6 +326,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">{t("adm_metaDescription")}</Label>
                                         <textarea
+                                            aria-label={t("adm_metaDescription")}
                                             value={form.metaDescription}
                                             onChange={(e) => updateField("metaDescription", e.target.value)}
                                             placeholder="Brief description for search results..."
@@ -337,6 +340,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">{t("adm_keywords")}</Label>
                                         <Input
+                                            aria-label={t("adm_keywords")}
                                             value={form.keywords}
                                             onChange={(e) => updateField("keywords", e.target.value)}
                                             placeholder="keyword1, keyword2, keyword3"
@@ -345,6 +349,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">{t("adm_canonicalUrl")}</Label>
                                         <Input
+                                            aria-label={t("adm_canonicalUrl")}
                                             value={form.canonical}
                                             onChange={(e) => updateField("canonical", e.target.value)}
                                             placeholder="https://example.com/canonical-page"
@@ -362,6 +367,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">OG Title</Label>
                                         <Input
+                                            aria-label="OG Title"
                                             value={form.ogTitle}
                                             onChange={(e) => updateField("ogTitle", e.target.value)}
                                             placeholder="Title for social sharing"
@@ -370,6 +376,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">OG Description</Label>
                                         <textarea
+                                            aria-label="OG Description"
                                             value={form.ogDescription}
                                             onChange={(e) => updateField("ogDescription", e.target.value)}
                                             placeholder="Description for social sharing..."
@@ -380,6 +387,7 @@ export default function SeoPageOverridesPage() {
                                     <div>
                                         <Label className="text-foreground">OG Image URL</Label>
                                         <Input
+                                            aria-label="OG Image URL"
                                             value={form.ogImage}
                                             onChange={(e) => updateField("ogImage", e.target.value)}
                                             placeholder="https://example.com/og-image.png"

@@ -2,7 +2,7 @@
   "id": "referral",
   "name": "Referral System",
   "description": "Earn credits by referring new users",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -53,7 +53,10 @@
     }
   ],
   "hooksEmitted": [
-    { "hook": "referral.referral.used", "type": "action" }
+    {
+      "hook": "referral.referral.used",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {

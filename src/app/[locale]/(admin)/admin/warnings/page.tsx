@@ -220,6 +220,7 @@ export default function WarningsPage() {
                             <div className="relative">
                                 <Label>{fallback("warnings_user", "User")}</Label>
                                 <Input
+                                    aria-label={fallback("warnings_user", "User")}
                                     value={userQuery}
                                     onChange={(e) => searchUsers(e.target.value)}
                                     placeholder={fallback(
@@ -256,6 +257,7 @@ export default function WarningsPage() {
                             <div>
                                 <Label>{fallback("warnings_reason", "Reason")}</Label>
                                 <Textarea
+                                    aria-label={fallback("warnings_reason", "Reason")}
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
                                     rows={3}
@@ -266,6 +268,7 @@ export default function WarningsPage() {
                                 <div>
                                     <Label>{fallback("warnings_points", "Points")}</Label>
                                     <Input
+                                        aria-label={fallback("warnings_points", "Points")}
                                         type="number"
                                         min={1}
                                         max={100}
@@ -276,6 +279,7 @@ export default function WarningsPage() {
                                 <div>
                                     <Label>{fallback("warnings_expiresAt", "Expires At")}</Label>
                                     <Input
+                                        aria-label={fallback("warnings_expiresAt", "Expires At")}
                                         type="datetime-local"
                                         value={expiresAt}
                                         onChange={(e) => setExpiresAt(e.target.value)}

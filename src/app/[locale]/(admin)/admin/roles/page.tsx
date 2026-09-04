@@ -196,6 +196,7 @@ export default function AdminRolesPage() {
                                 <div>
                                     <Label>{t("roles_internalName")} *</Label>
                                     <Input
+                                        aria-label={t("roles_internalName")}
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value.toLowerCase().replace(/[^a-z_]/g, "") })}
                                         placeholder="moderator"
@@ -207,6 +208,7 @@ export default function AdminRolesPage() {
                                 <div>
                                     <Label>{t("roles_displayName")} *</Label>
                                     <Input
+                                        aria-label={t("roles_displayName")}
                                         value={form.displayName}
                                         onChange={(e) => setForm({ ...form, displayName: e.target.value })}
                                         placeholder={t("roles_namePlaceholder")}
@@ -217,6 +219,7 @@ export default function AdminRolesPage() {
                                     <Label>{t("roles_color")}</Label>
                                     <div className="flex gap-2">
                                         <input
+                                            aria-label={t("roles_color")}
                                             type="color"
                                             value={form.color}
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
@@ -232,6 +235,7 @@ export default function AdminRolesPage() {
                                 <div>
                                     <Label>{t("roles_priority")}</Label>
                                     <Input
+                                        aria-label={t("roles_priority")}
                                         type="number"
                                         value={form.priority}
                                         onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}

@@ -206,11 +206,12 @@ export default function LicensesPage() {
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
                                     <Label>{t("adm_productName")}</Label>
-                                    <Input value={productName} onChange={(e) => setProductName(e.target.value)} />
+                                    <Input aria-label={t("adm_productName")} value={productName} onChange={(e) => setProductName(e.target.value)} />
                                 </div>
                                 <div>
                                     <Label>{t("adm_quantity")}</Label>
                                     <Input
+                                        aria-label={t("adm_quantity")}
                                         type="number"
                                         min="1"
                                         max="500"
@@ -222,6 +223,7 @@ export default function LicensesPage() {
                                 <div>
                                     <Label>{t("adm_maxActivations")}</Label>
                                     <Input
+                                        aria-label={t("adm_maxActivations")}
                                         type="number"
                                         min="1"
                                         value={maxActivations}
@@ -232,6 +234,7 @@ export default function LicensesPage() {
                                 <div>
                                     <Label>{t("adm_validDays")}</Label>
                                     <Input
+                                        aria-label={t("adm_validDays")}
                                         type="number"
                                         min="1"
                                         value={validDays}
@@ -242,6 +245,7 @@ export default function LicensesPage() {
                                 <div>
                                     <Label>{t("adm_prefix")}</Label>
                                     <Input
+                                        aria-label={t("adm_prefix")}
                                         value={prefix}
                                         onChange={(e) => setPrefix(e.target.value.toUpperCase())}
                                         maxLength={8}
@@ -250,7 +254,7 @@ export default function LicensesPage() {
                                 </div>
                                 <div>
                                     <Label>{t("adm_note")}</Label>
-                                    <Input value={note} onChange={(e) => setNote(e.target.value)} />
+                                    <Input aria-label={t("adm_note")} value={note} onChange={(e) => setNote(e.target.value)} />
                                 </div>
                             </div>
                             <Button type="submit" disabled={saving}>

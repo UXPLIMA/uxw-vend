@@ -115,6 +115,7 @@ export default function AdminForumCategoriesPage() {
                                 <div>
                                     <Label>{`${t("adm_name")} *`}</Label>
                                     <Input
+                                        aria-label={t("adm_name")}
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         required
@@ -123,6 +124,7 @@ export default function AdminForumCategoriesPage() {
                                 <div>
                                     <Label>{t("adm_icon")}</Label>
                                     <Input
+                                        aria-label={t("adm_icon")}
                                         value={form.icon}
                                         onChange={(e) => setForm({ ...form, icon: e.target.value })}
                                         placeholder="💬"
@@ -141,6 +143,7 @@ export default function AdminForumCategoriesPage() {
                                     <Label>{t("adm_color")}</Label>
                                     <div className="flex gap-2">
                                         <input
+                                            aria-label={t("adm_color")}
                                             type="color"
                                             value={form.color}
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
@@ -152,6 +155,7 @@ export default function AdminForumCategoriesPage() {
                                 <div>
                                     <Label>{t("adm_order")}</Label>
                                     <Input
+                                        aria-label={t("adm_order")}
                                         type="number"
                                         value={form.order}
                                         onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}

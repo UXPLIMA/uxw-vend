@@ -131,12 +131,12 @@ export default function CustomPagesAdminPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <Label>{`${t("adm_title")} *`}</Label>
-                                    <Input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder={t("adm_pageTitle")} />
+                                    <Input aria-label={t("adm_title")} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder={t("adm_pageTitle")} />
                                 </div>
                                 {!editingId && (
                                     <div>
                                         <Label>{t("adm_slugOptional")}</Label>
-                                        <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-from-title" />
+                                        <Input aria-label={t("adm_slugOptional")} value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated-from-title" />
                                     </div>
                                 )}
                             </div>
@@ -151,7 +151,7 @@ export default function CustomPagesAdminPage() {
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <Label className="text-sm">{t("adm_order")}</Label>
-                                    <Input type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
+                                    <Input aria-label={t("adm_order")} type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
                             <Button type="submit" disabled={saving}>

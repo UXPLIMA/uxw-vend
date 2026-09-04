@@ -102,6 +102,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                 <Label>{field.label}</Label>
                                 {field.type === "textarea" ? (
                                     <textarea
+                                        aria-label={field.label}
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
                                         placeholder={field.placeholder}

@@ -153,6 +153,7 @@ export default function IpBlocksPage() {
                             <div>
                                 <Label>{fallback("ipBlocks_ipLabel", "IP or CIDR")}</Label>
                                 <Input
+                                    aria-label={fallback("ipBlocks_ipLabel", "IP or CIDR")}
                                     value={ip}
                                     onChange={(e) => setIp(e.target.value)}
                                     placeholder="1.2.3.4 or 192.168.0.0/24"
@@ -169,6 +170,7 @@ export default function IpBlocksPage() {
                             <div>
                                 <Label>{fallback("ipBlocks_scope", "Scope")}</Label>
                                 <select
+                                    aria-label={fallback("ipBlocks_scope", "Scope")}
                                     value={scope}
                                     onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")}
                                     className="w-full h-9 px-3 rounded-md border bg-background text-sm"
@@ -181,6 +183,7 @@ export default function IpBlocksPage() {
                             <div>
                                 <Label>{fallback("ipBlocks_reason", "Reason (optional)")}</Label>
                                 <Input
+                                    aria-label={fallback("ipBlocks_reason", "Reason (optional)")}
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
                                     placeholder={fallback("ipBlocks_reasonPlaceholder", "Abuse, spam, ...")}
@@ -189,6 +192,7 @@ export default function IpBlocksPage() {
                             <div>
                                 <Label>{fallback("ipBlocks_expiresAt", "Expires at (optional)")}</Label>
                                 <Input
+                                    aria-label={fallback("ipBlocks_expiresAt", "Expires at (optional)")}
                                     type="datetime-local"
                                     value={expiresAt}
                                     onChange={(e) => setExpiresAt(e.target.value)}

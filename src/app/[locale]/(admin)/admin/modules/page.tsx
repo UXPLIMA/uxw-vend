@@ -286,6 +286,7 @@ export default function AdminModulesPage() {
                             )}
                             <label className="text-xs text-muted-foreground">{t("modules_sort")}</label>
                             <select
+                                aria-label={t("modules_sort")}
                                 value={sortKey}
                                 onChange={(e) => setSortKey(e.target.value as SortKey)}
                                 className="text-xs border rounded-md px-2 py-1.5 bg-background"

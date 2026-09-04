@@ -181,7 +181,7 @@ export default function NavbarSettingsPage() {
                                             {link.children!.map((child, j) => (
                                                 <div key={j} className="flex items-center gap-2 pl-6">
                                                     <span className="text-muted-foreground">└</span>
-                                                    <Input value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder={t("navbar_subItemPlaceholder")} className="flex-1" />
+                                                    <Input aria-label={t("navbar_dropdownItems")} value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder={t("navbar_subItemPlaceholder")} className="flex-1" />
                                                     <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" className="flex-1" />
                                                     <Button variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>
                                                 </div>

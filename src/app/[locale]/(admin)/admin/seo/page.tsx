@@ -191,6 +191,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_defaultTitle")}</Label>
                         <Input
+                            aria-label={t("seo_defaultTitle")}
                             value={global.seo_default_title}
                             onChange={(e) => updateGlobal("seo_default_title", e.target.value)}
                             placeholder={t("seo_siteNamePlaceholder")}
@@ -202,6 +203,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_titleTemplate")}</Label>
                         <Input
+                            aria-label={t("seo_titleTemplate")}
                             value={global.seo_title_template}
                             onChange={(e) => updateGlobal("seo_title_template", e.target.value)}
                             placeholder="%s | My Site"
@@ -213,6 +215,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_defaultDescription")}</Label>
                         <Textarea
+                            aria-label={t("seo_defaultDescription")}
                             value={global.seo_default_description}
                             onChange={(e) =>
                                 updateGlobal("seo_default_description", e.target.value)
@@ -235,6 +238,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_ogImage")}</Label>
                         <Input
+                            aria-label={t("seo_ogImage")}
                             value={global.seo_default_og_image}
                             onChange={(e) =>
                                 updateGlobal("seo_default_og_image", e.target.value)
@@ -256,6 +260,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_googleVerification")}</Label>
                         <Input
+                            aria-label={t("seo_googleVerification")}
                             value={global.seo_google_verification}
                             onChange={(e) =>
                                 updateGlobal("seo_google_verification", e.target.value)
@@ -269,6 +274,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_bingVerification")}</Label>
                         <Input
+                            aria-label={t("seo_bingVerification")}
                             value={global.seo_bing_verification}
                             onChange={(e) =>
                                 updateGlobal("seo_bing_verification", e.target.value)
@@ -290,6 +296,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_robotsDirective")}</Label>
                         <Input
+                            aria-label={t("seo_robotsDirective")}
                             value={global.seo_robots_directive}
                             onChange={(e) =>
                                 updateGlobal("seo_robots_directive", e.target.value)
@@ -303,6 +310,7 @@ export default function SeoPage() {
                     <div>
                         <Label className="text-xs">{t("seo_canonicalUrl")}</Label>
                         <Input
+                            aria-label={t("seo_canonicalUrl")}
                             value={global.seo_canonical_url}
                             onChange={(e) =>
                                 updateGlobal("seo_canonical_url", e.target.value)
@@ -333,6 +341,7 @@ export default function SeoPage() {
                                 <div>
                                     <Label className="text-xs">{t("seo_metaTitle")}</Label>
                                     <Input
+                                        aria-label={t("seo_metaTitle")}
                                         value={seo[page.key]?.title || ""}
                                         onChange={(e) =>
                                             setSeo({
@@ -351,6 +360,7 @@ export default function SeoPage() {
                                         {t("seo_metaDescription")}
                                     </Label>
                                     <Textarea
+                                        aria-label={t("seo_metaDescription")}
                                         value={seo[page.key]?.description || ""}
                                         onChange={(e) =>
                                             setSeo({

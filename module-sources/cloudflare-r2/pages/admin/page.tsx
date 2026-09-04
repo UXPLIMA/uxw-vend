@@ -94,6 +94,7 @@ export default function CloudflareR2AdminPage() {
                     <div>
                         <Label>{t("accountId")}</Label>
                         <Input
+                            aria-label={t("accountId")}
                             value={config.accountId}
                             onChange={(e) => setConfig({ ...config, accountId: e.target.value })}
                             placeholder="abc123def456..."
@@ -102,6 +103,7 @@ export default function CloudflareR2AdminPage() {
                     <div>
                         <Label>{t("bucket")}</Label>
                         <Input
+                            aria-label={t("bucket")}
                             value={config.bucket}
                             onChange={(e) => setConfig({ ...config, bucket: e.target.value })}
                             placeholder="my-bucket"
@@ -110,6 +112,7 @@ export default function CloudflareR2AdminPage() {
                     <div>
                         <Label>{t("accessKey")}</Label>
                         <Input
+                            aria-label={t("accessKey")}
                             value={config.accessKey}
                             onChange={(e) => setConfig({ ...config, accessKey: e.target.value })}
                             placeholder="..."
@@ -118,6 +121,7 @@ export default function CloudflareR2AdminPage() {
                     <div>
                         <Label>{t("secretKey")}</Label>
                         <Input
+                            aria-label={t("secretKey")}
                             type="password"
                             value={config.secretKey}
                             onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
@@ -127,6 +131,7 @@ export default function CloudflareR2AdminPage() {
                     <div>
                         <Label>{t("publicUrl")}</Label>
                         <Input
+                            aria-label={t("publicUrl")}
                             value={config.publicUrl}
                             onChange={(e) => setConfig({ ...config, publicUrl: e.target.value })}
                             placeholder="https://pub-xxx.r2.dev"

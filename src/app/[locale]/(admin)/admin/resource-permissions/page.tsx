@@ -231,6 +231,7 @@ export default function ResourcePermissionsPage() {
                                 <div>
                                     <Label>{fallback("rp_resource", "Resource")}</Label>
                                     <Input
+                                        aria-label={fallback("rp_resource", "Resource")}
                                         value={formResource}
                                         onChange={(e) => setFormResource(e.target.value)}
                                         placeholder="blog.article"
@@ -242,6 +243,7 @@ export default function ResourcePermissionsPage() {
                                         {fallback("rp_resourceId", "Resource ID (optional)")}
                                     </Label>
                                     <Input
+                                        aria-label={fallback("rp_resourceId", "Resource ID (optional)")}
                                         value={formResourceId}
                                         onChange={(e) => setFormResourceId(e.target.value)}
                                         placeholder={fallback(
@@ -253,6 +255,7 @@ export default function ResourcePermissionsPage() {
                                 <div>
                                     <Label>{fallback("rp_action", "Action")}</Label>
                                     <select
+                                        aria-label={fallback("rp_action", "Action")}
                                         value={formAction}
                                         onChange={(e) => setFormAction(e.target.value)}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -267,6 +270,7 @@ export default function ResourcePermissionsPage() {
                                 <div>
                                     <Label>{fallback("rp_allow", "Allow / Deny")}</Label>
                                     <select
+                                        aria-label={fallback("rp_allow", "Allow / Deny")}
                                         value={formAllow}
                                         onChange={(e) => setFormAllow(e.target.value)}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -278,6 +282,7 @@ export default function ResourcePermissionsPage() {
                                 <div>
                                     <Label>{fallback("rp_principalType", "Principal")}</Label>
                                     <select
+                                        aria-label={fallback("rp_principalType", "Principal")}
                                         value={formPrincipalType}
                                         onChange={(e) =>
                                             setFormPrincipalType(e.target.value as "role" | "user")
@@ -293,6 +298,7 @@ export default function ResourcePermissionsPage() {
                                         <>
                                             <Label>{fallback("rp_selectRole", "Select Role")}</Label>
                                             <select
+                                                aria-label={fallback("rp_selectRole", "Select Role")}
                                                 value={formRoleId}
                                                 onChange={(e) => setFormRoleId(e.target.value)}
                                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -312,6 +318,7 @@ export default function ResourcePermissionsPage() {
                                         <>
                                             <Label>{fallback("rp_searchUser", "Search User")}</Label>
                                             <Input
+                                                aria-label={fallback("rp_searchUser", "Search User")}
                                                 value={formUserQuery}
                                                 onChange={(e) => searchUsers(e.target.value)}
                                                 placeholder={fallback(
@@ -370,6 +377,7 @@ export default function ResourcePermissionsPage() {
                     <div>
                         <Label>{fallback("rp_filterResource", "Resource")}</Label>
                         <Input
+                            aria-label={fallback("rp_filterResource", "Resource")}
                             value={resourceFilter}
                             onChange={(e) => {
                                 setPage(1);
@@ -381,6 +389,7 @@ export default function ResourcePermissionsPage() {
                     <div>
                         <Label>{fallback("rp_filterPrincipal", "Principal Type")}</Label>
                         <select
+                            aria-label={fallback("rp_filterPrincipal", "Principal Type")}
                             value={principalFilter}
                             onChange={(e) => {
                                 setPage(1);

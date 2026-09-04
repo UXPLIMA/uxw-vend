@@ -217,6 +217,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                             <div>
                                 <label className="text-sm text-muted-foreground block mb-1">{t("adm_status")}</label>
                                 <select
+                                    aria-label={t("adm_status")}
                                     value={ticket.status}
                                     onChange={(e) => updateTicket("status", e.target.value)}
                                     disabled={updating}
@@ -230,6 +231,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                             <div>
                                 <label className="text-sm text-muted-foreground block mb-1">{t("adm_priority")}</label>
                                 <select
+                                    aria-label={t("adm_priority")}
                                     value={ticket.priority}
                                     onChange={(e) => updateTicket("priority", e.target.value)}
                                     disabled={updating}

@@ -222,6 +222,7 @@ export default function AuditLogPage() {
                                 {t("auditLog_action")}
                             </label>
                             <select
+                                aria-label={t("auditLog_action")}
                                 value={actionFilter}
                                 onChange={(e) =>
                                     resetPageAndSet(setActionFilter)(e.target.value)
@@ -244,6 +245,7 @@ export default function AuditLogPage() {
                                 {t("auditLog_userId")}
                             </label>
                             <Input
+                                aria-label={t("auditLog_userId")}
                                 value={userFilter}
                                 onChange={(e) =>
                                     resetPageAndSet(setUserFilter)(e.target.value)
@@ -258,6 +260,7 @@ export default function AuditLogPage() {
                                 {t("auditLog_from")}
                             </label>
                             <Input
+                                aria-label={t("auditLog_from")}
                                 type="date"
                                 value={fromDate}
                                 onChange={(e) =>
@@ -272,6 +275,7 @@ export default function AuditLogPage() {
                                 {t("auditLog_to")}
                             </label>
                             <Input
+                                aria-label={t("auditLog_to")}
                                 type="date"
                                 value={toDate}
                                 onChange={(e) =>
