@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, readJsonBody } from "@/core/sdk/server";
+import { prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/linked-accounts
@@ -18,6 +18,15 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const allowed = await rateLimitForRoleAsync(
+        `linked-account:${session.user.id}`,
+        { maxRequests: 20, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
+    }
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
@@ -45,6 +54,15 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const allowed = await rateLimitForRoleAsync(
+        `linked-account:${session.user.id}`,
+        { maxRequests: 20, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
+    }
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;

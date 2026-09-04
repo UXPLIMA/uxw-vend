@@ -16,7 +16,7 @@ import { verifyAssertion } from "../../lib/steam-openid";
 import { issueTicket } from "../../lib/steam-ticket";
 import { steamReturnTo, steamSignInPath, steamFailurePath } from "../../lib/steam-urls";
 
-export const GET = withRateLimit(async (req: NextRequest) => {
+export const GET = withRateLimit("steam-callback", async (req: NextRequest) => {
     const appUrl = resolveAppUrl();
 
     if (!process.env.AUTH_STEAM_API_KEY) {

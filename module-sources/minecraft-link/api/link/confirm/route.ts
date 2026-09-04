@@ -12,7 +12,7 @@ import { auth } from "@/core/sdk/auth";
 import { redeemCode } from "../../../lib/link-code";
 import { lookupProfile } from "../../../lib/mojang";
 
-export const POST = withRateLimit(async (request: NextRequest) => {
+export const POST = withRateLimit("minecraft-link-confirm", async (request: NextRequest) => {
     const session = await auth();
     const userId = session?.user?.id;
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

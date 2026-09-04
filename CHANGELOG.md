@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Rate limits that were not what they said.** Three separate faults.
+  `withRateLimit` hit the limiter with the bare client IP as its key, so every
+  route wrapped in it shared one counter: a licence server checking keys from
+  an office spent the budget the people behind that NAT needed to search the
+  site or sign in through Steam, and a route asking for a tighter limit could
+  not have one, because the count it read was everybody's. It now takes the
+  scope as its first argument, which is what every hand-written call already
+  did (`register:`, `gift-redeem:`, `2fa-verify:`). Three modules -
+  custom-forms, downloads, help-center - built their key from
+  `x-forwarded-for` read straight off the request, which the caller sets: a
+  fresh header bought a fresh budget, so the form-spam limit in particular was
+  no limit at all. They use `getClientIP`, which only honours that header from
+  a peer in `TRUSTED_PROXY_IPS`. And seventeen mutating handlers reachable by
+  any signed-in account had no ceiling at all: adding to a cart, placing an
+  order, liking a post, editing a forum post. That last one writes a Revision
+  row per edit holding the whole previous body, retained for a year, so an
+  edit loop was a way for an ordinary member to grow the database without
+  bound. A test now walks every handler and fails on a signed-in write path
+  with no limit, an unscoped `withRateLimit`, or a key built from a header.
+
 - **No endpoint had a request body limit.** App Router route handlers do not
   carry the 1 MB cap that Pages API routes shipped with, and nothing else in
   the stack supplies one, so every JSON endpoint accepted a body of any size

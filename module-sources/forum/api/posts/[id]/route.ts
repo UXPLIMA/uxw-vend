@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, sanitizeHtml, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumPostSchema } from "../../../lib/validations";
 
@@ -10,6 +10,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const allowed = await rateLimitForRoleAsync(
+        `forum-post-edit:${session.user.id}`,
+        { maxRequests: 20, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
     }
 
     const { id } = await params;

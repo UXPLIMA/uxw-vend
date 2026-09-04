@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense, releaseActivation } from "../../../lib/licenses";
 
-export const POST = withRateLimit(async (request: NextRequest) => {
+export const POST = withRateLimit("license-activate", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";
@@ -36,7 +36,7 @@ export const POST = withRateLimit(async (request: NextRequest) => {
 }, rateLimits.auth);
 
 /** Frees this machine's seat so the customer can move to another one. */
-export const DELETE = withRateLimit(async (request: NextRequest) => {
+export const DELETE = withRateLimit("license-release", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";

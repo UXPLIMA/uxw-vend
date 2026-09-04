@@ -97,17 +97,32 @@ export function apiPaginated<T>(
 }
 
 /**
- * Wrap a handler with IP-based rate limiting. The rate limit envelope uses the
+ * Wrap a handler with per-route, IP-based rate limiting. The envelope uses the
  * standard `apiError` shape with `code: "rate_limited"` so clients can branch
  * on it cleanly.
+ *
+ * `scope` names the bucket, and it is required because the alternative was
+ * worse than it looked. This wrapper used to hit the limiter with the bare IP
+ * as the key, which meant every route using it shared one counter: a licence
+ * server checking keys from an office spent the same budget that the people
+ * behind that NAT needed to search the site or sign in through Steam, and a
+ * route asking for a tighter limit could not get one, because the count it
+ * read was everybody's. Every hand-written call to `rateLimit` in the codebase
+ * already prefixed its key - `register:`, `gift-redeem:`, `2fa-verify:` - and
+ * this is the same discipline, enforced by the signature.
+ *
+ * The scope is a fixed name, never anything from the request. A key built from
+ * a path with an id in it is a different bucket per id, which is no limit at
+ * all to a caller who can vary the id.
  */
 export function withRateLimit(
+    scope: string,
     handler: (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>,
     config = rateLimits.api,
 ) {
     return async (request: NextRequest, ...args: unknown[]) => {
         const ip = getClientIP(request.headers);
-        const { success, remaining, resetAt } = await rateLimit(ip, config);
+        const { success, remaining, resetAt } = await rateLimit(`${scope}:${ip}`, config);
 
         if (!success) {
             return apiError("Too many requests. Please try again later.", 429, {

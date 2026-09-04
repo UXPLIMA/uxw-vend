@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRole, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 interface RouteParams {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/v1/help/articles/[slug]/feedback - Submit feedback
 export async function POST(request: NextRequest, { params }: RouteParams) {
     const { slug } = await params;
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || request.headers.get("x-real-ip") || "unknown";
+    const ip = getClientIP(request.headers);
     const rl = await rateLimitForRole(
         `help-feedback:${ip}`,
         { maxRequests: 10, windowMs: 3_600_000 },

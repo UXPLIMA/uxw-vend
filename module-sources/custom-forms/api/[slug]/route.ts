@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ slug: string }> };
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { slug } = await params;
     const session = await auth();
 
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || request.headers.get("x-real-ip") || "unknown";
+    const ip = getClientIP(request.headers);
     const identifier = session?.user?.id ? `custom-forms:submit:${session.user.id}` : `custom-forms:submit:${ip}`;
     const allowed = await rateLimitForRoleAsync(
         identifier,

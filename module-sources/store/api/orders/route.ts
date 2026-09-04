@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -73,6 +73,15 @@ export async function POST(request: NextRequest) {
 
         if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const allowed = await rateLimitForRoleAsync(
+            `order-create:${session.user.id}`,
+            { maxRequests: 20, windowMs: 60_000 },
+            session.user.role
+        );
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
         }
 
         const body = await readJsonBody(request);

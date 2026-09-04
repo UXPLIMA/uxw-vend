@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { logActivity } from "@/core/lib/activity-log";
+import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 
 /**
  * POST /api/v1/admin/impersonate/stop
@@ -13,6 +14,17 @@ export async function POST() {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Every call writes an activity-log row, so the endpoint is a way to grow
+    // that table even though it changes nothing else.
+    const allowed = await rateLimitForRoleAsync(
+        `impersonate-stop:${session.user.id}`,
+        { maxRequests: 20, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
     }
 
     const realAdminId = session.user.originalUserId;
