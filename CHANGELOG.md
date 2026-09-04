@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Sequential scans on the tables that grow.** The admin moderation screen
+  asks each provider for a count of pending items, and not one of the four
+  content tables it counts - blog comments, forum posts, forum topics,
+  suggestions - had an index on the column being counted. On a site with a
+  million forum posts and three pending ones, opening that screen was four
+  full table scans to render a badge, and the cost only shows up once someone
+  else's site has the rows. `Announcement` had no index at all, although its
+  banner query runs on every page render. The scheduled-publish crons scanned
+  `publishAt` on every tick; the stats screens scanned a date window over
+  orders, tickets, topics, articles and users. Twelve indexes added, which
+  `apply-schema-additions` treats as additive, so they arrive on update
+  without a migration file. A new gate walks every `where` on a model whose
+  rows accumulate and fails on an unindexed column unless it is listed with a
+  reason; ten are, and each says why an index would not pay for itself there.
+- **The conversation list read every message the user had ever received.**
+  Unread counts have a per-conversation cutoff, so the list fetched all
+  inbound messages and bucketed them in memory: work proportional to a user's
+  entire history, for a number that is nearly always small. One grouped count
+  with the cutoffs expressed as an `OR` says the same thing to the database,
+  which answers it without sending a row.
+
+### Fixed
 - **Rate limits that were not what they said.** Three separate faults.
   `withRateLimit` hit the limiter with the bare client IP as its key, so every
   route wrapped in it shared one counter: a licence server checking keys from

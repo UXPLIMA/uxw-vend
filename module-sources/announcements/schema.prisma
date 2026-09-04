@@ -17,4 +17,9 @@ model Announcement {
   publishAt    DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+
+  // The public banner query runs on every page render, and the scheduled-
+  // publish cron scans publishAt on every tick. The model had no index at all.
+  @@index([isActive])
+  @@index([publishAt])
 }

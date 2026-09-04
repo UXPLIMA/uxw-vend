@@ -32,35 +32,32 @@ export async function GET() {
         orderBy: { conversation: { lastMessageAt: "desc" } },
     });
 
-    // Unread counts in a single groupBy instead of one COUNT per conversation.
-    // We can't express "createdAt > per-conversation lastReadAt" in a single
-    // query, so we fetch all inbound messages and bucket them in memory.
+    // Unread counts in one grouped query.
+    //
+    // The cutoff is per conversation - each participation carries its own
+    // lastReadAt - which is why this used to read every inbound message the
+    // user had ever received and bucket them in memory. That is O(all of the
+    // user's messages) on every load of the conversation list, for a number
+    // that is almost always small. An OR of one clause per conversation says
+    // the same thing to the database, which counts them without sending a row.
     const userId = session.user.id;
-    const convIds = myParticipations.map((p) => p.conversationId);
     const unreadById = new Map<string, number>();
 
-    if (convIds.length > 0) {
-        // lastReadAt cutoff per conversation for this user.
-        const lastReadByConv = new Map<string, Date | null>();
-        for (const p of myParticipations) {
-            lastReadByConv.set(p.conversationId, p.lastReadAt);
-        }
-
-        // Group inbound messages per conversation; then subtract the ones
-        // already read by walking the ids in a second cheap findMany.
-        const inbound = await prisma.message.findMany({
+    if (myParticipations.length > 0) {
+        const grouped = await prisma.message.groupBy({
+            by: ["conversationId"],
+            _count: { _all: true },
             where: {
-                conversationId: { in: convIds },
                 authorId: { not: userId },
+                OR: myParticipations.map((p) => ({
+                    conversationId: p.conversationId,
+                    ...(p.lastReadAt ? { createdAt: { gt: p.lastReadAt } } : {}),
+                })),
             },
-            select: { conversationId: true, createdAt: true },
         });
 
-        for (const m of inbound) {
-            const cutoff = lastReadByConv.get(m.conversationId);
-            if (!cutoff || m.createdAt > cutoff) {
-                unreadById.set(m.conversationId, (unreadById.get(m.conversationId) ?? 0) + 1);
-            }
+        for (const row of grouped) {
+            unreadById.set(row.conversationId, row._count._all);
         }
     }
 

@@ -104,6 +104,9 @@ model Order {
 
   @@index([userId])
   @@index([status])
+
+  // The revenue chart and the community goal both scan a date window.
+  @@index([createdAt])
 }
 
 enum OrderStatus {
