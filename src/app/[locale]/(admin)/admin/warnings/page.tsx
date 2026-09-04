@@ -40,6 +40,7 @@ export default function WarningsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [warnings, setWarnings] = useState<Warning[]>([]);
@@ -364,6 +365,7 @@ export default function WarningsPage() {
                                             </Button>
                                         )}
                                         <Button
+                                            aria-label={commonT("delete")}
                                             variant="ghost"
                                             size="sm"
                                             className="text-destructive"
@@ -383,6 +385,7 @@ export default function WarningsPage() {
                             </span>
                             <div className="flex gap-1">
                                 <Button
+                                    aria-label={commonT("previousPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page === 1}
@@ -391,6 +394,7 @@ export default function WarningsPage() {
                                     <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <Button
+                                    aria-label={commonT("nextPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page >= pages}

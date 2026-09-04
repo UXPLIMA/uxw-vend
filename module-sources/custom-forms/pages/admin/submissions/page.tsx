@@ -128,7 +128,7 @@ export default function SubmissionsPage() {
                                                 </tbody>
                                             </table>
                                             {sub.userId && (
-                                                <p className="text-xs text-muted-foreground mt-2">User ID: {sub.userId}</p>
+                                                <p className="text-xs text-muted-foreground mt-2">{t("adm_userId", { id: sub.userId })}</p>
                                             )}
                                         </div>
                                     )}
@@ -144,7 +144,7 @@ export default function SubmissionsPage() {
                                 {t("adm_previous")}
                             </Button>
                             <span className="flex items-center text-sm text-muted-foreground">
-                                Page {page} of {totalPages}
+                                {t("adm_pageOf", { page, total: totalPages })}
                             </span>
                             <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
                                 {t("adm_next")}

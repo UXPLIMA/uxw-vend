@@ -32,6 +32,7 @@ interface SettingsFormProps {
 
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -84,7 +85,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
         <>
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/admin/settings">
-                    <Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
                 </Link>
                 <div>
                     <h1 className="text-3xl font-bold">{title}</h1>

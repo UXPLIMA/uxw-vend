@@ -53,6 +53,7 @@ const EMPTY_FORM: FormData = {
 
 export default function SeoPageOverridesPage() {
     const t = useTranslations("seo");
+    const commonT = useTranslations("common");
     const [pages, setPages] = useState<SeoPage[]>([]);
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -188,7 +189,7 @@ export default function SeoPageOverridesPage() {
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <Link href="/admin/seo">
-                        <Button variant="ghost" size="icon">
+                        <Button aria-label={commonT("back")} variant="ghost" size="icon">
                             <ArrowLeft className="w-4 h-4" />
                         </Button>
                     </Link>
@@ -256,10 +257,10 @@ export default function SeoPageOverridesPage() {
                                             </td>
                                             <td className="p-4 text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="icon" onClick={() => openEdit(page)}>
+                                                    <Button aria-label={commonT("edit")} variant="ghost" size="icon" onClick={() => openEdit(page)}>
                                                         <Pencil className="w-4 h-4" />
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(page)}>
+                                                    <Button aria-label={commonT("delete")} variant="ghost" size="icon" onClick={() => handleDelete(page)}>
                                                         <Trash2 className="w-4 h-4 text-destructive" />
                                                     </Button>
                                                 </div>
@@ -286,7 +287,7 @@ export default function SeoPageOverridesPage() {
                             <h2 className="text-lg font-semibold text-foreground">
                                 {editingId ? t("adm_editPageSeo") : t("adm_addPageSeo")}
                             </h2>
-                            <Button variant="ghost" size="icon" onClick={() => setDialogOpen(false)}>
+                            <Button aria-label={commonT("close")} variant="ghost" size="icon" onClick={() => setDialogOpen(false)}>
                                 <X className="w-4 h-4" />
                             </Button>
                         </div>

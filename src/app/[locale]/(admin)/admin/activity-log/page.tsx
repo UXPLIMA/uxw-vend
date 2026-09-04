@@ -21,6 +21,7 @@ export default function ActivityLogPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -79,8 +80,8 @@ export default function ActivityLogPage() {
                         <div className="flex items-center justify-between p-4 border-t">
                             <span className="text-sm text-muted-foreground">{t("activityLog_page", { page, total: totalPages })}</span>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}><ChevronLeft className="w-4 h-4" /></Button>
-                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-4 h-4" /></Button>
+                                <Button aria-label={commonT("previousPage")} variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}><ChevronLeft className="w-4 h-4" /></Button>
+                                <Button aria-label={commonT("nextPage")} variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-4 h-4" /></Button>
                             </div>
                         </div>
                     )}

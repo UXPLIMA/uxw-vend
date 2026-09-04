@@ -24,6 +24,7 @@ export default function ApiKeysPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [keys, setKeys] = useState<ApiKeyItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -94,7 +95,7 @@ export default function ApiKeysPage() {
                     <p className="text-sm font-medium text-green-800 mb-2">{t("apiKeys_keyCreated")}</p>
                     <div className="flex items-center gap-2">
                         <code className="flex-1 text-sm bg-muted px-3 py-2 rounded border border-border font-mono select-all">{newKey}</code>
-                        <Button size="sm" variant="outline" onClick={copyKey}>
+                        <Button aria-label={commonT("copy")} size="sm" variant="outline" onClick={copyKey}>
                             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </Button>
                     </div>
@@ -134,7 +135,7 @@ export default function ApiKeysPage() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs text-muted-foreground">{new Date(k.createdAt).toLocaleDateString(__dateTag)}</span>
-                                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteKey(k.id)}>
+                                        <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteKey(k.id)}>
                                             <Trash2 className="w-3 h-3" />
                                         </Button>
                                     </div>

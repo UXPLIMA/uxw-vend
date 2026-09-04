@@ -18,6 +18,7 @@ interface PageProps {
 
 export default async function AdminOrderDetailPage({ params }: PageProps) {
     const t = await getTranslations("store");
+    const commonT = await getTranslations("common");
     const dateTag = dateLocaleTag(await getLocale());
     const session = await auth();
     if (!session?.user) redirect("/auth/login");
@@ -46,7 +47,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
         <>
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/admin/store/orders">
-                    <Button variant="ghost" size="icon">
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                 </Link>

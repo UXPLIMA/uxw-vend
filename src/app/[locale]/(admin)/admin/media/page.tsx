@@ -264,7 +264,7 @@ export default function MediaLibraryPage() {
                                     <div className="text-muted-foreground text-xs">{t("media_url")}</div>
                                     <div className="flex gap-2">
                                         <Input value={selected.url} readOnly className="text-xs font-mono" />
-                                        <Button variant="outline" size="sm" onClick={() => copyUrl(selected)}>
+                                        <Button aria-label={commonT("copy")} variant="outline" size="sm" onClick={() => copyUrl(selected)}>
                                             {copiedId === selected.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                                         </Button>
                                     </div>

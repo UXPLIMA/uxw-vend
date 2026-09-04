@@ -23,6 +23,7 @@ interface Topic {
 
 export default function AdminForumTopicsPage() {
     const t = useTranslations("forum");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const relativeTime = useRelativeTime();
     const [topics, setTopics] = useState<Topic[]>([]);
@@ -184,6 +185,7 @@ export default function AdminForumTopicsPage() {
                                                         {topic.isLocked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
                                                     </Button>
                                                     <Button
+                                                        aria-label={commonT("delete")}
                                                         variant="ghost"
                                                         size="sm"
                                                         className="text-destructive"

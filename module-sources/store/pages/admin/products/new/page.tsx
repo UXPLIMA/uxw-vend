@@ -92,7 +92,7 @@ export default function NewProductPage() {
         <>
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/admin/store/products">
-                    <Button variant="ghost" size="icon">
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                 </Link>

@@ -26,6 +26,7 @@ interface Form {
 
 export default function FormsPage() {
     const t = useTranslations("customForms");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [forms, setForms] = useState<Form[]>([]);
     const [loading, setLoading] = useState(true);
@@ -171,7 +172,7 @@ export default function FormsPage() {
                                                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(i, { required: e.target.checked })} />
                                                 {t("adm_required")}
                                             </label>
-                                            <Button type="button" variant="ghost" size="sm" onClick={() => removeField(i)}><X className="w-3 h-3" /></Button>
+                                            <Button aria-label={commonT("remove")} type="button" variant="ghost" size="sm" onClick={() => removeField(i)}><X className="w-3 h-3" /></Button>
                                         </div>
                                     ))}
                                 </div>
@@ -199,8 +200,8 @@ export default function FormsPage() {
                                     {form.description && <p className="text-xs text-muted-foreground">{form.description}</p>}
                                 </div>
                                 <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" onClick={() => startEdit(form)}><Pencil className="w-3 h-3" /></Button>
-                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteForm(form.slug)}><Trash2 className="w-3 h-3" /></Button>
+                                    <Button aria-label={commonT("edit")} variant="ghost" size="sm" onClick={() => startEdit(form)}><Pencil className="w-3 h-3" /></Button>
+                                    <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteForm(form.slug)}><Trash2 className="w-3 h-3" /></Button>
                                 </div>
                             </div>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">

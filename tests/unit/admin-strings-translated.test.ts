@@ -90,9 +90,25 @@ function offendersIn(source: string, file: string): string[] {
         const text = match[1].trim();
         if (text && looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  ${text}`);
     }
+    // A text run that stops at an interpolation: `>Page {page}/{total}<`.
+    for (const match of source.matchAll(/>([^<>{}]+)\{/g)) {
+        const text = match[1].trim();
+        if (text && looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  ${text}{...}`);
+    }
+    // ...and one that starts after it: `>{count} modules installed<`.
+    for (const match of source.matchAll(/\}([^<>{}]+)</g)) {
+        const text = match[1].trim();
+        if (text && looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  {...}${text}`);
+    }
     for (const match of source.matchAll(/\b(placeholder|title|aria-label)="([^"]+)"/g)) {
         const text = match[2].trim();
         if (looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  ${match[1]}="${text}"`);
+    }
+    // The same attributes written as a template literal, interpolations removed:
+    // title={`Update to v${mod.latestVersion}`}.
+    for (const match of source.matchAll(/\b(placeholder|title|aria-label)=\{`([^`]+)`\}/g)) {
+        const text = match[2].replace(/\$\{[^}]*\}/g, "").trim();
+        if (looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  ${match[1]}={\`${text}\`}`);
     }
     return found;
 }

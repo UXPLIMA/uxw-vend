@@ -29,6 +29,7 @@ interface NavLink {
 
 export default function NavbarSettingsPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const moduleStatus = useAllModules();
     const [links, setLinks] = useState<NavLink[]>([]);
     const [loading, setLoading] = useState(true);
@@ -171,7 +172,7 @@ export default function NavbarSettingsPage() {
                                                 <ChevronDown className="w-3 h-3" />
                                             </Button>
                                         )}
-                                        <Button variant="ghost" size="sm" onClick={() => removeLink(i)}><Trash2 className="w-3 h-3 text-destructive" /></Button>
+                                        <Button aria-label={commonT("remove")} variant="ghost" size="sm" onClick={() => removeLink(i)}><Trash2 className="w-3 h-3 text-destructive" /></Button>
                                     </div>
 
                                     {/* Dropdown children */}
@@ -183,7 +184,7 @@ export default function NavbarSettingsPage() {
                                                     <span className="text-muted-foreground">└</span>
                                                     <Input aria-label={t("navbar_dropdownItems")} value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder={t("navbar_subItemPlaceholder")} className="flex-1" />
                                                     <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" className="flex-1" />
-                                                    <Button variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>
+                                                    <Button aria-label={commonT("remove")} variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>
                                                 </div>
                                             ))}
                                             <Button variant="ghost" size="sm" className="ml-6" onClick={() => addChild(i)}>

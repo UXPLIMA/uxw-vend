@@ -21,6 +21,7 @@ interface CurrencyConfig {
 
 export default function CurrencyAdminPage() {
     const t = useTranslations("currency");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [config, setConfig] = useState<CurrencyConfig>({ base: "USD", currencies: [] });
     const [loading, setLoading] = useState(true);
@@ -182,6 +183,7 @@ export default function CurrencyAdminPage() {
                                         <Star className="w-3 h-3" />
                                     </Button>
                                     <Button
+                                        aria-label={commonT("delete")}
                                         type="button"
                                         size="sm"
                                         variant="ghost"

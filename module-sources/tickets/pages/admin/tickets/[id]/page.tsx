@@ -58,6 +58,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("tickets");
+    const commonT = useTranslations("common");
     const params = use(props.params);
     const ticketId = params.id;
 
@@ -146,7 +147,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
         <>
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/admin/tickets">
-                    <Button variant="ghost" size="icon">
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                 </Link>

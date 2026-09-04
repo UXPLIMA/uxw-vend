@@ -142,6 +142,7 @@ export default function AuditLogPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
     const [actions, setActions] = useState<string[]>([]);
@@ -402,6 +403,7 @@ export default function AuditLogPage() {
                         </span>
                         <div className="flex gap-2">
                             <Button
+                                aria-label={commonT("previousPage")}
                                 variant="outline"
                                 size="sm"
                                 disabled={page <= 1}
@@ -410,6 +412,7 @@ export default function AuditLogPage() {
                                 <ChevronLeft className="w-4 h-4" />
                             </Button>
                             <Button
+                                aria-label={commonT("nextPage")}
                                 variant="outline"
                                 size="sm"
                                 disabled={page >= pages}

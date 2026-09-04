@@ -18,6 +18,7 @@ const webhookEvents = [
 
 export default function DiscordSettingsPage() {
     const t = useTranslations("discordIntegration");
+    const commonT = useTranslations("common");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -105,7 +106,7 @@ export default function DiscordSettingsPage() {
         <>
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/admin/settings">
-                    <Button variant="ghost" size="icon">
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
                         <ArrowLeft className="w-4 h-4" />
                     </Button>
                 </Link>
@@ -137,6 +138,7 @@ export default function DiscordSettingsPage() {
                                     </div>
                                     {webhooks[event.key] && (
                                         <Button
+                                            aria-label={t("testWebhook")}
                                             type="button"
                                             variant="outline"
                                             size="sm"

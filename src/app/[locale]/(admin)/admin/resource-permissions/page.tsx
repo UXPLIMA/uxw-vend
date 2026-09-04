@@ -45,6 +45,7 @@ const ACTIONS = ["view", "create", "edit", "delete", "*"];
 
 export default function ResourcePermissionsPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [grants, setGrants] = useState<Grant[]>([]);
@@ -455,6 +456,7 @@ export default function ResourcePermissionsPage() {
                                         </span>
                                     </div>
                                     <Button
+                                        aria-label={commonT("delete")}
                                         variant="ghost"
                                         size="sm"
                                         className="text-destructive"
@@ -473,6 +475,7 @@ export default function ResourcePermissionsPage() {
                             </span>
                             <div className="flex gap-1">
                                 <Button
+                                    aria-label={commonT("previousPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page === 1}
@@ -481,6 +484,7 @@ export default function ResourcePermissionsPage() {
                                     <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <Button
+                                    aria-label={commonT("nextPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page >= pages}
