@@ -9,30 +9,61 @@ import { dateLocaleTag } from "@/core/sdk";
 
 export const revalidate = 60;
 
-async function getBlogArticles() {
-    const articles = await prisma.blogArticle.findMany({
-        where: {
-            status: "PUBLISHED",
-            publishedAt: { lte: new Date() },
-        },
-        orderBy: { publishedAt: "desc" },
-        include: {
-            author: { select: { username: true, avatar: true } },
-            category: { select: { name: true, slug: true } },
-        },
-    });
+/**
+ * One page of articles.
+ *
+ * The index used to read every published article, with its author and its
+ * category joined, and render all of them into one grid. That is the whole
+ * table on every visit, and it grows for the life of the site while the page
+ * only ever shows a screenful.
+ */
+const PER_PAGE = 12;
 
-    const categories = await prisma.blogCategory.findMany({
-        include: {
-            _count: { select: { articles: true } },
-        },
-    });
+async function getBlogArticles(page: number) {
+    const where = {
+        status: "PUBLISHED",
+        publishedAt: { lte: new Date() },
+    } as const;
 
-    return { articles, categories };
+    const [articles, total, categories, recent] = await Promise.all([
+        prisma.blogArticle.findMany({
+            where,
+            orderBy: { publishedAt: "desc" },
+            skip: (page - 1) * PER_PAGE,
+            take: PER_PAGE,
+            include: {
+                author: { select: { username: true, avatar: true } },
+                category: { select: { name: true, slug: true } },
+            },
+        }),
+        prisma.blogArticle.count({ where }),
+        prisma.blogCategory.findMany({
+            include: {
+                _count: { select: { articles: true } },
+            },
+        }),
+        // The sidebar wants the five newest on every page, not the five that
+        // happen to be at the top of the page being viewed.
+        prisma.blogArticle.findMany({
+            where,
+            orderBy: { publishedAt: "desc" },
+            take: 5,
+            select: { id: true, number: true, slug: true, title: true, publishedAt: true, createdAt: true },
+        }),
+    ]);
+
+    return { articles, categories, recent, pages: Math.max(1, Math.ceil(total / PER_PAGE)) };
 }
 
-export default async function BlogPage() {
-    const { articles, categories } = await getBlogArticles();
+interface BlogPageProps {
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+    const raw = (await searchParams)?.page;
+    const requested = Number.parseInt(Array.isArray(raw) ? raw[0] : raw ?? "", 10);
+    const page = Number.isFinite(requested) && requested > 0 ? requested : 1;
+    const { articles, categories, recent, pages } = await getBlogArticles(page);
     const t = await getTranslations('blog');
     const dateTag = dateLocaleTag(await getLocale());
     const commonT = await getTranslations('common');
@@ -68,7 +99,7 @@ export default async function BlogPage() {
                                 <div className="bg-card rounded-xl border border-border p-5">
                                     <h2 className="font-bold text-foreground mb-4">{t('recentPosts')}</h2>
                                     <div className="space-y-4">
-                                        {articles.slice(0, 5).map((article) => (
+                                        {recent.map((article) => (
                                             <Link
                                                 key={article.id}
                                                 href={`/blog/${article.number}/${article.slug}`}
@@ -102,7 +133,24 @@ export default async function BlogPage() {
                                         <p className="text-muted-foreground">{t('noArticles')}</p>
                                     </div>
                                 ) : (
-                                    <NewsGrid posts={articles} />
+                                    <>
+                                        <NewsGrid posts={articles} />
+                                        {pages > 1 && (
+                                            <nav className="flex items-center justify-between mt-8" aria-label={t('title')}>
+                                                {page > 1 ? (
+                                                    <Link href={`/blog?page=${page - 1}`} className="text-sm text-primary hover:underline">
+                                                        {commonT('previous')}
+                                                    </Link>
+                                                ) : <span />}
+                                                <span className="text-sm text-muted-foreground">{page} / {pages}</span>
+                                                {page < pages ? (
+                                                    <Link href={`/blog?page=${page + 1}`} className="text-sm text-primary hover:underline">
+                                                        {commonT('next')}
+                                                    </Link>
+                                                ) : <span />}
+                                            </nav>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         )}

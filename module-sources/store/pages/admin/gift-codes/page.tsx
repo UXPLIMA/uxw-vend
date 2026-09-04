@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, Gift, Copy, Check } from "lucide-react";
+import { Loader2, Plus, X, Trash2, Gift, Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 interface GiftCode {
@@ -31,15 +31,23 @@ export default function GiftCodesPage() {
     const [count, setCount] = useState("1");
     const [expiresAt, setExpiresAt] = useState("");
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    // Codes are generated in batches, so this table is one of the few here
+    // that genuinely reaches thousands of rows. It reads a page at a time.
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const fetchCodes = async () => {
-        const res = await fetch("/api/v1/gift-codes");
-        if (res.ok) { const data = await res.json(); setCodes(data.giftCodes || []); }
+    const fetchCodes = async (targetPage = page) => {
+        const res = await fetch(`/api/v1/gift-codes?page=${targetPage}`);
+        if (res.ok) {
+            const data = await res.json();
+            setCodes(data.giftCodes || []);
+            setTotalPages(Math.max(1, data.pages || 1));
+        }
         setLoading(false);
     };
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    useEffect(() => { fetchCodes(); }, []);
+    useEffect(() => { fetchCodes(page); }, [page]);
 
     const generate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,7 +65,8 @@ export default function GiftCodesPage() {
             const data = await res.json();
             toast.success(`Generated ${data.count} gift codes`);
             setShowForm(false);
-            fetchCodes();
+            setPage(1);
+            fetchCodes(1);
         } else toast.error("Failed to generate");
         setSaving(false);
     };
@@ -176,6 +185,16 @@ export default function GiftCodesPage() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between p-4 border-t">
+                            <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
+                            <div className="flex gap-2">
+                                <Button aria-label={commonT("previousPage")} variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}><ChevronLeft className="w-4 h-4" /></Button>
+                                <Button aria-label={commonT("nextPage")} variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-4 h-4" /></Button>
+                            </div>
                         </div>
                     )}
                 </CardContent>

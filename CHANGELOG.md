@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Seven list queries read a whole table to fill one screen.** The store's
+  gift codes are generated in batches from a form that takes a count, and the
+  admin screen fetched every code the site had ever minted into one response
+  and one table on every visit. The blog index read every published article,
+  with author and category joined onto each, to show a screenful; its admin
+  list did the same with no cap at all. `announcements`, `downloads` and
+  `trophies` answered public GETs with whatever the table held. The gift codes
+  and both blog screens page now; the three public lists carry a ceiling. The
+  IP blocklist, which the proxy walks in process on every request, is capped
+  too - a blocklist past that size wants a different design, not a longer
+  array.
+- **The blog sidebar's "recent posts" showed the current page.** It sliced the
+  articles the page had already fetched, so page two called page two's
+  articles recent. It asks for the newest five.
+
+### Fixed
 - **Five stats screens read the whole history to draw a chart 366 numbers
   long.** Core's `/api/v1/stats` and the store, tickets, blog and forum stats
   routes each did the same thing: `findMany` every row in the window,

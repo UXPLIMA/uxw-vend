@@ -28,6 +28,7 @@ export async function GET() {
     const trophies = await prisma.trophy.findMany({
         orderBy: [{ isActive: "desc" }, { points: "desc" }, { name: "asc" }],
         include: { _count: { select: { users: true } } },
+        take: 200,
     });
 
     return NextResponse.json({ trophies });

@@ -19,6 +19,10 @@ export async function GET() {
             ],
         },
         orderBy: { createdAt: "desc" },
+        // A banner shows a handful. The cap is a ceiling on what an install
+        // that never expires an announcement can make this endpoint return,
+        // not a page size anything here scrolls through.
+        take: 100,
     });
 
     return NextResponse.json({ announcements });

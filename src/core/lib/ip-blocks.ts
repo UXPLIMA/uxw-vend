@@ -30,6 +30,9 @@ interface CachedBlock {
 
 const CACHE_TTL_MS = 60 * 1000;
 
+/** How many blocks the in-process cache will hold. See `loadBlocks`. */
+const MAX_CACHED_BLOCKS = 10_000;
+
 let cache: CachedBlock[] = [];
 let cacheLoadedAt = 0;
 let cacheWarm = false;
@@ -51,6 +54,11 @@ async function loadBlocks(): Promise<CachedBlock[]> {
                 OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
             },
             select: { ip: true, scope: true, expiresAt: true },
+            // This list is walked in process on every request that asks, so a
+            // blocklist past this size wants a different design rather than a
+            // longer array. The cap keeps one runaway table from making every
+            // request slow.
+            take: MAX_CACHED_BLOCKS,
         });
         cache = rows;
         cacheLoadedAt = now;
@@ -143,9 +151,9 @@ export async function isIpBlocked(ip: string, scope: IpBlockScope): Promise<bool
     return false;
 }
 
-/** List every block (including expired) for the admin UI. */
+/** The newest blocks, including expired ones, for the admin UI. */
 export async function listBlocks(): Promise<IpBlock[]> {
-    return prisma.ipBlock.findMany({ orderBy: { createdAt: "desc" } });
+    return prisma.ipBlock.findMany({ orderBy: { createdAt: "desc" }, take: MAX_CACHED_BLOCKS });
 }
 
 /**

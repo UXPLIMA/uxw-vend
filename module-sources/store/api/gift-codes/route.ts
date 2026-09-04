@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { intParam, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { randomBytes } from "crypto";
 
-// GET /api/v1/gift-codes - List all (admin)
-export async function GET() {
+// GET /api/v1/gift-codes - One page of codes, newest first (admin).
+//
+// This used to read the whole table. Codes are generated in batches - the
+// form on the admin screen takes a count - so the table is exactly the kind
+// that grows in thousands, and every one of them was serialised into one
+// response and rendered into one table on every visit to the page.
+export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,14 +20,28 @@ export async function GET() {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const giftCodes = await prisma.giftCode.findMany({
-        include: {
-            redeemedBy: { select: { id: true, username: true } },
-        },
-        orderBy: { createdAt: "desc" },
-    });
+    const params = request.nextUrl.searchParams;
+    const page = intParam(params, "page", { fallback: 1, min: 1 });
+    const perPage = intParam(params, "perPage", { fallback: 50, min: 1, max: 200 });
 
-    return NextResponse.json({ giftCodes });
+    const [giftCodes, total] = await Promise.all([
+        prisma.giftCode.findMany({
+            include: {
+                redeemedBy: { select: { id: true, username: true } },
+            },
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * perPage,
+            take: perPage,
+        }),
+        prisma.giftCode.count(),
+    ]);
+
+    return NextResponse.json({
+        giftCodes,
+        total,
+        page,
+        pages: Math.max(1, Math.ceil(total / perPage)),
+    });
 }
 
 // POST /api/v1/gift-codes - Create gift codes (admin)

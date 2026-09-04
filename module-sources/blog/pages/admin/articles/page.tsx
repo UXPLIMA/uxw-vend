@@ -10,25 +10,42 @@ import { dateLocaleTag } from "@/core/sdk";
 
 export const dynamic = "force-dynamic";
 
-async function getBlogArticles() {
-    const articles = await prisma.blogArticle.findMany({
-        orderBy: { createdAt: "desc" },
-        include: {
-            author: { select: { username: true } },
-            category: { select: { name: true } },
-        },
-    });
+/**
+ * One page of articles.
+ *
+ * The screen used to list every article the site has ever had, with the author
+ * and category joined onto each. The totals above the table come from a
+ * groupBy, so they never needed the rows.
+ */
+const PER_PAGE = 25;
 
-    const stats = await prisma.blogArticle.groupBy({
-        by: ["status"],
-        _count: true,
-    });
+async function getBlogArticles(page: number) {
+    const [articles, stats] = await Promise.all([
+        prisma.blogArticle.findMany({
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * PER_PAGE,
+            take: PER_PAGE,
+            include: {
+                author: { select: { username: true } },
+                category: { select: { name: true } },
+            },
+        }),
+        prisma.blogArticle.groupBy({
+            by: ["status"],
+            _count: true,
+        }),
+    ]);
 
     return { articles, stats };
 }
 
-export default async function AdminBlogArticlesPage() {
+interface AdminBlogArticlesPageProps {
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogArticlesPageProps) {
     const t = await getTranslations("blog");
+    const commonT = await getTranslations("common");
     const dateTag = dateLocaleTag(await getLocale());
     const session = await auth();
 
@@ -41,10 +58,16 @@ export default async function AdminBlogArticlesPage() {
         redirect("/");
     }
 
-    const { articles, stats } = await getBlogArticles();
+    const raw = (await searchParams)?.page;
+    const requested = Number.parseInt(Array.isArray(raw) ? raw[0] : raw ?? "", 10);
+    const page = Number.isFinite(requested) && requested > 0 ? requested : 1;
+    const { articles, stats } = await getBlogArticles(page);
 
     const draftCount = stats.find(s => s.status === "DRAFT")?._count || 0;
     const publishedCount = stats.find(s => s.status === "PUBLISHED")?._count || 0;
+    // The count card asks how many articles exist, not how many are on screen.
+    const totalCount = stats.reduce((sum, s) => sum + s._count, 0);
+    const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE));
 
     return (
         <>
@@ -67,7 +90,7 @@ export default async function AdminBlogArticlesPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{articles.length}</div>
+                        <div className="text-2xl font-bold">{totalCount}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -172,6 +195,24 @@ export default async function AdminBlogArticlesPage() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between p-4 border-t">
+                            <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
+                            <div className="flex gap-3">
+                                {page > 1 && (
+                                    <Link href={`/admin/blog/articles?page=${page - 1}`} className="text-sm text-primary hover:underline">
+                                        {commonT("previous")}
+                                    </Link>
+                                )}
+                                {page < totalPages && (
+                                    <Link href={`/admin/blog/articles?page=${page + 1}`} className="text-sm text-primary hover:underline">
+                                        {commonT("next")}
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     )}
                 </CardContent>
