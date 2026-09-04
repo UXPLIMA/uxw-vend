@@ -13,6 +13,7 @@ import { getModuleStates } from '@/core/lib/module-cache';
 import { checkCsrf } from '@/core/lib/csrf';
 import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
+import { isStaticAsset } from '@/core/lib/proxy-paths';
 
 const intlMiddleware = createIntlMiddleware({
     locales: locales,
@@ -124,14 +125,6 @@ function resolveIpScope(pathname: string): IpBlockScope {
     if (pathname.startsWith('/api/v1/admin')) return 'admin';
     if (pathname.startsWith('/api/')) return 'api';
     return 'all';
-}
-
-function isStaticAsset(pathname: string): boolean {
-    return (
-        pathname.startsWith('/_next') ||
-        pathname.startsWith('/_vercel') ||
-        pathname.includes('.')
-    );
 }
 
 /**
@@ -327,6 +320,14 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next|_vercel|.*\\..*).*)'
+        // Pages and everything else, minus Next internals and anything that
+        // looks like a file in /public.
+        '/((?!api|_next|_vercel|.*\\..*).*)',
+        // API routes unconditionally. The pattern above drops any path
+        // containing a dot, and an API id is allowed to contain one, so
+        // `DELETE /api/v1/store/products/1.` used to reach the handler
+        // without passing the CSRF, IP blocklist, maintenance, setup,
+        // module-enabled or demo-write gates that all live in this file.
+        '/api/:path*',
     ]
 };

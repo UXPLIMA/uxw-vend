@@ -323,6 +323,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `statsApi` and reaches the handler without `isAdmin()`, `isStaff()` or
   `hasPermission()` fails the gate, and a unit test applies the same rule to
   `module-sources/` so `npm test` alone catches a regression.
+- **A dot in the path skipped every gate the platform has.** `src/proxy.ts`
+  holds the CSRF check, the IP blocklist, maintenance mode, the setup wizard
+  gate, the module-enabled check and the demo write gate, and two separate
+  places decided a request was a static file because its path contained a dot:
+  the `config.matcher` that decides whether the proxy runs at all, and
+  `isStaticAsset()`. An API id is allowed to contain a dot, and the store
+  resolves a product with `Number(id)`, so `DELETE /api/v1/store/products/1.`
+  reached the same row as `products/1` from outside all of it - the plain path
+  answered 403 `csrf_rejected`, the dotted one reached the handler and
+  answered 401. Every `/api` path now goes through the proxy, and
+  `isStaticAsset()` never calls one static.
+- **The Redis rate limiter did not count a burst.** It read the counter, added
+  one in Node and wrote it back, which is two round trips: requests that
+  overlap between them all read the same number and all write the same number
+  back. Replaying the old code against a server that yields per command, ten
+  simultaneous requests against a limit of five were all allowed and the
+  server recorded one hit. A burst is the only traffic a rate limiter exists
+  to stop. Counting is now a single server-side script (`INCR`, `PEXPIRE` on
+  the first hit of the window, `PTTL` for the reset time), so the same ten
+  requests are counted ten times and five are refused. Keys moved from `rl:`
+  to `rlc:` because the old ones hold JSON that `INCR` cannot touch.
 
 ## [0.2.1] - 2026-09-02
 
