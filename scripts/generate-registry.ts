@@ -585,6 +585,7 @@ function routePathToRegexSource(routePath: string): string {
 function generateModuleRoutes() {
     const loaded = loadManifests();
     const modulePatterns: Record<string, Set<string>> = {};
+    const providerCallbackPatterns = new Set<string>();
 
     for (const { moduleName, manifest } of loaded) {
         const patterns = new Set<string>();
@@ -607,6 +608,9 @@ function generateModuleRoutes() {
             const body = routePathToRegexSource(api.path);
             if (body) {
                 patterns.add(`/^\\/api\\/v1\\/${body}(?:\\/|$)/`);
+                if (api.providerCallback) {
+                    providerCallbackPatterns.add(`/^\\/api\\/v1\\/${body}(?:\\/|$)/`);
+                }
             }
         }
 
@@ -622,7 +626,15 @@ function generateModuleRoutes() {
         for (const pattern of patterns) output += `    ${pattern},\n`;
         output += `  ],\n`;
     }
-    output += '};\n';
+    output += '};\n\n';
+
+    // Endpoints an external service posts to with no browser behind it, so
+    // no Origin header and nothing for the CSRF gate to match. Each handler
+    // authenticates the request itself; validate-module enforces that.
+    output += '// Module endpoints exempt from the CSRF origin check.\n';
+    output += 'export const providerCallbackRoutes: RegExp[] = [\n';
+    for (const pattern of providerCallbackPatterns) output += `  ${pattern},\n`;
+    output += '];\n';
 
     const dir = path.dirname(ROUTES_OUTPUT_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

@@ -100,6 +100,22 @@ const apiEntry = z.object({
     handler: relativePath("handler"),
     method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH", "ALL"]).optional(),
     description: z.string().max(500).optional(),
+    /**
+     * An endpoint a payment provider or other external service posts to
+     * directly, with no browser and therefore no `Origin` header.
+     *
+     * The proxy's CSRF gate rejects exactly that shape, so every gateway
+     * webhook was answered 403 before its handler ran and no payment ever
+     * settled. Core cannot know a module's callback paths - the gate's
+     * hardcoded `/api/v1/webhook/` prefix only ever matched core's own route -
+     * so the module declares them and the proxy reads the declaration.
+     *
+     * The exemption is only safe because such a handler authenticates the
+     * request itself: a signature it verifies, or reading the payment back
+     * from the provider with this site's own credentials. `validate-module`
+     * fails a `providerCallback` whose handler does neither.
+     */
+    providerCallback: z.boolean().optional(),
 });
 
 const widgetEntry = z.object({

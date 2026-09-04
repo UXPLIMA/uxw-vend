@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **No payment could ever settle.** The proxy runs a same-origin CSRF check
+  over every `/api/` request and exempts three literal prefixes: `/api/auth/`,
+  `/api/v1/webhook/` and `/api/webhook/`. Those are core's own routes. A
+  payment gateway is a module, and it serves its callback wherever its manifest
+  says - `/api/v1/mollie/webhook`, `/api/v1/paytr/callback`, and Stripe at
+  `/api/v1/webhooks/stripe`, plural, where the exemption reads singular. A
+  provider posts server to server, so it sends no `Origin` and no `Referer`,
+  which is exactly what `checkCsrf` rejects: all twelve gateways answered 403
+  `csrf_rejected` before their handler ran, and an order stayed pending however
+  many times the provider retried. Core cannot know a module's callback paths,
+  so the module now declares them: `providerCallback: true` on an `api[]` entry
+  puts that route into the generated `providerCallbackRoutes`, and the proxy
+  consults it alongside the three literals. Skipping the origin check is only
+  safe for a handler that authenticates the request itself, so
+  `validate-module` fails a `providerCallback` entry whose handler verifies no
+  signature, and a unit gate holds the reverse: a callback-shaped endpoint that
+  does verify one must declare the flag.
+
 - **A hundred and thirteen unreachable translation fallbacks, and eleven
   strings with no key at all.** Fifteen admin screens wrote
   `t.has(key) ? t(key) : "English"` for keys that were in the catalogue the
