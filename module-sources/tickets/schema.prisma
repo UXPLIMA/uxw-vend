@@ -74,6 +74,7 @@ model TicketMessage {
   user     User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([ticketId])
+  @@index([userId])
 }
 
 model CannedResponse {

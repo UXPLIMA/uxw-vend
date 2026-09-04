@@ -23,8 +23,6 @@ model ForumCategory {
   updatedAt   DateTime @updatedAt
 
   topics ForumTopic[]
-
-  @@index([slug])
 }
 
 model ForumTopic {
@@ -48,7 +46,6 @@ model ForumTopic {
   posts ForumPost[]
   likes ForumTopicLike[]
 
-  @@index([slug])
   @@index([categoryId])
   @@index([authorId])
 }
@@ -81,6 +78,7 @@ model ForumTopicLike {
   user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([topicId, userId])
+  @@index([userId])
 }
 
 model ForumPostLike {
@@ -93,4 +91,5 @@ model ForumPostLike {
   user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId])
+  @@index([userId])
 }

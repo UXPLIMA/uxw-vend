@@ -18,6 +18,4 @@ model SeoPage {
   structuredData  Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
-  @@index([path])
 }

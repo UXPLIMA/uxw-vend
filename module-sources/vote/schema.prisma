@@ -29,7 +29,10 @@ model VoteLog {
 
   // No @@unique([userId, voteSiteId]) - the claim handler stores one row
   // per vote so the 24h cooldown can be derived from the latest createdAt.
-  @@index([userId])
+  // That read is `where userId, voteSiteId order by createdAt desc limit 1`,
+  // which this index answers whole, ordering included; leading with userId
+  // also gives the cascade from User something to seek on.
+  @@index([userId, voteSiteId, createdAt])
   @@index([voteSiteId])
   @@index([createdAt])
 }

@@ -44,6 +44,5 @@ model UserTrophy {
   awardedAt DateTime @default(now())
 
   @@unique([userId, trophyId])
-  @@index([userId])
   @@index([trophyId])
 }

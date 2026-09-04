@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",

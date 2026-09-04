@@ -14,7 +14,6 @@ model CustomForm {
   updatedAt   DateTime @updatedAt
 
   submissions CustomFormSubmission[]
-  @@index([slug])
 }
 
 model CustomFormSubmission {

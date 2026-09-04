@@ -17,8 +17,6 @@ model BlogCategory {
   updatedAt   DateTime @updatedAt
 
   articles BlogArticle[]
-
-  @@index([slug])
 }
 
 model BlogArticle {
@@ -44,7 +42,6 @@ model BlogArticle {
   comments BlogComment[]
   tags     BlogTag[]
 
-  @@index([slug])
   @@index([status])
   @@index([authorId])
   @@index([categoryId])
@@ -81,6 +78,4 @@ model BlogTag {
   slug String @unique
 
   articles BlogArticle[]
-
-  @@index([slug])
 }

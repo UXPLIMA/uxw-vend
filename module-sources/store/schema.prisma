@@ -36,7 +36,6 @@ model Category {
 
   products Product[]
 
-  @@index([slug])
   @@index([parentId])
 }
 
@@ -70,7 +69,6 @@ model Product {
   cartItems  CartItem[]
   subscriptions Subscription[]
 
-  @@index([slug])
   @@index([categoryId])
   @@index([isActive, isFeatured])
 }
@@ -104,7 +102,6 @@ model Order {
   items    OrderItem[]
   payments Payment[]
 
-  @@index([orderNumber])
   @@index([userId])
   @@index([status])
 }
@@ -130,6 +127,7 @@ model OrderItem {
   product   Product? @relation(fields: [productId], references: [id])
 
   @@index([orderId])
+  @@index([productId])
 }
 
 model CartItem {
@@ -145,7 +143,7 @@ model CartItem {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, productId])
-  @@index([userId])
+  @@index([productId])
 }
 
 model Payment {
@@ -189,7 +187,6 @@ model Coupon {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  @@index([code])
   @@index([isActive])
 }
 
@@ -207,7 +204,6 @@ model OwnedProduct {
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])
-  @@index([userId])
 }
 
 model BulkDiscount {
@@ -238,7 +234,7 @@ model GiftCode {
   redeemedBy   User?   @relation("RedeemedGifts", fields: [redeemedById], references: [id])
   createdById  String?
 
-  @@index([code])
+  @@index([redeemedById])
 }
 
 model ProductVariable {
@@ -304,7 +300,6 @@ model CreatorCode {
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
 
-  @@index([code])
   @@index([creatorId])
 }
 
@@ -322,5 +317,5 @@ model Subscription {
   updatedAt            DateTime @updatedAt
 
   @@index([userId])
-  @@index([stripeSubscriptionId])
+  @@index([productId])
 }

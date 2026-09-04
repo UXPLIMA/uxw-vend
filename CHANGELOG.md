@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The schema indexed the wrong columns.** Two rules, both of which the
+  schema already stated in one place and broke in forty others. `IpBlock`
+  carries the comment "No `@@index([ip])` - `@unique` already creates a B-tree
+  on `ip`", and it was the only model that held to it: thirty-four other
+  indexes duplicated a unique constraint they can never beat, each one a second
+  B-tree maintained on every insert, update and delete for no read it could
+  answer better. The mirror of that was twelve foreign keys with no index at
+  all. Postgres does not index a foreign key for you, and a referential action
+  has to find the rows that reference the row going away: deleting one user
+  meant a sequential scan of `Account`, `ForumTopicLike`, `ForumPostLike`,
+  `StaffMember`, `TicketMessage`, `GiftCode` and both theme tables, and
+  deleting a product meant `OrderItem`, `CartItem` and `Subscription`.
+  Confirmed on the demo, where `EXPLAIN` on `Account` by `userId` planned a Seq
+  Scan. `VoteLog` gained a composite that answers the vote cooldown read whole,
+  ordering included, instead of only its `userId`. A gate now holds both rules
+  over every schema, core and module alike. Note that an existing install picks
+  up the new indexes on its next start, since they are additive, but keeps the
+  redundant ones until a `db push` reconciles the database.
+
 - **Two module settings that nothing could ever read.**
   `/api/v1/public-settings` serves an allow-list of core's own keys, and its
   comment says a module's public values belong in the module's own API. Two

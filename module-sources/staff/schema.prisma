@@ -17,6 +17,8 @@ model StaffMember {
   avatar    String?
   order     Int     @default(0)
   isActive  Boolean @default(true)
+
+  @@index([userId])
 }
 
 // ==================== STAFF APPLICATIONS ====================
