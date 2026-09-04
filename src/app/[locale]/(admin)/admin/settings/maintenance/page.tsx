@@ -15,7 +15,17 @@ interface MaintenanceConfig {
     allowedRoles?: string[];
 }
 
-const ROLE_OPTIONS = ["admin", "moderator", "member"];
+/**
+ * The checkbox list used to be these three names, hardcoded.
+ *
+ * Roles are the admin's to create and rename, so on a site with a "developer"
+ * role the list offered a box for a role nobody has and no box for the one
+ * they wanted; on a site that renamed "member" it offered two. The real roles
+ * come from the API, and the free-text field below stays for a name that does
+ * not exist yet - "admin" is always in the list even if the query fails, since
+ * the gate falls back to it.
+ */
+const FALLBACK_ROLE_OPTIONS = ["admin"];
 
 export default function MaintenanceSettingsPage() {
     const t = useTranslations("admin");
@@ -24,6 +34,17 @@ export default function MaintenanceSettingsPage() {
     const [enabled, setEnabled] = useState(false);
     const [message, setMessage] = useState("");
     const [allowedRoles, setAllowedRoles] = useState<string[]>(["admin"]);
+    const [roleOptions, setRoleOptions] = useState<string[]>(FALLBACK_ROLE_OPTIONS);
+
+    useEffect(() => {
+        fetch("/api/v1/roles")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((payload: { roles?: { name: string }[] } | null) => {
+                const names = (payload?.roles ?? []).map((r) => r.name);
+                if (names.length > 0) setRoleOptions(names);
+            })
+            .catch(() => { /* the fallback list and the free-text field still work */ });
+    }, []);
 
     useEffect(() => {
         fetch("/api/v1/admin/maintenance")
@@ -145,10 +166,12 @@ export default function MaintenanceSettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                     <p className="text-xs text-muted-foreground mb-2">
-                        Users with these roles can still browse the site while maintenance mode is
-                        active.
+                        {t("maintenance_allowedRolesHint")}
                     </p>
-                    {ROLE_OPTIONS.map((role) => (
+                    {/* Roles the site has, plus any name already saved that no
+                        longer matches one - so an old entry stays visible and
+                        removable rather than disappearing from the screen. */}
+                    {[...new Set([...roleOptions, ...allowedRoles])].map((role) => (
                         <label
                             key={role}
                             className="flex items-center gap-2 text-sm text-foreground cursor-pointer"

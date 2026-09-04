@@ -498,6 +498,7 @@
     "maintenance_addRole": "Add custom role name and press Enter",
     "maintenance_adminRequired": "Admin role must always be allowed during maintenance.",
     "maintenance_allowedRoles": "Allowed roles",
+    "maintenance_allowedRolesHint": "Users with these roles can still browse the site while maintenance mode is active.",
     "maintenance_defaultMessage": "We'll be back soon.",
     "maintenance_enable": "Enable maintenance mode",
     "maintenance_loadFailed": "Failed to load maintenance settings",

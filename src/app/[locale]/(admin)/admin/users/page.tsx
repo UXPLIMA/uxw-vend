@@ -109,7 +109,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                                                 <UserRoleSelect
                                                     userId={user.id}
                                                     currentRoleId={user.roleId || ""}
-                                                    roles={roles.map((r) => ({ id: r.id, name: r.name, displayName: r.displayName }))}
+                                                    roles={roles.map((r) => ({ id: r.id, name: r.name, displayName: r.displayName, color: r.color }))}
                                                 />
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">

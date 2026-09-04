@@ -129,7 +129,7 @@ function DefaultNavbar() {
         .filter(nc => NavbarComponentRegistry[nc.id]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
-    const isStaffUser = (session?.user?.rolePriority ?? 0) >= 50;
+    const isStaffUser = (session?.user?.rolePriority ?? 0) >= STAFF_ROLE_PRIORITY;
 
     return (
         <>
@@ -269,6 +269,7 @@ function DefaultNavbar() {
 
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { STAFF_ROLE_PRIORITY } from "@/core/lib/constants";
 
 export function Navbar() {
     return <ThemeComponentSlot name="Navbar" fallback={DefaultNavbar} />;

@@ -498,6 +498,7 @@
     "maintenance_addRole": "Özel rol adı ekle ve Enter'a bas",
     "maintenance_adminRequired": "Bakım sırasında admin rolüne her zaman izin verilmelidir.",
     "maintenance_allowedRoles": "İzin verilen roller",
+    "maintenance_allowedRolesHint": "Bu rollerdeki kullanicilar bakim modu acikken siteyi gezmeye devam edebilir.",
     "maintenance_defaultMessage": "Yakında geri döneceğiz.",
     "maintenance_enable": "Bakım modunu aç",
     "maintenance_loadFailed": "Bakım ayarları yüklenemedi",

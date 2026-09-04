@@ -14,13 +14,14 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Sparkles, Settings, Puzzle } from "lucide-react";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { STAFF_ROLE_PRIORITY } from "@/core/lib/constants";
 
 export default function HomePage() {
   const commonT = useTranslations('common');
   const { data: session } = useSession();
   const modules = useAllModules();
   const { settings } = useSiteSettings();
-  const isStaff = (session?.user?.rolePriority ?? 0) >= 50;
+  const isStaff = (session?.user?.rolePriority ?? 0) >= STAFF_ROLE_PRIORITY;
 
   const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
   const enabledWidgets = ModuleWidgets
