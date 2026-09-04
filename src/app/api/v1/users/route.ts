@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import { PER_PAGE_USERS, BCRYPT_ROUNDS, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } from "@/core/lib/constants";
+import { PER_PAGE_USERS, BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } from "@/core/lib/constants";
+import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import bcrypt from "bcryptjs";
 import { readJsonBody } from "@/core/lib/api-body";
 
@@ -102,9 +103,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (password.length < PASSWORD_MIN_LENGTH || password.length > PASSWORD_MAX_LENGTH) {
+        // An admin-created account signs in through the same form as any
+        // other, so it answers to the same policy. This route used to check
+        // length alone, against a looser constant than the policy's own.
+        const policyCheck = await enforcePasswordPolicy(password);
+        if (!policyCheck.ok) {
             return NextResponse.json(
-                { error: `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters` },
+                { error: policyCheck.message ?? "Password does not meet the policy", code: policyCheck.reason },
                 { status: 400 }
             );
         }

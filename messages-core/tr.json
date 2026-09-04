@@ -1409,7 +1409,7 @@
       "username": "Kullanıcı adı",
       "password": "Parola",
       "passwordConfirm": "Parolayı doğrulayın",
-      "passwordHint": "En az 8 karakter.",
+      "passwordHint": "En az 10 karakter, bir büyük harf ve bir rakam içermeli.",
       "mismatch": "Parolalar eşleşmiyor."
     },
     "site": {

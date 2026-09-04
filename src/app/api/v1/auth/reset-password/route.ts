@@ -5,7 +5,7 @@ import { createHash } from "crypto";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
-import { checkPasswordBreach } from "@/core/lib/password-policy";
+import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 
 // POST /api/v1/auth/reset-password

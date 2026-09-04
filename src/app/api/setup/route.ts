@@ -18,6 +18,7 @@ import { MODULES_DIR } from "@/core/lib/runtime-paths";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { syncModuleTranslations } from "@/core/lib/i18n/translation-service";
 import { readJsonBody } from "@/core/lib/api-body";
+import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 
 /**
  * First-run setup API.
@@ -32,7 +33,10 @@ const setupSchema = z.object({
     admin: z.object({
         email: z.string().email(),
         username: z.string().min(3).max(32).regex(/^[a-zA-Z0-9_-]+$/),
-        password: z.string().min(8).max(128),
+        // Length alone is checked by the shared policy below, which knows
+        // the real minimum and the rest of the rules. Bounding it here only
+        // keeps an absurd payload out of bcrypt.
+        password: z.string().max(128),
     }),
     site: z.object({
         siteName: z.string().min(1).max(100),
@@ -82,6 +86,19 @@ export async function POST(request: NextRequest) {
         );
     }
     const data = parsed.data;
+
+    // The first administrator is the most privileged account the site will
+    // ever have, and it was the one account exempt from the site's own
+    // password rules: the schema asked for eight characters where every other
+    // flow asks for ten, an uppercase, a digit and a name that is not on the
+    // common list.
+    const policyCheck = await enforcePasswordPolicy(data.admin.password);
+    if (!policyCheck.ok) {
+        return NextResponse.json(
+            { error: policyCheck.message ?? "Password does not meet the policy", code: policyCheck.reason },
+            { status: 400 }
+        );
+    }
 
     // Hash the password outside the transaction - bcrypt is CPU-heavy and
     // the advisory-locked transaction below should hold the lock for as

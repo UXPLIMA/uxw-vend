@@ -1409,7 +1409,7 @@
       "username": "Username",
       "password": "Password",
       "passwordConfirm": "Confirm password",
-      "passwordHint": "At least 8 characters.",
+      "passwordHint": "At least 10 characters, with an uppercase letter and a number.",
       "mismatch": "Passwords do not match."
     },
     "site": {
