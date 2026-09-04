@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Thirty six endpoints told an anonymous caller it was forbidden rather
+  than that it needed to sign in.** 401 and 403 answer different questions:
+  "I do not know who you are" and "I know, and you may not". 208 guards across
+  the API separate them; these thirty six folded the session test and the
+  permission test into one `if` and answered 403 for both. A client that
+  renews an expired session keys on 401 - the store, forum and suggestions
+  pages each do - so an admin whose session lapsed on one of these endpoints
+  was told it was a permission problem and sent to ask for access they already
+  had. Every one now checks the session, answers 401, then checks the
+  permission and answers 403. Affects broadcasts, warnings, revisions, media,
+  themes, resource permissions, moderation and module updates in core, and the
+  trophies, cloudflare-r2 and cloudflare-turnstile settings endpoints.
+
 - **Anyone could mint a link on the site's own domain that says whatever they
   want.** A module page is a component in a registry, not a route segment
   file, so it cannot export `generateMetadata` and core's catch-all titled it

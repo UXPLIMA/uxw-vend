@@ -15,7 +15,10 @@ import { readJsonBody } from "@/core/lib/api-body";
  */
 export async function GET(request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -120,7 +123,10 @@ const setSchema = z.object({
 /** POST → upsert a grant */
 export async function POST(request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -156,7 +162,10 @@ const deleteSchema = setSchema.omit({ allow: true });
 /** DELETE → remove a grant */
 export async function DELETE(request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

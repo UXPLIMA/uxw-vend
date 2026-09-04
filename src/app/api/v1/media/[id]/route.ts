@@ -11,7 +11,10 @@ type RouteParams = { params: Promise<{ id: string }> };
 /** PATCH /api/v1/media/[id] - update alt text */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -29,7 +32,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 /** DELETE /api/v1/media/[id] - delete record + file from disk (local only) */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

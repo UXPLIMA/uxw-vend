@@ -9,7 +9,10 @@ type RouteParams = { params: Promise<{ id: string }> };
 /** PATCH - revoke (soft-disable) a warning by setting isActive=false */
 export async function PATCH(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
@@ -32,7 +35,10 @@ export async function PATCH(_request: NextRequest, { params }: RouteParams) {
 /** DELETE - permanently remove a warning */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;

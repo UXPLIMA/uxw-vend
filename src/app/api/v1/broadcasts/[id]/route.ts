@@ -8,7 +8,10 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
@@ -20,7 +23,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 /** POST → queue this broadcast (transitions draft → queued) */
 export async function POST(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
@@ -30,7 +36,10 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;

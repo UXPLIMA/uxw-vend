@@ -25,7 +25,10 @@ function sanitizeByType(def: ThemeFieldDef, value: unknown): unknown {
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string; group: string }> }) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id, group } = await ctx.params;
@@ -35,7 +38,10 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
 
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string; group: string }> }) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id, group } = await ctx.params;
