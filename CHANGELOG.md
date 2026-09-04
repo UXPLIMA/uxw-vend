@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **`/wp-login.php` answered 200 with the homepage.** The proxy's page matcher
+  skips any path containing a dot, which is how it stays off files in
+  `/public`, and nothing downstream checked the segment it skipped. So a
+  single-segment URL with a dot in it matched `app/[locale]/page.tsx` with
+  that string as the locale, and the homepage went out under
+  `<html lang="wp-login.php">`: a 200 for every scanner probe, unbounded
+  duplicate content pointing at one real page, and a language tag no screen
+  reader can act on. `/index.php`, `/sitemap.xml.gz` and anything shaped that
+  way did the same. The locale layout now refuses a segment that is not a
+  locale the site serves, before it reads anything for the request.
+- **The 404 page was a client component that needed a provider it never got.**
+  `app/[locale]/not-found.tsx` read its three strings through
+  `useTranslations`, which needs the context the locale layout mounts, and
+  Next renders that boundary without the layout: the site's root layout sits
+  under a top-level dynamic segment, which the framework names as the case
+  where it cannot compose a not-found page. Both not-found pages now carry
+  their own document and read their strings on the server, and ask for the
+  language by cookie and header rather than by a segment they cannot see.
+
+### Fixed
 - **Demoting the moderator role did not close the doors it opened.** `isStaff`
   measured two different things depending on which half ran: the fast path
   accepted the role *name* "moderator" straight off the session, the slow path
