@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Public search took any query, at any rate.** `/api/v1/search` is the one
+  anonymous endpoint that fans out: it hands the caller's string to every
+  enabled module's search provider, and each provider spends a
+  `plainto_tsquery` parse or an ILIKE scan on it. Nothing bounded the string
+  and nothing limited the rate, so one request could be turned into as many
+  expensive queries as the install has providers, as often as the caller
+  liked. The query is now capped at `SEARCH_QUERY_MAX_LENGTH` before any
+  provider sees it - rejected rather than truncated, since results for a query
+  the caller did not ask for are a wrong answer dressed as a real one - and the
+  endpoint is rate limited like the rest of the public API. The search page's
+  input carries the same constant, so the UI cannot produce a request the
+  server will refuse.
+
 - **No payment could ever settle.** The proxy runs a same-origin CSRF check
   over every `/api/` request and exempts three literal prefixes: `/api/auth/`,
   `/api/v1/webhook/` and `/api/webhook/`. Those are core's own routes. A

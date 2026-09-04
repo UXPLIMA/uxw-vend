@@ -11,6 +11,7 @@ import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import type { ComponentType } from "react";
 import * as LucideIcons from "lucide-react";
 import { Search, Loader2, File } from "lucide-react";
+import { SEARCH_QUERY_MAX_LENGTH } from "@/core/lib/constants";
 
 interface SearchResult {
     type?: string;
@@ -101,6 +102,7 @@ export default function SearchPage() {
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder={t("placeholder")}
                         className="flex-1"
+                        maxLength={SEARCH_QUERY_MAX_LENGTH}
                         aria-label={t("searchQuery")}
                     />
                     <Button type="submit" disabled={query.trim().length < 2}>{t("searchButton")}</Button>

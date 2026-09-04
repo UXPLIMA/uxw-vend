@@ -16,3 +16,11 @@ export const RATE_LIMIT_UPLOAD = { maxRequests: 3, windowMs: 60000 };
 // Pagination defaults (core admin)
 export const PER_PAGE_USERS = 20;
 export const PER_PAGE_ACTIVITY = 50;
+
+// Public search
+// The longest query /api/v1/search will act on. Every enabled module's search
+// provider is handed this string, and each one puts it through a full-text
+// parse or an ILIKE scan, so an unbounded value turns one anonymous request
+// into a fan-out of expensive queries. No person types a search term this
+// long; the input on the search page carries the same cap.
+export const SEARCH_QUERY_MAX_LENGTH = 128;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ModuleSearchProviders } from "@/core/generated/module-search";
+import { apiError, withRateLimit } from "@/core/lib/api-utils";
+import { SEARCH_QUERY_MAX_LENGTH } from "@/core/lib/constants";
 import { applyFiltersAsync } from "@/core/lib/hooks";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { safeCall } from "@/core/lib/module-safe-call";
@@ -26,12 +28,28 @@ interface ResultGroup {
  *
  * Queries every enabled module's search provider in parallel, groups
  * the results by provider, lets hooks transform the final shape.
+ *
+ * Anonymous and fan-out: one request reaches every enabled provider, and each
+ * one spends a full-text parse or an ILIKE scan on `q`. So the query is
+ * bounded before any provider sees it, and the endpoint is rate limited like
+ * the rest of the public API - an unbounded `q` at an unbounded rate is a
+ * cheap way to hold the database open from the outside.
+ *
+ * Too long is an error rather than a silent truncation: results for a query
+ * the caller did not ask for are a wrong answer dressed as a real one.
  */
-export async function GET(request: NextRequest) {
+export const GET = withRateLimit(async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
     if (q.length < 2) {
         return NextResponse.json({ groups: [], total: 0 });
+    }
+    if (q.length > SEARCH_QUERY_MAX_LENGTH) {
+        return apiError(
+            `Search query must be at most ${SEARCH_QUERY_MAX_LENGTH} characters.`,
+            400,
+            { code: "query_too_long" },
+        );
     }
 
     const moduleStates = await getModuleStates();
@@ -66,4 +84,4 @@ export async function GET(request: NextRequest) {
     const total = finalGroups.reduce((sum, g) => sum + g.results.length, 0);
 
     return NextResponse.json({ groups: finalGroups, total, query: q });
-}
+});
