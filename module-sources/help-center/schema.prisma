@@ -16,8 +16,6 @@ model HelpCategory {
   updatedAt   DateTime @updatedAt
 
   articles HelpArticle[]
-
-  @@index([slug])
 }
 
 model HelpArticle {
@@ -35,6 +33,5 @@ model HelpArticle {
   categoryId String
   category   HelpCategory @relation(fields: [categoryId], references: [id])
 
-  @@index([slug])
   @@index([categoryId])
 }

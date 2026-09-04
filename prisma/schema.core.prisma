@@ -61,8 +61,7 @@ model User {
   // Module relations are injected here by merge-schemas.ts
   // @@MODULE_RELATIONS
 
-  @@index([email])
-  @@index([username])
+  @@index([roleId])
 }
 
 model Account {
@@ -82,6 +81,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -114,8 +114,6 @@ model Role {
 
   permissions Permission[]
   users       User[]
-
-  @@index([name])
 }
 
 model Permission {
@@ -126,7 +124,6 @@ model Permission {
 
   roles Role[]
 
-  @@index([name])
   @@index([module])
 }
 
@@ -153,9 +150,7 @@ model Translation {
   updatedAt DateTime @updatedAt
 
   @@unique([locale, namespace, key, module])
-  @@index([locale])
   @@index([module])
-  @@index([locale, namespace])
 }
 
 model ModuleConfig {
@@ -188,7 +183,7 @@ model ThemeCustomization {
   updatedAt   DateTime @updatedAt
 
   @@unique([themeId, mode])
-  @@index([themeId])
+  @@index([updatedById])
 }
 
 /// Per-theme key/value settings (grouped). Admin-managed; read by theme
@@ -204,7 +199,7 @@ model ThemeSetting {
   updatedAt   DateTime @updatedAt
 
   @@unique([themeId, groupKey, key])
-  @@index([themeId, groupKey])
+  @@index([updatedById])
 }
 
 /// Singleton (id=1) - the currently active theme + colour mode for the
@@ -330,7 +325,6 @@ model UserSession {
   isRevoked    Boolean  @default(false)
 
   @@index([userId])
-  @@index([tokenId])
   @@index([expiresAt])
 }
 
@@ -387,7 +381,6 @@ model NotificationPreference {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, eventType, channel])
-  @@index([userId])
 }
 
 // Email broadcast - admin sends a single message to many users.
@@ -439,7 +432,6 @@ model ModuleMigration {
   executionMs   Int?
 
   @@unique([moduleId, migrationName])
-  @@index([moduleId])
 }
 
 model ApiKey {

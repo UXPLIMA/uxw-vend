@@ -54,7 +54,6 @@ model LicenseActivation {
   lastSeenAt   DateTime @default(now())
 
   @@unique([licenseKeyId, machineHash])
-  @@index([licenseKeyId])
 }
 
 // Which store products come with a key, and what that key is worth.
