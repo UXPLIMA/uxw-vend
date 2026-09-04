@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A permission the roles screen could not grant.** `custom-forms` declared
+  `forms.manage` in its manifest and checked `custom-forms.manage` in
+  `can-access-form.ts`. The manifest is the only route a permission name takes
+  to the roles screen, and the roles screen is the only place a `Permission`
+  row is ever created, so the name the code asked about was one no operator
+  could tick. Every non-admin fell through to the granular per-form grant, and
+  the module's own manage permission did nothing for anybody. Both halves now
+  say `custom-forms.manage`. `help-center` had the milder version of the same
+  drift, declaring `help.view` and `help.manage` under a namespace matching no
+  module id, which also mis-attributed the `Permission.module` column that
+  `roles/route.ts` derives from the part before the dot; it declares
+  `help-center.*` now.
+- **Two copies of the core permission list.** The names of the four permissions
+  core owns were written out once in `modules.ts` and again in the roles screen,
+  and only the second copy reached the UI. They come from
+  `src/core/lib/permission-names.ts` now, which both read.
+
+### Added
+- `tests/unit/permissions-are-declared.test.ts` pins the two halves of a
+  permission name together: a name a module's code checks must be declared in
+  that module's manifest, and a declared name must sit under its own module id
+  (or `admin`, the namespace core owns). It also pins the inventory of the 33
+  permissions that are declared, offered as a checkbox, and enforced by
+  nothing, because every admin route gates on `isAdmin` instead. That list may
+  shrink as permissions get wired up. It may not grow, so a new declaration has
+  to arrive with the check that gives it meaning.
+
 - **Paid for, marked paid, and granted nothing.** `settleOrder` is what every
   payment gateway calls once the money has moved. It marked the order
   COMPLETED, re-read it, created a chest item and an ownership row per line

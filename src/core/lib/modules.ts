@@ -1,5 +1,6 @@
 
 import { moduleLoader } from './module-loader';
+import { CORE_PERMISSIONS } from './permission-names';
 import { ModuleState, ModuleManifest } from './module-types';
 
 /**
@@ -71,13 +72,7 @@ class ModuleSystem {
      * Get all permissions from enabled modules
      */
     getAllPermissions(): string[] {
-        const permissions: string[] = [
-            // Core permissions
-            "admin.access",
-            "admin.settings",
-            "admin.users",
-            "admin.roles",
-        ];
+        const permissions: string[] = [...CORE_PERMISSIONS];
 
         for (const mod of this.getEnabledModules()) {
             if (mod.permissions) {

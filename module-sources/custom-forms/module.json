@@ -2,13 +2,13 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
   "icon": "FileEdit",
   "permissions": [
-    "forms.manage"
+    "custom-forms.manage"
   ],
   "menu": [
     {
