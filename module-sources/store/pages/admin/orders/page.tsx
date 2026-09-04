@@ -8,6 +8,10 @@ import { formatCurrency, formatDate } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { adminOrderStatusKeys, orderStatusLabel } from "../../../lib/order-status";
+
+/** The admin catalogue's copy of the order status labels. */
+const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 
 interface Order {
     id: string;
@@ -148,7 +152,7 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span className={`text-xs px-2 py-1 rounded ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
-                                                    {order.status}
+                                                    {orderStatusLabel(t, ADMIN_ORDER_STATUS_KEYS, order.status)}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4 text-right">

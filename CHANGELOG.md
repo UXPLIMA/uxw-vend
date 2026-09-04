@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Fifteen screens printed a database enum where a label belonged.**
+  A Prisma enum column holds `IN_PROGRESS`, `PENDING`, `DRAFT`. Fifteen render
+  sites across eight modules and two core admin pages put that value on the
+  page as-is, so a visitor read "WAITING_REPLY" where the manifest already
+  carried "Waiting for reply" in both locales - the screen simply never asked
+  for the key.
+
+  The store's customer order tab was worse than untranslated: it mapped each
+  status to a `tab_orders_status*` key the manifest never declared, and
+  next-intl renders a missing key as its own path rather than throwing, so a
+  finished order read "store.tab_orders_statusCompleted" to the customer who
+  placed it. Those five messages now exist in en and tr.
+
+  Every site now goes through a lookup guarded by `t.has`, so a status added
+  to the schema later degrades to the enum value rather than to a key path.
+  Where a translation was missing it was added: `punishments.console`,
+  `custom-forms.adm_submissionNew`, three `broadcasts_*` states in core, and
+  the five store order statuses. `tests/unit/enum-values-are-labelled.test.ts`
+  fails the build if a JSX child is a bare status/type/state/priority
+  expression, with an allowlist whose nine entries each carry a reason - an
+  admin-authored free-text `type`, and a numeric `priority` the admin types.
 - **Sixty-two write handlers that never validated the request body.**
   `readJsonBody` was typed to return `any`, on the reasoning - written into its
   own doc comment - that every call site validated what it got, with Zod or by

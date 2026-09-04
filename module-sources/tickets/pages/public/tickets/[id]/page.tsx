@@ -9,6 +9,7 @@ import { Button, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
 
 interface Message {
     id: string;
@@ -181,10 +182,10 @@ export default function TicketDetailPage({ params }: PageProps) {
                                         <h1 className="text-xl font-bold text-foreground mb-2">{ticket.subject}</h1>
                                         <div className="flex flex-wrap gap-3 text-sm">
                                             <span className={`px-2 py-1 rounded font-medium ${statusColors[ticket.status]}`}>
-                                                {ticket.status.replace(/_/g, " ")}
+                                                {labelFor(t, STATUS_KEYS, ticket.status)}
                                             </span>
                                             <span className="text-muted-foreground">
-                                                {t("priority")}: <strong>{ticket.priority}</strong>
+                                                {t("priority")}: <strong>{labelFor(t, PRIORITY_KEYS, ticket.priority)}</strong>
                                             </span>
                                             <span className="text-muted-foreground">
                                                 {t("department")}: <strong>{ticket.department.name}</strong>

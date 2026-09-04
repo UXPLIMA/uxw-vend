@@ -7,6 +7,7 @@ import { Button } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
 import { useTranslations } from "next-intl";
 
 interface Ticket {
@@ -40,27 +41,8 @@ export default function SupportPage() {
     const t = useTranslations('tickets');
     const relativeTime = useRelativeTime();
     const commonT = useTranslations('common');
-    const statusLabel = (status: string) => {
-        const map: Record<string, string> = {
-            OPEN: "open",
-            IN_PROGRESS: "inProgress",
-            WAITING_REPLY: "waitingReply",
-            RESOLVED: "resolved",
-            CLOSED: "closed",
-        };
-        const key = map[status];
-        return key && t.has(key) ? t(key) : status.replace(/_/g, " ");
-    };
-    const priorityLabel = (priority: string) => {
-        const map: Record<string, string> = {
-            LOW: "low",
-            MEDIUM: "medium",
-            HIGH: "high",
-            URGENT: "urgent",
-        };
-        const key = map[priority];
-        return key && t.has(key) ? t(key) : priority;
-    };
+    const statusLabel = (status: string) => labelFor(t, STATUS_KEYS, status);
+    const priorityLabel = (priority: string) => labelFor(t, PRIORITY_KEYS, priority);
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
 

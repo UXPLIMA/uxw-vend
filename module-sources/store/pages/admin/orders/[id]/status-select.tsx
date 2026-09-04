@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { adminOrderStatusKeys, ORDER_STATUSES, orderStatusLabel } from "../../../../lib/order-status";
 
-const statusOptions = ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "REFUNDED"];
+/** The admin catalogue's copy of the order status labels. */
+const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 
 const statusColors: Record<string, string> = {
     PENDING: "border-yellow-200 bg-yellow-50",
@@ -58,8 +60,8 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
                 aria-label={t("adm_status")}
                 className={`text-sm px-3 py-1.5 rounded-md border cursor-pointer ${statusColors[status] || ""}`}
             >
-                {statusOptions.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>{orderStatusLabel(t, ADMIN_ORDER_STATUS_KEYS, s)}</option>
                 ))}
             </select>
             {saving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}

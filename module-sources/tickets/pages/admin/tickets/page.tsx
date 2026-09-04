@@ -6,6 +6,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
+
+/** The admin catalogue's copy of the status labels. */
+const ADMIN_STATUS_KEYS = adminKeys(STATUS_KEYS);
 
 
 interface Ticket {
@@ -204,12 +208,12 @@ export default function AdminTicketsPage() {
                                     </td>
                                     <td className="px-4 py-4">
                                         <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[ticket.status]}`}>
-                                            {ticket.status.replace(/_/g, " ")}
+                                            {labelFor(t, ADMIN_STATUS_KEYS, ticket.status)}
                                         </span>
                                     </td>
                                     <td className="px-4 py-4">
                                         <span className={`text-sm font-medium ${priorityColors[ticket.priority]}`}>
-                                            {ticket.priority}
+                                            {labelFor(t, PRIORITY_KEYS, ticket.priority)}
                                         </span>
                                     </td>
                                     <td className="px-4 py-4 text-sm text-muted-foreground">

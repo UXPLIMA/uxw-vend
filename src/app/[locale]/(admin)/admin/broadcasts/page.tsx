@@ -117,6 +117,16 @@ export default function BroadcastsPage() {
         fetchBroadcasts();
     };
 
+    // The message key per broadcast status. The chip printed the column, so
+    // a Turkish admin read "queued" on the row and "Sirada" nowhere.
+    const STATUS_LABEL: Record<string, string> = {
+        draft: "broadcasts_draft",
+        queued: "broadcasts_queued",
+        sending: "broadcasts_sending",
+        sent: "broadcasts_sent",
+        failed: "broadcasts_failed",
+    };
+
     const STATUS_BADGE: Record<string, string> = {
         draft: "bg-muted text-muted-foreground",
         queued: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
@@ -178,7 +188,7 @@ export default function BroadcastsPage() {
                                     <div className="flex items-center gap-2 mb-1">
                                         <h2 className="font-medium text-foreground truncate">{b.subject}</h2>
                                         <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${STATUS_BADGE[b.status] || ""}`}>
-                                            {b.status}
+                                            {STATUS_LABEL[b.status] && t.has(STATUS_LABEL[b.status]) ? t(STATUS_LABEL[b.status]) : b.status}
                                         </span>
                                     </div>
                                     <p className="text-xs text-muted-foreground">

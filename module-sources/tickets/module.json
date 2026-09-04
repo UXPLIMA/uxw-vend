@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",

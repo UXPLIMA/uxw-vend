@@ -7,6 +7,10 @@ import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
+
+/** The admin catalogue's copy of the status labels. */
+const ADMIN_STATUS_KEYS = adminKeys(STATUS_KEYS);
 
 interface Message {
     id: string;
@@ -259,13 +263,13 @@ export default function AdminTicketDetailPage(props: PageProps) {
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">{t("adm_status")}</span>
                                 <span className={`text-xs px-2 py-1 rounded ${statusColors[ticket.status] || ""}`}>
-                                    {ticket.status.replace("_", " ")}
+                                    {labelFor(t, ADMIN_STATUS_KEYS, ticket.status)}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">{t("adm_priority")}</span>
                                 <span className={`text-xs px-2 py-1 rounded ${priorityColors[ticket.priority] || ""}`}>
-                                    {ticket.priority}
+                                    {labelFor(t, PRIORITY_KEYS, ticket.priority)}
                                 </span>
                             </div>
                             <div className="flex justify-between">

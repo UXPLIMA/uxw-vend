@@ -111,7 +111,7 @@ export default function SubmissionsPage() {
                                                 {new Date(sub.createdAt).toLocaleString(__dateTag)}
                                             </span>
                                             <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-                                                {sub.status}
+                                                {sub.status === "new" && t.has("adm_submissionNew") ? t("adm_submissionNew") : sub.status}
                                             </span>
                                         </div>
                                         {expandedId === sub.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
