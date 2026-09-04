@@ -79,6 +79,7 @@ function generateRegistry() {
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<Record<string, unknown>>> = {\n`;
     const routes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = [];
     const apiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
+    const routeResolvers: { key: string; module: string; handler: string }[] = [];
 
     for (const { moduleName, manifest } of loaded) {
         for (const route of manifest.routes ?? []) {
@@ -86,6 +87,7 @@ function generateRegistry() {
             const importPath = `@/modules/${moduleName}/${route.component.replace(/\.tsx?$/, '')}`;
             mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then((mod: { default?: ComponentType<any> }) => mod.default ?? (mod as unknown as ComponentType<any>)), { loading: () => <PageLoader /> }),\n`;
             routes.push({ path: route.path, key: componentKey, module: moduleName, ...(route.noindex ? { noindex: true } : {}), ...(route.titleFromPath ? { titleFromPath: true } : {}) });
+            if (route.resolver) routeResolvers.push({ key: componentKey, module: moduleName, handler: route.resolver });
         }
 
         for (const route of manifest.adminRoutes ?? []) {
@@ -459,6 +461,22 @@ function generateRegistry() {
     }
     cronsContent += '];\n';
     fs.writeFileSync(CRONS_FILE, cronsContent);
+
+    // Existence checks for dynamic module routes. Core's catch-all awaits the
+    // one matching the route it is about to render and calls notFound() when it
+    // answers false, so a URL naming nothing gets a status that says so.
+    const RESOLVERS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-route-resolvers.ts');
+    let resolversContent = '// Auto-generated dynamic route existence checks\n\n';
+    resolversContent += 'export type RouteResolver = (params: Record<string, string | string[]>) => Promise<boolean>;\n\n';
+    resolversContent += 'export const ModuleRouteResolvers: Record<string, () => Promise<{ default: RouteResolver }>> = {\n';
+    for (const rr of routeResolvers) {
+        const handlerPath = rr.handler.replace(/\.tsx?$/, '');
+        const importPath = `@/modules/${rr.module}/${handlerPath}`;
+        resolversContent += `  ${JSON.stringify(rr.key)}: () => import('${importPath}') as Promise<{ default: RouteResolver }>,\n`;
+    }
+    resolversContent += '};\n';
+    fs.writeFileSync(RESOLVERS_FILE, resolversContent);
+    console.log(`Generated module route resolvers at ${RESOLVERS_FILE} (${routeResolvers.length} route(s))`);
 
     const SEARCH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-search.ts');
     let searchContent = '// Auto-generated public search providers registry\n\n';

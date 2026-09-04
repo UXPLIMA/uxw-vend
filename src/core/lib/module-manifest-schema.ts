@@ -99,6 +99,20 @@ const routeEntry = z.object({
      * `validate-module` checks the page really is that shape.
      */
     titleFromPath: z.boolean().optional(),
+    /**
+     * A server-side existence check for a dynamic route, run by core's
+     * catch-all before the page renders.
+     *
+     * A page that fetches its subject in the browser has already answered 200
+     * by the time it learns there is nothing there, so `/player/nobody` and
+     * `/store/product/99999` were soft 404s: indexable, invisible to link
+     * checkers and to any monitor watching for a status. Rewriting seven
+     * interactive pages as server components would be a large change for a
+     * small question, so the module answers the question separately: a file
+     * that default-exports `(params) => Promise<boolean>`, false meaning
+     * `notFound()`. Only routes with a dynamic segment need one.
+     */
+    resolver: relativePath("resolver").optional(),
 });
 
 const adminRouteEntry = z.object({
@@ -647,7 +661,7 @@ export function collectManifestFileRefs(m: ValidatedModuleManifest): string[] {
     const refs: string[] = [];
     const push = (v: string | undefined) => { if (v) refs.push(v); };
 
-    m.routes?.forEach((r) => { push(r.component); push(r.layout); });
+    m.routes?.forEach((r) => { push(r.component); push(r.layout); push(r.resolver); });
     m.adminRoutes?.forEach((r) => push(r.component));
     m.api?.forEach((r) => push(r.handler));
     m.widgets?.forEach((r) => push(r.component));

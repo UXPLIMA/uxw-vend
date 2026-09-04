@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -33,7 +33,8 @@
   "routes": [
     {
       "path": "/support",
-      "component": "pages/public/tickets/page.tsx"
+      "component": "pages/public/tickets/page.tsx",
+      "noindex": true
     },
     {
       "path": "/support/new",
@@ -41,7 +42,9 @@
     },
     {
       "path": "/support/[id]",
-      "component": "pages/public/tickets/[id]/page.tsx"
+      "component": "pages/public/tickets/[id]/page.tsx",
+      "resolver": "lib/route-exists.ts",
+      "noindex": true
     }
   ],
   "adminRoutes": [
