@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Thirty store and blog strings that were English in every language.**
+  `t.has(key) ? t(key) : "literal"` is the supported way to render a key that
+  may be absent, and it exists for a real case: a module's translations are
+  seeded into the database at install time, so an install running an older copy
+  has none of the keys a newer release added. The guard is not a substitute for
+  writing the key. Where the key is missing from the module's own catalogue as
+  well, no install will ever have it, the guard is taken every time, and the
+  English literal is what every locale gets. The store shipped its whole cart
+  error vocabulary that way (invalid coupon, invalid creator code, checkout
+  failed), plus the "added to cart" toast, the cart icon's aria-label, the
+  product thumbnail alt text, the option picker and the delete confirmations on
+  three admin screens; blog shipped its category delete confirmation the same
+  way. All 27 keys are now written in English and Turkish. The guards stay,
+  because the stale-install case they were written for is real.
+
 - **A permission the roles screen could not grant.** `custom-forms` declared
   `forms.manage` in its manifest and checked `custom-forms.manage` in
   `can-access-form.ts`. The manifest is the only route a permission name takes
@@ -26,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/core/lib/permission-names.ts` now, which both read.
 
 ### Added
+- `tests/unit/module-translation-keys.test.ts` gained a second rule: a key a
+  module guards with `t.has` must exist in that module's shipped catalogue. The
+  existing rule deliberately skips guarded keys, since a guard is the correct
+  way to render a key that may be missing at runtime, and that exemption was
+  the blind spot the store's English strings lived in.
 - `tests/unit/permissions-are-declared.test.ts` pins the two halves of a
   permission name together: a name a module's code checks must be declared in
   that module's manifest, and a declared name must sit under its own module id
