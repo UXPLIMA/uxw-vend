@@ -110,3 +110,40 @@ describe("the shipped modules", () => {
         expect(dangling).toEqual([]);
     });
 });
+
+/**
+ * A module leaves rows behind in core's tables, and one of them was nobody's.
+ *
+ * The scheduler keys a `CronRun` row per job as `<moduleId>:<jobId>`, and
+ * uninstall cleared `ModuleConfig` and the module's translations but never
+ * those. A demo box was carrying rows for three modules that had not been
+ * installed for some time. They are inert while the module is gone, since a
+ * tick only walks registered jobs, but a reinstall inherits the stale
+ * `lastRunAt`, and a monthly job then sits out the remainder of an interval
+ * that elapsed while it did not exist.
+ *
+ * Module-owned tables are preserved for reinstall on purpose, and that is the
+ * admin's data. A scheduling timestamp is not.
+ */
+describe("uninstall", () => {
+    const source = fs.readFileSync(
+        path.join(root, "src/app/api/v1/modules/[id]/route.ts"),
+        "utf8",
+    );
+
+    it("clears the module's cron bookkeeping", () => {
+        expect(source).toContain("prisma.cronRun");
+        expect(source).toContain("jobKey: { startsWith: `${moduleId}:` }");
+    });
+
+    it("still clears the config row and the translations", () => {
+        expect(source).toContain('prisma.moduleConfig.deleteMany({ where: { id: moduleId } })');
+        expect(source).toContain("removeModuleTranslations(moduleId)");
+    });
+
+    it("still preserves the module's own tables", () => {
+        // Reinstalling must not lose what the admin put in the module.
+        expect(source).toContain("intentionally preserved");
+        expect(source).not.toMatch(/DROP TABLE/i);
+    });
+});

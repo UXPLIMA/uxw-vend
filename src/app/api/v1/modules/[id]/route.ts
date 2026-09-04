@@ -95,6 +95,18 @@ export async function DELETE(
         // can never observe a state where the registry lists the module but
         // ModuleConfig says it should be disabled.
         await prisma.moduleConfig.deleteMany({ where: { id: moduleId } });
+
+        // The scheduler keys a CronRun row per job as "<moduleId>:<jobId>",
+        // and nothing was clearing them: a demo box had rows for three
+        // modules that were no longer installed. They are inert while the
+        // module is gone, since a tick only walks registered jobs, but a
+        // reinstall inherits the old lastRunAt and a monthly job then sits
+        // out the rest of its interval. Module-owned tables are preserved
+        // for reinstall on purpose; a scheduling timestamp is not data the
+        // admin put there.
+        await prisma.cronRun
+            .deleteMany({ where: { jobKey: { startsWith: `${moduleId}:` } } })
+            .catch(() => {});
         await invalidateModuleCache().catch(() => {});
 
         let registryNeedsRebuild = false;

@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Disabling a module did not stop its scheduled jobs.** Cron jobs are
+  registered once, at bootstrap, and the scheduler has no reset path.
+  Toggling a module off updates `ModuleConfig`, drops the caches and calls
+  `resetHooks()` so the hook registry rebuilds from the new state, and it
+  deliberately schedules no rebuild, because disabling is meant to be instant.
+  Nothing told the scheduler. Every other subsystem honours the flag - the
+  proxy refuses the module's routes, `bootstrapHooks` skips its listeners,
+  search drops its provider, the sitemap leaves out its pages - and this was
+  the one that did not, so a disabled blog went on publishing scheduled
+  articles, a disabled currency module went on calling an exchange rate API on
+  a timer, and the admin panel showed nothing to say so. A tick now reads the
+  module states once and skips a disabled module's jobs without claiming their
+  slot, so the toggle takes effect immediately rather than at the next
+  restart, and running one by hand from the cron page is refused with the
+  reason. Core's own jobs are never gated, and an unreadable config leaves
+  every job eligible, matching what `getModuleStates` promises everywhere
+  else.
+- **Uninstall left a module's cron bookkeeping behind.** The scheduler keys a
+  `CronRun` row per job as `<moduleId>:<jobId>`; uninstall cleared the config
+  row and the translations but never those, and a running demo was carrying
+  rows for three modules that had not been installed in some time. Inert while
+  the module is gone, but a reinstall inherits the stale `lastRunAt` and a
+  monthly job then sits out the rest of an interval that elapsed while it did
+  not exist. Module-owned tables are still preserved for reinstall: that is
+  the admin's data, and a scheduling timestamp is not.
+
 - **The documented external cron trigger did not drive the scheduler.**
   `docs/DEPLOYMENT.md` tells an operator to point a system cron at
   `POST /api/v1/admin/cron` with an API key, and said the endpoint "runs

@@ -117,11 +117,46 @@ async function runJob(job: CronJob): Promise<void> {
     }
 }
 
+/**
+ * Whether a job belongs to a module the admin has switched off.
+ *
+ * Registration happens once, at bootstrap, and there is no reset path: a
+ * module disabled while the server is running stays registered until the
+ * process restarts. Every other subsystem honours the flag immediately -
+ * the proxy refuses the module's routes, `bootstrapHooks` skips its
+ * listeners and `resetHooks()` re-runs on the toggle, search drops its
+ * provider - and the scheduler was the one that did not. So a disabled blog
+ * went on publishing scheduled articles, a disabled currency module went on
+ * calling an exchange rate API, and the admin had no way to tell.
+ *
+ * Checked per tick rather than at registration, because that is what makes
+ * the toggle take effect now instead of at the next restart.
+ */
+function isDisabled(key: string, states: Record<string, boolean>): boolean {
+    if (key.startsWith("core:")) return false;
+    const moduleId = key.slice(0, key.indexOf(":"));
+    // An id with no row is enabled, the same convention getModuleStates
+    // documents: an empty map during a DB blip must not silence every job.
+    return states[moduleId] === false;
+}
+
 async function tick(): Promise<string[]> {
     const ran: string[] = [];
     if (isShuttingDown()) return ran;
+
+    let states: Record<string, boolean> = {};
+    try {
+        const { getModuleStates } = await import("./module-cache");
+        states = await getModuleStates();
+    } catch (err) {
+        // Fail soft, as getModuleStates itself does: an unreadable config
+        // means no explicit state is known, and every job stays eligible.
+        console.error("[scheduler] Could not read module states:", err);
+    }
+
     for (const job of registeredJobs.values()) {
         if (isShuttingDown()) return ran;
+        if (isDisabled(job.key, states)) continue;
         try {
             if (await claimJob(job.key, job.schedule)) {
                 await runJob(job);
@@ -339,6 +374,13 @@ export async function runJobNow(key: string): Promise<void> {
     const job = registeredJobs.get(key);
     if (!job) {
         throw new Error(`No registered cron job with key "${key}"`);
+    }
+    // The admin cron page lists every registered job, including those of a
+    // module switched off since boot. Running one by hand would do the work
+    // the toggle was meant to stop, so say what happened instead.
+    const { getModuleStates } = await import("./module-cache");
+    if (isDisabled(key, await getModuleStates())) {
+        throw new Error(`Module "${key.slice(0, key.indexOf(":"))}" is disabled`);
     }
     await runJob(job);
 }
