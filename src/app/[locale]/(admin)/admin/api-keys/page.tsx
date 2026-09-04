@@ -106,7 +106,7 @@ export default function ApiKeysPage() {
                         <form onSubmit={createKey} className="flex items-end gap-3">
                             <div className="flex-1">
                                 <Label>{t("apiKeys_keyName")}</Label>
-                                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("apiKeys_namePlaceholder")} required />
+                                <Input aria-label={t("apiKeys_keyName")} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("apiKeys_namePlaceholder")} required />
                             </div>
                             <Button type="submit" disabled={saving}>
                                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t("apiKeys_create")}

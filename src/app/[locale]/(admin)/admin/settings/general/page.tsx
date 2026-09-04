@@ -120,6 +120,7 @@ export default function GeneralSettingsPage() {
                                     <div key={field.key}>
                                         <Label>{t(field.labelKey)}</Label>
                                         <Input
+                                            aria-label={t(field.labelKey)}
                                             type="number"
                                             value={values[field.key] as string}
                                             onChange={(e) => setValue(field.key, e.target.value)}

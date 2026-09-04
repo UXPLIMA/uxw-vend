@@ -145,6 +145,7 @@ export default function AdminBlogCategoriesPage() {
                                 <div>
                                     <Label>{`${t("adm_name")} *`}</Label>
                                     <Input
+                                        aria-label={t("adm_name")}
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         required
@@ -153,6 +154,7 @@ export default function AdminBlogCategoriesPage() {
                                 <div>
                                     <Label>{t("adm_description")}</Label>
                                     <Input
+                                        aria-label={t("adm_description")}
                                         value={form.description}
                                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                                         placeholder={t("adm_briefDescription")}

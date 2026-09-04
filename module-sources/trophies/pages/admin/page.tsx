@@ -365,6 +365,7 @@ export default function AdminTrophiesPage() {
                             <div>
                                 <Label>{t("name")}</Label>
                                 <Input
+                                    aria-label={t("name")}
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                                     placeholder="First Post"
@@ -373,6 +374,7 @@ export default function AdminTrophiesPage() {
                             <div>
                                 <Label>{t("descriptionLabel")}</Label>
                                 <Textarea
+                                    aria-label={t("descriptionLabel")}
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                                     placeholder="Awarded for creating your first forum topic."
@@ -383,6 +385,7 @@ export default function AdminTrophiesPage() {
                                 <div>
                                     <Label>{t("lucideIcon")}</Label>
                                     <Input
+                                        aria-label={t("lucideIcon")}
                                         value={form.icon}
                                         onChange={(e) => setForm({ ...form, icon: e.target.value })}
                                         placeholder="Award"
@@ -392,6 +395,7 @@ export default function AdminTrophiesPage() {
                                     <Label>{t("color")}</Label>
                                     <div className="flex gap-2 items-center">
                                         <Input
+                                            aria-label={t("color")}
                                             type="color"
                                             value={form.color}
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
@@ -409,6 +413,7 @@ export default function AdminTrophiesPage() {
                                 <div>
                                     <Label>{t("points")}</Label>
                                     <Input
+                                        aria-label={t("points")}
                                         type="number"
                                         value={form.points}
                                         onChange={(e) => setForm({ ...form, points: e.target.value })}
@@ -417,6 +422,7 @@ export default function AdminTrophiesPage() {
                                 <div>
                                     <Label>{t("ruleType")}</Label>
                                     <select
+                                        aria-label={t("ruleType")}
                                         value={form.ruleType}
                                         onChange={(e) => setForm({ ...form, ruleType: e.target.value })}
                                         className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
@@ -428,6 +434,7 @@ export default function AdminTrophiesPage() {
                             <div>
                                 <Label>{t("ruleEvent")}</Label>
                                 <Input
+                                    aria-label={t("ruleEvent")}
                                     list="trophy-event-suggestions"
                                     value={form.ruleEvent}
                                     onChange={(e) => setForm({ ...form, ruleEvent: e.target.value })}
@@ -445,6 +452,7 @@ export default function AdminTrophiesPage() {
                             <div>
                                 <Label>{t("ruleThreshold")}</Label>
                                 <Input
+                                    aria-label={t("ruleThreshold")}
                                     type="number"
                                     min="1"
                                     value={form.ruleThreshold}

@@ -106,6 +106,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>{t("siteSettings_siteName")}</Label>
                                 <Input
+                                    aria-label={t("siteSettings_siteName")}
                                     value={form.siteName}
                                     onChange={(e) => setForm({ ...form, siteName: e.target.value })}
                                 />
@@ -113,6 +114,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>{t("siteSettings_description")}</Label>
                                 <Textarea
+                                    aria-label={t("siteSettings_description")}
                                     value={form.siteDescription}
                                     onChange={(e) => setForm({ ...form, siteDescription: e.target.value })}
                                     rows={3}
@@ -121,6 +123,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>{t("siteSettings_serverIp")}</Label>
                                 <Input
+                                    aria-label={t("siteSettings_serverIp")}
                                     value={form.serverIp}
                                     onChange={(e) => setForm({ ...form, serverIp: e.target.value })}
                                     placeholder="play.example.com"
@@ -129,6 +132,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>{t("siteSettings_contactEmail")}</Label>
                                 <Input
+                                    aria-label={t("siteSettings_contactEmail")}
                                     type="email"
                                     value={form.contactEmail}
                                     onChange={(e) => setForm({ ...form, contactEmail: e.target.value })}
@@ -146,6 +150,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>Discord</Label>
                                 <Input
+                                    aria-label="Discord"
                                     value={form.socialDiscord}
                                     onChange={(e) => setForm({ ...form, socialDiscord: e.target.value })}
                                     placeholder="https://discord.gg/..."
@@ -154,6 +159,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>Twitter / X</Label>
                                 <Input
+                                    aria-label="Twitter / X"
                                     value={form.socialTwitter}
                                     onChange={(e) => setForm({ ...form, socialTwitter: e.target.value })}
                                     placeholder="https://twitter.com/..."
@@ -162,6 +168,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>YouTube</Label>
                                 <Input
+                                    aria-label="YouTube"
                                     value={form.socialYoutube}
                                     onChange={(e) => setForm({ ...form, socialYoutube: e.target.value })}
                                     placeholder="https://youtube.com/..."
@@ -170,6 +177,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>Instagram</Label>
                                 <Input
+                                    aria-label="Instagram"
                                     value={form.socialInstagram}
                                     onChange={(e) => setForm({ ...form, socialInstagram: e.target.value })}
                                     placeholder="https://instagram.com/..."
@@ -178,6 +186,7 @@ export default function SiteSettingsPage() {
                             <div>
                                 <Label>Facebook</Label>
                                 <Input
+                                    aria-label="Facebook"
                                     value={form.socialFacebook}
                                     onChange={(e) => setForm({ ...form, socialFacebook: e.target.value })}
                                     placeholder="https://facebook.com/..."

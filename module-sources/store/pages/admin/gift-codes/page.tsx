@@ -110,15 +110,15 @@ export default function GiftCodesPage() {
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
                                     <Label>{t("adm_valueDollar")}</Label>
-                                    <Input type="number" step="0.01" min="0.01" value={value} onChange={(e) => setValue(e.target.value)} required />
+                                    <Input aria-label={t("adm_valueDollar")} type="number" step="0.01" min="0.01" value={value} onChange={(e) => setValue(e.target.value)} required />
                                 </div>
                                 <div>
                                     <Label>{t("adm_quantity")}</Label>
-                                    <Input type="number" min="1" max="100" value={count} onChange={(e) => setCount(e.target.value)} required />
+                                    <Input aria-label={t("adm_quantity")} type="number" min="1" max="100" value={count} onChange={(e) => setCount(e.target.value)} required />
                                 </div>
                                 <div>
                                     <Label>{t("adm_expiresAt")}</Label>
-                                    <Input type="datetime-local" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+                                    <Input aria-label={t("adm_expiresAt")} type="datetime-local" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
                                 </div>
                             </div>
                             <Button type="submit" disabled={saving}>

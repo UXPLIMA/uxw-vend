@@ -145,11 +145,12 @@ export default function AdminPunishmentsPage() {
                         <div className="grid md:grid-cols-2 gap-3">
                             <div>
                                 <Label>{t("adm_playerName")}</Label>
-                                <Input value={form.playerName} onChange={e => setForm(f => ({ ...f, playerName: e.target.value }))} />
+                                <Input aria-label={t("adm_playerName")} value={form.playerName} onChange={e => setForm(f => ({ ...f, playerName: e.target.value }))} />
                             </div>
                             <div>
                                 <Label>{t("adm_type")}</Label>
                                 <select
+                                    aria-label={t("adm_type")}
                                     className="w-full border border-input bg-background rounded-md h-9 px-3 text-sm"
                                     value={form.type}
                                     onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
@@ -161,15 +162,15 @@ export default function AdminPunishmentsPage() {
                             </div>
                             <div>
                                 <Label>{t("adm_reason")}</Label>
-                                <Input value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} />
+                                <Input aria-label={t("adm_reason")} value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} />
                             </div>
                             <div>
                                 <Label>{t("adm_duration")}</Label>
-                                <Input value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} placeholder="7d" />
+                                <Input aria-label={t("adm_duration")} value={form.duration} onChange={e => setForm(f => ({ ...f, duration: e.target.value }))} placeholder="7d" />
                             </div>
                             <div className="md:col-span-2">
                                 <Label>{t("adm_expiresAt")}</Label>
-                                <Input type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} />
+                                <Input aria-label={t("adm_expiresAt")} type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))} />
                             </div>
                         </div>
                         <div className="flex justify-end gap-2">

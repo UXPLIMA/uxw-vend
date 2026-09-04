@@ -297,6 +297,7 @@ export function ProfileSecurityTab() {
                             <div>
                                 <Label>{t("verificationCodePlaceholder")}</Label>
                                 <Input
+                                    aria-label={t("verificationCodePlaceholder")}
                                     value={twoFAToken}
                                     onChange={(e) => setTwoFAToken(e.target.value)}
                                     placeholder="000000"
@@ -388,6 +389,7 @@ export function ProfileSecurityTab() {
                                 <div>
                                     <Label>{t("verificationCode")}</Label>
                                     <Input
+                                        aria-label={t("verificationCode")}
                                         value={credentialToken}
                                         onChange={(e) => setCredentialToken(e.target.value)}
                                         placeholder={t("verificationCodePlaceholder")}
@@ -401,6 +403,7 @@ export function ProfileSecurityTab() {
                                 <div>
                                     <Label>{t("password")}</Label>
                                     <Input
+                                        aria-label={t("password")}
                                         type="password"
                                         value={credentialPassword}
                                         onChange={(e) => setCredentialPassword(e.target.value)}
@@ -448,12 +451,13 @@ export function ProfileSecurityTab() {
                         )}
                         {passwordSaved && (
                             <div className="p-3 bg-green-50 border border-green-100 text-green-600 text-sm rounded-lg">
-                                {t.has("passwordChanged") ? t("passwordChanged") : "Password changed successfully"}
+                                {t("passwordChanged")}
                             </div>
                         )}
                         <div>
-                            <Label>{t.has("currentPassword") ? t("currentPassword") : "Current password"}</Label>
+                            <Label>{t("currentPassword")}</Label>
                             <Input
+                                aria-label={t("currentPassword")}
                                 type="password"
                                 value={currentPassword}
                                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -461,8 +465,9 @@ export function ProfileSecurityTab() {
                             />
                         </div>
                         <div>
-                            <Label>{t.has("newPassword") ? t("newPassword") : "New password"}</Label>
+                            <Label>{t("newPassword")}</Label>
                             <Input
+                                aria-label={t("newPassword")}
                                 type="password"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
@@ -471,8 +476,9 @@ export function ProfileSecurityTab() {
                             />
                         </div>
                         <div>
-                            <Label>{t.has("confirmNewPassword") ? t("confirmNewPassword") : "Confirm new password"}</Label>
+                            <Label>{t("confirmNewPassword")}</Label>
                             <Input
+                                aria-label={t("confirmNewPassword")}
                                 type="password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}

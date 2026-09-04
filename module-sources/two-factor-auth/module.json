@@ -2,7 +2,7 @@
   "id": "two-factor-auth",
   "name": "Two-Factor Authentication",
   "description": "TOTP-based 2FA with backup codes for enhanced account security",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -58,8 +58,14 @@
     }
   ],
   "hooksEmitted": [
-    { "hook": "user.2fa.disabled", "type": "action" },
-    { "hook": "user.2fa.enabled", "type": "action" }
+    {
+      "hook": "user.2fa.disabled",
+      "type": "action"
+    },
+    {
+      "hook": "user.2fa.enabled",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {

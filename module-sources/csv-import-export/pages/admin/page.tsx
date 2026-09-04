@@ -75,6 +75,7 @@ export default function ExportImportPage() {
                                 CSV with columns: name, slug, price, comparePrice, stock, isActive, isFeatured, type, description
                             </p>
                             <Input
+                                aria-label={t("adm_importProducts")}
                                 type="file"
                                 accept=".csv"
                                 onChange={importProducts}

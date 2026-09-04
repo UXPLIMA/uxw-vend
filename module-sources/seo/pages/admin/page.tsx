@@ -131,6 +131,7 @@ export default function SeoSettingsPage() {
                         <div>
                             <Label className="text-foreground">{t("adm_defaultSiteTitle")}</Label>
                             <Input
+                                aria-label={t("adm_defaultSiteTitle")}
                                 value={settings.seo_default_title}
                                 onChange={(e) => updateSetting("seo_default_title", e.target.value)}
                                 placeholder="My Awesome Site"
@@ -141,6 +142,7 @@ export default function SeoSettingsPage() {
                         <div>
                             <Label className="text-foreground">{t("adm_titleTemplate")}</Label>
                             <Input
+                                aria-label={t("adm_titleTemplate")}
                                 value={settings.seo_title_template}
                                 onChange={(e) => updateSetting("seo_title_template", e.target.value)}
                                 placeholder="%s | My Site"
@@ -151,6 +153,7 @@ export default function SeoSettingsPage() {
                         <div>
                             <Label className="text-foreground">{t("adm_defaultDescription")}</Label>
                             <textarea
+                                aria-label={t("adm_defaultDescription")}
                                 value={settings.seo_default_description}
                                 onChange={(e) => updateSetting("seo_default_description", e.target.value)}
                                 placeholder="A brief description of your site for search engines..."
@@ -162,6 +165,7 @@ export default function SeoSettingsPage() {
                         <div>
                             <Label className="text-foreground">{t("adm_defaultOgImage")}</Label>
                             <Input
+                                aria-label={t("adm_defaultOgImage")}
                                 value={settings.seo_default_og_image}
                                 onChange={(e) => updateSetting("seo_default_og_image", e.target.value)}
                                 placeholder="https://example.com/og-image.png"
@@ -175,6 +179,7 @@ export default function SeoSettingsPage() {
                                 <div>
                                     <Label className="text-foreground">{t("adm_googleVerification")}</Label>
                                     <Input
+                                        aria-label={t("adm_googleVerification")}
                                         value={settings.seo_google_verification}
                                         onChange={(e) => updateSetting("seo_google_verification", e.target.value)}
                                         placeholder="google-site-verification=..."
@@ -184,6 +189,7 @@ export default function SeoSettingsPage() {
                                 <div>
                                     <Label className="text-foreground">{t("adm_bingVerification")}</Label>
                                     <Input
+                                        aria-label={t("adm_bingVerification")}
                                         value={settings.seo_bing_verification}
                                         onChange={(e) => updateSetting("seo_bing_verification", e.target.value)}
                                         placeholder="msvalidate.01=..."

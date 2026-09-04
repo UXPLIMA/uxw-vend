@@ -186,6 +186,7 @@ export default function AlertingSettingsPage() {
                         <div>
                             <Label>{fallback("alerting_webhookUrl", "Webhook URL")}</Label>
                             <Input
+                                aria-label={fallback("alerting_webhookUrl", "Webhook URL")}
                                 type="url"
                                 value={webhookUrl}
                                 onChange={(e) => setWebhookUrl(e.target.value)}

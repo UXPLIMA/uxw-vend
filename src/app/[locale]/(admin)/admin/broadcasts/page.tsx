@@ -145,7 +145,7 @@ export default function BroadcastsPage() {
                     <CardContent className="space-y-4">
                         <div>
                             <Label>{t("broadcasts_subject")}</Label>
-                            <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("broadcasts_subjectPlaceholder")} />
+                            <Input aria-label={t("broadcasts_subject")} value={subject} onChange={(e) => setSubject(e.target.value)} placeholder={t("broadcasts_subjectPlaceholder")} />
                         </div>
                         <div>
                             <Label>{t("broadcasts_body")}</Label>

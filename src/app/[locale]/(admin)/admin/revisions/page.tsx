@@ -114,6 +114,7 @@ export default function RevisionsPage() {
                     <div>
                         <Label>{fallback("revisions_filterResource", "Resource")}</Label>
                         <select
+                            aria-label={fallback("revisions_filterResource", "Resource")}
                             value={resourceFilter}
                             onChange={(e) => {
                                 setPage(1);
@@ -132,6 +133,7 @@ export default function RevisionsPage() {
                     <div>
                         <Label>{fallback("revisions_filterResourceId", "Resource ID")}</Label>
                         <Input
+                            aria-label={fallback("revisions_filterResourceId", "Resource ID")}
                             value={resourceIdFilter}
                             onChange={(e) => {
                                 setPage(1);

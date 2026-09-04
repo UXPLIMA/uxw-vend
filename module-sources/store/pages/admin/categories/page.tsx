@@ -148,6 +148,7 @@ export default function AdminStoreCategoriesPage() {
                                 <div>
                                     <Label>{`${t("adm_name")} *`}</Label>
                                     <Input
+                                        aria-label={t("adm_name")}
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         required
@@ -156,6 +157,7 @@ export default function AdminStoreCategoriesPage() {
                                 <div>
                                     <Label>{t("adm_parentCategory")}</Label>
                                     <select
+                                        aria-label={t("adm_parentCategory")}
                                         value={form.parentId}
                                         onChange={(e) => setForm({ ...form, parentId: e.target.value })}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -186,6 +188,7 @@ export default function AdminStoreCategoriesPage() {
                                 <div>
                                     <Label>{t("adm_order")}</Label>
                                     <Input
+                                        aria-label={t("adm_order")}
                                         type="number"
                                         value={form.order}
                                         onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}

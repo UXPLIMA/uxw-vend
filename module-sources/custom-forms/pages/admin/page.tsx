@@ -140,11 +140,11 @@ export default function FormsPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <Label>{`${t("adm_formTitle")} *`}</Label>
-                                    <Input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Contact Form" />
+                                    <Input aria-label={t("adm_formTitle")} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Contact Form" />
                                 </div>
                                 <div>
                                     <Label>{t("adm_description")}</Label>
-                                    <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
+                                    <Input aria-label={t("adm_description")} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
                                 </div>
                             </div>
 

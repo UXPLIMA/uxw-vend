@@ -84,6 +84,7 @@ export default function CloudflareTurnstileAdminPage() {
                     <div>
                         <Label>{t("siteKey")}</Label>
                         <Input
+                            aria-label={t("siteKey")}
                             value={config.siteKey}
                             onChange={(e) => setConfig({ ...config, siteKey: e.target.value })}
                             placeholder="0x..."
@@ -92,6 +93,7 @@ export default function CloudflareTurnstileAdminPage() {
                     <div>
                         <Label>{t("secretKey")}</Label>
                         <Input
+                            aria-label={t("secretKey")}
                             type="password"
                             value={config.secretKey}
                             onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}

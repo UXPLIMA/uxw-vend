@@ -179,6 +179,7 @@ export default function AdminHelpCenterPage() {
                                     <div>
                                         <Label>{`${t("adm_title")} *`}</Label>
                                         <Input
+                                            aria-label={t("adm_title")}
                                             value={articleForm.title}
                                             onChange={(e) => setArticleForm({ ...articleForm, title: e.target.value })}
                                             required
@@ -190,6 +191,7 @@ export default function AdminHelpCenterPage() {
                                             <p className="text-sm text-destructive mt-1">{t("adm_noCategoriesYet")}</p>
                                         ) : (
                                             <select
+                                                aria-label={t("adm_category")}
                                                 value={articleForm.categoryId}
                                                 onChange={(e) => setArticleForm({ ...articleForm, categoryId: e.target.value })}
                                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -286,6 +288,7 @@ export default function AdminHelpCenterPage() {
                                     <div>
                                         <Label>{`${t("adm_name")} *`}</Label>
                                         <Input
+                                            aria-label={t("adm_name")}
                                             value={categoryForm.name}
                                             onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
                                             required
@@ -294,6 +297,7 @@ export default function AdminHelpCenterPage() {
                                     <div>
                                         <Label>{t("adm_description")}</Label>
                                         <Textarea
+                                            aria-label={t("adm_description")}
                                             value={categoryForm.description}
                                             onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
                                             rows={3}

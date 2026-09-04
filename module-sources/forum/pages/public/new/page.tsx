@@ -96,6 +96,7 @@ export default function NewTopicPage() {
                                     <div>
                                         <Label>{t('categoryLabel')}</Label>
                                         <select
+                                            aria-label={t('categoryLabel')}
                                             value={form.categoryId}
                                             onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
                                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -111,6 +112,7 @@ export default function NewTopicPage() {
                                     <div>
                                         <Label>{t('titleLabel')}</Label>
                                         <Input
+                                            aria-label={t('titleLabel')}
                                             value={form.title}
                                             onChange={(e) => setForm({ ...form, title: e.target.value })}
                                             placeholder={t('topicTitle')}
@@ -122,6 +124,7 @@ export default function NewTopicPage() {
                                     <div>
                                         <Label>{t('contentLabel')}</Label>
                                         <Textarea
+                                            aria-label={t('contentLabel')}
                                             value={form.content}
                                             onChange={(e) => setForm({ ...form, content: e.target.value })}
                                             placeholder={t('topicContent')}

@@ -188,6 +188,7 @@ export default function AdminReferralPage() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t("adm_rewardPerReferral")}</label>
                             <Input
+                                aria-label={t("adm_rewardPerReferral")}
                                 type="number"
                                 min="0"
                                 step="0.01"
