@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
-import { runScheduledTasks } from "@/core/lib/scheduled-tasks";
 import { validateApiKey } from "@/core/lib/api-key-auth";
 import { prisma } from "@/core/lib/db";
-import { listRegisteredJobs, bootstrapScheduler } from "@/core/lib/scheduler";
+import { listRegisteredJobs, bootstrapScheduler, runDueJobs } from "@/core/lib/scheduler";
 
 interface CronJobRow {
     key: string;
@@ -48,7 +47,18 @@ export async function GET() {
     return NextResponse.json({ jobs });
 }
 
-// POST /api/v1/admin/cron - Run scheduled tasks
+/**
+ * POST /api/v1/admin/cron - drive one scheduler tick from outside the process.
+ *
+ * This is the trigger `docs/DEPLOYMENT.md` tells an operator to point an
+ * external cron at, for a host where the in-process ticker cannot be relied
+ * on. It used to call a parallel task list holding a single core cleanup and
+ * nothing else, so an operator who wired it up ran none of core's registered
+ * jobs and none of the modules', while the documentation said it ran both.
+ *
+ * Every job that is due now runs through the same claim the in-process ticker
+ * uses, so the two triggers cannot execute one job twice inside its interval.
+ */
 export async function POST(request: NextRequest) {
     // Allow via API key or admin session
     const rawKey = request.headers.get("x-api-key");
@@ -61,6 +71,6 @@ export async function POST(request: NextRequest) {
         if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const results = await runScheduledTasks();
-    return NextResponse.json({ results, ran: results.length });
+    const jobs = await runDueJobs();
+    return NextResponse.json({ jobs, ran: jobs.length });
 }

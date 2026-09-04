@@ -326,7 +326,7 @@ Module-contributed counters are fetched directly from each module's declared `st
 | POST | `/admin/backup/[id]/restore` | Admin | Restore from a backup |
 | GET | `/admin/rate-limits` | Admin | Read rate-limit configuration and role multipliers |
 | GET | `/admin/cron` | Admin | List registered cron jobs joined with their last `CronRun` |
-| POST | `/admin/cron` | Admin or API Key (`cron:run`) | Run scheduled tasks one-shot |
+| POST | `/admin/cron` | Admin or API Key (`cron:run`) | Run one scheduler tick: every job that is due |
 | POST | `/admin/cron/[key]/run` | Admin | Run a single job by key |
 | POST | `/admin/impersonate/start` | Admin | Begin impersonating a user |
 | POST | `/admin/impersonate/stop` | Admin | End the current impersonation |
@@ -471,7 +471,11 @@ Operators trigger ticks two ways:
    x-api-key: <key>
    ```
 
-   The endpoint runs the core scheduled tasks once and reports `{ results, ran }`.
+   Each POST is one tick: every registered job whose interval has elapsed
+   runs, core's and the modules' alike, and the response reports
+   `{ jobs, ran }` naming the ones that did. It shares the in-process
+   ticker's claim on `CronRun`, so running both triggers never executes a
+   job twice inside its interval.
 
 A single job can also be re-run on demand by an admin: `POST /api/v1/admin/cron/[key]/run`.
 

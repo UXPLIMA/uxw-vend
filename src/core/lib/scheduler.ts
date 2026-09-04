@@ -117,18 +117,41 @@ async function runJob(job: CronJob): Promise<void> {
     }
 }
 
-async function tick(): Promise<void> {
-    if (isShuttingDown()) return;
+async function tick(): Promise<string[]> {
+    const ran: string[] = [];
+    if (isShuttingDown()) return ran;
     for (const job of registeredJobs.values()) {
-        if (isShuttingDown()) return;
+        if (isShuttingDown()) return ran;
         try {
             if (await claimJob(job.key, job.schedule)) {
                 await runJob(job);
+                ran.push(job.key);
             }
         } catch (err) {
             console.error(`[scheduler] Tick error for ${job.key}:`, err);
         }
     }
+    return ran;
+}
+
+/**
+ * One tick, driven from outside the process.
+ *
+ * `POST /api/v1/admin/cron` is the trigger the deployment guide tells an
+ * operator to wire an external cron to, for a host where the in-process
+ * ticker cannot be relied on. It used to call a parallel task list that
+ * knew about exactly one core cleanup and nothing about the registered
+ * jobs at all, so an operator following those instructions ran none of
+ * core's jobs and none of the modules' while the documentation said it ran
+ * both.
+ *
+ * Claiming is what makes two triggers safe: the in-process ticker and an
+ * external one race on the same `CronRun` row, and exactly one wins the
+ * interval, so nothing runs twice.
+ */
+export async function runDueJobs(): Promise<string[]> {
+    await bootstrapScheduler();
+    return tick();
 }
 
 /**
@@ -189,15 +212,15 @@ export async function bootstrapScheduler(): Promise<void> {
         handler: async () => {
             const { pruneOldRecords } = await import("./retention");
             const r = await pruneOldRecords();
-            const total = r.activityFeed + r.webhookLog + r.cronRun + r.revision + r.userSession;
+            const total = r.activityFeed + r.cronRun + r.revision + r.userSession + r.verificationToken;
             if (total > 0) {
                 log.info("cron: retention sweep complete", {
                     job: "retention",
                     activityFeed: r.activityFeed,
-                    webhookLog: r.webhookLog,
                     cronRun: r.cronRun,
                     revision: r.revision,
                     userSession: r.userSession,
+                    verificationToken: r.verificationToken,
                 });
             }
         },

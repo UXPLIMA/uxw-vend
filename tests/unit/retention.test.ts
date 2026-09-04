@@ -1,179 +1,149 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// Deletemany mocks - one per table
 const activityFeedItemDeleteMany = vi.fn();
-const webhookLogDeleteMany = vi.fn();
 const cronRunDeleteMany = vi.fn();
 const revisionDeleteMany = vi.fn();
 const userSessionDeleteMany = vi.fn();
+const verificationTokenDeleteMany = vi.fn();
+const webhookLogDeleteMany = vi.fn();
 
-// Toggle whether webhookLog key exists on prisma mock
-let includeWebhookLog = true;
-
-vi.mock("@/core/lib/db", () => {
-    // Use a getter so each test can toggle includeWebhookLog before importing
-    const prismaBase: Record<string, unknown> = {
-        activityFeedItem: {
-            deleteMany: (...args: unknown[]) => activityFeedItemDeleteMany(...args),
-        },
-        cronRun: {
-            deleteMany: (...args: unknown[]) => cronRunDeleteMany(...args),
-        },
-        revision: {
-            deleteMany: (...args: unknown[]) => revisionDeleteMany(...args),
-        },
-        userSession: {
-            deleteMany: (...args: unknown[]) => userSessionDeleteMany(...args),
-        },
-    };
-    return {
-        get prisma() {
-            if (includeWebhookLog) {
-                return {
-                    ...prismaBase,
-                    webhookLog: {
-                        deleteMany: (...args: unknown[]) => webhookLogDeleteMany(...args),
-                    },
-                };
-            }
-            return prismaBase;
-        },
-    };
-});
+vi.mock("@/core/lib/db", () => ({
+    prisma: {
+        activityFeedItem: { deleteMany: (...a: unknown[]) => activityFeedItemDeleteMany(...a) },
+        cronRun: { deleteMany: (...a: unknown[]) => cronRunDeleteMany(...a) },
+        revision: { deleteMany: (...a: unknown[]) => revisionDeleteMany(...a) },
+        userSession: { deleteMany: (...a: unknown[]) => userSessionDeleteMany(...a) },
+        verificationToken: { deleteMany: (...a: unknown[]) => verificationTokenDeleteMany(...a) },
+        // Present, because the module that owns it is installed. Core still
+        // must not touch it.
+        webhookLog: { deleteMany: (...a: unknown[]) => webhookLogDeleteMany(...a) },
+    },
+}));
 
 type RetentionModule = typeof import("@/core/lib/retention");
 let mod: RetentionModule;
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const count = (n: number) => ({ count: n });
+
 beforeEach(async () => {
     vi.resetModules();
-    activityFeedItemDeleteMany.mockReset();
-    webhookLogDeleteMany.mockReset();
-    cronRunDeleteMany.mockReset();
-    revisionDeleteMany.mockReset();
-    userSessionDeleteMany.mockReset();
-    userSessionDeleteMany.mockResolvedValue({ count: 0 });
-    includeWebhookLog = true;
-    // Silence expected error logs
+    for (const fn of [
+        activityFeedItemDeleteMany,
+        cronRunDeleteMany,
+        revisionDeleteMany,
+        userSessionDeleteMany,
+        verificationTokenDeleteMany,
+        webhookLogDeleteMany,
+    ]) {
+        fn.mockReset().mockResolvedValue(count(0));
+    }
     vi.spyOn(console, "error").mockImplementation(() => {});
-
     mod = await import("@/core/lib/retention");
 });
 
-function countResult(n: number) {
-    return { count: n };
-}
-
 describe("retention: pruneOldRecords", () => {
-    it("returns aggregate counts from each table", async () => {
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(5));
-        webhookLogDeleteMany.mockResolvedValue(countResult(2));
-        cronRunDeleteMany.mockResolvedValue(countResult(7));
-        revisionDeleteMany.mockResolvedValue(countResult(3));
+    it("returns a count per table", async () => {
+        activityFeedItemDeleteMany.mockResolvedValue(count(5));
+        cronRunDeleteMany.mockResolvedValue(count(7));
+        revisionDeleteMany.mockResolvedValue(count(3));
+        verificationTokenDeleteMany.mockResolvedValue(count(4));
 
-        const result = await mod.pruneOldRecords();
-        expect(result).toEqual({
+        expect(await mod.pruneOldRecords()).toEqual({
             activityFeed: 5,
-            webhookLog: 2,
             cronRun: 7,
             revision: 3,
             userSession: 0,
+            verificationToken: 4,
         });
     });
 
-    it("calls deleteMany with a createdAt.lt cutoff for activityFeedItem (180 days)", async () => {
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(0));
-        webhookLogDeleteMany.mockResolvedValue(countResult(0));
-        cronRunDeleteMany.mockResolvedValue(countResult(0));
-        revisionDeleteMany.mockResolvedValue(countResult(0));
-
+    it("keeps activity feed items for 180 days", async () => {
         const before = Date.now();
         await mod.pruneOldRecords();
-        const after = Date.now();
-
-        const arg = activityFeedItemDeleteMany.mock.calls[0]?.[0] as {
-            where: { createdAt: { lt: Date } };
-        };
+        const arg = activityFeedItemDeleteMany.mock.calls[0]?.[0] as { where: { createdAt: { lt: Date } } };
         expect(arg.where.createdAt.lt).toBeInstanceOf(Date);
-        const cutoffMs = arg.where.createdAt.lt.getTime();
-        const expected180 = before - 180 * 24 * 60 * 60 * 1000;
-        expect(cutoffMs).toBeGreaterThanOrEqual(expected180 - 10);
-        expect(cutoffMs).toBeLessThanOrEqual(after - 180 * 24 * 60 * 60 * 1000 + 10);
+        expect(Math.abs(arg.where.createdAt.lt.getTime() - (before - 180 * DAY_MS))).toBeLessThan(200);
     });
 
-    it("uses a 30-day cutoff for webhookLog and cronRun", async () => {
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(0));
-        webhookLogDeleteMany.mockResolvedValue(countResult(0));
-        cronRunDeleteMany.mockResolvedValue(countResult(0));
-        revisionDeleteMany.mockResolvedValue(countResult(0));
-
+    it("keeps cron runs for 30 days and revisions for 365", async () => {
         const before = Date.now();
         await mod.pruneOldRecords();
-
-        const whArg = webhookLogDeleteMany.mock.calls[0]?.[0] as {
-            where: { createdAt: { lt: Date } };
-        };
-        const crArg = cronRunDeleteMany.mock.calls[0]?.[0] as {
-            where: { lastRunAt: { lt: Date } };
-        };
-        const dayMs = 24 * 60 * 60 * 1000;
-        expect(Math.abs(whArg.where.createdAt.lt.getTime() - (before - 30 * dayMs))).toBeLessThan(100);
-        expect(Math.abs(crArg.where.lastRunAt.lt.getTime() - (before - 30 * dayMs))).toBeLessThan(100);
+        const cron = cronRunDeleteMany.mock.calls[0]?.[0] as { where: { lastRunAt: { lt: Date } } };
+        const rev = revisionDeleteMany.mock.calls[0]?.[0] as { where: { createdAt: { lt: Date } } };
+        expect(Math.abs(cron.where.lastRunAt.lt.getTime() - (before - 30 * DAY_MS))).toBeLessThan(200);
+        expect(Math.abs(rev.where.createdAt.lt.getTime() - (before - 365 * DAY_MS))).toBeLessThan(200);
     });
 
-    it("uses a 365-day cutoff for revision", async () => {
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(0));
-        webhookLogDeleteMany.mockResolvedValue(countResult(0));
-        cronRunDeleteMany.mockResolvedValue(countResult(0));
-        revisionDeleteMany.mockResolvedValue(countResult(0));
-
-        const before = Date.now();
-        await mod.pruneOldRecords();
-
-        const revArg = revisionDeleteMany.mock.calls[0]?.[0] as {
-            where: { createdAt: { lt: Date } };
-        };
-        const dayMs = 24 * 60 * 60 * 1000;
-        expect(Math.abs(revArg.where.createdAt.lt.getTime() - (before - 365 * dayMs))).toBeLessThan(100);
-    });
-
-    it("one table failure does not block the others", async () => {
+    it("one table failing does not stop the rest", async () => {
         activityFeedItemDeleteMany.mockRejectedValue(new Error("boom"));
-        webhookLogDeleteMany.mockResolvedValue(countResult(1));
-        cronRunDeleteMany.mockResolvedValue(countResult(2));
-        revisionDeleteMany.mockResolvedValue(countResult(4));
+        cronRunDeleteMany.mockResolvedValue(count(2));
+        revisionDeleteMany.mockResolvedValue(count(4));
+        verificationTokenDeleteMany.mockResolvedValue(count(1));
 
         const result = await mod.pruneOldRecords();
         expect(result.activityFeed).toBe(0);
-        expect(result.webhookLog).toBe(1);
         expect(result.cronRun).toBe(2);
         expect(result.revision).toBe(4);
+        expect(result.verificationToken).toBe(1);
+    });
+});
+
+/**
+ * Email verification and password reset both write a VerificationToken, and
+ * both leave the row behind whenever the person never finishes: an unconfirmed
+ * signup, a reset link nobody clicked. Nothing consumes an expired one.
+ *
+ * The prune existed, in `runScheduledTasks()`, which no scheduled job ever
+ * called - only `POST /api/v1/admin/cron`, and the admin panel does not use
+ * that endpoint. So the rows had accumulated since the table existed.
+ */
+describe("expired verification tokens", () => {
+    it("are pruned by the daily sweep", async () => {
+        await mod.pruneOldRecords();
+        expect(verificationTokenDeleteMany).toHaveBeenCalledTimes(1);
     });
 
-    it("cronRun failure does not block revision", async () => {
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(5));
-        webhookLogDeleteMany.mockResolvedValue(countResult(1));
-        cronRunDeleteMany.mockRejectedValue(new Error("db err"));
-        revisionDeleteMany.mockResolvedValue(countResult(8));
-
-        const result = await mod.pruneOldRecords();
-        expect(result.cronRun).toBe(0);
-        expect(result.revision).toBe(8);
+    it("are pruned on expiry, with no grace window", async () => {
+        const before = Date.now();
+        await mod.pruneOldRecords();
+        const after = Date.now();
+        const arg = verificationTokenDeleteMany.mock.calls[0]?.[0] as { where: { expires: { lt: Date } } };
+        const cutoff = arg.where.expires.lt.getTime();
+        expect(cutoff).toBeGreaterThanOrEqual(before - 200);
+        expect(cutoff).toBeLessThanOrEqual(after + 200);
     });
 
-    it("gracefully skips webhookLog when prisma.webhookLog is undefined", async () => {
-        includeWebhookLog = false;
-        vi.resetModules();
-        mod = await import("@/core/lib/retention");
-
-        activityFeedItemDeleteMany.mockResolvedValue(countResult(3));
-        cronRunDeleteMany.mockResolvedValue(countResult(2));
-        revisionDeleteMany.mockResolvedValue(countResult(1));
+    it("do not take the sweep down when the table is missing", async () => {
+        verificationTokenDeleteMany.mockRejectedValue(new Error("relation does not exist"));
+        activityFeedItemDeleteMany.mockResolvedValue(count(9));
 
         const result = await mod.pruneOldRecords();
-        expect(result.webhookLog).toBe(0);
+        expect(result.verificationToken).toBe(0);
+        expect(result.activityFeed).toBe(9);
+    });
+});
+
+/**
+ * WebhookLog belongs to the `webhook-logs` module, which runs its own daily
+ * cron over that table with the same thirty day window. Core used to prune it
+ * as well, behind an `in prisma` guard - a module's work done twice a day, by
+ * a core file naming a model it has no business knowing.
+ */
+describe("a module's table", () => {
+    it("is left to the module", async () => {
+        await mod.pruneOldRecords();
         expect(webhookLogDeleteMany).not.toHaveBeenCalled();
-        expect(result.activityFeed).toBe(3);
-        expect(result.cronRun).toBe(2);
-        expect(result.revision).toBe(1);
+    });
+
+    it("is not named in core's retention at all", async () => {
+        const fs = await import("fs");
+        const path = await import("path");
+        const source = fs.readFileSync(
+            path.join(path.resolve(import.meta.dirname, "../.."), "src/core/lib/retention.ts"),
+            "utf8",
+        );
+        const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+        expect(code).not.toContain("webhookLog");
     });
 });
