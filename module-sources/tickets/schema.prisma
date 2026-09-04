@@ -44,6 +44,9 @@ model Ticket {
   @@index([departmentId])
   @@index([status])
   @@index([assignedToId])
+
+  // The stats screen scans a date window.
+  @@index([createdAt])
 }
 
 enum TicketStatus {

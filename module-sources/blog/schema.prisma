@@ -46,6 +46,11 @@ model BlogArticle {
   @@index([authorId])
   @@index([categoryId])
   @@index([publishedAt])
+
+  // publishAt is scanned by the scheduled-publish cron on every tick;
+  // createdAt by the stats window.
+  @@index([publishAt])
+  @@index([createdAt])
 }
 
 enum ArticleStatus {
@@ -70,6 +75,10 @@ model BlogComment {
 
   @@index([articleId])
   @@index([authorId])
+
+  // The moderation queue counts and lists PENDING rows on every load of the
+  // admin screen, once per provider, with nothing else to narrow it.
+  @@index([moderationState])
 }
 
 model BlogTag {

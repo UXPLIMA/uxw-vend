@@ -25,6 +25,10 @@ model Suggestion {
 
   @@index([status])
   @@index([authorId])
+
+  // The moderation queue counts and lists PENDING rows on every load of the
+  // admin screen, once per provider, with nothing else to narrow it.
+  @@index([moderationState])
 }
 
 model SuggestionVote {
