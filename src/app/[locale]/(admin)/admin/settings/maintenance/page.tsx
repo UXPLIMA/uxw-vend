@@ -89,7 +89,7 @@ export default function MaintenanceSettingsPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold">
-                    Maintenance Mode
+                    {t("sidebar_maintenance")}
                 </h1>
                 <p className="text-muted-foreground">
                     Temporarily take your site offline for visitors while allowing administrators to
@@ -99,7 +99,7 @@ export default function MaintenanceSettingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-base">Status</CardTitle>
+                    <CardTitle className="text-base">{t("common_status")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <label className="flex items-center gap-3 cursor-pointer">
@@ -110,7 +110,7 @@ export default function MaintenanceSettingsPage() {
                             className="w-4 h-4"
                         />
                         <span className="text-sm font-medium text-foreground">
-                            Enable maintenance mode
+                            {t("maintenance_enable")}
                         </span>
                     </label>
                     <p className="text-xs text-muted-foreground">
@@ -123,7 +123,7 @@ export default function MaintenanceSettingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-base">Message</CardTitle>
+                    <CardTitle className="text-base">{t("maintenance_message")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <textarea
@@ -134,14 +134,14 @@ export default function MaintenanceSettingsPage() {
                         className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                        Shown to visitors on the maintenance page.
+                        {t("maintenance_messageHelp")}
                     </p>
                 </CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-base">Allowed roles</CardTitle>
+                    <CardTitle className="text-base">{t("maintenance_allowedRoles")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                     <p className="text-xs text-muted-foreground mb-2">
@@ -192,11 +192,11 @@ export default function MaintenanceSettingsPage() {
                 >
                     {saving ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("seo_saving")}
                         </>
                     ) : (
                         <>
-                            <Save className="w-4 h-4 mr-2" /> Save changes
+                            <Save className="w-4 h-4 mr-2" /> {t("moderationSettings_saveChanges")}
                         </>
                     )}
                 </Button>

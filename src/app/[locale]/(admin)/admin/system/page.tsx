@@ -89,19 +89,19 @@ export default function SystemPage() {
                             <span className="font-medium">{system.system.processMemoryMB.rss} MB</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Heap Used</span>
+                            <span className="text-muted-foreground">{t("system_heapUsed")}</span>
                             <span className="font-medium">{system.system.processMemoryMB.heapUsed} MB</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Heap Total</span>
+                            <span className="text-muted-foreground">{t("system_heapTotal")}</span>
                             <span className="font-medium">{system.system.processMemoryMB.heapTotal} MB</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">System Total</span>
+                            <span className="text-muted-foreground">{t("system_systemTotal")}</span>
                             <span className="font-medium">{system.system.totalMemoryGB} GB</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">System Free</span>
+                            <span className="text-muted-foreground">{t("system_systemFree")}</span>
                             <span className="font-medium">{system.system.freeMemoryGB} GB</span>
                         </div>
                     </CardContent>
@@ -121,11 +121,11 @@ export default function SystemPage() {
                             <span className="font-medium truncate max-w-[60%]">{system.system.cpuModel}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Load Avg</span>
+                            <span className="text-muted-foreground">{t("system_loadAvg")}</span>
                             <span className="font-medium">{system.system.loadAvg.join(", ")}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Disk Total</span>
+                            <span className="text-muted-foreground">{t("system_diskTotal")}</span>
                             <span className="font-medium">{system.disk.total}</span>
                         </div>
                     </CardContent>

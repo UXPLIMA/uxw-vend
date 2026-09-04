@@ -193,7 +193,7 @@ export default function SeoPage() {
                         <Input
                             value={global.seo_default_title}
                             onChange={(e) => updateGlobal("seo_default_title", e.target.value)}
-                            placeholder="My Awesome Site"
+                            placeholder={t("seo_siteNamePlaceholder")}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("seo_defaultTitleHint")}

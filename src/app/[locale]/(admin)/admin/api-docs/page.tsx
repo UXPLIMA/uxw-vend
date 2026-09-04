@@ -6,17 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { FileJson, ExternalLink } from "lucide-react";
 import "swagger-ui-react/swagger-ui.css";
 
+function SwaggerLoading() {
+    const t = useTranslations("admin");
+    return <div className="text-sm text-muted-foreground p-6">{t("apiDocs_loading")}</div>;
+}
+
 // swagger-ui-react bundles its own styles and touches window, so it must be
 // loaded on the client only.
 const SwaggerUI = dynamic(
     () => import("swagger-ui-react").then((mod) => mod.default),
     {
         ssr: false,
-        loading: () => (
-            <div className="text-sm text-muted-foreground p-6">
-                Loading API explorer...
-            </div>
-        ),
+        // Rendered outside the page component, so it reads the catalogue
+        // itself rather than closing over the page's `t`.
+        loading: () => <SwaggerLoading />,
     },
 );
 

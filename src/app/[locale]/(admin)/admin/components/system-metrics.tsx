@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Activity, Clock, AlertTriangle, Zap } from "lucide-react";
 
@@ -12,6 +13,7 @@ interface MetricsData {
 }
 
 export function SystemMetrics() {
+    const t = useTranslations("admin");
     const [data, setData] = useState<MetricsData | null>(null);
 
     const fetchMetrics = useCallback(() => {
@@ -38,7 +40,7 @@ export function SystemMetrics() {
 
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold">System Metrics</h2>
+            <h2 className="text-xl font-bold">{t("metrics_title")}</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {statCards.map((card) => (
@@ -57,7 +59,7 @@ export function SystemMetrics() {
             {data.slowEndpoints.length > 0 && (
                 <Card>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Slowest Endpoints (Last Hour)</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{t("metrics_slowestEndpoints")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-1">

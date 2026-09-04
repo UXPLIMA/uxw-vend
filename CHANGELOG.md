@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **The admin panel is readable in Turkish.** Ninety strings across twenty-three
+  admin screens were written in English directly in the JSX, so an operator who
+  had set the panel to Turkish still read "Refresh", "Save changes", "No results
+  found" and the rest in English. Twenty-four of them already had a key sitting
+  unused in the catalogue - the spotlight's four hint labels, the sidebar search
+  placeholder, the appearance heading - meaning the translation had been written
+  and then never wired up. All ninety now read from the `admin` namespace, with
+  about sixty new keys added in both locales, and a gate fails any new hardcoded
+  English JSX text or `placeholder`/`title`/`aria-label` literal under the admin
+  tree so the panel cannot drift back one screen at a time.
+
 ### Added
 - **Icons are picked from a list, not typed from memory.** Every icon field in
   the admin - the navbar editor, a module's CRUD form, a module settings form,

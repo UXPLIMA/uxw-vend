@@ -32,13 +32,13 @@ export function AdminBreadcrumb() {
 
     return (
         <nav
-            aria-label="Breadcrumb"
+            aria-label={t("crumb_landmark")}
             className="flex items-center gap-1.5 text-sm text-muted-foreground"
         >
             <Link
                 href="/admin"
                 className="p-1 rounded hover:bg-muted hover:text-foreground transition"
-                aria-label="Admin home"
+                aria-label={t("crumb_home")}
             >
                 <Home size={14} />
             </Link>

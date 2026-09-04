@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 export default function AdminError({
@@ -10,6 +11,8 @@ export default function AdminError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const t = useTranslations("admin");
+
     useEffect(() => {
         console.error("Admin error:", error);
     }, [error]);
@@ -21,13 +24,13 @@ export default function AdminError({
                     <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 </div>
                 <h2 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                    Something went wrong
+                    {t("error_title")}
                 </h2>
                 <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
-                    An unexpected error occurred in the admin panel.
+                    {t("error_body")}
                     {error.digest && (
                         <span className="mt-1 block font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                            Error ID: {error.digest}
+                            {t("error_id")} {error.digest}
                         </span>
                     )}
                 </p>
@@ -36,7 +39,7 @@ export default function AdminError({
                     className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                 >
                     <RotateCcw className="h-4 w-4" />
-                    Try again
+                    {t("error_tryAgain")}
                 </button>
             </div>
         </div>

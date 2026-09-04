@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, Zap, Layers, Cpu } from "lucide-react";
 
@@ -47,6 +48,7 @@ function formatUptime(seconds: number): string {
 }
 
 export default function DevToolsPage() {
+    const t = useTranslations("admin");
     const [data, setData] = useState<DevData | null>(null);
     const [loading, setLoading] = useState(true);
     const [tab, setTab] = useState<"hooks" | "registries" | "runtime">("hooks");
@@ -72,9 +74,9 @@ export default function DevToolsPage() {
         <>
             <div className="mb-6">
                 <h1 className="text-3xl font-bold">
-                    Developer Tools
+                    {t("dev_title")}
                 </h1>
-                <p className="text-muted-foreground">Runtime introspection of hooks, registries, and process state</p>
+                <p className="text-muted-foreground">{t("dev_subtitle")}</p>
             </div>
 
             {/* Tabs */}
@@ -96,7 +98,7 @@ export default function DevToolsPage() {
                     </button>
                 ))}
                 <button onClick={fetchData} className="ml-auto text-xs text-muted-foreground hover:text-foreground self-center">
-                    Refresh
+                    {t("system_refresh")}
                 </button>
             </div>
 
@@ -107,7 +109,7 @@ export default function DevToolsPage() {
                         <CardHeader><CardTitle className="text-base">Registered Listeners ({data.hooks.registered.length})</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.registered.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No module has registered any hook listeners yet.</p>
+                                <p className="text-sm text-muted-foreground">{t("dev_noListeners")}</p>
                             ) : (
                                 <div className="space-y-1">
                                     {data.hooks.registered.map((l, i) => (
@@ -129,7 +131,7 @@ export default function DevToolsPage() {
                         <CardHeader><CardTitle className="text-base">Active Actions ({data.hooks.actions.length})</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.actions.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No actions have listeners yet.</p>
+                                <p className="text-sm text-muted-foreground">{t("dev_noActions")}</p>
                             ) : (
                                 <div className="space-y-1">
                                     {data.hooks.actions.map((a) => (
@@ -148,7 +150,7 @@ export default function DevToolsPage() {
                         <CardHeader><CardTitle className="text-base">Active Filters ({data.hooks.filters.length})</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.filters.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No filters have listeners yet.</p>
+                                <p className="text-sm text-muted-foreground">{t("dev_noFilters")}</p>
                             ) : (
                                 <div className="space-y-1">
                                     {data.hooks.filters.map((f) => (
@@ -176,7 +178,7 @@ export default function DevToolsPage() {
                                 <p className="text-2xl font-bold text-foreground">{items.length}</p>
                                 <details className="mt-2">
                                     <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                                        View entries
+                                        {t("dev_viewEntries")}
                                     </summary>
                                     <pre className="text-[10px] mt-2 max-h-48 overflow-auto bg-muted p-2 rounded">
                                         {JSON.stringify(items, null, 2)}
@@ -191,20 +193,20 @@ export default function DevToolsPage() {
             {tab === "runtime" && (
                 <div className="grid md:grid-cols-2 gap-4">
                     <Card>
-                        <CardHeader><CardTitle className="text-base">Process</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base">{t("dev_process")}</CardTitle></CardHeader>
                         <CardContent className="space-y-2 text-sm">
-                            <div className="flex justify-between"><span className="text-muted-foreground">Node version</span><code>{data.runtime.nodeVersion}</code></div>
-                            <div className="flex justify-between"><span className="text-muted-foreground">Environment</span><code>{data.runtime.env}</code></div>
-                            <div className="flex justify-between"><span className="text-muted-foreground">Uptime</span><code>{formatUptime(data.runtime.uptime)}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("dev_nodeVersion")}</span><code>{data.runtime.nodeVersion}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("dev_environment")}</span><code>{data.runtime.env}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("system_uptime")}</span><code>{formatUptime(data.runtime.uptime)}</code></div>
                         </CardContent>
                     </Card>
                     <Card>
-                        <CardHeader><CardTitle className="text-base">Memory</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base">{t("dev_memory")}</CardTitle></CardHeader>
                         <CardContent className="space-y-2 text-sm">
                             <div className="flex justify-between"><span className="text-muted-foreground">RSS</span><code>{formatBytes(data.runtime.memory.rss)}</code></div>
-                            <div className="flex justify-between"><span className="text-muted-foreground">Heap Used</span><code>{formatBytes(data.runtime.memory.heapUsed)}</code></div>
-                            <div className="flex justify-between"><span className="text-muted-foreground">Heap Total</span><code>{formatBytes(data.runtime.memory.heapTotal)}</code></div>
-                            <div className="flex justify-between"><span className="text-muted-foreground">External</span><code>{formatBytes(data.runtime.memory.external)}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("dev_heapUsed")}</span><code>{formatBytes(data.runtime.memory.heapUsed)}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("dev_heapTotal")}</span><code>{formatBytes(data.runtime.memory.heapTotal)}</code></div>
+                            <div className="flex justify-between"><span className="text-muted-foreground">{t("dev_external")}</span><code>{formatBytes(data.runtime.memory.external)}</code></div>
                         </CardContent>
                     </Card>
                 </div>

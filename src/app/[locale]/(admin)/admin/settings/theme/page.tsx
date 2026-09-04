@@ -128,10 +128,10 @@ export default function ThemeSettingsPage() {
                     <div className="h-4 w-1/2 rounded" style={{ background: colors.primary, opacity: 0.1 }} />
                     <div className="flex space-x-2 mt-4">
                         <div className="h-8 px-4 rounded flex items-center text-xs font-bold" style={{ background: colors.primary, color: '#fff' }}>
-                            Action
+                            {t("theme_previewPrimary")}
                         </div>
                         <div className="h-8 px-4 rounded flex items-center text-xs font-bold" style={{ background: colors.secondary, color: '#fff' }}>
-                            Sec
+                            {t("theme_previewSecondary")}
                         </div>
                     </div>
                 </div>
@@ -181,9 +181,9 @@ export default function ThemeSettingsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-medium">Appearance</h3>
+                    <h3 className="text-lg font-medium">{t("settings_appearance")}</h3>
                     <p className="text-sm text-muted-foreground">
-                        Customize the look and feel of your store.
+                        {t("theme_subtitle")}
                     </p>
                 </div>
                 <div>
@@ -200,9 +200,9 @@ export default function ThemeSettingsPage() {
                         disabled={uploading}
                     >
                         {uploading ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading...</>
+                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("theme_uploading")}</>
                         ) : (
-                            <><Upload className="w-4 h-4 mr-2" /> Upload Theme</>
+                            <><Upload className="w-4 h-4 mr-2" /> {t("theme_upload")}</>
                         )}
                     </Button>
                 </div>
@@ -289,7 +289,7 @@ export default function ThemeSettingsPage() {
                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                                     <span>v{theme.version || '1.0.0'}</span>
                                     <div className="flex items-center gap-2">
-                                        {!isBuiltIn && <span className="text-blue-500">Custom</span>}
+                                        {!isBuiltIn && <span className="text-blue-500">{t("theme_custom")}</span>}
                                         <span>{theme.modes?.default ?? "-"}</span>
                                     </div>
                                 </div>
@@ -307,7 +307,7 @@ export default function ThemeSettingsPage() {
                     <div>
                         <h3 className="text-lg font-medium flex items-center gap-2 mb-4">
                             <CheckCircle className="w-5 h-5 text-blue-500" />
-                            Verified Themes
+                            {t("theme_verified")}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {available.map((theme: { id: string; name: string; version: string; type: string; description: string; verified: boolean; zip: string; colors?: Record<string, string> }) => (
@@ -334,7 +334,7 @@ export default function ThemeSettingsPage() {
                                             </div>
                                         )}
                                         <Button size="sm" className="w-full" disabled={installing === theme.id} onClick={() => handleMarketplaceInstall(theme)}>
-                                            {installing === theme.id ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> Installing...</> : <><Download className="w-3 h-3 mr-1.5" /> Install</>}
+                                            {installing === theme.id ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 mr-1.5" /> {t("modules_install")}</>}
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -353,7 +353,7 @@ export default function ThemeSettingsPage() {
 
             <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                    <strong>Upload a theme:</strong> ZIP file must contain a <code className="text-xs bg-background px-1 rounded">theme.json</code> with theme configuration (id, name, colors, fonts).
+                    <strong>{t("theme_uploadLabel")}</strong> {t("theme_uploadHint")} <code className="text-xs bg-background px-1 rounded">theme.json</code> with theme configuration (id, name, colors, fonts).
                     Optionally include a <code className="text-xs bg-background px-1 rounded">components/</code> folder with TSX overrides.
                     After uploading, restart the server to activate the theme.
                 </p>

@@ -28,6 +28,9 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
 export function AdminSpotlight() {
     const router = useRouter();
     const t = useTranslations("common");
+    // The spotlight's own copy lives in the admin namespace; `t` above is the
+    // shared one, for the close button.
+    const at = useTranslations("admin");
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
@@ -116,7 +119,7 @@ export function AdminSpotlight() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={onKeyDown}
-                        placeholder="Search admin pages, users, settings…"
+                        placeholder={at("spotlight_placeholder")}
                         className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
                     />
                     <kbd className="hidden sm:inline px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted rounded">ESC</kbd>
@@ -129,9 +132,9 @@ export function AdminSpotlight() {
                     {loading && results.length === 0 ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">Searching…</div>
                     ) : query.length < 2 ? (
-                        <div className="p-4 text-center text-sm text-muted-foreground">Start typing to search</div>
+                        <div className="p-4 text-center text-sm text-muted-foreground">{at("spotlight_startTyping")}</div>
                     ) : results.length === 0 ? (
-                        <div className="p-4 text-center text-sm text-muted-foreground">No results</div>
+                        <div className="p-4 text-center text-sm text-muted-foreground">{at("spotlight_noResults")}</div>
                     ) : (
                         <div className="py-1">
                             {results.map((r, i) => {
@@ -164,9 +167,9 @@ export function AdminSpotlight() {
                 <div className="border-t border-border px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                         <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">↑↓</kbd>
-                        <span>Navigate</span>
+                        <span>{at("spotlight_navigate")}</span>
                         <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">↵</kbd>
-                        <span>Open</span>
+                        <span>{at("spotlight_open")}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <kbd className="px-1 py-0.5 bg-muted rounded text-[10px]">⌘K</kbd>

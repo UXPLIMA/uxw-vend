@@ -273,7 +273,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
             {/* Mobile hamburger */}
             <button
                 onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
+                aria-label={t("sidebar_openMenu")}
                 className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border shadow-sm flex items-center justify-center"
             >
                 <Menu size={20} />
@@ -290,7 +290,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
 
             {/* Mobile sidebar: stacks icon rail above contextual items */}
             <aside
-                aria-label="Admin navigation"
+                aria-label={t("sidebar_landmark")}
                 className={`lg:hidden fixed top-0 left-0 bottom-0 flex z-50 transition-transform duration-200 bg-card border-r border-border ${
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
@@ -299,7 +299,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                 <div className="w-56 relative">
                     <button
                         onClick={() => setMobileOpen(false)}
-                        aria-label="Close menu"
+                        aria-label={t("sidebar_closeMenu")}
                         className="absolute top-4 right-4 w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center z-10"
                     >
                         <X size={18} />
@@ -310,7 +310,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
 
             {/* Desktop: fixed icon rail + contextual sidebar */}
             <aside
-                aria-label="Admin navigation"
+                aria-label={t("sidebar_landmark")}
                 className="hidden lg:flex fixed top-0 left-0 bottom-0 bg-card border-r border-border z-30"
             >
                 <div className="w-14 border-r border-border bg-background/30">{iconRail}</div>

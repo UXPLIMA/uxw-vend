@@ -116,8 +116,8 @@ export default function NavbarSettingsPage() {
     return (
         <>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Navbar Editor</h1>
-                <p className="text-muted-foreground">Customize navigation links, order, and dropdown menus</p>
+                <h1 className="text-3xl font-bold">{t("navbar_title")}</h1>
+                <p className="text-muted-foreground">{t("navbar_subtitle")}</p>
             </div>
 
             <Card className="mb-6">
@@ -125,8 +125,8 @@ export default function NavbarSettingsPage() {
                     <div className="flex items-center justify-between">
                         <CardTitle>{t("navbar_links")}</CardTitle>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={addLink}><Plus className="w-4 h-4 mr-1" /> Link</Button>
-                            <Button variant="outline" size="sm" onClick={addDropdown}><Plus className="w-4 h-4 mr-1" /> Dropdown</Button>
+                            <Button variant="outline" size="sm" onClick={addLink}><Plus className="w-4 h-4 mr-1" /> {t("navbar_addLink")}</Button>
+                            <Button variant="outline" size="sm" onClick={addDropdown}><Plus className="w-4 h-4 mr-1" /> {t("navbar_addDropdown")}</Button>
                         </div>
                     </div>
                 </CardHeader>
@@ -144,7 +144,7 @@ export default function NavbarSettingsPage() {
                                             <button onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
                                             <button onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
                                         </div>
-                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder="Label" className="flex-1 min-w-0" />
+                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder={t("navbar_labelPlaceholder")} className="flex-1 min-w-0" />
                                         {!isDropdown && (
                                             <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1 min-w-0" />
                                         )}
@@ -176,17 +176,17 @@ export default function NavbarSettingsPage() {
                                     {/* Dropdown children */}
                                     {isDropdown && isExpanded && (
                                         <div className="border-t border-border p-3 bg-card space-y-2">
-                                            <Label className="text-xs text-muted-foreground">Dropdown Items</Label>
+                                            <Label className="text-xs text-muted-foreground">{t("navbar_dropdownItems")}</Label>
                                             {link.children!.map((child, j) => (
                                                 <div key={j} className="flex items-center gap-2 pl-6">
                                                     <span className="text-muted-foreground">└</span>
-                                                    <Input value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder="Sub-item label" className="flex-1" />
+                                                    <Input value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder={t("navbar_subItemPlaceholder")} className="flex-1" />
                                                     <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" className="flex-1" />
                                                     <Button variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>
                                                 </div>
                                             ))}
                                             <Button variant="ghost" size="sm" className="ml-6" onClick={() => addChild(i)}>
-                                                <Plus className="w-3 h-3 mr-1" /> Add Sub-item
+                                                <Plus className="w-3 h-3 mr-1" /> {t("navbar_addSubItem")}
                                             </Button>
                                         </div>
                                     )}
@@ -198,7 +198,7 @@ export default function NavbarSettingsPage() {
             </Card>
 
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : <><Check className="w-4 h-4 mr-2" /> Save Navbar</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("seo_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("navbar_save")}</>}
             </Button>
 
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">

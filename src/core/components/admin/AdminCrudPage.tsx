@@ -160,7 +160,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             case "select":
                 return (
                     <select value={val} onChange={(e) => onChange(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required={field.required}>
-                        <option value="">Select...</option>
+                        <option value="">{ct("crud_selectPlaceholder")}</option>
                         {field.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
                 );
@@ -168,7 +168,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 return (
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" checked={val === "true"} onChange={(e) => onChange(String(e.target.checked))} className="rounded" />
-                        <span className="text-sm">Enabled</span>
+                        <span className="text-sm">{ct("enabled")}</span>
                     </label>
                 );
             case "datetime":
@@ -283,8 +283,8 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">{items.length} items · Page {page}/{totalPages}</span>
                             <div className="flex gap-1">
-                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>Prev</Button>
-                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next</Button>
+                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>{ct("common_prev")}</Button>
+                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>{ct("users_next")}</Button>
                             </div>
                         </div>
                     )}
