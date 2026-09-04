@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **One line in one module manifest could turn the CSRF gate off for the whole
+  API.** A payment provider posting a webhook has no browser and sends no
+  Origin header, so a module marks that endpoint `providerCallback` and core
+  generates a pattern the proxy exempts from the same-origin check. That
+  pattern was built the same way as the module route map, which is a prefix
+  match: right for "this subtree belongs to this module", wrong for "this path
+  needs no origin check". A callback declared at `/[provider]` generated
+  `/^\/api\/v1\/[^\/]+(?:\/|$)/`, which matches `/api/v1/users/me`,
+  `/api/v1/roles`, `/api/v1/settings` and every other route in the product;
+  `/[...path]` matched them all too. The only check on these declarations
+  looked at whether the handler verified a signature, never at how far the
+  exemption reached. Modules install from a ZIP, so the manifest is a trust
+  boundary and this was reachable without touching core. The generated pattern
+  is now anchored to the end of the declared path, `validate-module` refuses a
+  callback whose first segment is dynamic, and a test checks the property both
+  of those exist for: that no route core serves itself is exempt. The one
+  callback that ships today, the Stripe webhook, is at a literal path and was
+  never over-matching.
+
 - **Eleven of the twelve dialogs promised a keyboard behaviour they did not
   have.** `role="dialog"` with `aria-modal="true"` tells assistive technology
   the rest of the page is inert, and nothing in the DOM makes that true. Only
