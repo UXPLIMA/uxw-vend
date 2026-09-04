@@ -13,7 +13,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
-import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
+import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 const DEMO_EMAIL = "admin@example.com";

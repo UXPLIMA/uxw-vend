@@ -27,12 +27,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
+import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import {
     CHALLENGE_FIELD,
     CHALLENGE_PASSED,
     parseChallengeFields,
-    runAuthChallenge,
-} from "@/core/lib/auth-challenge";
+} from "@/core/lib/auth-challenge-shared";
 import { addFilter, removeFilter } from "@/core/lib/hooks";
 
 const ROOT = join(__dirname, "../..");

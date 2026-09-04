@@ -8,7 +8,8 @@ import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { checkPasswordBreach } from "@/core/lib/password-policy";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
-import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
+import { runAuthChallenge } from "@/core/lib/auth-challenge";
+import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
 // Used at signup so the welcome email goes out in the language the visitor

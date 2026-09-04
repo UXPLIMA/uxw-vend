@@ -21,42 +21,17 @@
  * listeners, and `runAuthChallenge` returns the value it was given. The
  * three forms behave exactly as they did.
  *
+ * The names the browser also needs - the field, the action union, the
+ * parser - live in `auth-challenge-shared.ts`, because everything this
+ * file reaches is server-only. See that file for why.
+ *
  * `code` follows the auth error contract: the client looks up `auth.err.<code>`
  * and falls back to a generic message when the key is missing, so a module
  * can return a code core has never heard of and still get a sentence in the
  * user's language if it ships the key itself.
  */
 
-export type AuthChallengeAction = "login" | "register" | "forgotPassword";
-
-export interface AuthChallengeResult {
-    ok: boolean;
-    code: string | null;
-}
-
-/** What every form starts with: nothing to prove. */
-export const CHALLENGE_PASSED: AuthChallengeResult = { ok: true, code: null };
-
-/** The credential/body field the collected challenge fields travel in. */
-export const CHALLENGE_FIELD = "challenge";
-
-/** Parse what the client sent, tolerating absence and nonsense. */
-export function parseChallengeFields(raw: unknown): Record<string, string> {
-    let value = raw;
-    if (typeof value === "string") {
-        try {
-            value = JSON.parse(value);
-        } catch {
-            return {};
-        }
-    }
-    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-    const out: Record<string, string> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-        if (typeof v === "string" && v.length <= 4096) out[k] = v;
-    }
-    return out;
-}
+import { CHALLENGE_PASSED, type AuthChallengeAction, type AuthChallengeResult } from "./auth-challenge-shared";
 
 /**
  * Ask every listener whether this attempt may proceed.

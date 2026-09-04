@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { Slot } from "@/core/components/Slot";
-import type { AuthChallengeAction } from "@/core/lib/auth-challenge";
+import type { AuthChallengeAction } from "@/core/lib/auth-challenge-shared";
 
 /**
  * Where a module gets to put a check in front of an auth form.
