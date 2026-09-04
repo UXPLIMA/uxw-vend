@@ -25,7 +25,10 @@ import {
  */
 export async function GET() {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

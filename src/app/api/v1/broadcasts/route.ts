@@ -10,7 +10,10 @@ import { readJsonBody } from "@/core/lib/api-body";
 /** GET - list broadcasts (admin) */
 export async function GET() {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const broadcasts = await prisma.emailBroadcast.findMany({
@@ -36,7 +39,10 @@ const createSchema = z.object({
 /** POST - create + optionally queue (admin) */
 export async function POST(request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id || !(await isAdmin(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isAdmin(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

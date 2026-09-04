@@ -7,7 +7,10 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
-    if (!session?.user?.id || !(await isStaff(session.user.id, session.user.role))) {
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await isStaff(session.user.id, session.user.role))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
