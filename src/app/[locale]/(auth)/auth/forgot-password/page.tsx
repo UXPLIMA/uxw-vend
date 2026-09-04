@@ -6,6 +6,7 @@ import { Home, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 export default function ForgotPasswordPage() {
     const t = useTranslations('auth');
@@ -30,7 +31,7 @@ export default function ForgotPasswordPage() {
                 setSent(true);
             } else {
                 const data = await res.json();
-                setError(data.error || t('genericError'));
+                setError(authErrorMessage(t, data, t('genericError')));
             }
         } catch {
             setError(t('genericError'));
@@ -93,7 +94,7 @@ export default function ForgotPasswordPage() {
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="you@example.com"
+                                        placeholder={t('emailPlaceholder')}
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required

@@ -24,6 +24,7 @@ import { SessionsTab } from "@/core/components/profile/SessionsTab";
 import { ActivityTab } from "@/core/components/profile/ActivityTab";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 interface UserProfile {
     id: string;
@@ -77,7 +78,7 @@ export default function ProfilePage() {
             const res = await fetch("/api/v1/auth/profile/export");
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || t("failedToExportData"));
+                toast.error(authErrorMessage(authT, body, t("failedToExportData")));
                 return;
             }
             const blob = await res.blob();
@@ -113,7 +114,7 @@ export default function ProfilePage() {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setDeleteError(data.error || t("failedToUpdate"));
+                setDeleteError(authErrorMessage(authT, data, t("failedToUpdate")));
                 return;
             }
             toast.success(t("accountDeleted"));
@@ -174,7 +175,7 @@ export default function ProfilePage() {
             });
             const data = await res.json();
             if (!res.ok) {
-                setProfileError(data.error || t("failedToUpdate"));
+                setProfileError(authErrorMessage(authT, data, t("failedToUpdate")));
                 return;
             }
             setProfileSaved(true);

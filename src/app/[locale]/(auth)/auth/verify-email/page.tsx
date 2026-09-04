@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Home, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 type Status = "verifying" | "success" | "failed";
 
@@ -33,7 +34,7 @@ export default function VerifyEmailPage() {
                     setStatus("failed");
                     try {
                         const data = await res.json();
-                        if (data?.error) setErrorMessage(data.error);
+                        setErrorMessage(authErrorMessage(t, data, t('genericError')));
                     } catch { /* ignore */ }
                 }
             })

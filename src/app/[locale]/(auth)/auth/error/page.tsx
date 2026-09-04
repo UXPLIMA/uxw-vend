@@ -16,10 +16,7 @@ export default function AuthErrorPage() {
             case "Configuration": return t("errorConfiguration");
             case "AccessDenied": return t("errorAccessDenied");
             case "Verification": return t("errorVerification");
-            case "OAuthAccountNotLinked":
-                return t.has("errorOAuthAccountNotLinked")
-                    ? t("errorOAuthAccountNotLinked")
-                    : "This email is already associated with another account. Sign in with the original provider.";
+            case "OAuthAccountNotLinked": return t("errorOAuthAccountNotLinked");
             default: return t("errorDefault");
         }
     })();

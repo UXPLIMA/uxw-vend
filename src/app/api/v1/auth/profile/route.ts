@@ -11,7 +11,7 @@ import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 export async function GET() {
     const session = await auth();
     if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -35,7 +35,7 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -52,29 +52,29 @@ export async function PATCH(request: NextRequest) {
         });
         if (!rl.success) {
             return NextResponse.json(
-                { error: "Too many attempts. Try again later." },
+                { error: "Too many attempts. Try again later.", code: "rate_limited" },
                 { status: 429 },
             );
         }
 
         const validation = updatePasswordSchema.safeParse(body);
         if (!validation.success) {
-            return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+            return NextResponse.json({ error: validation.error.issues[0].message, code: "invalid_input" }, { status: 400 });
         }
 
         const policyCheck = await enforcePasswordPolicy(validation.data.newPassword);
         if (!policyCheck.ok) {
-            return NextResponse.json({ error: policyCheck.message ?? "Invalid password" }, { status: 400 });
+            return NextResponse.json({ error: policyCheck.message ?? "Invalid password", code: "weak_password" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({ where: { id: session.user.id } });
         if (!user?.password) {
-            return NextResponse.json({ error: "Cannot change password for OAuth accounts" }, { status: 400 });
+            return NextResponse.json({ error: "Cannot change password for OAuth accounts", code: "oauth_password_change" }, { status: 400 });
         }
 
         const isValid = await bcrypt.compare(validation.data.currentPassword, user.password);
         if (!isValid) {
-            return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+            return NextResponse.json({ error: "Current password is incorrect", code: "wrong_password" }, { status: 400 });
         }
 
         const hashedPassword = await bcrypt.hash(validation.data.newPassword, BCRYPT_ROUNDS);
@@ -96,7 +96,7 @@ export async function PATCH(request: NextRequest) {
     // Profile update
     const validation = updateUserSchema.safeParse(body);
     if (!validation.success) {
-        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+        return NextResponse.json({ error: validation.error.issues[0].message, code: "invalid_input" }, { status: 400 });
     }
 
     const data: Record<string, unknown> = {};
@@ -105,7 +105,7 @@ export async function PATCH(request: NextRequest) {
             where: { username: validation.data.username, id: { not: session.user.id } },
         });
         if (existing) {
-            return NextResponse.json({ error: "Username already taken" }, { status: 400 });
+            return NextResponse.json({ error: "Username already taken", code: "username_taken" }, { status: 400 });
         }
         data.username = validation.data.username;
     }

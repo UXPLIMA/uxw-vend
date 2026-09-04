@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -48,7 +49,7 @@ export default function RegisterPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || "Registration failed");
+                setError(authErrorMessage(t, data, t('genericError')));
                 return;
             }
 
@@ -99,7 +100,7 @@ export default function RegisterPage() {
                                     id="email"
                                     name="email"
                                     type="email"
-                                    placeholder="you@example.com"
+                                    placeholder={t('emailPlaceholder')}
                                     value={formData.email}
                                     onChange={handleChange}
                                     required
@@ -115,7 +116,7 @@ export default function RegisterPage() {
                                     id="username"
                                     name="username"
                                     type="text"
-                                    placeholder="johndoe"
+                                    placeholder={t('usernamePlaceholder')}
                                     value={formData.username}
                                     onChange={handleChange}
                                     required

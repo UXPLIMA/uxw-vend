@@ -7,6 +7,7 @@ import { Home, CheckCircle } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 export default function ResetPasswordPage() {
     const t = useTranslations('auth');
@@ -46,7 +47,7 @@ export default function ResetPasswordPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || t('genericError'));
+                setError(authErrorMessage(t, data, t('genericError')));
                 return;
             }
 

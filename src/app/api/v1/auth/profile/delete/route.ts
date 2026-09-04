@@ -20,7 +20,7 @@ const deleteSchema = z.object({
 export async function POST(request: Request) {
     const session = await auth();
     if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
     const userId = session.user.id;
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     });
     if (!rl.success) {
         return NextResponse.json(
-            { error: "Too many attempts. Try again later." },
+            { error: "Too many attempts. Try again later.", code: "rate_limited" },
             { status: 429 }
         );
     }
@@ -39,13 +39,13 @@ export async function POST(request: Request) {
     try {
         body = await request.json();
     } catch {
-        return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid JSON", code: "invalid_input" }, { status: 400 });
     }
 
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json(
-            { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+            { error: parsed.error.issues[0]?.message ?? "Invalid input", code: "invalid_input" },
             { status: 400 }
         );
     }
@@ -55,13 +55,14 @@ export async function POST(request: Request) {
         select: { id: true, password: true },
     });
     if (!user) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
+        return NextResponse.json({ error: "User not found", code: "user_not_found" }, { status: 404 });
     }
     if (!user.password) {
         return NextResponse.json(
             {
                 error:
                     "This account signs in via an external provider. Contact support to delete your account.",
+                code: "oauth_account_delete",
             },
             { status: 400 }
         );
@@ -69,13 +70,13 @@ export async function POST(request: Request) {
 
     const passwordOk = await bcrypt.compare(parsed.data.password, user.password);
     if (!passwordOk) {
-        return NextResponse.json({ error: "Incorrect password" }, { status: 400 });
+        return NextResponse.json({ error: "Incorrect password", code: "wrong_password" }, { status: 400 });
     }
 
     const result = await softDeleteUser(userId, "Self-requested deletion");
     if (!result.success) {
         return NextResponse.json(
-            { error: result.error ?? "Failed to delete account" },
+            { error: result.error ?? "Failed to delete account", code: "delete_failed" },
             { status: 500 }
         );
     }

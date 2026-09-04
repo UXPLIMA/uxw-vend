@@ -12,7 +12,7 @@ import { logActivity } from "@/core/lib/activity-log";
 export async function GET(request: Request) {
     const session = await auth();
     if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     });
     if (!rl.success) {
         return NextResponse.json(
-            { error: "Too many export requests. Try again later." },
+            { error: "Too many export requests. Try again later.", code: "rate_limited" },
             { status: 429 }
         );
     }
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
     } catch (err) {
         console.error("[profile-export] failed", err);
         return NextResponse.json(
-            { error: "Failed to build export" },
+            { error: "Failed to build export", code: "export_failed" },
             { status: 500 }
         );
     }

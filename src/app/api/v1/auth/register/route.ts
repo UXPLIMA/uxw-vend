@@ -26,14 +26,14 @@ export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute per IP
     const ip = getClientIP(request.headers);
     const rl = await rateLimit(`register:${ip}`, rateLimits.auth);
-    if (!rl.success) return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+    if (!rl.success) return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
     try {
         const body = await request.json();
 
         const validation = registerSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json(
-                { error: validation.error.issues[0].message },
+                { error: validation.error.issues[0].message, code: "invalid_input" },
                 { status: 400 }
             );
         }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         // configured minimum length, which can only be stricter.
         const policyCheck = await enforcePasswordPolicy(password);
         if (!policyCheck.ok) {
-            return NextResponse.json({ error: policyCheck.message ?? "Invalid password" }, { status: 400 });
+            return NextResponse.json({ error: policyCheck.message ?? "Invalid password", code: "weak_password" }, { status: 400 });
         }
 
         // Optional HIBP breach check (opt-in via PASSWORD_BREACH_CHECK=1).
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         const breach = await checkPasswordBreach(password);
         if (!breach.ok) {
             return NextResponse.json(
-                { error: "This password has appeared in a known data breach - pick something else." },
+                { error: "This password has appeared in a known data breach - pick something else.", code: "password_breached" },
                 { status: 400 },
             );
         }
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
             return NextResponse.json(
-                { error: "Email or username already registered" },
+                { error: "Email or username already registered", code: "already_registered" },
                 { status: 400 }
             );
         }
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
             (error as { code: string }).code === "P2002"
         ) {
             return NextResponse.json(
-                { error: "Email or username already registered" },
+                { error: "Email or username already registered", code: "already_registered" },
                 { status: 400 }
             );
         }
@@ -152,13 +152,13 @@ export async function POST(request: NextRequest) {
         ) {
             console.error("Prisma error code:", (error as { code: string }).code);
             return NextResponse.json(
-                { error: "Database error. Please try again later." },
+                { error: "Database error. Please try again later.", code: "db_error" },
                 { status: 500 }
             );
         }
 
         return NextResponse.json(
-            { error: "Internal server error" },
+            { error: "Internal server error", code: "server_error" },
             { status: 500 }
         );
     }
