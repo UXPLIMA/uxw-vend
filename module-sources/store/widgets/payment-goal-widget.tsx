@@ -62,7 +62,7 @@ export function PaymentGoalWidget() {
 
             {percent >= 100 && (
                 <div className="mt-2 text-center text-xs font-bold text-green-600 bg-green-50 rounded py-1">
-                    Goal Reached!
+                    {sidebarT('goalReached')}
                 </div>
             )}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 
 /**
@@ -23,6 +24,7 @@ interface BlogCategory {
 }
 
 function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): React.ReactElement {
+    const t = useTranslations("blog");
     const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -61,7 +63,7 @@ function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): Re
                     ))}
                 </div>
             ) : categories.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No categories yet.</div>
+                <div className="text-muted-foreground text-sm">{t("noCategories")}</div>
             ) : (
                 <div className={`grid grid-cols-2 ${colClass} gap-4`}>
                     {categories.map((cat) => {

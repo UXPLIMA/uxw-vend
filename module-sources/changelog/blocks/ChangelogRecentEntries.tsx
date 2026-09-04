@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 
 /**
@@ -27,6 +27,7 @@ interface ChangelogEntry {
 }
 
 function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRecentEntriesProps): React.ReactElement {
+    const t = useTranslations("changelog");
     const [entries, setEntries] = useState<ChangelogEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -59,7 +60,7 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
                     ))}
                 </div>
             ) : entries.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No changelog entries yet.</div>
+                <div className="text-muted-foreground text-sm">{t("noEntries")}</div>
             ) : (
                 <ul className="space-y-4">
                     {entries.map((entry) => (

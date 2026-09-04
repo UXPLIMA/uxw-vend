@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The modules' own visitor-facing screens were in English, and no gate
+  watched them.** The public translation gate covered core's `(public)` tree
+  and chrome, the admin gate covered `(admin)`, and everything a module
+  renders to a visitor sat outside both. The whole of the public ticket page
+  was English - the breadcrumb, the sidebar's created and updated rows, the
+  staff badge, the reply box, the login prompt, the loading and error states.
+  So were the referral tab on a user's profile, the custom page's 404, the
+  announcement banner's dismiss button, the store's payment-goal banner and
+  the empty states of four page-builder blocks. Most of the keys already
+  existed in every locale of the module's own manifest: the translations had
+  been written and the components had simply never been wired to them. The
+  gate now walks every module's `pages/public`, `blocks`, `slots`, `widgets`
+  and `components`.
 - **A hundred and fifty form controls had no name a screen reader could
   read.** Each sat under a `<label>` or `<Label>` carrying no `htmlFor` and
   wrapping nothing, next to an input carrying no `id` and no `aria-label`.

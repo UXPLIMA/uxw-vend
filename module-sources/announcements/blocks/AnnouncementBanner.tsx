@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 import { Info, AlertTriangle, CheckCircle, AlertCircle, X } from "lucide-react";
 
@@ -32,6 +33,7 @@ const styleConfig: Record<string, { Icon: typeof Info; color: string }> = {
 };
 
 function AnnouncementBannerBlockRender({ style, dismissible }: AnnouncementBannerProps): React.ReactElement {
+    const t = useTranslations("announcements");
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
     const [dismissed, setDismissed] = useState(false);
 
@@ -82,7 +84,7 @@ function AnnouncementBannerBlockRender({ style, dismissible }: AnnouncementBanne
                         type="button"
                         onClick={() => setDismissed(true)}
                         className="flex-shrink-0 p-1 rounded transition-opacity opacity-50 hover:opacity-100"
-                        aria-label="Dismiss announcement"
+                        aria-label={t("dismiss")}
                     >
                         <X className="w-3.5 h-3.5" />
                     </button>

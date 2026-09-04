@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 import { Crown, Medal, Trophy } from "lucide-react";
 
@@ -32,6 +33,7 @@ function iconFor(type: LeaderboardTopProps["type"]) {
 }
 
 function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): React.ReactElement {
+    const t = useTranslations("leaderboard");
     const [entries, setEntries] = useState<LeaderEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -71,7 +73,7 @@ function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): Re
                     </div>
                 ) : entries.length === 0 ? (
                     <div className="p-6 text-sm text-muted-foreground text-center">
-                        No leaderboard data yet.
+                        {t("noData")}
                     </div>
                 ) : (
                     <ul className="divide-y divide-border">

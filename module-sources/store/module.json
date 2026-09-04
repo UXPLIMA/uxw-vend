@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -765,16 +765,17 @@
         "featured": "Featured"
       },
       "sidebar": {
+        "allTime": "All Time",
         "featuredProduct": "Featured Product",
+        "goalReached": "Goal Reached!",
+        "live": "Live",
+        "paidThisMonth": "Paid {amount} this month",
         "paymentGoal": "Payment Goal",
-        "topCustomer": "Top Customer",
+        "recentPurchases": "Recent Store Purchases",
+        "thisWeek": "This Week",
         "topBuyers": "Top Buyers",
         "topCreditLoaders": "Top Credit Loaders",
-        "recentPurchases": "Recent Store Purchases",
-        "live": "Live",
-        "thisWeek": "This Week",
-        "allTime": "All Time",
-        "paidThisMonth": "Paid {amount} this month",
+        "topCustomer": "Top Customer",
         "viewDetails": "View Details"
       },
       "admin": {
@@ -1292,16 +1293,17 @@
         "featured": "Öne Çıkan"
       },
       "sidebar": {
+        "allTime": "Tüm Zamanlar",
         "featuredProduct": "Öne Çıkan Ürün",
+        "goalReached": "Hedefe ulaşıldı!",
+        "live": "Canlı",
+        "paidThisMonth": "Bu ay {amount} ödedi",
         "paymentGoal": "Ödeme Hedefi",
-        "topCustomer": "En İyi Müşteri",
+        "recentPurchases": "Son Satın Almalar",
+        "thisWeek": "Bu Hafta",
         "topBuyers": "En Çok Satın Alanlar",
         "topCreditLoaders": "En Çok Kredi Yükleyenler",
-        "recentPurchases": "Son Satın Almalar",
-        "live": "Canlı",
-        "thisWeek": "Bu Hafta",
-        "allTime": "Tüm Zamanlar",
-        "paidThisMonth": "Bu ay {amount} ödedi",
+        "topCustomer": "En İyi Müşteri",
         "viewDetails": "Detayları Gör"
       },
       "admin": {
@@ -1767,16 +1769,17 @@
         "featured": "Empfohlen"
       },
       "sidebar": {
+        "allTime": "Alle Zeiten",
         "featuredProduct": "Empfohlenes Produkt",
+        "goalReached": "Ziel erreicht!",
+        "live": "Live",
+        "paidThisMonth": "Diesen Monat {amount} bezahlt",
         "paymentGoal": "Zahlungsziel",
-        "topCustomer": "Bester Kunde",
+        "recentPurchases": "Letzte Einkäufe",
+        "thisWeek": "Diese Woche",
         "topBuyers": "Top-Käufer",
         "topCreditLoaders": "Top-Guthaben-Lader",
-        "recentPurchases": "Letzte Einkäufe",
-        "live": "Live",
-        "thisWeek": "Diese Woche",
-        "allTime": "Alle Zeiten",
-        "paidThisMonth": "Diesen Monat {amount} bezahlt",
+        "topCustomer": "Bester Kunde",
         "viewDetails": "Details anzeigen"
       },
       "admin": {
@@ -2152,16 +2155,17 @@
         "featured": "Destacado"
       },
       "sidebar": {
+        "allTime": "Todo el tiempo",
         "featuredProduct": "Producto destacado",
+        "goalReached": "¡Meta alcanzada!",
+        "live": "En vivo",
+        "paidThisMonth": "Pagó {amount} este mes",
         "paymentGoal": "Meta de pago",
-        "topCustomer": "Mejor cliente",
+        "recentPurchases": "Compras recientes",
+        "thisWeek": "Esta semana",
         "topBuyers": "Mayores compradores",
         "topCreditLoaders": "Mayores cargadores de crédito",
-        "recentPurchases": "Compras recientes",
-        "live": "En vivo",
-        "thisWeek": "Esta semana",
-        "allTime": "Todo el tiempo",
-        "paidThisMonth": "Pagó {amount} este mes",
+        "topCustomer": "Mejor cliente",
         "viewDetails": "Ver detalles"
       },
       "admin": {
@@ -2537,16 +2541,17 @@
         "featured": "En vedette"
       },
       "sidebar": {
+        "allTime": "Tous les temps",
         "featuredProduct": "Produit en vedette",
+        "goalReached": "Objectif atteint !",
+        "live": "En direct",
+        "paidThisMonth": "A payé {amount} ce mois",
         "paymentGoal": "Objectif de paiement",
-        "topCustomer": "Meilleur client",
+        "recentPurchases": "Achats récents",
+        "thisWeek": "Cette semaine",
         "topBuyers": "Meilleurs acheteurs",
         "topCreditLoaders": "Meilleurs chargeurs de crédit",
-        "recentPurchases": "Achats récents",
-        "live": "En direct",
-        "thisWeek": "Cette semaine",
-        "allTime": "Tous les temps",
-        "paidThisMonth": "A payé {amount} ce mois",
+        "topCustomer": "Meilleur client",
         "viewDetails": "Voir les détails"
       },
       "admin": {
@@ -2922,16 +2927,17 @@
         "featured": "Рекомендуемое"
       },
       "sidebar": {
+        "allTime": "За все время",
         "featuredProduct": "Рекомендуемый товар",
+        "goalReached": "Цель достигнута!",
+        "live": "Сейчас",
+        "paidThisMonth": "Оплатил {amount} в этом месяце",
         "paymentGoal": "Цель оплаты",
-        "topCustomer": "Лучший покупатель",
+        "recentPurchases": "Последние покупки",
+        "thisWeek": "На этой неделе",
         "topBuyers": "Лучшие покупатели",
         "topCreditLoaders": "Лучшие по пополнению",
-        "recentPurchases": "Последние покупки",
-        "live": "Сейчас",
-        "thisWeek": "На этой неделе",
-        "allTime": "За все время",
-        "paidThisMonth": "Оплатил {amount} в этом месяце",
+        "topCustomer": "Лучший покупатель",
         "viewDetails": "Подробнее"
       },
       "admin": {
@@ -3307,16 +3313,17 @@
         "featured": "Destaque"
       },
       "sidebar": {
+        "allTime": "Todos os tempos",
         "featuredProduct": "Produto em destaque",
+        "goalReached": "Meta alcançada!",
+        "live": "Ao vivo",
+        "paidThisMonth": "Pagou {amount} este mês",
         "paymentGoal": "Meta de pagamento",
-        "topCustomer": "Melhor cliente",
+        "recentPurchases": "Compras recentes",
+        "thisWeek": "Esta semana",
         "topBuyers": "Maiores compradores",
         "topCreditLoaders": "Maiores carregadores de crédito",
-        "recentPurchases": "Compras recentes",
-        "live": "Ao vivo",
-        "thisWeek": "Esta semana",
-        "allTime": "Todos os tempos",
-        "paidThisMonth": "Pagou {amount} este mês",
+        "topCustomer": "Melhor cliente",
         "viewDetails": "Ver detalhes"
       },
       "admin": {
