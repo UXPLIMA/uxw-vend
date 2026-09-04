@@ -5,7 +5,12 @@ import { safeCall } from "@/core/lib/module-safe-call";
 import { connection } from "next/server";
 import { resolveAppUrl } from "@/core/lib/app-url";
 import { ModuleRoutes } from "@/core/generated/module-registry";
-import { CORE_STATIC_ROUTES, staticModuleRoutes } from "@/core/lib/sitemap-routes";
+import {
+    CORE_STATIC_ROUTES,
+    localeAlternates,
+    localizedPaths,
+    staticModuleRoutes,
+} from "@/core/lib/sitemap-routes";
 
 // This used to be `export const revalidate = 3600`, which made Next prerender
 // the sitemap at BUILD time and serve that copy for the first hour. In a
@@ -42,14 +47,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ) {
         return sitemapMemo.entries;
     }
-    const now = new Date();
-
-    const entries: MetadataRoute.Sitemap = CORE_STATIC_ROUTES.map((r) => ({
-        url: `${siteUrl}${r.path}`,
-        lastModified: now,
-        changeFrequency: r.changeFrequency,
-        priority: r.priority,
-    }));
+    // Every page on this site lives under a locale segment, so a bare path is a
+    // 307 and never a canonical URL. Each path is published once per locale,
+    // and each of those entries carries the `hreflang` alternates that tell a
+    // crawler the others are the same page in another language.
+    //
+    // No `lastModified`: core does not know when a module's page last changed,
+    // and a sitemap that stamps every URL with the generation time teaches a
+    // crawler to ignore the field. A module's own contributor supplies a real
+    // one below.
+    const entries: MetadataRoute.Sitemap = CORE_STATIC_ROUTES.flatMap((r) =>
+        localizedPaths(r.path).map((path) => ({
+            url: `${siteUrl}${path}`,
+            changeFrequency: r.changeFrequency,
+            priority: r.priority,
+            alternates: { languages: localeAlternates(siteUrl, r.path) },
+        })),
+    );
 
     // Only modules that are actually enabled contribute URLs. Keeps the
     // sitemap aligned with what's actually routable on the site.
@@ -63,13 +77,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Every static page an enabled module routes. A module's own contributor
     // below can still add detail URLs core cannot enumerate, and a duplicate
     // there simply overwrites this entry's defaults.
-    for (const path of staticModuleRoutes(ModuleRoutes, enabledStates)) {
-        entries.push({
-            url: `${siteUrl}${path}`,
-            lastModified: now,
-            changeFrequency: "weekly",
-            priority: 0.7,
-        });
+    for (const routePath of staticModuleRoutes(ModuleRoutes, enabledStates)) {
+        for (const path of localizedPaths(routePath)) {
+            entries.push({
+                url: `${siteUrl}${path}`,
+                changeFrequency: "weekly",
+                priority: 0.7,
+                alternates: { languages: localeAlternates(siteUrl, routePath) },
+            });
+        }
     }
 
     for (const seoRoute of ModuleSeoRoutes) {
@@ -92,12 +108,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         );
 
         for (const e of moduleEntries) {
-            entries.push({
-                url: e.url.startsWith("http") ? e.url : `${siteUrl}${e.url.startsWith("/") ? "" : "/"}${e.url}`,
+            const shared = {
                 ...(e.lastModified ? { lastModified: e.lastModified } : {}),
                 ...(e.changeFreq ? { changeFrequency: mapChangeFreq(e.changeFreq) } : {}),
                 ...(typeof e.priority === "number" ? { priority: e.priority } : {}),
-            });
+            };
+
+            // A module names a path, never a locale: it has no way to know
+            // which ones this install serves. An absolute URL is the module
+            // pointing somewhere it owns, so it is published as written.
+            if (e.url.startsWith("http")) {
+                entries.push({ url: e.url, ...shared });
+                continue;
+            }
+
+            const routePath = e.url.startsWith("/") ? e.url : `/${e.url}`;
+            for (const path of localizedPaths(routePath)) {
+                entries.push({
+                    url: `${siteUrl}${path}`,
+                    ...shared,
+                    alternates: { languages: localeAlternates(siteUrl, routePath) },
+                });
+            }
         }
     }
 
