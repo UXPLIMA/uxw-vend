@@ -109,8 +109,8 @@ export default function FormsPage() {
 
     const deleteForm = async (slug: string) => {
         const ok = await confirm({
-            title: t("adm_deleteForm") || "Delete form",
-            message: t("adm_deleteFormConfirm") || "Delete this form and all submissions?",
+            title: t("adm_deleteForm"),
+            message: t("adm_deleteFormConfirm"),
             variant: "danger",
         });
         if (!ok) return;
@@ -134,7 +134,7 @@ export default function FormsPage() {
 
             {showCreate && (
                 <Card className="mb-6">
-                    <CardHeader><CardTitle>{editingSlug ? t("adm_editForm") || "Edit Form" : t("adm_createForm")}</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>{editingSlug ? t("adm_editForm") : t("adm_createForm")}</CardTitle></CardHeader>
                     <CardContent>
                         <form onSubmit={submitForm} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
@@ -169,7 +169,7 @@ export default function FormsPage() {
                                             </select>
                                             <label className="flex items-center gap-1 text-xs">
                                                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(i, { required: e.target.checked })} />
-                                                {t("adm_required") || "Req"}
+                                                {t("adm_required")}
                                             </label>
                                             <Button type="button" variant="ghost" size="sm" onClick={() => removeField(i)}><X className="w-3 h-3" /></Button>
                                         </div>
@@ -179,7 +179,7 @@ export default function FormsPage() {
 
                             <Button type="submit" disabled={saving}>
                                 {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {editingSlug ? t("adm_saveChanges") || "Save Changes" : t("adm_createFormButton") || "Create Form"}
+                                {editingSlug ? t("adm_saveChanges") : t("adm_createFormButton")}
                             </Button>
                         </form>
                     </CardContent>
