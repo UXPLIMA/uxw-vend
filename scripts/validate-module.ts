@@ -1207,6 +1207,76 @@ function checkTitleFromPathIsEarned(modulePath: string): CheckResult {
     return { name, passed: true, message: `${declared.length} route(s) earn their path-derived title` };
 }
 
+/**
+ * Find each `prisma.setting.upsert(...)` / `.create(...)` call and return the
+ * source of its argument, by counting brackets from the opening paren.
+ */
+function settingWriteCalls(body: string): string[] {
+    const out: string[] = [];
+    const re = /prisma\.setting\.(?:upsert|create|createMany)\s*\(/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(body)) !== null) {
+        let depth = 0;
+        let i = m.index + m[0].length - 1;
+        const start = i;
+        for (; i < body.length; i++) {
+            const c = body[i];
+            if (c === "(" || c === "{" || c === "[") depth++;
+            else if (c === ")" || c === "}" || c === "]") {
+                depth--;
+                if (depth === 0) break;
+            }
+        }
+        out.push(body.slice(start, i + 1));
+    }
+    return out;
+}
+
+function checkSettingsAreOwned(modulePath: string): CheckResult {
+    const name = "Settings rows name their module";
+    const offenders: string[] = [];
+
+    const files: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name === "node_modules") continue;
+                walk(full);
+            } else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) {
+                files.push(full);
+            }
+        }
+    })(modulePath);
+
+    for (const file of files) {
+        const body = fs.readFileSync(file, "utf8");
+        for (const call of settingWriteCalls(body)) {
+            // `update` never needs it: the row already exists and keeps the
+            // owner it was created with.
+            if (!/\bcreate\s*:/.test(call) && !/\bdata\s*:/.test(call)) continue;
+            if (/\bmodule\s*:/.test(call)) continue;
+            offenders.push(path.relative(modulePath, file).replace(/\\/g, "/"));
+        }
+    }
+
+    if (offenders.length > 0) {
+        const unique = [...new Set(offenders)];
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} Setting write(s) do not say which module owns the row: ${unique.join(", ")}`,
+            suggestion:
+                'Add `module: "<module id>"` to the create half of the write. Uninstall deletes a module\'s settings by ' +
+                'that column, so an untagged row defaults to "core" and outlives the module that made it, credentials ' +
+                'included. Use `module: "core"` only for a key the module writes on core\'s behalf.',
+        };
+    }
+
+    return { name, passed: true, message: "Every Setting write names an owner" };
+}
+
 function checkSecretChecksLimited(modulePath: string): CheckResult {
     const name = "Secret checks are rate limited";
     const comparesSecret = /bcrypt\.compare\(|verifyToken\(/;
@@ -1441,6 +1511,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),
+        checkSettingsAreOwned(modulePath),
         checkCspOriginsDeclared(modulePath),
         checkHooksEmitted(modulePath),
     ];

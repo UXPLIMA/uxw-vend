@@ -67,7 +67,7 @@ export async function PATCH(request: NextRequest) {
         await prisma.setting.upsert({
             where: { key },
             update: { value: value as string },
-            create: { key, value: value as string },
+            create: { key, value: value as string, module: "store" },
         });
     }
 

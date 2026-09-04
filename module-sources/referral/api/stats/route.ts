@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     await prisma.setting.upsert({
         where: { key: "referral_reward_amount" },
         update: { value: String(rewardAmount) },
-        create: { key: "referral_reward_amount", value: String(rewardAmount) },
+        create: { key: "referral_reward_amount", value: String(rewardAmount), module: "referral" },
     });
 
     return NextResponse.json({ message: "Settings updated" });
