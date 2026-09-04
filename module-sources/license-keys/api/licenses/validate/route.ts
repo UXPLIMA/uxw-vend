@@ -3,11 +3,12 @@
  * without claiming a seat. Same public exposure as activation, same limits.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimits, withRateLimit } from "@/core/sdk/server";
+import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense } from "../../../lib/licenses";
 
 export const POST = withRateLimit(async (request: NextRequest) => {
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";
     if (!key) return NextResponse.json({ valid: false, reason: "missing_fields" }, { status: 400 });
 

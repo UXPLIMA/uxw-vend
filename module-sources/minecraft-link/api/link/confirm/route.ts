@@ -6,7 +6,7 @@
  * substitute a different name into.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimits, withRateLimit } from "@/core/sdk/server";
+import { prisma, rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { doActionAsync } from "@/core/sdk";
 import { auth } from "@/core/sdk/auth";
 import { redeemCode } from "../../../lib/link-code";
@@ -17,7 +17,8 @@ export const POST = withRateLimit(async (request: NextRequest) => {
     const userId = session?.user?.id;
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const code = typeof body.code === "string" ? body.code.trim() : "";
     if (!code) return NextResponse.json({ error: "code_required" }, { status: 400 });
 

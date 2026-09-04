@@ -1,6 +1,6 @@
 /** Editing or removing one product mapping. */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, isAdmin } from "@/core/sdk/server";
+import { prisma, isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 interface RouteParams {
@@ -19,7 +19,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (denied) return denied;
 
     const { id } = await params;
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
     if (typeof body.productId === "string" && body.productId.trim()) data.productId = body.productId.trim();
     if (body.keysPerUnit !== undefined) data.keysPerUnit = Math.max(1, Number(body.keysPerUnit) || 1);

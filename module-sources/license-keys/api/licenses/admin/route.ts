@@ -6,7 +6,7 @@
  * of the admin panel is not a thing this module offers.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, isAdmin, logActivity } from "@/core/sdk/server";
+import { prisma, isAdmin, logActivity, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { issueKeys } from "../../../lib/licenses";
 
@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
     const guard = await requireAdmin();
     if (guard instanceof NextResponse) return guard;
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const count = Math.min(Math.max(Number(body.count) || 1, 1), 500);
 
     const issued = await issueKeys(count, {

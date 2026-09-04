@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { applyFiltersAsync } from "@/core/sdk";
-import { log } from "@/core/sdk/server";
+import { log, readJsonBody } from "@/core/sdk/server";
 import {
     getMercadoPagoConfig,
     mercadoPagoGet,
@@ -39,7 +39,9 @@ export async function POST(request: NextRequest) {
     const config = await getMercadoPagoConfig();
     if (!config) return NextResponse.json({ error: "Mercado Pago is not configured" }, { status: 503 });
 
-    const body = (await request.json().catch(() => ({}))) as Notification;
+    const raw = await readJsonBody(request, { fallback: {} });
+    if (raw instanceof NextResponse) return raw;
+    const body = raw as Notification;
     const kind = body.type ?? body.topic ?? request.nextUrl.searchParams.get("type") ?? "";
     const paymentId = String(body.data?.id ?? request.nextUrl.searchParams.get("data.id") ?? "");
 

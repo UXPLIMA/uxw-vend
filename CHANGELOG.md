@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **No endpoint had a request body limit.** App Router route handlers do not
+  carry the 1 MB cap that Pages API routes shipped with, and nothing else in
+  the stack supplies one, so every JSON endpoint accepted a body of any size
+  and buffered it whole before its own validation could refuse a single field
+  of it. The live demo parsed and answered an 8 MB registration body in 140 ms;
+  the only unusual thing about that request was its size, and concurrency
+  turns it into the heap. `readJsonBody` now reads the body as a stream and
+  abandons it the moment it passes the cap, so an oversized request costs the
+  cap and no more, and a `content-length` that lies or is missing entirely
+  buys nothing. The default is 1 MiB, comfortably above every bound the
+  schemas here set; a route that needs more says `{ maxBytes }`. Thirty routes
+  that read their body with a bare `request.json().catch(...)` were reading
+  without any cap at all, and they now say `{ fallback }` instead, which keeps
+  the optional-body contract and keeps the ceiling. `proxy.ts` refuses
+  anything above 64 MB - past the upload ceiling in `storage.ts` - before a
+  handler runs. A test holds all of it, including the chunked body that
+  declares no length.
+
 - **A bad query string answered 500 instead of 400.** Prisma validates its own
   arguments before it builds any SQL and reports a bad one by throwing, which
   in a route handler is an uncaught 500 with no body. Three parameters reached

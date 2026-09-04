@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
 import { PASSWORD_RESET_EXPIRY, getDurationMs } from "@/core/lib/security-settings";
 import { randomBytes, createHash } from "crypto";
@@ -19,7 +20,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
         }
 
-        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+        const raw = await readJsonBody(request, { fallback: {} });
+        if (raw instanceof NextResponse) return raw;
+        const body = raw as Record<string, unknown>;
         const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 
         // A reset mail is free to send and lands in someone else's inbox, so

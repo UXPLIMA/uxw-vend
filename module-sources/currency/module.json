@@ -2,7 +2,7 @@
   "id": "currency",
   "name": "Multi-Currency",
   "description": "Multi-currency support with automatic conversion",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
