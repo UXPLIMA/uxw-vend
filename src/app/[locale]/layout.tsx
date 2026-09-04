@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { isKnownLocale } from "@/core/lib/i18n/resolve-locale";
 import { buildPageMeta, buildOrganizationJsonLd } from "@/core/lib/seo";
 import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
@@ -69,6 +71,18 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
+  // The proxy's page matcher skips any path containing a dot, which is how it
+  // avoids running on files in /public. Nothing then validated the segment, so
+  // a single-segment URL with a dot in it - `/wp-login.php`, `/index.php`,
+  // `/anything.txt` - matched this layout with that string as the locale and
+  // served the homepage under `<html lang="wp-login.php">`: a 200 for every
+  // scanner probe, endless duplicate content for a crawler, and a language tag
+  // no screen reader can act on.
+  if (!isKnownLocale(locale)) {
+    notFound();
+  }
+
   const messages = await getMessages();
   const commonT = await getTranslations("common");
 
