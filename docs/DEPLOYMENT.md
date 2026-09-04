@@ -398,7 +398,13 @@ Create an API key with the `cron:run` permission in Admin > API Keys, then set u
   -H "x-api-key: YOUR_API_KEY" >> /var/log/uxwvend-cron.log 2>&1
 ```
 
-The cron endpoint runs maintenance tasks registered by installed modules (expiring coupons, closing stale tickets, etc.).
+Each POST is one scheduler tick: every registered job whose interval has
+elapsed runs, core's and the installed modules' alike, and the response names
+the ones that did. Safe to run alongside the in-process ticker, which is on by
+default: both claim a job through the same `CronRun` row and only one of them
+wins an interval, so nothing executes twice. An external cron is worth wiring
+up where the in-process ticker cannot be trusted to keep running, such as a
+host that scales to zero between requests.
 
 ---
 

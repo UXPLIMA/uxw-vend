@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The documented external cron trigger did not drive the scheduler.**
+  `docs/DEPLOYMENT.md` tells an operator to point a system cron at
+  `POST /api/v1/admin/cron` with an API key, and said the endpoint "runs
+  maintenance tasks registered by installed modules (expiring coupons, closing
+  stale tickets, etc.)". It did nothing of the kind. It called
+  `runScheduledTasks()`, a task list living beside the scheduler that knew
+  about one core cleanup and nothing about a registered job, core's or a
+  module's. Only the in-process ticker ever ran those. So an operator who
+  followed the deployment guide, on the sort of host where an in-process
+  ticker is exactly what you cannot rely on, ran none of the jobs they had
+  been told they were running. The endpoint now performs one real tick: every
+  registered job whose interval has elapsed, through the same `CronRun` claim
+  the ticker uses, so the two triggers together can never run a job twice.
+- **Expired password reset and verification tokens were never deleted.** The
+  prune existed, and it was the one thing that stray task list held, so it ran
+  only when someone posted to that endpoint by hand. The admin panel never
+  does: its cron page runs jobs one at a time through
+  `/admin/cron/[key]/run`. Email verification and password reset both write a
+  `VerificationToken`, and both leave the row behind whenever the person never
+  finishes, so the table had been growing since it existed. The prune moved
+  into the daily retention sweep, which is scheduled.
+- **Core pruned a table it does not own.** Retention deleted `WebhookLog` rows
+  behind an `in prisma` guard, because the model belongs to the `webhook-logs`
+  module - and that module has always run its own daily cron over the same
+  table with the same thirty day window. Core was doing a module's work twice
+  a day while naming a model it has no business knowing. Removed; the module
+  keeps its own house.
+
 - **Core's CSP was a fixed list no module could reach.** It named two payment
   gateway origins, `https://api.sandbox.paypal.com` and `https://js.stripe.com`,
   which is core knowing about modules, and it was wrong twice over: both
