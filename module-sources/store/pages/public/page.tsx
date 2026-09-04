@@ -142,9 +142,19 @@ export default function StorePage() {
                     {activeMode && (
                         <>
                             <ChevronRight className="w-4 h-4" />
-                            <span className={`text-foreground capitalize ${activeCategory ? "cursor-pointer hover:text-blue-600" : ""}`} onClick={() => setActiveCategory(null)}>
-                                {activeRootCategory?.name || activeMode}
-                            </span>
+                            {activeCategory ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveCategory(null)}
+                                    className="text-foreground capitalize hover:text-blue-600"
+                                >
+                                    {activeRootCategory?.name || activeMode}
+                                </button>
+                            ) : (
+                                <span className="text-foreground capitalize">
+                                    {activeRootCategory?.name || activeMode}
+                                </span>
+                            )}
                         </>
                     )}
                     {activeCategory && (

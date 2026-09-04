@@ -369,10 +369,12 @@ export default function SetupWizardPage() {
                         ) : (
                             <div className="grid gap-3">
                                 {themes.map(theme => (
-                                    <div
+                                    <button
                                         key={theme.id}
+                                        type="button"
                                         onClick={() => handleSelectTheme(theme.id)}
-                                        className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                                        aria-pressed={selectedTheme === theme.id}
+                                        className={`w-full text-left flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
                                             selectedTheme === theme.id
                                                 ? "border-blue-500 bg-blue-50/50"
                                                 : "border-border hover:border-border"
@@ -381,25 +383,25 @@ export default function SetupWizardPage() {
                                         <div className="flex items-center gap-3">
                                             <Palette className={`w-5 h-5 ${selectedTheme === theme.id ? "text-blue-500" : "text-muted-foreground"}`} />
                                             <div>
-                                                <h4 className="font-medium text-sm">{theme.name}</h4>
+                                                <span className="block font-medium text-sm">{theme.name}</span>
                                                 {theme.description && (
-                                                    <p className="text-xs text-muted-foreground">{theme.description}</p>
+                                                    <span className="block text-xs text-muted-foreground">{theme.description}</span>
                                                 )}
                                                 <div className="flex items-center gap-2 mt-0.5">
-                                                    {theme.author && <span className="text-xs text-muted-foreground">by {theme.author}</span>}
+                                                    {theme.author && <span className="text-xs text-muted-foreground">{t("setup_byAuthor", { author: theme.author })}</span>}
                                                     <span className="text-xs text-muted-foreground">v{theme.version}</span>
                                                     {theme.componentCount > 0 && (
                                                         <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-blue-50 text-blue-600">
-                                                            {theme.componentCount} components
+                                                            {t("setup_componentCount", { count: theme.componentCount })}
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
                                         {selectedTheme === theme.id && (
-                                            <Check className="w-5 h-5 text-blue-500" />
+                                            <Check className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                         )}
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         )}

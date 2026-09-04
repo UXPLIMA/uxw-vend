@@ -1010,6 +1010,8 @@
     "setup_contactEmail": "Iletisim E-postasi",
     "setup_allInstalled": "Tum onerilen moduller zaten kurulu!",
     "setup_noThemes": "Tema mevcut degil. Varsayilan tema kullanilacak.",
+    "setup_byAuthor": "{author} tarafından",
+    "setup_componentCount": "{count} bileşen",
     "setup_goToDashboard": "Gosterge Paneline Git",
     "setup_welcome": "uxwVend'e Hos Geldiniz!",
     "setup_welcomeDesc": "Oyun sunucu platformunuzu birkac hizli adimda kuralim.",

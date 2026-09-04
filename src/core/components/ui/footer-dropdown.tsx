@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface FooterDropdownProps {
@@ -17,20 +17,38 @@ interface FooterDropdownProps {
  */
 export function FooterDropdown({ options, value, onChange, formatLabel }: FooterDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+
+    // The only way to close this was clicking the invisible sheet over the
+    // page, which a keyboard user cannot do. Escape closes it and puts focus
+    // back where it came from.
+    useEffect(() => {
+        if (!isOpen) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== "Escape") return;
+            setIsOpen(false);
+            triggerRef.current?.focus();
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [isOpen]);
 
     return (
         <div className="relative">
             <button
+                ref={triggerRef}
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm min-w-[100px]"
             >
                 <span className="flex-1 text-left">{formatLabel ? formatLabel(value) : value}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" />
             </button>
             {isOpen && (
                 <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
                     <div className="absolute bottom-full left-0 mb-1 w-full bg-zinc-800 border border-zinc-700 rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {options.map((option) => (
                             <button

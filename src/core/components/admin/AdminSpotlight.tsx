@@ -107,10 +107,13 @@ export function AdminSpotlight() {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4 bg-black/50" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4" role="presentation">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} aria-hidden="true" />
             <div
-                className="bg-card rounded-lg shadow-2xl border border-border w-full max-w-xl overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={at("spotlight_placeholder")}
+                className="relative bg-card rounded-lg shadow-2xl border border-border w-full max-w-xl overflow-hidden"
             >
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                     <Search className="w-5 h-5 text-muted-foreground flex-shrink-0" />

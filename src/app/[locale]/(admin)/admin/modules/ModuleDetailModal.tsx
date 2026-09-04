@@ -23,12 +23,17 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
     }, [onClose]);
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-            <div className="relative bg-card border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" role="presentation">
+            <div className="fixed inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="module-detail-title"
+                className="relative bg-card border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+            >
                 <div className="flex items-start justify-between p-5 border-b">
                     <div className="min-w-0">
-                        <h3 className="text-lg font-semibold flex items-center gap-2 flex-wrap">
+                        <h3 id="module-detail-title" className="text-lg font-semibold flex items-center gap-2 flex-wrap">
                             {mod.name}
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground">
                                 v{mod.version}

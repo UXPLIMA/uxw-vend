@@ -30,6 +30,16 @@ export function DashboardCustomizer() {
     const [saving, setSaving] = useState(false);
     const { confirm } = useConfirm();
 
+    // Closing it needed a mouse: the backdrop click was the only way out.
+    useEffect(() => {
+        if (!open) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [open]);
+
     useEffect(() => {
         if (!open) return;
         setLoading(true);
@@ -106,16 +116,13 @@ export function DashboardCustomizer() {
             </Button>
 
             {open && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-                    onClick={() => setOpen(false)}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label={t("customizer_title")}
-                >
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} aria-hidden="true" />
                     <div
-                        className="bg-card rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={t("customizer_title")}
+                        className="relative bg-card rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] flex flex-col"
                     >
                         <div className="p-4 border-b border-border">
                             <h2 className="text-lg font-semibold">{t("customizer_title")}</h2>

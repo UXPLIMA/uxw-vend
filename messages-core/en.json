@@ -1010,6 +1010,8 @@
     "setup_contactEmail": "Contact Email",
     "setup_allInstalled": "All recommended modules are already installed!",
     "setup_noThemes": "No themes available. The default theme will be used.",
+    "setup_byAuthor": "by {author}",
+    "setup_componentCount": "{count} components",
     "setup_goToDashboard": "Go to Dashboard",
     "setup_welcome": "Welcome to uxwVend!",
     "setup_welcomeDesc": "Let's set up your game server platform in a few quick steps.",
