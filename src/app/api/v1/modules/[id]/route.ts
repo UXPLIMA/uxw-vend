@@ -11,6 +11,8 @@ import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
+import { findDependents } from "@/core/lib/module-dependencies";
+import moduleSystem from "@/core/lib/modules";
 
 export async function DELETE(
     _request: NextRequest,
@@ -41,6 +43,25 @@ export async function DELETE(
         const resolvedDir = path.resolve(moduleDir);
         if (!resolvedDir.startsWith(path.resolve(MODULES_DIR) + path.sep)) {
             return NextResponse.json({ error: "Invalid module path" }, { status: 400 });
+        }
+
+        // Disabling refuses while an enabled module depends on this one.
+        // Uninstalling is the more destructive half of the same operation and
+        // had no such check, so removing `store` while `leaderboard` was
+        // installed took `Order` out of the merged Prisma schema and left
+        // `prisma.order` in leaderboard's code: the deferred rebuild then
+        // failed and the site stayed on the last good build with no way
+        // forward. Every module on disk counts here, enabled or not, because
+        // the schema merge and the registry read the filesystem.
+        const dependents = findDependents(moduleId, moduleSystem.getDefinitions());
+        if (dependents.length > 0) {
+            return NextResponse.json(
+                {
+                    error: `Cannot uninstall '${moduleId}': ${dependents.length === 1 ? `module '${dependents[0]}' depends` : `modules ${dependents.map((d) => `'${d}'`).join(", ")} depend`} on it. Uninstall ${dependents.length === 1 ? "it" : "them"} first.`,
+                    dependents,
+                },
+                { status: 400 },
+            );
         }
 
         const exists = await fs.access(moduleDir).then(() => true).catch(() => false);
