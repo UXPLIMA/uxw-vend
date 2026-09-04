@@ -12,7 +12,13 @@
  * made with `Object.create(null)` has no prototype chain, so a key the check
  * ever fails to catch lands as an ordinary own property and nothing further
  * up is touched. `JSON.stringify` and `Object.entries` treat these the same
- * as any other object, which is all either caller does with them.
+ * as any other object.
+ *
+ * They are an accumulator and nothing more. React will not serialize an
+ * object with a null prototype from a Server Component to a Client one, so a
+ * caller that hands its result across that boundary has to give back a plain
+ * copy - `JSON.parse(JSON.stringify(...))` is enough, and the translation
+ * service does it on the way out for that reason.
  */
 
 /** A key that would reach the prototype chain rather than the object. */
