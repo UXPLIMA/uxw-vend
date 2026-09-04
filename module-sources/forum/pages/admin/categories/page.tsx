@@ -149,7 +149,7 @@ export default function AdminForumCategoriesPage() {
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
                                             className="w-10 h-10 rounded cursor-pointer"
                                         />
-                                        <Input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
+                                        <Input value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} aria-label={t("adm_color")} />
                                     </div>
                                 </div>
                                 <div>

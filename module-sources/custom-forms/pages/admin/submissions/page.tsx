@@ -76,6 +76,7 @@ export default function SubmissionsPage() {
                 <select
                     value={filterForm}
                     onChange={(e) => { setFilterForm(e.target.value); setPage(1); }}
+                    aria-label={t("adm_filterByForm")}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                     <option value="">{t("adm_allForms")}</option>

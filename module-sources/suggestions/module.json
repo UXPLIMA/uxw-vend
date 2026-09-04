@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -129,7 +129,8 @@
         "loginToVote": "Log in to vote",
         "loginToSubmit": "Log in to submit a suggestion",
         "deletedUser": "Deleted user",
-        "login": "Log in"
+        "login": "Log in",
+        "visibility": "Visibility"
       },
       "activity": {
         "suggestionCreated": "suggested:"
@@ -191,7 +192,8 @@
         "loginToVote": "Oy vermek için giriş yapın",
         "loginToSubmit": "Öneri göndermek için giriş yapın",
         "deletedUser": "Silinmiş kullanıcı",
-        "login": "Giriş yap"
+        "login": "Giriş yap",
+        "visibility": "Görünürlük"
       },
       "activity": {
         "suggestionCreated": "öneri gönderdi:"

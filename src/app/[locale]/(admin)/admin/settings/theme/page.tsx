@@ -193,6 +193,7 @@ export default function ThemeSettingsPage() {
                         type="file"
                         accept=".zip"
                         onChange={handleUpload}
+                        aria-label={t("theme_upload")}
                         className="hidden"
                     />
                     <Button

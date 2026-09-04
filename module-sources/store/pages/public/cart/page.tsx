@@ -372,7 +372,7 @@ export default function CartPage() {
                                         ) : (
                                             <div className="flex gap-2">
                                                 <Input
-                                                    placeholder={t('enterCode')}
+                                                    placeholder={t('enterCode')} aria-label={t('enterCode')}
                                                     value={couponCode}
                                                     onChange={(e) => setCouponCode(e.target.value)}
                                                     onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
@@ -403,7 +403,7 @@ export default function CartPage() {
                                         ) : (
                                             <div className="flex gap-2">
                                                 <Input
-                                                    placeholder={t('creatorCode')}
+                                                    placeholder={t('creatorCode')} aria-label={t('creatorCode')}
                                                     value={creatorCodeInput}
                                                     onChange={(e) => setCreatorCodeInput(e.target.value)}
                                                     onKeyDown={(e) => e.key === "Enter" && applyCreatorCode()}

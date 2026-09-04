@@ -157,6 +157,7 @@ export default function ReferralPage() {
                                 <div className="flex gap-2">
                                     <Input
                                         readOnly
+                                        aria-label={t("yourLink")}
                                         value={`${typeof window !== "undefined" ? window.location.origin : ""}?ref=${data.referralCode}`}
                                         className="font-mono text-sm"
                                     />
@@ -182,7 +183,7 @@ export default function ReferralPage() {
                             <CardContent>
                                 <div className="flex gap-2">
                                     <Input
-                                        placeholder={t("codePlaceholder")}
+                                        placeholder={t("codePlaceholder")} aria-label={t("codePlaceholder")}
                                         value={referralCodeInput}
                                         onChange={e => setReferralCodeInput(e.target.value)}
                                         onKeyDown={e => e.key === "Enter" && applyCode()}

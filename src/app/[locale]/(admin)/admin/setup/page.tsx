@@ -255,7 +255,7 @@ export default function SetupWizardPage() {
                                     </div>
                                 )}
                                 <div>
-                                    <input type="file" accept="image/*" ref={logoInputRef} className="hidden" onChange={handleLogoChange} />
+                                    <input type="file" accept="image/*" ref={logoInputRef} aria-label={t("setup_uploadLogo")} className="hidden" onChange={handleLogoChange} />
                                     <Button variant="outline" size="sm" onClick={() => logoInputRef.current?.click()}>
                                         <Upload className="w-4 h-4 mr-2" /> {t("setup_uploadLogo")}
                                     </Button>

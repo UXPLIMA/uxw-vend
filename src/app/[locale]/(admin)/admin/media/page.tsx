@@ -163,7 +163,7 @@ export default function MediaLibraryPage() {
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={t("media_searchPlaceholder")}
+                            placeholder={t("media_searchPlaceholder")} aria-label={t("media_searchPlaceholder")}
                             className="pl-8 bg-background"
                         />
                     </div>
@@ -172,6 +172,7 @@ export default function MediaLibraryPage() {
                 <select
                     value={type}
                     onChange={(e) => { setType(e.target.value as "" | "image" | "document"); setPage(1); }}
+                    aria-label={t("media_type")}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                     <option value="">{t("media_allTypes")}</option>
@@ -258,7 +259,7 @@ export default function MediaLibraryPage() {
                                 <div className="col-span-2">
                                     <div className="text-muted-foreground text-xs">{t("media_url")}</div>
                                     <div className="flex gap-2">
-                                        <Input value={selected.url} readOnly className="text-xs font-mono" />
+                                        <Input value={selected.url} readOnly aria-label={t("media_url")} className="text-xs font-mono" />
                                         <Button aria-label={commonT("copy")} variant="outline" size="sm" onClick={() => copyUrl(selected)}>
                                             {copiedId === selected.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                                         </Button>
@@ -270,7 +271,7 @@ export default function MediaLibraryPage() {
                                         value={selected.alt || ""}
                                         onChange={(e) => setSelected({ ...selected, alt: e.target.value })}
                                         onBlur={(e) => updateItem(selected.id, { alt: e.target.value })}
-                                        placeholder={t("media_altPlaceholder")}
+                                        placeholder={t("media_altPlaceholder")} aria-label={t("media_altText")}
                                     />
                                 </div>
                             </div>

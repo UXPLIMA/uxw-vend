@@ -233,7 +233,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                 <Textarea
                                                     value={reply}
                                                     onChange={(e) => setReply(e.target.value)}
-                                                    placeholder={t("replyPlaceholder")}
+                                                    placeholder={t("replyPlaceholder")} aria-label={t("replyPlaceholder")}
                                                     rows={4}
                                                     className="mb-3"
                                                 />

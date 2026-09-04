@@ -78,7 +78,7 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                         <Input
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder={t("search")}
+                            placeholder={t("search")} aria-label={t("search")}
                             className="pl-9"
                         />
                     </div>

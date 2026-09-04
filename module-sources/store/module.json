@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -774,7 +774,8 @@
         "vip_feature": "Feature",
         "vip_popular": "Most popular",
         "vip_subtitle": "Compare what each rank unlocks",
-        "vip_title": "VIP Ranks"
+        "vip_title": "VIP Ranks",
+        "sortBy": "Sort by"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1332,7 +1333,8 @@
         "vip_feature": "Özellik",
         "vip_popular": "En çok tercih edilen",
         "vip_subtitle": "Her rütbenin neler açtığını karşılaştırın",
-        "vip_title": "VIP Rütbeleri"
+        "vip_title": "VIP Rütbeleri",
+        "sortBy": "Sırala"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

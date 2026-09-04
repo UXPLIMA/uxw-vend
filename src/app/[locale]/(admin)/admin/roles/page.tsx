@@ -232,7 +232,7 @@ export default function AdminRolesPage() {
                                         <Input
                                             value={form.color}
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
-                                            placeholder="#6366f1"
+                                            placeholder="#6366f1" aria-label={t("roles_color")}
                                         />
                                     </div>
                                 </div>

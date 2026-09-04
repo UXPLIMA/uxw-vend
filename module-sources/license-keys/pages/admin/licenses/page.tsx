@@ -270,7 +270,7 @@ export default function LicensesPage() {
                 <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder={t("adm_searchPlaceholder")}
+                    placeholder={t("adm_searchPlaceholder")} aria-label={t("adm_searchPlaceholder")}
                     className="max-w-sm"
                 />
             </div>

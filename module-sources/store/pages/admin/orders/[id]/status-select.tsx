@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const statusOptions = ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "REFUNDED"];
 
@@ -19,6 +20,7 @@ interface OrderStatusSelectProps {
 }
 
 export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectProps) {
+    const t = useTranslations("store");
     const [status, setStatus] = useState(currentStatus);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -53,6 +55,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
                 value={status}
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={saving}
+                aria-label={t("adm_status")}
                 className={`text-sm px-3 py-1.5 rounded-md border cursor-pointer ${statusColors[status] || ""}`}
             >
                 {statusOptions.map((s) => (

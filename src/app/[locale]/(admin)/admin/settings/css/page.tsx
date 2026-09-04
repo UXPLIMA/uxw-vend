@@ -51,6 +51,7 @@ export default function CssSettingsPage() {
                         value={css}
                         onChange={(e) => setCss(e.target.value)}
                         placeholder={`/* Your custom CSS here */\n.my-class {\n  color: red;\n}`}
+                        aria-label={t("css_editor")}
                         rows={20}
                         className="w-full font-mono text-sm bg-gray-900 text-green-400 p-4 rounded-lg border-0 resize-y"
                         spellCheck={false}

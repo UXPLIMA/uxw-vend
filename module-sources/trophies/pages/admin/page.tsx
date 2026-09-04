@@ -405,7 +405,7 @@ export default function AdminTrophiesPage() {
                                         <Input
                                             value={form.color}
                                             onChange={(e) => setForm({ ...form, color: e.target.value })}
-                                            placeholder="#f59e0b"
+                                            placeholder="#f59e0b" aria-label={t("color")}
                                         />
                                     </div>
                                 </div>

@@ -116,7 +116,7 @@ export default function AdminModulesPage() {
                             <p className="text-sm text-muted-foreground">{t("modules_uploadDesc")}</p>
                         </div>
                         <div>
-                            <input type="file" accept=".zip" ref={fileInputRef} className="hidden" onChange={handleUpload} />
+                            <input type="file" accept=".zip" ref={fileInputRef} aria-label={t("modules_uploadZip")} className="hidden" onChange={handleUpload} />
                             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
                                 {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("modules_installing")}</> : <><Upload className="w-4 h-4 mr-2" /> {t("modules_uploadZip")}</>}
                             </Button>
@@ -367,6 +367,7 @@ export default function AdminModulesPage() {
                                                 type="checkbox"
                                                 checked={selectedModules.has(mod.id)}
                                                 onChange={() => toggleSelect(mod.id)}
+                                                aria-label={t("common_selectRow")}
                                                 className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                                             />
                                             <span className="text-blue-500"><ModuleIcon name={mod.icon} /></span>

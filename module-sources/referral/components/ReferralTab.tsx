@@ -79,6 +79,7 @@ export function ReferralTab() {
                     <div className="flex gap-2">
                         <Input
                             readOnly
+                            aria-label={t("yourLink")}
                             value={`${typeof window !== "undefined" ? window.location.origin : ""}?ref=${data.referralCode}`}
                             className="font-mono text-xs"
                         />

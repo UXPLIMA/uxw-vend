@@ -320,6 +320,7 @@ export default function StorePage() {
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
+                                aria-label={t('sortBy')}
                                 className="text-sm border border-border rounded-lg px-3 py-1.5 bg-card"
                             >
                                 <option value="newest">{t('newest')}</option>

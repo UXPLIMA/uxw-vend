@@ -2,7 +2,7 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -154,7 +154,8 @@
         "typeTextarea": "Text Area",
         "updateError": "Failed to update form",
         "updated": "Form updated successfully",
-        "viewSubmissions": "View Submissions"
+        "viewSubmissions": "View Submissions",
+        "adm_filterByForm": "Filter by form"
       },
       "admin": {
         "menu_custom-forms": "Custom Forms",
@@ -258,7 +259,8 @@
         "typeTextarea": "Metin Alanı",
         "updateError": "Form güncellenemedi",
         "updated": "Form başarıyla güncellendi",
-        "viewSubmissions": "Gönderimleri Gör"
+        "viewSubmissions": "Gönderimleri Gör",
+        "adm_filterByForm": "Forma göre filtrele"
       },
       "admin": {
         "menu_custom-forms": "Formlar",

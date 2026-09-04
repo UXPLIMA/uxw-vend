@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Role {
     id: string;
@@ -16,6 +17,7 @@ interface UserRoleSelectProps {
 }
 
 export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectProps) {
+    const t = useTranslations("admin");
     const [roleId, setRoleId] = useState(currentRoleId);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -57,6 +59,7 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
                 value={roleId}
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={saving}
+                aria-label={t("users_role")}
                 className={`text-xs px-2 py-1 rounded border ${roleColor} cursor-pointer`}
             >
                 {roles.map((role) => (

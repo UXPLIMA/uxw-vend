@@ -316,6 +316,7 @@ export default function ModerationPage() {
                                 type="checkbox"
                                 checked={selected.size === items.length && items.length > 0}
                                 onChange={toggleAll}
+                                aria-label={t("common_selectAll")}
                                 className="w-4 h-4"
                             />
                             <span className="text-xs text-muted-foreground flex-1">
@@ -360,6 +361,7 @@ export default function ModerationPage() {
                                         type="checkbox"
                                         checked={selected.has(item.id)}
                                         onChange={() => toggleOne(item.id)}
+                                        aria-label={t("common_selectRow")}
                                         className="w-4 h-4 mt-1"
                                     />
                                     <div className="flex-1 min-w-0">
