@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { title, excerpt, content, coverImage, status, publishedAt, publishAt, categoryId, tags } = validation.data;
+    const { title, slug: requestedSlug, excerpt, content, coverImage, status, publishedAt, publishAt, categoryId, tags } = validation.data;
 
     // If publishAt is in the future, force SCHEDULED status
     const publishAtDate = publishAt ? new Date(publishAt) : null;
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         : (effectiveStatus === "PUBLISHED" ? new Date() : null);
 
     // Generate slug from title
-    const slug = body.slug || generateSlug(title);
+    const slug = requestedSlug || generateSlug(title);
 
     // Check if slug already exists
     const existingArticle = await prisma.blogArticle.findUnique({ where: { slug } });

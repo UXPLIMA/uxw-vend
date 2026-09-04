@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, isModuleEnabled, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { productCommandSchema } from "../../lib/validations";
 
 // GET ?productId=xxx
 export async function GET(request: NextRequest) {
@@ -28,8 +29,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { productId, command, order, serverId } = jsonBody;
-    if (!productId || !command) return NextResponse.json({ error: "productId and command required" }, { status: 400 });
+    const parsed = productCommandSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "productId and command required" }, { status: 400 });
+    const { productId, command, order, serverId } = parsed.data;
 
     const cmd = await prisma.productCommand.create({
         data: { productId, command, serverId: serverId || null, order: order || 0 },

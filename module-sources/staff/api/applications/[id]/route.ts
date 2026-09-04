@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { staffApplicationReviewSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -13,7 +14,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { status, adminNote } = jsonBody;
+    const parsed = staffApplicationReviewSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { status, adminNote } = parsed.data;
 
     const data: Record<string, unknown> = {};
     if (status) data.status = status;

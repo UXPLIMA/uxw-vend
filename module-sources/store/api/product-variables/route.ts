@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, isModuleEnabled, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { productVariableSchema } from "../../lib/validations";
 
 // GET ?productId=xxx (public for checkout, admin for all)
 export async function GET(request: NextRequest) {
@@ -23,8 +24,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { productId, name, label, type, required, placeholder, options } = jsonBody;
-    if (!productId || !name || !label) return NextResponse.json({ error: "productId, name, label required" }, { status: 400 });
+    const parsed = productVariableSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "productId, name, label required" }, { status: 400 });
+    const { productId, name, label, type, required, placeholder, options } = parsed.data;
 
     const variable = await prisma.productVariable.create({
         data: {

@@ -7,6 +7,7 @@ import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
 
 // GET /api/v1/auth/profile
 export async function GET() {
@@ -43,7 +44,10 @@ export async function PATCH(request: NextRequest) {
     if (body instanceof NextResponse) return body;
 
     // Password change
-    if (body.currentPassword && body.newPassword) {
+    const passwordFields = z
+        .object({ currentPassword: z.string().optional(), newPassword: z.string().optional() })
+        .safeParse(body);
+    if (passwordFields.success && passwordFields.data.currentPassword && passwordFields.data.newPassword) {
         // `bcrypt.compare` below turns this branch into a password oracle, and
         // one bcrypt round at cost 12 per request is a CPU sink besides. The
         // account deletion route has always had this ceiling; the branch that
@@ -112,8 +116,8 @@ export async function PATCH(request: NextRequest) {
         data.username = validation.data.username;
     }
     if (validation.data.avatar !== undefined) data.avatar = validation.data.avatar;
-    if (body.locale) data.locale = body.locale;
-    if (body.currency) data.currency = body.currency;
+    if (validation.data.locale) data.locale = validation.data.locale;
+    if (validation.data.currency) data.currency = validation.data.currency;
 
     const user = await prisma.user.update({
         where: { id: session.user.id },

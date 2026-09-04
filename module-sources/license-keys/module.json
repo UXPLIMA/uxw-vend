@@ -2,7 +2,7 @@
   "id": "license-keys",
   "name": "License Keys",
   "description": "Generate, deliver and activate license keys for digital products, with a machine limit per key",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.2.0",
   "category": "commerce",
   "author": "uxwVend",

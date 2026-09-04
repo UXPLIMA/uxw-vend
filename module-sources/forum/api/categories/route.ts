@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
 
-    const { name, description, icon, color, order, isActive } = validation.data;
-    const slug = body.slug || generateSlug(name);
+    const { name, slug: requestedSlug, description, icon, color, order, isActive } = validation.data;
+    const slug = requestedSlug || generateSlug(name);
 
     const existing = await prisma.forumCategory.findUnique({ where: { slug } });
     if (existing) {

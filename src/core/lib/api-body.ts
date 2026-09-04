@@ -117,21 +117,26 @@ async function readBoundedText(request: Request, maxBytes: number): Promise<stri
 /**
  * Parse a JSON request body, or the response to return instead.
  *
- * The return type mirrors `Request.json()`, which the DOM lib types as
- * `Promise<any>`. Narrowing it to `unknown` here would be more honest about
- * what arrives on the wire, but it would also push a cast into all hundred
- * and twenty call sites that this helper exists to simplify - and every one
- * of them already validates what it got, with Zod or by hand. The `any` is
- * the same `any` the call sites have today, moved into one place.
+ * The return type is `unknown`, not the `Promise<any>` that `Request.json()`
+ * is typed as. This used to be `any`, on the reasoning that every call site
+ * already validated what it got, with Zod or by hand. That reasoning was
+ * wrong: sixty-two write handlers read a body and never ran a schema over it.
+ * They passed client-supplied values straight into Prisma, where a string
+ * where a number was meant is a 500 rather than a 400, a string with no
+ * declared bound is whatever fits under the size cap, and an object in a
+ * `where` clause is not a value at all but a filter operator.
  *
- * The cost of that is that `any` swallows the union: TypeScript cannot make
- * a caller check the sentinel, and a route that forgot the guard would hand
- * a `NextResponse` to its own validator. `tests/unit/json-body-contract.ts`
- * checks it instead - every call is followed by the guard, or the gate
- * fails.
+ * `unknown` is what actually arrives on the wire, and typing it honestly is
+ * what makes the omission impossible: reaching into the body without
+ * narrowing it first does not compile. The narrowing is a Zod schema, which
+ * most call sites already had.
+ *
+ * It also fixes the sentinel. `any` swallowed the union, so nothing made a
+ * caller check for the 400/413 response and a route that forgot the guard
+ * handed a `NextResponse` to its own validator. With `unknown` the guard is
+ * the only way to get a usable value out.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function readJsonBody(request: Request, options: ReadJsonBodyOptions = {}): Promise<any> {
+export async function readJsonBody(request: Request, options: ReadJsonBodyOptions = {}): Promise<unknown> {
     const text = await readBoundedText(request, options.maxBytes ?? MAX_JSON_BODY_BYTES);
     if (text === null) return NextResponse.json(BODY_TOO_LARGE, { status: 413 });
     try {

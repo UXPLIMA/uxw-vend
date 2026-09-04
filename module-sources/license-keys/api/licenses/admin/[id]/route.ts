@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, isAdmin, logActivity, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { licensePatchSchema } from "../../../../lib/validations";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -21,15 +22,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = licensePatchSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
     const data: Record<string, unknown> = {};
 
-    if (body.status === "active" || body.status === "revoked") data.status = body.status;
-    if (body.note !== undefined) data.note = typeof body.note === "string" ? body.note : null;
-    if (body.maxActivations !== undefined) {
-        data.maxActivations = Math.max(1, Number(body.maxActivations) || 1);
-    }
-    if (body.expiresAt !== undefined) {
-        data.expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
+    if (fields.status !== undefined) data.status = fields.status;
+    if (fields.note !== undefined) data.note = fields.note ?? null;
+    if (fields.maxActivations !== undefined) data.maxActivations = fields.maxActivations;
+    if (fields.expiresAt !== undefined) {
+        data.expiresAt = fields.expiresAt ? new Date(fields.expiresAt) : null;
     }
 
     const license = await prisma.licenseKey.update({ where: { id }, data });

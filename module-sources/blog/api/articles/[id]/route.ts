@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         );
     }
 
-    const { title, excerpt, content, coverImage, status, publishedAt, publishAt, categoryId, tags } = validation.data;
+    const { title, slug: requestedSlug, excerpt, content, coverImage, status, publishedAt, publishAt, categoryId, tags } = validation.data;
 
     // Resolve scheduled-publishing state
     let effectiveStatus = status;
@@ -113,7 +113,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // Generate new slug if title changed
     let slug = article.slug;
     if (title && title !== article.title) {
-        slug = body.slug || generateSlug(title);
+        slug = requestedSlug || generateSlug(title);
         const existingSlug = await prisma.blogArticle.findFirst({
             where: { slug, id: { not: id } },
         });

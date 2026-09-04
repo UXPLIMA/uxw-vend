@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { markReadSchema } from "../lib/validations";
 
 export async function GET() {
     const session = await auth();
@@ -30,7 +31,11 @@ export async function PATCH(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { id, markAllRead } = jsonBody;
+    const parsed = markReadSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { id, markAllRead } = parsed.data;
 
     if (markAllRead) {
         await prisma.notification.updateMany({ where: { userId: session.user.id, isRead: false }, data: { isRead: true } });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../../lib/delivery";
+import { chestRedeemSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -23,14 +24,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
 
+    const parsed = chestRedeemSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const item = await prisma.chestItem.findUnique({ where: { id } });
     if (!item || item.userId !== session.user.id) return NextResponse.json({ error: "Not found" }, { status: 404 });
     if (item.isRedeemed) return NextResponse.json({ error: "Already redeemed" }, { status: 400 });
 
     // Gift to another user
-    if (body.giftTo) {
+    if (fields.giftTo) {
         const target = await prisma.user.findFirst({
-            where: { OR: [{ username: body.giftTo }, { id: body.giftTo }] },
+            where: { OR: [{ username: fields.giftTo }, { id: fields.giftTo }] },
         });
         if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -73,7 +80,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (commands.length > 0) {
-        const playerName = body.playerName || session.user.name || "Player";
+        const playerName = fields.playerName || session.user.name || "Player";
         await deliverProduct({
             playerName,
             productName: item.productName,

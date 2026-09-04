@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { creatorCodeCreateSchema } from "../../lib/validations";
 const CREATOR_DEFAULT_DISCOUNT = 5;
 const CREATOR_DEFAULT_COMMISSION = 10;
 
@@ -33,8 +34,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { code, creatorId, discountPercent, commissionPercent } = jsonBody;
-    if (!code || !creatorId) return NextResponse.json({ error: "Code and creator required" }, { status: 400 });
+    const parsed = creatorCodeCreateSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "Code and creator required" }, { status: 400 });
+    const { code, creatorId, discountPercent, commissionPercent } = parsed.data;
 
     const existing = await prisma.creatorCode.findUnique({ where: { code: code.toUpperCase() } });
     if (existing) return NextResponse.json({ error: "Code already exists" }, { status: 400 });

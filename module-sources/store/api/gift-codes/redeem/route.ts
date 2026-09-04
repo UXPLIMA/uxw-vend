@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { moduleSettings, prisma, rateLimitStrict, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { giftCodeRedeemSchema } from "../../../lib/validations";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
 export async function POST(request: NextRequest) {
@@ -30,11 +31,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { code } = jsonBody;
-
-    if (!code) {
+    const parsed = giftCodeRedeemSchema.safeParse(jsonBody);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
+    const { code } = parsed.data;
 
     const giftCode = await prisma.giftCode.findUnique({
         where: { code: code.trim().toUpperCase() },

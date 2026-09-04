@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { formCreateSchema } from "../lib/validations";
 
 export async function GET() {
     const forms = await prisma.customForm.findMany({
@@ -19,8 +20,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { title, description, fields } = jsonBody;
-    if (!title || !fields) return NextResponse.json({ error: "Title and fields required" }, { status: 400 });
+    const parsed = formCreateSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
+    }
+    const { title, description, fields } = parsed.data;
 
     const slug = generateSlug(title);
     const form = await prisma.customForm.create({

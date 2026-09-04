@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
 import bcrypt from "bcryptjs";
@@ -8,6 +9,17 @@ import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
+
+/**
+ * The three fields a reset carries. `password` is bounded here only so an
+ * absurd one never reaches bcrypt; the policy and breach checks below decide
+ * whether it is acceptable.
+ */
+const resetPasswordSchema = z.object({
+    email: z.string().min(1).max(254),
+    token: z.string().min(1).max(256),
+    password: z.string().min(1).max(200),
+});
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
@@ -20,18 +32,12 @@ export async function POST(request: NextRequest) {
 
         const raw = await readJsonBody(request, { fallback: {} });
         if (raw instanceof NextResponse) return raw;
-        const body = raw as {
-            email?: unknown;
-            token?: unknown;
-            password?: unknown;
-        };
-        const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-        const token = typeof body.token === "string" ? body.token : "";
-        const password = typeof body.password === "string" ? body.password : "";
-
-        if (!email || !token || !password) {
+        const parsed = resetPasswordSchema.safeParse(raw);
+        if (!parsed.success) {
             return NextResponse.json({ error: "Missing required fields", code: "missing_fields" }, { status: 400 });
         }
+        const email = parsed.data.email.trim().toLowerCase();
+        const { token, password } = parsed.data;
 
         const policyCheck = await enforcePasswordPolicy(password);
         if (!policyCheck.ok) {

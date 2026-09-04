@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { bulkDiscountUpdateSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -16,13 +17,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = bulkDiscountUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.name === "string") data.name = body.name;
-    if (typeof body.minQuantity === "number") data.minQuantity = body.minQuantity;
-    if (typeof body.discountPercent === "number") data.discountPercent = body.discountPercent;
-    if (typeof body.productId === "string" || body.productId === null) data.productId = body.productId;
-    if (typeof body.categoryId === "string" || body.categoryId === null) data.categoryId = body.categoryId;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+    if (fields.name !== undefined) data.name = fields.name;
+    if (fields.minQuantity !== undefined) data.minQuantity = fields.minQuantity;
+    if (fields.discountPercent !== undefined) data.discountPercent = fields.discountPercent;
+    if (fields.productId !== undefined) data.productId = fields.productId;
+    if (fields.categoryId !== undefined) data.categoryId = fields.categoryId;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const updated = await prisma.bulkDiscount.update({ where: { id }, data });
     return NextResponse.json({ bulkDiscount: updated });

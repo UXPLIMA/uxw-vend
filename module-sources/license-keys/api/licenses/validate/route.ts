@@ -5,12 +5,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense } from "../../../lib/licenses";
+import { validateSchema } from "../../../lib/validations";
 
 export const POST = withRateLimit("license-validate", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const key = typeof body.key === "string" ? body.key.trim() : "";
-    if (!key) return NextResponse.json({ valid: false, reason: "missing_fields" }, { status: 400 });
+    const parsed = validateSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ valid: false, reason: "missing_fields" }, { status: 400 });
+    const { key } = parsed.data;
 
     const result = await checkLicense(key);
     if (!result.ok) return NextResponse.json({ valid: false, reason: result.reason }, { status: 403 });

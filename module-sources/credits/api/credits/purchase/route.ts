@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { creditPurchaseSchema } from "../../../lib/validations";
 
 // POST /api/v1/credits/purchase - Admin only: add credits to a user
 export async function POST(request: NextRequest) {
@@ -10,11 +11,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { userId, amount } = jsonBody;
-
-    if (!userId || !amount || amount <= 0 || amount > 100000) {
+    const parsed = creditPurchaseSchema.safeParse(jsonBody);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Valid userId and amount (1-100000) required" }, { status: 400 });
     }
+    const { userId, amount } = parsed.data;
 
     const user = await prisma.user.update({
         where: { id: userId },

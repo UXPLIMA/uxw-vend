@@ -48,6 +48,15 @@ export const updateUserSchema = z.object({
         )
         .optional(),
     avatar: z.string().url("Invalid URL").optional().nullable(),
+    /**
+     * The profile route wrote both of these to the user row untyped, so a
+     * signed-in account could store whatever fitted under the body cap in a
+     * column meant for a locale tag and a currency code. Core owns no locale
+     * list here (`i18n/config.ts` does), so this bounds the shape rather than
+     * the vocabulary: a resolver that meets an unknown tag already falls back.
+     */
+    locale: z.string().regex(/^[a-z]{2}(-[A-Za-z0-9]{2,8})?$/, "Invalid locale").optional(),
+    currency: z.string().regex(/^[A-Z]{3}$/, "Invalid currency code").optional(),
 });
 
 export const updatePasswordSchema = z.object({

@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",

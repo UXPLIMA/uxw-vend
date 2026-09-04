@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { licenseProductSchema } from "../../../lib/validations";
 
 async function denyUnlessAdmin(): Promise<NextResponse | null> {
     const session = await auth();
@@ -30,14 +31,17 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const productId = typeof body.productId === "string" ? body.productId.trim() : "";
-    if (!productId) return NextResponse.json({ error: "productId required" }, { status: 400 });
+    const parsed = licenseProductSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { productId } = parsed.data;
 
     const data = {
-        keysPerUnit: Math.max(1, Number(body.keysPerUnit) || 1),
-        maxActivations: Math.max(1, Number(body.maxActivations) || 1),
-        validDays: body.validDays ? Math.max(1, Number(body.validDays)) : null,
-        prefix: typeof body.prefix === "string" && body.prefix ? body.prefix : null,
+        keysPerUnit: parsed.data.keysPerUnit ?? 1,
+        maxActivations: parsed.data.maxActivations ?? 1,
+        validDays: parsed.data.validDays ?? null,
+        prefix: parsed.data.prefix || null,
     };
 
     // Upsert rather than create: mapping the same product twice is a correction,

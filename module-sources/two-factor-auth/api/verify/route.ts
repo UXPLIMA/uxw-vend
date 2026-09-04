@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateBackupCodes, prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { verifyTokenSchema } from "../../lib/validations";
 
 // POST /api/v1/auth/two-factor/verify - Verify token and enable 2FA
 export async function POST(request: NextRequest) {
@@ -24,10 +25,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { token } = jsonBody;
-    if (!token) {
+    const parsed = verifyTokenSchema.safeParse(jsonBody);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
+    const { token } = parsed.data;
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
     if (!user || !user.twoFactorSecret) {

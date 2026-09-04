@@ -19,6 +19,13 @@ import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** Which catalogue module to fetch. The regex checks below still apply. */
+const installModuleSchema = z.object({
+    moduleId: z.string().max(64),
+    zipFile: z.string().max(200),
+});
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
@@ -41,7 +48,8 @@ export async function POST(request: NextRequest) {
     try {
         const jsonBody = await readJsonBody(request);
         if (jsonBody instanceof NextResponse) return jsonBody;
-        const { moduleId, zipFile } = jsonBody;
+        const parsedBody = installModuleSchema.safeParse(jsonBody);
+        const { moduleId, zipFile } = parsedBody.success ? parsedBody.data : { moduleId: "", zipFile: "" };
         if (!moduleId || !zipFile) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }

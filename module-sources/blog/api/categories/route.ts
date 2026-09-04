@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { name, description } = validation.data;
-    const slug = body.slug || generateSlug(name);
+    const { name, slug: requestedSlug, description } = validation.data;
+    const slug = requestedSlug || generateSlug(name);
 
     // Check if slug already exists
     const existingCategory = await prisma.blogCategory.findUnique({ where: { slug } });

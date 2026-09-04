@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { staffApplicationSchema } from "../../lib/validations";
 
 // GET - Admin: all applications, User: own applications
 export async function GET() {
@@ -34,8 +35,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { position, content } = jsonBody;
-    if (!position || !content) return NextResponse.json({ error: "Position and content required" }, { status: 400 });
+    const parsed = staffApplicationSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Position and content required" }, { status: 400 });
+    }
+    const { position, content } = parsed.data;
 
     // Check for existing pending application
     const existing = await prisma.staffApplication.findFirst({

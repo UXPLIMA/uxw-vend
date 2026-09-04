@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { couponValidateSchema } from "../../../lib/validations";
 
 // POST /api/v1/store/coupons/validate - Check coupon validity
 export async function POST(request: NextRequest) {
@@ -25,9 +26,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { code, subtotal } = jsonBody;
-
-    if (!code) return NextResponse.json({ error: "Code required" }, { status: 400 });
+    const parsed = couponValidateSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "Code required" }, { status: 400 });
+    const { code, subtotal } = parsed.data;
 
     const coupon = await prisma.coupon.findUnique({
         where: { code: code.toUpperCase() },

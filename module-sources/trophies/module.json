@@ -2,7 +2,7 @@
   "id": "trophies",
   "name": "Trophies",
   "description": "Achievement badges with rule-based auto-award engine",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",

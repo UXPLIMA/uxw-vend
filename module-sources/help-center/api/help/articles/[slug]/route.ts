@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, moduleSettings, prisma, rateLimitForRole, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { helpArticleUpdateSchema, helpFeedbackSchema } from "../../../../lib/validations";
 
 interface RouteParams {
     params: Promise<{ slug: string }>;
@@ -62,7 +63,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { helpful } = body;
+    const parsedFeedback = helpFeedbackSchema.safeParse(body);
+    if (!parsedFeedback.success) {
+        return NextResponse.json({ error: "Invalid feedback" }, { status: 400 });
+    }
+    const { helpful } = parsedFeedback.data;
 
     const article = await prisma.helpArticle.findUnique({
         where: { slug },
@@ -96,12 +101,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = helpArticleUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.title === "string") data.title = body.title;
-    if (typeof body.slug === "string") data.slug = body.slug;
-    if (typeof body.content === "string") data.content = body.content;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
-    if (typeof body.categoryId === "string") data.categoryId = body.categoryId;
+    if (fields.title !== undefined) data.title = fields.title;
+    if (fields.slug !== undefined) data.slug = fields.slug;
+    if (fields.content !== undefined) data.content = fields.content;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
+    if (fields.categoryId !== undefined) data.categoryId = fields.categoryId;
 
     const updated = await prisma.helpArticle.update({ where: { id: existing.id }, data });
     return NextResponse.json({ article: updated });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { slideUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -22,15 +23,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = slideUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
     // Only fields the request actually carried, so a partial edit does not
     // blank the rest of the slide.
-    if (typeof body.title === "string" || body.title === null) data.title = body.title || null;
-    if (typeof body.subtitle === "string" || body.subtitle === null) data.subtitle = body.subtitle || null;
-    if (typeof body.image === "string" && body.image.length > 0) data.image = body.image;
-    if (typeof body.link === "string" || body.link === null) data.link = body.link || null;
-    if (typeof body.order === "number") data.order = body.order;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+    if (fields.title !== undefined) data.title = fields.title || null;
+    if (fields.subtitle !== undefined) data.subtitle = fields.subtitle || null;
+    if (fields.image !== undefined) data.image = fields.image;
+    if (fields.link !== undefined) data.link = fields.link || null;
+    if (fields.order !== undefined) data.order = fields.order;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const item = await prisma.sliderItem.update({ where: { id }, data });
     return NextResponse.json({ item });

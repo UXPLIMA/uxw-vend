@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { formSubmissionSchema, formUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
@@ -36,8 +37,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { data } = jsonBody;
-    if (!data) return NextResponse.json({ error: "Form data required" }, { status: 400 });
+    const parsed = formSubmissionSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Form data required" }, { status: 400 });
+    }
+    const { data } = parsed.data;
 
     const submission = await prisma.customFormSubmission.create({
         data: {
@@ -79,11 +83,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsedUpdate = formUpdateSchema.safeParse(body);
+    if (!parsedUpdate.success) {
+        return NextResponse.json({ error: "Validation failed", details: parsedUpdate.error.flatten() }, { status: 400 });
+    }
+    const fields = parsedUpdate.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.title === "string") data.title = body.title;
-    if (body.description !== undefined) data.description = body.description;
-    if (Array.isArray(body.fields)) data.fields = body.fields;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+    if (fields.title !== undefined) data.title = fields.title;
+    if (fields.description !== undefined) data.description = fields.description;
+    if (fields.fields !== undefined) data.fields = fields.fields;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const updated = await prisma.customForm.update({ where: { id: form.id }, data });
 

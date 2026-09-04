@@ -4,17 +4,32 @@ import { z } from "zod";
 
 export const forumCategorySchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
-    slug: z.string().min(1).optional(),
-    description: z.string().max(500).optional(),
-    icon: z.string().optional(),
-    color: z.string().optional(),
-    order: z.number().int().optional(),
+    slug: z.string().min(1).max(200).optional(),
+    description: z.string().max(500).optional().nullable(),
+    icon: z.string().max(64).optional().nullable(),
+    color: z.string().max(32).optional().nullable(),
+    order: z.number().int().min(0).max(10_000).optional(),
     isActive: z.boolean().optional(),
+});
+
+/** The PATCH form of the same category: every field optional. */
+export const forumCategoryUpdateSchema = forumCategorySchema.partial();
+
+/**
+ * What a topic's PATCH may carry. The route splits these by role - only the
+ * author writes title/content, only an admin flips the pins - so all four
+ * are optional here and the route still decides who may set which.
+ */
+export const forumTopicUpdateSchema = z.object({
+    title: z.string().min(3).max(200).optional(),
+    content: z.string().min(1).max(50_000).optional(),
+    isPinned: z.boolean().optional(),
+    isLocked: z.boolean().optional(),
 });
 
 export const forumTopicSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters").max(200),
-    slug: z.string().min(1).optional(),
+    slug: z.string().min(1).max(200).optional(),
     content: z.string().min(10, "Content must be at least 10 characters").max(50000, "Content is too long"),
     categoryId: z.string().min(1, "Category is required"),
     isPinned: z.boolean().optional(),

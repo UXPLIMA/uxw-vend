@@ -17,6 +17,15 @@ import { resolveInstallPlan, installPlanErrorMessage, type CatalogEntry } from "
 import { loadMarketplaceCatalog } from "../_catalog";
 import moduleSystem from "@/core/lib/modules";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/**
+ * The ticked modules. Only `id` is read; the catalogue supplies everything
+ * else, so extra fields are ignored rather than refused.
+ */
+const bulkInstallSchema = z.object({
+    modules: z.array(z.object({ id: z.string().max(64) })).min(1).max(50),
+});
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
@@ -117,19 +126,25 @@ export async function POST(request: NextRequest) {
     try {
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { modules } = jsonBody;
-    if (!Array.isArray(modules) || modules.length === 0) {
-        return NextResponse.json({ error: "modules array required" }, { status: 400 });
+    const parsed = bulkInstallSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        // Which of the two refusals it is comes from the issue itself rather
+        // than from re-reading the body: a `too_big` on `modules` is the cap,
+        // anything else is a malformed list.
+        const tooMany = parsed.error.issues.some(
+            (issue) => issue.code === "too_big" && issue.path[0] === "modules",
+        );
+        return NextResponse.json(
+            { error: tooMany ? "Max 50 modules per bulk install" : "modules array required" },
+            { status: 400 },
+        );
     }
-
-    if (modules.length > 50) {
-        return NextResponse.json({ error: "Max 50 modules per bulk install" }, { status: 400 });
-    }
+    const { modules } = parsed.data;
 
     const requestedIds: string[] = [];
     for (const mod of modules) {
-        const id = (mod as { id?: unknown }).id;
-        if (typeof id !== "string" || !/^[a-z0-9-]+$/.test(id)) {
+        const id = mod.id;
+        if (!/^[a-z0-9-]+$/.test(id)) {
             return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
         }
         if (RESERVED_IDS.includes(id)) {

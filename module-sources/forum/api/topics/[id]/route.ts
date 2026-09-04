@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { forumPostSchema } from "../../../lib/validations";
+import { forumPostSchema, forumTopicUpdateSchema } from "../../../lib/validations";
 import { denyGuestView } from "../../../lib/guest-view";
 
 type ModerationSettingValue = {
@@ -106,7 +106,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const validation = forumPostSchema.safeParse({ ...body, topicId: id });
+    // `topicId` comes from the path, not the body, so it is omitted here
+    // rather than spread in: a body is `unknown` until a schema narrows it.
+    const validation = forumPostSchema.omit({ topicId: true }).safeParse(body);
 
     if (!validation.success) {
         return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
@@ -179,11 +181,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const parsedPatch = forumTopicUpdateSchema.safeParse(body);
+    if (!parsedPatch.success) {
+        return NextResponse.json({ error: parsedPatch.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsedPatch.data;
+
     const data: Record<string, unknown> = {};
-    if (isAuthor && body.title) data.title = body.title;
-    if (isAuthor && body.content) data.content = sanitizeHtml(body.content);
-    if (adminCheck && body.isPinned !== undefined) data.isPinned = body.isPinned;
-    if (adminCheck && body.isLocked !== undefined) data.isLocked = body.isLocked;
+    if (isAuthor && fields.title) data.title = fields.title;
+    if (isAuthor && fields.content) data.content = sanitizeHtml(fields.content);
+    if (adminCheck && fields.isPinned !== undefined) data.isPinned = fields.isPinned;
+    if (adminCheck && fields.isLocked !== undefined) data.isLocked = fields.isLocked;
 
     // Only snapshot on content-meaningful edits (title / content), not pin/lock toggles
     if (data.title !== undefined || data.content !== undefined) {

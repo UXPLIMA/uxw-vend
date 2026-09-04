@@ -4,21 +4,24 @@ import { z } from "zod";
 
 export const ticketDepartmentSchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
-    description: z.string().max(500).optional(),
-    color: z.string().optional(),
-    order: z.number().int().optional(),
+    description: z.string().max(500).optional().nullable(),
+    color: z.string().max(32).optional().nullable(),
+    order: z.number().int().min(0).max(10_000).optional(),
     isActive: z.boolean().optional(),
 });
+
+/** The PATCH form: every field optional. */
+export const ticketDepartmentUpdateSchema = ticketDepartmentSchema.partial();
 
 export const ticketSchema = z.object({
     subject: z.string().min(3, "Subject must be at least 3 characters").max(200),
     departmentId: z.string().min(1, "Department is required"),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
-    message: z.string().min(10, "Message must be at least 10 characters"),
+    message: z.string().min(10, "Message must be at least 10 characters").max(20_000),
 });
 
 export const ticketMessageSchema = z.object({
-    content: z.string().min(1, "Message is required"),
+    content: z.string().min(1, "Message is required").max(20_000),
     ticketId: z.string().min(1),
     attachments: z.array(z.string().url()).optional(),
 });

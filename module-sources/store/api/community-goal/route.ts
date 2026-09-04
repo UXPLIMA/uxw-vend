@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { communityGoalSchema } from "../../lib/validations";
 
 // GET /api/v1/community-goal - Public endpoint
 export async function GET() {
@@ -58,10 +59,16 @@ export async function PATCH(request: NextRequest) {
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
+    const parsed = communityGoalSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const updates: { key: string; value: unknown }[] = [];
-    if (body.target !== undefined) updates.push({ key: "community_goal_target", value: body.target });
-    if (body.title !== undefined) updates.push({ key: "community_goal_title", value: body.title });
-    if (body.endDate !== undefined) updates.push({ key: "community_goal_end_date", value: body.endDate });
+    if (fields.target !== undefined) updates.push({ key: "community_goal_target", value: fields.target });
+    if (fields.title !== undefined) updates.push({ key: "community_goal_title", value: fields.title });
+    if (fields.endDate !== undefined) updates.push({ key: "community_goal_end_date", value: fields.endDate });
 
     for (const { key, value } of updates) {
         await prisma.setting.upsert({

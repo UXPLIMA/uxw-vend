@@ -8,6 +8,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Sixty-two write handlers that never validated the request body.**
+  `readJsonBody` was typed to return `any`, on the reasoning - written into its
+  own doc comment - that every call site validated what it got, with Zod or by
+  hand. That reasoning was wrong. Across core and the modules, sixty-two POST
+  and PATCH handlers read a field off the body and passed it straight to
+  Prisma. What that costs is not theoretical: a value in a column typed `Int`
+  is a 500 rather than a 400 when it arrives as a string, a string field with
+  no declared bound stores whatever fits under the 1 MiB body cap, and an
+  object reaching a `where` clause is not a value at all but a filter operator.
+
+  The return type is now `unknown`, which turns the omission into a compile
+  error at every call site rather than a bug someone has to notice. Every one
+  of the handlers has been given a schema that encodes what it already
+  accepted, plus bounds - nothing that was optional became required, so a
+  request that worked before still works, and one that used to produce a 500
+  now produces a 400 that says what was wrong.
+
+  The worst of them: `POST /api/v1/servers` read nine fields, including three
+  port numbers and an RCON password headed for `encryptSecret`, with no checks
+  at all, and `name`/`host` were required by the database rather than by the
+  route. `POST /api/v1/linked-accounts` stored four user-controlled strings
+  with no ceiling on any of them, per provider named. A custom form's `fields`
+  and a submission's `data` were arbitrary JSON, so a form could be saved in a
+  shape its own public page cannot render. `punishments` passed `playerName`
+  into a Prisma `where: { username }` lookup, and `in-app-notifications` passed
+  `id` into a `where` clause, both untyped. `credits/purchase` accepted a
+  fractional or string `amount` past its own hand-written bounds check. The
+  profile endpoint wrote `locale` and `currency` to the user row untyped.
+  Mercado Pago's webhook cast its notification to an interface instead of
+  checking it, so an object where a payment id belonged became the string
+  "[object Object]" and was looked up against the provider on every retry.
+
+  `tests/unit/bodies-are-narrowed.test.ts` holds the line the compiler cannot:
+  that the declared return type stays `unknown`, and that no route buys its way
+  past it with a cast. Eight routes were doing exactly that, including three on
+  the auth and 2FA paths, and now parse a schema instead.
+
 - **Sixteen module settings that nothing read.** Five modules declared a
   `defaultConfig` bag - blog, forum, help-center, store, tickets - and not one
   of the sixteen keys in it was read anywhere in the product. The field could

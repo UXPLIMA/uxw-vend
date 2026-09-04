@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { customPageUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ slug: string }> };
 
@@ -26,11 +27,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const page = await prisma.customPage.findFirst({ where: { OR: [{ slug }, { id: slug }] } });
     if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
 
+    const parsed = customPageUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Validation failed", details: parsed.error.flatten() }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (body.title !== undefined) data.title = body.title;
-    if (body.content !== undefined) data.content = sanitizeHtml(body.content);
-    if (body.isActive !== undefined) data.isActive = body.isActive;
-    if (body.order !== undefined) data.order = body.order;
+    if (fields.title !== undefined) data.title = fields.title;
+    if (fields.content !== undefined) data.content = sanitizeHtml(fields.content);
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
+    if (fields.order !== undefined) data.order = fields.order;
 
     // Snapshot the previous state before update
     const { recordRevision } = await import("@/core/sdk/server");

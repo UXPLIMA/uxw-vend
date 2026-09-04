@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { suggestionUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -15,15 +16,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const suggestion = await prisma.suggestion.findUnique({ where: { id } });
     if (!suggestion) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    const parsed = suggestionUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const adminCheck = await isAdmin(session.user.id);
     const data: Record<string, unknown> = {};
 
     // Admin can change status
-    if (adminCheck && body.status) data.status = body.status;
+    if (adminCheck && fields.status) data.status = fields.status;
     // Author can edit content
     if (suggestion.authorId === session.user.id) {
-        if (body.title) data.title = body.title;
-        if (body.content) data.content = body.content;
+        if (fields.title) data.title = fields.title;
+        if (fields.content) data.content = fields.content;
     }
 
     if (Object.keys(data).length === 0) {

@@ -7,6 +7,16 @@ import { themeRegistry } from "@/core/generated/theme-registry";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/**
+ * A bag of theme setting values. The values themselves stay `unknown`:
+ * `sanitizeByType` below decides what each one may be from the theme's own
+ * field declaration, and a value it does not recognise is dropped.
+ */
+const themeSettingsSchema = z.object({
+    values: z.record(z.string().max(128), z.unknown()),
+});
 
 function sanitizeByType(def: ThemeFieldDef, value: unknown): unknown {
     switch (def.type) {
@@ -51,12 +61,13 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string;
 
     const body = await readJsonBody(req);
     if (body instanceof NextResponse) return body;
-    if (!body.values || typeof body.values !== "object") {
+    const parsed = themeSettingsSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ error: "values required" }, { status: 400 });
     }
 
     const ops = [];
-    for (const [key, raw] of Object.entries(body.values)) {
+    for (const [key, raw] of Object.entries(parsed.data.values)) {
         const def = groupDef.fields[key];
         if (!def) continue;
         const clean = sanitizeByType(def, raw);

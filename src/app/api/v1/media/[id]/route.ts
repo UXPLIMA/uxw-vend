@@ -5,6 +5,13 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** The two fields a media item's record may be renamed by. */
+const updateMediaSchema = z.object({
+    alt: z.string().max(500).optional(),
+    filename: z.string().max(255).optional(),
+});
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -21,9 +28,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsed = updateMediaSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
+    }
     const data: Record<string, unknown> = {};
-    if (typeof body.alt === "string") data.alt = body.alt;
-    if (typeof body.filename === "string") data.filename = body.filename;
+    if (parsed.data.alt !== undefined) data.alt = parsed.data.alt;
+    if (parsed.data.filename !== undefined) data.filename = parsed.data.filename;
 
     const item = await prisma.mediaItem.update({ where: { id }, data });
     return NextResponse.json(item);

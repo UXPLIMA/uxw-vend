@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { helpCategoryUpdateSchema } from "../../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -16,13 +17,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = helpCategoryUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.name === "string") data.name = body.name;
-    if (typeof body.slug === "string") data.slug = body.slug;
-    if (typeof body.description === "string" || body.description === null) data.description = body.description;
-    if (typeof body.icon === "string" || body.icon === null) data.icon = body.icon;
-    if (typeof body.order === "number") data.order = body.order;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+    if (fields.name !== undefined) data.name = fields.name;
+    if (fields.slug !== undefined) data.slug = fields.slug;
+    if (fields.description !== undefined) data.description = fields.description;
+    if (fields.icon !== undefined) data.icon = fields.icon;
+    if (fields.order !== undefined) data.order = fields.order;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const updated = await prisma.helpCategory.update({ where: { id }, data });
     return NextResponse.json({ category: updated });

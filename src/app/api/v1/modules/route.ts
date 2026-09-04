@@ -15,6 +15,19 @@ import path from "path";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
 import { resolveSettings, settingDeclarations, validateSettingsInput } from "@/core/lib/module-settings";
+import { z } from "zod";
+
+/**
+ * Toggling or configuring one module. `config` stays `unknown` here on
+ * purpose - `validateSettingsInput` checks it against that module's own
+ * declarations, which this schema cannot know.
+ */
+const patchModuleSchema = z.object({
+    moduleId: z.string().max(64),
+    enabled: z.boolean().optional(),
+    config: z.unknown().optional(),
+    force: z.boolean().optional(),
+});
 
 
 // Cache marketplace index for update checks
@@ -101,14 +114,15 @@ export async function PATCH(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { moduleId, enabled, config } = body;
-
-    if (!moduleId) {
+    const parsedBody = patchModuleSchema.safeParse(body);
+    if (!parsedBody.success) {
         return NextResponse.json({ error: "Module ID required" }, { status: 400 });
     }
+    const { moduleId, enabled, config } = parsedBody.data;
+
     // Module ids are slugs. Validate before the value is used in log output or
     // filesystem paths (the onEnable/onDisable hook resolution below).
-    if (typeof moduleId !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(moduleId)) {
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(moduleId)) {
         return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
     }
 
@@ -176,7 +190,7 @@ export async function PATCH(request: NextRequest) {
         });
 
         if (dependents.length > 0) {
-            const force = body.force === true;
+            const force = parsedBody.data.force === true;
             if (!force) {
                 return NextResponse.json({
                     error: `Cannot disable '${moduleId}': module '${dependents[0]}' depends on it`,

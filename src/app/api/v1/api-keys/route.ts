@@ -7,6 +7,18 @@ import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/**
+ * A new API key. `expiresAt` used to reach `new Date(...)` untyped, and an
+ * unparseable value there is an Invalid Date that Prisma rejects with a 500
+ * rather than a 400.
+ */
+const createApiKeySchema = z.object({
+    name: z.string().trim().min(1, "Name required").max(100),
+    permissions: z.array(z.string().max(128)).max(200).optional(),
+    expiresAt: z.iso.datetime({ offset: true }).optional().nullable(),
+});
 
 export async function GET() {
     const session = await auth();
@@ -37,8 +49,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { name, permissions, expiresAt } = jsonBody;
-    if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
+    const parsed = createApiKeySchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Name required" }, { status: 400 });
+    }
+    const { name, permissions, expiresAt } = parsed.data;
 
     const rawKey = `uxw_${randomBytes(24).toString("hex")}`;
     const keyPrefix = rawKey.slice(0, 12);

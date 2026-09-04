@@ -8,17 +8,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense, releaseActivation } from "../../../lib/licenses";
+import { activateSchema, releaseSchema } from "../../../lib/validations";
 
 export const POST = withRateLimit("license-activate", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const key = typeof body.key === "string" ? body.key.trim() : "";
-    const machineId = typeof body.machineId === "string" ? body.machineId.trim() : "";
-    const label = typeof body.label === "string" ? body.label.slice(0, 100) : null;
-
-    if (!key || !machineId) {
+    const parsed = activateSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ valid: false, reason: "missing_fields" }, { status: 400 });
     }
+    const { key, machineId } = parsed.data;
+    const label = parsed.data.label ?? null;
 
     const result = await checkLicense(key, { machineId, label });
     if (!result.ok) {
@@ -39,10 +39,10 @@ export const POST = withRateLimit("license-activate", async (request: NextReques
 export const DELETE = withRateLimit("license-release", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const key = typeof body.key === "string" ? body.key.trim() : "";
-    const machineId = typeof body.machineId === "string" ? body.machineId.trim() : "";
-    if (!key || !machineId) {
+    const parsed = releaseSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ released: false, reason: "missing_fields" }, { status: 400 });
     }
+    const { key, machineId } = parsed.data;
     return NextResponse.json({ released: await releaseActivation(key, machineId) });
 }, rateLimits.auth);

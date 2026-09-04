@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
 import { PASSWORD_RESET_EXPIRY, getDurationMs } from "@/core/lib/security-settings";
@@ -6,9 +7,15 @@ import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
-import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
+import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
 
 const GENERIC_OK = { message: "If an account exists, a reset link has been sent." };
+
+/** The one field this endpoint reads. The challenge payload rides alongside it
+ * and is read by `challengeFieldsFrom`, which owns that shape. */
+const forgotPasswordSchema = z.object({
+    email: z.string().max(254).optional(),
+});
 
 // POST /api/v1/auth/forgot-password
 export async function POST(request: NextRequest) {
@@ -22,8 +29,11 @@ export async function POST(request: NextRequest) {
 
         const raw = await readJsonBody(request, { fallback: {} });
         if (raw instanceof NextResponse) return raw;
-        const body = raw as Record<string, unknown>;
-        const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+        // A body that does not fit is treated as an empty one rather than
+        // refused: this endpoint answers the same generic success either way,
+        // and a shape-specific error would be the signal it exists to withhold.
+        const parsed = forgotPasswordSchema.safeParse(raw);
+        const email = parsed.success ? (parsed.data.email ?? "").trim().toLowerCase() : "";
 
         // A reset mail is free to send and lands in someone else's inbox, so
         // a challenge module gets a say here too. The refusal keeps the same
@@ -31,7 +41,7 @@ export async function POST(request: NextRequest) {
         // whether an address exists.
         const challenge = await runAuthChallenge({
             action: "forgotPassword",
-            fields: parseChallengeFields(body[CHALLENGE_FIELD]),
+            fields: challengeFieldsFrom(raw),
             ip,
         });
         if (!challenge.ok) {
