@@ -60,7 +60,7 @@ describe("catch-all segments", () => {
 describe("admin message scoping", () => {
     it("trims the admin namespace in the locale layout", () => {
         const layout = fs.readFileSync(path.join(root, "src/app/[locale]/layout.tsx"), "utf8");
-        expect(layout).toContain("withoutAdminNamespaces(messages)");
+        expect(layout).toContain("publicMessages(messages)");
     });
 
     it("re-provides the full catalogue in the admin layout", () => {

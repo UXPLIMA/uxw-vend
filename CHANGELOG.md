@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   naming a field type rather than by shipping a component.
 
 ### Changed
+- **A public page no longer ships a module's admin copy either.** Dropping the
+  core `admin` namespace left the operator wording modules ship, because a
+  module owns one namespace and puts both its storefront and its admin screen
+  in it - the whole `store` catalogue, `adm_products` and all, went to every
+  visitor. `publicMessages()` (was `withoutAdminNamespaces`) now also drops the
+  `setup` namespace, which only the first-install wizard renders, and every key
+  a module prefixes `adm_`. The public catalogue went from 36KB to 25KB. The
+  setup wizard gets its own layout that re-provides the full catalogue, the way
+  the admin tree already did, and `validate-module` fails a module that renders
+  an `adm_` key outside `pages/admin/` so the prefix keeps meaning what core
+  assumes it means.
+- **The skip-to-content link is translated.** It was the one string in the
+  locale layout still written in English inline, so a Turkish visitor tabbing
+  into the page got "Skip to content".
 - **A public page no longer ships the admin panel's copy.** The locale layout
   handed the whole message catalogue to the client provider, and the `admin`
   namespace is around four fifths of it: every visitor downloaded 42KB of
@@ -33,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing entry, and a manifest that omits it behaves exactly as before.
 
 ### Fixed
+- **The Redis rate limiter's expiry test was flaky.** It opened a 20ms window
+  and slept 30ms; a loaded machine took longer than 20ms to get between the two
+  awaits inside the window, so the second request started a fresh window and
+  the test read a limiter that never blocks. The fake server's clock is now
+  driven by the test rather than by wall time.
 - **The sitemap listed four URLs and none of the site's content.** Core routes
   the home and activity screens; everything a visitor comes for is a module
   page, and a module reached the sitemap only by declaring a `seo`

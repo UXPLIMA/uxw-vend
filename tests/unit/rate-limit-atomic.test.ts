@@ -28,6 +28,15 @@ interface Entry {
 
 const store = new Map<string, Entry>();
 
+/**
+ * The fake server's clock. Left null it is the wall clock; a test that wants a
+ * window to expire sets it and moves it forward. Sleeping for a real 20ms
+ * window instead made the expiry test fail whenever a loaded machine took
+ * longer than the window to get between two awaits.
+ */
+let serverClock: number | null = null;
+const serverNow = () => serverClock ?? Date.now();
+
 /** One network round trip: control returns to the event loop exactly once. */
 const roundTrip = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -42,7 +51,7 @@ const fakeRedis = {
         await roundTrip();
         store.set(key, {
             value: Number(value),
-            expiresAt: options?.PX ? Date.now() + options.PX : null,
+            expiresAt: options?.PX ? serverNow() + options.PX : null,
         });
         return "OK";
     }),
@@ -53,13 +62,13 @@ const fakeRedis = {
         const key = options?.keys?.[0] as string;
         const windowMs = Number(options?.arguments?.[0]);
         const existing = store.get(key);
-        const live = existing && (existing.expiresAt === null || existing.expiresAt > Date.now());
+        const live = existing && (existing.expiresAt === null || existing.expiresAt > serverNow());
         const entry: Entry = live
             ? existing!
-            : { value: 0, expiresAt: Date.now() + windowMs };
+            : { value: 0, expiresAt: serverNow() + windowMs };
         entry.value += 1;
         store.set(key, entry);
-        const ttl = entry.expiresAt === null ? -1 : entry.expiresAt - Date.now();
+        const ttl = entry.expiresAt === null ? -1 : entry.expiresAt - serverNow();
         return [entry.value, ttl];
     }),
     del: vi.fn(),
@@ -77,6 +86,7 @@ vi.mock("@/core/lib/redis", () => ({
 beforeEach(() => {
     vi.resetModules();
     store.clear();
+    serverClock = null;
     fakeRedis.eval.mockClear();
     process.env.REDIS_URL = "redis://stub:6379";
 });
@@ -118,12 +128,13 @@ describe("Redis rate-limit backend", () => {
     it("expires the window rather than blocking forever", async () => {
         const { rateLimit } = await import("@/core/lib/rate-limit");
         const id = "expiry-" + Math.random().toString(36).slice(2, 10);
-        const config = { maxRequests: 1, windowMs: 20 };
+        const config = { maxRequests: 1, windowMs: 20_000 };
 
+        serverClock = Date.now();
         expect((await rateLimit(id, config)).success).toBe(true);
         expect((await rateLimit(id, config)).success).toBe(false);
 
-        await new Promise((resolve) => setTimeout(resolve, 30));
+        serverClock += 20_001;
 
         expect((await rateLimit(id, config)).success).toBe(true);
     });

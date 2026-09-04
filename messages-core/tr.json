@@ -43,7 +43,8 @@
     "replace": "Değiştir",
     "uploadFailed": "Yükleme başarısız",
     "fileUploaded": "Dosya yüklendi",
-    "notifications": "Bildirimler"
+    "notifications": "Bildirimler",
+    "skipToContent": "İçeriğe atla"
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
