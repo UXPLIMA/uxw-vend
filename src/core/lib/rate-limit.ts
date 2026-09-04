@@ -86,6 +86,31 @@ function warnRedisFallback(reason: string): void {
     console.error(`[rate-limit] Redis unavailable (${reason}) - serving requests with in-memory fallback. Counts are NOT shared across workers.`);
 }
 
+/**
+ * One INCR, one PEXPIRE on the first hit of a window, one PTTL to report when
+ * it resets - all inside a single server-side script, so a burst of parallel
+ * requests is counted once per request. The previous GET-then-SET pair read
+ * and wrote the count in two round trips: ten simultaneous requests all read
+ * the same number and all wrote it back plus one, recording nine fewer hits
+ * than happened. A burst is precisely what a rate limiter is for.
+ *
+ * PTTL comes back negative when the key exists with no expiry, which only
+ * happens if something outside this script wrote it; re-arming the window
+ * there keeps a stray key from becoming a permanent block.
+ */
+const HIT_SCRIPT = `
+local count = redis.call('INCR', KEYS[1])
+if count == 1 then
+    redis.call('PEXPIRE', KEYS[1], ARGV[1])
+end
+local ttl = redis.call('PTTL', KEYS[1])
+if ttl < 0 then
+    redis.call('PEXPIRE', KEYS[1], ARGV[1])
+    ttl = tonumber(ARGV[1])
+end
+return {count, ttl}
+`;
+
 export const RedisBackend: RateLimitBackend = {
     name: "redis",
     async hit(identifier, config) {
@@ -96,31 +121,30 @@ export const RedisBackend: RateLimitBackend = {
         }
 
         try {
-            const key = `rl:${identifier}`;
-            const now = Date.now();
+            // `rlc:` and not the old `rl:`: those keys hold a JSON blob, and
+            // INCR on one errors out. A fresh prefix costs one window of
+            // already-counted hits at deploy time instead of a window of
+            // every request failing over to memory.
+            const key = `rlc:${identifier}`;
+            const raw = await redis.eval(HIT_SCRIPT, {
+                keys: [key],
+                arguments: [String(Math.max(1, Math.floor(config.windowMs)))],
+            });
 
-            const stored = await redis.get(key);
-            if (stored) {
-                const entry: RateLimitEntry = JSON.parse(stored);
-                if (entry.resetAt < now) {
-                    const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
-                    await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
-                    return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
-                }
-
-                entry.count++;
-                const ttl = entry.resetAt - now;
-                await redis.set(key, JSON.stringify(entry), { PX: Math.max(ttl, 1) });
-
-                if (entry.count > config.maxRequests) {
-                    return { success: false, remaining: 0, resetAt: entry.resetAt };
-                }
-                return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
+            if (!Array.isArray(raw) || raw.length < 2) {
+                throw new Error(`unexpected EVAL reply: ${JSON.stringify(raw)}`);
+            }
+            const count = Number(raw[0]);
+            const ttl = Number(raw[1]);
+            if (!Number.isFinite(count) || !Number.isFinite(ttl)) {
+                throw new Error(`non-numeric EVAL reply: ${JSON.stringify(raw)}`);
             }
 
-            const newEntry: RateLimitEntry = { count: 1, resetAt: now + config.windowMs };
-            await redis.set(key, JSON.stringify(newEntry), { PX: config.windowMs });
-            return { success: true, remaining: config.maxRequests - 1, resetAt: newEntry.resetAt };
+            const resetAt = Date.now() + Math.max(ttl, 0);
+            if (count > config.maxRequests) {
+                return { success: false, remaining: 0, resetAt };
+            }
+            return { success: true, remaining: config.maxRequests - count, resetAt };
         } catch (err) {
             warnRedisFallback(err instanceof Error ? err.message : "unknown error");
             return memoryHitSync(identifier, config);

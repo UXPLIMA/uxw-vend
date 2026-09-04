@@ -4,7 +4,7 @@
  *
  * RedisBackend.hit catches any error thrown by getRedisClient/redis.set
  * and falls through to memoryHitSync. This test:
- *   - Stubs getRedisClient to return a client whose .set always throws
+ *   - Stubs getRedisClient to return a client whose .eval always throws
  *   - Calls rateLimit 3 times against a small limit (maxRequests:3) - each
  *     returns success because the memory fallback is incrementing locally
  *   - 4th call returns success:false
@@ -23,7 +23,8 @@ vi.mock("@/core/lib/db", () => ({
 const fakeRedis = {
     isOpen: true,
     get: vi.fn(async () => null),
-    set: vi.fn(async () => { throw new Error("simulated Redis SET failure"); }),
+    set: vi.fn(async () => null),
+    eval: vi.fn(async () => { throw new Error("simulated Redis EVAL failure"); }),
     del: vi.fn(),
     ping: vi.fn(),
     connect: vi.fn(),
@@ -39,7 +40,7 @@ vi.mock("@/core/lib/redis", () => ({
 beforeEach(async () => {
     vi.resetModules();
     process.env.REDIS_URL = "redis://stub:6379";
-    fakeRedis.set.mockClear();
+    fakeRedis.eval.mockClear();
 });
 
 afterEach(() => {
@@ -69,10 +70,10 @@ describe("rate-limit failover", () => {
         expect(r4.success).toBe(false);
         expect(r4.remaining).toBe(0);
 
-        // Sanity: redis.set was called (and threw) on every hit - confirms
+        // Sanity: redis.eval was called (and threw) on every hit - confirms
         // we exercised the failover path, not just the memory backend
         // outright.
-        expect(fakeRedis.set).toHaveBeenCalledTimes(4);
+        expect(fakeRedis.eval).toHaveBeenCalledTimes(4);
         warnSpy.mockRestore();
     });
 });

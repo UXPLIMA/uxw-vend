@@ -8,6 +8,12 @@ type RedisClientType = {
     get(key: string): Promise<string | null>;
     set(key: string, value: string, options?: { PX?: number; EX?: number }): Promise<unknown>;
     del(key: string | string[]): Promise<number>;
+    /**
+     * Server-side Lua. The rate limiter needs it: read-modify-write across two
+     * round trips lets concurrent requests observe the same count and each
+     * write back count+1, which is the exact burst a limiter exists to stop.
+     */
+    eval(script: string, options?: { keys?: string[]; arguments?: string[] }): Promise<unknown>;
     ping(): Promise<string>;
     connect(): Promise<void>;
     disconnect(): Promise<void>;
