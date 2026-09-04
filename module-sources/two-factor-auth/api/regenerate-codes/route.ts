@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { generateBackupCodes, prisma, rateLimitStrict, verifyToken } from "@/core/sdk/server";
+import { generateBackupCodes, prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/regenerate-codes - Regenerate backup codes
@@ -24,12 +24,9 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    let body: { password?: string; token?: string } = {};
-    try {
-        body = await request.json();
-    } catch {
-        body = {};
-    }
+    const raw = await readJsonBody(request, { fallback: {} });
+    if (raw instanceof NextResponse) return raw;
+    const body = raw as { password?: string; token?: string };
     const { password, token } = body;
 
     if (!password && !token) {

@@ -1,6 +1,6 @@
 /** Revoking, restoring, or deleting one key. */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, isAdmin, logActivity } from "@/core/sdk/server";
+import { prisma, isAdmin, logActivity, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 interface RouteParams {
@@ -19,7 +19,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (guard instanceof NextResponse) return guard;
 
     const { id } = await params;
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
 
     if (body.status === "active" || body.status === "revoked") data.status = body.status;

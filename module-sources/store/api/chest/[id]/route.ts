@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../../lib/delivery";
 
@@ -20,7 +20,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
 
     const item = await prisma.chestItem.findUnique({ where: { id } });
     if (!item || item.userId !== session.user.id) return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { restoreBackup, getBackupPath } from "@/core/lib/backup";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -27,7 +28,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     let confirmBody = false;
     try {
-        const body = await req.json().catch(() => null);
+        const body = await readJsonBody(req, { fallback: null });
+        if (body instanceof NextResponse) return body;
         if (body && typeof body.confirmText === "string" && body.confirmText === "RESTORE") {
             confirmBody = true;
         }

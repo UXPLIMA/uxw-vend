@@ -81,7 +81,7 @@ export { apiSuccess, apiError, apiPaginated, devOnlyDetail, withRateLimit } from
 // `readJsonBody` returns the parsed body, or the 400 to return when the body
 // is not JSON. A route that calls `request.json()` directly answers a
 // malformed body with a 500.
-export { readJsonBody, INVALID_JSON_BODY } from "@/core/lib/api-body";
+export { readJsonBody, INVALID_JSON_BODY, BODY_TOO_LARGE, MAX_JSON_BODY_BYTES } from "@/core/lib/api-body";
 
 // `intParam` and `enumParam` are the query-string half of the same idea: a
 // page number that cannot be NaN, and an enum filter that answers 400 instead

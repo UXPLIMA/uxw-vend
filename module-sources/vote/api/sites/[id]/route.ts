@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -14,7 +14,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const existing = await prisma.voteSite.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ error: "Vote site not found" }, { status: 404 });
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
     if (typeof body.name === "string") data.name = body.name;
     if (typeof body.url === "string") data.url = body.url;

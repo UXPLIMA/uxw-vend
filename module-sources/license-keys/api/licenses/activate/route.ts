@@ -6,11 +6,12 @@
  * a wrong key as about one that never existed, and never echoes the key back.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimits, withRateLimit } from "@/core/sdk/server";
+import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense, releaseActivation } from "../../../lib/licenses";
 
 export const POST = withRateLimit(async (request: NextRequest) => {
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";
     const machineId = typeof body.machineId === "string" ? body.machineId.trim() : "";
     const label = typeof body.label === "string" ? body.label.slice(0, 100) : null;
@@ -36,7 +37,8 @@ export const POST = withRateLimit(async (request: NextRequest) => {
 
 /** Frees this machine's seat so the customer can move to another one. */
 export const DELETE = withRateLimit(async (request: NextRequest) => {
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";
     const machineId = typeof body.machineId === "string" ? body.machineId.trim() : "";
     if (!key || !machineId) {

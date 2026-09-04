@@ -6,7 +6,7 @@
  *   DELETE - unlink
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, isAdmin, rateLimits, withRateLimit, log } from "@/core/sdk/server";
+import { prisma, isAdmin, rateLimits, withRateLimit, log, readJsonBody } from "@/core/sdk/server";
 import { doActionAsync } from "@/core/sdk";
 import { auth } from "@/core/sdk/auth";
 import { issueCode, CODE_TTL_MS } from "../../lib/link-code";
@@ -41,7 +41,8 @@ export const POST = withRateLimit(async (request: NextRequest) => {
     const userId = await currentUserId();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const requested = typeof body.username === "string" ? body.username.trim() : "";
     const serverId = typeof body.serverId === "string" && body.serverId ? body.serverId : null;
 
@@ -91,7 +92,8 @@ export async function DELETE(request: NextRequest) {
 
     // An admin clearing someone else's link is a moderation action; a user
     // clearing their own is not.
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const targetId = typeof body.userId === "string" && body.userId ? body.userId : userId;
     if (targetId !== userId && !(await isAdmin(userId))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });

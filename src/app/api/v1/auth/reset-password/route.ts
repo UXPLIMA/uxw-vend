@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
 import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
@@ -17,7 +18,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
         }
 
-        const body = (await request.json().catch(() => ({}))) as {
+        const raw = await readJsonBody(request, { fallback: {} });
+        if (raw instanceof NextResponse) return raw;
+        const body = raw as {
             email?: unknown;
             token?: unknown;
             password?: unknown;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readJsonBody } from "@/core/lib/api-body";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import {
@@ -31,7 +32,8 @@ export async function POST(request: NextRequest) {
     const auth = await requireAdmin();
     if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const body = await request.json().catch(() => null);
+    const body = await readJsonBody(request, { fallback: null });
+    if (body instanceof NextResponse) return body;
     if (!body || !Array.isArray(body.widgets)) {
         return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }

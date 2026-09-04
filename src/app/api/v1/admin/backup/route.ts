@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { createBackup, listBackups, formatBytes } from "@/core/lib/backup";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * GET /api/v1/admin/backup
@@ -47,7 +48,8 @@ export async function POST(request: NextRequest) {
 
     let notes: string | undefined;
     try {
-        const body = await request.json().catch(() => null);
+        const body = await readJsonBody(request, { fallback: null });
+        if (body instanceof NextResponse) return body;
         if (body && typeof body.notes === "string") {
             notes = body.notes.slice(0, 500);
         }

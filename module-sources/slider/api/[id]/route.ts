@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -20,7 +20,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const existing = await prisma.sliderItem.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ error: "Slide not found" }, { status: 404 });
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
     // Only fields the request actually carried, so a partial edit does not
     // blank the rest of the slide.

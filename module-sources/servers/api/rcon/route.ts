@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "@/core/sdk/server";
+import { isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { sendRconCommand, isRconAvailable } from "../../lib/rcon";
 
@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
     const denied = await requireAdmin();
     if (denied) return denied;
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const command = typeof body.command === "string" ? body.command.trim() : "";
     const serverId = typeof body.serverId === "string" && body.serverId ? body.serverId : null;
     if (!command) return NextResponse.json({ error: "Command required" }, { status: 400 });

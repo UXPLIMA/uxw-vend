@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma, rateLimitStrict, verifyToken } from "@/core/sdk/server";
+import { prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/disable - Disable 2FA
@@ -25,12 +25,9 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    let body: { token?: string; password?: string } = {};
-    try {
-        body = await request.json();
-    } catch {
-        body = {};
-    }
+    const raw = await readJsonBody(request, { fallback: {} });
+    if (raw instanceof NextResponse) return raw;
+    const body = raw as { token?: string; password?: string };
     const { token, password } = body;
 
     if (!token && !password) {

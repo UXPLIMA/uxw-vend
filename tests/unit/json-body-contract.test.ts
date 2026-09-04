@@ -14,15 +14,17 @@
  * wordings. `readJsonBody` is that block once, and this gate keeps every
  * route on it.
  *
- * Two shapes stay legal:
+ * This gate allows the two shapes a route used to say its body was optional:
+ * `request.json().catch(() => ({}))` and `.catch(() => null)`, and the same
+ * statement written longer as a try whose catch supplies the body itself. It
+ * forbids a bare `request.json()` with nothing to catch the throw.
  *
- *   - `request.json().catch(() => ({}))` and `.catch(() => null)`, which is
- *     how a route says the body is optional. A POST with nothing to send
- *     must not become a 400.
- *   - `request.json()` inside a try whose catch supplies the body itself
- *     (`catch { body = {}; }`), which is the same statement written longer.
- *
- * What is not legal is a bare `request.json()` with nothing to catch it.
+ * Nothing uses those shapes any more. A `.catch` also gives up the size cap
+ * that `readJsonBody` reads the body under, so an optional body now says so
+ * with `readJsonBody(request, { fallback: {} })` and keeps the cap;
+ * `tests/unit/json-body-is-bounded.test.ts` is the stricter rule that forbids
+ * `request.json()` in a route at all. This gate stays as the narrower
+ * statement of why: an uncaught parse is a 500 for the caller's mistake.
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "fs";

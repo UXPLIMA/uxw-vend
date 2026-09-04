@@ -27,6 +27,13 @@ const intlMiddleware = createIntlMiddleware({
 // experience - login, register, vote, post, suggestion, comment, cart,
 // preferences. We only block actions that would wreck the demo for the
 // next visitor or cost money.
+/**
+ * The largest request the application accepts at all, in bytes: the 50 MB
+ * upload ceiling in `storage.ts` plus room for multipart framing. Nothing
+ * legitimate is larger; JSON endpoints stop far earlier, in `readJsonBody`.
+ */
+const MAX_REQUEST_BYTES = 64 * 1024 * 1024;
+
 function isBlockedInDemo(method: string, pathname: string): boolean {
     const m = method.toUpperCase();
     const write = m === 'POST' || m === 'PUT' || m === 'PATCH' || m === 'DELETE';
@@ -161,6 +168,23 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     requestHeaders.set('x-correlation-id', correlationId);
 
     const { pathname } = request.nextUrl;
+
+    // ===== Absolute body ceiling =====
+    // App Router route handlers have no body limit of their own, so the only
+    // bound on an inbound request used to be whatever a handler imposed after
+    // it had already buffered the whole thing. `readJsonBody` caps JSON at a
+    // megabyte and `storage.ts` caps an upload at fifty, but both of those
+    // measure a body they have already read. This refuses a request whose own
+    // declared length is past anything the application accepts, before a
+    // handler runs at all. A body with no content-length, or one that lies,
+    // still meets the per-handler cap that reads it as a stream.
+    const declaredLength = Number(request.headers.get('content-length'));
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
+        return NextResponse.json(
+            { error: 'Request body too large', code: 'body_too_large' },
+            { status: 413 },
+        );
+    }
 
     // ===== Demo write gate =====
     // On the public demo instance (DEMO_MODE=1) any visitor can log in as

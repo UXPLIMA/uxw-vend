@@ -6,7 +6,7 @@
  * the mapping survives to mean something again when it comes back.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, isAdmin } from "@/core/sdk/server";
+import { prisma, isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 async function denyUnlessAdmin(): Promise<NextResponse | null> {
@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
     const denied = await denyUnlessAdmin();
     if (denied) return denied;
 
-    const body = await request.json().catch(() => ({}));
+    const body = await readJsonBody(request, { fallback: {} });
+    if (body instanceof NextResponse) return body;
     const productId = typeof body.productId === "string" ? body.productId.trim() : "";
     if (!productId) return NextResponse.json({ error: "productId required" }, { status: 400 });
 
