@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -270,6 +270,9 @@
       "activity": {
         "ticketCreated": "opened a ticket:",
         "ticketReplyCreated": "replied to ticket:"
+      },
+      "nav": {
+        "tickets": "Support"
       }
     },
     "tr": {
@@ -421,6 +424,9 @@
       "activity": {
         "ticketCreated": "bilet açtı:",
         "ticketReplyCreated": "bilete yanıt verdi:"
+      },
+      "nav": {
+        "tickets": "Destek"
       }
     }
   },
@@ -449,6 +455,7 @@
   "navLinks": [
     {
       "label": "Support",
+      "labelKey": "tickets",
       "href": "/support",
       "icon": "LifeBuoy",
       "position": 40
@@ -457,6 +464,7 @@
   "footerLinks": [
     {
       "label": "Support",
+      "labelKey": "tickets",
       "href": "/support",
       "section": "quick"
     }

@@ -2,7 +2,7 @@
   "id": "trophies",
   "name": "Trophies",
   "description": "Achievement badges with rule-based auto-award engine",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -64,6 +64,7 @@
   "navLinks": [
     {
       "label": "Trophies",
+      "labelKey": "trophies",
       "href": "/trophies",
       "icon": "Trophy",
       "position": 60
@@ -72,6 +73,7 @@
   "footerLinks": [
     {
       "label": "Trophies",
+      "labelKey": "trophies",
       "href": "/trophies",
       "section": "quick"
     }
@@ -163,6 +165,9 @@
         "toggleFailed": "Failed to toggle",
         "trophy": "Trophy",
         "updated": "Trophy updated"
+      },
+      "nav": {
+        "trophies": "Trophies"
       }
     },
     "tr": {
@@ -217,6 +222,9 @@
         "toggleFailed": "Durum değiştirilemedi",
         "trophy": "Kupa",
         "updated": "Kupa güncellendi"
+      },
+      "nav": {
+        "trophies": "Kupalar"
       }
     }
   }

@@ -22,6 +22,10 @@ interface NavChild {
 
 interface NavLink {
     label: string;
+    // Carried through from the module manifest so a seeded list that the admin
+    // saves unchanged keeps following the locale. Typing a label clears it:
+    // text the admin wrote is what they meant to show.
+    labelKey?: string;
     href: string;
     icon?: string;
     children?: NavChild[];
@@ -49,8 +53,8 @@ export default function NavbarSettingsPage() {
                     // admin sees real state and can edit from there.
                     const registry = ModuleNavLinks
                         .filter(nl => isEnabledIn(moduleStatus, nl.module))
-                        .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "" }));
-                    setLinks([{ label: "Home", href: "/", icon: "Home" }, ...registry]);
+                        .map(nl => ({ label: nl.label, labelKey: nl.labelKey, href: nl.href, icon: nl.icon || "" }));
+                    setLinks([{ label: "Home", labelKey: "home", href: "/", icon: "Home" }, ...registry]);
                 }
                 setLoading(false);
             })
@@ -61,7 +65,13 @@ export default function NavbarSettingsPage() {
     const addDropdown = () => setLinks([...links, { label: "More", href: "#", icon: "Star", children: [{ label: "", href: "/" }] }]);
 
     const updateLink = (i: number, field: string, value: string) => {
-        setLinks(links.map((l, idx) => idx === i ? { ...l, [field]: value } : l));
+        setLinks(links.map((l, idx) => {
+            if (idx !== i) return l;
+            // An edited label is the admin's own words, so it stops deferring
+            // to the module's translation key.
+            if (field === "label") return { ...l, label: value, labelKey: undefined };
+            return { ...l, [field]: value };
+        }));
     };
 
     const removeLink = (i: number) => {

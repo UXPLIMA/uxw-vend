@@ -23,7 +23,13 @@ export function MobileBottomNav() {
     const moduleLinks = ModuleNavLinks
         .filter(nl => isEnabledIn(moduleStatus, nl.module))
         .slice(0, 3)
-        .map(nl => ({ href: nl.href, iconName: nl.icon, label: nl.label }));
+        .map(nl => ({
+            href: nl.href,
+            iconName: nl.icon,
+            // Same resolution as the navbar: the manifest's `labelKey` first,
+            // its `label` when the module declares no key.
+            label: nl.labelKey && navT.has(nl.labelKey) ? navT(nl.labelKey) : nl.label,
+        }));
 
     const items: { href: string; iconName?: string; iconNode?: React.ReactNode; label: string }[] = [
         { href: "/", iconNode: <Home className="w-5 h-5" />, label: t("home") },

@@ -112,7 +112,7 @@ function generateRegistry() {
 
     // Aggregate typed collections across all modules
     const allWidgets: ({ id: string; component: string; defaultOrder: number; defaultVisible: boolean; module: string })[] = [];
-    const allNavLinks: ({ label: string; href: string; icon?: string; position?: number; module: string })[] = [];
+    const allNavLinks: ({ label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string })[] = [];
     const allFooterLinks: ManifestItem[] = [];
     const allDashboardCards: ManifestItem[] = [];
     const allHomepageSections: ({ id: string; type: 'content' | 'widget'; component: string; order: number; module: string })[] = [];
@@ -219,8 +219,8 @@ function generateRegistry() {
     homepageSectionImports += `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
 
     let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleNavLinks: { label: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
-    widgetRegistry += `export const ModuleFooterLinks: { label: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleNavLinks: { label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleFooterLinks: { label: string; labelKey?: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
     widgetRegistry += `// Activity-feed title localization entries contributed by modules.\n`;
     widgetRegistry += `export const ModuleActivityTitles: { type: string; prefix: string; key: string; module: string }[] = ${JSON.stringify(allActivityTitles, null, 2)};\n\n`;

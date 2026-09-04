@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -105,6 +105,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_changelog_changelog": "Changelog"
+      },
+      "nav": {
+        "changelog": "Changelog"
       }
     },
     "tr": {
@@ -156,6 +159,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_changelog_changelog": "Değişiklik Günlüğü"
+      },
+      "nav": {
+        "changelog": "Değişiklikler"
       }
     }
   },
@@ -176,6 +182,7 @@
   "navLinks": [
     {
       "label": "Changelog",
+      "labelKey": "changelog",
       "href": "/changelog",
       "icon": "GitCommit",
       "position": 60
@@ -184,6 +191,7 @@
   "footerLinks": [
     {
       "label": "Changelog",
+      "labelKey": "changelog",
       "href": "/changelog",
       "section": "quick"
     }

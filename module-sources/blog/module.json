@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -465,6 +465,7 @@
   "navLinks": [
     {
       "label": "Blog",
+      "labelKey": "blog",
       "href": "/blog",
       "icon": "Newspaper",
       "position": 10
@@ -473,6 +474,7 @@
   "footerLinks": [
     {
       "label": "Blog",
+      "labelKey": "blog",
       "href": "/blog",
       "section": "quick"
     }

@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A module's own name in the navigation never followed the locale.** The
+  navbar, the footer and the mobile bar printed the literal `label` from the
+  manifest, so a Turkish site showed "Store" and "Punishments" between a
+  translated "Ana Sayfa" and "Giris Yap". Four modules had already shipped the
+  translation - blog, forum, store and help-center each merged a `nav.*`
+  string into the shared namespace - and nothing read it. Manifests now carry
+  `labelKey` beside `label`, all three renderers resolve it in the `nav`
+  namespace, and `label` stays as the fallback, which is what an admin's own
+  typed text is. The navbar editor seeds itself from the registry and used to
+  drop the key on the way, so an admin who opened that screen and saved froze
+  every module's label in English for every locale; it now keeps the key, and
+  clears it only when the admin types over the label. Nine modules gained the
+  key and five gained the string they were missing.
+
+### Fixed
 - **Sequential scans on the tables that grow.** The admin moderation screen
   asks each provider for a count of pending items, and not one of the four
   content tables it counts - blog comments, forum posts, forum topics,

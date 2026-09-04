@@ -79,15 +79,24 @@ function DefaultNavbar() {
         return false;
     };
 
+    // A module's nav entry is its own name in the site's navigation, and it was
+    // the one string on the bar that never followed the locale: "Store" sitting
+    // next to a translated "Home". The manifest now carries `labelKey` and the
+    // module already shipped the string under the `nav` namespace; `label`
+    // remains the fallback for a module that declares no key, and for an admin
+    // who typed their own text in the navbar editor.
+    const navLabel = (link: { label: string; labelKey?: string }) =>
+        link.labelKey && t.has(link.labelKey) ? t(link.labelKey) : link.label;
+
     // Default links: Home + enabled module navLinks from registry
     const registryLinks = [
         { label: t('home'), href: "/", icon: "Home" },
         ...ModuleNavLinks
             .filter(nl => isEnabledIn(moduleStatus, nl.module))
-            .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "Package" })),
+            .map(nl => ({ label: navLabel(nl), href: nl.href, icon: nl.icon || "Package" })),
     ];
 
-    const rawNavLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : registryLinks) as { label: string; href: string; icon?: string; children?: { label: string; href: string }[] }[];
+    const rawNavLinks = (Array.isArray(settings.navbar_links) ? settings.navbar_links : registryLinks) as { label: string; labelKey?: string; href: string; icon?: string; children?: { label: string; labelKey?: string; href: string }[] }[];
 
     // Filter out disabled module links (including from dropdown children)
     const navLinks = rawNavLinks
@@ -96,9 +105,9 @@ function DefaultNavbar() {
             if (link.children) {
                 const filtered = link.children.filter((child) => isLinkEnabled(child.href));
                 if (filtered.length === 0) return null;
-                return { ...link, children: filtered };
+                return { ...link, label: navLabel(link), children: filtered.map((c) => ({ ...c, label: navLabel(c) })) };
             }
-            return link;
+            return { ...link, label: navLabel(link) };
         })
         .filter(Boolean) as typeof rawNavLinks;
 
