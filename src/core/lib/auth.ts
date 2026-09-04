@@ -18,6 +18,7 @@ import {
     resetFailedLogins,
 } from "./account-lockout";
 import { getClientIP } from "./rate-limit";
+import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "./auth-challenge";
 
 import type { Provider } from "next-auth/providers";
 import {
@@ -122,11 +123,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" },
                 twoFactorCode: { label: "2FA Code", type: "text" },
                 remember: { label: "Keep me signed in", type: "checkbox" },
+                // Whatever the auth.form.challenge slot asked to be sent,
+                // JSON-encoded. Core never reads inside it.
+                challenge: { label: "Challenge", type: "hidden" },
             },
             async authorize(credentials, request) {
                 const lookup = identifierLookup(credentials?.email);
                 if (!lookup || !credentials?.password) {
                     return null;
+                }
+
+                // Whatever module owns the auth.form.challenge slot gets to
+                // refuse before any account is looked up, so a failed
+                // challenge costs an attacker one round trip and tells them
+                // nothing about whether the address exists. With no module
+                // installed the filter has no listeners and this passes.
+                const challengeHeaders = (request as Request | undefined)?.headers;
+                const challenge = await runAuthChallenge({
+                    action: "login",
+                    fields: parseChallengeFields(credentials?.[CHALLENGE_FIELD]),
+                    ip: challengeHeaders ? getClientIP(challengeHeaders) : null,
+                });
+                if (!challenge.ok) {
+                    throw new Error(`CHALLENGE_FAILED:${challenge.code ?? "challenge_failed"}`);
                 }
 
                 const user = await prisma.user.findUnique({

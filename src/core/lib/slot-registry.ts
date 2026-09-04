@@ -45,6 +45,9 @@ export const CANONICAL_SLOTS = [
     "navbar.end",
     "footer.top",
     "mobile.nav",
+    // Auth forms - a module puts a check in front of signing in or up.
+    // See core/lib/auth-challenge.ts for the server half.
+    "auth.form.challenge",
 ] as const;
 
 export type CanonicalSlot = typeof CANONICAL_SLOTS[number];

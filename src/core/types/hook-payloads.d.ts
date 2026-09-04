@@ -73,6 +73,13 @@ interface UxwVendFilterPayloads {
     "admin.sidebar": Array<{ href: string; label: string; icon?: string }>;
     "email.subject": string;
     "email.body": string;
+
+    /**
+     * Whether a login, registration or password reset may proceed. Core runs
+     * this before it checks credentials or creates an account; a listener
+     * returns `{ ok: false, code }` to refuse. See core/lib/auth-challenge.ts.
+     */
+    "auth.challenge": { ok: boolean; code: string | null };
 }
 
 /**
@@ -87,7 +94,14 @@ interface UxwVendFilterPayloads {
  * Filters with nothing to say about their context simply do not appear, and
  * their context stays `unknown` as before.
  */
-// Core declares no contexts of its own: every entry so far belongs to a module,
-// and an empty interface here is the point - it exists to be merged into.
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface UxwVendFilterContexts {}
+interface UxwVendFilterContexts {
+    /**
+     * What the visitor is trying to do, whatever the `auth.form.challenge`
+     * slot asked to be sent, and where the request came from.
+     */
+    "auth.challenge": {
+        action: "login" | "register" | "forgotPassword";
+        fields: Record<string, string>;
+        ip: string | null;
+    };
+}

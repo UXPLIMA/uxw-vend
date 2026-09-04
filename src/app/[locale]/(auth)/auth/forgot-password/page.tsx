@@ -7,9 +7,12 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
+import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
+import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
 
 export default function ForgotPasswordPage() {
     const t = useTranslations('auth');
+    const challenge = useAuthChallenge();
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
@@ -24,7 +27,7 @@ export default function ForgotPasswordPage() {
             const res = await fetch("/api/v1/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, [CHALLENGE_FIELD]: challenge.read() }),
             });
 
             if (res.ok) {
@@ -101,6 +104,8 @@ export default function ForgotPasswordPage() {
                                         className="border-border bg-muted"
                                     />
                                 </div>
+
+                                <AuthChallenge action="forgotPassword" onField={challenge.onField} />
 
                                 <Button
                                     type="submit"

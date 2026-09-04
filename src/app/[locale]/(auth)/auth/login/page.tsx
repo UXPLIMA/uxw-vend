@@ -12,6 +12,9 @@ import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
+import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
+import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 const DEMO_EMAIL = "admin@example.com";
 const DEMO_PASSWORD = "password123";
@@ -19,6 +22,7 @@ const DEMO_PASSWORD = "password123";
 export default function LoginPage() {
     const router = useRouter();
     const t = useTranslations('auth');
+    const challenge = useAuthChallenge();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -56,6 +60,10 @@ export default function LoginPage() {
                 password,
                 twoFactorCode: needs2FA ? twoFactorCode : "",
                 remember: remember ? "true" : "false",
+                // Whatever the auth.form.challenge slot asked to be sent, as
+                // one field: Auth.js credentials are flat strings and core
+                // does not know how many a module needs.
+                [CHALLENGE_FIELD]: JSON.stringify(challenge.read()),
                 redirect: false,
             });
 
@@ -69,6 +77,12 @@ export default function LoginPage() {
                     setError(t('accountSuspended'));
                 } else if (result.error.includes("ACCOUNT_LOCKED") || result.error.includes("LOCKED")) {
                     setError(t('accountLocked'));
+                } else if (result.error.includes("CHALLENGE_FAILED")) {
+                    // The challenge module names its own code; core looks it
+                    // up the same way it does every other auth error and
+                    // falls back when the module ships no string for it.
+                    const code = result.error.split("CHALLENGE_FAILED:")[1]?.split(/[^a-z_]/)[0] ?? "";
+                    setError(authErrorMessage(t, { code }, t('challengeFailed')));
                 } else {
                     setError(t('invalidCredentials'));
                 }
@@ -222,6 +236,8 @@ export default function LoginPage() {
                                     {t('forgotPassword')}
                                 </Link>
                             </div>
+
+                            <AuthChallenge action="login" onField={challenge.onField} />
 
                             <Button
                                 type="submit"
