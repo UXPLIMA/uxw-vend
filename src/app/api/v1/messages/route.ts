@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { oneToOneConversationWhere } from "@/core/lib/conversations";
+import { rateLimitForRole } from "@/core/lib/rate-limit";
 
 /**
  * GET - list current user's conversations with last message preview
@@ -88,6 +90,22 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    // Starting a conversation writes into someone else's inbox, and the
+    // recipient is whoever the sender names, so one account could fan out to
+    // every user on the site. A budget, not a brute-force ceiling: this is
+    // throughput, so an operator's role multipliers apply.
+    const rl = await rateLimitForRole(
+        `message-start:${session.user.id}`,
+        { maxRequests: 20, windowMs: 15 * 60 * 1000 },
+        session.user.role,
+    );
+    if (!rl.success) {
+        return NextResponse.json(
+            { error: "Too many messages. Try again later." },
+            { status: 429 },
+        );
+    }
+
     const body = await request.json();
     const parsed = startSchema.safeParse(body);
     if (!parsed.success) {
@@ -98,13 +116,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Cannot message yourself" }, { status: 400 });
     }
 
-    // Look for an existing 1:1 conversation between these two users
+    // Look for an existing 1:1 conversation between these two users. See
+    // core/lib/conversations.ts for why "every" alone is not enough.
     const existing = await prisma.conversation.findFirst({
-        where: {
-            participants: {
-                every: { userId: { in: [session.user.id, parsed.data.recipientId] } },
-            },
-        },
+        where: oneToOneConversationWhere(session.user.id, parsed.data.recipientId),
         include: { participants: true },
     });
 
