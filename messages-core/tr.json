@@ -42,7 +42,8 @@
     "impersonationStopFailed": "Taklit modundan çıkılamadı",
     "replace": "Değiştir",
     "uploadFailed": "Yükleme başarısız",
-    "fileUploaded": "Dosya yüklendi"
+    "fileUploaded": "Dosya yüklendi",
+    "notifications": "Bildirimler"
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
@@ -69,7 +70,8 @@
     "primary": "Ana menü",
     "mobile": "Mobil menü",
     "social": "Sosyal medya",
-    "community": "Topluluk"
+    "community": "Topluluk",
+    "profileMenu": "Profil menüsü"
   },
   "hero": {
     "playersOnline": "{count} Oyuncu Çevrimiçi",
