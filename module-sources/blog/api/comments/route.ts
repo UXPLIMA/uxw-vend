@@ -16,7 +16,15 @@ async function getModerationMode(field: keyof ModerationSettingValue): Promise<"
     return value[field] === "manual" ? "manual" : "auto";
 }
 
-// GET /api/v1/blog/comments?articleId=xxx - List comments for an article
+/**
+ * The most comments one response will carry. An article's comment list is
+ * anonymous-readable and grows with every visitor who posts, so reading all of
+ * it was a query and a response with no ceiling. `?limit=` asks for fewer.
+ */
+const DEFAULT_COMMENT_LIMIT = 50;
+const MAX_COMMENT_LIMIT = 200;
+
+// GET /api/v1/blog/comments?articleId=xxx&limit=50 - List comments for an article
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const articleId = searchParams.get("articleId");
@@ -28,6 +36,11 @@ export async function GET(request: NextRequest) {
         );
     }
 
+    const requested = Number(searchParams.get("limit"));
+    const limit = Number.isFinite(requested) && requested > 0
+        ? Math.min(Math.floor(requested), MAX_COMMENT_LIMIT)
+        : DEFAULT_COMMENT_LIMIT;
+
     const session = await auth();
     const adminCheck = session?.user?.id ? await isAdmin(session.user.id) : false;
 
@@ -38,6 +51,7 @@ export async function GET(request: NextRequest) {
             ...(adminCheck ? {} : { moderationState: "APPROVED" }),
         },
         orderBy: { createdAt: "desc" },
+        take: limit,
         include: {
             author: {
                 select: { id: true, username: true, avatar: true },

@@ -5,7 +5,10 @@ import { prisma } from "@/core/lib/db";
 
 type RouteParams = { params: Promise<{ conversationId: string }> };
 
-/** GET - fetch all messages in a conversation + mark as read */
+/** Messages returned per read: the newest this many, oldest first. */
+const MESSAGE_PAGE_SIZE = 200;
+
+/** GET - fetch the newest page of a conversation + mark as read */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,11 +23,17 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Not a participant" }, { status: 403 });
     }
 
-    const messages = await prisma.message.findMany({
+    // The newest page, read newest-first and handed back in reading order. A
+    // thread grows without limit and every open re-read all of it, so this
+    // query and its response had no ceiling; each message is up to 10000
+    // characters, so the ceiling matters.
+    const page = await prisma.message.findMany({
         where: { conversationId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "desc" },
+        take: MESSAGE_PAGE_SIZE,
         include: { author: { select: { id: true, username: true, avatar: true } } },
     });
+    const messages = page.reverse();
 
     // Mark as read
     await prisma.conversationParticipant.update({

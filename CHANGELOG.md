@@ -47,6 +47,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing entry, and a manifest that omits it behaves exactly as before.
 
 ### Fixed
+- **Blog comments never loaded and could not be posted.** `CommentSection`
+  fetched `/api/v1/blog/${id}/comments`, a path the manifest never declared.
+  The dispatcher answers only declared paths, so the read 404'd and the
+  component's `.then` swallowed it into an empty list, and posting a comment
+  404'd with the error handler ignoring it: every article showed
+  "Comments (0)" and a form that did nothing. It now calls the route that
+  exists, `/blog/comments?articleId=`, sends the article id in the POST body,
+  reads the array and the comment object the route actually returns, and tells
+  the author when a comment is held for approval instead of showing it as
+  live. Its copy is translated too, and dates follow the visitor's locale
+  rather than always `tr-TR`. `validate-module` gained a check that fails a
+  module whose components fetch a path it does not route, with the same rule
+  mirrored under `npm test`.
+- **An article's whole comment history came back in one response.** The list is
+  anonymous-readable and grows with every visitor who posts. It is capped at 50
+  now, `?limit=` up to 200.
+- **A conversation returned every message it had ever held.** Each one is up to
+  10000 characters and a thread grows without limit, so both the query and the
+  response were unbounded on every open. The newest 200 come back, still oldest
+  first.
 - **A failing root layout showed Next's built-in error screen.**
   `[locale]/layout.tsx` is this app's root layout, and an error boundary never
   catches its own segment's layout, so a failure there (the database

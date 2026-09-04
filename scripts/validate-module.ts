@@ -902,6 +902,157 @@ function checkTranslationKeys(modulePath: string): CheckResult {
     return { name, passed: true, message: "Every rendered key is declared" };
 }
 
+/**
+ * Every `/api/v1/...` a module's own screens fetch has to be a route that
+ * exists.
+ *
+ * `checkApiRoutesWired` catches an `AdminCrudPage` pointed at an undeclared
+ * path, but a component that writes its own `fetch()` had nothing checking it.
+ * The blog's comment section fetched `/api/v1/blog/${id}/comments`, which the
+ * manifest never declared - the real route is `/blog/comments?articleId=`, so
+ * comments silently never loaded and posting one silently 404'd, on a page
+ * that looked fine.
+ *
+ * Only paths under a namespace the module itself owns are checked. Core's
+ * endpoints are collected from the filesystem so a module calling one of them
+ * is not flagged, and a path under another module's namespace is that module's
+ * to declare, not this one's.
+ */
+function coreApiPaths(): Set<string> {
+    const paths = new Set<string>();
+    const base = path.join(ROOT, "src/app/api");
+    const walk = (dir: string, prefix: string) => {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (entry.isDirectory()) {
+                walk(path.join(dir, entry.name), `${prefix}/${entry.name}`);
+            } else if (entry.name === "route.ts") {
+                paths.add(normalizeApiPath(`/api${prefix}`));
+            }
+        }
+    };
+    walk(base, "");
+    return paths;
+}
+
+/** Collapses every dynamic segment - `[id]`, `[...path]`, `${expr}` - to one placeholder. */
+function normalizeApiPath(raw: string): string {
+    return raw
+        .replace(/\$\{[^}]*\}/g, "[p]")
+        .replace(/\[[^\]]+\]/g, "[p]")
+        .split("?")[0]
+        .replace(/\/+$/, "");
+}
+
+/**
+ * Reads the string literal opening at `start` and returns its raw text, or
+ * null. Handles a template literal whose `${...}` holds quotes of its own,
+ * which a regex over the line cannot.
+ */
+function readStringLiteral(source: string, start: number): string | null {
+    const quote = source[start];
+    if (quote !== '"' && quote !== "'" && quote !== "`") return null;
+    let out = "";
+    let depth = 0;
+    for (let i = start + 1; i < source.length; i++) {
+        const c = source[i];
+        if (c === "\\") {
+            out += c + (source[i + 1] ?? "");
+            i++;
+            continue;
+        }
+        if (quote === "`" && c === "$" && source[i + 1] === "{") {
+            depth = 1;
+            let expr = "${";
+            i += 2;
+            for (; i < source.length && depth > 0; i++) {
+                if (source[i] === "{") depth++;
+                else if (source[i] === "}") depth--;
+                if (depth > 0) expr += source[i];
+            }
+            out += expr + "}";
+            i--;
+            continue;
+        }
+        if (c === quote) return out;
+        if (c === "\n" && quote !== "`") return null;
+        out += c;
+    }
+    return null;
+}
+
+function checkModuleFetchPaths(modulePath: string): CheckResult {
+    const name = "Fetched API paths exist";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { api?: { path: string; handler: string }[] };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const api = manifest.api ?? [];
+    if (api.length === 0) return { name, passed: true, message: "Declares no API routes" };
+
+    const declared = new Set(api.map((a) => normalizeApiPath(`/api/v1${a.path}`)));
+    const owned = new Set(api.map((a) => a.path.split("/")[1]).filter(Boolean));
+    const core = coreApiPaths();
+
+    const files: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name === "node_modules") continue;
+                walk(full);
+            } else if (/\.tsx?$/.test(entry.name) && entry.name !== "route.ts") {
+                files.push(full);
+            }
+        }
+    })(modulePath);
+
+    const problems: string[] = [];
+    for (const file of files) {
+        const source = fs.readFileSync(file, "utf8");
+        const where = path.relative(modulePath, file).replace(/\\/g, "/");
+        for (const match of source.matchAll(/fetch\(\s*/g)) {
+            const start = (match.index ?? 0) + match[0].length;
+            const raw = readStringLiteral(source, start);
+            if (!raw || !raw.includes("/api/v1/")) continue;
+            const tail = raw.slice(raw.indexOf("/api/v1/") + "/api/v1/".length);
+            const namespace = tail.split("/")[0].split("?")[0];
+            if (!owned.has(namespace)) continue;
+            const written = raw.slice(raw.indexOf("/api/v1"));
+            const normalized = normalizeApiPath(written);
+            if (declared.has(normalized) || core.has(normalized)) continue;
+            // An interpolation glued to the end of the path is usually a query
+            // string the route does declare - `/licenses/admin${q ? "?q=..." : ""}`.
+            // Accept it when everything written before the interpolation is
+            // itself a whole declared route.
+            const literalPrefix = written.split("${")[0].replace(/\/+$/, "");
+            if (declared.has(literalPrefix) || core.has(literalPrefix)) continue;
+            const line = source.slice(0, match.index).split("\n").length;
+            problems.push(`${where}:${line}: fetches ${raw} - no such route`);
+        }
+    }
+
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} unrouted fetch(es):\n      ${problems.slice(0, 8).join("\n      ")}`,
+            suggestion:
+                "The dispatcher answers only the paths the manifest declares, so a fetch to any other " +
+                "path 404s at runtime with nothing at build time to say so. Fix the path, or declare the route.",
+        };
+    }
+
+    return { name, passed: true, message: `${files.length} file(s) fetch only declared routes` };
+}
+
 function checkApiRoutesWired(modulePath: string): CheckResult {
     const name = "API routes wired";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1024,6 +1175,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkStatsApiAuth(modulePath),
         checkTranslationKeys(modulePath),
         checkAdminKeyPrefix(modulePath),
+        checkModuleFetchPaths(modulePath),
         checkHooksEmitted(modulePath),
     ];
 
