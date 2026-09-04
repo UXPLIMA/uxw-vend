@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Activity } from "lucide-react";
 import { Navbar, Footer } from "@/core/components/layout";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
@@ -9,9 +10,10 @@ import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations("activity");
     return buildPageMeta({
-        title: "Activity Feed",
-        description: "Latest activity across the site.",
+        title: t("title"),
+        description: t("description"),
         url: "/activity",
         type: "website",
     });
@@ -44,6 +46,7 @@ async function fetchPublicFeed(limit = 20): Promise<ActivityItem[]> {
 }
 
 export default async function ActivityFeedPage() {
+    const t = await getTranslations("activity");
     const items = await fetchPublicFeed(20);
 
     return (
@@ -54,10 +57,10 @@ export default async function ActivityFeedPage() {
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Activity className="w-7 h-7" />
-                        Activity Feed
+                        <Activity className="w-7 h-7" aria-hidden="true" />
+                        {t("title")}
                     </h1>
-                    <p className="text-muted-foreground">Latest activity across the site</p>
+                    <p className="text-muted-foreground">{t("description")}</p>
                 </div>
 
                 <ActivityFeedList items={items} />

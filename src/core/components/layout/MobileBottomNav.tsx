@@ -14,6 +14,7 @@ export function MobileBottomNav() {
     const { data: session } = useSession();
     const moduleStatus = useAllModules();
     const t = useTranslations("common");
+    const navT = useTranslations("nav");
 
     if (pathname.startsWith("/admin")) return null;
 
@@ -32,7 +33,7 @@ export function MobileBottomNav() {
     const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
     return (
-        <nav aria-label="Mobile" className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
+        <nav aria-label={navT("mobile")} className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-bottom">
             <Slot name="mobile.nav" />
             <div className="flex items-center justify-around h-14">
                 {items.map((item) => (

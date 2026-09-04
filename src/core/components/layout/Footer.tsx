@@ -31,6 +31,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 function DefaultFooter() {
     const t = useTranslations('footer');
     const commonT = useTranslations('common');
+    const navT = useTranslations('nav');
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
@@ -112,7 +113,7 @@ function DefaultFooter() {
                         <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                             {siteDescription}
                         </p>
-                        <ul className="flex gap-3 list-none p-0" aria-label="Social media">
+                        <ul className="flex gap-3 list-none p-0" aria-label={navT('social')}>
                             {serverConfig.social.facebook && (
                                 <li><a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors text-xs font-bold">
                                     <span aria-hidden="true">f</span>
@@ -134,7 +135,7 @@ function DefaultFooter() {
                                 </a></li>
                             )}
                             {communityUrl && (
-                                <li><a href={communityUrl} target="_blank" rel="noopener noreferrer" aria-label="Community" className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors">
+                                <li><a href={communityUrl} target="_blank" rel="noopener noreferrer" aria-label={navT('community')} className="w-8 h-8 rounded-full bg-white/10 hover:bg-primary flex items-center justify-center transition-colors">
                                     <Users className="w-4 h-4" aria-hidden="true" />
                                 </a></li>
                             )}

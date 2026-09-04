@@ -158,42 +158,6 @@ export async function invalidateTranslationCache(): Promise<void> {
     );
 }
 
-/**
- * Seed core translations from a nested JSON object.
- * Used by the seed script to populate from messages-core/*.json.
- */
-export async function seedCoreTranslations(
-    locale: string,
-    data: Record<string, unknown>,
-): Promise<number> {
-    const rows = flattenSingleLocale("core", locale, data);
-    let count = 0;
-
-    const CHUNK_SIZE = 200;
-    for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
-        const chunk = rows.slice(i, i + CHUNK_SIZE);
-        await Promise.all(
-            chunk.map((r) =>
-                prisma.translation.upsert({
-                    where: {
-                        locale_namespace_key_module: {
-                            locale: r.locale,
-                            namespace: r.namespace,
-                            key: r.key,
-                            module: r.module,
-                        },
-                    },
-                    update: { value: r.value },
-                    create: r,
-                }),
-            ),
-        );
-        count += chunk.length;
-    }
-
-    return count;
-}
-
 // ---------------------------------------------------------------------------
 // Internals
 // ---------------------------------------------------------------------------
@@ -227,26 +191,6 @@ function flattenTranslations(
                     rows.push({ locale, namespace, key, value: String(value), module: moduleId });
                 });
             }
-        }
-    }
-
-    return rows;
-}
-
-function flattenSingleLocale(
-    moduleId: string,
-    locale: string,
-    data: Record<string, unknown>,
-): { locale: string; namespace: string; key: string; value: string; module: string }[] {
-    const rows: { locale: string; namespace: string; key: string; value: string; module: string }[] = [];
-
-    for (const [namespace, content] of Object.entries(data)) {
-        if (typeof content === "string") {
-            rows.push({ locale, namespace, key: "_root", value: content, module: moduleId });
-        } else if (typeof content === "object" && content !== null) {
-            flattenObject(content as Record<string, unknown>, "", (key, value) => {
-                rows.push({ locale, namespace, key, value: String(value), module: moduleId });
-            });
         }
     }
 

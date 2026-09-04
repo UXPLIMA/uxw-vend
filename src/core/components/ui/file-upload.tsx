@@ -5,6 +5,7 @@ import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";
+import { useTranslations } from "next-intl";
 
 export interface FileUploadProps {
     value: string | null;
@@ -23,6 +24,7 @@ function looksLikeImage(value: string | null, accept?: string): boolean {
 }
 
 export function FileUpload({ value, onChange, accept, label }: FileUploadProps) {
+    const t = useTranslations("common");
     const inputRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
     const isImage = looksLikeImage(value, accept);
@@ -48,15 +50,15 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
 
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Upload failed");
+                toast.error(data.error || t("uploadFailed"));
                 return;
             }
 
             const data = (await res.json()) as { url: string; path: string };
             onChange(data.url);
-            toast.success("File uploaded");
+            toast.success(t("fileUploaded"));
         } catch {
-            toast.error("Upload failed");
+            toast.error(t("uploadFailed"));
         } finally {
             setUploading(false);
         }
@@ -102,7 +104,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                                 ) : (
                                     <Upload className="mr-1 h-3 w-3" />
                                 )}
-                                Replace
+                                {t("replace")}
                             </Button>
                             <Button
                                 type="button"
@@ -111,8 +113,8 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                                 onClick={handleRemove}
                                 disabled={uploading}
                             >
-                                <X className="mr-1 h-3 w-3" />
-                                Remove
+                                <X className="mr-1 h-3 w-3" aria-hidden="true" />
+                                {t("remove")}
                             </Button>
                         </div>
                     </div>
@@ -128,13 +130,13 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                 >
                     {uploading ? (
                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Uploading...
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                            {t("uploading")}
                         </>
                     ) : (
                         <>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload file
+                            <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+                            {t("uploadFile")}
                         </>
                     )}
                 </Button>
