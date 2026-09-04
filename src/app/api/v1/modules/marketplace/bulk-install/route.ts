@@ -13,9 +13,83 @@ import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
 import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { MODULES_DIR } from "@/core/lib/runtime-paths";
+import { resolveInstallPlan, installPlanErrorMessage, type CatalogEntry } from "@/core/lib/install-plan";
+import { loadMarketplaceCatalog } from "../_catalog";
+import moduleSystem from "@/core/lib/modules";
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
+
+interface RequestedModule {
+    id: string;
+    zip: string;
+    name: string;
+}
+
+/**
+ * Expands the ticked modules into a complete, ordered install list.
+ *
+ * The first-run wizard has always run every selection through
+ * `resolveInstallPlan`, on the client to show the operator what a tick pulls in
+ * and again on the server so the answer is not the client's to decide. The
+ * admin marketplace never did either, so ticking Leaderboard without ticking
+ * Store installed Leaderboard alone - and `leaderboard/api/route.ts` calls
+ * `prisma.order`, a model only Store's schema defines. The merged schema came
+ * out without it, the rebuild bulk install schedules failed, and the site sat
+ * on its last good build.
+ *
+ * Already-installed modules join the catalog so an existing dependency
+ * satisfies the plan instead of being reported missing, and so a module
+ * uploaded by hand rather than taken from the marketplace still counts.
+ */
+async function planBulkInstall(
+    requestedIds: readonly string[],
+): Promise<
+    | { ok: false; error: string }
+    | { ok: true; order: RequestedModule[]; autoAdded: string[] }
+> {
+    let index;
+    try {
+        index = await loadMarketplaceCatalog();
+    } catch {
+        return { ok: false, error: "Could not read the module marketplace catalog." };
+    }
+
+    const catalog: CatalogEntry[] = index.modules.map((m) => ({
+        id: m.id,
+        version: m.version,
+        dependencies: m.dependencies ?? [],
+        conflicts: m.conflicts ?? [],
+        ...(m.coreVersion ? { coreVersion: m.coreVersion } : {}),
+    }));
+    const known = new Set(catalog.map((e) => e.id));
+    for (const def of moduleSystem.getDefinitions()) {
+        if (known.has(def.id)) continue;
+        catalog.push({
+            id: def.id,
+            version: def.version ?? "0.0.0",
+            dependencies: def.dependencies ?? [],
+            conflicts: def.conflicts ?? [],
+        });
+    }
+
+    const plan = resolveInstallPlan(requestedIds, catalog);
+    if (plan.errors.length > 0) {
+        return { ok: false, error: plan.errors.map(installPlanErrorMessage).join("; ") };
+    }
+
+    // The zip a module ships as is the catalog's to say, not the caller's.
+    const byId = new Map(index.modules.map((m) => [m.id, m]));
+    const order: RequestedModule[] = [];
+    for (const id of plan.order) {
+        const entry = byId.get(id);
+        // Not in the marketplace means it is already on disk: nothing to fetch.
+        if (!entry) continue;
+        order.push({ id, zip: entry.zip, name: entry.name });
+    }
+
+    return { ok: true, order, autoAdded: plan.autoAdded };
+}
 
 interface BulkResult {
     id: string;
@@ -49,16 +123,29 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Max 50 modules per bulk install" }, { status: 400 });
     }
 
+    const requestedIds: string[] = [];
+    for (const mod of modules) {
+        const id = (mod as { id?: unknown }).id;
+        if (typeof id !== "string" || !/^[a-z0-9-]+$/.test(id)) {
+            return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+        }
+        if (RESERVED_IDS.includes(id)) {
+            return NextResponse.json({ error: `Module ID '${id}' is reserved` }, { status: 400 });
+        }
+        requestedIds.push(id);
+    }
+
+    const plan = await planBulkInstall(requestedIds);
+    if (!plan.ok) {
+        return NextResponse.json({ error: plan.error }, { status: 400 });
+    }
+
     const results: BulkResult[] = [];
     let hasSchemaChanges = false;
 
-    // Phase 1: Download and extract all modules
-    for (const mod of modules) {
+    // Phase 1: Download and extract all modules, dependencies first.
+    for (const mod of plan.order) {
         const { id, zip, name } = mod;
-        if (!id || !zip) { results.push({ id: id || "unknown", name: name || id, status: "failed", error: "Missing id or zip" }); continue; }
-        if (!/^[a-z0-9-]+\.zip$/.test(zip)) { results.push({ id, name: name || id, status: "failed", error: "Invalid zip name" }); continue; }
-        if (!/^[a-z0-9-]+$/.test(id)) { results.push({ id, name: name || id, status: "failed", error: "Invalid module ID" }); continue; }
-        if (RESERVED_IDS.includes(id)) { results.push({ id, name: name || id, status: "failed", error: "Module ID is reserved" }); continue; }
 
         const targetDir = path.join(MODULES_DIR, id);
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
@@ -191,7 +278,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-        total: modules.length,
+        // The plan, not the request: a dependency the operator did not tick is
+        // still a module that got installed, and the UI has to be able to say so.
+        total: plan.order.length,
+        autoAdded: plan.autoAdded,
         installed: installed.length,
         failed: results.filter(r => r.status === "failed").length,
         skipped: results.filter(r => r.status === "skipped").length,

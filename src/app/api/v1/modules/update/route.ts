@@ -5,7 +5,7 @@ import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
-import { scheduleBuild } from "@/core/lib/install-lock";
+import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import AdmZip from "adm-zip";
 import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
 import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
@@ -30,6 +30,20 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    // Install, bulk install and uninstall all serialize on this lock, and the
+    // uninstall route's own comment said update did too. It did not. An update
+    // stages the new files and then swaps them into src/modules/<id> while a
+    // concurrent uninstall is running `fs.rm` over the same directory, so the
+    // module could end up half replaced - or present with no module.json,
+    // which fails registry generation and takes the next build with it.
+    const releaseLock = await acquireInstallLock();
+    if (!releaseLock) {
+        return NextResponse.json(
+            { error: "Another module operation is in progress. Please try again." },
+            { status: 429 },
+        );
+    }
 
     try {
         const { moduleId, zipFile } = await request.json();
@@ -267,5 +281,7 @@ export async function POST(request: NextRequest) {
             ? 'Operation failed'
             : (err instanceof Error ? err.message : 'Unknown error');
         return NextResponse.json({ error: msg }, { status: 500 });
+    } finally {
+        releaseLock();
     }
 }

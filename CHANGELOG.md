@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Uninstalling a module could brick the next build.** Disabling one refuses
+  while an enabled module depends on it. Uninstall is the same operation with
+  the files deleted too, and it had no such check, so removing `store` while
+  `leaderboard` was installed took the `Order` model out of the merged Prisma
+  schema while `leaderboard/api/route.ts` went on calling `prisma.order`. The
+  rebuild uninstall schedules then failed and the site sat on its last good
+  build, with the module it would need to reinstall being the one whose files
+  were gone. Fifteen of the shipped modules depend on `store`, so this was one
+  click away on any real install. Uninstall now refuses and names the
+  dependents; every module on disk counts, enabled or not, because the schema
+  merge and the registry read the filesystem rather than `ModuleConfig`.
+- **Bulk install skipped the dependency resolution the wizard has always
+  done.** The first-run wizard expands a module selection through
+  `resolveInstallPlan` on the client, to show what a tick pulls in, and again
+  on the server so the answer is not the client's to decide. The admin
+  marketplace's bulk install did neither, so ticking Leaderboard without
+  ticking Store installed Leaderboard alone and the rebuild failed the same
+  way. It plans first now, installs dependencies before dependents, reports
+  what it added on the operator's behalf, and takes each module's zip name from
+  the catalog rather than from the caller.
+- **The update route never took the install lock.** Install, bulk install and
+  uninstall all serialize on it, and the uninstall route's own comment
+  described it as the lock "install/update use". Update staged the replacement
+  files and swapped them into the module directory with nothing stopping a
+  concurrent uninstall from running `fs.rm` over the same path, which can leave
+  a module directory with no `module.json` - registry generation fails on that,
+  and the next build fails with it.
+
 - **Controls that only a mouse could reach.** The store's breadcrumb hung its
   click handler on a `<span>`, so a visitor navigating by keyboard could not go
   back up a category, and the setup wizard hung one on the `<div>` around each

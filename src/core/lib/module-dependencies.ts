@@ -165,6 +165,36 @@ export async function checkModuleDependencies(
     };
 }
 
+/**
+ * The modules that declare a dependency on `moduleId`.
+ *
+ * The direction matters. `checkModuleDependencies` looks outward from one
+ * manifest - what does this module need. This looks inward - who needs it -
+ * which is the question every removal has to ask.
+ *
+ * Disabling and uninstalling ask it about different populations. Disabling only
+ * has to worry about modules that are running, because a disabled dependent
+ * makes no calls. Uninstalling has to worry about every module that is present
+ * on disk, enabled or not: the schema merge and the registry build read the
+ * filesystem, not `ModuleConfig`, so a disabled dependent still contributes
+ * code that references the removed module's Prisma models. Hence `onlyEnabled`.
+ */
+export function findDependents(
+    moduleId: string,
+    definitions: ReadonlyArray<{ id: string; dependencies?: string[] }>,
+    options: { onlyEnabled?: (id: string) => boolean } = {},
+): string[] {
+    const dependents: string[] = [];
+    for (const def of definitions) {
+        if (def.id === moduleId) continue;
+        const declared = def.dependencies ?? [];
+        if (!declared.some((spec) => parseDependency(spec).id === moduleId)) continue;
+        if (options.onlyEnabled && !options.onlyEnabled(def.id)) continue;
+        dependents.push(def.id);
+    }
+    return dependents;
+}
+
 export function dependencyErrorMessage(failure: DependencyCheckFailure): string {
     const parts: string[] = [];
     if (failure.coreIncompatible) {

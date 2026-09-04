@@ -7,6 +7,7 @@ import {
     dependencyErrorMessage,
     installedVersionsFrom,
     parseDependency,
+    findDependents,
 } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
@@ -154,20 +155,12 @@ export async function PATCH(request: NextRequest) {
             }
         }
     } else {
-        // When disabling: check if any enabled module depends on this one
-        const dependents: string[] = [];
-
-        for (const def of allDefs) {
-            if (def.id === moduleId) continue;
-            const deps = def.dependencies ?? [];
-            if (!deps.some((spec) => parseDependency(spec).id === moduleId)) continue;
-            // Check if this dependent module is enabled
-            const depConfig = configMap.get(def.id);
-            const isEnabled = depConfig ? depConfig.enabled : true;
-            if (isEnabled) {
-                dependents.push(def.id);
-            }
-        }
+        // When disabling: only modules that are actually running can be
+        // broken by it. A module with no config row has never been touched
+        // and counts as enabled.
+        const dependents = findDependents(moduleId, allDefs, {
+            onlyEnabled: (id) => configMap.get(id)?.enabled ?? true,
+        });
 
         if (dependents.length > 0) {
             const force = body.force === true;
