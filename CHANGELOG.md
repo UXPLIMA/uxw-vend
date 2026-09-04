@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The 404 page rendered nothing on the server.**
+  `app/[locale]/not-found.tsx` carried its own `<html>` and `<body>`, on the
+  belief that a root layout living on a top-level dynamic segment leaves a
+  not-found page with no layout to compose out of. Next composes a not-found
+  with the layouts above it, so what shipped was a document inside a document:
+  React failed the boundary on the server and streamed an empty
+  `__next_error__` shell. The status was right and the markup was in the flight
+  payload, but the body was empty until JavaScript ran, so a crawler, a text
+  browser and a reader with scripting off got a blank page for every mistyped
+  URL, every dead link and every deleted product. It is now content only, and
+  the layout that already names the language supplies the document.
+
+  `app/error.tsx` had the same fault from the other side: nothing above it
+  renders a document, and it opened with a bare `<div>`. It now carries one.
+
+  `tests/unit/app-shell-documents.test.ts` fails the build if a `not-found` or
+  `error` boundary renders a document inside a layout that already does, or if
+  one with no layout above it renders none. `global-error` is the documented
+  exception and keeps its own.
 - **Fifteen screens printed a database enum where a label belonged.**
   A Prisma enum column holds `IN_PROGRESS`, `PENDING`, `DRAFT`. Fifteen render
   sites across eight modules and two core admin pages put that value on the

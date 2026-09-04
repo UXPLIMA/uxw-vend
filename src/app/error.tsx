@@ -1,5 +1,18 @@
 "use client";
 
+/**
+ * Root error boundary.
+ *
+ * Reached for a failure that never enters a locale segment. It carries its own
+ * document for the same reason the root not-found does: the site's root layout
+ * is `app/[locale]/layout.tsx`, so nothing above this file supplies `<html>`,
+ * and a boundary that renders a bare `<div>` there leaves the browser with no
+ * document to put it in.
+ *
+ * Deliberately plain, and in English: no locale is resolved this far out, and
+ * a boundary that reaches for the database to translate itself is a boundary
+ * that can fail while reporting a failure.
+ */
 export default function RootError({
     error,
     reset,
@@ -8,6 +21,8 @@ export default function RootError({
     reset: () => void;
 }) {
     return (
+        <html lang="en">
+        <body className="antialiased bg-background">
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
             <div className="text-center max-w-md">
                 <h1 className="text-2xl font-bold text-foreground mb-2">
@@ -35,5 +50,7 @@ export default function RootError({
                 </button>
             </div>
         </div>
+        </body>
+        </html>
     );
 }

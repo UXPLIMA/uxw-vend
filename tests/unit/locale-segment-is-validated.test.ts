@@ -16,9 +16,14 @@ import path from "node:path";
  * and anything else shaped that way did the same.
  *
  * The layout now refuses a segment that is not a locale this site serves.
- * Refusing means a 404, which is why the not-found pages come with it: they
- * render outside the layout that would have given them a provider, a locale
- * and a stylesheet, so they carry their own.
+ * Refusing means a 404, which is why the not-found pages come with it. The two
+ * of them sit on opposite sides of that refusal: a `notFound()` thrown under a
+ * locale renders `app/[locale]/not-found.tsx` inside the layout, which names
+ * the language and loads the stylesheet, while a segment the layout itself
+ * rejects takes the layout down with it and leaves `app/not-found.tsx` to
+ * supply its own document. Which file may carry an `<html>` is the subject of
+ * tests/unit/app-shell-documents.test.ts; what is checked here is that a 404
+ * still names a language and reads its strings without the provider.
  */
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -109,12 +114,10 @@ describe("the layout", () => {
 });
 
 describe("the not-found pages", () => {
-    it("carry their own document, since no layout composes them", () => {
-        for (const file of ["src/app/not-found.tsx", "src/app/[locale]/not-found.tsx"]) {
-            const src = read(file);
-            expect(src, file).toMatch(/<html\b[^>]*lang=/);
-            expect(src, file).toContain("<body");
-        }
+    it("give the root one its own document, since no layout composes it", () => {
+        const src = read("src/app/not-found.tsx");
+        expect(src).toMatch(/<html\b[^>]*lang=/);
+        expect(src).toContain("<body");
     });
 
     it("read their strings without the provider the layout mounts", () => {
@@ -127,7 +130,11 @@ describe("the not-found pages", () => {
 
     it("name a language even when the request says nothing", () => {
         // resolveLocaleFromRequest always returns one of the site's locales,
-        // so `lang` is never empty and never the raw URL segment.
-        expect(read("src/app/[locale]/not-found.tsx")).toContain("lang={locale}");
+        // so `lang` is never empty and never the raw URL segment. The root
+        // not-found resolves nothing that far out and says so in its markup;
+        // the locale one is composed inside the layout, which sets the tag
+        // from the segment it has already checked.
+        expect(read("src/app/not-found.tsx")).toMatch(/<html lang="[a-z]{2}"/);
+        expect(read("src/app/[locale]/layout.tsx")).toContain("lang={locale}");
     });
 });
