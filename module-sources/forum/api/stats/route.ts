@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { dailySeries, dayLabels, isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /**
@@ -33,24 +33,15 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - period);
     startDate.setHours(0, 0, 0, 0);
 
-    const created = await prisma.forumTopic.findMany({
-        where: { createdAt: { gte: startDate } },
-        select: { createdAt: true },
-        orderBy: { createdAt: "asc" },
-    });
+    // Grouped by the database. This used to read every row in the window and
+    // bucket it here, so the work grew with the site's history to produce one
+    // number per day.
+    const series = await dailySeries({ table: "ForumTopic", since: startDate });
 
-    const labels: string[] = [];
-    const byDay: Record<string, number> = {};
-    for (let i = 0; i <= period; i++) {
-        const d = new Date(startDate);
-        d.setDate(d.getDate() + i);
-        const key = d.toISOString().split("T")[0];
-        labels.push(key);
-        byDay[key] = 0;
-    }
-    for (const row of created) {
-        const key = row.createdAt.toISOString().split("T")[0];
-        if (key in byDay) byDay[key] += 1;
+    const labels = dayLabels(startDate, period);
+    const byDay: Record<string, number> = Object.fromEntries(labels.map((k) => [k, 0]));
+    for (const row of series) {
+        if (row.day in byDay) byDay[row.day] = row.count;
     }
 
     return NextResponse.json({

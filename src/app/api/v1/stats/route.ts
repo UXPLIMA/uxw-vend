@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
-import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { cached } from "@/core/lib/cache";
+import { dailySeries, dayLabels } from "@/core/lib/daily-series";
 
 // GET /api/v1/stats?period=30d - Core stats (Users only, module stats come from module statsApi)
 export async function GET(request: NextRequest) {
@@ -18,28 +18,21 @@ export async function GET(request: NextRequest) {
         startDate.setDate(startDate.getDate() - days);
         startDate.setHours(0, 0, 0, 0);
 
-        const users = await prisma.user.findMany({
-            where: { createdAt: { gte: startDate } },
-            select: { createdAt: true },
-            orderBy: { createdAt: "asc" },
-        });
+        // Grouped by the database. This used to read every user row created in
+        // the window - a year of signups on a busy site - to produce one number
+        // per day.
+        const series = await dailySeries({ table: "User", since: startDate });
 
-        const usersByDay: Record<string, number> = {};
-        for (let i = 0; i <= days; i++) {
-            const d = new Date(startDate);
-            d.setDate(d.getDate() + i);
-            usersByDay[d.toISOString().split("T")[0]] = 0;
-        }
-        for (const user of users) {
-            const key = user.createdAt.toISOString().split("T")[0];
-            usersByDay[key] = (usersByDay[key] || 0) + 1;
+        const labels = dayLabels(startDate, days);
+        const usersByDay: Record<string, number> = Object.fromEntries(labels.map((k) => [k, 0]));
+        for (const row of series) {
+            if (row.day in usersByDay) usersByDay[row.day] = row.count;
         }
 
-        const labels = Object.keys(usersByDay);
         return {
             labels,
-            users: Object.values(usersByDay),
-            totals: { users: users.length },
+            users: labels.map((k) => usersByDay[k]),
+            totals: { users: series.reduce((sum, row) => sum + row.count, 0) },
         };
     });
 

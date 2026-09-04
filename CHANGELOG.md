@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Five stats screens read the whole history to draw a chart 366 numbers
+  long.** Core's `/api/v1/stats` and the store, tickets, blog and forum stats
+  routes each did the same thing: `findMany` every row in the window,
+  `select: { createdAt: true }`, then bucket them by day in JavaScript. The
+  window is a `period` parameter capped at 365 days, so an admin opening the
+  store analytics on a site with a year of orders pulled a year of orders into
+  Node. The number of rows read was the site's history; the answer never grows.
+  A new `dailySeries` in the SDK groups by `date_trunc('day', ...)` in the
+  database and returns at most one row per day. Every identifier it
+  interpolates is checked first, and every value is bound.
+- **The revisions filter read the revision table to fill a dropdown.**
+  `findMany({ distinct: ["resource"] })` reads rows to discard them; `groupBy`
+  is a GROUP BY the database answers.
+
 ### Security
 - **No module API endpoint was rate limited.** Core's own ninety-seven routes
   each call the limiter themselves, which holds because they are all in this
