@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { z } from "zod";
-
-const popupUpdateSchema = z.object({
-    title: z.string().optional(),
-    content: z.string().nullable().optional(),
-    image: z.string().nullable().optional(),
-    link: z.string().nullable().optional(),
-    linkText: z.string().nullable().optional(),
-    isActive: z.boolean().optional(),
-    startsAt: z.coerce.date().nullable().optional(),
-    endsAt: z.coerce.date().nullable().optional(),
-});
+import { popupUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 

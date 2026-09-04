@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
