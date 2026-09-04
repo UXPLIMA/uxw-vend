@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Seven public pages answered 200 for a URL that named nothing.** A player
+  who does not exist, a product id nobody issued, a deactivated help article,
+  a form, a custom page, a forum topic: each page looked its subject up in the
+  browser, so by the time it knew there was nothing there it had already sent
+  a 200 and a rendered shell, then drew "not found" inside it. That is a soft
+  404 - a crawler indexes it, a link checker walks past it, and a monitor
+  watching for a status sees a healthy page. `/player/nobody` and
+  `/store/product/99999` both answered 200 on the demo.
+  Rewriting seven interactive pages as server components would have been a
+  large change for a small question, so a route may now declare a `resolver`
+  in its manifest: a file default-exporting `(params) => Promise<boolean>`.
+  Core's catch-all asks it before anything renders and calls `notFound()` on
+  false, once per request, and treats a resolver that throws as no opinion so
+  a database hiccup cannot 404 a page that exists. `validate-module` fails a
+  dynamic public route that neither declares a resolver nor resolves on the
+  server, and a unit gate holds the same rule plus the wiring.
+- **A support ticket was indexable.** `/support` and `/support/[id]` show one
+  person's own conversation and had no `noindex`, unlike the cart and the
+  order confirmation next to them.
+
+### Fixed
 - **A module's own name in the navigation never followed the locale.** The
   navbar, the footer and the mobile bar printed the literal `label` from the
   manifest, so a Turkish site showed "Store" and "Punishments" between a

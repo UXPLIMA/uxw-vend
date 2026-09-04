@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -30,11 +30,13 @@
     },
     {
       "path": "/help/[slug]",
-      "component": "pages/public/help/[slug]/page.tsx"
+      "component": "pages/public/help/[slug]/page.tsx",
+      "resolver": "lib/article-exists.ts"
     },
     {
       "path": "/help/category/[slug]",
-      "component": "pages/public/help/category/[slug]/page.tsx"
+      "component": "pages/public/help/category/[slug]/page.tsx",
+      "resolver": "lib/category-exists.ts"
     }
   ],
   "adminRoutes": [

@@ -2,7 +2,7 @@
   "id": "custom-pages",
   "name": "Custom Pages",
   "description": "Admin-created HTML content pages",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -10,7 +10,8 @@
   "routes": [
     {
       "path": "/page/[slug]",
-      "component": "pages/public/[slug]/page.tsx"
+      "component": "pages/public/[slug]/page.tsx",
+      "resolver": "lib/route-exists.ts"
     }
   ],
   "adminRoutes": [

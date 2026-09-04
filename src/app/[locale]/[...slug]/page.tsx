@@ -1,11 +1,38 @@
 
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { ModuleRoutes } from "@/core/generated/module-registry";
+import { ModuleRouteResolvers } from "@/core/generated/module-route-resolvers";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
 import { moduleRouteTitle } from "@/core/lib/route-title";
+
+/**
+ * Ask the module whether the URL names anything, when it declared a way to ask.
+ *
+ * A page that looks its subject up in the browser has already answered 200 by
+ * the time it finds nothing, so `/player/nobody` was a soft 404: indexable,
+ * and invisible to a link checker or a monitor watching for a status. A route
+ * with a `resolver` in its manifest gets the question asked here instead,
+ * before anything renders.
+ *
+ * `cache` keeps it to one call per request even though metadata and the page
+ * both ask, and a resolver that throws is treated as "no opinion" rather than
+ * turning a database hiccup into a 404 on a page that exists.
+ */
+const routeExists = cache(async (key: string, params: Record<string, string | string[]>): Promise<boolean> => {
+    const load = ModuleRouteResolvers[key];
+    if (!load) return true;
+    try {
+        const { default: resolve } = await load();
+        return await resolve(params);
+    } catch (err) {
+        console.error(`[route-resolver] ${key} failed`, err);
+        return true;
+    }
+});
 
 // export const dynamic = "force-dynamic"; // Removed to support ISR
 export const revalidate = 60;
@@ -36,10 +63,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         type: "article",
     });
 
-    // Nothing serves this path: the component below is about to call
-    // `notFound()`. Next renders the not-found page with its own metadata, so
-    // this is belt and braces for anything that reads the head before then.
+    // Nothing serves this path, or the registry no longer carries the route it
+    // matched: the component below is about to call `notFound()`. Next renders
+    // the not-found page with its own metadata, so this is belt and braces for
+    // anything that reads the head before then.
+    if (!match) {
+        return { ...meta, robots: { index: false, follow: false } };
+    }
     if (!route) {
+        return { ...meta, robots: { index: false, follow: false } };
+    }
+
+    // The route pattern matches but names nothing. Same treatment: the page is
+    // about to 404, and until it does, no crawler should be told to index this.
+    if (!(await routeExists(match.key, match.params))) {
         return { ...meta, robots: { index: false, follow: false } };
     }
 
@@ -66,6 +103,10 @@ export default async function DynamicModulePage(props: PageProps) {
 
     if (!Component) {
         console.error(`Module component not found in registry: ${match.key}`);
+        notFound();
+    }
+
+    if (!(await routeExists(match.key, match.params))) {
         notFound();
     }
 

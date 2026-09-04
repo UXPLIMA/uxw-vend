@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -36,7 +36,8 @@
     },
     {
       "path": "/forum/topic/[...params]",
-      "component": "pages/public/topic/[...params]/page.tsx"
+      "component": "pages/public/topic/[...params]/page.tsx",
+      "resolver": "lib/route-exists.ts"
     },
     {
       "path": "/forum/new",

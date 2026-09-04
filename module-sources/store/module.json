@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.25",
+  "version": "2.0.26",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -119,7 +119,8 @@
     },
     {
       "path": "/store/product/[...params]",
-      "component": "pages/public/product/[...params]/page.tsx"
+      "component": "pages/public/product/[...params]/page.tsx",
+      "resolver": "lib/route-exists.ts"
     },
     {
       "path": "/store/order-success",

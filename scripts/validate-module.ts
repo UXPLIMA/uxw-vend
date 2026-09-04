@@ -1208,6 +1208,63 @@ function checkTitleFromPathIsEarned(modulePath: string): CheckResult {
 }
 
 /**
+ * A dynamic public route has to answer 404 when its URL names nothing.
+ *
+ * Either the page is a server component that looks the subject up and calls
+ * `notFound()`, or the manifest names a `resolver` and core's catch-all asks
+ * before rendering. A page that fetches in the browser and then draws "not
+ * found" has already sent a 200: search engines index it, link checkers walk
+ * past it, and a monitor watching for a status sees a healthy page.
+ */
+function checkDynamicRoutes404(modulePath: string): CheckResult {
+    const name = "Dynamic routes 404";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name, passed: true, message: "No manifest to check" };
+    }
+
+    let manifest: { routes?: Array<{ path: string; component: string; resolver?: string }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest is unreadable; another check reports that" };
+    }
+
+    const dynamic = (manifest.routes ?? []).filter((route) => route.path.includes("["));
+    if (dynamic.length === 0) {
+        return { name, passed: true, message: "No dynamic public routes" };
+    }
+
+    const offenders: string[] = [];
+    for (const route of dynamic) {
+        if (route.resolver) continue;
+        const component = path.join(modulePath, route.component);
+        if (!fs.existsSync(component)) {
+            offenders.push(`${route.path} (component missing)`);
+            continue;
+        }
+        const body = fs.readFileSync(component, "utf8");
+        const isClient = /^\s*["']use client["']/m.test(body);
+        if (isClient || !/\bnotFound\s*\(\s*\)/.test(body)) {
+            offenders.push(route.path);
+        }
+    }
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} dynamic route(s) answer 200 for a URL that names nothing: ${offenders.join(", ")}`,
+            suggestion:
+                "Add a `resolver` to the route in module.json - a file default-exporting " +
+                "`(params) => Promise<boolean>` - or resolve on the server and call notFound().",
+        };
+    }
+
+    return { name, passed: true, message: `${dynamic.length} dynamic route(s) answer 404 properly` };
+}
+
+/**
  * Find each `prisma.setting.upsert(...)` / `.create(...)` call and return the
  * source of its argument, by counting brackets from the opening paren.
  */
@@ -1567,6 +1624,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),
+        checkDynamicRoutes404(modulePath),
         checkSettingsAreOwned(modulePath),
         checkNoMassAssignment(modulePath),
         checkCspOriginsDeclared(modulePath),
