@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumTopicSchema } from "../../lib/validations";
+import { denyGuestView } from "../../lib/guest-view";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -19,9 +20,18 @@ async function getModerationMode(field: keyof ModerationSettingValue): Promise<"
 
 // GET /api/v1/forum/topics
 export async function GET(request: NextRequest) {
+    const denied = await denyGuestView();
+    if (denied) return denied;
+
     const searchParams = request.nextUrl.searchParams;
     const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20") || 20));
+    // The page size is the admin's `topicsPerPage`, not a constant. An explicit
+    // ?limit= still wins for API callers, capped as before.
+    const { topicsPerPage } = await moduleSettings<{ topicsPerPage: number }>("forum");
+    const requestedLimit = parseInt(searchParams.get("limit") || "");
+    const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
+        ? Math.min(100, requestedLimit)
+        : topicsPerPage;
     const categoryId = searchParams.get("category");
     const search = searchParams.get("search") || "";
 

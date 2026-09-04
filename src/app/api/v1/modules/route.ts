@@ -14,6 +14,7 @@ import { invalidateModuleCache } from "@/core/lib/module-cache";
 import path from "path";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
+import { resolveSettings, settingDeclarations, validateSettingsInput } from "@/core/lib/module-settings";
 
 
 // Cache marketplace index for update checks
@@ -73,10 +74,10 @@ export async function GET() {
         return {
             ...def,
             enabled: configMap.get(def.id)?.enabled ?? true,
-            config: {
-                ...def.defaultConfig,
-                ...(configMap.get(def.id)?.config as object || {}),
-            },
+            // Declarations and resolved values both, so the admin form can be
+            // rendered from one response without knowing any module's keys.
+            settings: settingDeclarations(def.id),
+            config: resolveSettings(def.id, configMap.get(def.id)?.config),
             updateAvailable,
             latestVersion: latestVersion ?? null,
         };
@@ -115,6 +116,16 @@ export async function PATCH(request: NextRequest) {
     if (!definition) {
         return NextResponse.json({ error: "Module not found" }, { status: 404 });
     }
+
+    // A config bag used to be persisted exactly as posted. Nothing declared
+    // what belonged in it, so any JSON an admin could reach this endpoint with
+    // was stored forever and read by nobody. It is now checked against the
+    // module's own declarations before it goes anywhere near the database.
+    const configCheck = validateSettingsInput(moduleId, config);
+    if (!configCheck.ok) {
+        return NextResponse.json({ error: configCheck.error }, { status: 400 });
+    }
+    const validatedConfig = config === undefined || config === null ? undefined : configCheck.value;
 
     const wantEnabled = enabled ?? true;
 
@@ -196,11 +207,11 @@ export async function PATCH(request: NextRequest) {
             id: moduleId,
             name: definition.name,
             enabled: wantEnabled,
-            config: config || {},
+            config: validatedConfig ?? {},
         },
         update: {
             enabled: wantEnabled,
-            ...(config ? { config } : {}),
+            ...(validatedConfig ? { config: validatedConfig } : {}),
         },
     });
 

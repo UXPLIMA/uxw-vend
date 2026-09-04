@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.29",
+  "version": "2.1.0",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -43,12 +43,31 @@
       "handler": "hooks/on-subscription-changed.ts"
     }
   ],
-  "defaultConfig": {
-    "allowGuestCheckout": false,
-    "maxCartItems": 10,
-    "enableCoupons": true,
-    "enableGiftCards": false
-  },
+  "settings": [
+    {
+      "key": "maxCartItems",
+      "type": "number",
+      "default": 10,
+      "min": 1,
+      "max": 100,
+      "label": "Maximum items in a cart",
+      "description": "How many distinct products one cart may hold."
+    },
+    {
+      "key": "enableCoupons",
+      "type": "boolean",
+      "default": true,
+      "label": "Enable coupon codes",
+      "description": "Whether shoppers can apply a coupon at checkout."
+    },
+    {
+      "key": "enableGiftCards",
+      "type": "boolean",
+      "default": true,
+      "label": "Enable gift codes",
+      "description": "Whether shoppers can redeem a gift code for store credit."
+    }
+  ],
   "navGroups": [
     {
       "id": "commerce",

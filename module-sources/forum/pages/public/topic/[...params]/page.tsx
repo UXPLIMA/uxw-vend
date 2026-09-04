@@ -10,7 +10,7 @@ import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { ArrowLeft, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { useTranslations } from "next-intl";
 
@@ -55,25 +55,34 @@ export default function TopicDetailPage() {
     const [sending, setSending] = useState(false);
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
+    const [postsPage, setPostsPage] = useState(1);
+    const [postsPages, setPostsPages] = useState(1);
+    const [restricted, setRestricted] = useState(false);
 
-    const fetchTopic = () => {
-        fetch(`/api/v1/forum/topics/${topicId}`)
-            .then((r) => r.json())
+    const fetchTopic = (page = postsPage) => {
+        fetch(`/api/v1/forum/topics/${topicId}?postsPage=${page}`)
+            .then(async (r) => {
+                if (r.status === 403) { setRestricted(true); return null; }
+                return r.json();
+            })
             .then((d) => {
-                setTopic(d.topic || null);
+                if (d) {
+                    setTopic(d.topic || null);
+                    setPostsPages(d.postsPages || 1);
+                }
                 setLoading(false);
             })
             .catch(() => setLoading(false));
     };
 
     useEffect(() => {
-        fetchTopic();
+        fetchTopic(postsPage);
         // Check like status
         fetch(`/api/v1/forum/topics/${topicId}/like`)
             .then((r) => r.json())
             .then((d) => { setLiked(d.liked); setLikeCount(d.count); })
             .catch(() => {});
-    }, [topicId]);  // eslint-disable-line react-hooks/exhaustive-deps
+    }, [topicId, postsPage]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     const toggleLike = async () => {
         if (!topic) return;
@@ -144,6 +153,13 @@ export default function TopicDetailPage() {
                     <div className="text-center py-12">
                         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
                     </div>
+                ) : restricted ? (
+                    <Card>
+                        <CardContent className="py-12 text-center space-y-3">
+                            <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
+                            <Link href="/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                        </CardContent>
+                    </Card>
                 ) : !topic ? (
                     <Card>
                         <CardContent className="py-12 text-center">
@@ -205,6 +221,31 @@ export default function TopicDetailPage() {
                                     <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
                                 ))}
                             </div>
+                        )}
+
+                        {/* Reply pager - a long thread arrives a page at a time */}
+                        {postsPages > 1 && (
+                            <nav className="flex items-center justify-center gap-3 mb-6" aria-label={t('replies', { count: topic.posts.length })}>
+                                <Button
+                                    variant="outline" size="icon"
+                                    onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
+                                    disabled={postsPage <= 1}
+                                    aria-label={t('previous')}
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                    {t('pageOf', { page: postsPage, total: postsPages })}
+                                </span>
+                                <Button
+                                    variant="outline" size="icon"
+                                    onClick={() => setPostsPage((p) => Math.min(postsPages, p + 1))}
+                                    disabled={postsPage >= postsPages}
+                                    aria-label={t('next')}
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </nav>
                         )}
 
                         {/* Reply Form */}

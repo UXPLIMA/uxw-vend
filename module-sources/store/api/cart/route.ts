@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { moduleSettings, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -114,6 +114,25 @@ export async function POST(request: NextRequest) {
                 { error: "Insufficient stock" },
                 { status: 400 }
             );
+        }
+
+        // A cart could hold every product in the catalogue: nothing capped how
+        // many distinct lines it carried, only the quantity on each. The cap
+        // applies to new lines only, so raising the quantity on something
+        // already in the cart is never refused.
+        const { maxCartItems } = await moduleSettings<{ maxCartItems: number }>("store");
+        const existing = await prisma.cartItem.findUnique({
+            where: { userId_productId: { userId: session.user.id, productId } },
+            select: { id: true },
+        });
+        if (!existing) {
+            const lines = await prisma.cartItem.count({ where: { userId: session.user.id } });
+            if (lines >= maxCartItems) {
+                return NextResponse.json(
+                    { error: `A cart can hold at most ${maxCartItems} different products`, code: "cart_full" },
+                    { status: 400 },
+                );
+            }
         }
 
         // Upsert cart item

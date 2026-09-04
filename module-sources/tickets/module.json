@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -13,11 +13,6 @@
     "tickets.create",
     "tickets.reply"
   ],
-  "defaultConfig": {
-    "allowAttachments": true,
-    "maxAttachmentSize": 10485760,
-    "autoCloseAfterDays": 7
-  },
   "menu": [
     {
       "label": "Tickets",

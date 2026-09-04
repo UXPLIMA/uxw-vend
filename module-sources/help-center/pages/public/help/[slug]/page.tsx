@@ -13,10 +13,12 @@ interface Article {
     title: string;
     slug: string;
     content: string;
-    views: number;
+    /** null when the site has turned view counts off. */
+    views: number | null;
     helpful: number;
     notHelpful: number;
     category: { id: string; name: string; slug: string };
+    settings?: { showViewCount: boolean; enableFeedback: boolean };
 }
 
 interface PageProps {
@@ -97,8 +99,12 @@ export default function HelpArticlePage({ params }: PageProps) {
 
                             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b">
                                 <span>{t("articleCategory", { name: article.category.name })}</span>
-                                <span>•</span>
-                                <span>{t("views", { count: article.views })}</span>
+                                {article.views !== null && (
+                                    <>
+                                        <span>•</span>
+                                        <span>{t("views", { count: article.views })}</span>
+                                    </>
+                                )}
                             </div>
 
                             {/* Article Content */}
@@ -108,6 +114,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                             />
 
                             {/* Feedback */}
+                            {article.settings?.enableFeedback !== false && (
                             <div className="border-t pt-6">
                                 <p className="font-medium text-foreground mb-3">{t("wasHelpful")}</p>
                                 {feedbackGiven ? (
@@ -129,6 +136,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                                     </div>
                                 )}
                             </div>
+                            )}
                         </div>
 
                         {/* Related */}

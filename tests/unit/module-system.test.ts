@@ -7,6 +7,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * reporting "enabled" then would expose a disabled module's admin surface.
  * getAllPermissions feeds the permission registry, so a module leaking in
  * there while disabled widens the authorization surface.
+ *
+ * Reading a module's settings is NOT here: that is module-cache's
+ * moduleSettings(), covered by module-settings.test.ts. This singleton once
+ * carried a getConfig() alongside it that nothing ever called.
  */
 
 const { moduleLoader } = vi.hoisted(() => ({
@@ -20,7 +24,6 @@ import { moduleSystem } from "@/core/lib/modules";
 interface Manifest {
     id: string;
     permissions?: string[];
-    defaultConfig?: Record<string, unknown>;
 }
 
 function manifests(...list: Manifest[]) {
@@ -100,36 +103,6 @@ describe("isEnabled", () => {
 
         expect(moduleSystem.isEnabled("shop")).toBe(false);
         expect(moduleSystem.isEnabled("blog")).toBe(true);
-    });
-});
-
-describe("getConfig", () => {
-    it("returns the manifest defaults when nothing is stored", () => {
-        manifests({ id: "shop", defaultConfig: { currency: "USD", perPage: 20 } });
-
-        expect(moduleSystem.getConfig("shop")).toEqual({ currency: "USD", perPage: 20 });
-    });
-
-    it("lets the stored config override a default", async () => {
-        manifests({ id: "shop", defaultConfig: { currency: "USD", perPage: 20 } });
-        await moduleSystem.initialize([
-            state("shop", true, { currency: "EUR" }),
-        ]);
-
-        expect(moduleSystem.getConfig("shop")).toEqual({ currency: "EUR", perPage: 20 });
-    });
-
-    it("is an empty object for an unknown module", () => {
-        expect(moduleSystem.getConfig("nope")).toEqual({});
-    });
-
-    it("returns stored config even for a module with no defaults", async () => {
-        manifests({ id: "shop" });
-        await moduleSystem.initialize([
-            state("shop", true, { a: 1 }),
-        ]);
-
-        expect(moduleSystem.getConfig("shop")).toEqual({ a: 1 });
     });
 });
 

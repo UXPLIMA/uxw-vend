@@ -4,6 +4,20 @@
  * runtime state (enabled, version on disk) that a catalogue entry never has.
  */
 
+/** One admin-editable setting a module declares in its manifest. */
+export interface ModuleSettingDecl {
+    key: string;
+    type: "boolean" | "number" | "string";
+    default: boolean | number | string;
+    label: string;
+    description?: string;
+    min?: number;
+    max?: number;
+    maxLength?: number;
+}
+
+export type ModuleSettingValues = Record<string, boolean | number | string>;
+
 export interface Module {
     id: string;
     name: string;
@@ -11,6 +25,10 @@ export interface Module {
     version: string;
     icon?: string;
     enabled: boolean;
+    /** What the manifest declares, so the form is built from the module itself. */
+    settings?: ModuleSettingDecl[];
+    /** Declared defaults overlaid with what the admin has saved. */
+    config?: ModuleSettingValues;
     dependencies?: string[];
     conflicts?: string[];
     routes?: { public?: string[]; admin?: string[] };

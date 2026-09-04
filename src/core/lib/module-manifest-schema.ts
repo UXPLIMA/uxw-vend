@@ -568,6 +568,59 @@ const cspContribution = z
     })
     .strict();
 
+/**
+ * One admin-editable setting a module declares.
+ *
+ * This replaced `defaultConfig`, a bare `Record<string, unknown>` of values.
+ * That field could only ever supply a default: it carried no type, no bounds
+ * and no label, so core could not render it, could not validate what an admin
+ * submitted for it, and could not tell a live setting from a forgotten one.
+ * Five modules declared sixteen keys under it and not one of them was read
+ * anywhere. A declaration that describes itself is what makes the settings
+ * form, the PATCH validation, the runtime read path and the
+ * "every declared key is read" gate all possible from one source.
+ */
+const moduleSetting = z
+    .object({
+        key: z.string().min(1).max(48).regex(/^[a-z][A-Za-z0-9]*$/, "setting key must be lowerCamelCase"),
+        type: z.enum(["boolean", "number", "string"]),
+        default: z.union([z.boolean(), z.number(), z.string()]),
+        /** English label shown in the admin form. */
+        label: z.string().min(1).max(80),
+        description: z.string().max(200).optional(),
+        /** Required for `number`: an admin form and a clamp both need bounds. */
+        min: z.number().optional(),
+        max: z.number().optional(),
+        /** Required for `string`, for the same reason. */
+        maxLength: z.number().int().min(1).max(10_000).optional(),
+    })
+    .strict()
+    .superRefine((setting, ctx) => {
+        if (typeof setting.default !== setting.type) {
+            ctx.addIssue({ code: "custom", message: `setting "${setting.key}": default must be a ${setting.type}` });
+        }
+        if (setting.type === "number") {
+            if (setting.min === undefined || setting.max === undefined) {
+                ctx.addIssue({ code: "custom", message: `setting "${setting.key}": a number setting must declare min and max` });
+            } else if (setting.min > setting.max) {
+                ctx.addIssue({ code: "custom", message: `setting "${setting.key}": min is greater than max` });
+            } else if (typeof setting.default === "number" && (setting.default < setting.min || setting.default > setting.max)) {
+                ctx.addIssue({ code: "custom", message: `setting "${setting.key}": default is outside min..max` });
+            }
+        } else if (setting.min !== undefined || setting.max !== undefined) {
+            ctx.addIssue({ code: "custom", message: `setting "${setting.key}": min/max only apply to a number setting` });
+        }
+        if (setting.type === "string") {
+            if (setting.maxLength === undefined) {
+                ctx.addIssue({ code: "custom", message: `setting "${setting.key}": a string setting must declare maxLength` });
+            } else if (typeof setting.default === "string" && setting.default.length > setting.maxLength) {
+                ctx.addIssue({ code: "custom", message: `setting "${setting.key}": default is longer than maxLength` });
+            }
+        } else if (setting.maxLength !== undefined) {
+            ctx.addIssue({ code: "custom", message: `setting "${setting.key}": maxLength only applies to a string setting` });
+        }
+    });
+
 export const moduleManifestSchema = z.object({
     id: z.string().min(1).max(64).regex(SAFE_ID, "id must be lowercase alphanumeric + hyphens"),
     name: z.string().min(1).max(100),
@@ -576,7 +629,19 @@ export const moduleManifestSchema = z.object({
     author: z.string().max(100).optional(),
     icon: iconName.optional(),
     permissions: z.array(z.string().min(1).max(128).regex(/^[a-z0-9._-]+$/)).max(100).optional(),
-    defaultConfig: z.record(z.string(), z.unknown()).optional(),
+    /**
+     * Admin-editable settings. `defaultConfig` is deliberately absent: the
+     * manifest is `.strict()`, so a module still carrying it fails to load
+     * with a clear error rather than shipping a field nothing reads.
+     */
+    settings: z
+        .array(moduleSetting)
+        .max(50)
+        .refine(
+            (list) => new Set(list.map((s) => s.key)).size === list.length,
+            "settings: duplicate key",
+        )
+        .optional(),
     dependencies: z.array(dependencySpec).max(50).optional(),
     conflicts: z.array(dependencySpec).max(50).optional(),
     /**

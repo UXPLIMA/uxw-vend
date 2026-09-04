@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { moduleManifestSchema, type ValidatedModuleManifest } from '../src/core/lib/module-manifest-schema';
 import { findNavGroupConflicts, type ModuleNavGroupDeclaration } from '../src/core/lib/nav-group-conflicts';
+import type { ModuleSetting } from '../src/core/lib/module-types';
 
 function toComponentName(basename: string): string {
     return basename
@@ -150,6 +151,7 @@ function generateRegistry() {
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
     const allUserDataTables: ({ model: string; key: string; column: string; module: string })[] = [];
     const allModerationProviders: ({ id: string; label: string; labelKey?: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string; handler: string; module: string })[] = [];
+    const allSettings: Record<string, ModuleSetting[]> = {};
 
 
     for (const { moduleName, manifest } of loaded) {
@@ -163,6 +165,7 @@ function generateRegistry() {
         manifest.navGroups?.forEach((ng) => allNavGroups.push({ ...ng, module: moduleName }));
         manifest.authProviders?.forEach((ap) => allAuthProviders.push({ ...ap, module: moduleName }));
         manifest.webhookChannels?.forEach((wc) => allWebhookChannels.push({ ...wc, module: moduleName }));
+        if (manifest.settings?.length) allSettings[manifest.id] = manifest.settings;
         manifest.settingsCards?.forEach((sc) => allSettingsCards.push({ ...sc, module: moduleName }));
         manifest.navbarComponents?.forEach((nc) => allNavbarComponents.push({ ...nc, module: moduleName }));
         manifest.footerComponents?.forEach((fc) => allFooterComponents.push({ ...fc, module: moduleName }));
@@ -337,10 +340,14 @@ function generateRegistry() {
 
     const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
     let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
+    dataContent += `import type { ModuleSetting } from "@/core/lib/module-types";\n\n`;
     dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
     dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     dataContent += `// Outbound webhook channels contributed by modules. Core owns the alert\n`;
     dataContent += `// content and the wire layouts; a channel only names its hosts and layout.\n`;
+    dataContent += `// Admin-editable settings declared by each module, keyed by module id.\n`;
+    dataContent += `// Core renders, validates and clamps these without knowing what any key means.\n`;
+    dataContent += `export const ModuleSettings: Record<string, ModuleSetting[]> = ${JSON.stringify(allSettings, null, 2)};\n\n`;
     dataContent += `export const ModuleWebhookChannels: { id: string; label: string; layout: "json" | "embed" | "attachment"; hosts?: string[]; urlPlaceholder?: string; module: string }[] = ${JSON.stringify(allWebhookChannels, null, 2)};\n`;
     fs.writeFileSync(DATA_FILE, dataContent);
 

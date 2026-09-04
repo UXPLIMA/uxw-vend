@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { compareVersions } from "./module-display";
-import type { Module, MarketplaceModule, SortKey } from "./types";
+import type { Module, MarketplaceModule, ModuleSettingValues, SortKey } from "./types";
 import { dateLocaleTag } from "@/core/lib/utils";
 
 export function useAdminModules() {
@@ -90,6 +90,33 @@ export function useAdminModules() {
         () => modulesWithUpdates.filter((m) => m.updateAvailable).length,
         [modulesWithUpdates],
     );
+
+    /**
+     * Save one module's settings. The values are checked against the module's
+     * own declarations on the server, so a bad field comes back as a message
+     * rather than being stored.
+     */
+    const saveSettings = async (moduleId: string, config: ModuleSettingValues): Promise<boolean> => {
+        const current = modules.find(m => m.id === moduleId);
+        try {
+            const res = await fetch("/api/v1/modules", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ moduleId, enabled: current?.enabled ?? true, config }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || t("modules_settingsFailed"));
+                return false;
+            }
+            setModules(modules.map(m => m.id === moduleId ? { ...m, config } : m));
+            toast.success(t("modules_settingsSaved"));
+            return true;
+        } catch {
+            toast.error(t("modules_networkError"));
+            return false;
+        }
+    };
 
     const toggleModule = async (moduleId: string, enabled: boolean) => {
         setUpdating(moduleId);
@@ -325,6 +352,7 @@ export function useAdminModules() {
         marketplaceById,
         updatesAvailableCount,
         toggleModule,
+        saveSettings,
         handleUpload,
         handleDelete,
         handleUpdate,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/store/coupons/validate - Check coupon validity
@@ -16,6 +16,11 @@ export async function POST(request: NextRequest) {
     );
     if (!rl.success) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
+    const { enableCoupons } = await moduleSettings<{ enableCoupons: boolean }>("store");
+    if (!enableCoupons) {
+        return NextResponse.json({ valid: false, error: "Coupon codes are not accepted" });
     }
 
     const jsonBody = await readJsonBody(request);

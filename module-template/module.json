@@ -18,9 +18,15 @@
         "mymodule.manage"
     ],
 
-    "defaultConfig": {
-        "exampleSetting": true
-    },
+    "settings": [
+        {
+            "key": "exampleSetting",
+            "type": "boolean",
+            "default": true,
+            "label": "Example setting",
+            "description": "Read it with moduleSettings(\"my-module\") - a setting nothing reads fails validation."
+        }
+    ],
 
 
     "menu": [

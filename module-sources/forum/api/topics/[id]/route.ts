@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumPostSchema } from "../../../lib/validations";
+import { denyGuestView } from "../../../lib/guest-view";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -22,8 +23,19 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
 
+    const denied = await denyGuestView();
+    if (denied) return denied;
+
     const sessionGet = await auth();
     const adminCheckGet = sessionGet?.user?.id ? await isAdmin(sessionGet.user.id) : false;
+
+    // Replies used to come back in one unbounded include: a thread that ran to
+    // ten thousand posts was ten thousand rows in one response, every time
+    // anyone opened it. They are now a page of `postsPerPage`, the size the
+    // admin sets.
+    const { postsPerPage } = await moduleSettings<{ postsPerPage: number }>("forum");
+    const postsPage = Math.max(1, parseInt(request.nextUrl.searchParams.get("postsPage") || "1") || 1);
+    const postWhere = adminCheckGet ? undefined : { moderationState: "APPROVED" as const };
 
     const topic = await prisma.forumTopic.findFirst({
         where: { OR: [{ id }, { slug: id }, ...(isNaN(Number(id)) ? [] : [{ number: Number(id) }])] },
@@ -31,8 +43,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             author: { select: { id: true, username: true, avatar: true } },
             category: { select: { id: true, name: true, slug: true, color: true } },
             posts: {
-                where: adminCheckGet ? undefined : { moderationState: "APPROVED" },
+                where: postWhere,
                 orderBy: { createdAt: "asc" },
+                skip: (postsPage - 1) * postsPerPage,
+                take: postsPerPage,
                 include: {
                     author: { select: { id: true, username: true, avatar: true } },
                     _count: { select: { likes: true } },
@@ -57,7 +71,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         data: { views: { increment: 1 } },
     });
 
-    return NextResponse.json({ topic });
+    // Counted separately rather than through `_count`: a non-admin only sees
+    // approved replies, and a pager built from the raw total would offer them
+    // pages that render empty.
+    const postsTotal = await prisma.forumPost.count({
+        where: { topicId: topic.id, ...(postWhere ?? {}) },
+    });
+
+    return NextResponse.json({
+        topic,
+        postsPage,
+        postsPerPage,
+        postsTotal,
+        postsPages: Math.max(1, Math.ceil(postsTotal / postsPerPage)),
+    });
 }
 
 // POST /api/v1/forum/topics/[id] - Reply to topic
