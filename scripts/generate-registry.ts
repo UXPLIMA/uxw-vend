@@ -642,9 +642,50 @@ function generateModuleRoutes() {
     console.log(`Generated module routes at ${ROUTES_OUTPUT_FILE}`);
 }
 
+const CSP_OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-csp.json');
+
+/**
+ * Collect the external origins the installed modules need in the CSP.
+ *
+ * Core's policy is one fixed list built in `next.config.ts`, and a module has
+ * no way to reach it from there - which is why the Discord widget's iframe and
+ * the Google Analytics tag both rendered nothing while core's own `frame-src`
+ * named two payment origins that nothing loads. JSON rather than a TypeScript
+ * module because `next.config.ts` reads this with `fs`: it is loaded by Next's
+ * own config loader in dev, build and start alike, and a plain file read
+ * behaves the same in all three.
+ *
+ * The manifest schema has already refused anything but a concrete https
+ * origin, so nothing here can widen the policy beyond naming a host.
+ */
+function generateModuleCsp() {
+    const loaded = loadManifests();
+    const byDirective: Record<string, Set<string>> = {};
+
+    for (const { manifest } of loaded) {
+        for (const [directive, origins] of Object.entries(manifest.csp ?? {})) {
+            if (!Array.isArray(origins)) continue;
+            byDirective[directive] ??= new Set<string>();
+            for (const origin of origins) byDirective[directive].add(origin);
+        }
+    }
+
+    const out: Record<string, string[]> = {};
+    for (const directive of Object.keys(byDirective).sort()) {
+        out[directive] = [...byDirective[directive]].sort();
+    }
+
+    const dir = path.dirname(CSP_OUTPUT_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CSP_OUTPUT_FILE, JSON.stringify(out, null, 2) + '\n');
+    const total = Object.values(out).reduce((n, o) => n + o.length, 0);
+    console.log(`Generated module CSP contributions at ${CSP_OUTPUT_FILE} (${total} origin(s))`);
+}
+
 function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 generateRegistry();
 generateModuleRoutes();
+generateModuleCsp();

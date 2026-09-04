@@ -482,6 +482,41 @@ const translationValue: z.ZodType<TranslationValue> = z.lazy(() =>
 );
 const translations = z.record(z.string(), z.record(z.string(), translationValue));
 
+/**
+ * External origins a module needs the Content-Security-Policy to allow.
+ *
+ * Core's CSP is one fixed list, and it used to carry payment gateway origins
+ * by name - which is core knowing about modules, and was wrong twice over,
+ * since neither gateway ever loaded them and three features that did need an
+ * origin were blocked. The Discord widget's iframe and the Google Analytics
+ * tag both rendered nothing, with no error anywhere but the browser console.
+ *
+ * A module may only widen the fetch directives, and only with a concrete
+ * https origin. Keywords are refused outright: `'unsafe-inline'`,
+ * `'unsafe-eval'`, `*`, `data:` and a bare scheme would let one module undo
+ * the policy for every page on the site.
+ */
+const CSP_ORIGIN = z
+    .string()
+    .min(1)
+    .max(253)
+    .regex(
+        /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/,
+        "must be a concrete https origin, e.g. https://discord.com",
+    );
+
+const cspContribution = z
+    .object({
+        "script-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "frame-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "connect-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "img-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "style-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "font-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "media-src": z.array(CSP_ORIGIN).max(10).optional(),
+    })
+    .strict();
+
 export const moduleManifestSchema = z.object({
     id: z.string().min(1).max(64).regex(SAFE_ID, "id must be lowercase alphanumeric + hyphens"),
     name: z.string().min(1).max(100),
@@ -552,6 +587,7 @@ export const moduleManifestSchema = z.object({
     seoRoutes: z.object({ handler: relativePath("handler") }).optional(),
     userDataExport: z.array(userDataExportEntry).max(50).optional(),
     moderationProviders: z.array(moderationProvider).max(20).optional(),
+    csp: cspContribution.optional(),
 }).strict();
 
 export type ValidatedModuleManifest = z.infer<typeof moduleManifestSchema>;

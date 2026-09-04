@@ -1004,6 +1004,86 @@ function readStringLiteral(source: string, start: number): string | null {
  * Without this check the flag is a way to punch an unauthenticated hole
  * through the gate, which is the opposite of what it exists for.
  */
+/**
+ * Every external origin a module loads must be one it declared.
+ *
+ * Core's CSP allows no third-party host on its own, so an iframe or a script
+ * tag pointing at one renders nothing and says so only in the browser console.
+ * The Discord widget and the Google Analytics tag both shipped that way for as
+ * long as they existed. The declaration is what puts the origin in the policy,
+ * so an undeclared one is a feature that cannot work.
+ */
+function checkCspOriginsDeclared(modulePath: string): CheckResult {
+    const name = "External origins are declared for the CSP";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name, passed: true, message: "No manifest to check" };
+    }
+
+    let manifest: { csp?: Record<string, string[]> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest is unreadable; another check reports that" };
+    }
+
+    const declared = new Set<string>();
+    for (const origins of Object.values(manifest.csp ?? {})) {
+        if (Array.isArray(origins)) for (const o of origins) declared.add(o);
+    }
+
+    const files: string[] = [];
+    const walk = (dir: string) => {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) walk(full);
+            else if (/\.tsx?$/.test(entry.name)) files.push(full);
+        }
+    };
+    walk(modulePath);
+
+    // Only the two directives a missing origin renders as "nothing happened":
+    // a blocked frame and a blocked script. Fetches ride core's `https:`.
+    const patterns = [
+        /<iframe[\s\S]{0,400}?src=\{?[`"']([^`"'{$]*https:\/\/[^`"'/]+)/g,
+        /<[Ss]cript[\s\S]{0,300}?src=\{?[`"']([^`"'{$]*https:\/\/[^`"'/]+)/g,
+    ];
+    const undeclared = new Set<string>();
+    for (const file of files) {
+        const source = fs.readFileSync(file, "utf8");
+        for (const pattern of patterns) {
+            for (const match of source.matchAll(pattern)) {
+                const url = match[1].replace(/^.*?(https:\/\/)/, "$1");
+                let origin: string;
+                try {
+                    origin = new URL(url).origin;
+                } catch {
+                    continue;
+                }
+                if (!declared.has(origin)) undeclared.add(origin);
+            }
+        }
+    }
+
+    if (undeclared.size > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${undeclared.size} origin(s) loaded but not declared: ${[...undeclared].join(", ")}`,
+            suggestion:
+                'Add them to the manifest, e.g. "csp": { "frame-src": ["https://discord.com"] }. ' +
+                "Core's policy allows no third-party origin, so an undeclared one is blocked in the browser.",
+        };
+    }
+
+    return {
+        name,
+        passed: true,
+        message: declared.size > 0 ? `${declared.size} declared origin(s)` : "Loads no external origin",
+    };
+}
+
 function checkProviderCallbacksVerify(modulePath: string): CheckResult {
     const name = "Provider callbacks authenticate themselves";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1286,6 +1366,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkModuleFetchPaths(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
+        checkCspOriginsDeclared(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

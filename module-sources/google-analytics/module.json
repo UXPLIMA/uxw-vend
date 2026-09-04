@@ -2,7 +2,7 @@
   "id": "google-analytics",
   "name": "Google Analytics",
   "description": "Google Analytics tracking integration",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -251,5 +251,10 @@
         "adm_field2Off": "Desativado"
       }
     }
+  },
+  "csp": {
+    "script-src": [
+      "https://www.googletagmanager.com"
+    ]
   }
 }
