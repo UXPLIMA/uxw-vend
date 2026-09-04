@@ -13,6 +13,7 @@
 
 import { prisma } from "@/core/lib/db";
 import { cacheGet, cacheSet, cacheDel } from "@/core/lib/redis";
+import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
 
 const CACHE_PREFIX = "uxw:translations:";
 const CACHE_TTL_SECONDS = 120;
@@ -69,7 +70,7 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
     const messages: Record<string, Record<string, unknown>> = {};
 
     for (const row of rows) {
-        if (!messages[row.namespace]) messages[row.namespace] = {};
+        if (!messages[row.namespace]) messages[row.namespace] = emptyRecord();
         setNestedValue(messages[row.namespace], row.key, row.value);
     }
 
@@ -212,17 +213,15 @@ function flattenObject(
     }
 }
 
-const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
-
 function setNestedValue(obj: Record<string, unknown>, dotPath: string, value: string): void {
     const parts = dotPath.split(".");
     // Reject prototype-polluting keys anywhere in the path.
-    if (parts.some((p) => UNSAFE_KEYS.has(p))) return;
+    if (parts.some(isUnsafeKey)) return;
     let current = obj;
     for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
         if (typeof current[part] !== "object" || current[part] === null) {
-            current[part] = {};
+            current[part] = emptyRecord();
         }
         current = current[part] as Record<string, unknown>;
     }

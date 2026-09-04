@@ -42,6 +42,7 @@ export {
     formatCurrency,
     formatDate,
     slugify,
+    stripHtmlTags,
     generateSlug,
     generateOrderNumber,
 } from "@/core/lib/utils";

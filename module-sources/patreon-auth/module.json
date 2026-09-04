@@ -2,7 +2,7 @@
   "id": "patreon-auth",
   "name": "Patreon Login",
   "description": "Allow users to sign in with their Patreon account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -51,41 +51,6 @@
         "adm_title": "Patreon ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Patreon ile OAuth girişini yapılandırın.",
         "signInWith": "Patreon ile giriş yap"
-      }
-    },
-    "de": {
-      "patreonAuth": {
-        "adm_title": "Patreon-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Patreon für Ihre Seite einrichten.",
-        "signInWith": "Mit Patreon anmelden"
-      }
-    },
-    "es": {
-      "patreonAuth": {
-        "adm_title": "Inicio de sesión con Patreon",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Patreon para tu sitio.",
-        "signInWith": "Iniciar sesión con Patreon"
-      }
-    },
-    "fr": {
-      "patreonAuth": {
-        "adm_title": "Connexion Patreon",
-        "adm_subtitle": "Configurez la connexion OAuth Patreon pour votre site.",
-        "signInWith": "Se connecter avec Patreon"
-      }
-    },
-    "ru": {
-      "patreonAuth": {
-        "adm_title": "Вход через Patreon",
-        "adm_subtitle": "Настройте вход на сайт через Patreon по OAuth.",
-        "signInWith": "Войти через Patreon"
-      }
-    },
-    "pt": {
-      "patreonAuth": {
-        "adm_title": "Início de sessão com Patreon",
-        "adm_subtitle": "Configure o início de sessão OAuth com Patreon no seu site.",
-        "signInWith": "Entrar com Patreon"
       }
     }
   }

@@ -2,7 +2,7 @@
   "id": "razorpay-gateway",
   "name": "Razorpay Gateway",
   "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -98,86 +98,6 @@
       "admin": {
         "menu_razorpay-gateway": "Razorpay Ödeme",
         "menu_razorpay-gateway_razorpay_settings": "Razorpay Ayarları"
-      }
-    },
-    "de": {
-      "razorpayGateway": {
-        "adm_title": "Razorpay-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über Razorpay anzunehmen.",
-        "adm_keyId": "Schlüssel-ID",
-        "adm_keyIdDesc": "Aus Ihrem Razorpay-Dashboard.",
-        "adm_keySecret": "Schlüsselgeheimnis",
-        "adm_keySecretDesc": "Aus Ihrem Razorpay-Dashboard.",
-        "adm_webhookSecret": "Webhook-Signaturschlüssel",
-        "adm_webhookSecretDesc": "Aus Ihrem Razorpay-Dashboard. Richten Sie die Razorpay-Benachrichtigungs-URL auf /api/v1/razorpay/webhook."
-      },
-      "admin": {
-        "menu_razorpay-gateway": "Razorpay-Gateway",
-        "menu_razorpay-gateway_razorpay_settings": "Razorpay-Einstellungen"
-      }
-    },
-    "es": {
-      "razorpayGateway": {
-        "adm_title": "Configuración de Razorpay",
-        "adm_subtitle": "Claves para aceptar pagos con Razorpay.",
-        "adm_keyId": "ID de clave",
-        "adm_keyIdDesc": "Desde tu panel de Razorpay.",
-        "adm_keySecret": "Secreto de clave",
-        "adm_keySecretDesc": "Desde tu panel de Razorpay.",
-        "adm_webhookSecret": "Secreto del webhook",
-        "adm_webhookSecretDesc": "Desde tu panel de Razorpay. Apunta la URL de notificaciones de Razorpay a /api/v1/razorpay/webhook."
-      },
-      "admin": {
-        "menu_razorpay-gateway": "Pasarela Razorpay",
-        "menu_razorpay-gateway_razorpay_settings": "Configuración de Razorpay"
-      }
-    },
-    "fr": {
-      "razorpayGateway": {
-        "adm_title": "Paramètres Razorpay",
-        "adm_subtitle": "Clés pour encaisser des paiements via Razorpay.",
-        "adm_keyId": "Identifiant de clé",
-        "adm_keyIdDesc": "Depuis votre tableau de bord Razorpay.",
-        "adm_keySecret": "Secret de clé",
-        "adm_keySecretDesc": "Depuis votre tableau de bord Razorpay.",
-        "adm_webhookSecret": "Secret du webhook",
-        "adm_webhookSecretDesc": "Depuis votre tableau de bord Razorpay. Faites pointer l'URL de notification Razorpay vers /api/v1/razorpay/webhook."
-      },
-      "admin": {
-        "menu_razorpay-gateway": "Passerelle Razorpay",
-        "menu_razorpay-gateway_razorpay_settings": "Paramètres Razorpay"
-      }
-    },
-    "ru": {
-      "razorpayGateway": {
-        "adm_title": "Настройки Razorpay",
-        "adm_subtitle": "Ключи для приёма платежей через Razorpay.",
-        "adm_keyId": "ID ключа",
-        "adm_keyIdDesc": "Из панели Razorpay.",
-        "adm_keySecret": "Секрет ключа",
-        "adm_keySecretDesc": "Из панели Razorpay.",
-        "adm_webhookSecret": "Секрет вебхука",
-        "adm_webhookSecretDesc": "Из панели Razorpay. Укажите в Razorpay адрес уведомлений /api/v1/razorpay/webhook."
-      },
-      "admin": {
-        "menu_razorpay-gateway": "Шлюз Razorpay",
-        "menu_razorpay-gateway_razorpay_settings": "Настройки Razorpay"
-      }
-    },
-    "pt": {
-      "razorpayGateway": {
-        "adm_title": "Configurações do Razorpay",
-        "adm_subtitle": "Chaves para receber pagamentos via Razorpay.",
-        "adm_keyId": "ID da chave",
-        "adm_keyIdDesc": "No painel do Razorpay.",
-        "adm_keySecret": "Segredo da chave",
-        "adm_keySecretDesc": "No painel do Razorpay.",
-        "adm_webhookSecret": "Segredo do webhook",
-        "adm_webhookSecretDesc": "No painel do Razorpay. Aponte a URL de notificação do Razorpay para /api/v1/razorpay/webhook."
-      },
-      "admin": {
-        "menu_razorpay-gateway": "Gateway Razorpay",
-        "menu_razorpay-gateway_razorpay_settings": "Configurações do Razorpay"
       }
     }
   }

@@ -2,7 +2,7 @@
   "id": "reddit-auth",
   "name": "Reddit Login",
   "description": "Allow users to sign in with their Reddit account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -51,41 +51,6 @@
         "adm_title": "Reddit ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Reddit ile OAuth girişini yapılandırın.",
         "signInWith": "Reddit ile giriş yap"
-      }
-    },
-    "de": {
-      "redditAuth": {
-        "adm_title": "Reddit-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Reddit für Ihre Seite einrichten.",
-        "signInWith": "Mit Reddit anmelden"
-      }
-    },
-    "es": {
-      "redditAuth": {
-        "adm_title": "Inicio de sesión con Reddit",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Reddit para tu sitio.",
-        "signInWith": "Iniciar sesión con Reddit"
-      }
-    },
-    "fr": {
-      "redditAuth": {
-        "adm_title": "Connexion Reddit",
-        "adm_subtitle": "Configurez la connexion OAuth Reddit pour votre site.",
-        "signInWith": "Se connecter avec Reddit"
-      }
-    },
-    "ru": {
-      "redditAuth": {
-        "adm_title": "Вход через Reddit",
-        "adm_subtitle": "Настройте вход на сайт через Reddit по OAuth.",
-        "signInWith": "Войти через Reddit"
-      }
-    },
-    "pt": {
-      "redditAuth": {
-        "adm_title": "Início de sessão com Reddit",
-        "adm_subtitle": "Configure o início de sessão OAuth com Reddit no seu site.",
-        "signInWith": "Entrar com Reddit"
       }
     }
   }

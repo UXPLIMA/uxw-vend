@@ -2,7 +2,7 @@
   "id": "spotify-auth",
   "name": "Spotify Login",
   "description": "Allow users to sign in with their Spotify account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -51,41 +51,6 @@
         "adm_title": "Spotify ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Spotify ile OAuth girişini yapılandırın.",
         "signInWith": "Spotify ile giriş yap"
-      }
-    },
-    "de": {
-      "spotifyAuth": {
-        "adm_title": "Spotify-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Spotify für Ihre Seite einrichten.",
-        "signInWith": "Mit Spotify anmelden"
-      }
-    },
-    "es": {
-      "spotifyAuth": {
-        "adm_title": "Inicio de sesión con Spotify",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Spotify para tu sitio.",
-        "signInWith": "Iniciar sesión con Spotify"
-      }
-    },
-    "fr": {
-      "spotifyAuth": {
-        "adm_title": "Connexion Spotify",
-        "adm_subtitle": "Configurez la connexion OAuth Spotify pour votre site.",
-        "signInWith": "Se connecter avec Spotify"
-      }
-    },
-    "ru": {
-      "spotifyAuth": {
-        "adm_title": "Вход через Spotify",
-        "adm_subtitle": "Настройте вход на сайт через Spotify по OAuth.",
-        "signInWith": "Войти через Spotify"
-      }
-    },
-    "pt": {
-      "spotifyAuth": {
-        "adm_title": "Início de sessão com Spotify",
-        "adm_subtitle": "Configure o início de sessão OAuth com Spotify no seu site.",
-        "signInWith": "Entrar com Spotify"
       }
     }
   }

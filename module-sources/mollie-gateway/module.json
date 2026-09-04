@@ -2,7 +2,7 @@
   "id": "mollie-gateway",
   "name": "Mollie Payment Gateway",
   "description": "Take iDEAL, Bancontact, SEPA and card payments through Mollie",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -90,66 +90,6 @@
       "admin": {
         "menu_mollie-gateway": "Mollie Ödeme",
         "menu_mollie-gateway_mollie_settings": "Mollie Ayarları"
-      }
-    },
-    "de": {
-      "mollieGateway": {
-        "adm_title": "Mollie-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über Mollie anzunehmen.",
-        "adm_apiKey": "API-Schlüssel",
-        "adm_apiKeyDesc": "Aus Ihrem Mollie-Dashboard. Richten Sie die Mollie-Benachrichtigungs-URL auf /api/v1/mollie/webhook."
-      },
-      "admin": {
-        "menu_mollie-gateway": "Mollie-Gateway",
-        "menu_mollie-gateway_mollie_settings": "Mollie-Einstellungen"
-      }
-    },
-    "es": {
-      "mollieGateway": {
-        "adm_title": "Configuración de Mollie",
-        "adm_subtitle": "Claves para aceptar pagos con Mollie.",
-        "adm_apiKey": "Clave de API",
-        "adm_apiKeyDesc": "Desde tu panel de Mollie. Apunta la URL de notificaciones de Mollie a /api/v1/mollie/webhook."
-      },
-      "admin": {
-        "menu_mollie-gateway": "Pasarela Mollie",
-        "menu_mollie-gateway_mollie_settings": "Configuración de Mollie"
-      }
-    },
-    "fr": {
-      "mollieGateway": {
-        "adm_title": "Paramètres Mollie",
-        "adm_subtitle": "Clés pour encaisser des paiements via Mollie.",
-        "adm_apiKey": "Clé API",
-        "adm_apiKeyDesc": "Depuis votre tableau de bord Mollie. Faites pointer l'URL de notification Mollie vers /api/v1/mollie/webhook."
-      },
-      "admin": {
-        "menu_mollie-gateway": "Passerelle Mollie",
-        "menu_mollie-gateway_mollie_settings": "Paramètres Mollie"
-      }
-    },
-    "ru": {
-      "mollieGateway": {
-        "adm_title": "Настройки Mollie",
-        "adm_subtitle": "Ключи для приёма платежей через Mollie.",
-        "adm_apiKey": "API-ключ",
-        "adm_apiKeyDesc": "Из панели Mollie. Укажите в Mollie адрес уведомлений /api/v1/mollie/webhook."
-      },
-      "admin": {
-        "menu_mollie-gateway": "Шлюз Mollie",
-        "menu_mollie-gateway_mollie_settings": "Настройки Mollie"
-      }
-    },
-    "pt": {
-      "mollieGateway": {
-        "adm_title": "Configurações do Mollie",
-        "adm_subtitle": "Chaves para receber pagamentos via Mollie.",
-        "adm_apiKey": "Chave de API",
-        "adm_apiKeyDesc": "No painel do Mollie. Aponte a URL de notificação do Mollie para /api/v1/mollie/webhook."
-      },
-      "admin": {
-        "menu_mollie-gateway": "Gateway Mollie",
-        "menu_mollie-gateway_mollie_settings": "Configurações do Mollie"
       }
     }
   }

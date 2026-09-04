@@ -2,7 +2,7 @@
   "id": "yandex-auth",
   "name": "Yandex Login",
   "description": "Allow users to sign in with their Yandex account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -53,46 +53,6 @@
         "adm_subtitle": "Siteniz için Yandex ile OAuth girişini yapılandırın.",
         "signInWith": "Yandex ile giriş yap",
         "adm_scopeNote": "Yandex uygulamasında login:info, login:email ve login:avatar izinleri açık olmalıdır. login:email olmadan hesap adressiz gelir ve geçici bir adres alır."
-      }
-    },
-    "de": {
-      "yandexAuth": {
-        "adm_title": "Yandex-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Yandex für Ihre Seite einrichten.",
-        "signInWith": "Mit Yandex anmelden",
-        "adm_scopeNote": "Die Yandex-Anwendung braucht die Rechte login:info, login:email und login:avatar. Ohne login:email kommt das Konto ohne Adresse an und erhält eine Platzhalteradresse."
-      }
-    },
-    "es": {
-      "yandexAuth": {
-        "adm_title": "Inicio de sesión con Yandex",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Yandex para tu sitio.",
-        "signInWith": "Iniciar sesión con Yandex",
-        "adm_scopeNote": "La aplicación de Yandex necesita los permisos login:info, login:email y login:avatar. Sin login:email la cuenta llega sin dirección y recibe una provisional."
-      }
-    },
-    "fr": {
-      "yandexAuth": {
-        "adm_title": "Connexion Yandex",
-        "adm_subtitle": "Configurez la connexion OAuth Yandex pour votre site.",
-        "signInWith": "Se connecter avec Yandex",
-        "adm_scopeNote": "L'application Yandex a besoin des droits login:info, login:email et login:avatar. Sans login:email, le compte arrive sans adresse et en reçoit une fictive."
-      }
-    },
-    "ru": {
-      "yandexAuth": {
-        "adm_title": "Вход через Yandex",
-        "adm_subtitle": "Настройте вход на сайт через Yandex по OAuth.",
-        "signInWith": "Войти через Yandex",
-        "adm_scopeNote": "Приложению Yandex нужны права login:info, login:email и login:avatar. Без login:email аккаунт приходит без адреса и получает временный."
-      }
-    },
-    "pt": {
-      "yandexAuth": {
-        "adm_title": "Início de sessão com Yandex",
-        "adm_subtitle": "Configure o início de sessão OAuth com Yandex no seu site.",
-        "signInWith": "Entrar com Yandex",
-        "adm_scopeNote": "A aplicação Yandex precisa das permissões login:info, login:email e login:avatar. Sem login:email a conta chega sem endereço e recebe um provisório."
       }
     }
   }

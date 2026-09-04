@@ -2,7 +2,7 @@
   "id": "battlenet-auth",
   "name": "Battle.net Login",
   "description": "Allow users to sign in with their Battle.net account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.4.0",
   "category": "integration",
   "author": "uxwVend",
@@ -60,51 +60,6 @@
         "signInWith": "Battle.net ile giriş yap",
         "adm_issuerNote": "AUTH_BATTLENET_ISSUER bölgeyi seçer ve şu adreslerden biri olmalıdır: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn veya https://www.battlenet.com.cn/oauth. Bu değer bunlardan biri olmadıkça giriş açılmaz.",
         "adm_emailNote": "Battle.net e-posta adresi paylaşmaz, bu yüzden bu yolla açılan hesaba posta alamayan geçici bir adres atanır. Bu kullanıcılardan profillerinde gerçek bir adres tanımlamalarını isteyin."
-      }
-    },
-    "de": {
-      "battlenetAuth": {
-        "adm_title": "Battle.net-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Battle.net für Ihre Seite einrichten.",
-        "signInWith": "Mit Battle.net anmelden",
-        "adm_issuerNote": "AUTH_BATTLENET_ISSUER wählt die Region und muss einer dieser Werte sein: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn oder https://www.battlenet.com.cn/oauth. Ohne einen davon bleibt die Anmeldung aus.",
-        "adm_emailNote": "Battle.net gibt keine E-Mail-Adresse heraus. Ein so erstelltes Konto erhält daher eine Platzhalteradresse, die keine Post empfangen kann. Bitten Sie diese Nutzer, im Profil eine echte Adresse zu hinterlegen."
-      }
-    },
-    "es": {
-      "battlenetAuth": {
-        "adm_title": "Inicio de sesión con Battle.net",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Battle.net para tu sitio.",
-        "signInWith": "Iniciar sesión con Battle.net",
-        "adm_issuerNote": "AUTH_BATTLENET_ISSUER elige la región y tiene que ser uno de https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn o https://www.battlenet.com.cn/oauth. El inicio de sesión no se activa hasta que contenga uno de ellos.",
-        "adm_emailNote": "Battle.net no comparte ninguna dirección de correo, así que una cuenta creada por esta vía recibe una dirección provisional que no puede recibir mensajes. Pide a estos usuarios que definan una real en su perfil."
-      }
-    },
-    "fr": {
-      "battlenetAuth": {
-        "adm_title": "Connexion Battle.net",
-        "adm_subtitle": "Configurez la connexion OAuth Battle.net pour votre site.",
-        "signInWith": "Se connecter avec Battle.net",
-        "adm_issuerNote": "AUTH_BATTLENET_ISSUER choisit la région et doit valoir https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn ou https://www.battlenet.com.cn/oauth. Tant que ce n'est pas le cas, la connexion reste inactive.",
-        "adm_emailNote": "Battle.net ne communique aucune adresse e-mail : un compte créé ainsi reçoit une adresse fictive qui ne peut rien recevoir. Demandez à ces utilisateurs d'en définir une vraie dans leur profil."
-      }
-    },
-    "ru": {
-      "battlenetAuth": {
-        "adm_title": "Вход через Battle.net",
-        "adm_subtitle": "Настройте вход на сайт через Battle.net по OAuth.",
-        "signInWith": "Войти через Battle.net",
-        "adm_issuerNote": "AUTH_BATTLENET_ISSUER задаёт регион и должен быть одним из: https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn или https://www.battlenet.com.cn/oauth. Пока значение другое, вход не включается.",
-        "adm_emailNote": "Battle.net не передаёт адрес почты, поэтому созданный так аккаунт получает временный адрес, на который ничего нельзя отправить. Попросите таких пользователей указать настоящий адрес в профиле."
-      }
-    },
-    "pt": {
-      "battlenetAuth": {
-        "adm_title": "Início de sessão com Battle.net",
-        "adm_subtitle": "Configure o início de sessão OAuth com Battle.net no seu site.",
-        "signInWith": "Entrar com Battle.net",
-        "adm_issuerNote": "AUTH_BATTLENET_ISSUER escolhe a região e tem de ser um de https://oauth.battle.net, https://eu.battle.net/oauth, https://us.battle.net/oauth, https://kr.battle.net/oauth, https://tw.battle.net/oauth, https://oauth.battlenet.com.cn ou https://www.battlenet.com.cn/oauth. Enquanto não for, o início de sessão fica desligado.",
-        "adm_emailNote": "O Battle.net não partilha um endereço de email, por isso uma conta criada assim recebe um endereço provisório que não consegue receber mensagens. Peça a estes utilizadores que definam um real no perfil."
       }
     }
   }

@@ -2,7 +2,7 @@
   "id": "paymentwall-gateway",
   "name": "Paymentwall Gateway",
   "description": "Take local payments, wallets and mobile billing through Paymentwall",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -89,76 +89,6 @@
       "admin": {
         "menu_paymentwall-gateway": "Paymentwall Ödeme",
         "menu_paymentwall-gateway_paymentwall_settings": "Paymentwall Ayarları"
-      }
-    },
-    "de": {
-      "paymentwallGateway": {
-        "adm_title": "Paymentwall-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über Paymentwall anzunehmen.",
-        "adm_projectKey": "Projektschlüssel",
-        "adm_projectKeyDesc": "Aus Ihrem Paymentwall-Dashboard.",
-        "adm_secretKey": "Geheimer Schlüssel",
-        "adm_secretKeyDesc": "Aus Ihrem Paymentwall-Dashboard. Richten Sie die Paymentwall-Benachrichtigungs-URL auf /api/v1/paymentwall/pingback."
-      },
-      "admin": {
-        "menu_paymentwall-gateway": "Paymentwall-Gateway",
-        "menu_paymentwall-gateway_paymentwall_settings": "Paymentwall-Einstellungen"
-      }
-    },
-    "es": {
-      "paymentwallGateway": {
-        "adm_title": "Configuración de Paymentwall",
-        "adm_subtitle": "Claves para aceptar pagos con Paymentwall.",
-        "adm_projectKey": "Clave de proyecto",
-        "adm_projectKeyDesc": "Desde tu panel de Paymentwall.",
-        "adm_secretKey": "Clave secreta",
-        "adm_secretKeyDesc": "Desde tu panel de Paymentwall. Apunta la URL de notificaciones de Paymentwall a /api/v1/paymentwall/pingback."
-      },
-      "admin": {
-        "menu_paymentwall-gateway": "Pasarela Paymentwall",
-        "menu_paymentwall-gateway_paymentwall_settings": "Configuración de Paymentwall"
-      }
-    },
-    "fr": {
-      "paymentwallGateway": {
-        "adm_title": "Paramètres Paymentwall",
-        "adm_subtitle": "Clés pour encaisser des paiements via Paymentwall.",
-        "adm_projectKey": "Clé de projet",
-        "adm_projectKeyDesc": "Depuis votre tableau de bord Paymentwall.",
-        "adm_secretKey": "Clé secrète",
-        "adm_secretKeyDesc": "Depuis votre tableau de bord Paymentwall. Faites pointer l'URL de notification Paymentwall vers /api/v1/paymentwall/pingback."
-      },
-      "admin": {
-        "menu_paymentwall-gateway": "Passerelle Paymentwall",
-        "menu_paymentwall-gateway_paymentwall_settings": "Paramètres Paymentwall"
-      }
-    },
-    "ru": {
-      "paymentwallGateway": {
-        "adm_title": "Настройки Paymentwall",
-        "adm_subtitle": "Ключи для приёма платежей через Paymentwall.",
-        "adm_projectKey": "Ключ проекта",
-        "adm_projectKeyDesc": "Из панели Paymentwall.",
-        "adm_secretKey": "Секретный ключ",
-        "adm_secretKeyDesc": "Из панели Paymentwall. Укажите в Paymentwall адрес уведомлений /api/v1/paymentwall/pingback."
-      },
-      "admin": {
-        "menu_paymentwall-gateway": "Шлюз Paymentwall",
-        "menu_paymentwall-gateway_paymentwall_settings": "Настройки Paymentwall"
-      }
-    },
-    "pt": {
-      "paymentwallGateway": {
-        "adm_title": "Configurações do Paymentwall",
-        "adm_subtitle": "Chaves para receber pagamentos via Paymentwall.",
-        "adm_projectKey": "Chave do projeto",
-        "adm_projectKeyDesc": "No painel do Paymentwall.",
-        "adm_secretKey": "Chave secreta",
-        "adm_secretKeyDesc": "No painel do Paymentwall. Aponte a URL de notificação do Paymentwall para /api/v1/paymentwall/pingback."
-      },
-      "admin": {
-        "menu_paymentwall-gateway": "Gateway Paymentwall",
-        "menu_paymentwall-gateway_paymentwall_settings": "Configurações do Paymentwall"
       }
     }
   }

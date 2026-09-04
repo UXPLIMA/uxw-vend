@@ -2,7 +2,7 @@
   "id": "midtrans-gateway",
   "name": "Midtrans Gateway",
   "description": "Take bank transfer, e-wallet, convenience store and card payments in Indonesia through Midtrans",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -94,76 +94,6 @@
       "admin": {
         "menu_midtrans-gateway": "Midtrans Ödeme",
         "menu_midtrans-gateway_midtrans_settings": "Midtrans Ayarları"
-      }
-    },
-    "de": {
-      "midtransGateway": {
-        "adm_title": "Midtrans-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über Midtrans anzunehmen.",
-        "adm_serverKey": "Server-Schlüssel",
-        "adm_serverKeyDesc": "Aus Ihrem Midtrans-Dashboard. Richten Sie die Midtrans-Benachrichtigungs-URL auf /api/v1/midtrans/notify.",
-        "adm_sandbox": "Sandbox-Modus",
-        "adm_sandboxDesc": "true für die Midtrans-Testumgebung."
-      },
-      "admin": {
-        "menu_midtrans-gateway": "Midtrans-Gateway",
-        "menu_midtrans-gateway_midtrans_settings": "Midtrans-Einstellungen"
-      }
-    },
-    "es": {
-      "midtransGateway": {
-        "adm_title": "Configuración de Midtrans",
-        "adm_subtitle": "Claves para aceptar pagos con Midtrans.",
-        "adm_serverKey": "Clave de servidor",
-        "adm_serverKeyDesc": "Desde tu panel de Midtrans. Apunta la URL de notificaciones de Midtrans a /api/v1/midtrans/notify.",
-        "adm_sandbox": "Modo de pruebas",
-        "adm_sandboxDesc": "Escribe true para usar el entorno de pruebas de Midtrans."
-      },
-      "admin": {
-        "menu_midtrans-gateway": "Pasarela Midtrans",
-        "menu_midtrans-gateway_midtrans_settings": "Configuración de Midtrans"
-      }
-    },
-    "fr": {
-      "midtransGateway": {
-        "adm_title": "Paramètres Midtrans",
-        "adm_subtitle": "Clés pour encaisser des paiements via Midtrans.",
-        "adm_serverKey": "Clé serveur",
-        "adm_serverKeyDesc": "Depuis votre tableau de bord Midtrans. Faites pointer l'URL de notification Midtrans vers /api/v1/midtrans/notify.",
-        "adm_sandbox": "Mode bac à sable",
-        "adm_sandboxDesc": "Mettez true pour l'environnement de test Midtrans."
-      },
-      "admin": {
-        "menu_midtrans-gateway": "Passerelle Midtrans",
-        "menu_midtrans-gateway_midtrans_settings": "Paramètres Midtrans"
-      }
-    },
-    "ru": {
-      "midtransGateway": {
-        "adm_title": "Настройки Midtrans",
-        "adm_subtitle": "Ключи для приёма платежей через Midtrans.",
-        "adm_serverKey": "Серверный ключ",
-        "adm_serverKeyDesc": "Из панели Midtrans. Укажите в Midtrans адрес уведомлений /api/v1/midtrans/notify.",
-        "adm_sandbox": "Тестовый режим",
-        "adm_sandboxDesc": "Укажите true для тестовой среды Midtrans."
-      },
-      "admin": {
-        "menu_midtrans-gateway": "Шлюз Midtrans",
-        "menu_midtrans-gateway_midtrans_settings": "Настройки Midtrans"
-      }
-    },
-    "pt": {
-      "midtransGateway": {
-        "adm_title": "Configurações do Midtrans",
-        "adm_subtitle": "Chaves para receber pagamentos via Midtrans.",
-        "adm_serverKey": "Chave do servidor",
-        "adm_serverKeyDesc": "No painel do Midtrans. Aponte a URL de notificação do Midtrans para /api/v1/midtrans/notify.",
-        "adm_sandbox": "Modo de testes",
-        "adm_sandboxDesc": "Defina true para usar o ambiente de testes do Midtrans."
-      },
-      "admin": {
-        "menu_midtrans-gateway": "Gateway Midtrans",
-        "menu_midtrans-gateway_midtrans_settings": "Configurações do Midtrans"
       }
     }
   }

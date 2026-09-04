@@ -2,7 +2,7 @@
   "id": "instagram-auth",
   "name": "Instagram Login",
   "description": "Allow users to sign in with their Instagram account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.4.0",
   "category": "integration",
   "author": "uxwVend",
@@ -59,51 +59,6 @@
         "signInWith": "Instagram ile giriş yap",
         "adm_apiNote": "Instagram'ın eski Basic Display API'si Aralık 2024'te kapatıldı; bu modül yerine gelen Instagram Login API'sini kullanır. Meta geliştirici konsolunda bu türde bir uygulama oluşturun ve yukarıdaki dönüş adresini ona kaydedin.",
         "adm_accountNote": "Bu yolla yalnızca profesyonel hesaplar (işletme veya içerik üretici) giriş yapabilir. Instagram e-posta adresi paylaşmadığı için bu hesaplara posta alamayan geçici bir adres atanır."
-      }
-    },
-    "de": {
-      "instagramAuth": {
-        "adm_title": "Instagram-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über Instagram für Ihre Seite einrichten.",
-        "signInWith": "Mit Instagram anmelden",
-        "adm_apiNote": "Instagrams alte Basic Display API wurde im Dezember 2024 abgeschaltet, daher wird hier Instagram API with Instagram Login verwendet. Legen Sie in der Meta-Entwicklerkonsole eine App dieses Typs an und tragen Sie die obige Redirect-URL dort ein.",
-        "adm_accountNote": "Nur professionelle Konten (Business oder Creator) können sich so anmelden, und Instagram gibt keine E-Mail-Adresse heraus - diese Konten erhalten daher eine Platzhalteradresse, die keine Post empfangen kann."
-      }
-    },
-    "es": {
-      "instagramAuth": {
-        "adm_title": "Inicio de sesión con Instagram",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con Instagram para tu sitio.",
-        "signInWith": "Iniciar sesión con Instagram",
-        "adm_apiNote": "La antigua Basic Display API de Instagram se cerró en diciembre de 2024, así que esto usa Instagram API with Instagram Login. Crea una app de ese tipo en la consola de desarrolladores de Meta y registra en ella la URL de redirección de arriba.",
-        "adm_accountNote": "Solo las cuentas profesionales (de empresa o creador) pueden iniciar sesión así, y como Instagram no comparte ninguna dirección de correo, estas cuentas reciben una provisional que no puede recibir mensajes."
-      }
-    },
-    "fr": {
-      "instagramAuth": {
-        "adm_title": "Connexion Instagram",
-        "adm_subtitle": "Configurez la connexion OAuth Instagram pour votre site.",
-        "signInWith": "Se connecter avec Instagram",
-        "adm_apiNote": "L'ancienne Basic Display API d'Instagram a été fermée en décembre 2024 : ce module utilise donc Instagram API with Instagram Login. Créez une application de ce type dans la console développeur Meta et enregistrez-y l'URL de redirection ci-dessus.",
-        "adm_accountNote": "Seuls les comptes professionnels (entreprise ou créateur) peuvent se connecter ainsi, et Instagram ne communique aucune adresse e-mail : ces comptes reçoivent donc une adresse fictive qui ne peut rien recevoir."
-      }
-    },
-    "ru": {
-      "instagramAuth": {
-        "adm_title": "Вход через Instagram",
-        "adm_subtitle": "Настройте вход на сайт через Instagram по OAuth.",
-        "signInWith": "Войти через Instagram",
-        "adm_apiNote": "Старый Basic Display API Instagram отключили в декабре 2024 года, поэтому здесь используется Instagram API with Instagram Login. Создайте приложение этого типа в консоли разработчика Meta и добавьте в него указанный выше адрес возврата.",
-        "adm_accountNote": "Так войти могут только профессиональные аккаунты (бизнес или автор), а адрес почты Instagram не передаёт, поэтому такие аккаунты получают временный адрес, на который ничего нельзя отправить."
-      }
-    },
-    "pt": {
-      "instagramAuth": {
-        "adm_title": "Início de sessão com Instagram",
-        "adm_subtitle": "Configure o início de sessão OAuth com Instagram no seu site.",
-        "signInWith": "Entrar com Instagram",
-        "adm_apiNote": "A antiga Basic Display API do Instagram foi encerrada em dezembro de 2024, por isso este módulo usa a Instagram API with Instagram Login. Crie uma aplicação desse tipo na consola de programador da Meta e registe nela o URL de redirecionamento acima.",
-        "adm_accountNote": "Só contas profissionais (empresa ou criador) podem entrar assim e, como o Instagram não partilha nenhum endereço de email, estas contas recebem um endereço provisório que não consegue receber mensagens."
       }
     }
   }

@@ -2,7 +2,7 @@
   "id": "tiktok-auth",
   "name": "TikTok Login",
   "description": "Allow users to sign in with their TikTok account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -51,41 +51,6 @@
         "adm_title": "TikTok ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için TikTok ile OAuth girişini yapılandırın.",
         "signInWith": "TikTok ile giriş yap"
-      }
-    },
-    "de": {
-      "tiktokAuth": {
-        "adm_title": "TikTok-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über TikTok für Ihre Seite einrichten.",
-        "signInWith": "Mit TikTok anmelden"
-      }
-    },
-    "es": {
-      "tiktokAuth": {
-        "adm_title": "Inicio de sesión con TikTok",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con TikTok para tu sitio.",
-        "signInWith": "Iniciar sesión con TikTok"
-      }
-    },
-    "fr": {
-      "tiktokAuth": {
-        "adm_title": "Connexion TikTok",
-        "adm_subtitle": "Configurez la connexion OAuth TikTok pour votre site.",
-        "signInWith": "Se connecter avec TikTok"
-      }
-    },
-    "ru": {
-      "tiktokAuth": {
-        "adm_title": "Вход через TikTok",
-        "adm_subtitle": "Настройте вход на сайт через TikTok по OAuth.",
-        "signInWith": "Войти через TikTok"
-      }
-    },
-    "pt": {
-      "tiktokAuth": {
-        "adm_title": "Início de sessão com TikTok",
-        "adm_subtitle": "Configure o início de sessão OAuth com TikTok no seu site.",
-        "signInWith": "Entrar com TikTok"
       }
     }
   }

@@ -9,6 +9,7 @@ import AdmZip from "adm-zip";
 import { logActivity } from "@/core/lib/activity-log";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
+import { resolveWithin } from "@/core/lib/runtime-paths";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 
@@ -29,7 +30,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid theme ID" }, { status: 400 });
         }
 
-        const targetDir = path.join(THEMES_DIR, themeId);
+        const targetDir = resolveWithin(THEMES_DIR, themeId);
+        if (!targetDir) {
+            return NextResponse.json({ error: "Invalid theme ID" }, { status: 400 });
+        }
         if (await fs.access(targetDir).then(() => true).catch(() => false)) {
             return NextResponse.json({ error: "Theme already installed" }, { status: 409 });
         }
@@ -79,9 +83,12 @@ export async function POST(request: NextRequest) {
             await fs.writeFile(resolvedPath, entry.getData());
         }
 
-        // Verify theme.json exists
+        // Read the manifest rather than asking whether it is there and then
+        // reading it: two syscalls with a gap between them, one answer needed.
         const manifestPath = path.join(targetDir, "theme.json");
-        if (!(await fs.access(manifestPath).then(() => true).catch(() => false))) {
+        try {
+            await fs.readFile(manifestPath, "utf-8");
+        } catch {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: "Invalid theme - no theme.json" }, { status: 400 });
         }

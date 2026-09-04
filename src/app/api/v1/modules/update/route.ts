@@ -20,7 +20,7 @@ import { satisfiesRange } from "@/core/lib/semver-range";
 import moduleSystem from "@/core/lib/modules";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
-import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
+import { MODULES_DIR, TMP_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
@@ -58,9 +58,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
         }
 
-        const targetDir = path.join(MODULES_DIR, moduleId);
-        const targetRoot = path.resolve(targetDir);
-        if (!targetRoot.startsWith(path.resolve(MODULES_DIR) + path.sep)) {
+        const targetDir = resolveWithin(MODULES_DIR, moduleId);
+        if (!targetDir) {
             return NextResponse.json({ error: "Invalid module target path" }, { status: 400 });
         }
 
@@ -110,11 +109,14 @@ export async function POST(request: NextRequest) {
         // Stage the update in a temp dir first, validate, then swap.
         const tmpDir = TMP_DIR;
         await fs.mkdir(tmpDir, { recursive: true });
-        const stageDir = path.join(tmpDir, `module-stage-${moduleId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+        const stageDir = resolveWithin(tmpDir, `module-stage-${moduleId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+        const backupDir = resolveWithin(tmpDir, `backup-${moduleId}-${Date.now()}`);
+        if (!stageDir || !backupDir) {
+            return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+        }
         await fs.mkdir(stageDir, { recursive: true });
         const stageRoot = path.resolve(stageDir);
 
-        const backupDir = path.join(tmpDir, `backup-${moduleId}-${Date.now()}`);
 
         try {
             for (const entry of entries) {
@@ -125,15 +127,18 @@ export async function POST(request: NextRequest) {
                 await fs.writeFile(resolvedPath, entry.getData());
             }
 
+            // One read answers both "is it there" and "what does it say".
             const manifestPath = path.join(stageDir, "module.json");
-            const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
-            if (!hasManifest) {
+            let manifestRaw: string;
+            try {
+                manifestRaw = await fs.readFile(manifestPath, "utf-8");
+            } catch {
                 return NextResponse.json({ error: "Invalid module update - no module.json found" }, { status: 400 });
             }
 
             let manifestJson: unknown;
             try {
-                manifestJson = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+                manifestJson = JSON.parse(manifestRaw);
             } catch {
                 return NextResponse.json({ error: "Invalid module.json - not valid JSON" }, { status: 400 });
             }

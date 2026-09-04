@@ -23,6 +23,38 @@ export function formatCurrency(
 }
 
 /**
+ * Strip every HTML tag, leaving the text.
+ *
+ * Two places did this with a one-line `replace`: the suggestions list, which
+ * shows a plain-text preview of a rich-text body, and the module installer,
+ * which strips markup out of a module's translation strings before merging
+ * them into the message catalogue. Both are correct as written - `[^>]`
+ * cannot cross a `>`, so the first `<` always starts the span that gets
+ * removed, and no `<` can survive to the left of one. A second pass finds
+ * nothing. The code scanner flags the shape anyway, and it is right to: that
+ * argument is four sentences long and lives nowhere near either call site.
+ *
+ * So the property is stated instead of reasoned about. Repeating until the
+ * string stops changing makes idempotence unconditional rather than a
+ * consequence of the exact character class, and the loop costs one extra
+ * pass over a string that is already short. It terminates because every pass
+ * that changes anything removes at least one character.
+ *
+ * This is a preview and merge helper, not a sanitiser. Nothing here makes
+ * untrusted HTML safe to render; both callers hand the result to React,
+ * which escapes it.
+ */
+export function stripHtmlTags(html: string): string {
+    let out = html;
+    let previous: string;
+    do {
+        previous = out;
+        out = out.replace(/<[^>]*>/g, "");
+    } while (out !== previous);
+    return out;
+}
+
+/**
  * The BCP 47 tag to hand `Intl` for a given app locale.
  *
  * Twenty-two screens called `toLocaleString("tr-TR")` outright, so an English

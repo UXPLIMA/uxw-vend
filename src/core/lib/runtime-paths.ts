@@ -17,3 +17,28 @@ export const MODULES_DIR = path.join(CWD, "src/modules");
 export const TMP_DIR = path.join(CWD, "tmp");
 export const BACKUPS_DIR = path.join(CWD, "backups");
 export const PROJECT_ROOT = CWD;
+
+/**
+ * Join `segments` under `root` and return the result only if it stays there.
+ *
+ * Every install, update and upload route builds a directory out of an id
+ * that arrived in a request body. All of them check that id against
+ * `/^[a-z0-9-]+$/` first, so none of them was reachable - but the check and
+ * the `path.join` sat far enough apart in a two hundred line handler that
+ * neither a reader nor a static analyser could see they were connected, and
+ * a future edit that moved or loosened the check would have gone unnoticed.
+ *
+ * This puts the containment where the path is built rather than where the
+ * input arrives. It resolves both sides before comparing, so `..` segments,
+ * absolute segments and symlink-free traversal are all caught, and it
+ * returns `null` rather than throwing so a route answers 400 instead of 500.
+ *
+ * The id check stays: this is the second lock, not a replacement for the
+ * first.
+ */
+export function resolveWithin(root: string, ...segments: string[]): string | null {
+    const base = path.resolve(root);
+    const target = path.resolve(base, ...segments);
+    if (target !== base && !target.startsWith(base + path.sep)) return null;
+    return target;
+}
