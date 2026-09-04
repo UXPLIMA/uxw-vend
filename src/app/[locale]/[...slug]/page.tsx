@@ -5,6 +5,7 @@ import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { ModuleRoutes } from "@/core/generated/module-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
+import { moduleRouteTitle } from "@/core/lib/route-title";
 
 // export const dynamic = "force-dynamic"; // Removed to support ISR
 export const revalidate = 60;
@@ -18,29 +19,34 @@ interface PageProps {
 }
 
 /**
- * Build a generic title for module-rendered pages from the URL slug
- * (e.g. ["blog", "1", "server-launch"] -> "Server Launch"). Modules
- * with richer per-page SEO needs render <script type="application/ld+json">
- * inline so search engines still get full data.
+ * Title a module-rendered page. The name comes from the route the module
+ * declared, not from the URL the visitor typed, unless that route declared
+ * `titleFromPath` - see `moduleRouteTitle`. Modules with richer per-page SEO
+ * needs render <script type="application/ld+json"> inline so search engines
+ * still get full data.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const last = (slug && slug.length > 0 ? slug[slug.length - 1] : "")
-        .replace(/[-_]+/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase()) || "Page";
-    const url = "/" + (slug?.join("/") || "");
+    const match = matchModuleRoute(slug);
+    const route = match ? ModuleRoutes.find((r) => r.key === match.key) : undefined;
+
     const meta = await buildPageMeta({
-        title: last,
-        url,
+        title: moduleRouteTitle(slug, route?.path, route?.titleFromPath),
+        url: "/" + (slug?.join("/") || ""),
         type: "article",
     });
+
+    // Nothing serves this path: the component below is about to call
+    // `notFound()`. Next renders the not-found page with its own metadata, so
+    // this is belt and braces for anything that reads the head before then.
+    if (!route) {
+        return { ...meta, robots: { index: false, follow: false } };
+    }
 
     // A module can mark a route `noindex` in its manifest: a cart, an order
     // confirmation, anything whose content belongs to one visitor. The same
     // flag keeps the page out of the sitemap.
-    const match = matchModuleRoute(slug);
-    const route = match ? ModuleRoutes.find((r) => r.key === match.key) : undefined;
-    if (route?.noindex) {
+    if (route.noindex) {
         return { ...meta, robots: { index: false, follow: true } };
     }
     return meta;

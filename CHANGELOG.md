@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Anyone could mint a link on the site's own domain that says whatever they
+  want.** A module page is a component in a registry, not a route segment
+  file, so it cannot export `generateMetadata` and core's catch-all titled it
+  instead, from the last URL segment, whatever that was. That is safe only
+  where a URL naming nothing answers 404, because Next then throws the
+  metadata away and renders the not-found page's. Only the blog does that.
+  Every other dynamic public module page resolves in the browser and answers
+  200, so `/store/product/999999/free-nitro-generator` came back 200 with
+  `<title>`, `og:title` and `twitter:title` all reading "Free Nitro Generator"
+  beside the site's own name, which is exactly what an unfurled link shows in
+  Discord or Twitter. With `custom-pages` installed the route is `/[slug]`, so
+  it was every unrecognised URL on the site and not just the ones under a
+  module. The title now comes from the route the module declared, not the URL
+  the visitor typed: that page is "Product", `/player/[username]` is "Player".
+  A route gets to name itself from the path only by declaring `titleFromPath`,
+  which `validate-module` grants only to a server page that calls
+  `notFound()`. The blog declares it and keeps its per-article titles.
+  A path nothing serves is now `noindex` as well.
+
 - **One line in one module manifest could turn the CSRF gate off for the whole
   API.** A payment provider posting a webhook has no browser and sends no
   Origin header, so a module marks that endpoint `providerCallback` and core

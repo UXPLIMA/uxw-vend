@@ -88,6 +88,17 @@ const routeEntry = z.object({
      * an order confirmation, anything whose content belongs to one visitor.
      */
     noindex: z.boolean().optional(),
+    /**
+     * Lets core title the page from the last URL segment.
+     *
+     * Only true where the page resolves the resource on the server and calls
+     * `notFound()` when there is none, because then a URL that names nothing
+     * answers 404 and the title never ships. A page that answers 200 and
+     * renders "not found" in the browser hands the visitor the site's own
+     * `<title>` and `og:title`, which is what an unfurled link shows in chat.
+     * `validate-module` checks the page really is that shape.
+     */
+    titleFromPath: z.boolean().optional(),
 });
 
 const adminRouteEntry = z.object({

@@ -77,7 +77,7 @@ function generateRegistry() {
 
     let mapping = `export const ModuleRegistry: Record<string, ComponentType<any>> = {\n`;
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<Record<string, unknown>>> = {\n`;
-    const routes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean }[] = [];
+    const routes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = [];
     const apiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
 
     for (const { moduleName, manifest } of loaded) {
@@ -85,7 +85,7 @@ function generateRegistry() {
             const componentKey = `${moduleName}:${route.component}`;
             const importPath = `@/modules/${moduleName}/${route.component.replace(/\.tsx?$/, '')}`;
             mapping += `  '${componentKey}': dynamic(() => import('${importPath}').then((mod: { default?: ComponentType<any> }) => mod.default ?? (mod as unknown as ComponentType<any>)), { loading: () => <PageLoader /> }),\n`;
-            routes.push({ path: route.path, key: componentKey, module: moduleName, ...(route.noindex ? { noindex: true } : {}) });
+            routes.push({ path: route.path, key: componentKey, module: moduleName, ...(route.noindex ? { noindex: true } : {}), ...(route.titleFromPath ? { titleFromPath: true } : {}) });
         }
 
         for (const route of manifest.adminRoutes ?? []) {
@@ -107,7 +107,7 @@ function generateRegistry() {
     mapping += `};\n`;
     apiMapping += `};\n\n`;
     // Route tables are plain data - no imports, safe anywhere.
-    let routeData = `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
+    let routeData = `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
     // Aggregate typed collections across all modules
@@ -327,7 +327,7 @@ function generateRegistry() {
     const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
     let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
     dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
-    dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
+    dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     dataContent += `// Outbound webhook channels contributed by modules. Core owns the alert\n`;
     dataContent += `// content and the wire layouts; a channel only names its hosts and layout.\n`;
     dataContent += `export const ModuleWebhookChannels: { id: string; label: string; layout: "json" | "embed" | "attachment"; hosts?: string[]; urlPlaceholder?: string; module: string }[] = ${JSON.stringify(allWebhookChannels, null, 2)};\n`;
