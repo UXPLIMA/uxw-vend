@@ -23,9 +23,9 @@ export default function AdminError({
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
                     <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 </div>
-                <h2 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                <h1 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                     {t("error_title")}
-                </h2>
+                </h1>
                 <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
                     {t("error_body")}
                     {error.digest && (

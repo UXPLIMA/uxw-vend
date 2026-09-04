@@ -52,7 +52,7 @@ export function SliderWidget() {
                 <img src={slide.image} alt={slide.title || ""} className="w-full h-full object-cover" />
                 {(slide.title || slide.subtitle) && (
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                        {slide.title && <h3 className="text-white font-bold text-lg">{slide.title}</h3>}
+                        {slide.title && <h2 className="text-white font-bold text-lg">{slide.title}</h2>}
                         {slide.subtitle && <p className="text-white/80 text-sm">{slide.subtitle}</p>}
                     </div>
                 )}

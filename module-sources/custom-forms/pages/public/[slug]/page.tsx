@@ -104,14 +104,14 @@ export default function FormPage({ params }: PageProps) {
                     <Card>
                         <CardContent className="py-12 text-center">
                             <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                            <h2 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h2>
+                            <h1 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h1>
                             <p className="text-muted-foreground">{t("thankYouBody")}</p>
                         </CardContent>
                     </Card>
                 ) : (
                     <Card>
                         <CardHeader>
-                            <CardTitle>{form.title}</CardTitle>
+                            <CardTitle as="h1">{form.title}</CardTitle>
                             {form.description && <p className="text-sm text-muted-foreground">{form.description}</p>}
                         </CardHeader>
                         <CardContent>

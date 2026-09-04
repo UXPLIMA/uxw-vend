@@ -72,7 +72,7 @@ export default function HelpCategoryPage({ params }: PageProps) {
                     </div>
                 ) : !category ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <h2 className="text-xl font-bold text-foreground mb-2">{t("categoryNotFound")}</h2>
+                        <h1 className="text-xl font-bold text-foreground mb-2">{t("categoryNotFound")}</h1>
                         <p className="text-muted-foreground mb-4">{t("categoryNotFoundBody")}</p>
                         <Link href="/help" className="text-blue-600 hover:underline">
                             {t("backToHelp")}

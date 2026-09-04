@@ -528,12 +528,12 @@ export default function AdminUserDetailPage() {
                                 <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                             </div>
                             <div>
-                                <h3
+                                <h2
                                     id="admin-delete-title"
                                     className="font-semibold text-foreground"
                                 >
                                     {t("users_deleteTitle", { username: user.username })}
-                                </h3>
+                                </h2>
                                 <p className="text-sm text-muted-foreground mt-1">
                                     {t("users_deleteDesc")}
                                 </p>

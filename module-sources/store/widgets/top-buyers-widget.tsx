@@ -27,7 +27,7 @@ export function TopBuyersWidget() {
     return (
         <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-foreground">{sidebarT('topBuyers')}</h3>
+                <h2 className="font-bold text-foreground">{sidebarT('topBuyers')}</h2>
                 <span className="text-xs text-muted-foreground uppercase">{sidebarT('thisWeek')}</span>
             </div>
             <div className="space-y-3">

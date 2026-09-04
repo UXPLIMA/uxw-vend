@@ -13,7 +13,7 @@ export function ThemeStep({ themes, activeTheme, setActiveTheme }: ThemeStepProp
     const t = useTranslations("setup.theme");
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground">{t("title")}</h2>
+            <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
             <p className="text-sm text-muted-foreground">{t("description")}</p>
             {themes.length === 0 ? (
                 <p className="text-xs text-muted-foreground italic">{t("empty")}</p>

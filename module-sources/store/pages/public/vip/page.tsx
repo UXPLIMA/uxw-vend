@@ -168,7 +168,7 @@ export default function VipTablePage() {
                                 ) : (
                                     <Crown className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
                                 )}
-                                <h3 className="text-xl font-bold text-foreground mb-1">{product.name}</h3>
+                                <h2 className="text-xl font-bold text-foreground mb-1">{product.name}</h2>
                                 <div className="mb-4">
                                     {product.comparePrice && (
                                         <span className="text-muted-foreground line-through text-sm mr-2">{formatPrice(product.comparePrice)}</span>

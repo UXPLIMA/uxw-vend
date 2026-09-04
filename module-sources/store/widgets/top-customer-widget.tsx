@@ -22,7 +22,7 @@ export function TopCustomerWidget() {
 
     return (
         <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-bold text-foreground mb-4">{sidebarT('topCustomer')}</h3>
+            <h2 className="font-bold text-foreground mb-4">{sidebarT('topCustomer')}</h2>
             <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-3 bg-muted rounded-lg flex items-center justify-center text-muted-foreground font-bold text-xl overflow-hidden">
                     {topCustomer.avatar ? (
@@ -32,7 +32,7 @@ export function TopCustomerWidget() {
                         topCustomer.username[0].toUpperCase()
                     )}
                 </div>
-                <h4 className="font-semibold text-foreground">{topCustomer.username}</h4>
+                <h3 className="font-semibold text-foreground">{topCustomer.username}</h3>
                 <p className="text-sm text-muted-foreground">
                     {sidebarT('paidThisMonth', { amount: formatPrice(topCustomer.total) })}
                 </p>

@@ -75,7 +75,7 @@ export default function NewTopicPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('newTopic')}</CardTitle>
+                        <CardTitle as="h1">{t('newTopic')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {categoriesLoaded && categories.length === 0 ? (

@@ -84,7 +84,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                     </div>
                 ) : !article ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <h2 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h2>
+                        <h1 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h1>
                         <p className="text-muted-foreground mb-4">{t("articleNotFoundBody")}</p>
                         <Link href="/help" className="text-blue-600 hover:underline">
                             {t("backToHelp")}

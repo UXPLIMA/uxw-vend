@@ -209,7 +209,7 @@ export default function SuggestionsPage() {
                                         </button>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="font-medium text-foreground">{s.title}</h3>
+                                                <h2 className="font-medium text-foreground">{s.title}</h2>
                                                 <span className={`text-xs px-2 py-0.5 rounded ${statusColors[s.status] || "bg-muted text-muted-foreground"}`}>
                                                     {t(statusKeys[s.status] || "open")}
                                                 </span>

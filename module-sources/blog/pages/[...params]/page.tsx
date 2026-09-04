@@ -113,7 +113,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                 {/* Related Articles */}
                                 {relatedArticles.length > 0 && (
                                     <div className="bg-card rounded-xl border border-border p-5">
-                                        <h3 className="font-bold text-foreground mb-4">{t.has("relatedArticles") ? t("relatedArticles") : "Related Articles"}</h3>
+                                        <h2 className="font-bold text-foreground mb-4">{t.has("relatedArticles") ? t("relatedArticles") : "Related Articles"}</h2>
                                         <div className="space-y-4">
                                             {relatedArticles.map((related) => (
                                                 <Link
@@ -133,9 +133,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                             />
                                                         </div>
                                                     )}
-                                                    <h4 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
+                                                    <h3 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
                                                         {related.title}
-                                                    </h4>
+                                                    </h3>
                                                     <p className="text-xs text-muted-foreground mt-1">
                                                         {formatDate(related.publishedAt || new Date(), undefined, dateTag)}
                                                     </p>
@@ -147,7 +147,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
                                 {/* Share */}
                                 <div className="bg-card rounded-xl border border-border p-5">
-                                    <h3 className="font-bold text-foreground mb-4">{t.has("share") ? t("share") : "Share"}</h3>
+                                    <h2 className="font-bold text-foreground mb-4">{t.has("share") ? t("share") : "Share"}</h2>
                                     <div className="flex gap-2">
                                         <a
                                             href={shareTwitter}

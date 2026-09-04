@@ -66,7 +66,7 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
 
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground">{t("title")}</h2>
+            <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
             <p className="text-sm text-muted-foreground">{t("description")}</p>
 
             {catalog.length === 0 ? (
@@ -120,9 +120,9 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                         <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
                             {grouped.map(([category, mods]) => (
                                 <div key={category}>
-                                    <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                                    <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                                         {categoryLabel(t, category)}
-                                    </h3>
+                                    </h2>
                                     <div className="space-y-2">
                                         {mods.map((m) => {
                                             const isPicked = pickedSet.has(m.id);

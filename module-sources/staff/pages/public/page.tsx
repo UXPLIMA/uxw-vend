@@ -89,7 +89,7 @@ export default function StaffPage() {
                                                 initial
                                             )}
                                         </div>
-                                        <h3 className="font-bold text-foreground">{member.name}</h3>
+                                        <h2 className="font-bold text-foreground">{member.name}</h2>
                                         <p className="text-sm text-blue-600 font-medium">{member.role}</p>
                                     </CardContent>
                                 </Card>

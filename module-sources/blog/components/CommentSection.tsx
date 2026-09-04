@@ -68,10 +68,10 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
 
     return (
         <div className="space-y-6">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
                 <MessageCircle className="w-5 h-5" aria-hidden="true" />
                 {t("comments")} ({comments.length})
-            </h3>
+            </h2>
             <form onSubmit={handleSubmit} className="flex gap-2">
                 <input
                     value={content}

@@ -32,13 +32,13 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
             >
                 <div className="flex items-start justify-between p-5 border-b">
                     <div className="min-w-0">
-                        <h3 id="module-detail-title" className="text-lg font-semibold flex items-center gap-2 flex-wrap">
+                        <h2 id="module-detail-title" className="text-lg font-semibold flex items-center gap-2 flex-wrap">
                             {mod.name}
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground">
                                 v{mod.version}
                             </span>
                             {mod.verified && <CheckCircle className="w-4 h-4 text-blue-500" />}
-                        </h3>
+                        </h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                             by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString(__dateTag)}
                         </p>
@@ -65,7 +65,7 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
 
                     {mod.dependencies.length > 0 && (
                         <div>
-                            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">{t("modules_dependencies")}</h4>
+                            <h3 className="text-xs font-semibold uppercase text-muted-foreground mb-1.5">{t("modules_dependencies")}</h3>
                             <div className="flex flex-wrap gap-1.5">
                                 {mod.dependencies.map((dep) => (
                                     <span key={dep} className="px-2 py-0.5 text-xs rounded bg-muted text-foreground">{dep}</span>

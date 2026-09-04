@@ -69,7 +69,7 @@ export default function VotePage() {
                                         <Gift className="w-6 h-6 text-blue-500" />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-medium">{site.name}</h3>
+                                        <h2 className="font-medium">{site.name}</h2>
                                         <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                             <span>{site._count.votes} {t("totalVotes").toLowerCase()}</span>
                                             {site.reward > 0 && (

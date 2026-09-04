@@ -71,7 +71,7 @@ export default function ChangelogPage() {
                                                         {formatLocalDate(entry.createdAt)}
                                                     </span>
                                                 </div>
-                                                <h3 className="font-bold text-foreground mb-2">{entry.title}</h3>
+                                                <h2 className="font-bold text-foreground mb-2">{entry.title}</h2>
                                                 <div
                                                     className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
                                                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(entry.content) }}

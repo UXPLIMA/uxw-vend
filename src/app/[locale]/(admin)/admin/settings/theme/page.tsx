@@ -182,7 +182,7 @@ export default function ThemeSettingsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-medium">{t("settings_appearance")}</h3>
+                    <h1 className="text-lg font-medium">{t("settings_appearance")}</h1>
                     <p className="text-sm text-muted-foreground">
                         {t("theme_subtitle")}
                     </p>
@@ -308,10 +308,10 @@ export default function ThemeSettingsPage() {
                 if (loadingMarketplace || available.length === 0) return null;
                 return (
                     <div>
-                        <h3 className="text-lg font-medium flex items-center gap-2 mb-4">
+                        <h2 className="text-lg font-medium flex items-center gap-2 mb-4">
                             <CheckCircle className="w-5 h-5 text-blue-500" />
                             {t("theme_verified")}
-                        </h3>
+                        </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {available.map((theme: { id: string; name: string; version: string; type: string; description: string; verified: boolean; zip: string; colors?: Record<string, string> }) => (
                                 <Card key={theme.id} className="hover:shadow-md transition-shadow">
@@ -321,10 +321,10 @@ export default function ThemeSettingsPage() {
                                                 <Palette className="w-5 h-5 text-white" />
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                                                <h3 className="font-semibold text-sm flex items-center gap-1.5">
                                                     {theme.name}
                                                     {theme.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
-                                                </h4>
+                                                </h3>
                                                 <p className="text-xs text-muted-foreground">v{theme.version} - {theme.type}</p>
                                             </div>
                                         </div>

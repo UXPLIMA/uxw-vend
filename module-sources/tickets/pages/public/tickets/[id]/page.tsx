@@ -150,7 +150,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                     <StandardSidebarLayout sidebar={(
                                 <div className="space-y-4">
                                     <div className="bg-card rounded-xl border border-border p-4">
-                                        <h3 className="font-bold text-foreground mb-3">{t("ticketInfo")}</h3>
+                                        <h2 className="font-bold text-foreground mb-3">{t("ticketInfo")}</h2>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">{t("createdAt")}</span>

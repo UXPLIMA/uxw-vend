@@ -174,7 +174,7 @@ export default function SeoSettingsPage() {
                         </div>
 
                         <div className="border-t border-border pt-5">
-                            <h3 className="text-sm font-semibold text-foreground mb-4">{t("adm_searchEngineVerification")}</h3>
+                            <h2 className="text-sm font-semibold text-foreground mb-4">{t("adm_searchEngineVerification")}</h2>
                             <div className="space-y-4">
                                 <div>
                                     <Label className="text-foreground">{t("adm_googleVerification")}</Label>
