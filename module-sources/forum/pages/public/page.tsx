@@ -42,28 +42,36 @@ export default function ForumPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [restricted, setRestricted] = useState(false);
     const t = useTranslations('forum');
     const relativeTime = useRelativeTime();
 
     useEffect(() => {
         fetch("/api/v1/forum/categories")
-            .then((r) => r.json())
-            .then((d) => setCategories(d.categories || []))
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => setCategories(d?.categories || []))
             .catch(() => {});
     }, []);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
-        const params = new URLSearchParams({ page: String(page), limit: "20" });
+        // No `limit` here on purpose: the page size is the admin's
+        // `topicsPerPage` setting, which the endpoint applies.
+        const params = new URLSearchParams({ page: String(page) });
         if (selectedCategory) params.set("category", selectedCategory);
         if (searchQuery) params.set("search", searchQuery);
 
         fetch(`/api/v1/forum/topics?${params}`)
-            .then((r) => r.json())
+            .then(async (r) => {
+                if (r.status === 403) { setRestricted(true); return null; }
+                return r.json();
+            })
             .then((d) => {
-                setTopics(d.topics || []);
-                setTotalPages(d.pages || 1);
+                if (d) {
+                    setTopics(d.topics || []);
+                    setTotalPages(d.pages || 1);
+                }
                 setLoading(false);
             })
             .catch(() => setLoading(false));
@@ -136,6 +144,14 @@ export default function ForumPage() {
                             <div className="text-center py-12">
                                 <p className="text-muted-foreground">{t('loadingTopics')}</p>
                             </div>
+                        ) : restricted ? (
+                            <Card>
+                                <CardContent className="py-12 text-center space-y-3">
+                                    <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                                    <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
+                                    <Link href="/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                                </CardContent>
+                            </Card>
                         ) : topics.length === 0 ? (
                             <Card>
                                 <CardContent className="py-12 text-center">

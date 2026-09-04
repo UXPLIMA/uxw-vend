@@ -21,7 +21,8 @@ interface Article {
     id: string;
     title: string;
     slug: string;
-    views: number;
+    /** null when the site has turned view counts off. */
+    views: number | null;
     category: { name: string; slug: string };
 }
 
@@ -133,7 +134,9 @@ export default function HelpCenterPage() {
                                                         <Link href={`/help/${article.slug}`} className="text-blue-600 hover:underline text-sm">
                                                             {article.title}
                                                         </Link>
-                                                        <p className="text-xs text-muted-foreground">{t('views', { count: article.views })}</p>
+                                                        {article.views !== null && (
+                                                            <p className="text-xs text-muted-foreground">{t('views', { count: article.views })}</p>
+                                                        )}
                                                     </li>
                                                 ))}
                                             </ul>

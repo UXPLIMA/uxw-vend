@@ -1334,6 +1334,59 @@ function checkSettingsAreOwned(modulePath: string): CheckResult {
     return { name, passed: true, message: "Every Setting write names an owner" };
 }
 
+function checkDeclaredSettingsAreRead(modulePath: string): CheckResult {
+    const name = "Declared settings are read";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name, passed: true, message: "No manifest to check" };
+    }
+
+    let manifest: { settings?: { key: string }[] };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest is unparseable - covered by another check" };
+    }
+
+    const declared = manifest.settings ?? [];
+    if (declared.length === 0) {
+        return { name, passed: true, message: "No settings declared" };
+    }
+
+    const sources: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name === "node_modules") continue;
+                walk(full);
+            } else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) {
+                sources.push(fs.readFileSync(full, "utf8"));
+            }
+        }
+    })(modulePath);
+
+    const body = sources.join("\n");
+    const unread = declared
+        .map((setting) => setting.key)
+        .filter((key) => !new RegExp(`\\b${key}\\b`).test(body));
+
+    if (unread.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${unread.length} declared setting(s) are never read: ${unread.join(", ")}`,
+            suggestion:
+                "Read it with `moduleSettings(\"<module id>\")` from @/core/sdk/server, or delete the declaration. " +
+                "A setting an admin can change and the module never consults is worse than no setting: it reads as a " +
+                "control that works. Five modules once declared sixteen of them and not one was read anywhere.",
+        };
+    }
+
+    return { name, passed: true, message: `All ${declared.length} declared setting(s) are read` };
+}
+
 function checkNoMassAssignment(modulePath: string): CheckResult {
     const name = "Request bodies are filtered before a write";
     const offenders: string[] = [];
@@ -1626,6 +1679,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkTitleFromPathIsEarned(modulePath),
         checkDynamicRoutes404(modulePath),
         checkSettingsAreOwned(modulePath),
+        checkDeclaredSettingsAreRead(modulePath),
         checkNoMassAssignment(modulePath),
         checkCspOriginsDeclared(modulePath),
         checkHooksEmitted(modulePath),

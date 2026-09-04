@@ -49,19 +49,6 @@ class ModuleSystem {
     }
 
     /**
-     * Get module configuration
-     */
-    getConfig<T = Record<string, unknown>>(id: string): T {
-        const definition = this.getDefinition(id);
-        const state = this.moduleStates.get(id);
-
-        return {
-            ...definition?.defaultConfig,
-            ...state?.config,
-        } as T;
-    }
-
-    /**
      * Get all enabled modules
      */
     getEnabledModules(): ModuleManifest[] {

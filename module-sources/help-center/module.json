@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -11,11 +11,29 @@
     "help-center.view",
     "help-center.manage"
   ],
-  "defaultConfig": {
-    "enableSearch": true,
-    "showViewCount": true,
-    "enableFeedback": true
-  },
+  "settings": [
+    {
+      "key": "enableSearch",
+      "type": "boolean",
+      "default": true,
+      "label": "Include articles in site search",
+      "description": "Whether help articles are returned by the site-wide search."
+    },
+    {
+      "key": "showViewCount",
+      "type": "boolean",
+      "default": true,
+      "label": "Show view counts",
+      "description": "Display how many times each article has been read."
+    },
+    {
+      "key": "enableFeedback",
+      "type": "boolean",
+      "default": true,
+      "label": "Collect article feedback",
+      "description": "Show the helpful / not helpful buttons and accept their votes."
+    }
+  ],
   "menu": [
     {
       "label": "Help Center",

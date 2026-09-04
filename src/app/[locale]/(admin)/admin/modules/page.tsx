@@ -12,6 +12,7 @@ import type { SortKey } from "./types";
 import { useAdminModules } from "./useAdminModules";
 import { ModuleIcon } from "./ModuleIcon";
 import { ModuleDetailModal } from "./ModuleDetailModal";
+import { ModuleSettingsPanel } from "./ModuleSettingsPanel";
 
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
@@ -46,6 +47,7 @@ export default function AdminModulesPage() {
         marketplaceById,
         updatesAvailableCount,
         toggleModule,
+        saveSettings,
         handleUpload,
         handleDelete,
         handleUpdate,
@@ -209,6 +211,8 @@ export default function AdminModulesPage() {
                                                 )}
                                             </div>
                                         )}
+
+                                        <ModuleSettingsPanel module={mod} onSave={saveSettings} />
 
                                         <div className="flex gap-2">
                                             <Button

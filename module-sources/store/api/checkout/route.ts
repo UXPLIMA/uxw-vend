@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
-import { logActivity, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
@@ -135,6 +135,13 @@ export async function POST(request: NextRequest) {
         // no feedback that their code didn't work.
         let couponDiscount = 0;
         if (couponCode) {
+            const { enableCoupons } = await moduleSettings<{ enableCoupons: boolean }>("store");
+            if (!enableCoupons) {
+                return NextResponse.json(
+                    { error: "Coupon codes are not accepted", code: "invalid_coupon" },
+                    { status: 400 },
+                );
+            }
             const couponError = await prisma.$transaction(async (tx): Promise<string | null> => {
                 const coupon = await tx.coupon.findUnique({
                     where: { code: couponCode.toUpperCase() },

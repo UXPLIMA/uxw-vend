@@ -1,4 +1,18 @@
 
+/** One admin-editable setting declared by a module manifest. */
+export interface ModuleSetting {
+    key: string;
+    type: "boolean" | "number" | "string";
+    default: boolean | number | string;
+    label: string;
+    description?: string;
+    /** Present exactly when `type` is "number". */
+    min?: number;
+    max?: number;
+    /** Present exactly when `type` is "string". */
+    maxLength?: number;
+}
+
 /**
  * Dynamic Module System Types
  */
@@ -11,7 +25,14 @@ export interface ModuleManifest {
     author?: string;
     icon?: string;
     permissions?: string[];
-    defaultConfig?: Record<string, unknown>;
+    /**
+     * Admin-editable settings this module reads at runtime. Each entry is
+     * self-describing (type, default, bounds, label) so core can render the
+     * form, validate what an admin submits and clamp what it stores without
+     * knowing what any of the keys mean. Replaces the old `defaultConfig`
+     * value bag - see module-settings.ts.
+     */
+    settings?: ModuleSetting[];
     menu?: {
         label: string;
         path: string; // Relative to /admin. e.g. "/store/products"

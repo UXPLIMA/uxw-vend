@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitStrict, readJsonBody } from "@/core/sdk/server";
+import { moduleSettings, prisma, rateLimitStrict, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
@@ -21,6 +21,11 @@ export async function POST(request: NextRequest) {
             { error: "Too many attempts. Try again later." },
             { status: 429 },
         );
+    }
+
+    const { enableGiftCards } = await moduleSettings<{ enableGiftCards: boolean }>("store");
+    if (!enableGiftCards) {
+        return NextResponse.json({ error: "Gift codes are not accepted" }, { status: 403 });
     }
 
     const jsonBody = await readJsonBody(request);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/core/sdk";
-import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { helpArticleSchema } from "../../../lib/validations";
 
@@ -33,7 +33,13 @@ export async function GET(request: NextRequest) {
         },
     });
 
-    return NextResponse.json(articles);
+    // Same reason as the single-article endpoint: the list page is a client
+    // component, so a hidden view count is withheld here, not there.
+    const { showViewCount } = await moduleSettings<{ showViewCount: boolean }>("help-center");
+
+    return NextResponse.json(
+        showViewCount ? articles : articles.map((a) => ({ ...a, views: null })),
+    );
 }
 
 // POST /api/v1/help/articles - Create article (admin)

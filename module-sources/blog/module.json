@@ -2,16 +2,20 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.0.16",
+  "version": "1.1.0",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
   "icon": "Newspaper",
-  "defaultConfig": {
-    "allowComments": true,
-    "requireCommentApproval": false,
-    "enableRss": true
-  },
+  "settings": [
+    {
+      "key": "allowComments",
+      "type": "boolean",
+      "default": true,
+      "label": "Allow comments",
+      "description": "Let signed-in readers comment on articles. Turning it off hides the comment section and refuses new ones; nothing is deleted."
+    }
+  ],
   "adminRoutes": [
     {
       "path": "/blog/articles",

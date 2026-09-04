@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { blogCommentSchema } from "../../lib/validations";
 
@@ -41,6 +41,12 @@ export async function GET(request: NextRequest) {
         ? Math.min(Math.floor(requested), MAX_COMMENT_LIMIT)
         : DEFAULT_COMMENT_LIMIT;
 
+    // With comments switched off the article page hides the section, but the
+    // endpoint is public: it has to stop publishing them too, or turning the
+    // setting off would only hide them from people who use a browser.
+    const { allowComments } = await moduleSettings<{ allowComments: boolean }>("blog");
+    if (!allowComments) return NextResponse.json([]);
+
     const session = await auth();
     const adminCheck = session?.user?.id ? await isAdmin(session.user.id) : false;
 
@@ -68,6 +74,11 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { allowComments } = await moduleSettings<{ allowComments: boolean }>("blog");
+    if (!allowComments) {
+        return NextResponse.json({ error: "Comments are closed" }, { status: 403 });
     }
 
     const rl = await rateLimitForRole(

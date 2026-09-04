@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody, getClientIP } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, rateLimitForRole, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 interface RouteParams {
@@ -27,7 +27,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         data: { views: { increment: 1 } },
     });
 
-    return NextResponse.json(article);
+    // The page that renders this is a client component, so what it may show is
+    // decided here rather than there: a hidden view count that still ships in
+    // the JSON is not hidden.
+    const { showViewCount, enableFeedback } = await moduleSettings<{
+        showViewCount: boolean;
+        enableFeedback: boolean;
+    }>("help-center");
+
+    return NextResponse.json({
+        ...article,
+        views: showViewCount ? article.views : null,
+        settings: { showViewCount, enableFeedback },
+    });
 }
 
 // POST /api/v1/help/articles/[slug]/feedback - Submit feedback
@@ -41,6 +53,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
     if (!rl.success) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
+    const { enableFeedback } = await moduleSettings<{ enableFeedback: boolean }>("help-center");
+    if (!enableFeedback) {
+        return NextResponse.json({ error: "Feedback is closed" }, { status: 403 });
     }
 
     const body = await readJsonBody(request);

@@ -27,6 +27,13 @@ export { ActivityFeedSection } from "@/core/components/homepage/ActivityFeedSect
 // --- Module state: what a module calls to gate its own endpoints ---
 export { isModuleEnabled } from "@/core/lib/module-cache";
 
+// --- Module settings: what a module calls to read its own admin settings ---
+// Returns the manifest's declared defaults overlaid with whatever the admin has
+// saved, each value checked and clamped against its declaration, so every key
+// the manifest declares is present and correctly typed.
+export { moduleSettings } from "@/core/lib/module-cache";
+export type { SettingValue } from "@/core/lib/module-settings";
+
 // --- Authorization (session lookup lives in @/core/sdk/auth) ---
 export { hasPermission, hasResourcePermission, isAdmin } from "@/core/lib/permissions";
 

@@ -106,7 +106,7 @@ The template manifest enumerates every common UI registration so you can see all
 | `dependencies` | Module IDs that must be installed and enabled |
 | `conflicts` | Module IDs that cannot be active simultaneously |
 | `permissions` | RBAC permission strings this module registers |
-| `defaultConfig` | Default `ModuleConfig.config` values |
+| `settings` | Admin-editable settings, read with `moduleSettings("<id>")` |
 | `cronJobs` | Background scheduled tasks |
 | `webhookReceivers` | Inbound webhook endpoints (HMAC verification supported) |
 | `hookListeners` | Action/filter listeners auto-wired at build time |

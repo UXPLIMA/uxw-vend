@@ -8,6 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Sixteen module settings that nothing read.** Five modules declared a
+  `defaultConfig` bag - blog, forum, help-center, store, tickets - and not one
+  of the sixteen keys in it was read anywhere in the product. The field could
+  only ever supply a value: it carried no type, no bounds and no label, so core
+  could not render it, could not validate what an admin submitted for it, and
+  could not tell a live setting from a forgotten one. The admin screen showed
+  none of them, and `PATCH /api/v1/modules` accepted and stored any JSON blob
+  sent as `config`. It is replaced by `settings`, a self-describing declaration
+  that supplies the admin form, the input validation, the stored value's shape
+  and the default the module reads, all from one place. `moduleSettings(id)` in
+  the server SDK is the read path; `validate:module` and a vitest gate now fail
+  a module that declares a setting none of its own files reads.
+
+  Eleven keys are now real. Blog `allowComments` closes the comment section and
+  the endpoint behind it. Forum `allowGuestView` decides whether a signed-out
+  visitor may read the forum at all, on the server rather than by hiding a link;
+  `topicsPerPage` and `postsPerPage` are the page sizes, and a topic's replies
+  arrive a page at a time instead of in one unbounded include - a thread of ten
+  thousand posts was ten thousand rows in one response, every time anyone opened
+  it. Help-center `enableSearch`, `showViewCount` and `enableFeedback` govern the
+  search contribution, the view counts (withheld from the JSON, not just the
+  markup) and the helpful / not-helpful votes. Store `maxCartItems` caps how many
+  distinct products one cart may hold - only the quantity per line was ever
+  capped - and `enableCoupons` and `enableGiftCards` gate the coupon and gift
+  code paths.
+
+  Five keys are gone rather than implemented, because there was nothing behind
+  them: `blog.requireCommentApproval` duplicated the working core moderation
+  setting, `blog.enableRss` named a feature the blog does not have,
+  `store.allowGuestCheckout` described a checkout that requires a session on
+  every path, and `tickets.maxAttachmentSize` and `tickets.autoCloseAfterDays`
+  described an upload that has no UI and a job that does not exist.
+
+### Fixed
 - **Seven list queries read a whole table to fill one screen.** The store's
   gift codes are generated in batches from a form that takes a count, and the
   admin screen fetched every code the site had ever minted into one response

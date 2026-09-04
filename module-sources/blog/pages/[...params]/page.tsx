@@ -1,5 +1,5 @@
 import { formatDate } from "@/core/sdk";
-import { buildArticleJsonLd, prisma } from "@/core/sdk/server";
+import { buildArticleJsonLd, moduleSettings, prisma } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar, Slot, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
@@ -79,6 +79,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
     }
 
     const relatedArticles = await getRelatedArticles(article.id, article.categoryId);
+    const { allowComments } = await moduleSettings<{ allowComments: boolean }>("blog");
     const commonT = await getTranslations("common");
     const t = await getTranslations("blog");
     const dateTag = dateLocaleTag(await getLocale());
@@ -274,7 +275,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                         )}
 
                                         {/* Comment Section */}
-                                        <CommentSection articleId={article.id} />
+                                        {allowComments && <CommentSection articleId={article.id} />}
                                     </div>
                                 </article>
                             </div>

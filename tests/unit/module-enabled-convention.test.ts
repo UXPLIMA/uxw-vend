@@ -70,6 +70,8 @@ const UNGATED_BY_DESIGN: Record<string, string> = {
         "Pure path matching. The proxy resolves a module id from the same route map and 404s a disabled one before this runs.",
     "src/core/lib/user-data-export.ts":
         "GDPR export. A user is owed every row the platform holds about them, and disabling a module deletes nothing - excluding its tables would silently truncate the export.",
+    "src/core/lib/module-settings.ts":
+        "Reads a module's own settings declaration. It is called by that module's own code, which the proxy has already gated - and an admin editing a disabled module's settings before turning it on must still see them.",
     "src/app/[locale]/[...slug]/page.tsx": "Module page catch-all, gated by the proxy.",
     "src/app/[locale]/(admin)/admin/[...slug]/page.tsx": "Module admin catch-all, gated by the proxy.",
 };

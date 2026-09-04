@@ -96,7 +96,7 @@ that runs.
 | `author` | `string` | Author name. |
 | `icon` | `string` | Lucide icon name shown in the admin sidebar. |
 | `permissions` | `string[]` | RBAC permission strings the module registers (e.g. `["store.view", "store.manage"]`). |
-| `defaultConfig` | `object` | Default config values merged with the DB-stored `ModuleConfig.config` at runtime. |
+| `settings` | `object[]` | Admin-editable settings, each `{ key, type, default, label, description?, min?, max?, maxLength? }`. Core renders the form on the modules screen, validates what an admin submits and clamps what it stores; the module reads them with `moduleSettings("<id>")`. See [Module settings](#module-settings). A declared key the module never reads fails `validate:module`. |
 | `dependencies` | `string[]` | Modules that must be installed and enabled, as `"id"` or `"id@range"` (e.g. `["store@^1.2.0", "currency"]`). A bare id accepts any installed version. Install and enable both fail when a dependency is missing, disabled, or outside its range. |
 | `conflicts` | `string[]` | Same `id` / `id@range` grammar; these must not be enabled at the same time. A range narrows the clash to the versions that actually conflict. |
 | `category` | `string` | Marketplace grouping slug (`commerce`, `community`, `gaming`, `management`, `content`, `integration`, or your own). Drives the category headings in the marketplace and the setup wizard. |
@@ -326,6 +326,56 @@ The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [stat
     }
 ]
 ```
+
+### `settings` - Admin-editable settings
+<a id="module-settings"></a>
+
+A module declares what an admin may change about it. Core renders the form on
+the modules screen, validates what is submitted against the declaration and
+clamps what it stores - without knowing what any key means.
+
+```json
+"settings": [
+    { "key": "allowComments", "type": "boolean", "default": true,
+      "label": "Allow comments",
+      "description": "Turning it off hides the comment section and refuses new ones." },
+    { "key": "postsPerPage", "type": "number", "default": 15, "min": 5, "max": 100,
+      "label": "Posts per page" }
+]
+```
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `key` | yes | lowerCamelCase, unique within the module |
+| `type` | yes | `boolean`, `number` or `string` |
+| `default` | yes | must match `type`, and sit inside the declared bounds |
+| `label` | yes | shown in the admin form |
+| `description` | no | one line under the control |
+| `min` / `max` | for `number` | a number setting must declare both: the form and the clamp each need bounds |
+| `maxLength` | for `string` | same reason |
+
+Read them on the server:
+
+```ts
+import { moduleSettings } from "@/core/sdk/server";
+
+const { allowComments } = await moduleSettings<{ allowComments: boolean }>("blog");
+if (!allowComments) return NextResponse.json({ error: "Comments are closed" }, { status: 403 });
+```
+
+Every declared key is present in the result and has the declared type: defaults
+fill the gaps, a stored value that no longer fits its declaration is clamped or
+discarded, and a key the manifest no longer declares is dropped. The read is
+cached alongside the module enabled-states, so calling it per request is cheap.
+
+Client components cannot call it. Return what the page needs from the module's
+own API route instead - and withhold the values themselves, not just the
+controls: a view count hidden in the markup but still present in the JSON is
+not hidden.
+
+`validate:module` fails a module that declares a setting none of its own source
+files reads. A control an admin can change that changes nothing is worse than
+no control at all.
 
 ### `authProviders` - sign-in providers
 
@@ -1046,7 +1096,7 @@ Carry `request.reference` through the provider and back: it is how the store rec
     "conflicts": ["incompatible-module"],
     "hooksEmitted": [{ "hook": "my-module.item.created", "type": "action" }],
     "permissions": ["mymod.view", "mymod.manage"],
-    "defaultConfig": { "exampleSetting": true },
+    "settings":          [{ "key": "exampleSetting", "type": "boolean", "default": true, "label": "Example setting" }],
 
     "routes":            [{ "path": "/my-page", "component": "pages/public/page.tsx" }],
     "adminRoutes":       [{ "path": "/my-feature", "component": "pages/admin/page.tsx" }],

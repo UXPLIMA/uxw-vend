@@ -3,9 +3,13 @@ import { generateSlug } from "@/core/sdk";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumCategorySchema } from "../../lib/validations";
+import { denyGuestView } from "../../lib/guest-view";
 
 // GET /api/v1/forum/categories
 export async function GET() {
+    const denied = await denyGuestView();
+    if (denied) return denied;
+
     const categories = await prisma.forumCategory.findMany({
         where: { isActive: true },
         orderBy: { order: "asc" },

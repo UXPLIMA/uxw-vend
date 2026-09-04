@@ -5,8 +5,10 @@
 
 import { prisma } from "./db";
 import { cacheGetJSON, cacheSetJSON, cacheDel } from "./redis";
+import { resolveSettings, type SettingValue } from "./module-settings";
 
 const CACHE_KEY = "uxw:modules:status";
+const CONFIG_CACHE_KEY = "uxw:modules:config";
 const CACHE_TTL = 30; // seconds
 
 /** Get all module enabled/disabled states (cached) */
@@ -57,4 +59,50 @@ export async function isModuleEnabled(id: string): Promise<boolean> {
 /** Invalidate module states cache (call after enable/disable/install/uninstall) */
 export async function invalidateModuleCache(): Promise<void> {
     await cacheDel(CACHE_KEY);
+    await cacheDel(CONFIG_CACHE_KEY);
+}
+
+/**
+ * Every module's stored config bag, cached alongside the enabled states.
+ *
+ * Kept separate from `getModuleStates` because that map is read by the proxy
+ * middleware on every request and only needs a boolean per module; config is
+ * read by the handful of modules that declare settings.
+ */
+async function getModuleConfigs(): Promise<Record<string, unknown>> {
+    const cached = await cacheGetJSON<Record<string, unknown>>(CONFIG_CACHE_KEY);
+    if (cached) return cached;
+
+    let configs: Array<{ id: string; config: unknown }> = [];
+    try {
+        configs = await prisma.moduleConfig.findMany({ select: { id: true, config: true } });
+    } catch (err) {
+        // Same contract as getModuleStates: an unreachable database means "no
+        // stored config known", and every caller falls back to the manifest
+        // defaults rather than failing the request.
+        if (process.env.NODE_ENV !== "production") {
+            console.warn("[module-cache] moduleConfig.findMany failed (returning empty):", err);
+        }
+        return {};
+    }
+
+    const out: Record<string, unknown> = {};
+    for (const c of configs) out[c.id] = c.config;
+    await cacheSetJSON(CONFIG_CACHE_KEY, out, CACHE_TTL);
+    return out;
+}
+
+/**
+ * A module's own settings: its manifest defaults overlaid with whatever an
+ * admin has saved, each value checked and clamped against its declaration.
+ *
+ * This is what a module calls to read its own configuration. It never throws
+ * and never returns a key the manifest does not declare, so a caller can index
+ * the result directly.
+ */
+export async function moduleSettings<T extends Record<string, SettingValue>>(
+    moduleId: string,
+): Promise<T> {
+    const configs = await getModuleConfigs();
+    return resolveSettings(moduleId, configs[moduleId]) as T;
 }

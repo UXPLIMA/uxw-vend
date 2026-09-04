@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { moduleSettings, prisma } from "@/core/sdk/server";
 
 interface SearchResult {
     type: string;
@@ -17,6 +17,12 @@ interface SearchResult {
  */
 export default async function search(q: string): Promise<SearchResult[]> {
     if (!q || q.length < 2) return [];
+
+    // A site that keeps its help centre out of search says so here. The
+    // provider stays registered - contributions are wired in at build time -
+    // and simply contributes nothing.
+    const { enableSearch } = await moduleSettings<{ enableSearch: boolean }>("help-center");
+    if (!enableSearch) return [];
 
     try {
         // Full-text path
