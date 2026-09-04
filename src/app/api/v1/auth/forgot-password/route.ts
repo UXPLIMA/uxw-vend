@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         // Per-IP cap blocks bulk enumeration from a single attacker IP.
         const rlIp = await rateLimit(`forgot:ip:${ip}`, { maxRequests: 10, windowMs: 3600000 });
         if (!rlIp.success) {
-            return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+            return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
         }
 
         const body = (await request.json().catch(() => ({}))) as { email?: unknown };

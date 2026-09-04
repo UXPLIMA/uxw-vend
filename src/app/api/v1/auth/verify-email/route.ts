@@ -14,21 +14,21 @@ function hashToken(token: string): string {
 
 export async function POST(_request: NextRequest) {
     const session = await auth();
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
 
     // Per-user cap stops an authenticated user from generating unlimited
     // verification email sends (and DB rows). 3 per hour matches the
     // forgot-password limit and is plenty for a legitimate user.
     const rl = await rateLimit(`verify-email:user:${session.user.id}`, { maxRequests: 3, windowMs: 3600000 });
     if (!rl.success) {
-        return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+        return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!user) return NextResponse.json({ error: "User not found", code: "user_not_found" }, { status: 404 });
 
     if (user.emailVerified) {
-        return NextResponse.json({ error: "Email already verified" }, { status: 400 });
+        return NextResponse.json({ error: "Email already verified", code: "already_verified" }, { status: 400 });
     }
 
     // Delete existing tokens
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     const email = request.nextUrl.searchParams.get("email");
 
     if (!token || !email) {
-        return NextResponse.json({ error: "Missing token or email" }, { status: 400 });
+        return NextResponse.json({ error: "Missing token or email", code: "missing_token" }, { status: 400 });
     }
 
     const tokenHash = hashToken(token);
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!verificationToken) {
-        return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid or expired token", code: "invalid_token" }, { status: 400 });
     }
 
     // Mark email as verified

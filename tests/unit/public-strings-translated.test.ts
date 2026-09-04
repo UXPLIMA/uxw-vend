@@ -22,6 +22,11 @@ const root = path.resolve(import.meta.dirname, "../..");
 
 const PUBLIC_SURFACE = [
     "src/app/[locale]/(public)",
+    // Sign in, register, forgot and reset password, verify email, auth error.
+    // The most-read pages on a fresh install and covered by neither gate
+    // until now, which is how the register form kept an English placeholder
+    // and its sibling login page did not.
+    "src/app/[locale]/(auth)",
     "src/app/[locale]/maintenance",
     "src/core/components/layout",
     "src/core/components/homepage",

@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Auth failures were answered in English, whatever language the page was
+  in.** Every endpoint under `/api/v1/auth` replied with an English sentence
+  and nothing else, and every screen wrote that sentence straight into the
+  page. A Turkish visitor whose username was taken, whose reset link had
+  expired, whose password turned up in a breach corpus, or who had simply
+  tried once too often, read the whole thing in English on an otherwise
+  Turkish page - and there was no machine-readable signal to translate from,
+  so no screen could have done better. Each response now carries a stable
+  `code` alongside the English string, which stays on the wire for API
+  clients and logs; the catalogue carries `auth.err.<code>` in both locales;
+  and `authErrorMessage` is what register, forgot password, reset password,
+  verify email and the profile screen call. An unrecognised code falls back
+  to the screen's own generic message rather than the server's English. A
+  gate fails the build if an auth endpoint answers without a code, if a code
+  has no message in every locale, if the locales disagree on the set, if a
+  message is orphaned, or if a screen renders `data.error` again.
+- **The sign-in tree was covered by no translation gate at all.** The public
+  gate watched `(public)` and the chrome, the admin gate watched `(admin)`,
+  and `(auth)` - the most-read pages on a fresh install - sat between them.
+  That is how the register form kept `you@example.com` and `johndoe` as
+  hardcoded placeholders while its sibling login page had translated its own
+  years ago. Both are translated now and the gate covers the tree.
+- **The most common OAuth error had no message to show.** The auth error page
+  guarded `OAuthAccountNotLinked` with `t.has(...)` and fell back to an
+  English sentence, because the key it guarded for was never added to the
+  catalogue. Signing in with a provider whose email already belongs to an
+  account is the single likeliest OAuth failure, so that fallback was not a
+  rare path. The key exists in both locales now and the guard is gone.
 - **The module enabled flag meant two different things.** Core documents one
   convention - `getModuleStates()` returns a row per module that has a
   `ModuleConfig`, an empty map when the database is unreachable, and an absent

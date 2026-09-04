@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         const ip = getClientIP(request.headers);
         const rl = await rateLimit(`reset:${ip}`, { maxRequests: 10, windowMs: 3600000 });
         if (!rl.success) {
-            return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+            return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
         }
 
         const body = (await request.json().catch(() => ({}))) as {
@@ -27,13 +27,13 @@ export async function POST(request: NextRequest) {
         const password = typeof body.password === "string" ? body.password : "";
 
         if (!email || !token || !password) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+            return NextResponse.json({ error: "Missing required fields", code: "missing_fields" }, { status: 400 });
         }
 
         const policyCheck = await enforcePasswordPolicy(password);
         if (!policyCheck.ok) {
             return NextResponse.json(
-                { error: policyCheck.message ?? "Invalid password" },
+                { error: policyCheck.message ?? "Invalid password", code: "weak_password" },
                 { status: 400 },
             );
         }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         const breach = await checkPasswordBreach(password);
         if (!breach.ok) {
             return NextResponse.json(
-                { error: "This password has appeared in a known data breach - pick something else." },
+                { error: "This password has appeared in a known data breach - pick something else.", code: "password_breached" },
                 { status: 400 },
             );
         }
@@ -66,12 +66,12 @@ export async function POST(request: NextRequest) {
         });
 
         if (consumed === 0) {
-            return NextResponse.json({ error: "Invalid or expired reset token" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid or expired reset token", code: "invalid_token" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || user.isBanned || user.isDeleted) {
-            return NextResponse.json({ error: "Invalid or expired reset token" }, { status: 400 });
+            return NextResponse.json({ error: "Invalid or expired reset token", code: "invalid_token" }, { status: 400 });
         }
 
         const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -97,6 +97,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: "Password has been reset successfully" });
     } catch (error) {
         console.error("Reset password error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        return NextResponse.json({ error: "Internal server error", code: "server_error" }, { status: 500 });
     }
 }
