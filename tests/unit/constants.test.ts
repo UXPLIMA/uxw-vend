@@ -3,8 +3,6 @@ import {
     BCRYPT_ROUNDS,
     EMAIL_VERIFY_EXPIRY_MS,
     PASSWORD_RESET_EXPIRY_MS,
-    PASSWORD_MIN_LENGTH,
-    PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH,
     USERNAME_MAX_LENGTH,
     BACKUP_CODES_COUNT,
@@ -28,11 +26,6 @@ describe('Auth constants', () => {
         expect(PASSWORD_RESET_EXPIRY_MS).toBe(60 * 60 * 1000);
     });
 
-    it('password length constraints are sensible', () => {
-        expect(PASSWORD_MIN_LENGTH).toBeGreaterThanOrEqual(6);
-        expect(PASSWORD_MAX_LENGTH).toBeLessThanOrEqual(200);
-        expect(PASSWORD_MAX_LENGTH).toBeGreaterThan(PASSWORD_MIN_LENGTH);
-    });
 
     it('username length constraints are sensible', () => {
         expect(USERNAME_MIN_LENGTH).toBeGreaterThanOrEqual(2);

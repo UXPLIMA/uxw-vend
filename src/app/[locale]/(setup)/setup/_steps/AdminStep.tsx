@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Input } from "@/core/components/ui/input";
 import { PasswordInput } from "@/core/components/ui/password-input";
+import { checkPasswordPolicy } from "@/core/lib/password-policy";
 
 interface AdminStepProps {
     email: string;
@@ -22,6 +23,8 @@ export function AdminStep({
     const t = useTranslations("setup.admin");
     const authT = useTranslations("auth");
     const mismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
+    // Only once they have typed something: an empty field is not a complaint.
+    const policy = password.length > 0 ? checkPasswordPolicy(password) : { ok: true };
     return (
         <div className="space-y-4">
             <h2 className="text-xl font-bold text-foreground">{t("title")}</h2>
@@ -38,7 +41,11 @@ export function AdminStep({
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("password")}</span>
                     <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" showLabel={authT("showPassword")} hideLabel={authT("hidePassword")} />
-                    <span className="text-xs text-muted-foreground">{t("passwordHint")}</span>
+                    {policy.ok ? (
+                        <span className="text-xs text-muted-foreground">{t("passwordHint")}</span>
+                    ) : (
+                        <span className="text-xs text-destructive">{policy.message}</span>
+                    )}
                 </label>
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("passwordConfirm")}</span>

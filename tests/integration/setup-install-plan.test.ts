@@ -133,21 +133,21 @@ vi.mock("child_process", async () => {
 
 import { NextRequest } from "next/server";
 
-function body(modules: string[]) {
+function body(modules: string[], password = "Correct horse battery 9") {
     return {
-        admin: { email: "a@example.com", username: "admin", password: "correct horse battery" },
+        admin: { email: "a@example.com", username: "admin", password },
         site: { siteName: "Test", siteDescription: "", defaultLocale: "en" },
         theme: "flat",
         modules,
     };
 }
 
-async function post(modules: string[]) {
+async function post(modules: string[], password?: string) {
     const { POST } = await import("@/app/api/setup/route");
     const req = new NextRequest("http://example.com/api/setup", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(body(modules)),
+        body: JSON.stringify(body(modules, password)),
     });
     const res = await POST(req);
     return { res, json: (await res.json()) as Record<string, unknown> };
@@ -241,5 +241,42 @@ describe("/api/setup - install planning", () => {
         userCount = 1;
         const { res } = await post([]);
         expect(res.status).toBe(409);
+    });
+});
+
+/**
+ * The first administrator is the most privileged account the site will ever
+ * have, and the setup schema used to hold it to eight characters and nothing
+ * else while a visitor registering an ordinary account answered to the full
+ * policy. `12345678` and `password` were both accepted here and refused there.
+ */
+describe("/api/setup - the first administrator's password", () => {
+    it("refuses the eight-character password the schema used to accept", async () => {
+        const { res, json } = await post([], "12345678");
+        expect(res.status).toBe(400);
+        expect(String(json.error)).toMatch(/at least 10 characters/i);
+    });
+
+    it("refuses one that is long enough but on the common list", async () => {
+        const { res, json } = await post([], "Password123");
+        expect(res.status).toBe(400);
+        expect(json.code).toBe("too_common");
+    });
+
+    it("refuses one with no digit", async () => {
+        const { res, json } = await post([], "Correcthorsebattery");
+        expect(res.status).toBe(400);
+        expect(json.code).toBe("missing_digit");
+    });
+
+    it("creates no account when the password is refused", async () => {
+        await post(["store"], "12345678");
+        expect(moduleConfigUpsert).not.toHaveBeenCalled();
+        expect(execCalls).toEqual([]);
+    });
+
+    it("accepts one that clears the policy", async () => {
+        const { res } = await post([]);
+        expect(res.status).toBe(200);
     });
 });

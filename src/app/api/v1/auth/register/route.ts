@@ -6,7 +6,7 @@ import { sendWelcomeEmail } from "@/core/lib/email";
 import { logActivity } from "@/core/lib/activity-log";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
-import { checkPasswordBreach } from "@/core/lib/password-policy";
+import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";

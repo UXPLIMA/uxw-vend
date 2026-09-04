@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The site's password rules did not apply to the site's own administrator.**
+  `enforcePasswordPolicy` is the one function that applies all of the policy:
+  ten characters, an uppercase, a digit, not one of the two dozen passwords
+  everybody tries first, and whatever higher minimum the operator set. Its own
+  file says "every flow that accepts a new password goes through this". Two did
+  not. `POST /api/setup`, which creates the first administrator, asked zod for
+  eight characters and nothing else, so the most privileged account on a new
+  install could be `12345678` or `password` while a visitor registering an
+  ordinary account was held to the full policy. `POST /api/v1/users`, where an
+  admin creates an account for somebody else, checked length against a separate
+  pair of constants in `constants.ts` that had drifted two characters below the
+  policy's own. Both go through the policy now, and those two constants are
+  gone: a second, looser password length sitting next to the real one is how
+  this happened.
+- **The setup wizard let the installer past a password the API would refuse.**
+  It gated the Next button at eight characters and said "At least 8
+  characters", which after the fix above would have meant filling the form,
+  walking through four more steps and collecting a 400 at the end, with the
+  wizard already past the screen that could fix it. It now applies the same
+  policy the API applies and shows the policy's own message under the field.
+  `checkPasswordBreach`, the one part of `password-policy.ts` that reaches the
+  network and node's crypto, moved to `password-breach.ts` so the policy stays
+  safe to import in the browser.
+
 - **Thirty store and blog strings that were English in every language.**
   `t.has(key) ? t(key) : "literal"` is the supported way to render a key that
   may be absent, and it exists for a real case: a module's translations are
@@ -41,6 +65,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/core/lib/permission-names.ts` now, which both read.
 
 ### Added
+- `tests/unit/password-writes-follow-policy.test.ts` requires every route that
+  writes a password onto a user row to have run it through
+  `enforcePasswordPolicy` first, and fails if a second password length
+  reappears in `constants.ts`. It keys on the write rather than on
+  `bcrypt.hash`, because API keys and two-factor backup codes are hashed too
+  and answer to nothing here. The setup route's own tests cover the refusals
+  end to end.
 - `tests/unit/module-translation-keys.test.ts` gained a second rule: a key a
   module guards with `t.has` must exist in that module's shipped catalogue. The
   existing rule deliberately skips guarded keys, since a guard is the correct

@@ -2,8 +2,6 @@
 export const BCRYPT_ROUNDS = 12;
 export const EMAIL_VERIFY_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24h
 export const PASSWORD_RESET_EXPIRY_MS = 60 * 60 * 1000; // 1h
-export const PASSWORD_MIN_LENGTH = 8;
-export const PASSWORD_MAX_LENGTH = 100;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 export const BACKUP_CODES_COUNT = 8;

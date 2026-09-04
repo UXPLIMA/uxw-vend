@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { toast } from "sonner";
 import { defaultThemeId } from "@/core/generated/theme-registry";
 import { resolveInstallPlan, type CatalogEntry } from "@/core/lib/install-plan";
+import { checkPasswordPolicy } from "@/core/lib/password-policy";
 import { Rocket, UserCog, Globe, Compass, Palette, Package, CheckCircle2, ChevronLeft, ChevronRight, Loader2, ArrowRight } from "lucide-react";
 import type { ThemeOption, PresetOption, ModuleOption, SetupResult } from "./types";
 import { WelcomeStep } from "./_steps/WelcomeStep";
@@ -146,7 +147,11 @@ export default function SetupWizardPage() {
             case 2:
                 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
                 if (!username || username.length < 3) return false;
-                if (!password || password.length < 8) return false;
+                // The same policy the setup API applies. Advancing on a
+                // weaker rule meant walking through four more steps and
+                // collecting a 400 at the end, with the wizard already past
+                // the screen that could fix it.
+                if (!checkPasswordPolicy(password).ok) return false;
                 if (password !== passwordConfirm) return false;
                 return true;
             case 3:

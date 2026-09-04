@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { checkPasswordBreach } from "@/core/lib/password-policy";
+import { checkPasswordBreach } from "@/core/lib/password-breach";
 
 const originalEnv = process.env.PASSWORD_BREACH_CHECK;
 
