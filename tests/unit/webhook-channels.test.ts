@@ -123,6 +123,30 @@ describe("validateWebhookUrl", () => {
             expect(validateWebhookUrl(GENERIC_CHANNEL, url), url).toMatchObject({ ok: false });
         }
     });
+
+    /**
+     * `[::ffff:127.0.0.1]` reaches the loopback the same way `127.0.0.1`
+     * does, and the URL parser normalizes it to `::ffff:7f00:1`, which looks
+     * nothing like the IPv6 prefixes the check knew about. The mapped address
+     * is unpacked and run through the IPv4 rules now.
+     */
+    it("blocks an internal target written as an IPv4-mapped IPv6 literal", () => {
+        for (const url of [
+            "https://[::ffff:127.0.0.1]/hook",
+            "https://[::ffff:7f00:1]/hook",
+            "https://[::ffff:169.254.169.254]/latest/meta-data",
+            "https://[::ffff:10.0.0.5]/hook",
+            "https://[::ffff:192.168.1.10]/hook",
+        ]) {
+            expect(validateWebhookUrl(GENERIC_CHANNEL, url), url).toMatchObject({ ok: false });
+        }
+    });
+
+    it("still accepts a public address in either family", () => {
+        expect(validateWebhookUrl(GENERIC_CHANNEL, "https://93.184.216.34/hook").ok).toBe(true);
+        expect(validateWebhookUrl(GENERIC_CHANNEL, "https://[2606:2800:220:1:248:1893:25c8:1946]/hook").ok).toBe(true);
+        expect(validateWebhookUrl(GENERIC_CHANNEL, "https://[::ffff:93.184.216.34]/hook").ok).toBe(true);
+    });
 });
 
 describe("buildWebhookPayload", () => {
