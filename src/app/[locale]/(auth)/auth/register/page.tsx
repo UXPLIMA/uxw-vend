@@ -64,9 +64,10 @@ export default function RegisterPage() {
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12 relative">
             <Link
                 href="/"
+                aria-label={t('backToHome')}
                 className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
             >
-                <Home className="w-5 h-5" />
+                <Home className="w-5 h-5" aria-hidden="true" />
             </Link>
 
             <div className="w-full max-w-md">

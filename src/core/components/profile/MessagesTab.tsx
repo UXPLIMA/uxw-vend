@@ -33,6 +33,7 @@ interface Message {
 
 export function MessagesTab() {
     const t = useTranslations("profile");
+    const commonT = useTranslations("common");
     const relativeTime = useRelativeTime();
     const [conversations, setConversations] = useState<ConversationListItem[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -98,8 +99,8 @@ export function MessagesTab() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <button onClick={() => { setActiveId(null); setMessages([]); }} className="text-muted-foreground hover:text-foreground">
-                            <ArrowLeft className="w-5 h-5" />
+                        <button onClick={() => { setActiveId(null); setMessages([]); }} aria-label={commonT("back")} className="text-muted-foreground hover:text-foreground">
+                            <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                         </button>
                         {conv?.participants.map((p) => p.username).join(", ") || t("conversation")}
                     </CardTitle>

@@ -26,7 +26,14 @@
     "welcomeOpenSettings": "Ayarları aç",
     "welcomeVisitorHint": "Üst menüden topluluğu keşfedebilirsiniz.",
     "retry": "Tekrar dene",
-    "go_home": "Ana sayfa"
+    "go_home": "Ana sayfa",
+    "close": "Kapat",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "search": "Ara",
+    "decreaseQuantity": "Adedi azalt",
+    "increaseQuantity": "Adedi artır",
+    "remove": "Kaldır"
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
@@ -1218,7 +1225,8 @@
     "emailOrUsernamePlaceholder": "sen@ornek.com veya kullanıcıadın",
     "rememberMe": "Oturumum açık kalsın",
     "showPassword": "Şifreyi göster",
-    "hidePassword": "Şifreyi gizle"
+    "hidePassword": "Şifreyi gizle",
+    "backToHome": "Ana sayfaya dön"
   },
   "search": {
     "title": "Arama",

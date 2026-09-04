@@ -26,7 +26,14 @@
     "welcomeOpenSettings": "Open settings",
     "welcomeVisitorHint": "Use the navigation above to explore the community.",
     "retry": "Try again",
-    "go_home": "Go home"
+    "go_home": "Go home",
+    "close": "Close",
+    "previous": "Previous",
+    "next": "Next",
+    "search": "Search",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "remove": "Remove"
   },
   "notFound": {
     "title": "Page not found",
@@ -1218,7 +1225,8 @@
     "emailOrUsernamePlaceholder": "you@example.com or yourname",
     "rememberMe": "Keep me signed in",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "backToHome": "Back to home"
   },
   "search": {
     "title": "Search",

@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/core/lib/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronRight, Home } from "lucide-react";
 
 interface BreadcrumbItem {
@@ -9,10 +10,12 @@ interface BreadcrumbItem {
 }
 
 export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
+    const t = useTranslations("common");
+
     return (
         <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-            <Link href="/" className="hover:text-foreground transition-colors">
-                <Home className="w-3.5 h-3.5" />
+            <Link href="/" aria-label={t("home")} className="hover:text-foreground transition-colors">
+                <Home className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
             {items.map((item, i) => (
                 <span key={i} className="flex items-center gap-1.5">

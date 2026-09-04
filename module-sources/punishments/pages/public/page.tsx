@@ -71,7 +71,7 @@ export default function PunishmentsPage() {
                     <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[200px]">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("searchPlaceholder")} className="pl-10" />
+                            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("searchPlaceholder")} aria-label={t("searchPlaceholder")} className="pl-10" />
                         </div>
                     </form>
                     <div className="flex gap-2">

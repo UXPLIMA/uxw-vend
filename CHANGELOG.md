@@ -378,6 +378,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and a case that times out mid-install leaves its recorded calls for the next
   one to trip over, so a third assertion failed for a reason of its own. The
   file states the budget the work actually needs.
+- **Icon-only controls announced nothing.** A `<button>` or `<Link>` whose
+  whole body is an icon reaches a screen reader as "button", with nothing to
+  say what it does. The auth pages' home link, the breadcrumb's home crumb,
+  the store's gallery arrows and quantity stepper, the cart's two "remove this
+  code" buttons, the store search's clear button, the slider arrows, the
+  announcement banner's dismiss, the popup's close, the media dialog's close,
+  the admin search and spotlight closes and the product image chips all carry
+  a translated `aria-label` now, and the icon inside each is
+  `aria-hidden`. A test walks the app, the shared components and all 78
+  modules and fails on a new one.
+- **Two public search fields had no accessible name.** The store's product
+  search and the punishments search carried a placeholder and nothing else, so
+  a screen reader announced an unlabelled text box. Both take the placeholder
+  text as their `aria-label`.
+- **The homepage had no `h1`.** Its content is a stack of module sections and
+  none of them is the page's own title, so the document outline started at
+  `h2` and a screen reader landed on the page with nothing naming it. The site
+  name is announced now without being drawn, since the design has no room for
+  it. Module versions: announcements 1.0.1, popups 1.0.1, punishments 1.0.1,
+  slider 1.0.2, store 2.0.5.
 
 ## [0.2.1] - 2026-09-02
 

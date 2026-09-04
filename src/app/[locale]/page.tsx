@@ -37,6 +37,17 @@ export default function HomePage() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-6 flex-1">
+        {/*
+          The homepage is a stack of module sections, none of which is the
+          page's own title, so it had no h1 at all: a screen reader landed on
+          the page with nothing naming it, and the document outline started at
+          h2. The name is not drawn since the design has no room for it, but
+          it is announced and it is what a crawler reads first. site_name
+          arrives from a client fetch, so the translated fallback is what
+          renders until then rather than an empty heading.
+        */}
+        <h1 className="sr-only">{(settings.site_name as string) || commonT('home')}</h1>
+
         <div className="text-sm text-muted-foreground mb-4">
           <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
         </div>
