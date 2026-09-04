@@ -33,7 +33,16 @@
     "search": "Ara",
     "decreaseQuantity": "Adedi azalt",
     "increaseQuantity": "Adedi artır",
-    "remove": "Kaldır"
+    "remove": "Kaldır",
+    "uploading": "Yükleniyor...",
+    "uploadFile": "Dosya yükle",
+    "impersonating": "<name>{username}</name> kullanıcısını taklit ediyorsunuz",
+    "impersonationStop": "Kendi hesabınıza dönün",
+    "impersonationStopped": "Kendi hesabınıza dönüldü",
+    "impersonationStopFailed": "Taklit modundan çıkılamadı",
+    "replace": "Değiştir",
+    "uploadFailed": "Yükleme başarısız",
+    "fileUploaded": "Dosya yüklendi"
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
@@ -41,7 +50,11 @@
     "goHome": "Ana sayfaya dön"
   },
   "activity": {
-    "userRegistered": "topluluğa katıldı"
+    "userRegistered": "topluluğa katıldı",
+    "title": "Etkinlik Akışı",
+    "description": "Sitedeki en son etkinlikler",
+    "recent": "Son Etkinlikler",
+    "viewAll": "Tümünü gör"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -52,7 +65,11 @@
     "profile": "Profil",
     "adminPanel": "Yönetici Paneli",
     "switchToLight": "Açık moda geç",
-    "switchToDark": "Karanlık moda geç"
+    "switchToDark": "Karanlık moda geç",
+    "primary": "Ana menü",
+    "mobile": "Mobil menü",
+    "social": "Sosyal medya",
+    "community": "Topluluk"
   },
   "hero": {
     "playersOnline": "{count} Oyuncu Çevrimiçi",
@@ -1342,5 +1359,9 @@
     "consoleHelp": "Uygulamayi su adresten olusturun:",
     "set": "tanimli",
     "notSet": "tanimli degil"
+  },
+  "maintenance": {
+    "title": "Bakım Çalışması",
+    "defaultMessage": "Kısa süre içinde döneceğiz."
   }
 }

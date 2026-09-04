@@ -33,7 +33,16 @@
     "search": "Search",
     "decreaseQuantity": "Decrease quantity",
     "increaseQuantity": "Increase quantity",
-    "remove": "Remove"
+    "remove": "Remove",
+    "uploading": "Uploading...",
+    "uploadFile": "Upload file",
+    "impersonating": "You are impersonating <name>{username}</name>",
+    "impersonationStop": "Return to your account",
+    "impersonationStopped": "Returned to your account",
+    "impersonationStopFailed": "Failed to stop impersonating",
+    "replace": "Replace",
+    "uploadFailed": "Upload failed",
+    "fileUploaded": "File uploaded"
   },
   "notFound": {
     "title": "Page not found",
@@ -41,7 +50,11 @@
     "goHome": "Go home"
   },
   "activity": {
-    "userRegistered": "joined the community"
+    "userRegistered": "joined the community",
+    "title": "Activity Feed",
+    "description": "Latest activity across the site",
+    "recent": "Recent Activity",
+    "viewAll": "View all"
   },
   "nav": {
     "home": "Home",
@@ -52,7 +65,11 @@
     "profile": "Profile",
     "adminPanel": "Admin Panel",
     "switchToLight": "Switch to light mode",
-    "switchToDark": "Switch to dark mode"
+    "switchToDark": "Switch to dark mode",
+    "primary": "Primary",
+    "mobile": "Mobile navigation",
+    "social": "Social media",
+    "community": "Community"
   },
   "hero": {
     "playersOnline": "{count} Players Online",
@@ -1342,5 +1359,9 @@
     "consoleHelp": "Create the application at",
     "set": "set",
     "notSet": "not set"
+  },
+  "maintenance": {
+    "title": "Under Maintenance",
+    "defaultMessage": "We'll be back soon."
   }
 }

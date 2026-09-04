@@ -398,6 +398,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name is announced now without being drawn, since the design has no room for
   it. Module versions: announcements 1.0.1, popups 1.0.1, punishments 1.0.1,
   slider 1.0.2, store 2.0.5.
+- **The public chrome still had English baked into it.** A Turkish visitor
+  read "Under Maintenance" on the maintenance screen and "Activity Feed" on
+  the activity page, and the activity page put the English title and
+  description in its metadata as well, which is what a crawler indexes for
+  both locales. The homepage activity section, the file upload control and
+  the impersonation banner were English throughout, and the navigation
+  landmarks a screen reader reads to tell one nav from another were labelled
+  "Primary", "Mobile", "Social media" and "Community" in English on every
+  locale. All of it now comes from `messages-core`, including a new
+  `maintenance` namespace. A test walks the public tree and fails on a new
+  English literal; brand names and a word the user has to type back verbatim
+  are the deliberate exceptions. `app/error.tsx`, `app/not-found.tsx` and the
+  two error boundaries stay in English on purpose, since they render with no
+  provider to ask.
+
+### Removed
+- `seedCoreTranslations` from the translation service. Nothing called it, and
+  it upserted with `update: { value }`, which would have overwritten an
+  operator's own wording on every run. `scripts/seed-translations.ts` is the
+  path that seeds core, and it does the two-pass write that leaves
+  `isCustom` rows alone.
 
 ## [0.2.1] - 2026-09-02
 

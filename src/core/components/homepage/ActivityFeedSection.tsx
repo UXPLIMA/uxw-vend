@@ -1,4 +1,5 @@
 import { Link } from "@/core/lib/i18n/navigation";
+import { getTranslations } from "next-intl/server";
 import { Activity, ChevronRight } from "lucide-react";
 import { prisma } from "@/core/lib/db";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
@@ -11,6 +12,7 @@ import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/
  * database (no API round trip) and renders up to `limit` public items.
  */
 export async function ActivityFeedSection({ limit = 10 }: { limit?: number } = {}) {
+    const t = await getTranslations("activity");
     let items: ActivityItem[] = [];
     try {
         const rows = await prisma.activityFeedItem.findMany({
@@ -40,11 +42,11 @@ export async function ActivityFeedSection({ limit = 10 }: { limit?: number } = {
         <section className="space-y-3">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
-                    Recent Activity
+                    <Activity className="w-5 h-5" aria-hidden="true" />
+                    {t("recent")}
                 </h2>
                 <Link href="/activity" className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
-                    View all <ChevronRight className="w-3 h-3" />
+                    {t("viewAll")} <ChevronRight className="w-3 h-3" aria-hidden="true" />
                 </Link>
             </div>
             <ActivityFeedList items={items} />

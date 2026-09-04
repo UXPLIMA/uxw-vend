@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { UserCog, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
  */
 export function ImpersonationBanner() {
     const { data: session, update } = useSession();
+    const t = useTranslations("common");
     const [stopping, setStopping] = useState(false);
 
     if (!session?.user?.originalUserId) return null;
@@ -27,11 +29,11 @@ export function ImpersonationBanner() {
             });
             if (!res.ok) {
                 const body = (await res.json().catch(() => ({}))) as { error?: string };
-                toast.error(body.error || "Failed to stop impersonating");
+                toast.error(body.error || t("impersonationStopFailed"));
                 return;
             }
             await update({ stopImpersonating: true });
-            toast.success("Returned to your account");
+            toast.success(t("impersonationStopped"));
             // Reload so server-rendered permissions re-run with the restored
             // session - the mirror of starting impersonation. A soft navigation
             // would leave the impersonated user's server-rendered tree in place
@@ -39,7 +41,7 @@ export function ImpersonationBanner() {
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             window.location.href = "/admin/users";
         } catch {
-            toast.error("Failed to stop impersonating");
+            toast.error(t("impersonationStopFailed"));
         } finally {
             setStopping(false);
         }
@@ -54,7 +56,10 @@ export function ImpersonationBanner() {
                 <div className="flex items-center gap-2 min-w-0">
                     <UserCog className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                     <span className="truncate">
-                        You are impersonating <strong>{impersonatedName}</strong>
+                        {t.rich("impersonating", {
+                            username: impersonatedName,
+                            name: (chunks) => <strong>{chunks}</strong>,
+                        })}
                     </span>
                 </div>
                 <button
@@ -68,7 +73,7 @@ export function ImpersonationBanner() {
                     ) : (
                         <LogOut className="w-3 h-3" aria-hidden="true" />
                     )}
-                    Return to your account
+                    {t("impersonationStop")}
                 </button>
             </div>
         </div>
