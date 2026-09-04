@@ -47,6 +47,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing entry, and a manifest that omits it behaves exactly as before.
 
 ### Fixed
+- **A failing root layout showed Next's built-in error screen.**
+  `[locale]/layout.tsx` is this app's root layout, and an error boundary never
+  catches its own segment's layout, so a failure there (the database
+  unreachable while it reads settings and messages) had no page of ours to land
+  on. `src/app/global-error.tsx` now supplies one, self-contained the way the
+  root not-found page is: its own document, inline styles, no locale to resolve.
+- **The root error page printed the error's message to the visitor.** Next
+  redacts a server error's message in production, but an error thrown in a
+  client component keeps its real text, which is written for whoever reads the
+  logs. It is now shown only in development, matching the locale error page.
+- **`t("key") || "fallback"` never reached its fallback.** next-intl returns
+  the key path for a missing message, and a key path is a non-empty string, so
+  the error boundary would have rendered "common.error_title" as its heading
+  rather than the English behind the `||`. Nine of them across the error
+  boundary and the custom-forms admin page are gone, the boundary guards with
+  `t.has()`, and a test fails the pattern anywhere in the repo.
 - **The Redis rate limiter's expiry test was flaky.** It opened a 20ms window
   and slept 30ms; a loaded machine took longer than 20ms to get between the two
   awaits inside the window, so the second request started a fresh window and

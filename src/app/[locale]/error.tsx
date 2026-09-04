@@ -5,23 +5,26 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { AlertTriangle, RotateCcw, Home } from "lucide-react";
 
+/**
+ * next-intl does not throw on a missing message: it logs and returns the key
+ * path, which is a non-empty string. `t(key) || "fallback"` therefore never
+ * reaches its fallback, and this screen would have rendered "common.error_title"
+ * as its heading. `t.has()` is the supported guard, and it matters more here
+ * than anywhere else - this is the page a visitor sees when the rest broke.
+ *
+ * The provider itself is guaranteed: an error boundary does not catch its own
+ * segment's layout, so if this renders, the layout that provides the messages
+ * already succeeded.
+ */
 function useErrorTranslations() {
-    try {
-        const t = useTranslations("common");
-        return {
-            title: t("error_title") || "Something went wrong",
-            description: t("error_description") || "An unexpected error occurred. Please try again.",
-            retry: t("retry") || "Try Again",
-            goHome: t("go_home") || "Go Home",
-        };
-    } catch {
-        return {
-            title: "Something went wrong",
-            description: "An unexpected error occurred. Please try again.",
-            retry: "Try Again",
-            goHome: "Go Home",
-        };
-    }
+    const t = useTranslations("common");
+    const label = (key: string, fallback: string) => (t.has(key) ? t(key) : fallback);
+    return {
+        title: label("error_title", "Something went wrong"),
+        description: label("error_description", "An unexpected error occurred. Please try again."),
+        retry: label("retry", "Try Again"),
+        goHome: label("go_home", "Go Home"),
+    };
 }
 
 export default function Error({
