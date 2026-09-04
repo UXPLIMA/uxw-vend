@@ -15,8 +15,17 @@ const ROOT = process.cwd();
  */
 const SCROLLS = /overflow-x-auto|overflow-auto|overflow-x-scroll/;
 
-/** Installed-module state is a copy of module-sources, refreshed on install. */
-const SKIP_DIRS = new Set(["node_modules", "generated", "modules"]);
+/**
+ * Skipped by full path, not by directory name. `src/modules` is
+ * installed-module state, a copy of module-sources refreshed on install and not
+ * the repo's to police. A name-based skip also swallowed
+ * `src/app/[locale]/(admin)/admin/modules`, which is core's own screen for
+ * managing them and very much in scope.
+ */
+const SKIP_PATHS = new Set([
+    path.join(ROOT, "src", "modules"),
+    path.join(ROOT, "src", "core", "generated"),
+]);
 
 function componentFiles(dir: string): string[] {
     const out: string[] = [];
@@ -25,7 +34,7 @@ function componentFiles(dir: string): string[] {
         for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
             const full = path.join(d, entry.name);
             if (entry.isDirectory()) {
-                if (SKIP_DIRS.has(entry.name)) continue;
+                if (entry.name === "node_modules" || SKIP_PATHS.has(full)) continue;
                 walk(full);
             } else if (/\.tsx$/.test(entry.name)) {
                 out.push(full);

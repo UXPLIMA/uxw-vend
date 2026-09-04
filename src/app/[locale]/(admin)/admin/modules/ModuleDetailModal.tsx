@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { Button } from "@/core/components/ui/button";
 import { CheckCircle, X } from "lucide-react";
@@ -16,18 +16,15 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
     const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("admin");
 
-    useEffect(() => {
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [onClose]);
+    // The modal is only ever rendered while it is open, so the hook is always
+    // told it is open.
+    const dialogRef = useModalDialog<HTMLDivElement>(true, onClose);
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" role="presentation">
             <div className="fixed inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="module-detail-title"

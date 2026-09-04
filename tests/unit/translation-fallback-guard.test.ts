@@ -20,8 +20,17 @@ const DEAD_FALLBACK = /\bt\(\s*["'`][^"'`]+["'`]\s*\)\s*\|\|/;
 /** Same trap one level up: a namespace object read straight off the catalogue. */
 const SOURCE_DIRS = ["src", "module-sources"];
 
-/** Installed-module state, regenerated on install - not the repo's to police. */
-const SKIP_DIRS = new Set(["node_modules", "generated", "modules"]);
+/**
+ * Skipped by full path, not by directory name. `src/modules` is
+ * installed-module state, a copy of module-sources refreshed on install and not
+ * the repo's to police. A name-based skip also swallowed
+ * `src/app/[locale]/(admin)/admin/modules`, which is core's own screen for
+ * managing them and very much in scope.
+ */
+const SKIP_PATHS = new Set([
+    path.join(ROOT, "src", "modules"),
+    path.join(ROOT, "src", "core", "generated"),
+]);
 
 function sources(dir: string): string[] {
     const out: string[] = [];
@@ -35,7 +44,7 @@ function sources(dir: string): string[] {
         for (const entry of entries) {
             const full = path.join(d, entry.name);
             if (entry.isDirectory()) {
-                if (SKIP_DIRS.has(entry.name)) continue;
+                if (entry.name === "node_modules" || SKIP_PATHS.has(full)) continue;
                 walk(full);
                 continue;
             }

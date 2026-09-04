@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { useRouter } from "@/core/lib/i18n/navigation";
 import { Search, X, FileText, User, Settings as SettingsIcon, Package, Layers } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -45,13 +46,18 @@ export function AdminSpotlight() {
             if ((e.metaKey || e.ctrlKey) && e.key === "k") {
                 e.preventDefault();
                 setOpen((v) => !v);
-            } else if (e.key === "Escape" && open) {
-                setOpen(false);
             }
+            // Escape belongs to useModalDialog, along with the trap and
+            // returning focus to whatever had it before Cmd+K.
         };
         window.addEventListener("keydown", handler);
         return () => window.removeEventListener("keydown", handler);
     }, [open]);
+
+    // autoFocus is off because the palette focuses its own input below on a
+    // short delay; the hook still traps Tab, closes on Escape and hands focus
+    // back to whatever had it when the palette opened.
+    const dialogRef = useModalDialog<HTMLDivElement>(open, () => setOpen(false), { autoFocus: false });
 
     // Focus input when opened
     useEffect(() => {
@@ -110,6 +116,7 @@ export function AdminSpotlight() {
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4" role="presentation">
             <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} aria-hidden="true" />
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={at("spotlight_placeholder")}

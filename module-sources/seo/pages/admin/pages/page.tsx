@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useModalDialog } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, X, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -57,6 +57,9 @@ export default function SeoPageOverridesPage() {
     const [pages, setPages] = useState<SeoPage[]>([]);
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
+    // The form dialog had no keyboard exit at all and left Tab free to walk
+    // into the table behind it.
+    const dialogRef = useModalDialog<HTMLDivElement>(dialogOpen, () => setDialogOpen(false));
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<FormData>(EMPTY_FORM);
     const [submitting, setSubmitting] = useState(false);
@@ -279,6 +282,7 @@ export default function SeoPageOverridesPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center" role="presentation">
                     <div className="fixed inset-0 bg-black/50" onClick={() => setDialogOpen(false)} aria-hidden="true" />
                     <div
+                        ref={dialogRef}
                         role="dialog"
                         aria-modal="true"
                         className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"

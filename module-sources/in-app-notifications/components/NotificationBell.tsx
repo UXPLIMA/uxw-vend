@@ -6,6 +6,7 @@ import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useModalDialog } from "@/core/sdk/ui";
 
 interface NotificationItem {
     id: string;
@@ -40,6 +41,13 @@ export function NotificationBell() {
     }, [session]);
 
     useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
+
+    // A panel, not a modal: the page behind it stays usable, so Tab is left
+    // alone. Escape still closes it and focus goes back to the bell.
+    const panelRef = useModalDialog<HTMLDivElement>(open, () => setOpen(false), {
+        trapFocus: false,
+        autoFocus: false,
+    });
 
     // Close on outside click
     useEffect(() => {
@@ -98,6 +106,7 @@ export function NotificationBell() {
 
             {open && (
                 <div
+                    ref={panelRef}
                     role="dialog"
                     aria-label={t("title")}
                     className="absolute right-0 top-full mt-1 w-80 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden"

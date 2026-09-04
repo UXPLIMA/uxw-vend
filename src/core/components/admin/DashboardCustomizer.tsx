@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Settings as SettingsIcon, ChevronUp, ChevronDown, RotateCcw, Loader2 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { toast } from "sonner";
@@ -31,14 +32,7 @@ export function DashboardCustomizer() {
     const { confirm } = useConfirm();
 
     // Closing it needed a mouse: the backdrop click was the only way out.
-    useEffect(() => {
-        if (!open) return;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") setOpen(false);
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [open]);
+    const dialogRef = useModalDialog<HTMLDivElement>(open, () => setOpen(false));
 
     useEffect(() => {
         if (!open) return;
@@ -119,6 +113,7 @@ export function DashboardCustomizer() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
                     <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} aria-hidden="true" />
                     <div
+                        ref={dialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-label={t("customizer_title")}

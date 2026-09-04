@@ -27,6 +27,11 @@ export { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 export { FileUpload } from "@/core/components/ui/file-upload";
 export { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 
+// The keyboard half of a dialog: Escape, a Tab trap, and focus handed back to
+// whatever opened it. A module that draws its own `role="dialog"` needs this
+// as much as core does, and there is one implementation of it.
+export { useModalDialog, type ModalDialogOptions } from "@/core/hooks/useModalDialog";
+
 // A module that builds a public page needs the same breadcrumb core uses.
 // This sat in the tree unreachable from a module, so the store hand-rolled
 // its own - and that copy was the one whose crumbs a keyboard could not reach.

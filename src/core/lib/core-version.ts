@@ -12,6 +12,11 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.6.0 - `useModalDialog` and `ModalDialogOptions` join `@/core/sdk/ui`. A
+ * module that draws its own `role="dialog"` gets Escape, a Tab trap and focus
+ * returned to whatever opened it, instead of hand-rolling a keydown listener
+ * that covers a third of the problem.
+ *
  * 1.5.0 - `readJsonBody` and `INVALID_JSON_BODY` join `@/core/sdk/server`.
  * A route that calls `request.json()` directly answers a malformed body with
  * a 500; the helper answers it with the 400 it deserves, in one wording.
@@ -40,4 +45,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.5.0";
+export const CORE_API_VERSION = "1.6.0";
