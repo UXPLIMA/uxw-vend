@@ -2,7 +2,7 @@
   "id": "iyzico-gateway",
   "name": "iyzico Payment Gateway",
   "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -35,6 +35,7 @@
   "api": [
     {
       "path": "/iyzico/callback",
+      "providerCallback": true,
       "handler": "api/callback/route.ts",
       "method": "POST",
       "description": "Where iyzico posts the result of a checkout form. Reads the payment back from iyzico before settling it."

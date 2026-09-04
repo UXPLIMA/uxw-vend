@@ -994,6 +994,65 @@ function readStringLiteral(source: string, start: number): string | null {
  * multipliers scale a budget and a multiplier of 0 removes it, which is right
  * for throughput and wrong for a brute-force ceiling.
  */
+/**
+ * A `providerCallback` endpoint is exempt from the proxy's CSRF origin check,
+ * because the service posting to it has no browser and sends no Origin. That
+ * exemption is only safe if the handler authenticates the request some other
+ * way: a signature it verifies, or reading the payment back from the provider
+ * with this site's own credentials.
+ *
+ * Without this check the flag is a way to punch an unauthenticated hole
+ * through the gate, which is the opposite of what it exists for.
+ */
+function checkProviderCallbacksVerify(modulePath: string): CheckResult {
+    const name = "Provider callbacks authenticate themselves";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name, passed: true, message: "No manifest to check" };
+    }
+
+    let manifest: { api?: Array<{ path: string; handler: string; method?: string; providerCallback?: boolean }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest is unreadable; another check reports that" };
+    }
+
+    const declared = (manifest.api ?? []).filter((entry) => entry.providerCallback);
+    if (declared.length === 0) {
+        return { name, passed: true, message: "Declares no provider callback" };
+    }
+
+    // Either a signature comparison, or the documented pattern of reading the
+    // payment back from the provider instead of trusting the post.
+    const verifies = /timingSafeEqual|constructEvent|verifyWebhookSignature|@provider-callback/;
+    const offenders: string[] = [];
+    for (const entry of declared) {
+        const handler = path.join(modulePath, entry.handler);
+        if (!fs.existsSync(handler)) {
+            offenders.push(`${entry.path} (handler missing)`);
+            continue;
+        }
+        if (!verifies.test(fs.readFileSync(handler, "utf8"))) {
+            offenders.push(entry.path);
+        }
+    }
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} provider callback(s) skip the CSRF gate without authenticating: ${offenders.join(", ")}`,
+            suggestion:
+                "Verify the provider's signature with crypto.timingSafeEqual (or the SDK's own verifier), or read the " +
+                "payment back from the provider with this site's credentials and document that with a @provider-callback " +
+                "comment. Drop providerCallback if the endpoint does not need the exemption.",
+        };
+    }
+
+    return { name, passed: true, message: `${declared.length} provider callback(s) authenticate themselves` };
+}
+
 function checkSecretChecksLimited(modulePath: string): CheckResult {
     const name = "Secret checks are rate limited";
     const comparesSecret = /bcrypt\.compare\(|verifyToken\(/;
@@ -1226,6 +1285,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkAdminKeyPrefix(modulePath),
         checkModuleFetchPaths(modulePath),
         checkSecretChecksLimited(modulePath),
+        checkProviderCallbacksVerify(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

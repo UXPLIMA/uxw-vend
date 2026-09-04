@@ -11,6 +11,7 @@ import prisma from '@/core/lib/db';
 import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
 import { getModuleStates } from '@/core/lib/module-cache';
 import { checkCsrf } from '@/core/lib/csrf';
+import { providerCallbackRoutes } from '@/core/generated/module-routes';
 import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
 import { isStaticAsset } from '@/core/lib/proxy-paths';
@@ -176,11 +177,21 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     // NextAuth handles /api/auth/* itself; inbound webhooks are exempt because
     // external services POST them without a browser origin. Everything else
     // gets a same-origin check to prevent cross-site cookie-riding attacks.
+    //
+    // The two literal prefixes below only ever matched core's own webhook
+    // route. A payment gateway ships its callback at whatever path its
+    // manifest declares - /api/v1/mollie/webhook, /api/v1/webhooks/stripe -
+    // and every one of them was answered 403 here before its handler ran, so
+    // no payment settled. Core cannot know those paths, so the module marks
+    // the endpoint `providerCallback` and the generated list says which they
+    // are. Each such handler verifies a signature or reads the payment back
+    // from the provider itself; validate-module fails one that does neither.
     if (
         pathname.startsWith('/api/') &&
         !pathname.startsWith('/api/auth/') &&
         !pathname.startsWith('/api/v1/webhook/') &&
-        !pathname.startsWith('/api/webhook/')
+        !pathname.startsWith('/api/webhook/') &&
+        !providerCallbackRoutes.some((route) => route.test(pathname))
     ) {
         const csrf = checkCsrf(request);
         if (!csrf.ok) {
