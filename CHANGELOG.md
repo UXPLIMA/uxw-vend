@@ -47,6 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing entry, and a manifest that omits it behaves exactly as before.
 
 ### Security
+- **A chest item could be redeemed twice.** The route read the row, saw
+  `isRedeemed: false`, ran the RCON delivery, and marked the row redeemed
+  afterwards. Two requests that arrived together both passed the read and both
+  delivered, so the player received the item as many times as they could
+  overlap the call. It claims the row first now, with the same conditional
+  `updateMany` the gift-code route has always used, and gifting is conditional
+  too so a gift racing a redeem cannot both win. A test fails the file if the
+  claim moves back behind the delivery.
 - **Five endpoints answered "was this guess right?" without a ceiling.** The
   profile route's password-change branch compared the current password with
   `bcrypt.compare` on every request, unlimited: an online password oracle
@@ -67,6 +75,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   over core under `npm test`.
 
 ### Fixed
+- **Deleting an account could split a conversation in two.** The lookup for an
+  existing 1:1 thread asked only that every participant be one of the two
+  people, which is vacuously true for a thread with no participants and true
+  for one whose only participant is the sender. `softDeleteUser` deletes the
+  leaving user's participant rows, so those orphans are the normal result of
+  someone exercising the right to be forgotten. `findFirst` has no order to
+  fall back on, so it could return an orphan, and the caller then started a
+  second conversation with someone it already had one with. The clause now
+  requires both people to be present as well.
+- **Four write endpoints had no budget.** Starting a conversation and replying
+  to one both write into somebody else's inbox with the recipient named by the
+  sender; checkout and buying credits each open a session at the payment
+  gateway whether or not anyone pays. All four are capped per user through
+  `rateLimitForRole`, which is the right tool here: this is throughput, so an
+  operator's role multipliers still apply.
 - **Blog comments never loaded and could not be posted.** `CommentSection`
   fetched `/api/v1/blog/${id}/comments`, a path the manifest never declared.
   The dispatcher answers only declared paths, so the read 404'd and the

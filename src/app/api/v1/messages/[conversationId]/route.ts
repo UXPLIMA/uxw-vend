@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { rateLimitForRole } from "@/core/lib/rate-limit";
 
 type RouteParams = { params: Promise<{ conversationId: string }> };
 
@@ -52,6 +53,20 @@ const replySchema = z.object({
 export async function POST(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Same budget as starting one: a reply is a write into the other
+    // participant's inbox.
+    const rl = await rateLimitForRole(
+        `message-reply:${session.user.id}`,
+        { maxRequests: 60, windowMs: 15 * 60 * 1000 },
+        session.user.role,
+    );
+    if (!rl.success) {
+        return NextResponse.json(
+            { error: "Too many messages. Try again later." },
+            { status: 429 },
+        );
+    }
 
     const { conversationId } = await params;
     const participation = await prisma.conversationParticipant.findUnique({

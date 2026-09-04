@@ -7,7 +7,7 @@
  * settled - never here.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/sdk/server";
+import { prisma, rateLimitForRole } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
@@ -22,6 +22,18 @@ export async function POST(request: NextRequest) {
         const session = await auth();
         if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // Every call opens a session at the payment gateway, which costs a
+        // request there whether or not anyone pays. A budget, not a
+        // brute-force ceiling, so role multipliers apply.
+        const rl = await rateLimitForRole(
+            `credits-buy:${session.user.id}`,
+            { maxRequests: 15, windowMs: 15 * 60 * 1000 },
+            session.user.role,
+        );
+        if (!rl.success) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
         }
 
         const body = await request.json();
