@@ -71,6 +71,46 @@ function renderedKeys(modulePath: string): { file: string; namespace: string; ke
     return found;
 }
 
+/**
+ * Keys a module renders through a `t.has(key) ? t(key) : "literal"` guard.
+ *
+ * The guard is the supported way to render a key that may be absent, and it
+ * exists for a real case: translations are seeded into the database when a
+ * module is installed, so an install running an older copy of the module has
+ * none of the keys a newer release added, and the guard keeps that screen
+ * from rendering key paths until the seed catches up.
+ *
+ * What it cannot do is stand in for the translation. If the key is missing
+ * from the module's own shipped catalogue too, then no install will ever have
+ * it, the guard is taken forever, and the literal on the right is the string
+ * every locale gets. That is how the store shipped its cart errors, its
+ * "added to cart" toast, its cart aria-label and its product thumbnail alt
+ * text in English to every Turkish shopper: each one guarded, each one
+ * guarded against a key that was never written.
+ */
+function guardedKeys(modulePath: string): { file: string; namespace: string; key: string }[] {
+    const found: { file: string; namespace: string; key: string }[] = [];
+
+    for (const file of sourceFiles(modulePath)) {
+        const content = fs.readFileSync(file, "utf8");
+        if (!content.includes("Translations(")) continue;
+
+        const bindings = new Map<string, string>();
+        const bindingPattern =
+            /const\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\s*\(\s*["'`]([^"'`]+)["'`]/g;
+        for (const match of content.matchAll(bindingPattern)) bindings.set(match[1], match[2]);
+
+        for (const [binding, namespace] of bindings) {
+            const guardPattern = new RegExp(`\\b${binding}\\.has\\s*\\(\\s*["'\`]([^"'\`$]+)["'\`]`, "g");
+            for (const match of content.matchAll(guardPattern)) {
+                found.push({ file: path.relative(modulePath, file), namespace, key: match[1] });
+            }
+        }
+    }
+
+    return found;
+}
+
 const modules = fs
     .readdirSync(sourcesDir, { withFileTypes: true })
     .filter((e) => e.isDirectory() && fs.existsSync(path.join(sourcesDir, e.name, "module.json")))
@@ -104,5 +144,33 @@ describe("module translation keys", () => {
         }
 
         expect(missing, `${id} renders keys it never declared`).toEqual([]);
+    });
+});
+
+describe("module translation guards", () => {
+    it.each(modules)("%s ships every key it guards", (id) => {
+        const modulePath = path.join(sourcesDir, id);
+        const manifest = JSON.parse(
+            fs.readFileSync(path.join(modulePath, "module.json"), "utf8"),
+        ) as { translations?: Catalogue };
+        const translations = manifest.translations;
+        if (!translations) return;
+
+        const permanent: string[] = [];
+        for (const { file, namespace, key } of guardedKeys(modulePath)) {
+            for (const locale of locales) {
+                const bucket = translations[locale]?.[namespace];
+                if (!bucket) continue;
+                if (coreMessages[locale]?.[namespace]?.[key] !== undefined) continue;
+                if (bucket[key] === undefined) {
+                    permanent.push(`${file}: ${namespace}.${key} (${locale})`);
+                }
+            }
+        }
+
+        expect(
+            permanent,
+            `${id} guards keys it never ships, so the English literal is what every locale gets`,
+        ).toEqual([]);
     });
 });
