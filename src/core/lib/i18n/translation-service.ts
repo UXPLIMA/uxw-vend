@@ -75,10 +75,17 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
     }
 
     // 4. Cache and return
+    //
+    // Return the round-tripped copy, not `messages` itself. next-intl hands
+    // this tree to a client provider, and React refuses to serialize an
+    // object with a null prototype across that boundary - which is exactly
+    // what the accumulators above are. A cache hit already returned parsed
+    // JSON, so the two paths disagreed and only a cold cache threw:
+    // "Only plain objects ... can be passed to Client Components".
     const json = JSON.stringify(messages);
     await cacheSet(cacheKey, json, CACHE_TTL_SECONDS);
 
-    return messages;
+    return JSON.parse(json) as Record<string, unknown>;
 }
 
 /**

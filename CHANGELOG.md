@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every page 500'd for the first request after each cache expiry.** The
+  translation service accumulates the nested message tree into
+  `Object.create(null)` records - a deliberate second lock against a dotted
+  key reaching the prototype chain. next-intl then hands that tree to a
+  client provider, and React will not serialize an object with a null
+  prototype from a Server Component to a Client one: "Only plain objects,
+  and a few built-ins, can be passed to Client Components". A cache hit
+  returned `JSON.parse` of the cached string, which is plain, so the same
+  URL was a 200 while the two-minute cache was warm and a 500 on the first
+  request after every expiry, install, enable or admin edit. On the demo
+  `/en` was warm and `/tr` was serving a 500. The cold path now returns the
+  round-tripped copy it already builds for the cache, so both paths hand
+  back the same shape, and the accumulators keep the prototype they never
+  had. Tests cover both paths and hold the pollution guard in place.
+
 - **The production build broke, and only the production build knew.** The
   auth challenge landed with the three auth forms importing one constant,
   `CHALLENGE_FIELD`, from `auth-challenge.ts`. Those forms are client
