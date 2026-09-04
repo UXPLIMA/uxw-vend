@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { dateLocaleTag } from "@/core/sdk";
 import type { ComponentConfig } from "@measured/puck";
 
 /**
@@ -27,6 +28,7 @@ interface ChangelogEntry {
 }
 
 function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRecentEntriesProps): React.ReactElement {
+    const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("changelog");
     const [entries, setEntries] = useState<ChangelogEntry[]>([]);
     const [loading, setLoading] = useState(true);
@@ -80,7 +82,7 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
                                 </span>
                                 {showDate ? (
                                     <span className="text-xs text-muted-foreground">
-                                        {new Date(entry.createdAt).toLocaleDateString("tr-TR")}
+                                        {new Date(entry.createdAt).toLocaleDateString(__dateTag)}
                                     </span>
                                 ) : null}
                             </div>

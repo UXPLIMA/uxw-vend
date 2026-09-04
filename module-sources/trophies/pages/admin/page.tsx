@@ -368,7 +368,7 @@ export default function AdminTrophiesPage() {
                                     aria-label={t("name")}
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                    placeholder="First Post"
+                                    placeholder={t("adm_namePlaceholder")}
                                 />
                             </div>
                             <div>
@@ -377,7 +377,7 @@ export default function AdminTrophiesPage() {
                                     aria-label={t("descriptionLabel")}
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                    placeholder="Awarded for creating your first forum topic."
+                                    placeholder={t("adm_descriptionPlaceholder")}
                                     rows={2}
                                 />
                             </div>
@@ -388,7 +388,7 @@ export default function AdminTrophiesPage() {
                                         aria-label={t("lucideIcon")}
                                         value={form.icon}
                                         onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                                        placeholder="Award"
+                                        placeholder={t("adm_categoryPlaceholder")}
                                     />
                                 </div>
                                 <div>

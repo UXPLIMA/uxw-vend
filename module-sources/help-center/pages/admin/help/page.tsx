@@ -274,7 +274,7 @@ export default function AdminHelpCenterPage() {
                 <>
                     <div className="flex justify-end mb-4">
                         <Button onClick={() => setShowCategoryForm(!showCategoryForm)}>
-                            {showCategoryForm ? <><X className="w-4 h-4 mr-2" /> Cancel</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</>}
+                            {showCategoryForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</>}
                         </Button>
                     </div>
 
@@ -315,7 +315,7 @@ export default function AdminHelpCenterPage() {
                                                         : "bg-muted border-border text-muted-foreground hover:text-foreground"
                                                 }`}
                                             >
-                                                Lucide Icon
+                                                {t("adm_lucideIcon")}
                                             </button>
                                             <button
                                                 type="button"
@@ -326,7 +326,7 @@ export default function AdminHelpCenterPage() {
                                                         : "bg-muted border-border text-muted-foreground hover:text-foreground"
                                                 }`}
                                             >
-                                                Image Upload
+                                                {t("adm_imageUpload")}
                                             </button>
                                         </div>
                                         {iconMode === "icon" ? (
@@ -344,7 +344,7 @@ export default function AdminHelpCenterPage() {
                                         )}
                                     </div>
                                     <Button type="submit" disabled={savingCategory}>
-                                        {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Creating...</> : t("adm_createCategory")}
+                                        {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
                                     </Button>
                                 </form>
                             </CardContent>

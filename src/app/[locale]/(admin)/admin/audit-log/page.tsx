@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { downloadFromUrl } from "@/core/lib/download";
+import { dateLocaleTag } from "@/core/lib/utils";
 import {
     ChevronLeft,
     ChevronRight,
@@ -139,7 +140,7 @@ function MetadataCell({ metadata }: { metadata: unknown }) {
 
 export default function AuditLogPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);

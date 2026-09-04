@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface ModerationItem {
     id: string;
@@ -40,7 +41,7 @@ interface ListPayload {
 
 export default function ModerationPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [types, setTypes] = useState<Record<string, { label: string; labelKey?: string }>>({});
     const [counts, setCounts] = useState<Record<string, number>>({});

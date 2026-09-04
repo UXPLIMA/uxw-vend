@@ -10,6 +10,7 @@ import { formatDate } from "@/core/lib/utils";
 import { Button } from "@/core/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { UserRoleSelect } from "./role-select";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     const [{ users, total }, roles] = await Promise.all([getUsers(requestedPage, PAGE_SIZE), getRoles()]);
     const t = await getTranslations("admin");
     const locale = await getLocale();
-    const dateTag = locale === "tr" ? "tr-TR" : locale;
+    const dateTag = dateLocaleTag(locale);
 
     const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const page = Math.min(requestedPage, pageCount);

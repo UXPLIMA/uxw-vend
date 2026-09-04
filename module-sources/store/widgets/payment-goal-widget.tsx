@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/sdk";
 import { useCurrency } from "../lib/currency-context";
 import { Target } from "lucide-react";
 
@@ -13,6 +14,7 @@ interface GoalData {
 }
 
 export function PaymentGoalWidget() {
+    const __dateTag = dateLocaleTag(useLocale());
     const sidebarT = useTranslations('sidebar');
     const { formatPrice } = useCurrency();
     const [goal, setGoal] = useState<GoalData | null>(null);
@@ -56,7 +58,7 @@ export function PaymentGoalWidget() {
 
             {goal.endDate && (
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Ends {new Date(goal.endDate).toLocaleDateString("tr-TR")}
+                    {sidebarT('endsOn', { date: new Date(goal.endDate).toLocaleDateString(__dateTag) })}
                 </p>
             )}
 

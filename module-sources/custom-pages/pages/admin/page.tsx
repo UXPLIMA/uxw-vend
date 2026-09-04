@@ -147,7 +147,7 @@ export default function CustomPagesAdminPage() {
                             <div className="flex items-center gap-4">
                                 <label className="flex items-center gap-2 text-sm">
                                     <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-                                    Published
+                                    {t("adm_published")}
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <Label className="text-sm">{t("adm_order")}</Label>
@@ -181,11 +181,11 @@ export default function CustomPagesAdminPage() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <Link href={`/admin/page-builder/${page.id}`}>
-                                        <Button variant="ghost" size="sm" title="Open in visual builder">
+                                        <Button variant="ghost" size="sm" title={t("adm_openInBuilder")}>
                                             <LayoutDashboard className="w-3 h-3" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" onClick={() => startEdit(page)} title="HTML editor"><Pencil className="w-3 h-3" /></Button>
+                                    <Button variant="ghost" size="sm" onClick={() => startEdit(page)} title={t("adm_htmlEditor")}><Pencil className="w-3 h-3" /></Button>
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deletePage(page)}><Trash2 className="w-3 h-3" /></Button>
                                 </div>
                             </CardContent>

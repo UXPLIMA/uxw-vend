@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Suggestion {
     id: string;
@@ -39,7 +40,7 @@ const statusBadgeClass = (status: string) => {
 export default function AdminSuggestionsPage() {
     const t = useTranslations("suggestions");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const { confirm } = useConfirm();
     const [items, setItems] = useState<Suggestion[]>([]);
     const [loading, setLoading] = useState(true);

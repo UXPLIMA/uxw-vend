@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface LogEntry {
     id: string;
@@ -18,7 +19,7 @@ interface LogEntry {
 
 export default function ActivityLogPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [loading, setLoading] = useState(true);

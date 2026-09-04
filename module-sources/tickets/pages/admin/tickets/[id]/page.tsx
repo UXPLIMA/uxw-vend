@@ -6,6 +6,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Message {
     id: string;
@@ -55,7 +56,7 @@ interface PageProps {
 
 export default function AdminTicketDetailPage(props: PageProps) {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("tickets");
     const params = use(props.params);
     const ticketId = params.id;
@@ -152,7 +153,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold">{ticket.subject}</h1>
                     <p className="text-sm text-muted-foreground">
-                        by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString("tr-TR")}
+                        by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString(__dateTag)}
                     </p>
                 </div>
             </div>
@@ -171,11 +172,11 @@ export default function AdminTicketDetailPage(props: PageProps) {
                                         <p className="text-sm font-medium">
                                             {msg.user.username}
                                             {msg.isStaffReply && (
-                                                <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Staff</span>
+                                                <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{t("staff")}</span>
                                             )}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(msg.createdAt).toLocaleString("tr-TR")}
+                                            {new Date(msg.createdAt).toLocaleString(__dateTag)}
                                         </p>
                                     </div>
                                 </div>

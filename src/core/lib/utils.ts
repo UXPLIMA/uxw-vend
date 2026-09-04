@@ -23,6 +23,27 @@ export function formatCurrency(
 }
 
 /**
+ * The BCP 47 tag to hand `Intl` for a given app locale.
+ *
+ * Twenty-two screens called `toLocaleString("tr-TR")` outright, so an English
+ * admin read Turkish-formatted dates on every one of them, and thirty-one
+ * more hand-rolled `locale === "tr" ? "tr-TR" : locale` to avoid exactly
+ * that. Both are the same decision made in fifty-three places. It lives here
+ * now, so adding a locale is one edit rather than a search.
+ *
+ * An unmapped locale is returned unchanged: `Intl` accepts a bare language
+ * subtag, and guessing a region for it would be worse than not guessing.
+ */
+const DATE_LOCALE_TAGS: Record<string, string> = {
+    en: "en-US",
+    tr: "tr-TR",
+};
+
+export function dateLocaleTag(locale: string): string {
+    return DATE_LOCALE_TAGS[locale] ?? locale;
+}
+
+/**
  * Format date. Accepts an optional locale for proper localization;
  * defaults to "en-US" so existing callers keep working.
  */

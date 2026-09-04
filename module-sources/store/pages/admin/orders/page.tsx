@@ -1,12 +1,13 @@
 "use client";
 
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency, formatDate } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Order {
     id: string;
@@ -30,6 +31,7 @@ const statusColors: Record<string, string> = {
 
 export default function AdminOrdersPage() {
     const t = useTranslations("store");
+    const dateTag = dateLocaleTag(useLocale());
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeStatus, setActiveStatus] = useState("ALL");
@@ -135,7 +137,7 @@ export default function AdminOrdersPage() {
                                                 <p className="text-xs text-muted-foreground">{order.user.email}</p>
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
-                                                {formatDate(new Date(order.createdAt))}
+                                                {formatDate(new Date(order.createdAt), undefined, dateTag)}
                                             </td>
                                             <td className="py-3 px-4 text-muted-foreground">
                                                 {t("adm_itemsCount", { count: order.items.length })}

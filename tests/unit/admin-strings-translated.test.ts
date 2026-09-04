@@ -17,11 +17,44 @@ const ROOT = process.cwd();
  */
 const DIRS = ["src/app/[locale]/(admin)", "src/core/components/admin"];
 
+/**
+ * A module's own admin screens, which neither gate watched. The blog's four
+ * status labels, the custom form field types, the help centre's icon-source
+ * toggle, the SEO manager's OpenGraph fields and its two verification hints,
+ * the referral overview's error and reward description, the tickets staff
+ * badge and a dozen example placeholders were all English on a Turkish
+ * panel. As with the visitor-facing round before it, most of the keys were
+ * already in every locale of the module's own manifest and the screens had
+ * simply never been wired to them.
+ */
+const MODULE_ADMIN = "pages/admin";
+
+/**
+ * Placeholders that are a format, a token or a literal identifier rather
+ * than prose. Translating these would break the example they are showing.
+ */
+const LITERAL_EXAMPLES = new Set([
+    "abc123def456...",      // an R2 access key
+    "my-bucket",            // an R2 bucket name
+    "0x...",                // a Turnstile key prefix
+    "auto-generated-from-title", // what an empty slug becomes
+    "HelpCircle, BookOpen, Lightbulb...", // Lucide icon identifiers
+    "7d",                   // a punishment duration
+    "%s | My Site",         // the title template's own syntax
+    "google-site-verification=...",
+    "msvalidate.01=...",
+    "/about",               // a URL path
+    "keyword1, keyword2, keyword3",
+    "give {player} diamond 64", // a server command with a placeholder token
+    "#f59e0b",              // a hex colour
+    "forum.topic.created",  // a hook event name
+]);
+
 /** Names that stay as they are in every language. */
 const BRAND_NAMES = new Set([
     "Discord", "Twitter / X", "YouTube", "Instagram", "Facebook", "Redis",
     "Node.js", "Prisma", "Postgres", "PostgreSQL", "Stripe", "PayPal",
-    "Cloudflare", "Minecraft", "GitHub", "Google", "Promise",
+    "Cloudflare", "Minecraft", "GitHub", "Google", "Promise", "OpenGraph",
 ]);
 
 function componentFiles(dir: string): string[] {
@@ -44,6 +77,7 @@ function componentFiles(dir: string): string[] {
  */
 function looksLikeCopy(text: string): boolean {
     if (BRAND_NAMES.has(text)) return false;
+    if (LITERAL_EXAMPLES.has(text)) return false;
     if (!/[a-z]/.test(text)) return false;
     if (!/^[A-Z][A-Za-z0-9 ,.'()/&:%!?-]*$/.test(text)) return false;
     return text.split(/\s+/).length <= 12;
@@ -77,6 +111,35 @@ describe("admin panel copy", () => {
     it("finds the screens it is meant to be checking", () => {
         const count = DIRS.reduce((total, dir) => total + componentFiles(path.join(ROOT, dir)).length, 0);
         expect(count).toBeGreaterThan(40);
+    });
+});
+
+function moduleAdminFiles(): string[] {
+    const sources = path.join(ROOT, "module-sources");
+    if (!fs.existsSync(sources)) return [];
+    return fs
+        .readdirSync(sources, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .flatMap((mod) => componentFiles(path.join(sources, mod.name, MODULE_ADMIN)));
+}
+
+describe("the modules' admin copy", () => {
+    it("finds every module admin screen", () => {
+        expect(moduleAdminFiles().length).toBeGreaterThan(60);
+    });
+
+    it("is never written in English in the JSX", () => {
+        const offenders: string[] = [];
+        for (const file of moduleAdminFiles()) {
+            offenders.push(...offendersIn(fs.readFileSync(file, "utf8"), path.relative(ROOT, file)));
+        }
+        expect(offenders).toEqual([]);
+    });
+
+    it("every literal example it lets through is still somewhere in the tree", () => {
+        const all = moduleAdminFiles().map((f) => fs.readFileSync(f, "utf8")).join("\n");
+        const stale = [...LITERAL_EXAMPLES].filter((ex) => !all.includes(ex));
+        expect(stale, "drop these from LITERAL_EXAMPLES").toEqual([]);
     });
 });
 

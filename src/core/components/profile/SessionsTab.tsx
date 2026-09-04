@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, Smartphone, Monitor, Trash2, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface UserSession {
     id: string;
@@ -25,7 +26,7 @@ function formatDate(d: string, localeTag: string): string {
 export function SessionsTab() {
     const t = useTranslations("profile");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const [sessions, setSessions] = useState<UserSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<Set<string>>(new Set());

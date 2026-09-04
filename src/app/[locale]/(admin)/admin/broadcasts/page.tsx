@@ -10,6 +10,7 @@ import { Send, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface Broadcast {
     id: string;
@@ -25,7 +26,7 @@ interface Broadcast {
 
 export default function BroadcastsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
     const [loading, setLoading] = useState(true);

@@ -167,7 +167,7 @@ export default function AdminBlogCategoriesPage() {
                                      editingId ? t("adm_saveChanges") : t("adm_createCategory")}
                                 </Button>
                                 {editingId && (
-                                    <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
+                                    <Button type="button" variant="outline" onClick={resetForm}>{t("adm_cancel")}</Button>
                                 )}
                             </div>
                         </form>

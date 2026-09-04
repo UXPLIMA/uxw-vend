@@ -7,6 +7,7 @@ import {
     CheckCircle2, XCircle, MinusCircle, Loader2, Users, Puzzle, History,
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface HealthData {
     status: "ok" | "degraded" | "down";
@@ -55,7 +56,7 @@ function StatusDot({ ok, disabled = false }: { ok: boolean; disabled?: boolean }
 
 export default function ObservabilityPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [health, setHealth] = useState<HealthData | null>(null);
     const [errors, setErrors] = useState<CronError[]>([]);
@@ -119,7 +120,7 @@ export default function ObservabilityPage() {
                     {refreshing && <Loader2 className="w-3 h-3 animate-spin" />}
                     {lastRefresh && (
                         <span>
-                            {t("observability_lastRefresh")}: {lastRefresh.toLocaleTimeString("tr-TR")}
+                            {t("observability_lastRefresh")}: {lastRefresh.toLocaleTimeString(__dateTag)}
                         </span>
                     )}
                 </div>
@@ -285,7 +286,7 @@ export default function ObservabilityPage() {
                                     <li key={e.jobKey} className="border-l-2 border-rose-500 pl-3">
                                         <div className="font-mono text-xs font-semibold">{e.jobKey}</div>
                                         <div className="text-xs text-muted-foreground">
-                                            {new Date(e.lastRunAt).toLocaleString("tr-TR")}
+                                            {new Date(e.lastRunAt).toLocaleString(__dateTag)}
                                         </div>
                                         {e.lastError && (
                                             <div className="text-xs text-rose-500 truncate">{e.lastError}</div>

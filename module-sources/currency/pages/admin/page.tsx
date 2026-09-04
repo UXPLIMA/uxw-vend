@@ -139,7 +139,7 @@ export default function CurrencyAdminPage() {
                                         aria-label={t("currencyName")}
                                         value={cur.name}
                                         onChange={(e) => updateCurrency(idx, { name: e.target.value })}
-                                        placeholder="US Dollar"
+                                        placeholder={t("adm_namePlaceholder")}
                                     />
                                 </div>
                                 <div className="col-span-2">

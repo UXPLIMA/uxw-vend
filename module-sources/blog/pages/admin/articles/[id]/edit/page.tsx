@@ -196,10 +196,10 @@ export default function EditBlogArticlePage(props: PageProps) {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="DRAFT">Draft</SelectItem>
-                                            <SelectItem value="PUBLISHED">Published</SelectItem>
-                                            <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                                            <SelectItem value="ARCHIVED">Archived</SelectItem>
+                                            <SelectItem value="DRAFT">{t("adm_draft")}</SelectItem>
+                                            <SelectItem value="PUBLISHED">{t("adm_published")}</SelectItem>
+                                            <SelectItem value="SCHEDULED">{t("adm_scheduled")}</SelectItem>
+                                            <SelectItem value="ARCHIVED">{t("adm_archived")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -210,10 +210,10 @@ export default function EditBlogArticlePage(props: PageProps) {
                                         onValueChange={(value: string) => setFormData({ ...formData, categoryId: value })}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select category" />
+                                            <SelectValue placeholder={t("adm_selectCategory")} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="">No Category</SelectItem>
+                                            <SelectItem value="">{t("adm_noCategory")}</SelectItem>
                                             {categories.map((cat) => (
                                                 <SelectItem key={cat.id} value={cat.id}>
                                                     {cat.name}
@@ -262,7 +262,7 @@ export default function EditBlogArticlePage(props: PageProps) {
                                         id="tags"
                                         value={formData.tags}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, tags: e.target.value })}
-                                        placeholder="news, update, event"
+                                        placeholder={t("adm_tagsPlaceholder")}
                                     />
                                 </div>
                             </CardContent>

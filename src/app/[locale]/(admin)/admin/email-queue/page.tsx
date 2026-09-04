@@ -7,6 +7,7 @@ import { Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 type EmailStatus = "pending" | "sending" | "sent" | "failed";
 type StatusFilter = "all" | EmailStatus;
@@ -53,14 +54,14 @@ const TABS: { key: StatusFilter; labelKey: string }[] = [
     { key: "failed", labelKey: "emailQueue_failed" },
 ];
 
-function formatDate(value: string | null): string {
+function formatDate(value: string | null, tag: string): string {
     if (!value) return "-";
-    return new Date(value).toLocaleString("tr-TR");
+    return new Date(value).toLocaleString(tag);
 }
 
 export default function EmailQueueAdminPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [jobs, setJobs] = useState<EmailJobRow[]>([]);
     const [summary, setSummary] = useState<Record<EmailStatus, number>>({ pending: 0, sending: 0, sent: 0, failed: 0 });
@@ -264,7 +265,7 @@ export default function EmailQueueAdminPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">{job.attempts}</td>
-                                                <td className="px-4 py-3 text-muted-foreground">{formatDate(job.scheduledAt)}</td>
+                                                <td className="px-4 py-3 text-muted-foreground">{formatDate(job.scheduledAt, __dateTag)}</td>
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex justify-end gap-1">
                                                         {hasError && (

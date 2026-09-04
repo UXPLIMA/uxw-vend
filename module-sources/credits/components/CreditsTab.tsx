@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Coins, Loader2, ArrowDownLeft, ArrowUpRight, ShoppingBag, Send } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Transaction {
     id: string;
@@ -26,7 +27,7 @@ const typeIcon = (type: string) => {
 export default function CreditsTab() {
     const t = useTranslations("credits");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const [balance, setBalance] = useState<number>(0);
     const [history, setHistory] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);

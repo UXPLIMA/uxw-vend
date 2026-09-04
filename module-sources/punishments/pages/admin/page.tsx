@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Punishment {
     id: string;
@@ -24,7 +25,7 @@ const TYPE_OPTIONS = ["ban", "mute", "kick", "warning", "tempBan", "tempMute"];
 export default function AdminPunishmentsPage() {
     const t = useTranslations("punishments");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const { confirm } = useConfirm();
     const [items, setItems] = useState<Punishment[]>([]);
     const [loading, setLoading] = useState(true);

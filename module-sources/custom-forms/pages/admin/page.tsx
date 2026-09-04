@@ -140,11 +140,11 @@ export default function FormsPage() {
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <Label>{`${t("adm_formTitle")} *`}</Label>
-                                    <Input aria-label={t("adm_formTitle")} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Contact Form" />
+                                    <Input aria-label={t("adm_formTitle")} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder={t("adm_titlePlaceholder")} />
                                 </div>
                                 <div>
                                     <Label>{t("adm_description")}</Label>
-                                    <Input aria-label={t("adm_description")} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
+                                    <Input aria-label={t("adm_description")} value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("adm_descriptionPlaceholder")} />
                                 </div>
                             </div>
 
@@ -160,12 +160,12 @@ export default function FormsPage() {
                                         <div key={i} className="flex items-center gap-2 p-2 bg-muted/50 rounded">
                                             <Input value={field.label} onChange={(e) => updateField(i, { label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") })} placeholder={t("adm_fieldLabel")} className="flex-1" />
                                             <select value={field.type} onChange={(e) => updateField(i, { type: e.target.value })} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
-                                                <option value="text">Text</option>
-                                                <option value="email">Email</option>
-                                                <option value="number">Number</option>
-                                                <option value="textarea">Textarea</option>
-                                                <option value="select">Select</option>
-                                                <option value="checkbox">Checkbox</option>
+                                                <option value="text">{t("typeText")}</option>
+                                                <option value="email">{t("typeEmail")}</option>
+                                                <option value="number">{t("typeNumber")}</option>
+                                                <option value="textarea">{t("typeTextarea")}</option>
+                                                <option value="select">{t("typeSelect")}</option>
+                                                <option value="checkbox">{t("typeCheckbox")}</option>
                                             </select>
                                             <label className="flex items-center gap-1 text-xs">
                                                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(i, { required: e.target.checked })} />

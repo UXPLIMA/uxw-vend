@@ -3,7 +3,7 @@
 import { useState, useEffect, useId } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@/core/lib/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import { Navbar, Footer } from "@/core/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -25,6 +25,7 @@ import { ActivityTab } from "@/core/components/profile/ActivityTab";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface UserProfile {
     id: string;
@@ -42,6 +43,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const modules = useAllModules();
     const t = useTranslations("profile");
+    const dateTag = dateLocaleTag(useLocale());
     const authT = useTranslations("auth");
     const commonT = useTranslations("common");
 
@@ -302,7 +304,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div>
                                     <Label htmlFor={memberSinceId}>{t("memberSince")}</Label>
-                                    <Input id={memberSinceId} value={profile ? formatDate(new Date(profile.createdAt)) : ""} disabled className="bg-muted" />
+                                    <Input id={memberSinceId} value={profile ? formatDate(new Date(profile.createdAt), undefined, dateTag) : ""} disabled className="bg-muted" />
                                 </div>
                                 <Button type="submit" disabled={savingProfile}>
                                     {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("saving")}</> :
