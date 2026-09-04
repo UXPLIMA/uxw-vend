@@ -43,6 +43,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only on a backdrop click.
 
 ### Removed
+- **Seven files under `src/core` that nothing could reach.** Two duplicated
+  something core already had, one was left behind by the rewrite that replaced
+  it, and one was a back-compatibility shim for an API with no callers - all
+  deleted. Two more were worse than dead: `Breadcrumb` and
+  `ActivityFeedSection` both described themselves as pieces a module or theme
+  could render, and the SDK boundary made that impossible, so the store went
+  and hand-rolled its own breadcrumb - the copy whose crumbs a keyboard could
+  not reach. Both are exported through the SDK now. The seventh was core's
+  Turnstile widget, unreachable and reading a `NEXT_PUBLIC_` site key that the
+  prebuilt image freezes at build time, so it could not have worked on a real
+  install either. A gate fails any new unreachable file under `src/core`.
+
 - **The generated `slot-registry.tsx`, which nothing imported.** It was written
   on every build and read by no component, which made the canonical `slots:`
   manifest field a no-op and made the file actively misleading to read - it
