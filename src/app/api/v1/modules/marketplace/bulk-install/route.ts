@@ -227,8 +227,22 @@ export async function POST(request: NextRequest) {
             const hasSchema = await fs.access(path.join(targetDir, "schema.prisma")).then(() => true).catch(() => false);
             if (hasSchema) hasSchemaChanges = true;
 
-            // Merge translations immediately (lightweight)
-            await mergeTranslations(manifest, targetDir);
+            // Seed the module's strings the way the single install does.
+            // This used to call a local `mergeTranslations` that wrote JSON
+            // into a `messages/` directory at the project root. That
+            // directory does not exist - core keeps its catalogue in
+            // `messages-core/` and everything else in the Translation table -
+            // so every write threw ENOENT into a `catch { /* skip */ }` and a
+            // bulk-installed module arrived with no strings at all, rendering
+            // raw keys on every one of its pages. Installing the same module
+            // one at a time worked, because that path always used the table.
+            if (manifest.translations) {
+                const { syncModuleTranslations } = await import("@/core/lib/i18n/translation-service");
+                await syncModuleTranslations(
+                    id,
+                    manifest.translations as Record<string, Record<string, unknown>>,
+                );
+            }
 
             // Create DB record
             await prisma.moduleConfig.upsert({
@@ -289,48 +303,5 @@ export async function POST(request: NextRequest) {
     });
     } finally {
         releaseLock();
-    }
-}
-
-// --- Translation helpers (same as single install) ---
-const PROTECTED_KEYS = ["common", "nav", "auth", "hero", "footer", "errors", "metadata", "admin"];
-
-function sanitize(obj: Record<string, unknown>): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj)) {
-        if (typeof value === 'string') result[key] = value.replace(/<[^>]*>/g, '');
-        else if (typeof value === 'object' && value !== null) result[key] = sanitize(value as Record<string, unknown>);
-        else result[key] = value;
-    }
-    return result;
-}
-
-async function mergeTranslations(manifest: Record<string, unknown>, targetDir: string) {
-    const messagesDir = path.join(process.cwd(), "messages");
-    if (manifest.translations && typeof manifest.translations === 'object') {
-        for (const [locale, translations] of Object.entries(manifest.translations as Record<string, unknown>)) {
-            const msgPath = path.join(messagesDir, `${locale}.json`);
-            try {
-                const existing = JSON.parse(await fs.readFile(msgPath, "utf-8"));
-                const sanitized = sanitize(translations as Record<string, unknown>);
-                for (const key of PROTECTED_KEYS) delete sanitized[key];
-                await fs.writeFile(msgPath, JSON.stringify({ ...existing, ...sanitized }, null, 2));
-            } catch { /* skip */ }
-        }
-    }
-    const moduleMessagesDir = path.join(targetDir, "messages");
-    const hasDir = await fs.access(moduleMessagesDir).then(() => true).catch(() => false);
-    if (hasDir) {
-        for (const file of await fs.readdir(moduleMessagesDir)) {
-            if (!file.endsWith(".json")) continue;
-            try {
-                const modT = JSON.parse(await fs.readFile(path.join(moduleMessagesDir, file), "utf-8"));
-                const corePath = path.join(messagesDir, file);
-                const existing = JSON.parse(await fs.readFile(corePath, "utf-8"));
-                const sanitized = sanitize(modT);
-                for (const key of PROTECTED_KEYS) delete sanitized[key];
-                await fs.writeFile(corePath, JSON.stringify({ ...existing, ...sanitized }, null, 2));
-            } catch { /* skip */ }
-        }
     }
 }

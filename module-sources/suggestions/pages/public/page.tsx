@@ -8,6 +8,7 @@ import { useRouter } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, Input, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { stripHtmlTags } from "@/core/sdk";
 import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { toast } from "sonner";
 import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
@@ -15,7 +16,7 @@ import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
 // Suggestion bodies are stored as rich-text HTML; the list view shows a
 // short preview, so strip tags rather than rendering them clamped.
 function plainText(html: string): string {
-    return html.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+    return stripHtmlTags(html).replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
 }
 
 interface Suggestion {

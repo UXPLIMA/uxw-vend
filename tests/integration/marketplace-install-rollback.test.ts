@@ -37,6 +37,13 @@ vi.mock("@/core/lib/runtime-paths", () => ({
     TMP_DIR: path.join(PROJECT_ROOT_STUB, "tmp"),
     BACKUPS_DIR: path.join(PROJECT_ROOT_STUB, "backups"),
     PROJECT_ROOT: PROJECT_ROOT_STUB,
+    // The real containment check, against the temp root this test stands up.
+    resolveWithin: (root: string, ...segments: string[]) => {
+        const base = path.resolve(root);
+        const target = path.resolve(base, ...segments);
+        if (target !== base && !target.startsWith(base + path.sep)) return null;
+        return target;
+    },
 }));
 
 vi.mock("@/core/lib/auth", () => ({

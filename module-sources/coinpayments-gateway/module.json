@@ -2,7 +2,7 @@
   "id": "coinpayments-gateway",
   "name": "CoinPayments Gateway",
   "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -90,76 +90,6 @@
       "admin": {
         "menu_coinpayments-gateway": "CoinPayments Ödeme",
         "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Ayarları"
-      }
-    },
-    "de": {
-      "coinpaymentsGateway": {
-        "adm_title": "CoinPayments-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über CoinPayments anzunehmen.",
-        "adm_merchantId": "Händler-ID",
-        "adm_merchantIdDesc": "Aus Ihrem CoinPayments-Dashboard.",
-        "adm_ipnSecret": "IPN-Geheimnis",
-        "adm_ipnSecretDesc": "Aus Ihrem CoinPayments-Dashboard. Richten Sie die CoinPayments-Benachrichtigungs-URL auf /api/v1/coinpayments/ipn."
-      },
-      "admin": {
-        "menu_coinpayments-gateway": "CoinPayments-Gateway",
-        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments-Einstellungen"
-      }
-    },
-    "es": {
-      "coinpaymentsGateway": {
-        "adm_title": "Configuración de CoinPayments",
-        "adm_subtitle": "Claves para aceptar pagos con CoinPayments.",
-        "adm_merchantId": "ID de comercio",
-        "adm_merchantIdDesc": "Desde tu panel de CoinPayments.",
-        "adm_ipnSecret": "Secreto IPN",
-        "adm_ipnSecretDesc": "Desde tu panel de CoinPayments. Apunta la URL de notificaciones de CoinPayments a /api/v1/coinpayments/ipn."
-      },
-      "admin": {
-        "menu_coinpayments-gateway": "Pasarela CoinPayments",
-        "menu_coinpayments-gateway_coinpayments_settings": "Configuración de CoinPayments"
-      }
-    },
-    "fr": {
-      "coinpaymentsGateway": {
-        "adm_title": "Paramètres CoinPayments",
-        "adm_subtitle": "Clés pour encaisser des paiements via CoinPayments.",
-        "adm_merchantId": "Identifiant marchand",
-        "adm_merchantIdDesc": "Depuis votre tableau de bord CoinPayments.",
-        "adm_ipnSecret": "Secret IPN",
-        "adm_ipnSecretDesc": "Depuis votre tableau de bord CoinPayments. Faites pointer l'URL de notification CoinPayments vers /api/v1/coinpayments/ipn."
-      },
-      "admin": {
-        "menu_coinpayments-gateway": "Passerelle CoinPayments",
-        "menu_coinpayments-gateway_coinpayments_settings": "Paramètres CoinPayments"
-      }
-    },
-    "ru": {
-      "coinpaymentsGateway": {
-        "adm_title": "Настройки CoinPayments",
-        "adm_subtitle": "Ключи для приёма платежей через CoinPayments.",
-        "adm_merchantId": "ID продавца",
-        "adm_merchantIdDesc": "Из панели CoinPayments.",
-        "adm_ipnSecret": "Секрет IPN",
-        "adm_ipnSecretDesc": "Из панели CoinPayments. Укажите в CoinPayments адрес уведомлений /api/v1/coinpayments/ipn."
-      },
-      "admin": {
-        "menu_coinpayments-gateway": "Шлюз CoinPayments",
-        "menu_coinpayments-gateway_coinpayments_settings": "Настройки CoinPayments"
-      }
-    },
-    "pt": {
-      "coinpaymentsGateway": {
-        "adm_title": "Configurações do CoinPayments",
-        "adm_subtitle": "Chaves para receber pagamentos via CoinPayments.",
-        "adm_merchantId": "ID do comerciante",
-        "adm_merchantIdDesc": "No painel do CoinPayments.",
-        "adm_ipnSecret": "Segredo IPN",
-        "adm_ipnSecretDesc": "No painel do CoinPayments. Aponte a URL de notificação do CoinPayments para /api/v1/coinpayments/ipn."
-      },
-      "admin": {
-        "menu_coinpayments-gateway": "Gateway CoinPayments",
-        "menu_coinpayments-gateway_coinpayments_settings": "Configurações do CoinPayments"
       }
     }
   }

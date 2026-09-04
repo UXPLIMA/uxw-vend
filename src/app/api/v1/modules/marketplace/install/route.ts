@@ -16,7 +16,7 @@ import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
-import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
+import { MODULES_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
@@ -62,7 +62,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if already installed
-        const targetDir = path.join(MODULES_DIR, moduleId);
+        const targetDir = resolveWithin(MODULES_DIR, moduleId);
+        if (!targetDir) {
+            return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+        }
         const exists = await fs.access(targetDir).then(() => true).catch(() => false);
         if (exists) {
             return NextResponse.json({ error: "Module already installed" }, { status: 409 });
@@ -126,10 +129,14 @@ export async function POST(request: NextRequest) {
             await fs.writeFile(resolvedPath, entry.getData());
         }
 
-        // Verify module.json exists
+        // Read the manifest. One read answers both "is it there" and "what
+        // does it say"; asking first and reading second leaves a gap the file
+        // can change in.
         const manifestPath = path.join(targetDir, "module.json");
-        const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
-        if (!hasManifest) {
+        let manifestRaw: string;
+        try {
+            manifestRaw = await fs.readFile(manifestPath, "utf-8");
+        } catch {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: "Invalid module - no module.json found" }, { status: 400 });
         }
@@ -137,7 +144,7 @@ export async function POST(request: NextRequest) {
         // Parse + validate manifest with Zod
         let manifestJson: unknown;
         try {
-            manifestJson = JSON.parse(await fs.readFile(manifestPath, "utf-8"));
+            manifestJson = JSON.parse(manifestRaw);
         } catch {
             await fs.rm(targetDir, { recursive: true, force: true });
             return NextResponse.json({ error: "Invalid module.json - not valid JSON" }, { status: 400 });

@@ -129,10 +129,16 @@ function writeFileBoth(relPath: string, content: string, moduleName: string, cha
         if (!fs.existsSync(base)) continue;
         const full = path.join(base, relPath);
         fs.mkdirSync(path.dirname(full), { recursive: true });
-        if (fs.existsSync(full)) {
-            fail(`File already exists: ${path.relative(ROOT, full)}`);
+        // "wx" fails if the file is already there, so the check and the write
+        // are one operation rather than two with a gap between them.
+        try {
+            fs.writeFileSync(full, content, { flag: "wx" });
+        } catch (err) {
+            if ((err as NodeJS.ErrnoException).code === "EEXIST") {
+                fail(`File already exists: ${path.relative(ROOT, full)}`);
+            }
+            throw err;
         }
-        fs.writeFileSync(full, content);
         changes.push(`created ${path.relative(ROOT, full)}`);
     }
 }
@@ -336,7 +342,7 @@ function cmdAddHook(args: string[]): void {
         fail("Usage: module-dev add-hook <module> <hookName>");
     }
     assertModuleExists(moduleName);
-    isValidIdentifier(hookName, /^[a-zA-Z][a-zA-Z0-9.-_]*$/, "hook name");
+    isValidIdentifier(hookName, /^[a-zA-Z][a-zA-Z0-9._-]*$/, "hook name");
 
     const safeFileName = hookName.replace(/[^a-zA-Z0-9-]+/g, "-");
     const relFile = path.join("listeners", `${safeFileName}.ts`);
@@ -364,7 +370,7 @@ function cmdAddSlot(args: string[]): void {
     }
     assertModuleExists(moduleName);
     isValidIdentifier(componentName, /^[A-Z][A-Za-z0-9]*$/, "component name (PascalCase)");
-    isValidIdentifier(slotName, /^[a-zA-Z][a-zA-Z0-9.-_]*$/, "slot name");
+    isValidIdentifier(slotName, /^[a-zA-Z][a-zA-Z0-9._-]*$/, "slot name");
 
     const relFile = path.join("slots", `${componentName}.tsx`);
     const changes: string[] = [];

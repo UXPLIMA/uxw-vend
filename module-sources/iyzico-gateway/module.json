@@ -2,7 +2,7 @@
   "id": "iyzico-gateway",
   "name": "iyzico Payment Gateway",
   "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -90,86 +90,6 @@
       "admin": {
         "menu_iyzico-gateway": "iyzico Ödeme",
         "menu_iyzico-gateway_iyzico_settings": "iyzico Ayarları"
-      }
-    },
-    "de": {
-      "iyzicoGateway": {
-        "adm_title": "iyzico-Einstellungen",
-        "adm_subtitle": "Schlüssel, um Zahlungen über iyzico anzunehmen.",
-        "adm_apiKey": "API-Schlüssel",
-        "adm_apiKeyDesc": "Aus Ihrem iyzico-Dashboard.",
-        "adm_secretKey": "Geheimer Schlüssel",
-        "adm_secretKeyDesc": "Aus Ihrem iyzico-Dashboard.",
-        "adm_sandbox": "Sandbox-Modus",
-        "adm_sandboxDesc": "true für die iyzico-Testumgebung."
-      },
-      "admin": {
-        "menu_iyzico-gateway": "iyzico-Gateway",
-        "menu_iyzico-gateway_iyzico_settings": "iyzico-Einstellungen"
-      }
-    },
-    "es": {
-      "iyzicoGateway": {
-        "adm_title": "Configuración de iyzico",
-        "adm_subtitle": "Claves para aceptar pagos con iyzico.",
-        "adm_apiKey": "Clave de API",
-        "adm_apiKeyDesc": "Desde tu panel de iyzico.",
-        "adm_secretKey": "Clave secreta",
-        "adm_secretKeyDesc": "Desde tu panel de iyzico.",
-        "adm_sandbox": "Modo de pruebas",
-        "adm_sandboxDesc": "Escribe true para usar el entorno de pruebas de iyzico."
-      },
-      "admin": {
-        "menu_iyzico-gateway": "Pasarela iyzico",
-        "menu_iyzico-gateway_iyzico_settings": "Configuración de iyzico"
-      }
-    },
-    "fr": {
-      "iyzicoGateway": {
-        "adm_title": "Paramètres iyzico",
-        "adm_subtitle": "Clés pour encaisser des paiements via iyzico.",
-        "adm_apiKey": "Clé API",
-        "adm_apiKeyDesc": "Depuis votre tableau de bord iyzico.",
-        "adm_secretKey": "Clé secrète",
-        "adm_secretKeyDesc": "Depuis votre tableau de bord iyzico.",
-        "adm_sandbox": "Mode bac à sable",
-        "adm_sandboxDesc": "Mettez true pour l'environnement de test iyzico."
-      },
-      "admin": {
-        "menu_iyzico-gateway": "Passerelle iyzico",
-        "menu_iyzico-gateway_iyzico_settings": "Paramètres iyzico"
-      }
-    },
-    "ru": {
-      "iyzicoGateway": {
-        "adm_title": "Настройки iyzico",
-        "adm_subtitle": "Ключи для приёма платежей через iyzico.",
-        "adm_apiKey": "API-ключ",
-        "adm_apiKeyDesc": "Из панели iyzico.",
-        "adm_secretKey": "Секретный ключ",
-        "adm_secretKeyDesc": "Из панели iyzico.",
-        "adm_sandbox": "Тестовый режим",
-        "adm_sandboxDesc": "Укажите true для тестовой среды iyzico."
-      },
-      "admin": {
-        "menu_iyzico-gateway": "Шлюз iyzico",
-        "menu_iyzico-gateway_iyzico_settings": "Настройки iyzico"
-      }
-    },
-    "pt": {
-      "iyzicoGateway": {
-        "adm_title": "Configurações do iyzico",
-        "adm_subtitle": "Chaves para receber pagamentos via iyzico.",
-        "adm_apiKey": "Chave de API",
-        "adm_apiKeyDesc": "No painel do iyzico.",
-        "adm_secretKey": "Chave secreta",
-        "adm_secretKeyDesc": "No painel do iyzico.",
-        "adm_sandbox": "Modo de testes",
-        "adm_sandboxDesc": "Defina true para usar o ambiente de testes do iyzico."
-      },
-      "admin": {
-        "menu_iyzico-gateway": "Gateway iyzico",
-        "menu_iyzico-gateway_iyzico_settings": "Configurações do iyzico"
       }
     }
   }

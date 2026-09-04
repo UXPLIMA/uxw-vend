@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Player Profiles",
   "description": "Public player profile pages",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -107,116 +107,6 @@
         "link": "Bağla",
         "linkError": "Hesap bağlanamadı.",
         "oauthAutoLink": "Giriş yaptığınız hesaplar otomatik olarak bağlanır."
-      }
-    },
-    "de": {
-      "playerProfiles": {
-        "title": "Spielerprofil",
-        "username": "Benutzername",
-        "joinDate": "Beitrittsdatum",
-        "lastSeen": "Zuletzt gesehen",
-        "online": "Online",
-        "offline": "Offline",
-        "linkedAccounts": "Verknüpfte Konten",
-        "noLinkedAccounts": "Keine verknüpften Konten",
-        "statistics": "Statistiken",
-        "playtime": "Spielzeit",
-        "firstJoined": "Erster Beitritt",
-        "playerNotFound": "Spieler nicht gefunden",
-        "searchPlayer": "Spieler suchen",
-        "searchPlaceholder": "Benutzernamen eingeben...",
-        "viewProfile": "Profil anzeigen",
-        "rank": "Rang",
-        "badges": "Abzeichen",
-        "activity": "Aktivität"
-      }
-    },
-    "es": {
-      "playerProfiles": {
-        "title": "Perfil del Jugador",
-        "username": "Nombre de usuario",
-        "joinDate": "Fecha de registro",
-        "lastSeen": "Visto por última vez",
-        "online": "En línea",
-        "offline": "Desconectado",
-        "linkedAccounts": "Cuentas vinculadas",
-        "noLinkedAccounts": "Sin cuentas vinculadas",
-        "statistics": "Estadísticas",
-        "playtime": "Tiempo de juego",
-        "firstJoined": "Primera conexión",
-        "playerNotFound": "Jugador no encontrado",
-        "searchPlayer": "Buscar jugador",
-        "searchPlaceholder": "Ingrese nombre de usuario...",
-        "viewProfile": "Ver perfil",
-        "rank": "Rango",
-        "badges": "Insignias",
-        "activity": "Actividad"
-      }
-    },
-    "fr": {
-      "playerProfiles": {
-        "title": "Profil du joueur",
-        "username": "Nom d'utilisateur",
-        "joinDate": "Date d'inscription",
-        "lastSeen": "Vu pour la dernière fois",
-        "online": "En ligne",
-        "offline": "Hors ligne",
-        "linkedAccounts": "Comptes liés",
-        "noLinkedAccounts": "Aucun compte lié",
-        "statistics": "Statistiques",
-        "playtime": "Temps de jeu",
-        "firstJoined": "Première connexion",
-        "playerNotFound": "Joueur introuvable",
-        "searchPlayer": "Rechercher un joueur",
-        "searchPlaceholder": "Entrez le nom d'utilisateur...",
-        "viewProfile": "Voir le profil",
-        "rank": "Rang",
-        "badges": "Badges",
-        "activity": "Activité"
-      }
-    },
-    "ru": {
-      "playerProfiles": {
-        "title": "Профиль игрока",
-        "username": "Имя пользователя",
-        "joinDate": "Дата регистрации",
-        "lastSeen": "Последний раз в сети",
-        "online": "В сети",
-        "offline": "Не в сети",
-        "linkedAccounts": "Привязанные аккаунты",
-        "noLinkedAccounts": "Нет привязанных аккаунтов",
-        "statistics": "Статистика",
-        "playtime": "Время игры",
-        "firstJoined": "Первое подключение",
-        "playerNotFound": "Игрок не найден",
-        "searchPlayer": "Поиск игрока",
-        "searchPlaceholder": "Введите имя пользователя...",
-        "viewProfile": "Просмотр профиля",
-        "rank": "Ранг",
-        "badges": "Значки",
-        "activity": "Активность"
-      }
-    },
-    "pt": {
-      "playerProfiles": {
-        "title": "Perfil do Jogador",
-        "username": "Nome de usuário",
-        "joinDate": "Data de registro",
-        "lastSeen": "Visto por último",
-        "online": "Online",
-        "offline": "Offline",
-        "linkedAccounts": "Contas vinculadas",
-        "noLinkedAccounts": "Sem contas vinculadas",
-        "statistics": "Estatísticas",
-        "playtime": "Tempo de jogo",
-        "firstJoined": "Primeira conexão",
-        "playerNotFound": "Jogador não encontrado",
-        "searchPlayer": "Buscar jogador",
-        "searchPlaceholder": "Digite o nome de usuário...",
-        "viewProfile": "Ver perfil",
-        "rank": "Ranking",
-        "badges": "Insígnias",
-        "activity": "Atividade"
       }
     }
   }

@@ -8,6 +8,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Bulk install left every module it installed with no strings.** The single
+  install seeded translations into the Translation table, which is where the
+  app reads them from. Bulk install called a local `mergeTranslations` that
+  wrote JSON files into a `messages/` directory at the project root. That
+  directory does not exist: core keeps its own catalogue in `messages-core/`
+  and everything else in the table. Every write threw ENOENT straight into a
+  `catch { /* skip */ }`, so a module installed through the bulk path
+  rendered raw keys like `store.adm_products` on every one of its pages.
+  Nothing failed and nothing logged, and installing the same module one at a
+  time worked. Bulk install now calls the same seeder, and a gate holds the
+  two paths to the same three things: one seeder, no writes to a directory
+  that is not there, one manifest schema.
+- **Modules declared five languages the site could never show.** Seventy-seven
+  of the seventy-eight shipped en, tr, de, es, fr, ru and pt in their
+  manifests. Core ships two, and `seed-translations` filters every row
+  through the i18n config before writing, so twelve thousand seven hundred
+  and twenty keys had never reached a page and never could. They rotted too,
+  because nothing checked them: thirty-five modules were missing keys in
+  those locales that en and tr had, the store a hundred and forty of them.
+  They are gone, and a gate now keeps a manifest from declaring a locale core
+  does not ship, or omitting one it does. Adding a language is one decision
+  in one place again.
+- **What the code scanner found.** Forty-five CodeQL alerts, three of them
+  genuinely wrong code. `/^[a-zA-Z][a-zA-Z0-9.-_]*$/` in the module
+  scaffolding CLI: inside a character class `.-_` is a range from `.` to `_`,
+  so a hook or slot name could contain `/`, `\`, `:`, `<`, `>`, `@`, `[` or
+  `]`. Five check-then-read pairs across the install, update and upload
+  routes, where `fs.access` asked whether a manifest existed and `fs.readFile`
+  then read it, leaving a gap the file could change in; one read answers both
+  questions. The thirty path-injection alerts were unreachable - every route
+  checks its id against `/^[a-z0-9-]+$/` first - but the check and the
+  `path.join` sat two hundred lines apart, so `resolveWithin()` now puts the
+  containment where the path is built rather than where the input arrives.
+  The two objects built from request keys accumulate into `Object.create(null)`
+  now, so a key the check ever misses has no prototype to reach.
+
 - **Sixty-one buttons and links had no name at all.** Each rendered nothing
   but a Lucide icon, and an icon is an `<svg>` with no text in it, so a screen
   reader read every one of them as "button" and a voice-control user had

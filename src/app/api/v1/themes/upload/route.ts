@@ -56,12 +56,15 @@ export async function POST(request: NextRequest) {
         }
 
         const manifestPath = path.join(extractDir, "theme.json");
-        const manifestExists = await fs.access(manifestPath).then(() => true).catch(() => false);
-        if (!manifestExists) {
+        // One read answers both "is it there" and "what does it say".
+        let manifestRaw: string;
+        try {
+            manifestRaw = await fs.readFile(manifestPath, "utf-8");
+        } catch {
             return NextResponse.json({ error: "theme.json missing" }, { status: 400 });
         }
         let raw: unknown;
-        try { raw = JSON.parse(await fs.readFile(manifestPath, "utf-8")); }
+        try { raw = JSON.parse(manifestRaw); }
         catch { return NextResponse.json({ error: "theme.json invalid JSON" }, { status: 400 }); }
 
         const parsed = themeManifestSchema.safeParse(raw);

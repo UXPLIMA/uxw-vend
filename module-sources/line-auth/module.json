@@ -2,7 +2,7 @@
   "id": "line-auth",
   "name": "LINE Login",
   "description": "Allow users to sign in with their LINE account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -53,46 +53,6 @@
         "adm_subtitle": "Siteniz için LINE ile OAuth girişini yapılandırın.",
         "signInWith": "LINE ile giriş yap",
         "adm_emailNote": "E-posta adresini okumak LINE kanalında ayrı bir izindir ve LINE onayı gerektirir. Bu izin olmadan hesaplara posta alamayan geçici bir adres atanır."
-      }
-    },
-    "de": {
-      "lineAuth": {
-        "adm_title": "LINE-Anmeldung",
-        "adm_subtitle": "OAuth-Anmeldung über LINE für Ihre Seite einrichten.",
-        "signInWith": "Mit LINE anmelden",
-        "adm_emailNote": "Das Lesen der E-Mail-Adresse ist eine eigene Berechtigung des LINE-Kanals und braucht LINEs Freigabe. Ohne sie erhalten Konten eine Platzhalteradresse, die keine Post empfangen kann."
-      }
-    },
-    "es": {
-      "lineAuth": {
-        "adm_title": "Inicio de sesión con LINE",
-        "adm_subtitle": "Configura el inicio de sesión OAuth con LINE para tu sitio.",
-        "signInWith": "Iniciar sesión con LINE",
-        "adm_emailNote": "Leer la dirección de correo es un permiso aparte del canal de LINE y requiere la aprobación de LINE. Sin él, las cuentas reciben una dirección provisional que no puede recibir mensajes."
-      }
-    },
-    "fr": {
-      "lineAuth": {
-        "adm_title": "Connexion LINE",
-        "adm_subtitle": "Configurez la connexion OAuth LINE pour votre site.",
-        "signInWith": "Se connecter avec LINE",
-        "adm_emailNote": "Lire l'adresse e-mail est une permission distincte du canal LINE et demande l'accord de LINE. Sans elle, les comptes reçoivent une adresse fictive qui ne peut rien recevoir."
-      }
-    },
-    "ru": {
-      "lineAuth": {
-        "adm_title": "Вход через LINE",
-        "adm_subtitle": "Настройте вход на сайт через LINE по OAuth.",
-        "signInWith": "Войти через LINE",
-        "adm_emailNote": "Чтение адреса почты - отдельное разрешение канала LINE, которое LINE должен одобрить. Без него аккаунты получают временный адрес, на который ничего нельзя отправить."
-      }
-    },
-    "pt": {
-      "lineAuth": {
-        "adm_title": "Início de sessão com LINE",
-        "adm_subtitle": "Configure o início de sessão OAuth com LINE no seu site.",
-        "signInWith": "Entrar com LINE",
-        "adm_emailNote": "Ler o endereço de email é uma permissão separada do canal LINE e precisa da aprovação da LINE. Sem ela, as contas recebem um endereço provisório que não consegue receber mensagens."
       }
     }
   }

@@ -98,13 +98,16 @@ export async function POST(request: NextRequest) {
         }
 
         const manifestPath = path.join(manifestDir, "module.json");
+        // Read it and let the read say whether it is there. Asking first and
+        // reading second is two answers to one question, and the file can
+        // change between them.
+        let manifestRaw: string;
         try {
-            await fs.access(manifestPath);
+            manifestRaw = await fs.readFile(manifestPath, "utf-8");
         } catch {
             return NextResponse.json({ error: "No module.json found in ZIP" }, { status: 400 });
         }
 
-        const manifestRaw = await fs.readFile(manifestPath, "utf-8");
         let manifestJson: unknown;
         try {
             manifestJson = JSON.parse(manifestRaw);
