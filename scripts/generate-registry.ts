@@ -609,7 +609,17 @@ function generateModuleRoutes() {
             if (body) {
                 patterns.add(`/^\\/api\\/v1\\/${body}(?:\\/|$)/`);
                 if (api.providerCallback) {
-                    providerCallbackPatterns.add(`/^\\/api\\/v1\\/${body}(?:\\/|$)/`);
+                    // Anchored to the end of the path, unlike the route-map
+                    // pattern above. That one exists to say "this subtree
+                    // belongs to this module" and a prefix match is right for
+                    // it. This one turns the CSRF gate off, and a prefix match
+                    // there is a hole: a callback declared at `/[provider]`
+                    // produced `/^\/api\/v1\/[^\/]+(?:\/|$)/`, which matches
+                    // `/api/v1/users/me` and every other route in the product.
+                    // One manifest entry disabled the origin check for the
+                    // whole API. An exemption covers the endpoint that asked
+                    // for it and nothing below it.
+                    providerCallbackPatterns.add(`/^\\/api\\/v1\\/${body}\\/?$/`);
                 }
             }
         }

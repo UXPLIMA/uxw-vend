@@ -1103,6 +1103,26 @@ function checkProviderCallbacksVerify(modulePath: string): CheckResult {
         return { name, passed: true, message: "Declares no provider callback" };
     }
 
+    // The exemption is generated into a regex the proxy tests every API path
+    // against. A path whose first segment is dynamic produces one that matches
+    // sibling routes it has nothing to do with: `/[provider]` becomes
+    // `/^\/api\/v1\/[^\/]+\/?$/` and answers for `/api/v1/roles`. A webhook
+    // lives at a URL the module tells the provider, so that first segment is
+    // always something the module chose and can write down.
+    const wildcardFirst = declared
+        .filter((entry) => /^\/?\[/.test(entry.path))
+        .map((entry) => entry.path);
+    if (wildcardFirst.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${wildcardFirst.length} provider callback(s) start with a dynamic segment, so the CSRF exemption they generate covers routes they do not own: ${wildcardFirst.join(", ")}`,
+            suggestion:
+                "Give the callback a literal first segment, for example /webhooks/[provider] rather than /[provider]. " +
+                "The exemption is then scoped to the path the module actually serves.",
+        };
+    }
+
     // Either a signature comparison, or the documented pattern of reading the
     // payment back from the provider instead of trusting the post.
     const verifies = /timingSafeEqual|constructEvent|verifyWebhookSignature|@provider-callback/;
