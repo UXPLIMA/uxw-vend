@@ -412,6 +412,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are the deliberate exceptions. `app/error.tsx`, `app/not-found.tsx` and the
   two error boundaries stay in English on purpose, since they render with no
   provider to ask.
+  Two labels the guard could not see went with them: the profile menu button
+  glued the English word "menu" onto a translated one, and sonner names its
+  own toast region "Notifications" on every locale unless it is told
+  otherwise.
 
 ### Removed
 - `seedCoreTranslations` from the translation service. Nothing called it, and

@@ -42,7 +42,8 @@
     "impersonationStopFailed": "Failed to stop impersonating",
     "replace": "Replace",
     "uploadFailed": "Upload failed",
-    "fileUploaded": "File uploaded"
+    "fileUploaded": "File uploaded",
+    "notifications": "Notifications"
   },
   "notFound": {
     "title": "Page not found",
@@ -69,7 +70,8 @@
     "primary": "Primary",
     "mobile": "Mobile navigation",
     "social": "Social media",
-    "community": "Community"
+    "community": "Community",
+    "profileMenu": "Profile menu"
   },
   "hero": {
     "playersOnline": "{count} Players Online",

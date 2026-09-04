@@ -3,7 +3,7 @@ import { buildPageMeta, buildOrganizationJsonLd } from "@/core/lib/seo";
 import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { withoutAdminNamespaces } from "@/core/lib/i18n/message-scopes";
 import { SessionProvider } from "next-auth/react";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
@@ -69,6 +69,7 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   const messages = await getMessages();
+  const commonT = await getTranslations("common");
 
   // Process-wide bootstrap (hooks, scheduler, search indexes) lives in
   // src/instrumentation.ts. A layout render is a per-request event and was
@@ -135,7 +136,13 @@ export default async function RootLayout({
                   <div className="relative z-[9999]">
                     <Slot name="layout.overlay" />
                   </div>
-                  <Toaster position="bottom-right" richColors closeButton />
+                  {/* sonner names its own live region, and its default is English. */}
+                  <Toaster
+                    position="bottom-right"
+                    richColors
+                    closeButton
+                    containerAriaLabel={commonT("notifications")}
+                  />
                 </ConfirmProvider>
                 </ModuleContextProviders>
                 </ModuleProvider>
