@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Three of the nine documented slots rendered nothing.** `CANONICAL_SLOTS`
+  advertises `layout.beforeMain`, `layout.afterMain` and `head.extra` as the
+  generic injection points - the way a module adds a banner, a modal or a head
+  tag without touching core React - and core rendered none of them. A module
+  targeting any of the three got silence, with nothing to say why. All three
+  are now rendered from the root layout; `head.extra` goes through a new
+  `<ServerSlot>` because it sits above the module provider that `<Slot>` reads
+  its enabled-module states from. `layout.overlay` had the opposite problem -
+  core renders it and a shipped module targets it, but it was missing from the
+  list - so it is declared now. A gate fails either kind of drift.
+- **The popups module drew two popups.** It contributed the same popup twice:
+  `PopupModal` through `layoutComponents`, and `PopupRenderer` through
+  `slotContents` on `layout.overlay`. Both render from the root layout, so
+  installing the module stacked two modals over every public page, and since
+  one stored dismissal as a session-wide flag and the other as a per-popup key,
+  dismissing one did not dismiss the other. One renderer survives.
+- **A popup's link and image are checked before they reach the DOM.** The
+  surviving renderer was the one that did not validate them, so a `javascript:`
+  URL in a popup link ran with the viewer's session on every public page. The
+  popups permission is not full site admin, so this was a real privilege step
+  up. Only http(s) gets through now, and the popup closes on Escape rather than
+  only on a backdrop click.
+
+### Removed
+- **The generated `slot-registry.tsx`, which nothing imported.** It was written
+  on every build and read by no component, which made the canonical `slots:`
+  manifest field a no-op and made the file actively misleading to read - it
+  listed contributions that were never going to render. `slots:` now feeds the
+  same registry `<Slot>` reads. The generator's aliases from
+  `navbarComponents`, `layoutComponents`, `homepageSections` and `profileTabs`
+  into slot names went with it: each of those fields already has its own render
+  path, and contributing them twice is exactly what produced the double popup.
+
 ### Changed
 - **The admin panel is readable in Turkish.** Ninety strings across twenty-three
   admin screens were written in English directly in the JSX, so an operator who

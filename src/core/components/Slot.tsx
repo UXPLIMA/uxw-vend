@@ -67,15 +67,3 @@ export function Slot({ name, context, fallback = null }: SlotProps) {
         </>
     );
 }
-
-/**
- * Server-side variant: returns the list of contributions so a server
- * component can render them without the module-provider context.
- * The component still renders on the client (they are "use client" modules).
- */
-export function getSlotContributions(name: string): { id: string; module: string; order: number }[] {
-    return ModuleSlotContents
-        .filter((sc) => sc.slot === name)
-        .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
-        .map((sc) => ({ id: sc.id, module: sc.module, order: sc.order ?? 999 }));
-}
