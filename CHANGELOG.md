@@ -344,6 +344,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the first hit of the window, `PTTL` for the reset time), so the same ten
   requests are counted ten times and five are refused. Keys moved from `rl:`
   to `rlc:` because the old ones hold JSON that `INCR` cannot touch.
+- **An alert webhook could be pointed at the loopback in IPv6 spelling.** The
+  generic channel refuses a URL that only resolves inside the network, and it
+  checked IPv6 literals against `::1`, `::`, `fc00::/7` and `fe80::/10`. None
+  of those match `[::ffff:127.0.0.1]`, which reaches the loopback exactly as
+  `127.0.0.1` does and which the URL parser hands back in its normalized form,
+  `::ffff:7f00:1`. Both spellings are unpacked to their IPv4 address now and
+  run through the IPv4 rules, so `[::ffff:169.254.169.254]` is refused with
+  the plain form.
 
 ## [0.2.1] - 2026-09-02
 
