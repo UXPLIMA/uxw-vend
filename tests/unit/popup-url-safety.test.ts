@@ -40,6 +40,16 @@ describe("safeUrl", () => {
         }
     });
 
+    it("keeps a same-origin path, which is what an upload hands back", () => {
+        // /api/v1/upload returns a site-relative "/uploads/<key>" for local
+        // storage, so refusing relative urls silently blanked every popup image
+        // that was uploaded through the admin form rather than pasted in.
+        expect(safeUrl("/uploads/2026/popup.png", false)).toBe("/uploads/2026/popup.png");
+        expect(safeUrl("/store", true)).toBe("/store");
+        // A protocol-relative url only looks relative; it points at another host.
+        expect(safeUrl("//evil.example.com/a.png", false)).toBeNull();
+    });
+
     it("treats a missing url as no url", () => {
         expect(safeUrl(null, true)).toBeNull();
         expect(safeUrl(undefined, true)).toBeNull();

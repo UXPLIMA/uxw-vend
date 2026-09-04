@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { popupSchema } from "../lib/validations";
 
 export async function GET() {
     const now = new Date();
@@ -23,16 +24,21 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const validation = popupSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+    }
+    const data = validation.data;
     const popup = await prisma.popup.create({
         data: {
-            title: body.title,
-            content: body.content || null,
-            image: body.image || null,
-            link: body.link || null,
-            linkText: body.linkText || null,
-            isActive: body.isActive ?? true,
-            startsAt: body.startsAt ? new Date(body.startsAt) : null,
-            endsAt: body.endsAt ? new Date(body.endsAt) : null,
+            title: data.title,
+            content: data.content ?? null,
+            image: data.image ?? null,
+            link: data.link ?? null,
+            linkText: data.linkText ?? null,
+            isActive: data.isActive ?? true,
+            startsAt: data.startsAt ?? null,
+            endsAt: data.endsAt ?? null,
         },
     });
     return NextResponse.json({ popup }, { status: 201 });

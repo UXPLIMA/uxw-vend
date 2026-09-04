@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A model validated on one write path and not the other.** The forum bounds
+  a reply at 50000 characters and refuses an empty one when it is posted, then
+  wrote the edit straight from the request body: `sanitizeHtml` turns a missing
+  field into `""`, so any author could blank their own post with a PATCH
+  carrying nothing, or store far more than the cap the create path enforces.
+  Popups had the same defect mirrored - its PATCH parsed a schema, its POST
+  wrote eight raw body fields, so `title` could be any type or absent (a 500
+  from Prisma rather than a 400) and no field had a length at all. Both write
+  paths of each model now parse the same schema; the popup schema moved to
+  `module-sources/popups/lib/validations.ts` where the two routes share it, and
+  it maps a cleared form field to null so an empty date no longer coerces to
+  an Invalid Date. A new test walks every write handler in core and 78 modules
+  and fails when one pushes body fields into a model that another handler
+  validates.
+
+- **Uploaded popup images never rendered.** The popup renderer passes the image
+  and link through `safeUrl`, which kept only absolute http(s) urls. The admin
+  form uploads its image through `/api/v1/upload`, which hands back a
+  site-relative `/uploads/...`, so the image was dropped at render every time
+  and the field looked broken. Same-origin paths are now kept; a
+  protocol-relative `//host` still is not, since it points off-site.
+
 - **One endpoint handed the request body straight to the database.**
   `PATCH /api/v1/changelog/[id]` built its update as `{ ...body }` and passed
   it to Prisma. Its own POST parses the same fields with a zod schema, so the

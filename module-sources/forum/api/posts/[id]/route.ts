@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { forumPostSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -24,6 +25,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    // The create path parses forumPostSchema, so a reply is bounded at 50000
+    // characters and cannot be empty. Editing has to hold the same line: without
+    // it a post could be blanked by PATCHing nothing at all (sanitizeHtml turns
+    // a missing body field into ""), or grown past any bound the create path has.
+    const validation = forumPostSchema.pick({ content: true }).safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
+    }
+
     // Snapshot the previous content before edit (subset - posts can be large)
     const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision(
@@ -36,7 +46,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const updated = await prisma.forumPost.update({
         where: { id },
-        data: { content: sanitizeHtml(body.content) },
+        data: { content: sanitizeHtml(validation.data.content) },
         include: { author: { select: { id: true, username: true, avatar: true } } },
     });
 
