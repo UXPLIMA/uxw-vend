@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 export async function GET() {
     const session = await auth();
@@ -34,7 +35,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { name, permissions, expiresAt } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { name, permissions, expiresAt } = jsonBody;
     if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
 
     const rawKey = `uxw_${randomBytes(24).toString("hex")}`;

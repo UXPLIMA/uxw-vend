@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { logActivity } from "@/core/lib/activity-log";
 import { invalidate } from "@/core/lib/cache";
 import { sanitizeCustomCss, CSS_SANITIZED_SETTING_KEYS } from "@/core/lib/css-sanitizer";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
 // Value is a Json column - accept any JSON-serializable value (string, number, boolean, array, object, null)
@@ -69,7 +70,8 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     // Validate settings keys and values
     const parsed = settingsBodySchema.safeParse(body);

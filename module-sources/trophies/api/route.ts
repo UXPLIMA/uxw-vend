@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /** GET - list all trophies (public endpoint, used by profile pages too) */
@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = trophySchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

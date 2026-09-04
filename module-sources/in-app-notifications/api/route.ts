@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/sdk/server";
+import { prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 export async function GET() {
@@ -19,7 +19,9 @@ export async function PATCH(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id, markAllRead } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { id, markAllRead } = jsonBody;
 
     if (markAllRead) {
         await prisma.notification.updateMany({ where: { userId: session.user.id, isRead: false }, data: { isRead: true } });

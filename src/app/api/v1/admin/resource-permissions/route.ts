@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin, setResourcePermission, removeResourcePermission, listGrantsForRole } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /** GET
  *  - ?roleId=xxx → list all grants for a single role
@@ -123,7 +124,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = setSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });
@@ -158,7 +160,8 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ slug: string }> };
@@ -34,7 +34,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
     if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 });
 
-    const { data } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { data } = jsonBody;
     if (!data) return NextResponse.json({ error: "Form data required" }, { status: 400 });
 
     const submission = await prisma.customFormSubmission.create({
@@ -75,7 +77,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const form = await prisma.customForm.findFirst({ where: { OR: [{ slug }, { id: slug }] } });
     if (!form) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
     if (typeof body.title === "string") data.title = body.title;
     if (body.description !== undefined) data.description = body.description;

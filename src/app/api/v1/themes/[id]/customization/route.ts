@@ -9,6 +9,7 @@ import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeManifest, ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
+import { readJsonBody } from "@/core/lib/api-body";
 
 // Reject prototype-polluting keys when copying user-supplied override maps.
 
@@ -185,12 +186,8 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
         return NextResponse.json({ error: "Unknown theme" }, { status: 404 });
     }
 
-    let body: unknown;
-    try {
-        body = await req.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
+    const body = await readJsonBody(req);
+    if (body instanceof NextResponse) return body;
 
     const mode = typeof (body as { mode?: unknown }).mode === "string" ? (body as { mode: string }).mode : null;
     if (!mode || !manifest.modes.available[mode]) {

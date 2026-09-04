@@ -17,6 +17,7 @@ import {
 import { MODULES_DIR } from "@/core/lib/runtime-paths";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { syncModuleTranslations } from "@/core/lib/i18n/translation-service";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * First-run setup API.
@@ -70,12 +71,8 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = setupSchema.safeParse(body);
     if (!parsed.success) {

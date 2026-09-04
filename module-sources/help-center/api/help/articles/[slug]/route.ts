@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 interface RouteParams {
@@ -43,7 +43,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const { helpful } = body;
 
     const article = await prisma.helpArticle.findUnique({

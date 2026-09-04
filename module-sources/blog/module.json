@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",

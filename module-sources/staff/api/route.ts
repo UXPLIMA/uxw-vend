@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 export async function GET(request: NextRequest) {
@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { name, role, avatar, userId, order } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { name, role, avatar, userId, order } = jsonBody;
     if (!name || !role) return NextResponse.json({ error: "Name and role required" }, { status: 400 });
 
     const member = await prisma.staffMember.create({

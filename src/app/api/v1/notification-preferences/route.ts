@@ -5,6 +5,7 @@ import { setPreference, getUserPreferences } from "@/core/lib/notif-prefs";
 import { ModuleNotificationTypes } from "@/core/generated/module-notification-types";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /** GET - list current user's prefs + the available event types */
 export async function GET() {
@@ -35,7 +36,8 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

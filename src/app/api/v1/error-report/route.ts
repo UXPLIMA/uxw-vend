@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createLogger } from "@/core/lib/logger";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
+import { readJsonBody } from "@/core/lib/api-body";
 
 export async function POST(request: NextRequest) {
     // Rate limit error reports (use API limit)
@@ -9,7 +10,8 @@ export async function POST(request: NextRequest) {
     if (!rl.success) return NextResponse.json({ error: "Too many reports" }, { status: 429 });
 
     try {
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
         const logger = createLogger();
 
         logger.error("client_error", {

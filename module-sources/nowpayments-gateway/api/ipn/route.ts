@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { applyFiltersAsync } from "@/core/sdk";
-import { log } from "@/core/sdk/server";
+import { log, readJsonBody } from "@/core/sdk/server";
 import { getNowPaymentsConfig, ipnSignature } from "../../lib/nowpayments";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
     }
 
     const signature = request.headers.get("x-nowpayments-sig");
-    const body = (await request.json()) as IpnBody;
+    const body = (await readJsonBody(request)) as IpnBody;
+    if (body instanceof NextResponse) return body;
 
     if (!signature || !signatureMatches(ipnSignature(config.ipnSecret, body), signature)) {
         log.error("[nowpayments-gateway] an IPN arrived with a bad signature");

@@ -13,6 +13,7 @@ import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import path from "path";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { readJsonBody } from "@/core/lib/api-body";
 
 
 // Cache marketplace index for update checks
@@ -97,7 +98,8 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const { moduleId, enabled, config } = body;
 
     if (!moduleId) {

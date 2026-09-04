@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitStrict } from "@/core/sdk/server";
+import { prisma, rateLimitStrict, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { code } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { code } = jsonBody;
 
     if (!code) {
         return NextResponse.json({ error: "Code is required" }, { status: 400 });

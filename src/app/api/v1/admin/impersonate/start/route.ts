@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * POST /api/v1/admin/impersonate/start
@@ -32,12 +33,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    let body: { userId?: string };
-    try {
-        body = (await request.json()) as { userId?: string };
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const targetId = body.userId?.trim();
     if (!targetId) {

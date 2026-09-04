@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, isModuleEnabled, prisma } from "@/core/sdk/server";
+import { isAdmin, isModuleEnabled, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET ?productId=xxx (public for checkout, admin for all)
@@ -21,7 +21,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { productId, name, label, type, required, placeholder, options } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { productId, name, label, type, required, placeholder, options } = jsonBody;
     if (!productId || !name || !label) return NextResponse.json({ error: "productId, name, label required" }, { status: 400 });
 
     const variable = await prisma.productVariable.create({

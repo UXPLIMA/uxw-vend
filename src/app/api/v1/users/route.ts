@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { PER_PAGE_USERS, BCRYPT_ROUNDS, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } from "@/core/lib/constants";
 import bcrypt from "bcryptjs";
+import { readJsonBody } from "@/core/lib/api-body";
 
 // GET /api/v1/users - List users (admin only)
 export async function GET(request: NextRequest) {
@@ -90,7 +91,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
         const { email, username, password, roleId } = body;
 
         if (!email || !username || !password) {

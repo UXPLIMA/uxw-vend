@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { rateLimitForRole } from "@/core/lib/rate-limit";
+import { readJsonBody } from "@/core/lib/api-body";
 
 type RouteParams = { params: Promise<{ conversationId: string }> };
 
@@ -76,7 +77,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Not a participant" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = replySchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

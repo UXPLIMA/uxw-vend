@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -56,7 +57,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     try {
         const { id } = await params;
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
 
         const existing = await prisma.user.findUnique({ where: { id } });
         if (!existing) {

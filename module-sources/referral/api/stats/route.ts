@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/referral/stats - Admin referral stats
@@ -73,7 +73,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { rewardAmount } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { rewardAmount } = jsonBody;
     if (typeof rewardAmount !== "number" || rewardAmount < 0) {
         return NextResponse.json({ error: "Invalid reward amount" }, { status: 400 });
     }

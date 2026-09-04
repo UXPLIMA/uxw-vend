@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { canDownload } from "../../lib/can-download";
 import { z } from "zod";
@@ -82,7 +82,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { id } = await params;
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const validation = downloadUpdateSchema.safeParse(body);
     if (!validation.success) {
         return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });

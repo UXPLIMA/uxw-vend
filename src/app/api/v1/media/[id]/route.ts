@@ -4,6 +4,7 @@ import path from "path";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { readJsonBody } from "@/core/lib/api-body";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -15,7 +16,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const data: Record<string, unknown> = {};
     if (typeof body.alt === "string") data.alt = body.alt;
     if (typeof body.filename === "string") data.filename = body.filename;

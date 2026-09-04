@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, logActivity, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, logActivity, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/announcements - Public: active announcements
@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
     const adminCheck = await isAdmin(session.user.id);
     if (!adminCheck) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const { title, content, type, isActive, dismissible, includePages, excludePages, startsAt, endsAt, publishAt } = body;
 
     if (!title || !content) {

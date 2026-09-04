@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { nanoid } from "nanoid";
 
@@ -78,7 +78,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const { referralCode } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { referralCode } = jsonBody;
     if (!referralCode || typeof referralCode !== "string") {
         return NextResponse.json({ error: "Referral code is required" }, { status: 400 });
     }

@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { applyFiltersAsync } from "@/core/sdk";
-import { log } from "@/core/sdk/server";
+import { log, readJsonBody } from "@/core/sdk/server";
 import { fromOrderId, getMidtransConfig, notificationSignature } from "../../lib/midtrans";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
     const config = await getMidtransConfig();
     if (!config) return NextResponse.json({ error: "Midtrans is not configured" }, { status: 503 });
 
-    const body = (await request.json()) as Notification;
+    const body = (await readJsonBody(request)) as Notification;
+    if (body instanceof NextResponse) return body;
     const orderId = body.order_id ?? "";
     const statusCode = body.status_code ?? "";
     const grossAmount = body.gross_amount ?? "";

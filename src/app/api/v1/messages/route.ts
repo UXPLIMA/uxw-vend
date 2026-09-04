@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { oneToOneConversationWhere } from "@/core/lib/conversations";
 import { rateLimitForRole } from "@/core/lib/rate-limit";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * GET - list current user's conversations with last message preview
@@ -106,7 +107,8 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = startSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

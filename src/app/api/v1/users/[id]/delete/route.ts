@@ -6,6 +6,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { softDeleteUser } from "@/core/lib/user-deletion";
 import { logActivity } from "@/core/lib/activity-log";
 import { getClientIP } from "@/core/lib/rate-limit";
+import { readJsonBody } from "@/core/lib/api-body";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -36,12 +37,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         );
     }
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = schema.safeParse(body);
     if (!parsed.success) {

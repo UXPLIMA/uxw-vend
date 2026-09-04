@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { updateUserSchema } from "@/core/lib/validations";
+import { readJsonBody } from "@/core/lib/api-body";
 
 // GET /api/v1/users/me - Get current user
 export async function GET() {
@@ -58,7 +59,8 @@ export async function PATCH(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
         const validation = updateUserSchema.safeParse(body);
 
         if (!validation.success) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -12,7 +12,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     try {
         const { id } = await params;
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
 
         const schema = z.object({
             path: z.string().min(1).max(500).refine((v) => v.startsWith("/"), "Path must start with /").optional(),

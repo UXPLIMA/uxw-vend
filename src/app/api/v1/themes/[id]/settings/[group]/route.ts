@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { themeRegistry } from "@/core/generated/theme-registry";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
+import { readJsonBody } from "@/core/lib/api-body";
 
 function sanitizeByType(def: ThemeFieldDef, value: unknown): unknown {
     switch (def.type) {
@@ -42,8 +43,8 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string;
     const groupDef = manifest?.settings?.[group];
     if (!groupDef) return NextResponse.json({ error: "Unknown theme or group" }, { status: 404 });
 
-    let body: { values?: Record<string, unknown> };
-    try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
+    const body = await readJsonBody(req);
+    if (body instanceof NextResponse) return body;
     if (!body.values || typeof body.values !== "object") {
         return NextResponse.json({ error: "values required" }, { status: 400 });
     }
