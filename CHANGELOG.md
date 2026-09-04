@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **No module API endpoint was rate limited.** Core's own ninety-seven routes
+  each call the limiter themselves, which holds because they are all in this
+  repository and a reviewer sees the omission. The module surface is a hundred
+  and sixty-five endpoints across fifty modules, written by whoever wrote the
+  module, and not one of them was limited: a form submission, a vote claim, a
+  wheel spin and every payment callback answered as fast as the network could
+  ask. A payment callback is the sharpest of them, because such a handler
+  reads the payment back from the provider before it trusts anything, so a
+  stranger could make this server call the provider's API once per request
+  until the operator's quota was gone. The dispatcher now applies a limit to
+  every module endpoint, keyed per endpoint and per caller - by user id when
+  there is a session, by address otherwise - and answers 429 with a
+  `Retry-After` before it loads the handler.
+
+### Added
+- **`api[].rateLimit` in the module manifest.** An endpoint that sends mail,
+  mints a reward or opens a ticket can ask for something stricter than the
+  default. It can only tighten: core takes the lower request count and the
+  longer window, so a module can neither raise its own ceiling nor turn the
+  limit off. `/vote/claim` and `/wheel/spin` declare 30 a minute.
+- **A roomier ceiling for `providerCallback` endpoints.** A webhook throttled
+  during a provider's retry burst delays a settlement, which is a worse
+  failure than the one the limit prevents, so those get 600 a minute rather
+  than the browser default of 120. It is still a ceiling.
+
 ### Fixed
 - **robots.txt blocked nothing it named.** It disallowed `/admin`, `/auth` and
   `/profile`, and no crawlable URL on this site begins with any of them: every

@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote System",
   "description": "Vote-for-rewards system with configurable sites and cooldowns",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -43,7 +43,11 @@
     {
       "path": "/vote/claim",
       "handler": "api/claim/route.ts",
-      "description": "Claim vote rewards after voting on an external site."
+      "description": "Claim vote rewards after voting on an external site.",
+      "rateLimit": {
+        "maxRequests": 30,
+        "windowMs": 60000
+      }
     }
   ],
   "dependencies": [

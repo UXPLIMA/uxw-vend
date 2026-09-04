@@ -23,6 +23,18 @@ export const RATE_LIMIT_AUTH = { maxRequests: 10, windowMs: 60000 };
 export const RATE_LIMIT_API = { maxRequests: 120, windowMs: 60000 };
 export const RATE_LIMIT_UPLOAD = { maxRequests: 3, windowMs: 60000 };
 
+/**
+ * The ceiling on an endpoint a payment provider posts to.
+ *
+ * Deliberately far above what a real provider sends: a webhook throttled
+ * during a burst delays a settlement, which is a worse failure than the one
+ * the limit exists to prevent. It is still a ceiling, and without one a
+ * stranger could make this server call the provider's API once per request -
+ * a callback handler reads the payment back before it trusts anything - until
+ * the operator's quota with that provider was gone.
+ */
+export const RATE_LIMIT_PROVIDER_CALLBACK = { maxRequests: 600, windowMs: 60000 };
+
 // Pagination defaults (core admin)
 export const PER_PAGE_USERS = 20;
 export const PER_PAGE_ACTIVITY = 50;
