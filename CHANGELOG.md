@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Updating a module never updated its strings.** A module's translations
+  live in the manifest, which is what the repo ships, and in the `Translation`
+  table, which is what the site renders. Only `syncModuleTranslations` fills
+  the table. Install, upload, bulk install and first-run setup all call it;
+  `POST /api/v1/modules/update` did not. So a module that gained a key in a new
+  release kept rendering the set it shipped with on the day it was first
+  installed: the key was in the files and never in the database, and the screen
+  either fell back to a hardcoded English literal or rendered the key path.
+  Nothing reported a problem, because from the file system's side the upgrade
+  had worked. Update syncs now, which refreshes the rows an operator has not
+  customised, adds the missing ones, and leaves `isCustom` rows alone.
+
 - **The site's password rules did not apply to the site's own administrator.**
   `enforcePasswordPolicy` is the one function that applies all of the policy:
   ten characters, an uppercase, a digit, not one of the two dozen passwords
@@ -65,6 +77,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/core/lib/permission-names.ts` now, which both read.
 
 ### Added
+- `tests/unit/module-writes-sync-translations.test.ts` requires every route
+  that validates an incoming module manifest, which is what marks a route as
+  one that writes a module's files, to put that module's strings in the
+  Translation table. Uninstall is the mirror image and is checked to remove
+  them instead.
 - `tests/unit/password-writes-follow-policy.test.ts` requires every route that
   writes a password onto a user row to have run it through
   `enforcePasswordPolicy` first, and fails if a second password length

@@ -255,6 +255,22 @@ export async function POST(request: NextRequest) {
             // via a pm2 binary the image does not contain.
             scheduleBuild();
 
+            // Install, upload, bulk install and setup all seed the module's
+            // strings into the Translation table; update did not, so a module
+            // that gained a key in a new release kept rendering the set it
+            // shipped with on the day it was first installed. The keys were
+            // in the files and never in the database. `syncModuleTranslations`
+            // refreshes the rows the operator has not customised, adds the
+            // missing ones, and leaves `isCustom` rows alone, which is exactly
+            // what an upgrade wants.
+            if (manifest.translations) {
+                const { syncModuleTranslations } = await import("@/core/lib/i18n/translation-service");
+                await syncModuleTranslations(
+                    moduleId,
+                    manifest.translations as Record<string, Record<string, unknown>>,
+                );
+            }
+
             const installedAt = new Date();
             const hash = manifestHash(manifest);
             await prisma.moduleConfig.upsert({
