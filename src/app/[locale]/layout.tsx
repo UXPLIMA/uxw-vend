@@ -12,6 +12,7 @@ import prisma from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
+import { ServerSlot } from "@/core/components/ServerSlot";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
@@ -108,6 +109,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: buildOrganizationJsonLd() }}
         />
         {overrideCss && <style dangerouslySetInnerHTML={{ __html: overrideCss }} />}
+        <ServerSlot name="head.extra" moduleStates={moduleStates} />
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
@@ -130,7 +132,9 @@ export default async function RootLayout({
                   <CustomCssInjector />
                   <ModuleLayoutComponents />
                   <Slot name="layout.top" />
+                  <Slot name="layout.beforeMain" />
                   {children}
+                  <Slot name="layout.afterMain" />
                   <MobileBottomNav />
                   </ErrorBoundary>
                   <div className="relative z-[9999]">

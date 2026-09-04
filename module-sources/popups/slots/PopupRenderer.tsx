@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { safeUrl } from "../lib/safe-url";
 
 interface ActivePopup {
     id: string;
@@ -21,6 +23,7 @@ interface ActivePopup {
  * registry simply doesn't contain this entry in that case.
  */
 export default function PopupRenderer() {
+    const t = useTranslations("popups");
     const [popup, setPopup] = useState<ActivePopup | null>(null);
 
     useEffect(() => {
@@ -41,30 +44,42 @@ export default function PopupRenderer() {
         return () => { active = false; };
     }, []);
 
-    if (!popup) return null;
-
-    const dismiss = () => {
+    const dismiss = useCallback(() => {
+        if (!popup) return;
         if (typeof window !== "undefined") {
             localStorage.setItem(`popup-dismissed:${popup.id}`, "1");
         }
         setPopup(null);
-    };
+    }, [popup]);
+
+    // A modal that only closes by clicking its backdrop cannot be closed with a
+    // keyboard at all.
+    useEffect(() => {
+        if (!popup) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") dismiss();
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [popup, dismiss]);
+
+    if (!popup) return null;
+
+    const image = safeUrl(popup.image, false);
+    const link = safeUrl(popup.link, true);
 
     return (
-        <div
-            className="fixed inset-0 z-[9998] bg-black/50 flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="popup-title"
-            onClick={dismiss}
-        >
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4" role="presentation">
+            <div className="fixed inset-0 bg-black/50" onClick={dismiss} aria-hidden="true" />
             <div
-                className="bg-card rounded-lg shadow-xl max-w-md w-full max-h-[85vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="popup-title"
+                className="relative bg-card rounded-lg shadow-xl max-w-md w-full max-h-[85vh] overflow-y-auto"
             >
-                {popup.image && (
+                {image && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={popup.image} alt="" className="w-full h-auto rounded-t-lg" />
+                    <img src={image} alt="" className="w-full h-auto rounded-t-lg" />
                 )}
                 <div className="p-5">
                     <h2 id="popup-title" className="text-lg font-semibold mb-2">{popup.title}</h2>
@@ -77,15 +92,17 @@ export default function PopupRenderer() {
                             onClick={dismiss}
                             className="text-sm text-muted-foreground hover:text-foreground px-3 py-1.5"
                         >
-                            Dismiss
+                            {t("close")}
                         </button>
-                        {popup.link && popup.linkText && (
+                        {link && (
                             <a
-                                href={popup.link}
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-sm bg-primary text-primary-foreground px-4 py-1.5 rounded hover:opacity-90"
                                 onClick={dismiss}
                             >
-                                {popup.linkText}
+                                {popup.linkText || t("learnMore")}
                             </a>
                         )}
                     </div>
