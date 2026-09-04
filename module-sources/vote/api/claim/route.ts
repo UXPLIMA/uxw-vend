@@ -22,7 +22,13 @@ export async function POST(request: NextRequest) {
     const site = await prisma.voteSite.findUnique({ where: { id: voteSiteId } });
     if (!site) return NextResponse.json({ error: "Vote site not found" }, { status: 404 });
 
-    // Use transaction to prevent race condition on vote claiming
+    // A transaction on its own does not prevent a double claim: under read
+    // committed, two claims submitted together both read no recent vote log
+    // and both go on to write one and award the credits. The invariant here is
+    // "no row newer than the cutoff", which no conditional write can express,
+    // so the isolation level has to carry it. Postgres aborts one of two
+    // serializable transactions whose reads and writes conflict this way; that
+    // abort is answered below as a retry, not a 500.
     try {
         const reward = await prisma.$transaction(async (tx) => {
             // Check cooldown (24 hours per site)
@@ -62,7 +68,7 @@ export async function POST(request: NextRequest) {
             }
 
             return site.reward;
-        });
+        }, { isolationLevel: "Serializable" });
 
         // Fire hook + activity feed entry
         const { doActionAsync } = await import("@/core/sdk");
@@ -90,6 +96,16 @@ export async function POST(request: NextRequest) {
         const message = err instanceof Error ? err.message : "Unknown error";
         if (message.startsWith("COOLDOWN:")) {
             return NextResponse.json({ error: message.slice(9) }, { status: 429 });
+        }
+        // P2034: the transaction was aborted for conflicting with another one.
+        // Two claims arrived together and Postgres kept exactly one, which is
+        // the point. The caller is told to try again rather than shown a 500.
+        const code = (err as { code?: string }).code;
+        if (code === "P2034") {
+            return NextResponse.json(
+                { error: "Another claim is in flight. Try again in a moment." },
+                { status: 409 },
+            );
         }
         throw err;
     }

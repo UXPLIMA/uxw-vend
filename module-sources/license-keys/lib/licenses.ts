@@ -136,9 +136,11 @@ export async function checkLicense(key: string, options: CheckOptions = {}): Pro
         return { ok: false, reason: "activation-limit" };
     }
 
+    let created: { id: string };
     try {
-        await prisma.licenseActivation.create({
+        created = await prisma.licenseActivation.create({
             data: { licenseKeyId: license.id, machineHash, label: options.label ?? null },
+            select: { id: true },
         });
     } catch {
         // Two launches at once on the same machine race for the same seat.
@@ -151,10 +153,27 @@ export async function checkLicense(key: string, options: CheckOptions = {}): Pro
         };
     }
 
+    // The seat count read above was a snapshot, and the unique index only
+    // covers two launches of the *same* machine. Two different machines
+    // activating a one-seat key together both saw a free seat and both got a
+    // row. Settle it after the fact and deterministically: the oldest
+    // maxActivations rows keep their seats, so exactly that many machines win
+    // and the rest are rolled back.
+    const seats = await prisma.licenseActivation.findMany({
+        where: { licenseKeyId: license.id },
+        orderBy: [{ activatedAt: "asc" }, { id: "asc" }],
+        take: license.maxActivations,
+        select: { id: true },
+    });
+    if (!seats.some((seat) => seat.id === created.id)) {
+        await prisma.licenseActivation.delete({ where: { id: created.id } }).catch(() => {});
+        return { ok: false, reason: "activation-limit" };
+    }
+
     return {
         ok: true,
         ...summary,
-        activationsUsed: license.activations.length + 1,
+        activationsUsed: seats.length,
         newActivation: true,
     };
 }

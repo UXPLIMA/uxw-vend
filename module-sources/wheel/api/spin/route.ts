@@ -67,12 +67,21 @@ export async function POST() {
         }
     }
 
-    // Deduct credits for paid spin
+    // Deduct credits for paid spin, conditional on the balance still covering
+    // it. The check above is a snapshot: two spins submitted together both saw
+    // enough credits, both spun, and the balance went negative. The condition
+    // is what makes the second deduction find nothing to update.
     if (paidSpin) {
-        await prisma.user.update({
-            where: { id: session.user.id },
+        const debited = await prisma.user.updateMany({
+            where: { id: session.user.id, creditBalance: { gte: spinCost } },
             data: { creditBalance: { decrement: spinCost } },
         });
+        if (debited.count === 0) {
+            return NextResponse.json(
+                { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
+                { status: 429 },
+            );
+        }
         await prisma.creditTransaction.create({
             data: {
                 userId: session.user.id,

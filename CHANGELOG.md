@@ -47,6 +47,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing entry, and a manifest that omits it behaves exactly as before.
 
 ### Security
+- **Credits could be spent twice.** Checkout read the balance, compared it to
+  the order total, and decremented inside a transaction. Two checkouts
+  submitted together both read the same balance, both passed the comparison,
+  and both got their goods while the balance went negative. A transaction does
+  not close that: under read committed both decrements simply apply. The paid
+  wheel spin had the same shape. Both debit conditionally now
+  (`updateMany` with `creditBalance: { gte: ... }`) and answer the losing call
+  the way the balance check already did.
+- **A single-use coupon could be used twice.** Same read-then-write, and
+  `usageLimit: 1` is the common case, not the rare one: the welcome coupon and
+  the wheel's coupon prize are both issued that way. Checkout and the orders
+  route claim the use conditionally now.
+- **A one-seat licence could be activated on two machines.** The unique index
+  covers two launches of the same machine; two different machines activating
+  together both saw a free seat. The count is settled after the insert now,
+  oldest rows keeping their seats, so exactly `maxActivations` machines win and
+  the rest are rolled back.
+- **A vote reward could be claimed twice.** The cooldown check and the reward
+  sat in one transaction with a comment saying that prevented the race. It does
+  not: two claims both read no recent vote log and both awarded credits. The
+  invariant is "no row newer than the cutoff", which no conditional write can
+  express, so the transaction is serializable now and Postgres keeps exactly
+  one. The abort is answered as a retry, not a 500.
 - **A chest item could be redeemed twice.** The route read the row, saw
   `isRedeemed: false`, ran the RCON delivery, and marked the row redeemed
   afterwards. Two requests that arrived together both passed the read and both
