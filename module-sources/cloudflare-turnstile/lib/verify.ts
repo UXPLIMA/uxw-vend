@@ -3,6 +3,9 @@ import { prisma } from "@/core/sdk/server";
 interface TurnstileConfig {
     siteKey?: string;
     secretKey?: string;
+    /** Which forms the admin switched the widget on for. */
+    enableOnLogin?: boolean;
+    enableOnRegister?: boolean;
 }
 
 /** Load Turnstile config from settings. Returns null if not configured. */

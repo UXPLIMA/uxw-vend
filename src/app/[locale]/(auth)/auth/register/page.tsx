@@ -8,10 +8,13 @@ import { Input } from "@/core/components/ui/input";
 import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
+import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
+import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
 
 export default function RegisterPage() {
     const router = useRouter();
     const t = useTranslations('auth');
+    const challenge = useAuthChallenge();
     const [formData, setFormData] = useState({
         email: "",
         username: "",
@@ -43,7 +46,7 @@ export default function RegisterPage() {
             const response = await fetch("/api/v1/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, [CHALLENGE_FIELD]: challenge.read() }),
             });
 
             const data = await response.json();
@@ -159,6 +162,8 @@ export default function RegisterPage() {
                                     hideLabel={t('hidePassword')}
                                 />
                             </div>
+
+                            <AuthChallenge action="register" onField={challenge.onField} />
 
                             <Button
                                 type="submit"

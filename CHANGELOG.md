@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The bot check that was switched on and did nothing.** The
+  cloudflare-turnstile module shipped an admin page with `enableOnLogin` and
+  `enableOnRegister`, saved both to the settings table, and stopped there. No
+  widget was rendered anywhere in the app, and `verifyTurnstileToken` had no
+  callers at all. An administrator who turned bot protection on got a page
+  that said it was on and a site exactly as open as before, which is worse
+  than no module: a security control that reports success without acting.
+  It could not have worked either, because core had nowhere to put it - a
+  module cannot add a field to the login form or refuse a request that core
+  owns. Core now provides both halves and still knows nothing about CAPTCHAs:
+  `auth.form.challenge`, a slot inside the login, register and
+  forgot-password forms whose contributions get an `onField` callback and
+  report whatever they need sent; and `auth.challenge`, a filter run before
+  credentials are checked or an account is created, carrying those fields,
+  the action and the caller's IP. With no module installed the slot renders
+  nothing, the filter has no listeners, and the three forms behave exactly as
+  they did. A listener that throws is treated as passing, so a broken module
+  cannot lock everyone out of the site. Turnstile now draws its widget in
+  that slot and refuses in that filter, an unconfigured install still lets
+  everything through, a missing token is refused as firmly as a bad one, and
+  the module ships the strings for the codes it invents rather than core
+  carrying words for a thing it does not have.
+
 - **Bulk install left every module it installed with no strings.** The single
   install seeded translations into the Translation table, which is where the
   app reads them from. Bulk install called a local `mergeTranslations` that

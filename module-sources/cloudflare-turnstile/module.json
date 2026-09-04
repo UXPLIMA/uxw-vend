@@ -2,7 +2,7 @@
   "id": "cloudflare-turnstile",
   "name": "Cloudflare Turnstile",
   "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -25,6 +25,11 @@
       "path": "/security/turnstile/settings",
       "handler": "api/settings/route.ts",
       "description": "Get or update Cloudflare Turnstile captcha settings (admin)."
+    },
+    {
+      "path": "/security/turnstile/public-config",
+      "handler": "api/public-config/route.ts",
+      "description": "Site key and per-form switches for the Turnstile widget (public; never the secret)."
     }
   ],
   "settingsCards": [
@@ -54,6 +59,10 @@
       "admin": {
         "menu_cloudflare-turnstile": "Cloudflare Turnstile",
         "menu_cloudflare-turnstile_cloudflare_turnstile": "Cloudflare Turnstile"
+      },
+      "auth": {
+        "err.captcha_failed": "The bot check did not pass. Please try again.",
+        "err.captcha_missing": "Please complete the bot check before continuing."
       }
     },
     "tr": {
@@ -73,7 +82,34 @@
       "admin": {
         "menu_cloudflare-turnstile": "Cloudflare Turnstile",
         "menu_cloudflare-turnstile_cloudflare_turnstile": "Cloudflare Turnstile"
+      },
+      "auth": {
+        "err.captcha_failed": "Bot kontrolü geçilemedi. Lütfen tekrar deneyin.",
+        "err.captcha_missing": "Devam etmeden önce bot kontrolünü tamamlayın."
       }
     }
+  },
+  "slotContents": [
+    {
+      "id": "auth-challenge",
+      "slot": "auth.form.challenge",
+      "component": "slots/TurnstileChallenge",
+      "order": 10
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "auth.challenge",
+      "type": "filter",
+      "handler": "hooks/on-auth-challenge.ts"
+    }
+  ],
+  "csp": {
+    "script-src": [
+      "https://challenges.cloudflare.com"
+    ],
+    "frame-src": [
+      "https://challenges.cloudflare.com"
+    ]
   }
 }

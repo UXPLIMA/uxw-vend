@@ -8,6 +8,7 @@ import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { checkPasswordBreach } from "@/core/lib/password-policy";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
+import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
 // Used at signup so the welcome email goes out in the language the visitor
@@ -39,6 +40,21 @@ export async function POST(request: NextRequest) {
         }
 
         const { email, username, password } = validation.data;
+
+        // Whatever module owns the auth.form.challenge slot gets to refuse
+        // here, before an account exists. With none installed the filter has
+        // no listeners and this returns the value it was handed.
+        const challenge = await runAuthChallenge({
+            action: "register",
+            fields: parseChallengeFields((body as Record<string, unknown>)?.[CHALLENGE_FIELD]),
+            ip,
+        });
+        if (!challenge.ok) {
+            return NextResponse.json(
+                { error: "Verification failed", code: challenge.code ?? "challenge_failed" },
+                { status: 400 },
+            );
+        }
 
         // The zod schema enforces the built-in policy; this adds the admin's
         // configured minimum length, which can only be stricter.

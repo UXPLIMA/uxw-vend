@@ -69,6 +69,12 @@ describe("auth API error contract", () => {
         const uncoded: string[] = [];
         for (const route of ROUTES) {
             for (const body of errorBodies(code(route))) {
+                // `code: challenge.code ?? "challenge_failed"` is the one
+                // shape that is not a bare literal, and it has to be: the
+                // module that refuses names its own code, and core supplies
+                // the fallback when it does not. It still always yields a
+                // string, which is what this gate is for.
+                if (/\bcode:\s*\w+\.code \?\? "/.test(body)) continue;
                 if (!/\bcode:\s*"/.test(body)) {
                     uncoded.push(`${route.slice(ROOT.length + 1)} -> ${body.replace(/\s+/g, " ").slice(0, 80)}`);
                 }

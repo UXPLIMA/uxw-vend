@@ -4,6 +4,7 @@ import { PASSWORD_RESET_EXPIRY, getDurationMs } from "@/core/lib/security-settin
 import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
+import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
 
 const GENERIC_OK = { message: "If an account exists, a reset link has been sent." };
 
@@ -17,8 +18,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
         }
 
-        const body = (await request.json().catch(() => ({}))) as { email?: unknown };
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
         const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+
+        // A reset mail is free to send and lands in someone else's inbox, so
+        // a challenge module gets a say here too. The refusal keeps the same
+        // generic shape as every other branch: this endpoint never confirms
+        // whether an address exists.
+        const challenge = await runAuthChallenge({
+            action: "forgotPassword",
+            fields: parseChallengeFields(body[CHALLENGE_FIELD]),
+            ip,
+        });
+        if (!challenge.ok) {
+            return NextResponse.json(
+                { error: "Verification failed", code: challenge.code ?? "challenge_failed" },
+                { status: 400 },
+            );
+        }
 
         if (!email || email.length > 254 || !email.includes("@")) {
             // Still return the generic success message so we don't leak
