@@ -740,6 +740,58 @@ function checkStatsApiAuth(modulePath: string): CheckResult {
  * read a namespace core or another module owns, and those keys are not this
  * module's to declare.
  */
+/**
+ * A key prefixed `adm_` is the module's promise that only its admin screen
+ * renders it, and core takes the module at its word: `publicMessages()` strips
+ * every `adm_` key before the catalogue reaches a visitor's browser. A module
+ * that renders one outside `pages/admin/` would print the raw key path on a
+ * public page.
+ *
+ * See src/core/lib/i18n/message-scopes.ts for the trim this protects.
+ */
+function checkAdminKeyPrefix(modulePath: string): CheckResult {
+    const name = "adm_ keys stay on admin screens";
+    const referencesAdminKey = /['"`]adm_[a-zA-Z0-9_]/;
+    const offenders: string[] = [];
+
+    const walk = (dir: string) => {
+        let entries: fs.Dirent[];
+        try {
+            entries = fs.readdirSync(dir, { withFileTypes: true });
+        } catch {
+            return;
+        }
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name === "node_modules" || entry.name === "admin") continue;
+                walk(full);
+                continue;
+            }
+            if (!/\.tsx?$/.test(entry.name)) continue;
+            if (referencesAdminKey.test(fs.readFileSync(full, "utf8"))) {
+                offenders.push(path.relative(modulePath, full));
+            }
+        }
+    };
+    walk(modulePath);
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message:
+                `${offenders.length} file(s) outside pages/admin/ render an adm_ key: ` +
+                `${offenders.slice(0, 10).join(", ")}`,
+            suggestion:
+                "Core strips adm_ keys from the catalogue public pages receive, so these render " +
+                "as raw key paths. Rename the key without the prefix, or move the screen under pages/admin/.",
+        };
+    }
+
+    return { name, passed: true, message: "No adm_ key is rendered outside an admin screen" };
+}
+
 function checkTranslationKeys(modulePath: string): CheckResult {
     const name = "Translation keys declared";
     const manifestPath = path.join(modulePath, "module.json");
@@ -971,6 +1023,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkApiRoutesWired(modulePath),
         checkStatsApiAuth(modulePath),
         checkTranslationKeys(modulePath),
+        checkAdminKeyPrefix(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

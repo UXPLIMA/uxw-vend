@@ -4,7 +4,7 @@ import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import { withoutAdminNamespaces } from "@/core/lib/i18n/message-scopes";
+import { publicMessages } from "@/core/lib/i18n/message-scopes";
 import { SessionProvider } from "next-auth/react";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
@@ -113,7 +113,7 @@ export default async function RootLayout({
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
       >
         <SessionProvider>
-          <NextIntlClientProvider messages={withoutAdminNamespaces(messages)}>
+          <NextIntlClientProvider messages={publicMessages(messages)}>
               <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>
                 <ModuleProvider moduleStates={moduleStates}>
                 <ModuleContextProviders>
@@ -122,7 +122,7 @@ export default async function RootLayout({
                     href="#main-content"
                     className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10001] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/70 focus:ring-offset-2"
                   >
-                    Skip to content
+                    {commonT("skipToContent")}
                   </a>
                   <ErrorBoundary>
                   <ImpersonationBanner />
