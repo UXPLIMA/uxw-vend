@@ -140,8 +140,20 @@ export async function POST(request: NextRequest) {
                 });
                 const { error, discount } = computeCouponDiscount(coupon, subtotal);
                 if (error) return error;
+                // Claim the use conditionally. The count read above is a
+                // snapshot, so two orders redeeming the last use of a
+                // single-use coupon both passed the check and both got the
+                // discount. Welcome coupons and wheel prizes are issued with
+                // usageLimit 1, so that is the common case, not the rare one.
+                const claimed = await tx.coupon.updateMany({
+                    where: {
+                        id: coupon!.id,
+                        ...(coupon!.usageLimit ? { usageCount: { lt: coupon!.usageLimit } } : {}),
+                    },
+                    data: { usageCount: { increment: 1 } },
+                });
+                if (claimed.count === 0) return "Coupon usage limit reached";
                 couponDiscount = discount;
-                await tx.coupon.update({ where: { id: coupon!.id }, data: { usageCount: { increment: 1 } } });
                 return null;
             });
             if (couponError) {
@@ -196,11 +208,21 @@ export async function POST(request: NextRequest) {
 
             // Atomic transaction: deduct credits, create order, grant ownership
             const order = await prisma.$transaction(async (tx) => {
-                // Deduct credits
-                await tx.user.update({
-                    where: { id: session.user.id },
+                // Deduct credits, conditional on the balance still covering it.
+                //
+                // The read above is a snapshot: two checkouts submitted
+                // together both saw the same balance, both passed the check,
+                // and both got their goods while the balance went negative.
+                // A transaction alone does not close that - under read
+                // committed both decrements apply. The condition is what makes
+                // the second one find nothing to update.
+                const debited = await tx.user.updateMany({
+                    where: { id: session.user.id, creditBalance: { gte: total } },
                     data: { creditBalance: { decrement: total } },
                 });
+                if (debited.count === 0) {
+                    throw new Error("INSUFFICIENT_CREDITS");
+                }
 
                 // Create credit transaction
                 await tx.creditTransaction.create({
@@ -455,6 +477,15 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ order, redirect: payment.redirectUrl }, { status: 201 });
     } catch (error) {
+        // The conditional debit lost the race: another checkout spent the
+        // balance between the read and the write. Same answer the read gave
+        // when it saw too little, not a 500.
+        if (error instanceof Error && error.message === "INSUFFICIENT_CREDITS") {
+            return NextResponse.json(
+                { error: "Insufficient credit balance." },
+                { status: 400 },
+            );
+        }
         console.error("Checkout error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }

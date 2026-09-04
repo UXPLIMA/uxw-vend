@@ -140,11 +140,17 @@ export async function POST(request: NextRequest) {
                         discount = Number(coupon.value);
                     }
 
-                    // Increment usage
-                    await prisma.coupon.update({
-                        where: { id: coupon.id },
+                    // Claim the use conditionally: the count read above is a
+                    // snapshot, so two orders redeeming the last use of a
+                    // capped coupon both passed the check.
+                    const claimed = await prisma.coupon.updateMany({
+                        where: {
+                            id: coupon.id,
+                            ...(coupon.usageLimit ? { usageCount: { lt: coupon.usageLimit } } : {}),
+                        },
                         data: { usageCount: { increment: 1 } },
                     });
+                    if (claimed.count === 0) discount = 0;
                 }
             }
         }
