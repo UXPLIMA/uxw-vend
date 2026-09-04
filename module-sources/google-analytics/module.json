@@ -2,11 +2,19 @@
   "id": "google-analytics",
   "name": "Google Analytics",
   "description": "Google Analytics tracking integration",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
   "icon": "BarChart",
+  "api": [
+    {
+      "path": "/google-analytics/config",
+      "handler": "api/config/route.ts",
+      "method": "GET",
+      "description": "The measurement ID and on/off flag the tracking script needs. Public."
+    }
+  ],
   "layoutComponents": [
     {
       "id": "GoogleAnalytics",
@@ -62,7 +70,9 @@
         "adm_field1Label": "Google Analytics ID",
         "adm_field1Desc": "Your Google Analytics measurement ID (e.g. G-XXXXXXXXXX)",
         "adm_field2Label": "Enable Analytics",
-        "adm_field2Desc": "Set to 'true' to enable tracking on your site"
+        "adm_field2Desc": "Whether the tracking script loads on your site",
+        "adm_field2On": "On",
+        "adm_field2Off": "Off"
       }
     },
     "tr": {
@@ -91,7 +101,9 @@
         "adm_field1Label": "Google Analytics ID",
         "adm_field1Desc": "Google Analytics ölçüm kimliğiniz (örn. G-XXXXXXXXXX)",
         "adm_field2Label": "Analitiği Etkinleştir",
-        "adm_field2Desc": "Sitenizde izlemeyi etkinleştirmek için 'true' olarak ayarlayın"
+        "adm_field2Desc": "İzleme betiğinin sitenizde yüklenip yüklenmeyeceği",
+        "adm_field2On": "Açık",
+        "adm_field2Off": "Kapalı"
       }
     },
     "de": {
@@ -118,7 +130,9 @@
         "adm_field1Label": "Google Analytics-ID",
         "adm_field1Desc": "Ihre Google Analytics Mess-ID (z.B. G-XXXXXXXXXX)",
         "adm_field2Label": "Analyse aktivieren",
-        "adm_field2Desc": "Auf 'true' setzen, um das Tracking auf Ihrer Website zu aktivieren"
+        "adm_field2Desc": "Ob das Tracking-Skript auf Ihrer Website geladen wird",
+        "adm_field2On": "An",
+        "adm_field2Off": "Aus"
       }
     },
     "es": {
@@ -145,7 +159,9 @@
         "adm_field1Label": "ID de Google Analytics",
         "adm_field1Desc": "Tu ID de medición de Google Analytics (ej. G-XXXXXXXXXX)",
         "adm_field2Label": "Habilitar análisis",
-        "adm_field2Desc": "Establece en 'true' para habilitar el seguimiento en tu sitio"
+        "adm_field2Desc": "Si el script de seguimiento se carga en tu sitio",
+        "adm_field2On": "Activado",
+        "adm_field2Off": "Desactivado"
       }
     },
     "fr": {
@@ -172,7 +188,9 @@
         "adm_field1Label": "ID Google Analytics",
         "adm_field1Desc": "Votre identifiant de mesure Google Analytics (ex. G-XXXXXXXXXX)",
         "adm_field2Label": "Activer l'analyse",
-        "adm_field2Desc": "Définissez sur 'true' pour activer le suivi sur votre site"
+        "adm_field2Desc": "Si le script de suivi est chargé sur votre site",
+        "adm_field2On": "Activé",
+        "adm_field2Off": "Désactivé"
       }
     },
     "ru": {
@@ -199,7 +217,9 @@
         "adm_field1Label": "ID Google Analytics",
         "adm_field1Desc": "Ваш идентификатор измерения Google Analytics (например, G-XXXXXXXXXX)",
         "adm_field2Label": "Включить аналитику",
-        "adm_field2Desc": "Установите 'true' для включения отслеживания на вашем сайте"
+        "adm_field2Desc": "Загружается ли скрипт отслеживания на вашем сайте",
+        "adm_field2On": "Включено",
+        "adm_field2Off": "Выключено"
       }
     },
     "pt": {
@@ -226,7 +246,9 @@
         "adm_field1Label": "ID do Google Analytics",
         "adm_field1Desc": "Seu ID de medição do Google Analytics (ex. G-XXXXXXXXXX)",
         "adm_field2Label": "Ativar análise",
-        "adm_field2Desc": "Defina como 'true' para ativar o rastreamento no seu site"
+        "adm_field2Desc": "Se o script de rastreamento é carregado no seu site",
+        "adm_field2On": "Ativado",
+        "adm_field2Off": "Desativado"
       }
     }
   }

@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Two module settings that nothing could ever read.**
+  `/api/v1/public-settings` serves an allow-list of core's own keys, and its
+  comment says a module's public values belong in the module's own API. Two
+  modules read from it anyway, for keys the allow-list has never carried, and
+  an absent key on a JSON object is not an error - so both failed in silence.
+  Google Analytics looked up `google_analytics_id` there: an admin could type a
+  measurement ID in, see it saved, and no page was ever tracked. Its other path
+  read `NEXT_PUBLIC_GA_ID`, which is frozen into the bundle at build time and
+  so unreachable on an install running the prebuilt image. The module now
+  serves `/api/v1/google-analytics/config` itself, honours the on/off setting,
+  and the setting is a select rather than a box asking the admin to type the
+  word "true". The measurement ID also stopped being interpolated raw into the
+  inline gtag script. The store's live purchase toast read
+  `live_purchase_toast`, a key nothing writes and no admin screen offers, and
+  it polled an authenticated orders endpoint that returns the viewer's own
+  orders - or, for an admin, everyone's, names and all. It was registered as a
+  layout component on every page and had never once fired. It is removed;
+  real purchase social proof needs a public, anonymised feed and a deliberate
+  decision to publish it, not this. A gate now fails any module that reads
+  core's public settings, and any core reader of a key the allow-list omits.
+
 - **Public search took any query, at any rate.** `/api/v1/search` is the one
   anonymous endpoint that fans out: it hands the caller's string to every
   enabled module's search provider, and each provider spends a
