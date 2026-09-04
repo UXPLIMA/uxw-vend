@@ -18,6 +18,21 @@ interface Application {
     user: { id: string; username: string; email: string; avatar: string | null };
 }
 
+/**
+ * The message key per application status.
+ *
+ * These are the same keys the filter buttons above the list use, which is the
+ * point: the buttons said "Kabul edildi" and the chip on every row under them
+ * said "accepted", because the chip printed the column. The public catalogue
+ * has an `approved` message for the same state, from a spelling this module
+ * does not use anywhere; the value written to the row is `accepted`.
+ */
+const statusKeys: Record<string, string> = {
+    pending: "adm_apps_pending",
+    accepted: "adm_apps_accepted",
+    rejected: "adm_apps_rejected",
+};
+
 const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-700",
     accepted: "bg-green-100 text-green-700",
@@ -94,7 +109,7 @@ export default function StaffApplicationsPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className={`text-xs px-2 py-1 rounded ${statusColors[app.status] || ""}`}>{app.status}</span>
+                                        <span className={`text-xs px-2 py-1 rounded ${statusColors[app.status] || ""}`}>{statusKeys[app.status] && t.has(statusKeys[app.status]) ? t(statusKeys[app.status]) : app.status}</span>
                                         <span className="text-sm font-medium text-muted-foreground">{app.position}</span>
                                     </div>
                                 </div>

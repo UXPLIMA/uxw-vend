@@ -7,6 +7,10 @@ import { auth } from "@/core/sdk/auth";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ArrowLeft, Package } from "lucide-react";
 import { OrderStatusSelect } from "./status-select";
+import { adminOrderStatusKeys, orderStatusLabel } from "../../../../lib/order-status";
+
+/** The admin catalogue's copy of the order status labels. */
+const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -143,7 +147,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                             </p>
                             <p className="text-sm mt-1">
                                 <span className="text-muted-foreground">{t("adm_status")}: </span>
-                                <span className="font-medium">{order.status}</span>
+                                <span className="font-medium">{orderStatusLabel(t, ADMIN_ORDER_STATUS_KEYS, order.status)}</span>
                             </p>
                         </CardContent>
                     </Card>

@@ -32,6 +32,17 @@ interface QueueResponse {
     summary: Record<EmailStatus, number>;
 }
 
+/**
+ * The message key per queue status. The four summary cards above the table
+ * already used these; the chip in each row printed the column instead.
+ */
+const STATUS_LABEL: Record<string, string> = {
+    pending: "emailQueue_pending",
+    sending: "emailQueue_sending",
+    sent: "emailQueue_sent",
+    failed: "emailQueue_failed",
+};
+
 const STATUS_BADGE: Record<string, string> = {
     pending: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
     sending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
@@ -262,7 +273,7 @@ export default function EmailQueueAdminPage() {
                                                     <span
                                                         className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${STATUS_BADGE[job.status] || "bg-muted text-muted-foreground"}`}
                                                     >
-                                                        {job.status}
+                                                        {STATUS_LABEL[job.status] && t.has(STATUS_LABEL[job.status]) ? t(STATUS_LABEL[job.status]) : job.status}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">{job.attempts}</td>

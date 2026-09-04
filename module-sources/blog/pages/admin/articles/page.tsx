@@ -45,6 +45,14 @@ interface AdminBlogArticlesPageProps {
 
 export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogArticlesPageProps) {
     const t = await getTranslations("blog");
+
+    // ArticleStatus is a Prisma enum, so the column holds "PUBLISHED". The
+    // four adm_* messages for it were already in the manifest, in both
+    // locales, and this table printed the enum instead.
+    const statusLabel = (status: string) => {
+        const key = ({ DRAFT: "adm_draft", PUBLISHED: "adm_published", SCHEDULED: "adm_scheduled", ARCHIVED: "adm_archived" } as Record<string, string>)[status];
+        return key && t.has(key) ? t(key) : status;
+    };
     const commonT = await getTranslations("common");
     const dateTag = dateLocaleTag(await getLocale());
     const session = await auth();
@@ -165,7 +173,7 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
                                                             : "bg-muted text-muted-foreground"
                                                         }`}
                                                 >
-                                                    {article.status}
+                                                    {statusLabel(article.status)}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4">

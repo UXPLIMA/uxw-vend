@@ -8,6 +8,7 @@ import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { ORDER_STATUS_KEYS, orderStatusLabel } from "../lib/order-status";
 
 interface Order {
     id: string;
@@ -43,16 +44,7 @@ export function ProfileOrdersTab() {
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
-    const statusLabel = (status: string) => {
-        const map: Record<string, string> = {
-            COMPLETED: "tab_orders_statusCompleted",
-            PENDING: "tab_orders_statusPending",
-            PROCESSING: "tab_orders_statusProcessing",
-            CANCELLED: "tab_orders_statusCancelled",
-        };
-        const key = map[status];
-        return key ? t(key) : status;
-    };
+    const statusLabel = (status: string) => orderStatusLabel(t, ORDER_STATUS_KEYS, status);
 
     useEffect(() => {
         fetch("/api/v1/store/orders?limit=10")

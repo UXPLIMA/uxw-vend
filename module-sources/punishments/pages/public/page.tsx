@@ -28,7 +28,19 @@ const typeColors: Record<string, string> = {
     warn: "bg-blue-100 text-blue-700",
 };
 
+/**
+ * The message key per punishment type. The filter dropdown above the table
+ * already read from this map; the table cell beside it printed the raw column
+ * instead, so a Turkish visitor read the filter as "Susturma" and every row
+ * under it as "mute".
+ */
 const typeKeys: Record<string, string> = { ban: "ban", mute: "mute", kick: "kick", warn: "warning" };
+
+/** The label for one type, falling back to the value when it is unmapped. */
+function typeLabel(t: { (key: string): string; has: (key: string) => boolean }, type: string): string {
+    const key = typeKeys[type];
+    return key && t.has(key) ? t(key) : type;
+}
 
 export default function PunishmentsPage() {
     const __locale = useLocale();
@@ -79,7 +91,7 @@ export default function PunishmentsPage() {
                         {["", "ban", "mute", "kick", "warn"].map((tf) => (
                             <Button key={tf} variant={typeFilter === tf ? "default" : "outline"} size="sm"
                                 onClick={() => { setTypeFilter(tf); setPage(1); }}>
-                                {tf === "" ? t("type") : t(typeKeys[tf] || tf)}
+                                {tf === "" ? t("type") : typeLabel(t, tf)}
                             </Button>
                         ))}
                     </div>
@@ -111,11 +123,11 @@ export default function PunishmentsPage() {
                                                 <td className="py-3 px-4 font-medium">{p.playerName}</td>
                                                 <td className="py-3 px-4">
                                                     <span className={`text-xs px-2 py-1 rounded inline-flex items-center gap-1 ${typeColors[p.type] || ""}`}>
-                                                        <Icon className="w-3 h-3" /> {p.type}
+                                                        <Icon className="w-3 h-3" /> {typeLabel(t, p.type)}
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-4 text-sm text-muted-foreground max-w-[200px] truncate">{p.reason || "-"}</td>
-                                                <td className="py-3 px-4 text-sm text-muted-foreground">{p.punishedBy || "Console"}</td>
+                                                <td className="py-3 px-4 text-sm text-muted-foreground">{p.punishedBy || t("console")}</td>
                                                 <td className="py-3 px-4 text-sm">{p.duration || t("permanent")}</td>
                                                 <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString(__dateTag)}</td>
                                             </tr>
