@@ -13,6 +13,7 @@ import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Sparkles, Settings, Puzzle } from "lucide-react";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 export default function HomePage() {
   const commonT = useTranslations('common');
@@ -23,12 +24,12 @@ export default function HomePage() {
 
   const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
   const enabledWidgets = ModuleWidgets
-    .filter(w => modules[w.module] === true)
+    .filter(w => isEnabledIn(modules, w.module))
     .filter(w => widgetVisibility[w.id] !== false)
     .filter(w => WidgetComponentRegistry[w.id]);
 
   const enabledSections = ModuleHomepageSections
-    .filter(s => modules[s.module] === true)
+    .filter(s => isEnabledIn(modules, s.module))
     .filter(s => HomepageSectionRegistry[s.id]);
 
   return (

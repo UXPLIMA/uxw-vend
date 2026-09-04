@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The module enabled flag meant two different things.** Core documents one
+  convention - `getModuleStates()` returns a row per module that has a
+  `ModuleConfig`, an empty map when the database is unreachable, and an absent
+  entry means enabled, because failing open beats 404ing every module the
+  moment the database blinks. The proxy and `isModuleEnabled` follow it.
+  Twenty-two UI call sites did not: they hand-rolled `states[id] === true`,
+  which reads an absent entry as disabled. The two agree while every module
+  has its row and diverge exactly when it matters, so a database blip left the
+  proxy serving `/blog` while the navbar, footer, homepage, mobile nav, admin
+  analytics, login page OAuth buttons and every slot quietly dropped their
+  module content. The comparison now lives in one helper, `isEnabledIn`, and a
+  gate fails the build if anyone writes it out by hand again.
+- **Three registries were read without consulting the flag at all.** Admin
+  search offered settings cards and admin pages belonging to disabled modules,
+  every one of which the proxy then answered with a 404 - a search result that
+  could only dead-end. The notification preferences page listed event types
+  from disabled modules, so users were shown toggles for notifications that
+  can never fire; saved preferences are untouched, and re-enabling the module
+  brings the type and the choice straight back. The dashboard customizer
+  offered widgets from disabled modules that render blank. A second gate now
+  walks every consumer of a generated registry and requires it either to
+  honour the flag or to be listed with the reason it must not - the GDPR
+  export owes a user every row regardless, the Puck block config drives the
+  public renderer as well as the editor, activity log titles must survive a
+  module being turned off, and Auth.js assembles its providers at module load,
+  before a database round-trip is possible.
+- **The root layout queried module states on every page render.** It ran its
+  own `moduleConfig.findMany` rather than the shared cache, so each render
+  paid for an uncached round-trip that Redis was already holding, and a
+  database blip threw the whole layout away instead of failing soft.
 - **Disabling a module did not stop its scheduled jobs.** Cron jobs are
   registered once, at bootstrap, and the scheduler has no reset path.
   Toggling a module off updates `ModuleConfig`, drops the caches and calls

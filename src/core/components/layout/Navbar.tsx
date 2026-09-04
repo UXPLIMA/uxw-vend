@@ -44,10 +44,10 @@ function DefaultNavbar() {
     // Installed module path prefixes (only from currently installed/enabled modules)
     const installedModulePaths = new Set<string>();
     for (const nl of ModuleNavLinks) {
-        if (moduleStatus[nl.module] === true) installedModulePaths.add(nl.href);
+        if (isEnabledIn(moduleStatus, nl.module)) installedModulePaths.add(nl.href);
     }
     for (const r of ModuleRoutes) {
-        if (!r.isAdmin && moduleStatus[r.module] === true) {
+        if (!r.isAdmin && isEnabledIn(moduleStatus, r.module)) {
             installedModulePaths.add('/' + r.path.split('/')[0]);
         }
     }
@@ -69,7 +69,7 @@ function DefaultNavbar() {
         if (corePaths.has(href)) return true;
         // Check if this href maps to a known module
         const moduleId = pathToModule[href];
-        if (moduleId) return moduleStatus[moduleId] === true;
+        if (moduleId) return isEnabledIn(moduleStatus, moduleId);
         // For DB-saved links: if the path is served by an installed module, allow it
         if (installedModulePaths.has(href)) return true;
         // If admin explicitly configured these links, trust unknown paths
@@ -83,7 +83,7 @@ function DefaultNavbar() {
     const registryLinks = [
         { label: t('home'), href: "/", icon: "Home" },
         ...ModuleNavLinks
-            .filter(nl => moduleStatus[nl.module] === true)
+            .filter(nl => isEnabledIn(moduleStatus, nl.module))
             .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "Package" })),
     ];
 
@@ -116,7 +116,7 @@ function DefaultNavbar() {
 
     // Navbar components from modules (bell, cart, etc.)
     const enabledNavbarComponents = ModuleNavbarComponents
-        .filter(nc => moduleStatus[nc.module] === true)
+        .filter(nc => isEnabledIn(moduleStatus, nc.module))
         .filter(nc => NavbarComponentRegistry[nc.id]);
 
     const isActive = (path: string) => path === "/" ? pathname === "/" : pathname.startsWith(path);
@@ -259,6 +259,7 @@ function DefaultNavbar() {
 }
 
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 export function Navbar() {
     return <ThemeComponentSlot name="Navbar" fallback={DefaultNavbar} />;

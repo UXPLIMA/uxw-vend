@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 interface ModuleContextType {
     modules: Record<string, boolean>;
@@ -24,8 +25,8 @@ export function ModuleProvider({
 
 export function useModuleStatus(moduleId: string): boolean {
     const { modules } = useContext(ModuleContext);
-    // Module must be explicitly enabled (true). Missing = not installed = disabled.
-    return modules[moduleId] === true;
+    // Convention lives in isEnabledIn: an absent entry means enabled.
+    return isEnabledIn(modules, moduleId);
 }
 
 export function useAllModules(): Record<string, boolean> {

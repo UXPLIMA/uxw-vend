@@ -6,6 +6,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Palette, Paintbrush, Globe, Navigation, PanelBottom, Image, LayoutGrid, Code, Settings, Package,
@@ -19,7 +20,7 @@ export default function SettingsPage() {
 
     // Sidebar widgets are contributed by modules. With none installed the page
     // behind this card is an empty list, so the card itself does not appear.
-    const hasWidgets = ModuleWidgets.some((w) => modules[w.module] === true);
+    const hasWidgets = ModuleWidgets.some((w) => isEnabledIn(modules, w.module));
 
     // Core settings - always visible
     const coreSettings = [

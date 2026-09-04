@@ -8,7 +8,7 @@ import { publicMessages } from "@/core/lib/i18n/message-scopes";
 import { SessionProvider } from "next-auth/react";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
-import prisma from "@/core/lib/db";
+import { getModuleStates } from "@/core/lib/module-cache";
 import { getActiveTheme } from "@/core/lib/theme-state";
 import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
@@ -76,9 +76,10 @@ export default async function RootLayout({
   // src/instrumentation.ts. A layout render is a per-request event and was
   // never the right trigger for it.
 
-  const moduleConfigs = await prisma.moduleConfig.findMany({ select: { id: true, enabled: true } });
-  const moduleStates: Record<string, boolean> = {};
-  for (const mc of moduleConfigs) { moduleStates[mc.id] = mc.enabled; }
+  // Through the shared cache, not a raw findMany: this runs on every page
+  // render, and the uncached version both re-queried per request and threw
+  // the whole layout away on a database blip instead of failing soft.
+  const moduleStates = await getModuleStates();
 
   // Resolve active theme + merged config on the server so the first paint
   // matches user customizations without a client round-trip.

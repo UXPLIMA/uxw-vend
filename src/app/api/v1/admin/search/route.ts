@@ -5,6 +5,8 @@ import { isAdmin } from "@/core/lib/permissions";
 import { applyFiltersAsync } from "@/core/lib/hooks";
 import { ModuleSettingsCards, ModuleRoutes } from "@/core/generated/module-registry";
 import { adminHref } from "@/core/lib/admin-path";
+import { getModuleStates } from "@/core/lib/module-cache";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 interface SearchResult {
     type: string;
@@ -66,8 +68,13 @@ export async function GET(request: NextRequest) {
         }
     }
 
+    // A disabled module's admin pages are 404'd by the proxy, so offering
+    // them here handed the admin a search result that could only dead-end.
+    const moduleStates = await getModuleStates();
+
     // 2. Module settings cards
     for (const card of ModuleSettingsCards) {
+        if (!isEnabledIn(moduleStates, card.module)) continue;
         const s = score(card.title, q);
         if (s > 0) {
             results.push({ type: "settings", id: card.href, title: card.title, subtitle: card.description, href: adminHref(card.href), score: s });
@@ -77,6 +84,7 @@ export async function GET(request: NextRequest) {
     // 3. Module routes (admin)
     for (const route of ModuleRoutes) {
         if (!route.isAdmin) continue;
+        if (!isEnabledIn(moduleStates, route.module)) continue;
         const s = score(route.path, q);
         if (s > 0) {
             results.push({ type: "module-page", id: route.key, title: route.path.split("/").pop() || route.path, subtitle: route.module, href: adminHref(route.path), score: s });

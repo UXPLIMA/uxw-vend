@@ -8,6 +8,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { Slot } from "@/core/components/Slot";
 import { NavIcon } from "@/core/components/ui/NavIcon";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 export function MobileBottomNav() {
     const pathname = usePathname();
@@ -20,7 +21,7 @@ export function MobileBottomNav() {
 
     // Build nav items from registry - Home + first 3 enabled module links + Profile
     const moduleLinks = ModuleNavLinks
-        .filter(nl => moduleStatus[nl.module] === true)
+        .filter(nl => isEnabledIn(moduleStatus, nl.module))
         .slice(0, 3)
         .map(nl => ({ href: nl.href, iconName: nl.icon, label: nl.label }));
 

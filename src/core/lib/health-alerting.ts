@@ -1,6 +1,7 @@
 import { prisma } from "@/core/lib/db";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { ModuleWebhookChannels } from "@/core/generated/module-data";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 import {
     GENERIC_CHANNEL_ID,
     buildWebhookPayload,
@@ -170,7 +171,7 @@ export async function listAlertingChannels(): Promise<WebhookChannel[]> {
         // No module state available (first boot, DB hiccup): offer the
         // built-in channel rather than failing the settings page.
     }
-    return listWebhookChannels(ModuleWebhookChannels, (moduleId) => states[moduleId] === true);
+    return listWebhookChannels(ModuleWebhookChannels, (moduleId) => isEnabledIn(states, moduleId));
 }
 
 function buildAlert(

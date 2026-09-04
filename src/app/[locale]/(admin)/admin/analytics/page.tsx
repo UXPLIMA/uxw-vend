@@ -17,6 +17,7 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 ChartJS.register(
     CategoryScale,
@@ -106,7 +107,7 @@ export default function AnalyticsPage() {
             if (res.ok) {
                 const data = await res.json();
                 const enabledModules = ((data.modules || []) as ModuleManifest[])
-                    .filter((m) => moduleStates[m.id] === true && !!m.statsApi);
+                    .filter((m) => isEnabledIn(moduleStates, m.id) && !!m.statsApi);
 
                 const fetches = enabledModules.map(async (m) => {
                     try {

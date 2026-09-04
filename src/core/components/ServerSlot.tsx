@@ -1,6 +1,7 @@
 import React from "react";
 import { ModuleSlotContents, SlotContentRegistry } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 /**
  * Server-rendered variant of `<Slot>`.
@@ -26,7 +27,7 @@ export function ServerSlot({ name, moduleStates, context, fallback = null }: Ser
 
     const contributions = ModuleSlotContents
         .filter((sc) => sc.slot === name)
-        .filter((sc) => moduleStates[sc.module] === true)
+        .filter((sc) => isEnabledIn(moduleStates, sc.module))
         .filter((sc) => registry[sc.id])
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
