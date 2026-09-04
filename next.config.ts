@@ -1,9 +1,40 @@
 import type { NextConfig } from "next";
+import { readFileSync } from "fs";
+import { join } from "path";
 import createNextIntlPlugin from 'next-intl/plugin';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin('./src/core/lib/i18n/request.ts');
 const analyzeBundles = withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
+
+/**
+ * Origins the installed modules asked the CSP to allow.
+ *
+ * Written by scripts/generate-registry.ts, which both `predev` and `prebuild`
+ * run before Next loads this file. Read rather than imported so a checkout
+ * that has never generated one still builds: an absent file is no modules
+ * installed, which is what a fresh core is. The manifest schema has already
+ * refused anything but a concrete https origin, so a module can name a host
+ * and nothing else.
+ */
+function moduleCspOrigins(): Record<string, string[]> {
+  try {
+    const raw = readFileSync(join(process.cwd(), 'src/core/generated/module-csp.json'), 'utf8');
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    const out: Record<string, string[]> = {};
+    for (const [directive, origins] of Object.entries(parsed as Record<string, unknown>)) {
+      if (!Array.isArray(origins)) continue;
+      const safe = origins.filter(
+        (o): o is string => typeof o === 'string' && /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(o),
+      );
+      if (safe.length > 0) out[directive] = safe;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -64,8 +95,16 @@ const nextConfig: NextConfig = {
     //    environments, Turbopack HMR), so dev adds it back or the client
     //    never hydrates. Swagger UI at /admin/api-docs needs it in every
     //    mode, so that route gets its own header override below.
-    //  - frame-src lists payment gateway frames (Stripe / PayPal sandbox) so
-    //    3DS / checkout iframes render when those modules are installed.
+    //  - every fetch directive is core's own sources plus the origins the
+    //    installed modules declared in their manifests. Core names no module's
+    //    host: it used to carry two payment origins that no gateway loaded,
+    //    while the Discord widget iframe and the Google Analytics tag were
+    //    blocked outright with nothing to say so but the browser console.
+
+    const moduleOrigins = moduleCspOrigins();
+    /** Core's own sources for a directive, plus whatever the modules declared. */
+    const directive = (name: string, ...sources: string[]) =>
+      [name, ...sources, ...(moduleOrigins[name] ?? [])].join(' ');
 
     const buildCsp = (unsafeEval: boolean) => [
       "default-src 'self'",
@@ -73,18 +112,23 @@ const nextConfig: NextConfig = {
       // static.cloudflareinsights.com hosts the beacon Cloudflare auto-
       // injects when Web Analytics is enabled for the zone; without it
       // the browser logs a CSP violation on every page load.
-      `script-src 'self' 'unsafe-inline'${unsafeEval ? " 'unsafe-eval'" : ''} https://static.cloudflareinsights.com`,
+      directive('script-src', `'self'`, `'unsafe-inline'`, ...(unsafeEval ? [`'unsafe-eval'`] : []), 'https://static.cloudflareinsights.com'),
       // @measured/puck's CSS pulls Inter from rsms.me (external @import in
       // its bundled stylesheet). Whitelist that origin for both the sheet
       // itself (style-src) and the @font-face URLs it references (font-src).
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me",
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' https://fonts.gstatic.com https://rsms.me data:",
+      directive('style-src', `'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com', 'https://rsms.me'),
+      directive('img-src', `'self'`, 'data:', 'blob:', 'https:'),
+      directive('font-src', `'self'`, 'https://fonts.gstatic.com', 'https://rsms.me', 'data:'),
       // The dev HMR socket is ws:// whenever the app is served over plain
       // HTTP, which wss: alone does not cover.
-      `connect-src 'self' https: wss:${isDev ? ' ws:' : ''}`,
+      directive('connect-src', `'self'`, 'https:', 'wss:', ...(isDev ? ['ws:'] : [])),
       "frame-ancestors 'self'",
-      "frame-src 'self' https://api.sandbox.paypal.com https://js.stripe.com",
+      // No gateway origins here. Core naming a module's hosts was wrong twice
+      // over: neither payment module ever loaded the two that used to sit in
+      // this list, and the origins that are genuinely needed belong to
+      // whichever modules are installed. They declare them; see `csp` in the
+      // manifest schema.
+      directive('frame-src', `'self'`),
       "form-action 'self'",
       "base-uri 'self'",
       "object-src 'none'",

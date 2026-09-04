@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Core's CSP was a fixed list no module could reach.** It named two payment
+  gateway origins, `https://api.sandbox.paypal.com` and `https://js.stripe.com`,
+  which is core knowing about modules, and it was wrong twice over: both
+  gateways are server to server and load neither, and the PayPal entry was not
+  a frame host at all but the REST API's, spelled differently from the one the
+  module actually calls. Meanwhile every origin a module did need was blocked.
+  The Discord widget's iframe points at `https://discord.com` and rendered an
+  empty box; the Google Analytics tag pulls gtag from
+  `https://www.googletagmanager.com` and loaded nothing, so last release's fix
+  to that module got it as far as a request the browser then refused. A blocked
+  subresource raises no server error and no client error, only a console line
+  nobody reads, so both had shipped that way from the start. A module now
+  declares its origins under `csp` in the manifest, the registry collects them
+  from the installed set, and every fetch directive is composed from core's own
+  sources plus those. Only fetch directives, and only concrete https origins: a
+  keyword or a bare scheme is refused by the schema, so no module can undo the
+  policy, and `default-src`, `frame-ancestors`, `form-action`, `base-uri` and
+  `object-src` stay literal with nothing to add to. `validate-module` fails a
+  module that loads an origin it did not declare.
+- **Two Swagger UIs, and the reachable one was blank.** `/api/docs` served a
+  second copy as raw HTML pulling its bundle and stylesheet from unpkg on a
+  floating `@5` tag. No third-party script origin is allowed, so the page had
+  only ever rendered an empty div, and the spec it fetches answers 401 to
+  anyone but an admin anyway. `/admin/api-docs` does the same job with the
+  bundle shipped in the app, behind the admin session, under its own policy.
+  The dead route is gone and `docs/API.md`, which had been pointing readers at
+  it, now names the one that works.
+
 - **The schema indexed the wrong columns.** Two rules, both of which the
   schema already stated in one place and broke in forty others. `IpBlock`
   carries the comment "No `@@index([ip])` - `@unique` already creates a B-tree

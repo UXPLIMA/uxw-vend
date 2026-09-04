@@ -2,7 +2,7 @@
   "id": "discord-widget",
   "name": "Discord Widget",
   "description": "Discord server widget on homepage sidebar",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -156,5 +156,10 @@
         "noServer": "Nenhum servidor Discord configurado"
       }
     }
+  },
+  "csp": {
+    "frame-src": [
+      "https://discord.com"
+    ]
   }
 }

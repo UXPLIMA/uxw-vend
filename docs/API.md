@@ -128,7 +128,11 @@ Access policy:
 - Admin session → full spec.
 - Anyone else → 401 by default. Set `OPENAPI_PUBLIC=1` to expose without auth (off by default - the spec enumerates every admin route).
 
-Interactive Swagger UI lives at `/api/docs`.
+Interactive Swagger UI lives at `/admin/api-docs`, behind the same admin
+session. It renders the bundle shipped with the app rather than fetching one
+from a CDN, which is what the old `/api/docs` page did: the site's CSP allows
+no third-party script origin, so that page had only ever rendered an empty
+div, and the spec it asked for would have answered 401 anyway.
 
 ---
 
