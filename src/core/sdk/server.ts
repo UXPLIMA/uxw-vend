@@ -18,6 +18,12 @@ export { sanitizeHtml } from "@/core/lib/sanitize";
 // --- Database ---
 export { prisma } from "@/core/lib/db";
 
+// --- Homepage sections a theme or a module can render directly ---
+// Reads the activity feed straight from the database rather than through the
+// API. Its own doc comment always described it as something a theme could
+// render; until it was exported here, the SDK boundary made that impossible.
+export { ActivityFeedSection } from "@/core/components/homepage/ActivityFeedSection";
+
 // --- Module state: what a module calls to gate its own endpoints ---
 export { isModuleEnabled } from "@/core/lib/module-cache";
 

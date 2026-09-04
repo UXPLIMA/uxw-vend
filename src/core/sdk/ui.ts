@@ -26,3 +26,8 @@ export { useConfirm } from "@/core/components/ui/confirm-dialog";
 export { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 export { FileUpload } from "@/core/components/ui/file-upload";
 export { FooterDropdown } from "@/core/components/ui/footer-dropdown";
+
+// A module that builds a public page needs the same breadcrumb core uses.
+// This sat in the tree unreachable from a module, so the store hand-rolled
+// its own - and that copy was the one whose crumbs a keyboard could not reach.
+export { Breadcrumb } from "@/core/components/ui/breadcrumb";
