@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { enumParam, isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { ticketSchema } from "../../lib/validations";
+import { TICKET_STATUSES, ticketSchema } from "../../lib/validations";
 
 // GET /api/v1/tickets - List tickets
 export async function GET(request: NextRequest) {
@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    // Ticket.status is a Prisma enum, so a value the enum does not have is a
+    // validation error thrown out of findMany - a 500 for what is a bad filter.
+    const status = enumParam(searchParams, "status", TICKET_STATUSES);
+    if (status instanceof NextResponse) return status;
     const departmentId = searchParams.get("departmentId");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10") || 10));

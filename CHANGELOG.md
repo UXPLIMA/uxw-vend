@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A bad query string answered 500 instead of 400.** Prisma validates its own
+  arguments before it builds any SQL and reports a bad one by throwing, which
+  in a route handler is an uncaught 500 with no body. Three parameters reached
+  it raw. `GET /api/v1/tickets?status=x` and the admin branch of
+  `GET /api/v1/blog/articles?status=x` filtered a Prisma enum column on
+  whatever the caller typed; the tickets one was reachable by any logged-in
+  account. `GET /api/v1/media?page=abc` produced `skip: NaN`, and `?page=-5` a
+  negative skip, because that route was the one paginated endpoint that parsed
+  its page without the `|| 1` the others have - `Math.min` and `Math.max` both
+  pass NaN straight through. Two helpers now do this once: `intParam` clamps a
+  number into range and can never return NaN, and `enumParam` returns the 400
+  the way `readJsonBody` does, so a caller that forgets the guard fails to
+  compile. Each module's status list moved next to its write schema so the
+  values the API will set and the values it will search for cannot drift. A
+  test walks every route in core and 78 modules and fails when a query
+  parameter reaches `skip`, `take` or an enum column unguarded.
+
 - **A model validated on one write path and not the other.** The forum bounds
   a reply at 50000 characters and refuses an empty one when it is posted, then
   wrote the edit straight from the request body: `sanitizeHtml` turns a missing

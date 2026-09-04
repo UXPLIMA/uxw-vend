@@ -8,13 +8,19 @@ export const blogCategorySchema = z.object({
     description: z.string().max(500).optional(),
 });
 
+/**
+ * The ArticleStatus enum, once - shared by the write schema and the list
+ * endpoint's `?status=` filter so a status one accepts is one the other knows.
+ */
+export const ARTICLE_STATUSES = ["DRAFT", "PUBLISHED", "SCHEDULED", "ARCHIVED"] as const;
+
 export const blogArticleSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters").max(200),
     slug: z.string().min(1).optional(),
     excerpt: z.string().max(500).optional(),
     content: z.string().min(10, "Content must be at least 10 characters").max(100000, "Content is too long"),
     coverImage: z.string().url().optional().nullable(),
-    status: z.enum(["DRAFT", "PUBLISHED", "SCHEDULED", "ARCHIVED"]).optional(),
+    status: z.enum(ARTICLE_STATUSES).optional(),
     publishedAt: z.string().datetime().optional().nullable(),
     publishAt: z.string().datetime().optional().nullable(),
     categoryId: z.string().optional().nullable(),

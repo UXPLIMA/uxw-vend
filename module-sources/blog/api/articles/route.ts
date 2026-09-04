@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { enumParam, isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { blogArticleSchema } from "../../lib/validations";
+import { ARTICLE_STATUSES, blogArticleSchema } from "../../lib/validations";
 
 // GET /api/v1/blog/articles - List all articles (public)
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10") || 10));
-    const status = searchParams.get("status") || "PUBLISHED";
+    // BlogArticle.status is a Prisma enum: an unrecognised value is a thrown
+    // validation error rather than an empty result, so it is answered here.
+    const rawStatus = searchParams.get("status");
+    const status = rawStatus === "ALL" ? "ALL" : enumParam(searchParams, "status", ARTICLE_STATUSES);
+    if (status instanceof NextResponse) return status;
     const categoryId = searchParams.get("categoryId");
 
     const skip = (page - 1) * limit;
@@ -26,6 +30,8 @@ export async function GET(request: NextRequest) {
         where.OR = [{ publishAt: null }, { publishAt: { lte: new Date() } }];
     } else if (status && status !== "ALL") {
         where.status = status;
+    } else if (!status) {
+        where.status = "PUBLISHED";
     }
 
     if (categoryId) {

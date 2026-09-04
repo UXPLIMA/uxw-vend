@@ -23,8 +23,15 @@ export const ticketMessageSchema = z.object({
     attachments: z.array(z.string().url()).optional(),
 });
 
+/**
+ * The TicketStatus enum, once. The list is what the write schema accepts and
+ * what the list endpoint's `?status=` filter accepts, so the two cannot drift:
+ * a status the API will not set is not one it will search for either.
+ */
+export const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "WAITING_REPLY", "RESOLVED", "CLOSED"] as const;
+
 export const ticketUpdateSchema = z.object({
-    status: z.enum(["OPEN", "IN_PROGRESS", "WAITING_REPLY", "RESOLVED", "CLOSED"]).optional(),
+    status: z.enum(TICKET_STATUSES).optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
     assignedToId: z.string().optional().nullable(),
 });
