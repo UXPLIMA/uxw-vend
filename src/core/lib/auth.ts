@@ -18,7 +18,8 @@ import {
     resetFailedLogins,
 } from "./account-lockout";
 import { getClientIP } from "./rate-limit";
-import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "./auth-challenge";
+import { runAuthChallenge } from "./auth-challenge";
+import { parseChallengeFields, CHALLENGE_FIELD } from "./auth-challenge-shared";
 
 import type { Provider } from "next-auth/providers";
 import {

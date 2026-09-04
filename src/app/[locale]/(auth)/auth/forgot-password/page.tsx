@@ -8,7 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
 import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
-import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
+import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 
 export default function ForgotPasswordPage() {
     const t = useTranslations('auth');

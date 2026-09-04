@@ -4,7 +4,8 @@ import { PASSWORD_RESET_EXPIRY, getDurationMs } from "@/core/lib/security-settin
 import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
-import { runAuthChallenge, parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge";
+import { runAuthChallenge } from "@/core/lib/auth-challenge";
+import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 
 const GENERIC_OK = { message: "If an account exists, a reset link has been sent." };
 

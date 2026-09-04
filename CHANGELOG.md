@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The production build broke, and only the production build knew.** The
+  auth challenge landed with the three auth forms importing one constant,
+  `CHALLENGE_FIELD`, from `auth-challenge.ts`. Those forms are client
+  components, so everything that file reaches is compiled for the browser -
+  and its other export dynamically imports the hook bus, which reaches the
+  database, the logger and the storage layer. `npm run build` failed with
+  three errors and seven import traces: `next/headers` in a browser bundle,
+  and no `async_hooks` or `fs/promises` to resolve. Typecheck, lint and the
+  full test suite were green throughout, because none of them builds a
+  bundle. The client-safe names - the field, the action union, the wire
+  parser - now live in `auth-challenge-shared.ts`, which imports nothing;
+  `auth-challenge.ts` keeps the server half. A new gate walks the same graph
+  the bundler does, from every `"use client"` file, through static and
+  dynamic imports alike, and fails on the same edge in a second instead of
+  three minutes into a build. It models barrels the way a bundler does, so
+  `@/core/sdk` stays importable from client code - `formatDate` pulls in
+  `utils.ts` and nothing else - and it holds that barrel to being nothing
+  but re-exports, since one declaration of its own would drag the hook bus
+  into all eleven module client components that import it.
+
 - **The bot check that was switched on and did nothing.** The
   cloudflare-turnstile module shipped an admin page with `enableOnLogin` and
   `enableOnRegister`, saved both to the settings table, and stopped there. No
