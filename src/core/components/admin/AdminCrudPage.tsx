@@ -157,10 +157,10 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
 
         switch (field.type) {
             case "textarea":
-                return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} rows={3} />;
+                return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} rows={3} />;
             case "select":
                 return (
-                    <select value={val} onChange={(e) => onChange(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required={field.required}>
+                    <select value={val} onChange={(e) => onChange(e.target.value)} aria-label={field.label} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required={field.required}>
                         <option value="">{ct("crud_selectPlaceholder")}</option>
                         {field.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
@@ -173,12 +173,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                     </label>
                 );
             case "datetime":
-                return <Input type="datetime-local" value={val} onChange={(e) => onChange(e.target.value)} />;
+                return <Input type="datetime-local" value={val} onChange={(e) => onChange(e.target.value)} aria-label={field.label} />;
             case "color":
                 return (
                     <div className="flex gap-2">
-                        <input type="color" value={val || "#3b82f6"} onChange={(e) => onChange(e.target.value)} className="w-10 h-10 rounded cursor-pointer" />
-                        <Input value={val} onChange={(e) => onChange(e.target.value)} placeholder="#3b82f6" />
+                        <input type="color" value={val || "#3b82f6"} onChange={(e) => onChange(e.target.value)} aria-label={field.label} className="w-10 h-10 rounded cursor-pointer" />
+                        <Input value={val} onChange={(e) => onChange(e.target.value)} placeholder="#3b82f6" aria-label={field.label} />
                     </div>
                 );
             case "image":
@@ -190,7 +190,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             case "icon":
                 return <IconPicker value={val} onChange={onChange} placeholder={field.placeholder} />;
             default:
-                return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} />;
+                return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} />;
         }
     };
 
@@ -258,6 +258,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                         type="checkbox"
                                         checked={selected.has(item.id as string)}
                                         onChange={() => toggleSelect(item.id as string)}
+                                        aria-label={ct("common_selectRow")}
                                         className="rounded flex-shrink-0"
                                     />
                                     <div className="flex-1 min-w-0">

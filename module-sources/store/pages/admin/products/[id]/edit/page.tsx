@@ -469,6 +469,7 @@ function ProductCommandsEditor({ productId }: { productId: string }) {
                     <select
                         value={newServerId}
                         onChange={(e) => setNewServerId(e.target.value)}
+                        aria-label={t("adm_defaultServer")}
                         className="rounded-md border border-border bg-background px-2 py-1 text-xs w-32"
                     >
                         <option value="">{t("adm_defaultServer")}</option>
@@ -477,7 +478,7 @@ function ProductCommandsEditor({ productId }: { productId: string }) {
                         ))}
                     </select>
                 )}
-                <Input value={newCmd} onChange={(e) => setNewCmd(e.target.value)} placeholder='give {player} diamond 64' className="font-mono text-xs flex-1" />
+                <Input value={newCmd} onChange={(e) => setNewCmd(e.target.value)} placeholder='give {player} diamond 64' aria-label={t("adm_deliveryCommands")} className="font-mono text-xs flex-1" />
                 <Button type="button" variant="outline" size="sm" onClick={addCmd}>{t("adm_add")}</Button>
             </div>
         </div>
@@ -521,7 +522,7 @@ function ProductVariablesEditor({ productId }: { productId: string }) {
                 </div>
             ))}
             <div className="flex gap-2">
-                <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder={t("adm_variableLabelPlaceholder")} className="text-xs" />
+                <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder={t("adm_variableLabelPlaceholder")} aria-label={t("adm_variableLabelPlaceholder")} className="text-xs" />
                 <Button type="button" variant="outline" size="sm" onClick={addVar}>{t("adm_add")}</Button>
             </div>
         </div>

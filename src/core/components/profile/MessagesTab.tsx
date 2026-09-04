@@ -134,7 +134,7 @@ export function MessagesTab() {
                                 <Input
                                     value={reply}
                                     onChange={(e) => setReply(e.target.value)}
-                                    placeholder={t("typeAMessage")}
+                                    placeholder={t("typeAMessage")} aria-label={t("typeAMessage")}
                                     disabled={sending}
                                     className="flex-1"
                                 />

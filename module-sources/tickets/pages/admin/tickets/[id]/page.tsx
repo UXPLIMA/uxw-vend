@@ -193,7 +193,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                                 <Textarea
                                     value={replyContent}
                                     onChange={(e) => setReplyContent(e.target.value)}
-                                    placeholder={t("adm_writeReply")}
+                                    placeholder={t("adm_writeReply")} aria-label={t("adm_writeReply")}
                                     rows={4}
                                     className="mb-3"
                                 />

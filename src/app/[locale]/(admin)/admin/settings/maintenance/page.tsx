@@ -130,7 +130,7 @@ export default function MaintenanceSettingsPage() {
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         rows={4}
-                        placeholder={t("maintenance_defaultMessage")}
+                        placeholder={t("maintenance_defaultMessage")} aria-label={t("maintenance_defaultMessage")}
                         className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
@@ -167,7 +167,7 @@ export default function MaintenanceSettingsPage() {
                     ))}
                     <Input
                         type="text"
-                        placeholder={t("maintenance_addRole")}
+                        placeholder={t("maintenance_addRole")} aria-label={t("maintenance_addRole")}
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
                                 e.preventDefault();

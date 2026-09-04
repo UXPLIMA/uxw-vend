@@ -94,7 +94,7 @@ export default function ForumPage() {
                     <Input
                         value={searchQuery}
                         onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                        placeholder={t('searchTopics')}
+                        placeholder={t('searchTopics')} aria-label={t('searchTopics')}
                         className="pl-10"
                     />
                 </div>

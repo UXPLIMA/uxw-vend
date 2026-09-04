@@ -146,9 +146,9 @@ export default function NavbarSettingsPage() {
                                             <button onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
                                             <button onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
                                         </div>
-                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder={t("navbar_labelPlaceholder")} className="flex-1 min-w-0" />
+                                        <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder={t("navbar_labelPlaceholder")} aria-label={t("navbar_labelPlaceholder")} className="flex-1 min-w-0" />
                                         {!isDropdown && (
-                                            <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" className="flex-1 min-w-0" />
+                                            <Input value={link.href} onChange={(e) => updateLink(i, "href", e.target.value)} placeholder="/path" aria-label={t("navbar_pathLabel")} className="flex-1 min-w-0" />
                                         )}
                                         <IconPicker
                                             value={link.icon || ""}
@@ -183,7 +183,7 @@ export default function NavbarSettingsPage() {
                                                 <div key={j} className="flex items-center gap-2 pl-6">
                                                     <span className="text-muted-foreground">└</span>
                                                     <Input aria-label={t("navbar_dropdownItems")} value={child.label} onChange={(e) => updateChild(i, j, "label", e.target.value)} placeholder={t("navbar_subItemPlaceholder")} className="flex-1" />
-                                                    <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" className="flex-1" />
+                                                    <Input value={child.href} onChange={(e) => updateChild(i, j, "href", e.target.value)} placeholder="/path" aria-label={t("navbar_pathLabel")} className="flex-1" />
                                                     <Button aria-label={commonT("remove")} variant="ghost" size="sm" onClick={() => removeChild(i, j)}><X className="w-3 h-3 text-destructive" /></Button>
                                                 </div>
                                             ))}

@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Sixty six form controls had no accessible name.** A screen reader
+  announced them by role alone: "checkbox, unchecked" with no hint of what it
+  selects, "combo box" with no hint of what it changes. Among them were the
+  select-all and per-row checkboxes in moderation, modules and every admin CRUD
+  screen, the role and order-status dropdowns, the media type filter, the
+  colour pickers, the custom CSS editor, the hidden file inputs behind every
+  Upload button, and the store's sort order.
+
+  A placeholder is not a name: it disappears as soon as anything is typed,
+  some assistive technology ignores it, and several of these held an example
+  rather than a description - `/path`, `#3b82f6`, `give {player} diamond 64` -
+  where repeating it would have said nothing. Controls with a descriptive
+  placeholder now carry it as `aria-label` as well, which is what the store's
+  search box already did; the rest borrow the visible label sitting beside
+  them, and three new strings cover what had no label to borrow. A test holds
+  all 313 controls to the rule WCAG states, and does not accept a placeholder
+  as a name.
+
 - **Uninstalling a module left its credentials in the database, with no
   screen left to clear them.** Modules keep configuration in the shared
   `Setting` table, one row per key. `Setting.module` says who owns a row and

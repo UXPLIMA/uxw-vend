@@ -334,6 +334,7 @@ export default function AdminHelpCenterPage() {
                                                 value={categoryForm.icon}
                                                 onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value, image: "" })}
                                                 placeholder="HelpCircle, BookOpen, Lightbulb..."
+                                                aria-label={t("adm_lucideIcon")}
                                             />
                                         ) : (
                                             <FileUpload

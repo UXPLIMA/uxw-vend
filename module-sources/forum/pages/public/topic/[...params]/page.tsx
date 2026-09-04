@@ -215,7 +215,7 @@ export default function TopicDetailPage() {
                                     <Textarea
                                         value={replyContent}
                                         onChange={(e) => setReplyContent(e.target.value)}
-                                        placeholder={t('writeYourReply')}
+                                        placeholder={t('writeYourReply')} aria-label={t('writeYourReply')}
                                         rows={4}
                                         className="mb-3"
                                     />

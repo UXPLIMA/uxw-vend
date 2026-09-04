@@ -68,7 +68,7 @@ export function UrlOrFile({
                     type="url"
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
+                    placeholder={placeholder} aria-label={placeholder}
                 />
             ) : (
                 <FileUpload

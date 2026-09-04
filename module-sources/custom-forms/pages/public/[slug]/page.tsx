@@ -70,10 +70,10 @@ export default function FormPage({ params }: PageProps) {
 
         switch (field.type) {
             case "textarea":
-                return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} rows={4} />;
+                return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} rows={4} />;
             case "select":
                 return (
-                    <select value={val} onChange={(e) => onChange(e.target.value)} required={field.required} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    <select value={val} onChange={(e) => onChange(e.target.value)} required={field.required} aria-label={field.label} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
                         <option value="">{t("selectOption")}</option>
                         {field.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
@@ -86,7 +86,7 @@ export default function FormPage({ params }: PageProps) {
                     </label>
                 );
             default:
-                return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} required={field.required} />;
+                return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} />;
         }
     };
 

@@ -147,6 +147,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                 type="file"
                 accept={accept}
                 onChange={handleChange}
+                aria-label={t("uploadFile")}
                 className="hidden"
             />
         </div>

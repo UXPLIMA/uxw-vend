@@ -126,6 +126,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                     <select
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
+                                        aria-label={field.label}
                                         className="w-full rounded-md border border-input bg-background px-3 h-9 text-sm"
                                     >
                                         {field.placeholder && !values[field.key] && (
@@ -140,7 +141,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         type={field.type || "text"}
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
-                                        placeholder={field.placeholder}
+                                        placeholder={field.placeholder} aria-label={field.label}
                                     />
                                 )}
                                 {field.description && (

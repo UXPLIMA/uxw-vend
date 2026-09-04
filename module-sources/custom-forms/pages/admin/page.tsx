@@ -159,8 +159,8 @@ export default function FormsPage() {
                                 <div className="space-y-2">
                                     {fields.map((field, i) => (
                                         <div key={i} className="flex items-center gap-2 p-2 bg-muted/50 rounded">
-                                            <Input value={field.label} onChange={(e) => updateField(i, { label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") })} placeholder={t("adm_fieldLabel")} className="flex-1" />
-                                            <select value={field.type} onChange={(e) => updateField(i, { type: e.target.value })} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
+                                            <Input value={field.label} onChange={(e) => updateField(i, { label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") })} placeholder={t("adm_fieldLabel")} aria-label={t("adm_fieldLabel")} className="flex-1" />
+                                            <select value={field.type} onChange={(e) => updateField(i, { type: e.target.value })} aria-label={t("fieldType")} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
                                                 <option value="text">{t("typeText")}</option>
                                                 <option value="email">{t("typeEmail")}</option>
                                                 <option value="number">{t("typeNumber")}</option>

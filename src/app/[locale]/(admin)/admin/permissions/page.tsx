@@ -147,7 +147,7 @@ export default function PermissionsMatrixPage() {
                         <Input
                             value={customResource}
                             onChange={(e) => setCustomResource(e.target.value)}
-                            placeholder={t("permissions_resourcePlaceholder")}
+                            placeholder={t("permissions_resourcePlaceholder")} aria-label={t("permissions_resourcePlaceholder")}
                             className="max-w-sm"
                         />
                         <Button variant="outline" onClick={addCustomResource}>
