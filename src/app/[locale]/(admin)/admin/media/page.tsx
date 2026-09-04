@@ -64,6 +64,17 @@ export default function MediaLibraryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchItems(); }, [page, type]);
 
+    // The detail panel closed only on a backdrop click, which a keyboard user
+    // has no way to perform.
+    useEffect(() => {
+        if (!selected) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setSelected(null);
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [selected]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPage(1);
@@ -217,10 +228,16 @@ export default function MediaLibraryPage() {
 
             {/* Detail panel */}
             {selected && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelected(null)}>
-                    <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setSelected(null)} aria-hidden="true" />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="media-detail-title"
+                        className="relative bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                    >
                         <div className="flex items-center justify-between p-4 border-b border-border">
-                            <h3 className="font-bold truncate">{selected.filename}</h3>
+                            <h3 id="media-detail-title" className="font-bold truncate">{selected.filename}</h3>
                             <button onClick={() => setSelected(null)} aria-label={commonT("close")} className="text-muted-foreground hover:text-foreground">
                                 <X className="w-5 h-5" aria-hidden="true" />
                             </button>

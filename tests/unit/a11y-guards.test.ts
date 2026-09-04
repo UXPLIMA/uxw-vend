@@ -109,3 +109,91 @@ describe("the homepage", () => {
         expect(source).toMatch(/<h1[\s>]/);
     });
 });
+
+/**
+ * A click handler on a plain element is a control only a mouse can reach.
+ *
+ * The store's breadcrumb put one on a `<span>`, so a visitor navigating by
+ * keyboard could not go back up a category; the setup wizard put one on the
+ * `<div>` wrapping each theme card, which made choosing a theme - a step every
+ * install goes through - impossible without a pointer.
+ *
+ * The exception is a modal backdrop: a full-screen sheet whose click closes
+ * the dialog. It is decoration, the dialog itself carries the keyboard path
+ * out, and it is only exempt when it is hidden from assistive tech.
+ */
+const NON_INTERACTIVE = ["div", "span", "li", "tr", "td", "p", "section", "article", "header", "h1", "h2", "h3", "h4", "ul", "label"];
+
+function mouseOnlyControls(file: string): string[] {
+    const source = fs.readFileSync(file, "utf8");
+    const found: string[] = [];
+
+    for (const tag of NON_INTERACTIVE) {
+        const open = `<${tag}`;
+        let i = source.indexOf(open);
+        while (i !== -1) {
+            if (/[\s>]/.test(source[i + open.length] ?? "")) {
+                const end = tagEnd(source, i);
+                if (end !== -1) {
+                    const attrs = source.slice(i + open.length, end);
+                    if (/\bonClick\b/.test(attrs)) {
+                        // A backdrop hidden from assistive tech is decoration.
+                        const backdrop = /aria-hidden="true"/.test(attrs) && /\bfixed\b[^"]*\binset-0\b/.test(attrs);
+                        // Anything given a role plus a key handler is already wired.
+                        const wired = /\brole=/.test(attrs) && /onKeyDown|onKeyUp|onKeyPress/.test(attrs);
+                        if (!backdrop && !wired) {
+                            const line = source.slice(0, i).split("\n").length;
+                            found.push(`${path.relative(root, file)}:${line} <${tag}> has onClick but no keyboard path`);
+                        }
+                    }
+                }
+            }
+            i = source.indexOf(open, i + 1);
+        }
+    }
+
+    return found;
+}
+
+describe("click handlers", () => {
+    const files = SCANNED.flatMap((dir) => tsxFiles(path.join(root, dir)));
+
+    it("are never the only way to use a control", () => {
+        const violations = files.flatMap(mouseOnlyControls);
+        expect(violations).toEqual([]);
+    });
+});
+
+/**
+ * A dialog that closes only by clicking its backdrop is a keyboard trap. The
+ * media detail panel, the dashboard customizer and the footer language
+ * selector were all reachable by keyboard and impossible to leave that way.
+ */
+describe("dialogs and popovers", () => {
+    const CLOSABLE = [
+        "src/app/[locale]/(admin)/admin/media/page.tsx",
+        "src/app/[locale]/(admin)/admin/modules/ModuleDetailModal.tsx",
+        "src/core/components/admin/DashboardCustomizer.tsx",
+        "src/core/components/admin/AdminSpotlight.tsx",
+        "src/core/components/ui/footer-dropdown.tsx",
+        "src/core/components/ui/confirm-dialog.tsx",
+        "src/core/components/ui/icon-picker.tsx",
+        "module-sources/popups/slots/PopupRenderer.tsx",
+    ];
+
+    it("all close on Escape", () => {
+        const missing = CLOSABLE.filter(
+            (file) => !fs.readFileSync(path.join(root, file), "utf8").includes('"Escape"'),
+        );
+        expect(missing).toEqual([]);
+    });
+
+    it("put the dialog role on the panel, never on the backdrop that closes it", () => {
+        for (const file of CLOSABLE) {
+            const source = fs.readFileSync(path.join(root, file), "utf8");
+            for (const match of source.matchAll(/<div\b([^>]*\brole="dialog"[^>]*)>/g)) {
+                expect(match[1], `${file}: the dialog element itself closes on click`).not.toMatch(/\bonClick\b/);
+            }
+        }
+    });
+});

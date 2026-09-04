@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Controls that only a mouse could reach.** The store's breadcrumb hung its
+  click handler on a `<span>`, so a visitor navigating by keyboard could not go
+  back up a category, and the setup wizard hung one on the `<div>` around each
+  theme card - making the theme step every install goes through impossible
+  without a pointer. Both are buttons now. Three dialogs closed only by
+  clicking their backdrop, which is not something a keyboard can do: the media
+  detail panel, the dashboard customizer and the footer language selector all
+  close on Escape, and the selector tells assistive tech that it opens a list.
+  The dashboard customizer had also put `role="dialog"` on the backdrop that
+  dismisses it rather than on the panel. Guards cover all of it.
+
 - **Three of the nine documented slots rendered nothing.** `CANONICAL_SLOTS`
   advertises `layout.beforeMain`, `layout.afterMain` and `head.extra` as the
   generic injection points - the way a module adds a banner, a modal or a head
