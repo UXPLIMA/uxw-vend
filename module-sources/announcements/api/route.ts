@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, logActivity, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { announcementCreateSchema } from "../lib/validations";
 
 // GET /api/v1/announcements - Public: active announcements
 export async function GET() {
@@ -37,18 +38,11 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { title, content, type, isActive, dismissible, includePages, excludePages, startsAt, endsAt, publishAt } = body;
-
-    if (!title || !content) {
-        return NextResponse.json({ error: "Title and content required" }, { status: 400 });
+    const parsed = announcementCreateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
     }
-
-    // Validate publishAt as ISO datetime if provided
-    if (publishAt !== undefined && publishAt !== null) {
-        if (typeof publishAt !== "string" || isNaN(Date.parse(publishAt))) {
-            return NextResponse.json({ error: "Invalid publishAt" }, { status: 400 });
-        }
-    }
+    const { title, content, type, isActive, dismissible, includePages, excludePages, startsAt, endsAt, publishAt } = parsed.data;
 
     const announcement = await prisma.announcement.create({
         data: {

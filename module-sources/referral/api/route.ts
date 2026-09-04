@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { nanoid } from "nanoid";
+import { applyReferralSchema } from "../lib/validations";
 
 // GET /api/v1/referral - Get user's referral code + stats
 export async function GET() {
@@ -80,10 +81,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { referralCode } = jsonBody;
-    if (!referralCode || typeof referralCode !== "string") {
+    const parsed = applyReferralSchema.safeParse(jsonBody);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Referral code is required" }, { status: 400 });
     }
+    const { referralCode } = parsed.data;
 
     // Check if user already has a referral
     const existingReferral = await prisma.referral.findUnique({

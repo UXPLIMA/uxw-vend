@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma, isAdmin, logActivity, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { issueKeys } from "../../../lib/licenses";
+import { issueSchema } from "../../../lib/validations";
 
 async function requireAdmin(): Promise<{ userId: string } | NextResponse> {
     const session = await auth();
@@ -65,16 +66,21 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const count = Math.min(Math.max(Number(body.count) || 1, 1), 500);
+    const parsed = issueSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+    const count = fields.count ?? 1;
 
     const issued = await issueKeys(count, {
-        productId: typeof body.productId === "string" ? body.productId : null,
-        productName: typeof body.productName === "string" ? body.productName : null,
-        userId: typeof body.userId === "string" ? body.userId : null,
-        maxActivations: Number(body.maxActivations) || 1,
-        validDays: body.validDays ? Number(body.validDays) : null,
-        prefix: typeof body.prefix === "string" ? body.prefix : null,
-        note: typeof body.note === "string" ? body.note : null,
+        productId: fields.productId ?? null,
+        productName: fields.productName ?? null,
+        userId: fields.userId ?? null,
+        maxActivations: fields.maxActivations ?? 1,
+        validDays: fields.validDays ?? null,
+        prefix: fields.prefix ?? null,
+        note: fields.note ?? null,
     });
 
     await logActivity({
@@ -82,7 +88,7 @@ export async function POST(request: NextRequest) {
         action: "license.issued",
         entity: "license",
         entityId: issued[0]?.id ?? "",
-        metadata: { count, productId: body.productId ?? null },
+        metadata: { count, productId: fields.productId ?? null },
     }).catch(() => undefined);
 
     return NextResponse.json({ keys: issued.map((k) => k.key) }, { status: 201 });

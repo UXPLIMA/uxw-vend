@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { licenseProductPatchSchema } from "../../../../lib/validations";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -21,12 +22,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = licenseProductPatchSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.productId === "string" && body.productId.trim()) data.productId = body.productId.trim();
-    if (body.keysPerUnit !== undefined) data.keysPerUnit = Math.max(1, Number(body.keysPerUnit) || 1);
-    if (body.maxActivations !== undefined) data.maxActivations = Math.max(1, Number(body.maxActivations) || 1);
-    if (body.validDays !== undefined) data.validDays = body.validDays ? Math.max(1, Number(body.validDays)) : null;
-    if (body.prefix !== undefined) data.prefix = body.prefix || null;
+    if (fields.productId !== undefined) data.productId = fields.productId;
+    if (fields.keysPerUnit !== undefined) data.keysPerUnit = fields.keysPerUnit;
+    if (fields.maxActivations !== undefined) data.maxActivations = fields.maxActivations;
+    if (fields.validDays !== undefined) data.validDays = fields.validDays ?? null;
+    if (fields.prefix !== undefined) data.prefix = fields.prefix || null;
 
     const product = await prisma.licenseProduct.update({ where: { id }, data });
     return NextResponse.json({ product });

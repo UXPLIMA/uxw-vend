@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { linkAccountSchema, unlinkAccountSchema } from "../../lib/validations";
 
 // GET /api/v1/linked-accounts
 export async function GET() {
@@ -30,8 +31,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { provider, providerId, username, avatar } = jsonBody;
-    if (!provider || !providerId) return NextResponse.json({ error: "Provider and ID required" }, { status: 400 });
+    const parsed = linkAccountSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Provider and ID required" }, { status: 400 });
+    }
+    const { provider, providerId, username, avatar } = parsed.data;
 
     // Check if already linked to another user
     const existing = await prisma.linkedAccount.findUnique({
@@ -66,8 +70,11 @@ export async function DELETE(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { provider } = jsonBody;
-    if (!provider) return NextResponse.json({ error: "Provider required" }, { status: 400 });
+    const parsedUnlink = unlinkAccountSchema.safeParse(jsonBody);
+    if (!parsedUnlink.success) {
+        return NextResponse.json({ error: "Provider required" }, { status: 400 });
+    }
+    const { provider } = parsedUnlink.data;
 
     await prisma.linkedAccount.deleteMany({
         where: { userId: session.user.id, provider },

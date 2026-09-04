@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { slideCreateSchema } from "../lib/validations";
 
 // GET /api/v1/slider - Slides for the homepage widget, or every slide for
 // the admin screen. An admin that only ever saw the active ones had no way
@@ -22,14 +23,20 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsed = slideCreateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const item = await prisma.sliderItem.create({
         data: {
-            title: body.title || null,
-            subtitle: body.subtitle || null,
-            image: body.image,
-            link: body.link || null,
-            order: body.order || 0,
-            isActive: body.isActive ?? true,
+            title: fields.title || null,
+            subtitle: fields.subtitle || null,
+            image: fields.image,
+            link: fields.link || null,
+            order: fields.order || 0,
+            isActive: fields.isActive ?? true,
         },
     });
     return NextResponse.json({ item }, { status: 201 });

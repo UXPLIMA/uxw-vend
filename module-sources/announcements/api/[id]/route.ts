@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, logActivity, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { announcementUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -13,17 +14,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
+    const parsed = announcementUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (body.title !== undefined) data.title = body.title;
-    if (body.content !== undefined) data.content = sanitizeHtml(body.content);
-    if (body.type !== undefined) data.type = body.type;
-    if (body.isActive !== undefined) data.isActive = body.isActive;
-    if (body.dismissible !== undefined) data.dismissible = body.dismissible;
-    if (body.includePages !== undefined) data.includePages = body.includePages || null;
-    if (body.excludePages !== undefined) data.excludePages = body.excludePages || null;
-    if (body.startsAt !== undefined) data.startsAt = body.startsAt ? new Date(body.startsAt) : null;
-    if (body.endsAt !== undefined) data.endsAt = body.endsAt ? new Date(body.endsAt) : null;
-    if (body.publishAt !== undefined) data.publishAt = body.publishAt ? new Date(body.publishAt) : null;
+    if (fields.title !== undefined) data.title = fields.title;
+    if (fields.content !== undefined) data.content = sanitizeHtml(fields.content);
+    if (fields.type !== undefined) data.type = fields.type;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
+    if (fields.dismissible !== undefined) data.dismissible = fields.dismissible;
+    if (fields.includePages !== undefined) data.includePages = fields.includePages || null;
+    if (fields.excludePages !== undefined) data.excludePages = fields.excludePages || null;
+    if (fields.startsAt !== undefined) data.startsAt = fields.startsAt ? new Date(fields.startsAt) : null;
+    if (fields.endsAt !== undefined) data.endsAt = fields.endsAt ? new Date(fields.endsAt) : null;
+    if (fields.publishAt !== undefined) data.publishAt = fields.publishAt ? new Date(fields.publishAt) : null;
 
     const announcement = await prisma.announcement.update({ where: { id }, data });
 

@@ -9,6 +9,7 @@ import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
 import { sanitizeHtml } from "@/core/lib/sanitize";
 import type { ThemeManifest, ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
+import { z } from "zod";
 import { readJsonBody } from "@/core/lib/api-body";
 
 // Reject prototype-polluting keys when copying user-supplied override maps.
@@ -169,6 +170,17 @@ function sanitizeOverrides(manifest: ThemeManifest, overrides: Record<string, un
     return out;
 }
 
+/**
+ * A theme customisation write. `overrides` stays `unknown` here on purpose -
+ * what a valid key is comes from the theme's own manifest, and
+ * `sanitizeOverrides` below is what decides that. This only establishes that
+ * a mode and an overrides value arrived at all.
+ */
+const customizationSchema = z.object({
+    mode: z.string().max(64),
+    overrides: z.unknown(),
+});
+
 export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
     const { id: themeId } = await ctx.params;
     const session = await auth();
@@ -189,12 +201,12 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     const body = await readJsonBody(req);
     if (body instanceof NextResponse) return body;
 
-    const mode = typeof (body as { mode?: unknown }).mode === "string" ? (body as { mode: string }).mode : null;
-    if (!mode || !manifest.modes.available[mode]) {
+    const parsed = customizationSchema.safeParse(body);
+    if (!parsed.success || !manifest.modes.available[parsed.data.mode]) {
         return NextResponse.json({ error: "mode is required and must exist on the theme" }, { status: 400 });
     }
+    const { mode, overrides } = parsed.data;
 
-    const overrides = (body as { overrides?: unknown })?.overrides;
     if (overrides === undefined || overrides === null) {
         return NextResponse.json({ error: "overrides is required" }, { status: 400 });
     }

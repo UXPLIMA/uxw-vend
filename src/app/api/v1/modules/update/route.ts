@@ -23,6 +23,13 @@ import { manifestHash } from "@/core/lib/module-install-audit";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** Which catalogue module to fetch. The regex checks below still apply. */
+const updateModuleSchema = z.object({
+    moduleId: z.string().max(64),
+    zipFile: z.string().max(200),
+});
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
@@ -49,7 +56,8 @@ export async function POST(request: NextRequest) {
     try {
         const jsonBody = await readJsonBody(request);
         if (jsonBody instanceof NextResponse) return jsonBody;
-        const { moduleId, zipFile } = jsonBody;
+        const parsed = updateModuleSchema.safeParse(jsonBody);
+        const { moduleId, zipFile } = parsed.success ? parsed.data : { moduleId: "", zipFile: "" };
         if (!moduleId || !zipFile) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }

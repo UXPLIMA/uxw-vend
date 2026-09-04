@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { twoFactorChallengeSchema } from "../../lib/validations";
 
 // POST /api/v1/auth/two-factor/disable - Disable 2FA
 // Requires current password OR a valid TOTP code.
@@ -27,8 +28,14 @@ export async function POST(request: NextRequest) {
 
     const raw = await readJsonBody(request, { fallback: {} });
     if (raw instanceof NextResponse) return raw;
-    const body = raw as { token?: string; password?: string };
-    const { token, password } = body;
+    const parsed = twoFactorChallengeSchema.safeParse(raw);
+    if (!parsed.success) {
+        return NextResponse.json(
+            { error: "Password or verification code required" },
+            { status: 400 }
+        );
+    }
+    const { token, password } = parsed.data;
 
     if (!token && !password) {
         return NextResponse.json(

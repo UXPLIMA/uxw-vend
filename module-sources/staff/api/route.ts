@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { staffMemberSchema } from "../lib/validations";
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -43,8 +44,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { name, role, avatar, userId, order } = jsonBody;
-    if (!name || !role) return NextResponse.json({ error: "Name and role required" }, { status: 400 });
+    const parsed = staffMemberSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Name and role required" }, { status: 400 });
+    }
+    const { name, role, avatar, userId, order } = parsed.data;
 
     const member = await prisma.staffMember.create({
         data: { name, role, avatar: avatar || null, userId: userId || null, order: order || 0 },

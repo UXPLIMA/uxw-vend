@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { blogCommentModerationSchema } from "../../../lib/validations";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -58,7 +59,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { isApproved } = body;
+    const parsed = blogCommentModerationSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "Validation failed", details: parsed.error.flatten() }, { status: 400 });
+    }
+    const { isApproved } = parsed.data;
 
     const updatedComment = await prisma.blogComment.update({
         where: { id },

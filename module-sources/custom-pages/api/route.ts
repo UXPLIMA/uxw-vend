@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { customPageCreateSchema } from "../lib/validations";
 
 // GET /api/v1/custom-pages
 export async function GET() {
@@ -21,13 +22,13 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { title, content, isActive, order } = body;
-
-    if (!title || !content) {
-        return NextResponse.json({ error: "Title and content required" }, { status: 400 });
+    const parsed = customPageCreateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
     }
+    const { title, content, isActive, order } = parsed.data;
 
-    let slug = body.slug || generateSlug(title);
+    let slug = parsed.data.slug || generateSlug(title);
     const existing = await prisma.customPage.findUnique({ where: { slug } });
     if (existing) slug = `${slug}-${Date.now().toString(36)}`;
 

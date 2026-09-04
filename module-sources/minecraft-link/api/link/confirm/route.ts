@@ -11,6 +11,7 @@ import { doActionAsync } from "@/core/sdk";
 import { auth } from "@/core/sdk/auth";
 import { redeemCode } from "../../../lib/link-code";
 import { lookupProfile } from "../../../lib/mojang";
+import { confirmSchema } from "../../../lib/validations";
 
 export const POST = withRateLimit("minecraft-link-confirm", async (request: NextRequest) => {
     const session = await auth();
@@ -19,8 +20,9 @@ export const POST = withRateLimit("minecraft-link-confirm", async (request: Next
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const code = typeof body.code === "string" ? body.code.trim() : "";
-    if (!code) return NextResponse.json({ error: "code_required" }, { status: 400 });
+    const parsed = confirmSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: "code_required" }, { status: 400 });
+    const { code } = parsed.data;
 
     const result = await redeemCode(userId, code);
     if (!result.ok) {

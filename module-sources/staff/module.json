@@ -2,7 +2,7 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",

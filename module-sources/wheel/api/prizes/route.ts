@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { wheelPrizeCreateSchema } from "../../lib/validations";
 
 // GET - List prizes (admin sees all, public sees active only)
 export async function GET() {
@@ -24,8 +25,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { name, type, value, color, probability, order } = jsonBody;
-    if (!name || !type) return NextResponse.json({ error: "Name and type required" }, { status: 400 });
+    const parsed = wheelPrizeCreateSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "Name and type required" }, { status: 400 });
+    const { name, type, value, color, probability, order } = parsed.data;
 
     const prize = await prisma.wheelPrize.create({
         data: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { voteSiteCreateSchema } from "../../lib/validations";
 
 // GET /api/v1/vote - List vote sites
 export async function GET() {
@@ -20,11 +21,11 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { name, url, reward, icon } = body;
-
-    if (!name || !url) {
+    const parsed = voteSiteCreateSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Name and URL required" }, { status: 400 });
     }
+    const { name, url, reward, icon } = parsed.data;
 
     const site = await prisma.voteSite.create({
         data: { name, url, reward: reward || 0, icon: icon || null },

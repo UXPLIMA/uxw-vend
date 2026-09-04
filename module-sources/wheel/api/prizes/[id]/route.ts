@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { wheelPrizeUpdateSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -14,14 +15,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
+    const parsed = wheelPrizeUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (body.name !== undefined) data.name = body.name;
-    if (body.type !== undefined) data.type = body.type;
-    if (body.value !== undefined) data.value = Number(body.value) || 0;
-    if (body.color !== undefined) data.color = body.color;
-    if (body.probability !== undefined) data.probability = Number(body.probability) || 10;
-    if (body.order !== undefined) data.order = Number(body.order) || 0;
-    if (body.isActive !== undefined) data.isActive = body.isActive;
+    if (fields.name !== undefined) data.name = fields.name;
+    if (fields.type !== undefined) data.type = fields.type;
+    if (fields.value !== undefined) data.value = fields.value;
+    if (fields.color !== undefined) data.color = fields.color;
+    if (fields.probability !== undefined) data.probability = fields.probability;
+    if (fields.order !== undefined) data.order = fields.order;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const prize = await prisma.wheelPrize.update({ where: { id }, data });
     return NextResponse.json({ prize });

@@ -43,3 +43,18 @@ export function parseChallengeFields(raw: unknown): Record<string, string> {
     }
     return out;
 }
+
+/**
+ * The challenge fields out of a request body, whatever the body turns out to
+ * be.
+ *
+ * A route's body is `unknown` until a schema narrows it, and the challenge
+ * field is deliberately outside every route's own schema: the shape of what a
+ * challenge module collects is that module's business, not the route's. So
+ * the indexing happens once, here, behind a real check - rather than at each
+ * call site behind a cast that assumed an object had arrived.
+ */
+export function challengeFieldsFrom(body: unknown): Record<string, string> {
+    if (!body || typeof body !== "object" || Array.isArray(body)) return {};
+    return parseChallengeFields((body as Record<string, unknown>)[CHALLENGE_FIELD]);
+}

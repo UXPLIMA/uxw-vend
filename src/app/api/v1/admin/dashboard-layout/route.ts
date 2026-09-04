@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/**
+ * A saved dashboard arrangement. `saveLayout` drops any widget id it does not
+ * recognise, so the ids need no list here - but the shape does need checking:
+ * an entry that was not an object reached `w.id` and threw.
+ */
+const layoutSchema = z.object({
+    widgets: z.array(z.object({
+        id: z.string().max(128),
+        visible: z.boolean().optional(),
+        order: z.number().int().min(0).max(1000).optional(),
+    })).max(200),
+});
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import {
@@ -34,11 +48,16 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request, { fallback: null });
     if (body instanceof NextResponse) return body;
-    if (!body || !Array.isArray(body.widgets)) {
+    const parsed = layoutSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const widgets: DashboardWidget[] = body.widgets;
+    const widgets: DashboardWidget[] = parsed.data.widgets.map((w) => ({
+        id: w.id,
+        visible: w.visible ?? true,
+        order: w.order ?? 0,
+    }));
     await saveLayout(auth.userId, widgets);
     return NextResponse.json({ success: true });
 }

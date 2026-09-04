@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { creatorCodeUpdateSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -15,12 +16,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
+    const parsed = creatorCodeUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.code === "string") data.code = body.code;
-    if (typeof body.creatorId === "string" || body.creatorId === null) data.creatorId = body.creatorId;
-    if (typeof body.discountPercent === "number") data.discountPercent = body.discountPercent;
-    if (typeof body.commissionPercent === "number") data.commissionPercent = body.commissionPercent;
-    if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+    if (fields.code !== undefined) data.code = fields.code;
+    if (fields.creatorId !== undefined) data.creatorId = fields.creatorId;
+    if (fields.discountPercent !== undefined) data.discountPercent = fields.discountPercent;
+    if (fields.commissionPercent !== undefined) data.commissionPercent = fields.commissionPercent;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const code = await prisma.creatorCode.update({ where: { id }, data });
     return NextResponse.json({ code });

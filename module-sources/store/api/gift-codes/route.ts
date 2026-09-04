@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { intParam, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { giftCodeCreateSchema } from "../../lib/validations";
 import { randomBytes } from "crypto";
 
 // GET /api/v1/gift-codes - One page of codes, newest first (admin).
@@ -58,11 +59,12 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { value, description, count = 1, expiresAt } = body;
-
-    if (!value || value <= 0) {
+    const parsed = giftCodeCreateSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Value must be positive" }, { status: 400 });
     }
+    const { value, description, expiresAt } = parsed.data;
+    const count = parsed.data.count ?? 1;
 
     // Generate multiple gift codes
     const codes = [];

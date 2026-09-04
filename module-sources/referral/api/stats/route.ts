@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { referralRewardSchema } from "../../lib/validations";
 
 // GET /api/v1/referral/stats - Admin referral stats
 export async function GET() {
@@ -75,10 +76,11 @@ export async function POST(request: Request) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { rewardAmount } = jsonBody;
-    if (typeof rewardAmount !== "number" || rewardAmount < 0) {
+    const parsed = referralRewardSchema.safeParse(jsonBody);
+    if (!parsed.success) {
         return NextResponse.json({ error: "Invalid reward amount" }, { status: 400 });
     }
+    const { rewardAmount } = parsed.data;
 
     await prisma.setting.upsert({
         where: { key: "referral_reward_amount" },

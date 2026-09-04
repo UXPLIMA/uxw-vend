@@ -4,6 +4,11 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+const startImpersonationSchema = z.object({
+    userId: z.string().trim().min(1, "userId is required").max(64),
+});
 
 /**
  * POST /api/v1/admin/impersonate/start
@@ -36,10 +41,11 @@ export async function POST(request: NextRequest) {
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
-    const targetId = body.userId?.trim();
-    if (!targetId) {
+    const parsed = startImpersonationSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
+    const targetId = parsed.data.userId;
 
     if (targetId === session.user.id) {
         return NextResponse.json(

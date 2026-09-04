@@ -4,6 +4,10 @@ import { isAdmin } from "@/core/lib/permissions";
 import { restoreBackup, getBackupPath } from "@/core/lib/backup";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** The typed-out confirmation this route accepts in place of `?confirm=true`. */
+const restoreBodySchema = z.object({ confirmText: z.literal("RESTORE") });
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -30,9 +34,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     try {
         const body = await readJsonBody(req, { fallback: null });
         if (body instanceof NextResponse) return body;
-        if (body && typeof body.confirmText === "string" && body.confirmText === "RESTORE") {
-            confirmBody = true;
-        }
+        if (restoreBodySchema.safeParse(body).success) confirmBody = true;
     } catch {
         // ignore – body may be empty
     }

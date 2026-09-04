@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { ticketDepartmentUpdateSchema } from "../../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -13,12 +14,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
+    const parsed = ticketDepartmentUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (body.name !== undefined) data.name = body.name;
-    if (body.description !== undefined) data.description = body.description;
-    if (body.color !== undefined) data.color = body.color;
-    if (body.order !== undefined) data.order = body.order;
-    if (body.isActive !== undefined) data.isActive = body.isActive;
+    if (fields.name !== undefined) data.name = fields.name;
+    if (fields.description !== undefined) data.description = fields.description;
+    if (fields.color !== undefined) data.color = fields.color;
+    if (fields.order !== undefined) data.order = fields.order;
+    if (fields.isActive !== undefined) data.isActive = fields.isActive;
 
     const department = await prisma.ticketDepartment.update({ where: { id }, data });
     return NextResponse.json({ department });

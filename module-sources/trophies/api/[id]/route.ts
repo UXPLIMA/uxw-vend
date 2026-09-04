@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { trophyUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -15,13 +16,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsed = trophyUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (typeof body.name === "string") data.name = body.name;
-    if (body.description !== undefined) data.description = body.description;
-    if (body.icon !== undefined) data.icon = body.icon;
-    if (body.color !== undefined) data.color = body.color;
-    if (typeof body.points === "number") data.points = body.points;
-    if (body.awardOn !== undefined) data.awardOn = body.awardOn;
+    if (fields.name !== undefined) data.name = fields.name;
+    if (fields.description !== undefined) data.description = fields.description;
+    if (fields.icon !== undefined) data.icon = fields.icon;
+    if (fields.color !== undefined) data.color = fields.color;
+    if (fields.points !== undefined) data.points = fields.points;
+    if (fields.awardOn !== undefined) data.awardOn = fields.awardOn;
     const trophy = await prisma.trophy.update({ where: { id }, data });
     return NextResponse.json({ trophy });
 }

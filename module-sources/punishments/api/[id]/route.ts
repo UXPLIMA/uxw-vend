@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { punishmentUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -12,15 +13,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsed = punishmentUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const data: Record<string, unknown> = {};
-    if (body.reason !== undefined) data.reason = body.reason;
-    if (body.active !== undefined) data.active = body.active;
-    if (body.duration !== undefined) data.duration = body.duration;
-    if (body.expiresAt !== undefined) data.expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
+    if (fields.reason !== undefined) data.reason = fields.reason;
+    if (fields.active !== undefined) data.active = fields.active;
+    if (fields.duration !== undefined) data.duration = fields.duration;
+    if (fields.expiresAt !== undefined) data.expiresAt = fields.expiresAt ? new Date(fields.expiresAt) : null;
     const punishment = await prisma.punishment.update({ where: { id }, data });
 
     // If the punishment was revoked (active → false), fire revoke hook + feed
-    if (body.active === false) {
+    if (fields.active === false) {
         const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("punishments.punishment.revoked", {
             punishmentId: punishment.id,

@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { z } from "zod";
 import { applyFiltersAsync } from "@/core/sdk";
 import { log, readJsonBody } from "@/core/sdk/server";
 import {
@@ -22,11 +23,19 @@ export const dynamic = "force-dynamic";
 
 const UNHANDLED: PaymentOutcome = { handled: false, duplicate: false, error: null };
 
-interface Notification {
-    type?: string;
-    topic?: string;
-    data?: { id?: string | number };
-}
+/**
+ * What Mercado Pago sends. The body used to be cast to this shape rather
+ * than checked against it, so a notification carrying an object where an id
+ * was expected reached `String(...)` and became "[object Object]" - a payment
+ * id that matches nothing, looked up against the provider on every retry.
+ * A body that does not fit is acknowledged and dropped rather than answered
+ * with an error, because a non-2xx here only buys another delivery attempt.
+ */
+const notificationSchema = z.object({
+    type: z.string().max(64).optional(),
+    topic: z.string().max(64).optional(),
+    data: z.object({ id: z.union([z.string().max(128), z.number()]).optional() }).optional(),
+});
 
 function signatureMatches(expected: string, received: string): boolean {
     const a = Buffer.from(expected, "utf8");
@@ -41,7 +50,8 @@ export async function POST(request: NextRequest) {
 
     const raw = await readJsonBody(request, { fallback: {} });
     if (raw instanceof NextResponse) return raw;
-    const body = raw as Notification;
+    const notification = notificationSchema.safeParse(raw);
+    const body = notification.success ? notification.data : {};
     const kind = body.type ?? body.topic ?? request.nextUrl.searchParams.get("type") ?? "";
     const paymentId = String(body.data?.id ?? request.nextUrl.searchParams.get("data.id") ?? "");
 

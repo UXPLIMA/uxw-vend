@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { ticketDepartmentSchema } from "../../../lib/validations";
 
 // GET /api/v1/tickets/departments - List departments
 export async function GET(request: NextRequest) {
@@ -33,14 +34,14 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
-    const { name, description, color, order } = body;
-
-    if (!name) {
+    const parsed = ticketDepartmentSchema.safeParse(body);
+    if (!parsed.success) {
         return NextResponse.json(
-            { error: "Name is required" },
+            { error: parsed.error.issues[0].message },
             { status: 400 }
         );
     }
+    const { name, description, color, order } = parsed.data;
 
     const department = await prisma.ticketDepartment.create({
         data: {

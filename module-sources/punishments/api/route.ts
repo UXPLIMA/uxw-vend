@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { punishmentCreateSchema } from "../lib/validations";
 
 /**
  * Constant-time API key comparison. Guards against undefined values and
@@ -57,8 +58,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { playerName, playerUuid, type, reason, duration, punishedBy, expiresAt } = jsonBody;
-    if (!playerName || !type) return NextResponse.json({ error: "playerName and type required" }, { status: 400 });
+    const parsed = punishmentCreateSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "playerName and type required" }, { status: 400 });
+    }
+    const { playerName, playerUuid, type, reason, duration, punishedBy, expiresAt } = parsed.data;
 
     const punishment = await prisma.punishment.create({
         data: {

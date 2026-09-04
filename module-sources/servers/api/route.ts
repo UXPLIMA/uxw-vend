@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { encryptSecret, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { serverCreateSchema } from "../lib/validations";
 
 export async function GET() {
     const servers = await prisma.gameServer.findMany({
@@ -18,19 +19,25 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
+    const parsed = serverCreateSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const fields = parsed.data;
+
     const server = await prisma.gameServer.create({
         data: {
-            name: body.name,
-            type: body.type || "minecraft",
-            host: body.host,
-            port: body.port || 25565,
-            rconPort: body.rconPort || null,
+            name: fields.name,
+            type: fields.type || "minecraft",
+            host: fields.host,
+            port: fields.port || 25565,
+            rconPort: fields.rconPort || null,
             // RCON password is stored encrypted at rest (AES-256-GCM).
             // Read back via decryptSecret() when the connection is opened.
-            rconPassword: body.rconPassword ? encryptSecret(body.rconPassword) : null,
-            queryPort: body.queryPort || null,
-            isDefault: body.isDefault || false,
-            order: body.order || 0,
+            rconPassword: fields.rconPassword ? encryptSecret(fields.rconPassword) : null,
+            queryPort: fields.queryPort || null,
+            isDefault: fields.isDefault || false,
+            order: fields.order || 0,
         },
     });
     return NextResponse.json({ server }, { status: 201 });

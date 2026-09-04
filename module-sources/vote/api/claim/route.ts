@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { voteClaimSchema } from "../../lib/validations";
 
 // POST /api/v1/vote/claim - Claim vote reward
 export async function POST(request: NextRequest) {
@@ -18,8 +19,9 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { voteSiteId } = jsonBody;
-    if (!voteSiteId) return NextResponse.json({ error: "Vote site ID required" }, { status: 400 });
+    const parsed = voteClaimSchema.safeParse(jsonBody);
+    if (!parsed.success) return NextResponse.json({ error: "Vote site ID required" }, { status: 400 });
+    const { voteSiteId } = parsed.data;
 
     const site = await prisma.voteSite.findUnique({ where: { id: voteSiteId } });
     if (!site) return NextResponse.json({ error: "Vote site not found" }, { status: 404 });

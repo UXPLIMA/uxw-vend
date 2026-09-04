@@ -152,8 +152,9 @@ describe("readJsonBody", () => {
             });
             const result = await readJsonBody(request);
             expect(result, JSON.stringify(body)).toBeInstanceOf(NextResponse);
-            expect(result.status).toBe(400);
-            expect(await result.json()).toEqual(INVALID_JSON_BODY);
+            const response = result as InstanceType<typeof NextResponse>;
+            expect(response.status).toBe(400);
+            expect(await response.json()).toEqual(INVALID_JSON_BODY);
         }
     });
 

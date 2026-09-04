@@ -6,6 +6,13 @@ import { themeRegistry, defaultThemeId } from "@/core/generated/theme-registry";
 import { setActiveTheme } from "@/core/lib/theme-state";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** Which installed theme is active, and in which of the modes it declares. */
+const themeStateSchema = z.object({
+    themeId: z.string().max(64),
+    mode: z.string().max(64).optional(),
+});
 
 export async function GET() {
     const row = await prisma.themeState.findFirst();
@@ -33,15 +40,17 @@ export async function PUT(req: NextRequest) {
     const body = await readJsonBody(req);
     if (body instanceof NextResponse) return body;
 
-    const themeId = typeof body.themeId === "string" ? body.themeId : null;
+    const parsed = themeStateSchema.safeParse(body);
+    const themeId = parsed.success ? parsed.data.themeId : null;
     const manifest = themeId ? themeRegistry[themeId] : null;
-    if (!manifest) return NextResponse.json({ error: "Unknown theme" }, { status: 404 });
+    if (!manifest || !themeId) return NextResponse.json({ error: "Unknown theme" }, { status: 404 });
 
-    const mode = typeof body.mode === "string" && manifest.modes.available[body.mode]
-        ? body.mode
+    const requestedMode = parsed.success ? parsed.data.mode : undefined;
+    const mode = requestedMode && manifest.modes.available[requestedMode]
+        ? requestedMode
         : manifest.modes.default;
 
-    await setActiveTheme(themeId!, mode);
-    await logActivity({ userId: session.user.id, action: "theme.state.update", entity: "theme", entityId: themeId!, metadata: { mode } }).catch(() => {});
+    await setActiveTheme(themeId, mode);
+    await logActivity({ userId: session.user.id, action: "theme.state.update", entity: "theme", entityId: themeId, metadata: { mode } }).catch(() => {});
     return NextResponse.json({ ok: true, themeId, mode });
 }

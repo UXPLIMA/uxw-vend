@@ -12,6 +12,7 @@ import { auth } from "@/core/sdk/auth";
 import { issueCode, CODE_TTL_MS } from "../../lib/link-code";
 import { lookupProfile, MINECRAFT_USERNAME } from "../../lib/mojang";
 import { whisper } from "../../lib/whisper";
+import { linkRequestSchema, unlinkSchema } from "../../lib/validations";
 
 async function currentUserId(): Promise<string | null> {
     const session = await auth();
@@ -43,8 +44,12 @@ export const POST = withRateLimit("minecraft-link", async (request: NextRequest)
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const requested = typeof body.username === "string" ? body.username.trim() : "";
-    const serverId = typeof body.serverId === "string" && body.serverId ? body.serverId : null;
+    const parsed = linkRequestSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: "invalid_username" }, { status: 400 });
+    }
+    const requested = parsed.data.username ?? "";
+    const serverId = parsed.data.serverId || null;
 
     if (!MINECRAFT_USERNAME.test(requested)) {
         return NextResponse.json({ error: "invalid_username" }, { status: 400 });
@@ -94,7 +99,11 @@ export async function DELETE(request: NextRequest) {
     // clearing their own is not.
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const targetId = typeof body.userId === "string" && body.userId ? body.userId : userId;
+    const parsedUnlink = unlinkSchema.safeParse(body);
+    if (!parsedUnlink.success) {
+        return NextResponse.json({ error: parsedUnlink.error.issues[0].message }, { status: 400 });
+    }
+    const targetId = parsedUnlink.data.userId || userId;
     if (targetId !== userId && !(await isAdmin(userId))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

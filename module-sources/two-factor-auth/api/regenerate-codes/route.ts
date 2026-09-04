@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { generateBackupCodes, prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { twoFactorChallengeSchema } from "../../lib/validations";
 
 // POST /api/v1/auth/two-factor/regenerate-codes - Regenerate backup codes
 // Requires current password OR a valid TOTP code.
@@ -26,8 +27,14 @@ export async function POST(request: NextRequest) {
 
     const raw = await readJsonBody(request, { fallback: {} });
     if (raw instanceof NextResponse) return raw;
-    const body = raw as { password?: string; token?: string };
-    const { password, token } = body;
+    const parsed = twoFactorChallengeSchema.safeParse(raw);
+    if (!parsed.success) {
+        return NextResponse.json(
+            { error: "Password or verification code required" },
+            { status: 400 }
+        );
+    }
+    const { token, password } = parsed.data;
 
     if (!password && !token) {
         return NextResponse.json(

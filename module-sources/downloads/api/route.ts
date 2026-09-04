@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { downloadCreateSchema } from "../lib/validations";
 
 export async function GET() {
     const downloads = await prisma.download.findMany({
@@ -20,8 +21,11 @@ export async function POST(request: NextRequest) {
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
-    const { title, description, fileName, fileUrl, fileSize } = jsonBody;
-    if (!title || !fileName || !fileUrl) return NextResponse.json({ error: "Title, fileName and fileUrl required" }, { status: 400 });
+    const parsed = downloadCreateSchema.safeParse(jsonBody);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
+    }
+    const { title, description, fileName, fileUrl, fileSize } = parsed.data;
 
     const download = await prisma.download.create({
         data: { title, description: description || null, fileName, fileUrl, fileSize: fileSize || null },

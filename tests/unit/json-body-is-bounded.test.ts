@@ -76,7 +76,9 @@ describe("readJsonBody", () => {
 
     it("honours a route's own larger cap", async () => {
         const body = JSON.stringify({ note: "A".repeat(MAX_JSON_BODY_BYTES + 1024) });
-        const parsed = await readJsonBody(jsonRequest(body), { maxBytes: MAX_JSON_BODY_BYTES * 4 });
+        const parsed = (await readJsonBody(jsonRequest(body), {
+            maxBytes: MAX_JSON_BODY_BYTES * 4,
+        })) as { note: string };
         expect(parsed.note.length).toBe(MAX_JSON_BODY_BYTES + 1024);
     });
 
@@ -119,7 +121,7 @@ describe("readJsonBody", () => {
     it("decodes multi-byte characters by bytes, not by characters", async () => {
         // Three bytes each, so 400 of them is 1200 bytes and the cap is on bytes.
         const body = JSON.stringify({ note: "ç".repeat(400) });
-        expect((await readJsonBody(jsonRequest(body), { maxBytes: 200 })).constructor).toBe(NextResponse);
+        expect((await readJsonBody(jsonRequest(body), { maxBytes: 200 }))?.constructor).toBe(NextResponse);
         expect(await readJsonBody(jsonRequest(body), { maxBytes: 4000 })).toEqual({ note: "ç".repeat(400) });
     });
 

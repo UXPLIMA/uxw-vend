@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { sendRconCommand, isRconAvailable } from "../../lib/rcon";
+import { rconCommandSchema } from "../../lib/validations";
 
 async function requireAdmin(): Promise<NextResponse | null> {
     const session = await auth();
@@ -18,9 +19,10 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
-    const command = typeof body.command === "string" ? body.command.trim() : "";
-    const serverId = typeof body.serverId === "string" && body.serverId ? body.serverId : null;
-    if (!command) return NextResponse.json({ error: "Command required" }, { status: 400 });
+    const parsed = rconCommandSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: "Command required" }, { status: 400 });
+    const { command } = parsed.data;
+    const serverId = parsed.data.serverId || null;
 
     try {
         return NextResponse.json({ response: await sendRconCommand(command, serverId) });

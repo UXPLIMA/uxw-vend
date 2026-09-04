@@ -9,7 +9,7 @@ import { BCRYPT_ROUNDS } from "@/core/lib/constants";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
-import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
+import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
 import { readJsonBody } from "@/core/lib/api-body";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         // no listeners and this returns the value it was handed.
         const challenge = await runAuthChallenge({
             action: "register",
-            fields: parseChallengeFields((body as Record<string, unknown>)?.[CHALLENGE_FIELD]),
+            fields: challengeFieldsFrom(body),
             ip,
         });
         if (!challenge.ok) {

@@ -4,6 +4,10 @@ import { isAdmin } from "@/core/lib/permissions";
 import { createBackup, listBackups, formatBytes } from "@/core/lib/backup";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** An optional note filed alongside a manual backup. */
+const backupBodySchema = z.object({ notes: z.string().max(500).optional() });
 
 /**
  * GET /api/v1/admin/backup
@@ -50,9 +54,8 @@ export async function POST(request: NextRequest) {
     try {
         const body = await readJsonBody(request, { fallback: null });
         if (body instanceof NextResponse) return body;
-        if (body && typeof body.notes === "string") {
-            notes = body.notes.slice(0, 500);
-        }
+        const parsed = backupBodySchema.safeParse(body);
+        if (parsed.success && parsed.data.notes) notes = parsed.data.notes;
     } catch {
         // empty body → just proceed
     }

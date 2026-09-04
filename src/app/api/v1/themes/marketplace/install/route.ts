@@ -11,6 +11,13 @@ import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
 import { resolveWithin } from "@/core/lib/runtime-paths";
 import { readJsonBody } from "@/core/lib/api-body";
+import { z } from "zod";
+
+/** Which catalogue theme to fetch. The regex checks below still apply. */
+const installThemeSchema = z.object({
+    themeId: z.string().max(64),
+    zipFile: z.string().max(200),
+});
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 
@@ -22,8 +29,9 @@ export async function POST(request: NextRequest) {
     try {
         const jsonBody = await readJsonBody(request);
         if (jsonBody instanceof NextResponse) return jsonBody;
-        const { themeId, zipFile } = jsonBody;
-        if (!themeId || !zipFile) return NextResponse.json({ error: "themeId and zipFile required" }, { status: 400 });
+        const parsed = installThemeSchema.safeParse(jsonBody);
+        if (!parsed.success) return NextResponse.json({ error: "themeId and zipFile required" }, { status: 400 });
+        const { themeId, zipFile } = parsed.data;
 
         // Validate inputs to prevent SSRF / path traversal
         if (!/^[a-z0-9-]+\.zip$/.test(zipFile)) {
