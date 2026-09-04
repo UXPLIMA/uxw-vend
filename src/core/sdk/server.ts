@@ -83,6 +83,11 @@ export { apiSuccess, apiError, apiPaginated, devOnlyDetail, withRateLimit } from
 // malformed body with a 500.
 export { readJsonBody, INVALID_JSON_BODY } from "@/core/lib/api-body";
 
+// `intParam` and `enumParam` are the query-string half of the same idea: a
+// page number that cannot be NaN, and an enum filter that answers 400 instead
+// of handing Prisma a value its enum does not have.
+export { intParam, enumParam, INVALID_QUERY_PARAM } from "@/core/lib/api-query";
+
 // --- Transactional email ---
 export { sendEmail, queueEmail } from "@/core/lib/email";
 

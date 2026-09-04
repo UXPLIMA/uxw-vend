@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { intParam } from "@/core/lib/api-query";
 
 /**
  * GET /api/v1/media - list media items.
@@ -17,8 +18,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const perPage = Math.min(parseInt(searchParams.get("perPage") || "24"), 100);
+    const page = intParam(searchParams, "page", { fallback: 1, min: 1 });
+    const perPage = intParam(searchParams, "perPage", { fallback: 24, min: 1, max: 100 });
     const search = searchParams.get("search")?.trim() || "";
     const type = searchParams.get("type")?.trim() || "";
 
