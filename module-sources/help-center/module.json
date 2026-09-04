@@ -2,14 +2,14 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
   "icon": "HelpCircle",
   "permissions": [
-    "help.view",
-    "help.manage"
+    "help-center.view",
+    "help-center.manage"
   ],
   "defaultConfig": {
     "enableSearch": true,

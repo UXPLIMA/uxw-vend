@@ -9,6 +9,7 @@ import { Loader2, Plus, X, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { CORE_PERMISSIONS } from "@/core/lib/permission-names";
 
 interface Permission {
     id: string;
@@ -27,9 +28,11 @@ interface Role {
     _count: { users: number };
 }
 
-// Core permissions always shown; module permissions added dynamically
+// Core permissions always shown; module permissions added dynamically.
+// The names come from core so this screen and moduleSystem.getAllPermissions()
+// cannot drift apart.
 const corePermissions = [
-    { module: "admin", perms: ["admin.access", "admin.settings", "admin.users", "admin.roles"] },
+    { module: "admin", perms: [...CORE_PERMISSIONS] },
 ];
 
 export default function AdminRolesPage() {
