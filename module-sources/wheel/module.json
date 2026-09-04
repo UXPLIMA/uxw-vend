@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -43,7 +43,11 @@
     {
       "path": "/wheel/spin",
       "handler": "api/spin/route.ts",
-      "description": "Spin the prize wheel and award a prize to the current user."
+      "description": "Spin the prize wheel and award a prize to the current user.",
+      "rateLimit": {
+        "maxRequests": 30,
+        "windowMs": 60000
+      }
     }
   ],
   "dependencies": [

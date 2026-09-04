@@ -7,6 +7,10 @@ export interface ApiRouteMatch {
     module: string;
     params: Record<string, string>;
     method?: string;
+    /** An endpoint an external service posts to, with no browser behind it. */
+    providerCallback?: boolean;
+    /** A stricter limit the manifest asked for, if it asked for one. */
+    rateLimit?: { maxRequests: number; windowMs: number };
 }
 
 export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
@@ -20,7 +24,9 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
             key: exactMatch.key,
             module: exactMatch.module,
             params: {},
-            method: exactMatch.method
+            method: exactMatch.method,
+            providerCallback: exactMatch.providerCallback,
+            rateLimit: exactMatch.rateLimit,
         };
     }
 
@@ -33,7 +39,9 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
                 key: route.key,
                 module: route.module,
                 params: match.params,
-                method: route.method
+                method: route.method,
+                providerCallback: route.providerCallback,
+                rateLimit: route.rateLimit,
             };
         }
     }

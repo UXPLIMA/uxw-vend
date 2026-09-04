@@ -1,0 +1,45 @@
+import { RATE_LIMIT_API, RATE_LIMIT_PROVIDER_CALLBACK } from "@/core/lib/constants";
+import type { RateLimitConfig } from "@/core/lib/rate-limit";
+
+/**
+ * Which rate-limit bucket a module endpoint gets.
+ *
+ * Core's own routes each call the limiter themselves, which works because
+ * there are ninety-seven of them and they all live in this repository. The
+ * module surface is a hundred and sixty-five endpoints across fifty modules,
+ * written by whoever wrote the module, and not one of them was limited: a
+ * stranger could post to a form endpoint, a vote claim or a payment callback
+ * as fast as the network allowed. Leaving it to each module to remember is
+ * the bet that lost here, so the dispatcher applies this to all of them.
+ *
+ * A `providerCallback` gets a far higher ceiling than a browser endpoint: a
+ * webhook throttled during a provider's burst delays a settlement, which is a
+ * worse failure than the one the limit prevents. It is still a ceiling.
+ */
+export interface EndpointLimit {
+    providerCallback?: boolean;
+    rateLimit?: { maxRequests: number; windowMs: number };
+}
+
+export function defaultBucket(providerCallback?: boolean): RateLimitConfig {
+    return providerCallback ? RATE_LIMIT_PROVIDER_CALLBACK : RATE_LIMIT_API;
+}
+
+/**
+ * A manifest may only tighten. Fewer requests, or the same number spread over
+ * a longer window - never more, and never off, because the reason core
+ * enforces this at all is that an endpoint may not opt out of it.
+ */
+export function bucketFor(route: EndpointLimit): RateLimitConfig {
+    const base = defaultBucket(route.providerCallback);
+    if (!route.rateLimit) return base;
+    return {
+        maxRequests: Math.min(base.maxRequests, route.rateLimit.maxRequests),
+        windowMs: Math.max(base.windowMs, route.rateLimit.windowMs),
+    };
+}
+
+/** Requests per minute a bucket allows, for comparing two windows fairly. */
+export function perMinute(config: RateLimitConfig): number {
+    return (config.maxRequests * 60_000) / config.windowMs;
+}

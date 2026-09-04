@@ -141,6 +141,26 @@ const apiEntry = z.object({
      * fails a `providerCallback` whose handler does neither.
      */
     providerCallback: z.boolean().optional(),
+    /**
+     * A stricter rate limit than the default for this one endpoint.
+     *
+     * Every module endpoint is limited whether or not it says so - the
+     * dispatcher applies `RATE_LIMIT_API` per endpoint per client, and
+     * `RATE_LIMIT_PROVIDER_CALLBACK` to a `providerCallback`, which a real
+     * provider retrying a burst must never trip. This field is for the
+     * endpoints where the default is far too generous to mean anything: one
+     * that sends mail, mints a reward, or opens a ticket.
+     *
+     * It can only tighten. A module cannot raise its own ceiling and cannot
+     * turn the limit off, because the point of enforcing this in core is that
+     * an endpoint may not opt out of it.
+     */
+    rateLimit: z
+        .object({
+            maxRequests: z.number().int().min(1).max(10_000),
+            windowMs: z.number().int().min(1_000).max(3_600_000),
+        })
+        .optional(),
 });
 
 const widgetEntry = z.object({

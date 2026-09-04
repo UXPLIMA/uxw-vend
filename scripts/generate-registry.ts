@@ -78,7 +78,7 @@ function generateRegistry() {
     let mapping = `export const ModuleRegistry: Record<string, ComponentType<any>> = {\n`;
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<Record<string, unknown>>> = {\n`;
     const routes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = [];
-    const apiRoutes: { path: string; key: string; module: string; method?: string }[] = [];
+    const apiRoutes: { path: string; key: string; module: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = [];
     const routeResolvers: { key: string; module: string; handler: string }[] = [];
 
     for (const { moduleName, manifest } of loaded) {
@@ -102,7 +102,16 @@ function generateRegistry() {
             const apiKey = `${moduleName}:api:${api.path}`;
             const handlerImportPath = `@/modules/${moduleName}/${api.handler.replace(/\.ts?$/, '')}`;
             apiMapping += `  '${apiKey}': () => import('${handlerImportPath}'),\n`;
-            apiRoutes.push({ path: api.path, key: apiKey, module: moduleName, method: api.method || 'ALL' });
+            apiRoutes.push({
+                path: api.path,
+                key: apiKey,
+                module: moduleName,
+                method: api.method || 'ALL',
+                // Carried into the route table so the dispatcher can pick the
+                // right rate-limit bucket without reading the manifest.
+                ...(api.providerCallback ? { providerCallback: true } : {}),
+                ...(api.rateLimit ? { rateLimit: api.rateLimit } : {}),
+            });
         }
     }
 
@@ -110,7 +119,7 @@ function generateRegistry() {
     apiMapping += `};\n\n`;
     // Route tables are plain data - no imports, safe anywhere.
     let routeData = `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
-    routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
+    routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
     // Aggregate typed collections across all modules
     const allWidgets: ({ id: string; component: string; defaultOrder: number; defaultVisible: boolean; module: string })[] = [];
@@ -328,7 +337,7 @@ function generateRegistry() {
 
     const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
     let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
-    dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
+    dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
     dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     dataContent += `// Outbound webhook channels contributed by modules. Core owns the alert\n`;
     dataContent += `// content and the wire layouts; a channel only names its hosts and layout.\n`;

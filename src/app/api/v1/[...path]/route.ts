@@ -1,8 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ModuleApiRegistry } from "@/core/generated/module-api-registry";
-import { matchApiRoute } from "@/core/lib/api-matcher";
+import { matchApiRoute, type ApiRouteMatch } from "@/core/lib/api-matcher";
 import { logRequest } from "@/core/lib/logger";
 import { recordMetric } from "@/core/lib/metrics";
+import { auth } from "@/core/lib/auth";
+import { getClientIP, rateLimitForRoleAsync } from "@/core/lib/rate-limit";
+import { bucketFor } from "@/core/lib/module-api-limits";
+
+/**
+ * Every module endpoint is rate limited, and none of them was.
+ *
+ * Which bucket an endpoint gets, and why a module may only tighten it, is in
+ * module-api-limits.ts. The dispatcher's job is to apply it before it loads a
+ * handler, so an endpoint cannot forget and cannot opt out.
+ *
+ * The bucket is per endpoint and per caller, so one busy endpoint does not
+ * spend another's budget, and a signed-in user is counted by their id rather
+ * than by an address they may be sharing with a whole campus.
+ */
+
+/** Whether this request even carries a session, so an anonymous one costs no decode. */
+function hasSessionCookie(req: NextRequest): boolean {
+    return req.cookies.getAll().some((c) => c.name.includes("session-token"));
+}
+
+async function callerFor(req: NextRequest, match: ApiRouteMatch): Promise<{ id: string; role: string | null }> {
+    const ip = getClientIP(req.headers);
+    // A provider posts with no cookie and no session; skip the decode.
+    if (match.providerCallback || !hasSessionCookie(req)) return { id: `ip:${ip}`, role: null };
+    try {
+        const session = await auth();
+        const userId = session?.user?.id;
+        if (userId) return { id: `user:${userId}`, role: session.user.role ?? null };
+    } catch {
+        // A cookie that will not decode is an anonymous caller, not an error.
+    }
+    return { id: `ip:${ip}`, role: null };
+}
 
 async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: string[] }>, method: string) {
     const { path } = await paramsPromise;
@@ -22,6 +56,21 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
         finish(405);
         recordMetric(method, fullPath, 405, Date.now() - requestStart);
         return NextResponse.json({ error: `Method ${method} not allowed` }, { status: 405 });
+    }
+
+    const caller = await callerFor(req, match);
+    const allowed = await rateLimitForRoleAsync(
+        `module-api:${match.key}:${caller.id}`,
+        bucketFor(match),
+        caller.role,
+    );
+    if (!allowed) {
+        finish(429, { handler: match.key });
+        recordMetric(method, fullPath, 429, Date.now() - requestStart);
+        return NextResponse.json(
+            { error: "Too many requests", code: "rate_limited" },
+            { status: 429, headers: { "Retry-After": "60" } },
+        );
     }
 
     const loadHandler = ModuleApiRegistry[match.key];
