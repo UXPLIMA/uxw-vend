@@ -208,6 +208,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Atomic transaction: deduct credits, create order, grant ownership
+            const buyerId = session.user.id;
             const order = await prisma.$transaction(async (tx) => {
                 // Deduct credits, conditional on the balance still covering it.
                 //
@@ -253,29 +254,49 @@ export async function POST(request: NextRequest) {
                     },
                 });
 
-                // Grant ownership
-                for (const item of orderItems) {
-                    await tx.chestItem.create({
-                        data: { userId: session.user.id, productId: item.productId, productName: item.name, quantity: item.quantity, orderId: ord.id },
-                    });
-                    await tx.ownedProduct.upsert({
-                        where: { userId_productId: { userId: session.user.id, productId: item.productId } },
-                        update: {},
-                        create: { userId: session.user.id, productId: item.productId, orderId: ord.id },
-                    });
-                }
+                // Grant ownership. Two statements rather than two per item:
+                // a twelve-item order held the transaction - and the row lock
+                // on the buyer's balance - open for twenty-four round trips.
+                await tx.chestItem.createMany({
+                    data: orderItems.map((item) => ({
+                        userId: buyerId,
+                        productId: item.productId,
+                        productName: item.name,
+                        quantity: item.quantity,
+                        orderId: ord.id,
+                    })),
+                });
+                await tx.ownedProduct.createMany({
+                    data: [...new Set(orderItems.map((item) => item.productId))].map((productId) => ({
+                        userId: buyerId,
+                        productId,
+                        orderId: ord.id,
+                    })),
+                    skipDuplicates: true,
+                });
 
                 return ord;
             });
 
             // ── RCON delivery for credits payment ──
-            for (const item of orderItems) {
-                if (!item.productId) continue;
-                const commands = await prisma.productCommand.findMany({
-                    where: { productId: item.productId },
-                    orderBy: { order: "asc" },
-                });
-                if (commands.length > 0) {
+            // One query for every product in the order, not one per item.
+            const deliverable = orderItems.filter((item) => item.productId);
+            const commandRows = deliverable.length
+                ? await prisma.productCommand.findMany({
+                      where: { productId: { in: [...new Set(deliverable.map((i) => i.productId))] } },
+                      orderBy: { order: "asc" },
+                  })
+                : [];
+            const commandsByProduct = new Map<string, typeof commandRows>();
+            for (const row of commandRows) {
+                const list = commandsByProduct.get(row.productId);
+                if (list) list.push(row);
+                else commandsByProduct.set(row.productId, [row]);
+            }
+
+            for (const item of deliverable) {
+                const commands = commandsByProduct.get(item.productId);
+                if (commands && commands.length > 0) {
                     const itemVars = (item.metadata as Record<string, unknown>)?.variables as Record<string, string> | undefined;
                     deliverProduct({
                         playerName,
@@ -385,18 +406,32 @@ export async function POST(request: NextRequest) {
         // order arrives and no gateway can take it, refuse it instead of
         // silently giving the product away.
         if (total <= 0) {
-            await prisma.order.update({ where: { id: order.id }, data: { status: "COMPLETED" } });
-
-            for (const item of orderItems) {
-                await prisma.chestItem.create({
-                    data: { userId: session.user.id, productId: item.productId, productName: item.name, quantity: item.quantity, orderId: order.id },
+            // One transaction, like the credits path above and the gateway
+            // path in settleOrder: completing the order and granting what it
+            // holds either both happen or neither does. Done in sequence, a
+            // process that died in between left a COMPLETED order with an
+            // empty chest and nothing that would ever go back and fix it.
+            const freeBuyerId = session.user.id;
+            await prisma.$transaction(async (tx) => {
+                await tx.order.update({ where: { id: order.id }, data: { status: "COMPLETED" } });
+                await tx.chestItem.createMany({
+                    data: orderItems.map((item) => ({
+                        userId: freeBuyerId,
+                        productId: item.productId,
+                        productName: item.name,
+                        quantity: item.quantity,
+                        orderId: order.id,
+                    })),
                 });
-                await prisma.ownedProduct.upsert({
-                    where: { userId_productId: { userId: session.user.id, productId: item.productId } },
-                    update: {},
-                    create: { userId: session.user.id, productId: item.productId, orderId: order.id },
+                await tx.ownedProduct.createMany({
+                    data: [...new Set(orderItems.map((item) => item.productId))].map((productId) => ({
+                        userId: freeBuyerId,
+                        productId,
+                        orderId: order.id,
+                    })),
+                    skipDuplicates: true,
                 });
-            }
+            });
 
             await announceOrderCompleted(order.id);
             return NextResponse.json({ order, redirect: null, message: "Order completed (free)" }, { status: 201 });

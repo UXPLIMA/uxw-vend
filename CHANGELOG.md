@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Paid for, marked paid, and granted nothing.** `settleOrder` is what every
+  payment gateway calls once the money has moved. It marked the order
+  COMPLETED, re-read it, created a chest item and an ownership row per line
+  one at a time, then wrote the payment - four sets of round trips after the
+  order already said it was paid. A process that died anywhere in the middle
+  left a buyer who had paid with a COMPLETED order and an empty chest, and the
+  duplicate guard at the top of the function then answered every webhook retry
+  with "already settled", so nothing ever went back and fixed it. The read at
+  the top is also a snapshot, so a gateway retry and a reloaded return URL
+  arriving together both saw PENDING and both granted the same order. The
+  credits path at checkout had already learned all of this and debits the
+  balance with a conditional write; the gateway path had not, and neither had
+  the free-order path beside it or either half of a subscription change - a
+  cancelled plan whose ownership row survived the crash left the subscriber
+  with the product they had stopped paying for, and a new plan whose grant did
+  not land left them paying every month for nothing, because the retry found
+  the subscription row and only updated its status. Credit top-ups were the
+  same shape again: `findFirst` on `description: { contains: providerRef }` -
+  a scan of the whole ledger - then an increment, so two deliveries of one
+  webhook credited the account twice. Every one of these is now a single
+  transaction claimed with a condition, and a top-up's ledger row carries a
+  deterministic id so the primary key refuses the second write. The grants
+  went from two statements per line item to two per order, and the delivery
+  commands from one query per item to one per order, which a gateway webhook
+  with a timeout will notice.
+
 - **A malformed request body answered with a 500.** `request.json()` throws
   when the body is not JSON - truncated, wrong content, or absent - and an
   uncaught throw in a route handler is a bare 500. Eighty-seven routes
