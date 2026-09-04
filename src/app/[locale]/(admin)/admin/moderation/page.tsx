@@ -43,6 +43,7 @@ export default function ModerationPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [types, setTypes] = useState<Record<string, { label: string; labelKey?: string }>>({});
     const [counts, setCounts] = useState<Record<string, number>>({});
     const [activeTab, setActiveTab] = useState<string>("all");
@@ -423,6 +424,7 @@ export default function ModerationPage() {
                             </span>
                             <div className="flex gap-1">
                                 <Button
+                                    aria-label={commonT("previousPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page === 1}
@@ -431,6 +433,7 @@ export default function ModerationPage() {
                                     <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <Button
+                                    aria-label={commonT("nextPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page >= pages}

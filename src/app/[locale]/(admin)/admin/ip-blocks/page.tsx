@@ -25,6 +25,7 @@ export default function IpBlocksPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [blocks, setBlocks] = useState<IpBlock[]>([]);
@@ -264,6 +265,7 @@ export default function IpBlocksPage() {
                                                 </td>
                                                 <td className="p-3 text-right">
                                                     <Button
+                                                        aria-label={commonT("delete")}
                                                         variant="ghost"
                                                         size="sm"
                                                         className="text-destructive"

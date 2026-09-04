@@ -23,6 +23,7 @@ interface Category {
 
 export default function AdminStoreCategoriesPage() {
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -234,6 +235,7 @@ export default function AdminStoreCategoriesPage() {
                                             {cat.isActive ? t("adm_active") : t("adm_inactive")}
                                         </span>
                                         <Button
+                                            aria-label={commonT("delete")}
                                             variant="ghost"
                                             size="sm"
                                             className="text-destructive"
@@ -255,6 +257,7 @@ export default function AdminStoreCategoriesPage() {
                                                     <p className="text-xs text-muted-foreground">/{sub.slug}</p>
                                                 </div>
                                                 <Button
+                                                    aria-label={commonT("delete")}
                                                     variant="ghost"
                                                     size="sm"
                                                     className="text-destructive"

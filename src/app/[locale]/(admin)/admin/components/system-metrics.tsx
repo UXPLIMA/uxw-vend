@@ -79,9 +79,9 @@ export function SystemMetrics() {
             )}
 
             <div className="flex gap-2 text-xs text-muted-foreground">
-                <span>Total: {data.total.requests} requests</span>
+                <span>{t("metrics_totalRequests", { count: data.total.requests })}</span>
                 <span>|</span>
-                <span>Last hour: {data.lastHour.requests} requests, {data.lastHour.errorRate}% errors</span>
+                <span>{t("metrics_lastHourSummary", { count: data.lastHour.requests, errorRate: data.lastHour.errorRate })}</span>
             </div>
         </div>
     );

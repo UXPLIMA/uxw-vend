@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Sixty-one buttons and links had no name at all.** Each rendered nothing
+  but a Lucide icon, and an icon is an `<svg>` with no text in it, so a screen
+  reader read every one of them as "button" and a voice-control user had
+  nothing to say to click one: the delete and edit buttons on every admin
+  list, the back arrow at the top of a dozen detail pages, every pagination
+  arrow, the copy buttons on the API key, media, gift code and referral
+  screens, the close button in four dialogs, the reply-send button on the
+  profile messages tab. All sixty-one now carry an `aria-label` taken from
+  core's `common` namespace, which already held delete, edit, back, close,
+  remove, previous and next for exactly this vocabulary; `copy`, `send`,
+  `previousPage` and `nextPage` joined it. The gate decides "renders no text"
+  the way a browser would, by looking at what survives once the child tags
+  are stripped, so `{count}` counts as a name and `{copied ? <Check/> :
+  <Copy/>}` does not. It is a companion to the input gate rather than a
+  replacement: one covers what you type into, the other what you press.
+- **Fourteen more admin strings were still written in English.** The module
+  update badge announced "3 module updates available" and pluralised itself
+  in JSX, the developer page titled three cards in English, the system
+  metrics strip read "Total: 412 requests", the user delete dialog said "Type
+  <name> to confirm", and the custom-form submissions and store coupon
+  screens carried a page counter, a user id and a minimum-purchase label.
+  Every one of them sat next to an interpolation or inside a template
+  literal, which is exactly what the admin copy gate could not see: it
+  matched `>Text<` and `title="Text"` and nothing else. It now also reads a
+  text run that stops at an interpolation, one that starts after it, and the
+  same attributes written as a template literal.
+
 - **The modules' admin screens were in English, and dates were formatted in
   Turkish for everyone.** Two defects in the same corner. The admin
   translation gate covered core's `(admin)` tree only, so every module's own

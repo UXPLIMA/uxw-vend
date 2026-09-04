@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Bell } from "lucide-react";
 
@@ -10,6 +11,7 @@ import { Bell } from "lucide-react";
  * out of date. Click navigates to /admin/modules/updates.
  */
 export function ModuleUpdateBadge() {
+    const t = useTranslations("admin");
     const [count, setCount] = useState(0);
 
     useEffect(() => {
@@ -39,11 +41,11 @@ export function ModuleUpdateBadge() {
         <Link
             href="/admin/modules/updates"
             className="relative inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-xs font-medium hover:bg-orange-200 dark:hover:bg-orange-950/60 transition-colors"
-            title={`${count} module update${count === 1 ? "" : "s"} available`}
+            title={t("modules_updatesBadgeTitle", { count })}
         >
             <Bell className="w-3 h-3" />
             {count}
-            <span className="hidden sm:inline">update{count === 1 ? "" : "s"}</span>
+            <span className="hidden sm:inline">{t("modules_updatesBadgeShort", { count })}</span>
         </Link>
     );
 }

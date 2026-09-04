@@ -46,6 +46,7 @@ interface AdminCrudPageProps {
 
 export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
     const ct = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -268,10 +269,10 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                         ) : null}
                                     </div>
                                     <div className="flex gap-1">
-                                        <Button variant="ghost" size="sm" onClick={() => startEdit(item)}>
+                                        <Button aria-label={commonT("edit")} variant="ghost" size="sm" onClick={() => startEdit(item)}>
                                             <Pencil className="w-3 h-3" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteItem(item.id as string)}>
+                                        <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteItem(item.id as string)}>
                                             <Trash2 className="w-3 h-3" />
                                         </Button>
                                     </div>

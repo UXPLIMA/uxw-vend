@@ -28,6 +28,7 @@ export default function AdminCouponsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
@@ -336,7 +337,7 @@ export default function AdminCouponsPage() {
                                                 </span>
                                                 {coupon.minPurchase && (
                                                     <p className="text-xs text-muted-foreground">
-                                                        Min: {formatCurrency(Number(coupon.minPurchase))}
+                                                        {t("adm_minPurchase", { amount: formatCurrency(Number(coupon.minPurchase)) })}
                                                     </p>
                                                 )}
                                             </td>
@@ -368,6 +369,7 @@ export default function AdminCouponsPage() {
                                                     {t("adm_edit")}
                                                 </Button>
                                                 <Button
+                                                    aria-label={commonT("delete")}
                                                     variant="ghost"
                                                     size="sm"
                                                     className="text-destructive"

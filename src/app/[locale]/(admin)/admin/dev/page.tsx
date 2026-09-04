@@ -106,7 +106,7 @@ export default function DevToolsPage() {
             {tab === "hooks" && (
                 <div className="space-y-4">
                     <Card>
-                        <CardHeader><CardTitle className="text-base">Registered Listeners ({data.hooks.registered.length})</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base">{t("dev_registeredListeners", { count: data.hooks.registered.length })}</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.registered.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">{t("dev_noListeners")}</p>
@@ -128,7 +128,7 @@ export default function DevToolsPage() {
                     </Card>
 
                     <Card>
-                        <CardHeader><CardTitle className="text-base">Active Actions ({data.hooks.actions.length})</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base">{t("dev_activeActions", { count: data.hooks.actions.length })}</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.actions.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">{t("dev_noActions")}</p>
@@ -147,7 +147,7 @@ export default function DevToolsPage() {
                     </Card>
 
                     <Card>
-                        <CardHeader><CardTitle className="text-base">Active Filters ({data.hooks.filters.length})</CardTitle></CardHeader>
+                        <CardHeader><CardTitle className="text-base">{t("dev_activeFilters", { count: data.hooks.filters.length })}</CardTitle></CardHeader>
                         <CardContent>
                             {data.hooks.filters.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">{t("dev_noFilters")}</p>

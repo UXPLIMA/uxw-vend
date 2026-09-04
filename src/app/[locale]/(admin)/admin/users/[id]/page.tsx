@@ -550,11 +550,12 @@ export default function AdminUserDetailPage() {
                         <div className="space-y-3">
                             <div>
                                 <Label htmlFor={deleteConfirmUsernameId}>
-                                    Type{" "}
-                                    <span className="font-mono text-red-600">
-                                        {user.username}
-                                    </span>{" "}
-                                    to confirm
+                                    {t.rich("users_deleteTypeToConfirm", {
+                                        username: user.username,
+                                        name: (chunks) => (
+                                            <span className="font-mono text-red-600">{chunks}</span>
+                                        ),
+                                    })}
                                 </Label>
                                 <Input
                                     id={deleteConfirmUsernameId}

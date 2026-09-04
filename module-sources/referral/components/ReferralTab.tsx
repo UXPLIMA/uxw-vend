@@ -27,6 +27,7 @@ interface ReferralData {
 export function ReferralTab() {
     const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("referral");
+    const commonT = useTranslations("common");
     const [data, setData] = useState<ReferralData | null>(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
@@ -81,7 +82,7 @@ export function ReferralTab() {
                             value={`${typeof window !== "undefined" ? window.location.origin : ""}?ref=${data.referralCode}`}
                             className="font-mono text-xs"
                         />
-                        <Button onClick={copyLink} variant="outline" size="sm">
+                        <Button aria-label={commonT("copy")} onClick={copyLink} variant="outline" size="sm">
                             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                         </Button>
                     </div>

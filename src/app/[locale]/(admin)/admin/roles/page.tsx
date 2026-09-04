@@ -34,6 +34,7 @@ const corePermissions = [
 
 export default function AdminRolesPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [availablePermissions, setAvailablePermissions] = useState(corePermissions);
@@ -185,7 +186,7 @@ export default function AdminRolesPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                             <span>{editingRole ? t("roles_editRole", { name: editingRole.displayName }) : t("roles_newRole")}</span>
-                            <Button variant="ghost" size="icon" onClick={resetForm}>
+                            <Button aria-label={commonT("close")} variant="ghost" size="icon" onClick={resetForm}>
                                 <X className="w-4 h-4" />
                             </Button>
                         </CardTitle>
@@ -307,6 +308,7 @@ export default function AdminRolesPage() {
                                     </Button>
                                     {role.name !== "admin" && role.name !== "member" && (
                                         <Button
+                                            aria-label={commonT("delete")}
                                             variant="ghost"
                                             size="sm"
                                             className="text-destructive"

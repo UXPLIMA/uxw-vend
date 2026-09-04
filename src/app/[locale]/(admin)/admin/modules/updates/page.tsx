@@ -21,6 +21,7 @@ export default function ModuleUpdatesPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [updates, setUpdates] = useState<UpdateInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -84,7 +85,7 @@ export default function ModuleUpdatesPage() {
     return (
         <>
             <div className="flex items-center gap-4 mb-6">
-                <Link href="/admin/modules"><Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
+                <Link href="/admin/modules"><Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold">
                         {t("moduleUpdates_title")}

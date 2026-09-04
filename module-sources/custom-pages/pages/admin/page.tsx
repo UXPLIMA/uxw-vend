@@ -19,6 +19,7 @@ interface CustomPage {
 
 export default function CustomPagesAdminPage() {
     const t = useTranslations("customPages");
+    const commonT = useTranslations("common");
     const [pages, setPages] = useState<CustomPage[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -186,7 +187,7 @@ export default function CustomPagesAdminPage() {
                                         </Button>
                                     </Link>
                                     <Button variant="ghost" size="sm" onClick={() => startEdit(page)} title={t("adm_htmlEditor")}><Pencil className="w-3 h-3" /></Button>
-                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deletePage(page)}><Trash2 className="w-3 h-3" /></Button>
+                                    <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deletePage(page)}><Trash2 className="w-3 h-3" /></Button>
                                 </div>
                             </CardContent>
                         </Card>

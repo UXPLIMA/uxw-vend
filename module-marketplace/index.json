@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-04",
-  "updatedAt": "2026-09-04T08:46:10Z",
+  "updatedAt": "2026-09-04T09:17:06Z",
   "modules": [
     {
       "id": "announcements",
@@ -13,7 +13,7 @@
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -46,7 +46,7 @@
       "icon": "Apple",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -75,7 +75,7 @@
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -104,7 +104,7 @@
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -142,7 +142,7 @@
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -175,7 +175,7 @@
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -204,7 +204,7 @@
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -233,7 +233,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -270,7 +270,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -307,7 +307,7 @@
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -336,7 +336,7 @@
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -367,7 +367,7 @@
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -390,13 +390,13 @@
       "id": "currency",
       "name": "Multi-Currency",
       "description": "Multi-currency support with automatic conversion",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -419,13 +419,13 @@
       "id": "custom-forms",
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -453,13 +453,13 @@
       "id": "custom-pages",
       "name": "Custom Pages",
       "description": "Admin-created HTML content pages",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -488,7 +488,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -511,13 +511,13 @@
       "id": "discord-integration",
       "name": "Discord Integration",
       "description": "Discord webhook notifications and settings",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -553,7 +553,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -584,7 +584,7 @@
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -615,7 +615,7 @@
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -644,7 +644,7 @@
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -673,7 +673,7 @@
       "icon": "Users",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -702,7 +702,7 @@
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -725,13 +725,13 @@
       "id": "forum",
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -767,7 +767,7 @@
       "icon": "Code2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -796,7 +796,7 @@
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -825,7 +825,7 @@
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -854,7 +854,7 @@
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -885,7 +885,7 @@
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -914,7 +914,7 @@
       "icon": "Camera",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -943,7 +943,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -979,7 +979,7 @@
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1008,7 +1008,7 @@
       "icon": "Radio",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1037,7 +1037,7 @@
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1068,7 +1068,7 @@
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1101,7 +1101,7 @@
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1130,7 +1130,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1159,7 +1159,7 @@
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1197,7 +1197,7 @@
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1226,7 +1226,7 @@
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1264,7 +1264,7 @@
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1299,7 +1299,7 @@
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1337,7 +1337,7 @@
       "icon": "Compass",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1366,7 +1366,7 @@
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1404,7 +1404,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1441,7 +1441,7 @@
       "icon": "Heart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1470,7 +1470,7 @@
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1507,7 +1507,7 @@
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1543,7 +1543,7 @@
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1580,7 +1580,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1617,7 +1617,7 @@
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1646,7 +1646,7 @@
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1675,7 +1675,7 @@
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1707,7 +1707,7 @@
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1745,7 +1745,7 @@
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1768,13 +1768,13 @@
       "id": "referral",
       "name": "Referral System",
       "description": "Earn credits by referring new users",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1807,7 +1807,7 @@
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1838,7 +1838,7 @@
       "icon": "Boxes",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1861,13 +1861,13 @@
       "id": "seo",
       "name": "SEO Manager",
       "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1896,7 +1896,7 @@
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1927,7 +1927,7 @@
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1956,7 +1956,7 @@
       "icon": "Music",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1985,7 +1985,7 @@
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2014,7 +2014,7 @@
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2037,13 +2037,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.0.14",
+      "version": "2.0.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2088,7 +2088,7 @@
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2127,7 +2127,7 @@
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2157,13 +2157,13 @@
       "id": "tickets",
       "name": "Support Tickets",
       "description": "Customer support ticket system with departments and priority levels",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2197,7 +2197,7 @@
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2220,13 +2220,13 @@
       "id": "trophies",
       "name": "Trophies",
       "description": "Achievement badges with rule-based auto-award engine",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2257,7 +2257,7 @@
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2286,7 +2286,7 @@
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2318,7 +2318,7 @@
       "icon": "MessagesSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2347,7 +2347,7 @@
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2374,13 +2374,13 @@
       "id": "webhook-logs",
       "name": "Webhook Logs",
       "description": "View and manage webhook delivery logs",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2409,7 +2409,7 @@
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2443,7 +2443,7 @@
       "icon": "AtSign",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2472,7 +2472,7 @@
       "icon": "Search",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-04T08:46:10Z",
+      "updatedAt": "2026-09-04T09:17:06Z",
       "screenshots": [],
       "tags": [
         "integration"

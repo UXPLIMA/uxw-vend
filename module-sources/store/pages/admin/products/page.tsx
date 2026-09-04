@@ -24,6 +24,7 @@ interface Product {
 
 export default function AdminProductsPage() {
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -157,10 +158,10 @@ export default function AdminProductsPage() {
                                         {t("adm_pageOf", { page, totalPages })}
                                     </p>
                                     <div className="flex gap-2">
-                                        <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                                        <Button aria-label={commonT("previousPage")} variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>
                                             <ChevronLeft className="w-4 h-4" />
                                         </Button>
-                                        <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+                                        <Button aria-label={commonT("nextPage")} variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
                                             <ChevronRight className="w-4 h-4" />
                                         </Button>
                                     </div>

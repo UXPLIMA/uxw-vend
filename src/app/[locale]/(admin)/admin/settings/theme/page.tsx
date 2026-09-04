@@ -14,6 +14,7 @@ import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedM
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     // currentMode is only used by handleThemeSwitch below; color customization
     // itself moved to /admin/theme/appearance so this page no longer loads or
     // mutates ThemeCustomization rows.
@@ -265,6 +266,7 @@ export default function ThemeSettingsPage() {
                                         {isActive && <Check className="h-4 w-4 text-primary" />}
                                         {!isBuiltIn && (
                                             <button
+                                                aria-label={commonT("delete")}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDelete(id);

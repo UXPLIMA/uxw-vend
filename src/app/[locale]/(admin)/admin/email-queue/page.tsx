@@ -63,6 +63,7 @@ export default function EmailQueueAdminPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [jobs, setJobs] = useState<EmailJobRow[]>([]);
     const [summary, setSummary] = useState<Record<EmailStatus, number>>({ pending: 0, sending: 0, sent: 0, failed: 0 });
     const [total, setTotal] = useState(0);
@@ -289,6 +290,7 @@ export default function EmailQueueAdminPage() {
                                                             </Button>
                                                         )}
                                                         <Button
+                                                            aria-label={commonT("delete")}
                                                             variant="ghost"
                                                             size="sm"
                                                             className="text-destructive"

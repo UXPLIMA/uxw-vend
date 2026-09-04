@@ -21,6 +21,7 @@ interface GiftCode {
 
 export default function GiftCodesPage() {
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [codes, setCodes] = useState<GiftCode[]>([]);
     const [loading, setLoading] = useState(true);
@@ -163,10 +164,10 @@ export default function GiftCodesPage() {
                                             </td>
                                             <td className="py-3 px-4 text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="sm" onClick={() => copyCode(code.code, code.id)}>
+                                                    <Button aria-label={commonT("copy")} variant="ghost" size="sm" onClick={() => copyCode(code.code, code.id)}>
                                                         {copiedId === code.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                                                     </Button>
-                                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteCode(code.id)}>
+                                                    <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteCode(code.id)}>
                                                         <Trash2 className="w-3 h-3" />
                                                     </Button>
                                                 </div>

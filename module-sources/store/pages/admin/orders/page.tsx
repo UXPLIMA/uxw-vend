@@ -31,6 +31,7 @@ const statusColors: Record<string, string> = {
 
 export default function AdminOrdersPage() {
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
     const dateTag = dateLocaleTag(useLocale());
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -170,6 +171,7 @@ export default function AdminOrdersPage() {
                             </p>
                             <div className="flex gap-2">
                                 <Button
+                                    aria-label={commonT("previousPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page === 1}
@@ -178,6 +180,7 @@ export default function AdminOrdersPage() {
                                     <ChevronLeft className="w-4 h-4" />
                                 </Button>
                                 <Button
+                                    aria-label={commonT("nextPage")}
                                     variant="outline"
                                     size="sm"
                                     disabled={page === totalPages}

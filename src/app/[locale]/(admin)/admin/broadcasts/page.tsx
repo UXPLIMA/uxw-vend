@@ -28,6 +28,7 @@ export default function BroadcastsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
     const [loading, setLoading] = useState(true);
     const [composing, setComposing] = useState(false);
@@ -196,7 +197,7 @@ export default function BroadcastsPage() {
                                             <Send className="w-3 h-3 mr-1" /> {t("broadcasts_sendButton")}
                                         </Button>
                                     )}
-                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteBroadcast(b)}>
+                                    <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteBroadcast(b)}>
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
                                 </div>

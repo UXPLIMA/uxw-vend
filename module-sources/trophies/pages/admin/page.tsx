@@ -72,6 +72,7 @@ const BLANK_FORM: FormState = {
 
 export default function AdminTrophiesPage() {
     const t = useTranslations("trophies");
+    const commonT = useTranslations("common");
     const tc = useTranslations("admin");
     const { confirm } = useConfirm();
     const [trophies, setTrophies] = useState<AdminTrophy[]>([]);
@@ -357,7 +358,7 @@ export default function AdminTrophiesPage() {
                             <h2 className="text-lg font-semibold">
                                 {editing ? t("editTrophy") : t("newTrophy")}
                             </h2>
-                            <Button variant="ghost" size="sm" onClick={closeModal}>
+                            <Button aria-label={commonT("close")} variant="ghost" size="sm" onClick={closeModal}>
                                 <X className="w-4 h-4" />
                             </Button>
                         </div>

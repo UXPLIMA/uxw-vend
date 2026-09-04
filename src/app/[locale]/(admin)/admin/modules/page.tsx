@@ -15,6 +15,7 @@ import { ModuleDetailModal } from "./ModuleDetailModal";
 
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const {
         modules,
         marketplace,
@@ -97,7 +98,7 @@ export default function AdminModulesPage() {
                         <div className="flex items-center gap-2 text-sm">
                             <ArrowUp className="w-4 h-4 text-amber-600" />
                             <span className="font-medium">
-                                Showing {updatesAvailableCount} module{updatesAvailableCount === 1 ? "" : "s"} with updates available
+                                {t("modules_updatesAvailable", { count: updatesAvailableCount })}
                             </span>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => setUpdatesOnly(false)}>
@@ -161,7 +162,7 @@ export default function AdminModulesPage() {
                                                         {mod.updateAvailable && mod.latestVersion && (
                                                             <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800 inline-flex items-center gap-1">
                                                                 <ArrowUp className="w-2.5 h-2.5" />
-                                                                Update: v{mod.latestVersion}
+                                                                {t("modules_updateToLatest", { version: mod.latestVersion })}
                                                             </span>
                                                         )}
                                                     </h3>
@@ -236,12 +237,13 @@ export default function AdminModulesPage() {
                                                     disabled={updatingModule === mod.id}
                                                     onClick={() => handleUpdate(mod)}
                                                     className="text-amber-600 hover:text-amber-700 border-amber-300"
-                                                    title={`Update to v${mod.latestVersion}`}
+                                                    title={t("modules_updateToVersion", { version: mod.latestVersion ?? "" })}
                                                 >
                                                     {updatingModule === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowUp className="w-3 h-3" />}
                                                 </Button>
                                             )}
                                             <Button
+                                                aria-label={commonT("delete")}
                                                 variant="ghost"
                                                 size="sm"
                                                 disabled={deleting === mod.id}

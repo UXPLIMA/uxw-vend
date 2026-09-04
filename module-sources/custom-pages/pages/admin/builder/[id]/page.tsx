@@ -17,6 +17,7 @@ interface PageProps {
 export default function PageBuilderPage(props: PageProps) {
     const params = use(props.params);
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const router = useRouter();
     const pageId = params.id;
 
@@ -112,7 +113,7 @@ export default function PageBuilderPage(props: PageProps) {
             {/* Top bar */}
             <div className="flex items-center gap-4 px-4 py-3 border-b border-border flex-shrink-0">
                 <Link href="/admin/custom-pages">
-                    <Button variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
+                    <Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
                 </Link>
                 <div className="flex-1 min-w-0">
                     <h1 className="font-bold truncate">{pageTitle}</h1>
