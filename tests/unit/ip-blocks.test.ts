@@ -307,13 +307,14 @@ describe("block administration", () => {
         expect(await isIpBlocked("1.2.3.4", "all")).toBe(false);
     });
 
-    it("lists every block, newest first and unfiltered, for the admin UI", async () => {
+    it("lists the newest blocks, unfiltered, for the admin UI", async () => {
         rows = [{ ip: "1.2.3.4", scope: "all", expiresAt: null }];
         const { listBlocks } = await load();
 
         expect(await listBlocks()).toEqual(rows);
         // Unlike the middleware read, this one must not filter out expired
-        // rows - the admin needs to see and clear them.
-        expect(findManyArgs[0]).toEqual({ orderBy: { createdAt: "desc" } });
+        // rows - the admin needs to see and clear them. It is capped, because
+        // the caller renders the array and the proxy walks it in process.
+        expect(findManyArgs[0]).toEqual({ orderBy: { createdAt: "desc" }, take: 10_000 });
     });
 });

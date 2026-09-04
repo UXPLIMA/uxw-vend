@@ -6,6 +6,9 @@ export async function GET() {
     const downloads = await prisma.download.findMany({
         where: { isActive: true },
         orderBy: { createdAt: "desc" },
+        // The page renders every row it is given, so this is the ceiling on
+        // one response rather than a page size.
+        take: 200,
     });
     return NextResponse.json({ downloads });
 }

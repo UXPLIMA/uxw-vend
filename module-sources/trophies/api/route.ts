@@ -8,6 +8,9 @@ export async function GET() {
     const trophies = await prisma.trophy.findMany({
         orderBy: { points: "desc" },
         include: { _count: { select: { users: true } } },
+        // A curated set, and a public endpoint. The cap bounds an install that
+        // decided otherwise.
+        take: 200,
     });
     return NextResponse.json({ trophies });
 }
