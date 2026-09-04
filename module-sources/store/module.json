@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -414,12 +414,6 @@
     }
   ],
   "statsApi": "/store/stats",
-  "layoutComponents": [
-    {
-      "id": "LivePurchaseToast",
-      "component": "components/LivePurchaseToast"
-    }
-  ],
   "navbarComponents": [
     {
       "id": "CartIcon",
@@ -728,8 +722,6 @@
         "tab_orders_browse": "Browse the store",
         "tab_orders_discount": "Discount",
         "tab_orders_total": "Total",
-        "livePurchase": "Someone just made a purchase",
-        "livePurchaseDetail": "{username} just bought {product}",
         "bd_title": "Bulk Discounts",
         "bd_subtitle": "Discount an item once a customer buys enough of it",
         "bd_nameLabel": "Name",
@@ -973,8 +965,6 @@
         "err_validateCreatorCode": "Failed to validate creator code",
         "err_checkoutFailed": "Checkout failed",
         "err_generic": "Something went wrong. Please try again.",
-        "livePurchase": "Someone purchased an item",
-        "livePurchaseDetail": "{username} purchased {product}",
         "popup_learnMore": "Learn More",
         "popup_close": "Close",
         "product_thumbnail": "Thumbnail {n}",
@@ -1259,8 +1249,6 @@
         "tab_orders_browse": "Mağazaya göz atın",
         "tab_orders_discount": "İndirim",
         "tab_orders_total": "Toplam",
-        "livePurchase": "Biraz önce bir satın alma yapıldı",
-        "livePurchaseDetail": "{username} biraz önce {product} satın aldı",
         "bd_title": "Toplu İndirimler",
         "bd_subtitle": "Müşteri yeterli adet aldığında ürüne indirim uygulayın",
         "bd_nameLabel": "Ad",
@@ -1504,8 +1492,6 @@
         "err_validateCreatorCode": "Kod doğrulanamadı",
         "err_checkoutFailed": "Ödeme başarısız",
         "err_generic": "Bir şeyler ters gitti. Lütfen tekrar dene.",
-        "livePurchase": "Biri bir ürün satın aldı",
-        "livePurchaseDetail": "{username} satın aldı: {product}",
         "popup_learnMore": "Daha Fazla",
         "popup_close": "Kapat",
         "product_thumbnail": "Küçük resim {n}",
