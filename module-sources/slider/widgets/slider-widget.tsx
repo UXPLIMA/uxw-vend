@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface SlideItem {
@@ -12,6 +13,7 @@ interface SlideItem {
 }
 
 export function SliderWidget() {
+    const t = useTranslations("common");
     const [slides, setSlides] = useState<SlideItem[]>([]);
     const [current, setCurrent] = useState(0);
 
@@ -58,11 +60,11 @@ export function SliderWidget() {
 
             {slides.length > 1 && (
                 <>
-                    <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow">
-                        <ChevronLeft className="w-4 h-4" />
+                    <button onClick={prev} aria-label={t("previous")} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow">
+                        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow">
-                        <ChevronRight className="w-4 h-4" />
+                    <button onClick={next} aria-label={t("next")} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow">
+                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
                     </button>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
                         {slides.map((_, i) => (

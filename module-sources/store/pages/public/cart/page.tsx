@@ -57,6 +57,7 @@ export default function CartPage() {
     const router = useRouter();
     const { formatPrice } = useCurrency();
     const t = useTranslations('store');
+    const commonT = useTranslations('common');
     const [cart, setCart] = useState<CartData | null>(null);
     const [loading, setLoading] = useState(true);
     const [couponCode, setCouponCode] = useState("");
@@ -364,8 +365,8 @@ export default function CartPage() {
                                                     <Check className="w-4 h-4 text-green-600" />
                                                     <span className="text-sm font-medium text-green-700">{couponApplied}</span>
                                                 </div>
-                                                <button onClick={removeCoupon}>
-                                                    <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" />
+                                                <button onClick={removeCoupon} aria-label={commonT('remove')}>
+                                                    <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
                                                 </button>
                                             </div>
                                         ) : (
@@ -395,8 +396,8 @@ export default function CartPage() {
                                                     <Check className="w-4 h-4 text-blue-600" />
                                                     <span className="text-sm font-medium text-blue-700">{creatorApplied.code} ({creatorApplied.discountPercent}% off)</span>
                                                 </div>
-                                                <button onClick={removeCreatorCode}>
-                                                    <X className="w-4 h-4 text-muted-foreground" />
+                                                <button onClick={removeCreatorCode} aria-label={commonT('remove')}>
+                                                    <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                                                 </button>
                                             </div>
                                         ) : (

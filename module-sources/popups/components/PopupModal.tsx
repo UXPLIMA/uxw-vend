@@ -17,6 +17,7 @@ interface PopupData {
 
 export function PopupModal() {
     const t = useTranslations("popups");
+    const commonT = useTranslations("common");
     const [popup, setPopup] = useState<PopupData | null>(null);
 
     useEffect(() => {
@@ -50,9 +51,10 @@ export function PopupModal() {
             <div className="relative bg-card rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
                 <button
                     onClick={dismiss}
+                    aria-label={commonT("close")}
                     className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4" aria-hidden="true" />
                 </button>
 
                 {safeImage && (

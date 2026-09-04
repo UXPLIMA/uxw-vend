@@ -39,6 +39,7 @@ export default function MediaLibraryPage() {
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const { confirm } = useConfirm();
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
 
     const fetchItems = async () => {
         setLoading(true);
@@ -220,8 +221,8 @@ export default function MediaLibraryPage() {
                     <div className="bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <h3 className="font-bold truncate">{selected.filename}</h3>
-                            <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground">
-                                <X className="w-5 h-5" />
+                            <button onClick={() => setSelected(null)} aria-label={commonT("close")} className="text-muted-foreground hover:text-foreground">
+                                <X className="w-5 h-5" aria-hidden="true" />
                             </button>
                         </div>
                         <div className="p-4 space-y-4">

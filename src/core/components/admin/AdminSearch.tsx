@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Search, User, Package, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SearchResult {
     type: string;
@@ -17,6 +18,8 @@ const typeIcons: Record<string, typeof User> = {
 };
 
 export function AdminSearch() {
+    const t = useTranslations("common");
+
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [open, setOpen] = useState(false);
@@ -54,8 +57,8 @@ export function AdminSearch() {
                     className="w-full pl-9 pr-8 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
                 {query && (
-                    <button onClick={() => { setQuery(""); setResults([]); setOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2">
-                        <X className="w-4 h-4 text-muted-foreground" />
+                    <button onClick={() => { setQuery(""); setResults([]); setOpen(false); }} aria-label={t("close")} className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                     </button>
                 )}
             </div>

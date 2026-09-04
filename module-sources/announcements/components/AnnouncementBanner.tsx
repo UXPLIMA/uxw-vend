@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { X, Info, AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
 
 interface Announcement {
@@ -42,6 +43,7 @@ function isVisibleOnPage(ann: Announcement, path: string): boolean {
 }
 
 export function AnnouncementBanner() {
+    const t = useTranslations("common");
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [dismissed, setDismissed] = useState<Set<string>>(new Set());
     const pathname = usePathname();
@@ -96,9 +98,10 @@ export function AnnouncementBanner() {
                             {announcement.dismissible && (
                                 <button
                                     onClick={() => dismiss(announcement.id)}
+                                    aria-label={t("close")}
                                     className="flex-shrink-0 p-1 rounded transition-opacity opacity-50 hover:opacity-100"
                                 >
-                                    <X className="w-3.5 h-3.5" />
+                                    <X className="w-3.5 h-3.5" aria-hidden="true" />
                                 </button>
                             )}
                         </div>

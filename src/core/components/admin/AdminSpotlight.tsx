@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "@/core/lib/i18n/navigation";
 import { Search, X, FileText, User, Settings as SettingsIcon, Package, Layers } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SearchResult {
     type: string;
@@ -26,6 +27,8 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
  */
 export function AdminSpotlight() {
     const router = useRouter();
+    const t = useTranslations("common");
+
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
@@ -117,8 +120,8 @@ export function AdminSpotlight() {
                         className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
                     />
                     <kbd className="hidden sm:inline px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted rounded">ESC</kbd>
-                    <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
-                        <X className="w-4 h-4" />
+                    <button onClick={() => setOpen(false)} aria-label={t("close")} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-4 h-4" aria-hidden="true" />
                     </button>
                 </div>
 

@@ -168,12 +168,13 @@ export default function StorePage() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder={t('searchProducts')}
+                            aria-label={t('searchProducts')}
                             style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
                             className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                         {searchQuery && (
-                            <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2">
-                                <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" />
+                            <button type="button" onClick={clearSearch} aria-label={commonT('close')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
                             </button>
                         )}
                     </div>

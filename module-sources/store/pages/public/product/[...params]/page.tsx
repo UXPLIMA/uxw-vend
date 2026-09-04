@@ -39,6 +39,7 @@ export default function ProductDetailPage() {
     const { status: authStatus } = useSession();
     const { formatPrice } = useCurrency();
     const t = useTranslations('store');
+    const commonT = useTranslations('common');
 
     const requireLogin = () => {
         toast.error(t.has("loginRequired") ? t("loginRequired") : "Please log in to continue", {
@@ -239,15 +240,17 @@ export default function ProductDetailPage() {
                                 <>
                                     <button
                                         onClick={prevImage}
+                                        aria-label={commonT('previous')}
                                         className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 hover:bg-card flex items-center justify-center shadow-lg transition-colors"
                                     >
-                                        <ChevronLeft className="w-5 h-5 text-foreground" />
+                                        <ChevronLeft className="w-5 h-5 text-foreground" aria-hidden="true" />
                                     </button>
                                     <button
                                         onClick={nextImage}
+                                        aria-label={commonT('next')}
                                         className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 hover:bg-card flex items-center justify-center shadow-lg transition-colors"
                                     >
-                                        <ChevronRight className="w-5 h-5 text-foreground" />
+                                        <ChevronRight className="w-5 h-5 text-foreground" aria-hidden="true" />
                                     </button>
                                 </>
                             )}
@@ -335,16 +338,18 @@ export default function ProductDetailPage() {
                                     <div className="flex items-center gap-3">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                            aria-label={commonT('decreaseQuantity')}
                                             className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted"
                                         >
-                                            <Minus className="w-4 h-4" />
+                                            <Minus className="w-4 h-4" aria-hidden="true" />
                                         </button>
                                         <span className="text-lg font-medium text-foreground w-12 text-center">{quantity}</span>
                                         <button
                                             onClick={() => setQuantity(Math.min(maxStock, quantity + 1))}
+                                            aria-label={commonT('increaseQuantity')}
                                             className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted"
                                         >
-                                            <Plus className="w-4 h-4" />
+                                            <Plus className="w-4 h-4" aria-hidden="true" />
                                         </button>
                                     </div>
                                 </div>
