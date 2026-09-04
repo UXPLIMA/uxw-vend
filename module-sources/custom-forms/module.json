@@ -2,7 +2,7 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -56,10 +56,22 @@
     }
   ],
   "hooksEmitted": [
-    { "hook": "customforms.form.created", "type": "action" },
-    { "hook": "customforms.form.deleted", "type": "action" },
-    { "hook": "customforms.form.updated", "type": "action" },
-    { "hook": "customforms.submission.created", "type": "action" }
+    {
+      "hook": "customforms.form.created",
+      "type": "action"
+    },
+    {
+      "hook": "customforms.form.deleted",
+      "type": "action"
+    },
+    {
+      "hook": "customforms.form.updated",
+      "type": "action"
+    },
+    {
+      "hook": "customforms.submission.created",
+      "type": "action"
+    }
   ],
   "translations": {
     "en": {
@@ -130,7 +142,13 @@
         "adm_formTitle": "Form Title",
         "adm_newForm": "New Form",
         "adm_noFormsYet": "No forms yet",
-        "adm_noSubmissions": "No submissions yet"
+        "adm_noSubmissions": "No submissions yet",
+        "adm_deleteForm": "Delete form",
+        "adm_deleteFormConfirm": "Delete this form and every submission to it?",
+        "adm_editForm": "Edit Form",
+        "adm_required": "Required",
+        "adm_saveChanges": "Save Changes",
+        "adm_createFormButton": "Create Form"
       },
       "admin": {
         "menu_custom-forms": "Custom Forms",
@@ -222,7 +240,13 @@
         "adm_formTitle": "Form Başlığı",
         "adm_newForm": "Yeni Form",
         "adm_noFormsYet": "Henüz form yok",
-        "adm_noSubmissions": "Henüz gönderim yok"
+        "adm_noSubmissions": "Henüz gönderim yok",
+        "adm_deleteForm": "Formu sil",
+        "adm_deleteFormConfirm": "Bu form ve gelen tüm yanıtlar silinsin mi?",
+        "adm_editForm": "Formu Düzenle",
+        "adm_required": "Zorunlu",
+        "adm_saveChanges": "Değişiklikleri Kaydet",
+        "adm_createFormButton": "Form Oluştur"
       },
       "admin": {
         "menu_custom-forms": "Formlar",

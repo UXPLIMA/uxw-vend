@@ -726,6 +726,130 @@ function checkStatsApiAuth(modulePath: string): CheckResult {
     return { name, passed: true, message: `${entry.handler} checks for an admin` };
 }
 
+/**
+ * Every `t("literal")` a module renders has to exist in the module's own
+ * catalogue, in every locale core ships.
+ *
+ * next-intl does not throw on a missing message: it logs and renders the key
+ * path, so the page reads "store.vip_title" where the heading should be. The
+ * public VIP page, both store profile tabs and three admin screens shipped
+ * that way. A `t.has(key) ? t(key) : "..."` guard is the supported way to
+ * ship a key the catalogue may not have, and is not flagged.
+ *
+ * Only namespaces the module itself declares are checked. A module is free to
+ * read a namespace core or another module owns, and those keys are not this
+ * module's to declare.
+ */
+function checkTranslationKeys(modulePath: string): CheckResult {
+    const name = "Translation keys declared";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { translations?: Record<string, Record<string, Record<string, string>>> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const translations = manifest.translations;
+    if (!translations) return { name, passed: true, message: "No translations declared" };
+
+    // The locales core ships, which are the ones a visitor can actually
+    // select. A module may carry more; those are not held to this.
+    const coreMessagesDir = path.join(process.cwd(), "messages-core");
+    const locales = fs.existsSync(coreMessagesDir)
+        ? fs
+              .readdirSync(coreMessagesDir)
+              .filter((f) => f.endsWith(".json"))
+              .map((f) => path.basename(f, ".json"))
+        : ["en"];
+
+    // At runtime the catalogue is core merged with the enabled modules, so a
+    // key core already owns resolves. `admin` in particular is a shared
+    // namespace: a module adds its menu entry to it and reads core's keys out
+    // of it.
+    const coreMessages: Record<string, Record<string, Record<string, string>>> = {};
+    for (const locale of locales) {
+        const file = path.join(coreMessagesDir, `${locale}.json`);
+        if (!fs.existsSync(file)) continue;
+        try {
+            coreMessages[locale] = JSON.parse(fs.readFileSync(file, "utf8"));
+        } catch {
+            // A broken core catalogue is not this module's problem.
+        }
+    }
+
+    function walkFiles(dir: string): string[] {
+        const results: string[] = [];
+        if (!fs.existsSync(dir)) return results;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                results.push(...walkFiles(fullPath));
+            } else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) {
+                results.push(fullPath);
+            }
+        }
+        return results;
+    }
+
+    const violations: string[] = [];
+
+    for (const file of walkFiles(modulePath)) {
+        const content = fs.readFileSync(file, "utf8");
+        if (!content.includes("Translations(")) continue;
+
+        // const t = useTranslations("ns") / const t = await getTranslations("ns")
+        const bindings = new Map<string, string>();
+        const bindingPattern =
+            /const\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\s*\(\s*["'`]([^"'`]+)["'`]/g;
+        for (const match of content.matchAll(bindingPattern)) {
+            bindings.set(match[1], match[2]);
+        }
+        if (bindings.size === 0) continue;
+
+        for (const [binding, namespace] of bindings) {
+            // A template literal or a variable is a runtime key; only a
+            // literal can be checked here.
+            const callPattern = new RegExp(`\\b${binding}\\s*\\(\\s*["'\`]([^"'\`$]+)["'\`]`, "g");
+            for (const match of content.matchAll(callPattern)) {
+                const key = match[1];
+                const guard = new RegExp(
+                    `\\b${binding}\\.has\\s*\\(\\s*["'\`]${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\`]`,
+                );
+                if (guard.test(content)) continue;
+
+                for (const locale of locales) {
+                    const bucket = translations[locale]?.[namespace];
+                    // Namespace not this module's: core or another module owns it.
+                    if (!bucket) continue;
+                    if (coreMessages[locale]?.[namespace]?.[key] !== undefined) continue;
+                    if (bucket[key] === undefined) {
+                        const where = path.relative(modulePath, file);
+                        violations.push(`${where}: ${namespace}.${key} missing from ${locale}`);
+                    }
+                }
+            }
+        }
+    }
+
+    if (violations.length > 0) {
+        return {
+            name,
+            passed: false,
+            message:
+                `${violations.length} translation key(s) are rendered but not declared, so the ` +
+                `key path shows up in the UI:\n      ` +
+                violations.slice(0, 10).join("\n      ") +
+                (violations.length > 10 ? `\n      ... and ${violations.length - 10} more` : ""),
+            suggestion: "Add the key to translations.<locale>.<namespace> in module.json, or guard the call with t.has().",
+        };
+    }
+
+    return { name, passed: true, message: "Every rendered key is declared" };
+}
+
 function checkApiRoutesWired(modulePath: string): CheckResult {
     const name = "API routes wired";
     const manifestPath = path.join(modulePath, "module.json");
@@ -846,6 +970,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkApiAuthChecks(modulePath),
         checkApiRoutesWired(modulePath),
         checkStatsApiAuth(modulePath),
+        checkTranslationKeys(modulePath),
         checkHooksEmitted(modulePath),
     ];
 

@@ -353,6 +353,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   run through the IPv4 rules, so `[::ffff:169.254.169.254]` is refused with
   the plain form.
 
+### Fixed
+- **Pages showed the translation key where the text belongs.** next-intl does
+  not throw on a missing message: it logs and renders the key path, so the
+  store's public VIP page read `store.vip_title` as its heading, with
+  `store.vip_buy` on every button. The same held for both store profile tabs,
+  the live purchase toast, the bulk-discount, creator-code, custom-forms and
+  servers admin screens - 50 renders of keys no manifest declared. All of them
+  are declared now in English and Turkish. A few of these read
+  `t("key") || "fallback"`, which never fires: `t()` returns the key path, not
+  a falsy value. The supported form is `t.has(key) ? t(key) : "fallback"`, and
+  the ones already written that way were left alone.
+- **`validate-module` now checks that a rendered key is declared.** It fails a
+  module for any unguarded `t("literal")` whose key is missing from the
+  module's own catalogue in a locale core ships, for each of the locales in
+  `messages-core/`. Keys core owns still resolve, since the runtime catalogue
+  is core merged with the enabled modules, and a `t.has()` guard is left
+  alone. A unit test applies the same rule so `npm test` catches it too.
+  Module versions: store 2.0.4, custom-forms 1.0.1, servers 1.1.1.
+- **A setup test failed by machine load rather than by code.** The three
+  install-planning cases run vitest's 5s default while the route hashes the
+  admin password with bcrypt at cost 12, the one thing in that file which is
+  not mocked. With the rest of the suite running in parallel they timed out,
+  and a case that times out mid-install leaves its recorded calls for the next
+  one to trip over, so a third assertion failed for a reason of its own. The
+  file states the budget the work actually needs.
+
 ## [0.2.1] - 2026-09-02
 
 ### Fixed
