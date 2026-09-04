@@ -13,6 +13,7 @@ import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 import { findDependents } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
+import { invalidate } from "@/core/lib/cache";
 
 export async function DELETE(
     _request: NextRequest,
@@ -107,6 +108,23 @@ export async function DELETE(
         await prisma.cronRun
             .deleteMany({ where: { jobKey: { startsWith: `${moduleId}:` } } })
             .catch(() => {});
+
+        // A module's own rows in the shared `Setting` table go with it. Every
+        // module that writes settings tags them with its id on create, which
+        // is what makes them findable; `validate-module` checks that it did.
+        // Module-owned *tables* are preserved on purpose, because those hold
+        // what the admin built - products, articles, tickets. A module's
+        // settings are not that: they are credentials and endpoints for a
+        // service the operator has just decided to stop using. An uninstalled
+        // Cloudflare R2 left its access key and secret in the database with no
+        // screen left in the admin panel to clear them, since the screen came
+        // out with the module. Keys a module deliberately writes on core's
+        // behalf, like `storage_active_provider`, are tagged `core` and stay;
+        // storage already falls back to local when its provider is gone.
+        await prisma.setting
+            .deleteMany({ where: { module: moduleId } })
+            .catch(() => {});
+        await invalidate("public-settings").catch(() => {});
         await invalidateModuleCache().catch(() => {});
 
         let registryNeedsRebuild = false;

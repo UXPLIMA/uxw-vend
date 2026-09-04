@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Uninstalling a module left its credentials in the database, with no
+  screen left to clear them.** Modules keep configuration in the shared
+  `Setting` table, one row per key. `Setting.module` says who owns a row and
+  is indexed, but nothing ever deleted by it: uninstall removed the module's
+  files, its translations and its cron rows and left its settings untouched.
+  Removing Cloudflare R2 stripped the admin page that holds its access key and
+  secret while the key and secret stayed in the database. That is a different
+  call from preserving module-owned tables, which hold what the admin built -
+  products, articles, tickets - and should survive a reinstall; a stopped
+  integration's credentials should not. Uninstall now deletes the rows the
+  module owns and drops the cached public payload. Keys a module writes on
+  core's behalf, like `storage_active_provider`, are tagged `core` and stay,
+  and storage already falls back to local when its provider is gone.
+
+- **Two modules never said which module their settings belonged to.** `store`
+  and `referral` wrote rows without the owner column, so they defaulted to
+  `core` and were indistinguishable from the platform's own - nothing could
+  have cleaned them up even before uninstall started trying. Both tag their
+  rows now, and `validate-module` rejects a settings write that does not.
+
 - **Thirty six endpoints told an anonymous caller it was forbidden rather
   than that it needed to sign in.** 401 and 403 answer different questions:
   "I do not know who you are" and "I know, and you may not". 208 guards across
