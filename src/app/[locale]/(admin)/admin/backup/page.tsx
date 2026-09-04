@@ -123,7 +123,7 @@ export default function BackupAdminPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                toast.success(`Backup created: ${data.backup?.sizeHuman ?? ""}`);
+                toast.success(t("backup_createdToast", { size: data.backup?.sizeHuman ?? "" }));
                 await fetchBackups();
             } else {
                 toast.error(data.error || t("backup_backupFailed"));
@@ -211,7 +211,7 @@ export default function BackupAdminPage() {
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => { void fetchBackups(); void fetchCronInfo(); }} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                        {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
+                        {t("common_refresh")}
                     </Button>
                     <Button onClick={handleCreate} disabled={creating}>
                         {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}

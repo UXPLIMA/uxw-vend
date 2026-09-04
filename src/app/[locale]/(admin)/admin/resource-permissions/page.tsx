@@ -189,7 +189,7 @@ export default function ResourcePermissionsPage() {
             toast.success(fallback("rp_revoked", "Permission revoked."));
             fetchGrants();
         } else {
-            toast.error("Failed");
+            toast.error(t("common_failed"));
         }
     };
 

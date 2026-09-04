@@ -124,34 +124,32 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                     {pageCount > 1 && (
                         <div className="flex items-center justify-between gap-4 pt-4 mt-4 border-t">
                             <p className="text-sm text-muted-foreground">
-                                {t.has("users_pageOf")
-                                    ? t("users_pageOf", { page, total: pageCount })
-                                    : `Page ${page} of ${pageCount}`}
+                                {t("users_pageOf", { page, total: pageCount })}
                             </p>
                             <div className="flex gap-2">
                                 {prevPage ? (
                                     <Link href={`/admin/users?page=${prevPage}`}>
                                         <Button variant="outline" size="sm">
                                             <ChevronLeft className="w-4 h-4 mr-1" />
-                                            {t.has("users_prev") ? t("users_prev") : "Previous"}
+                                            {t("users_prev")}
                                         </Button>
                                     </Link>
                                 ) : (
                                     <Button variant="outline" size="sm" disabled>
                                         <ChevronLeft className="w-4 h-4 mr-1" />
-                                        {t.has("users_prev") ? t("users_prev") : "Previous"}
+                                        {t("users_prev")}
                                     </Button>
                                 )}
                                 {nextPage ? (
                                     <Link href={`/admin/users?page=${nextPage}`}>
                                         <Button variant="outline" size="sm">
-                                            {t.has("users_next") ? t("users_next") : "Next"}
+                                            {t("users_next")}
                                             <ChevronRight className="w-4 h-4 ml-1" />
                                         </Button>
                                     </Link>
                                 ) : (
                                     <Button variant="outline" size="sm" disabled>
-                                        {t.has("users_next") ? t("users_next") : "Next"}
+                                        {t("users_next")}
                                         <ChevronRight className="w-4 h-4 ml-1" />
                                     </Button>
                                 )}

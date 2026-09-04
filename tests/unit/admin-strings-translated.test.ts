@@ -119,3 +119,82 @@ describe("keys that were sitting unused", () => {
         }
     });
 });
+
+/**
+ * The scan above only reads `.tsx`, because that is where JSX lives. The admin
+ * modules screen keeps its logic in a `.ts` hook, and every toast and
+ * confirmation it raised was written in English there: "installed", "deleted",
+ * "updated to v...", "Install N modules?", "Failed: ...". Four more read
+ * `t.has(key) ? t(key) : "English"` for keys that were in the catalogue all
+ * along, so the fallback was unreachable and the English was decoration.
+ */
+function messageLiterals(source: string, file: string): string[] {
+    const found: string[] = [];
+    const at = (index: number) => `${file}:${source.slice(0, index).split("\n").length}`;
+
+    // A toast, or a confirm dialog's own copy, given a literal rather than a key.
+    const patterns = [
+        /toast\.(?:success|error|info|warning|message)\(\s*([`"'])((?:[^\\]|\\.)*?)\1/g,
+        /\b(?:message|title|confirmText|cancelText)\s*:\s*([`"'])((?:[^\\]|\\.)*?)\1/g,
+    ];
+    for (const pattern of patterns) {
+        for (const match of source.matchAll(pattern)) {
+            // Strip interpolations so `${count} modules` still reads as English.
+            const text = match[2].replace(/\$\{[^}]*\}/g, "").trim();
+            if (text && looksLikeCopy(text)) found.push(`${at(match.index ?? 0)}  ${text}`);
+        }
+    }
+    return found;
+}
+
+/**
+ * A fallback for a key that exists is unreachable. next-intl does not throw on
+ * a missing message - it returns the key path - so `t.has` is the right guard
+ * where a key genuinely may be absent, and dead weight everywhere else.
+ */
+function deadTranslationFallbacks(source: string, file: string, catalogue: Record<string, string>): string[] {
+    const found: string[] = [];
+    const at = (index: number) => `${file}:${source.slice(0, index).split("\n").length}`;
+    for (const match of source.matchAll(/t\.has\("([^"]+)"\)/g)) {
+        if (catalogue[match[1]] !== undefined) {
+            found.push(`${at(match.index ?? 0)}  t.has("${match[1]}") guards a key that exists`);
+        }
+    }
+    return found;
+}
+
+describe("admin logic files", () => {
+    const catalogue = (JSON.parse(
+        fs.readFileSync(path.join(ROOT, "messages-core/en.json"), "utf8"),
+    ) as { admin: Record<string, string> }).admin;
+
+    function logicFiles(dir: string): string[] {
+        const out: string[] = [];
+        const walk = (d: string) => {
+            if (!fs.existsSync(d)) return;
+            for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+                const full = path.join(d, entry.name);
+                if (entry.isDirectory()) walk(full);
+                else if (/\.tsx?$/.test(entry.name)) out.push(full);
+            }
+        };
+        walk(dir);
+        return out;
+    }
+
+    const files = DIRS.flatMap((dir) => logicFiles(path.join(ROOT, dir)));
+
+    it("raise no toast or dialog written in English", () => {
+        const offenders = files.flatMap((file) =>
+            messageLiterals(fs.readFileSync(file, "utf8"), path.relative(ROOT, file)),
+        );
+        expect(offenders).toEqual([]);
+    });
+
+    it("guard with t.has only where the key really may be missing", () => {
+        const offenders = files.flatMap((file) =>
+            deadTranslationFallbacks(fs.readFileSync(file, "utf8"), path.relative(ROOT, file), catalogue),
+        );
+        expect(offenders).toEqual([]);
+    });
+});

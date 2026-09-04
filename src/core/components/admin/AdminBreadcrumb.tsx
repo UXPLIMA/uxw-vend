@@ -62,7 +62,7 @@ export function AdminBreadcrumb() {
                 <>
                     <ChevronRight size={12} className="opacity-50" />
                     <span className="text-foreground font-medium">
-                        {t.has("crumb_overview") ? t("crumb_overview") : "Overview"}
+                        {t("crumb_overview")}
                     </span>
                 </>
             )}

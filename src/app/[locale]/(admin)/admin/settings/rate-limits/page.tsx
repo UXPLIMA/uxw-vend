@@ -45,7 +45,7 @@ export default function RateLimitsSettingsPage() {
             })
             .catch(() => {
                 if (cancelled) return;
-                toast.error(t.has("rateLimits_loadError") ? t("rateLimits_loadError") : "Failed to load rate limits");
+                toast.error(t("rateLimits_loadError"));
                 setLoading(false);
             });
         return () => {
@@ -69,12 +69,12 @@ export default function RateLimitsSettingsPage() {
             });
             if (!res.ok) {
                 const j = await res.json().catch(() => ({}));
-                toast.error(j.error || (t.has("rateLimits_saveError") ? t("rateLimits_saveError") : "Failed to save rate limits"));
+                toast.error(j.error || (t("rateLimits_saveError")));
                 return;
             }
-            toast.success(t.has("rateLimits_saved") ? t("rateLimits_saved") : "Rate limits saved");
+            toast.success(t("rateLimits_saved"));
         } catch {
-            toast.error(t.has("rateLimits_saveError") ? t("rateLimits_saveError") : "Failed to save rate limits");
+            toast.error(t("rateLimits_saveError"));
         } finally {
             setSaving(false);
         }
@@ -88,19 +88,15 @@ export default function RateLimitsSettingsPage() {
         );
     }
 
-    const titleText = t.has("rateLimits_title") ? t("rateLimits_title") : "API Rate Limits";
-    const subtitleText = t.has("rateLimits_subtitle")
-        ? t("rateLimits_subtitle")
-        : "Configure per-role multipliers for the API rate limiter.";
-    const descriptionText = t.has("rateLimits_description")
-        ? t("rateLimits_description")
-        : "Each value multiplies the base request limit for that role. Use 0 to disable rate limiting entirely, 1 for the default, or any value up to 100 to raise the ceiling. Changes take effect within 60 seconds.";
-    const roleLabel = t.has("rateLimits_role") ? t("rateLimits_role") : "Role";
-    const multiplierLabel = t.has("rateLimits_multiplier") ? t("rateLimits_multiplier") : "Multiplier";
-    const unlimitedLabel = t.has("rateLimits_unlimited") ? t("rateLimits_unlimited") : "Unlimited";
-    const priorityLabel = t.has("rateLimits_priority") ? t("rateLimits_priority") : "Priority";
-    const savingLabel = t.has("rateLimits_saving") ? t("rateLimits_saving") : "Saving...";
-    const saveLabel = t.has("rateLimits_save") ? t("rateLimits_save") : "Save";
+    const titleText = t("rateLimits_title");
+    const subtitleText = t("rateLimits_subtitle");
+    const descriptionText = t("rateLimits_description");
+    const roleLabel = t("rateLimits_role");
+    const multiplierLabel = t("rateLimits_multiplier");
+    const unlimitedLabel = t("rateLimits_unlimited");
+    const priorityLabel = t("rateLimits_priority");
+    const savingLabel = t("rateLimits_saving");
+    const saveLabel = t("rateLimits_save");
 
     return (
         <>
@@ -118,7 +114,7 @@ export default function RateLimitsSettingsPage() {
                     <CardContent className="space-y-5">
                         {roles.length === 0 && (
                             <p className="text-sm text-muted-foreground">
-                                {t.has("rateLimits_noRoles") ? t("rateLimits_noRoles") : "No roles found."}
+                                {t("rateLimits_noRoles")}
                             </p>
                         )}
                         {roles.map((role) => {

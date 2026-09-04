@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import type { ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { Button } from "@/core/components/ui/button";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
+    const t = useTranslations("admin");
     const [values, setValues] = useState<Record<string, unknown>>(() => ({ ...initialValues }));
     const [saving, setSaving] = useState(false);
 
@@ -27,8 +29,8 @@ export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
             body: JSON.stringify({ values }),
         });
         setSaving(false);
-        if (!res.ok) { toast.error("Save failed"); return; }
-        toast.success("Saved");
+        if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
+        toast.success(t("theme_saved"));
     };
 
     return (

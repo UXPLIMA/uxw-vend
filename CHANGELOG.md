@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A hundred and thirteen unreachable translation fallbacks, and eleven
+  strings with no key at all.** Fifteen admin screens wrote
+  `t.has(key) ? t(key) : "English"` for keys that were in the catalogue the
+  whole time, so the English branch could never run and only made the code look
+  as though a translation might be missing. `t.has` still guards the dynamic
+  keys, where a module may or may not have contributed one. Separately, the
+  admin copy gate only read `.tsx`, and the modules screen keeps its logic in a
+  `.ts` hook: every toast and confirmation it raised was written in English
+  there. Both classes are gated now.
+- **Bulk install says what it pulled in.** The API reports the dependencies it
+  added on the operator's behalf, and the screen names them instead of quietly
+  installing more modules than were ticked.
+
 - **Uninstalling a module could brick the next build.** Disabling one refuses
   while an enabled module depends on it. Uninstall is the same operation with
   the files deleted too, and it had no such check, so removing `store` while

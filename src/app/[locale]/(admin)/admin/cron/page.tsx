@@ -104,7 +104,7 @@ export default function CronAdminPage() {
                 </div>
                 <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
                     <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                    {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
+                    {t("common_refresh")}
                 </Button>
             </div>
 

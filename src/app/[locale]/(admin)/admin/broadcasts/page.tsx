@@ -79,15 +79,13 @@ export default function BroadcastsPage() {
                 const data = await res.json();
                 toast.success(
                     sendNow
-                        ? (t.has("broadcasts_queuedToast")
-                            ? t("broadcasts_queuedToast", { count: data.queuedRecipients })
-                            : `Queued for ${data.queuedRecipients} recipients`)
-                        : (t.has("broadcasts_draftSaved") ? t("broadcasts_draftSaved") : "Draft saved"),
+                        ? (t("broadcasts_queuedToast", { count: data.queuedRecipients }))
+                        : (t("broadcasts_draftSaved")),
                 );
                 setSubject(""); setBody(""); setComposing(false);
                 fetchBroadcasts();
             } else {
-                toast.error(t.has("broadcasts_sendFailed") ? t("broadcasts_sendFailed") : "Failed");
+                toast.error(t("broadcasts_sendFailed"));
             }
         } finally {
             setSending(false);
@@ -97,9 +95,7 @@ export default function BroadcastsPage() {
     const deleteBroadcast = async (b: Broadcast) => {
         const ok = await confirm({
             title: t("broadcasts_deleteTitle"),
-            message: t.has("broadcasts_deleteConfirm")
-                ? t("broadcasts_deleteConfirm", { subject: b.subject })
-                : `Delete "${b.subject}"?`,
+            message: t("broadcasts_deleteConfirm", { subject: b.subject }),
             variant: "danger",
         });
         if (!ok) return;
@@ -134,10 +130,10 @@ export default function BroadcastsPage() {
                     <h1 className="text-xl font-semibold">
                         {t("sidebar_broadcasts")}
                     </h1>
-                    <p className="text-sm text-muted-foreground">{t.has("settings_broadcastsDesc") ? t("settings_broadcastsDesc") : "Compose and send bulk email to users."}</p>
+                    <p className="text-sm text-muted-foreground">{t("settings_broadcastsDesc")}</p>
                 </div>
                 <Button onClick={() => setComposing(!composing)}>
-                    {composing ? t("customizer_cancel") : (t.has("common_new") ? t("common_new") : "New")}
+                    {composing ? t("customizer_cancel") : (t("common_new"))}
                 </Button>
             </div>
 

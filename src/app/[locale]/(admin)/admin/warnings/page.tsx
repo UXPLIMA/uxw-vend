@@ -162,7 +162,7 @@ export default function WarningsPage() {
             toast.success(fallback("warnings_revoked", "Warning revoked."));
             fetchWarnings();
         } else {
-            toast.error("Failed");
+            toast.error(t("common_failed"));
         }
     };
 
@@ -178,7 +178,7 @@ export default function WarningsPage() {
             toast.success(fallback("warnings_deleted", "Warning deleted."));
             fetchWarnings();
         } else {
-            toast.error("Failed");
+            toast.error(t("common_failed"));
         }
     };
 

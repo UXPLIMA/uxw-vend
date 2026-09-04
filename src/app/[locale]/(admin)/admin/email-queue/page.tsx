@@ -105,7 +105,7 @@ export default function EmailQueueAdminPage() {
         const ok = await confirm({
             title: t("emailQueue_processTitle"),
             message: t("emailQueue_processConfirm"),
-            confirmText: "Process",
+            confirmText: t("emailQueue_process"),
         });
         if (!ok) return;
 
@@ -131,8 +131,8 @@ export default function EmailQueueAdminPage() {
     const handleRetry = async (job: EmailJobRow) => {
         const ok = await confirm({
             title: t("emailQueue_retryTitle"),
-            message: `Reset "${job.subject}" to pending and clear its attempts?`,
-            confirmText: "Retry",
+            message: t("emailQueue_retryConfirm", { subject: job.subject }),
+            confirmText: t("emailQueue_retry"),
         });
         if (!ok) return;
 
@@ -186,7 +186,7 @@ export default function EmailQueueAdminPage() {
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                        {t.has("common_refresh") ? t("common_refresh") : "Refresh"}
+                        {t("common_refresh")}
                     </Button>
                     <Button onClick={handleProcess} disabled={processing}>
                         {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}

@@ -197,10 +197,8 @@ export default function AuditLogPage() {
         setter(v);
     };
 
-    const title = t.has("auditLog_title") ? t("auditLog_title") : "Audit Log";
-    const subtitle = t.has("auditLog_subtitle")
-        ? t("auditLog_subtitle")
-        : "Review sensitive admin actions across the platform.";
+    const title = t("auditLog_title");
+    const subtitle = t("auditLog_subtitle");
 
     return (
         <div className="space-y-6">
@@ -211,7 +209,7 @@ export default function AuditLogPage() {
                 </div>
                 <Button variant="outline" size="sm" onClick={exportCsv}>
                     <Download className="w-4 h-4 mr-2" />
-                    {t.has("auditLog_exportCsv") ? t("auditLog_exportCsv") : "Export CSV"}
+                    {t("auditLog_exportCsv")}
                 </Button>
             </div>
 
@@ -221,7 +219,7 @@ export default function AuditLogPage() {
                         <div className="flex flex-col gap-1">
                             <label className="text-xs text-muted-foreground flex items-center gap-1">
                                 <FilterIcon className="w-3 h-3" />
-                                {t.has("auditLog_action") ? t("auditLog_action") : "Action"}
+                                {t("auditLog_action")}
                             </label>
                             <select
                                 value={actionFilter}
@@ -231,9 +229,7 @@ export default function AuditLogPage() {
                                 className="h-9 rounded-md border bg-background px-3 text-sm min-w-48"
                             >
                                 <option value="">
-                                    {t.has("auditLog_allActions")
-                                        ? t("auditLog_allActions")
-                                        : "All actions"}
+                                    {t("auditLog_allActions")}
                                 </option>
                                 {actions.map((a) => (
                                     <option key={a} value={a}>
@@ -245,9 +241,7 @@ export default function AuditLogPage() {
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs text-muted-foreground">
-                                {t.has("auditLog_userId")
-                                    ? t("auditLog_userId")
-                                    : "User ID"}
+                                {t("auditLog_userId")}
                             </label>
                             <Input
                                 value={userFilter}
@@ -261,7 +255,7 @@ export default function AuditLogPage() {
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs text-muted-foreground">
-                                {t.has("auditLog_from") ? t("auditLog_from") : "From"}
+                                {t("auditLog_from")}
                             </label>
                             <Input
                                 type="date"
@@ -275,7 +269,7 @@ export default function AuditLogPage() {
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs text-muted-foreground">
-                                {t.has("auditLog_to") ? t("auditLog_to") : "To"}
+                                {t("auditLog_to")}
                             </label>
                             <Input
                                 type="date"
@@ -299,7 +293,7 @@ export default function AuditLogPage() {
                                     setPage(1);
                                 }}
                             >
-                                {t.has("auditLog_clear") ? t("auditLog_clear") : "Clear"}
+                                {t("auditLog_clear")}
                             </Button>
                         )}
                     </div>
@@ -314,9 +308,7 @@ export default function AuditLogPage() {
                         </div>
                     ) : logs.length === 0 ? (
                         <p className="text-muted-foreground text-center py-12">
-                            {t.has("auditLog_noLogs")
-                                ? t("auditLog_noLogs")
-                                : "No audit log entries match the current filters."}
+                            {t("auditLog_noLogs")}
                         </p>
                     ) : (
                         <div className="overflow-x-auto">
@@ -324,29 +316,19 @@ export default function AuditLogPage() {
                                 <thead>
                                     <tr className="border-b bg-muted/30">
                                         <th className="text-left py-2 px-4 font-medium text-xs text-muted-foreground">
-                                            {t.has("auditLog_timestamp")
-                                                ? t("auditLog_timestamp")
-                                                : "Timestamp"}
+                                            {t("auditLog_timestamp")}
                                         </th>
                                         <th className="text-left py-2 px-4 font-medium text-xs text-muted-foreground">
-                                            {t.has("auditLog_user")
-                                                ? t("auditLog_user")
-                                                : "User"}
+                                            {t("auditLog_user")}
                                         </th>
                                         <th className="text-left py-2 px-4 font-medium text-xs text-muted-foreground">
-                                            {t.has("auditLog_action")
-                                                ? t("auditLog_action")
-                                                : "Action"}
+                                            {t("auditLog_action")}
                                         </th>
                                         <th className="text-left py-2 px-4 font-medium text-xs text-muted-foreground">
-                                            {t.has("auditLog_target")
-                                                ? t("auditLog_target")
-                                                : "Target"}
+                                            {t("auditLog_target")}
                                         </th>
                                         <th className="text-left py-2 px-4 font-medium text-xs text-muted-foreground">
-                                            {t.has("auditLog_metadata")
-                                                ? t("auditLog_metadata")
-                                                : "Metadata"}
+                                            {t("auditLog_metadata")}
                                         </th>
                                     </tr>
                                 </thead>
@@ -408,10 +390,8 @@ export default function AuditLogPage() {
                     <div className="flex items-center justify-between p-4 border-t">
                         <span className="text-sm text-muted-foreground">
                             {total}{" "}
-                            {t.has("auditLog_entries")
-                                ? t("auditLog_entries")
-                                : "entries"}{" "}
-                            · {t.has("auditLog_page") ? t("auditLog_page") : "page"} {page}
+                            {t("auditLog_entries")}{" "}
+                            · {t("auditLog_page")} {page}
                             {" / "}
                             {pages}
                         </span>
