@@ -1277,6 +1277,62 @@ function checkSettingsAreOwned(modulePath: string): CheckResult {
     return { name, passed: true, message: "Every Setting write names an owner" };
 }
 
+function checkNoMassAssignment(modulePath: string): CheckResult {
+    const name = "Request bodies are filtered before a write";
+    const offenders: string[] = [];
+
+    const files: string[] = [];
+    (function walk(dir: string) {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name === "node_modules") continue;
+                walk(full);
+            } else if (entry.name === "route.ts") {
+                files.push(full);
+            }
+        }
+    })(modulePath);
+
+    for (const file of files) {
+        const body = fs.readFileSync(file, "utf8");
+
+        // Names holding the parsed request body, and anything spread from one.
+        const names = new Set(
+            [...body.matchAll(/(?:const|let)\s+(\w+)\s*=\s*(?:await\s+)?(?:readJsonBody|request\.json|req\.json)\(/g)]
+                .map((m) => m[1]),
+        );
+        if (names.size === 0) continue;
+        for (let pass = 0; pass < 3; pass++) {
+            for (const m of body.matchAll(/(?:const|let)\s+(\w+)(?::[^=]+)?\s*=\s*\{\s*\.\.\.\s*(\w+)/g)) {
+                if (names.has(m[2])) names.add(m[1]);
+            }
+        }
+
+        const rel = path.relative(modulePath, file).replace(/\\/g, "/");
+        for (const m of body.matchAll(/data:\s*(?:\{\s*\.\.\.\s*)?(\w+)\s*[,}]/g)) {
+            if (names.has(m[1])) {
+                offenders.push(`${rel} (data: ${m[1]})`);
+            }
+        }
+    }
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} Prisma write(s) receive the request body unfiltered: ${[...new Set(offenders)].join(", ")}`,
+            suggestion:
+                "Parse the body with a schema that names the fields the endpoint means to accept, and write the parsed " +
+                "result. Handing the raw body to Prisma lets a caller set any column on the model, skips whatever bounds " +
+                "the matching create enforces, and answers 500 on a key the model does not have.",
+        };
+    }
+
+    return { name, passed: true, message: "No write takes an unfiltered body" };
+}
+
 function checkSecretChecksLimited(modulePath: string): CheckResult {
     const name = "Secret checks are rate limited";
     const comparesSecret = /bcrypt\.compare\(|verifyToken\(/;
@@ -1512,6 +1568,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),
         checkSettingsAreOwned(modulePath),
+        checkNoMassAssignment(modulePath),
         checkCspOriginsDeclared(modulePath),
         checkHooksEmitted(modulePath),
     ];

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { z } from "zod";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -20,13 +21,36 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("changelog.entry", id, existing, "update", session.user.id);
 
-    const patchData: Record<string, unknown> = { ...body };
-    if (typeof patchData.content === "string") {
-        patchData.content = sanitizeHtml(patchData.content);
+    // Everything POST accepts, each field optional, plus the two an edit can
+    // reach that a create cannot. This used to be `{ ...body }` handed
+    // straight to Prisma, which let an admin write any column on the model -
+    // `id`, so the revision rows recorded against the old one no longer found
+    // it, and `createdAt`, which is what the public list orders by - while
+    // skipping every bound POST enforces on the same fields. Any key outside
+    // this list was passed through to Prisma too and answered 500, because a
+    // column it does not know is a validation error thrown, not returned.
+    // Zod strips what it does not name, so unknown keys are simply dropped.
+    const patchSchema = z.object({
+        version: z.string().min(1).max(50),
+        title: z.string().min(1).max(200),
+        content: z.string().min(1).max(10000),
+        type: z.string().max(50),
+        color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+        isActive: z.boolean(),
+        publishAt: z.string().datetime().nullable(),
+    }).partial();
+
+    const validation = patchSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
-    if (patchData.publishAt !== undefined) {
-        patchData.publishAt = patchData.publishAt ? new Date(patchData.publishAt as string) : null;
-    }
+
+    const { content, publishAt, ...rest } = validation.data;
+    const patchData = {
+        ...rest,
+        ...(content !== undefined ? { content: sanitizeHtml(content) } : {}),
+        ...(publishAt !== undefined ? { publishAt: publishAt ? new Date(publishAt) : null } : {}),
+    };
     const entry = await prisma.changelogEntry.update({ where: { id }, data: patchData });
 
     const { doActionAsync } = await import("@/core/sdk");

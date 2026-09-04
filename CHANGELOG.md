@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **One endpoint handed the request body straight to the database.**
+  `PATCH /api/v1/changelog/[id]` built its update as `{ ...body }` and passed
+  it to Prisma. Its own POST parses the same fields with a zod schema, so the
+  module bounded `version` to 50 characters and required `color` to be
+  `#rrggbb` on create and accepted anything on edit, writing the same row both
+  ways. The spread also reached columns no edit should: `id`, which orphans
+  the revision rows recorded against the old value, and `createdAt`, which is
+  what the public changelog is ordered by. A key the model does not have went
+  to Prisma too and came back 500, because an unknown column is a validation
+  error thrown rather than returned. PATCH now parses with the same schema as
+  POST, every field optional, plus the `isActive` and `publishAt` an edit can
+  legitimately reach; zod drops anything else. It was the only write of its
+  kind in core and 78 modules, and both `validate-module` and a test now say
+  so.
+
 - **Sixty six form controls had no accessible name.** A screen reader
   announced them by role alone: "checkbox, unchecked" with no hint of what it
   selects, "combo box" with no hint of what it changes. Among them were the
