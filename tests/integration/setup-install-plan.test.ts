@@ -13,6 +13,16 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+/**
+ * The route hashes the admin password with bcrypt at cost 12 on every call,
+ * which is CPU-heavy by design and is the one thing here that is not mocked.
+ * On a machine running the rest of the suite in parallel that alone can pass
+ * vitest's 5s default, and a test that times out mid-install leaves its
+ * recorded calls behind for the next one to trip over. The work is real, so
+ * the budget says so rather than the tests failing by machine load.
+ */
+vi.setConfig({ testTimeout: 30_000 });
+
 const CATALOG = {
     modules: [
         { id: "currency", version: "1.0.0", dependencies: [], conflicts: [] },

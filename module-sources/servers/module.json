@@ -2,7 +2,7 @@
   "id": "servers",
   "name": "Game Servers",
   "description": "Game server management, RCON, and status monitoring",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "coreVersion": "^1.3.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -112,7 +112,9 @@
         "svr_typeHytale": "Hytale",
         "svr_typeCs2": "Counter-Strike 2",
         "svr_typeGarrysmod": "Garry's Mod",
-        "svr_typeUnturned": "Unturned"
+        "svr_typeUnturned": "Unturned",
+        "adm_title": "Game Servers",
+        "adm_subtitle": "The servers shown on the status list"
       },
       "admin": {
         "menu_servers": "Servers",
@@ -177,7 +179,9 @@
         "svr_typeHytale": "Hytale",
         "svr_typeCs2": "Counter-Strike 2",
         "svr_typeGarrysmod": "Garry's Mod",
-        "svr_typeUnturned": "Unturned"
+        "svr_typeUnturned": "Unturned",
+        "adm_title": "Oyun Sunucuları",
+        "adm_subtitle": "Durum listesinde gösterilen sunucular"
       },
       "admin": {
         "menu_servers": "Sunucular",
