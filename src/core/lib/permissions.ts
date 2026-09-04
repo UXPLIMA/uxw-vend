@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { STAFF_ROLE_PRIORITY } from "./constants";
 
 /**
  * Permission system.
@@ -112,16 +113,31 @@ export async function isAdmin(userId: string, sessionRole?: string): Promise<boo
     return user?.role?.name === "admin";
 }
 
-/** Staff = admin or moderator (role priority ≥ 50). Skip DB via sessionRole. */
-export async function isStaff(userId: string, sessionRole?: string): Promise<boolean> {
-    if (sessionRole === "admin" || sessionRole === "moderator") return true;
+/**
+ * Staff = admin, or a role that has reached `STAFF_ROLE_PRIORITY`.
+ *
+ * The fast path used to accept the role *name* "moderator", which is not what
+ * the database half of this function measures. Roles are the admin's to
+ * rename and reorder, so a site that demoted its moderators saw the staff
+ * links disappear from the navbar - that check reads the priority - while
+ * every endpoint behind them kept saying yes, because the session still
+ * carried the old name. Pass `sessionPriority` (the token carries it) to skip
+ * the query; both paths now answer the same question.
+ */
+export async function isStaff(
+    userId: string,
+    sessionRole?: string,
+    sessionPriority?: number,
+): Promise<boolean> {
+    if (sessionRole === "admin") return true;
+    if (typeof sessionPriority === "number") return sessionPriority >= STAFF_ROLE_PRIORITY;
 
     const user = await prisma.user.findUnique({
         where: { id: userId },
         include: { role: true },
     });
 
-    return (user?.role?.priority || 0) >= 50;
+    return (user?.role?.priority || 0) >= STAFF_ROLE_PRIORITY;
 }
 
 /* ─────────────────── Granular ResourcePermission ─────────────────── */

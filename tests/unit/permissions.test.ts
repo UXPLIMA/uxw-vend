@@ -12,7 +12,8 @@
  *   - hasResourcePermission: admin bypass, no-grants deny, most-specific-wins
  *     precedence (user+id > user > role+id > role), deny short-circuit, wildcard
  *     action match
- *   - isAdmin / isStaff: sessionRole fast path + DB fallback
+ *   - isAdmin / isStaff: sessionRole fast path, sessionPriority fast path,
+ *     DB fallback, and that a role name alone never confers staff
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -255,9 +256,22 @@ describe("isStaff", () => {
         expect(mockUserFindUnique).not.toHaveBeenCalled();
     });
 
-    it("sessionRole=moderator short-circuits true", async () => {
-        expect(await isStaff("u1", "moderator")).toBe(true);
+    it("a role named moderator is not staff by its name alone", async () => {
+        // It used to short-circuit true on the name. Demoting that role in the
+        // admin panel hid the staff links and left the endpoints open.
+        mockUserFindUnique.mockResolvedValue({ role: { priority: 10 } });
+        expect(await isStaff("u1", "moderator")).toBe(false);
+    });
+
+    it("sessionPriority short-circuits, in both directions", async () => {
+        expect(await isStaff("u1", "moderator", 60)).toBe(true);
+        expect(await isStaff("u1", "moderator", 10)).toBe(false);
         expect(mockUserFindUnique).not.toHaveBeenCalled();
+    });
+
+    it("a role the site invented is staff when it ranks high enough", async () => {
+        mockUserFindUnique.mockResolvedValue({ role: { priority: 70 } });
+        expect(await isStaff("u1", "developer")).toBe(true);
     });
 
     it("DB fallback: priority >= 50 is staff", async () => {

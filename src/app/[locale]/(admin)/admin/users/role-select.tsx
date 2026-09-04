@@ -8,6 +8,7 @@ interface Role {
     id: string;
     name: string;
     displayName: string;
+    color: string | null;
 }
 
 interface UserRoleSelectProps {
@@ -46,12 +47,16 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
         }
     };
 
+    // The role's own colour, which the admin picks on the roles screen and
+    // which the profile page and the user detail page already honour. This
+    // control used to paint red for a role named "admin", purple for one named
+    // "moderator" and grey for everything else, so a site's custom roles all
+    // looked alike and its chosen colours went nowhere.
     const currentRole = roles.find((r) => r.id === roleId);
-    const roleColor = currentRole?.name === "admin"
-        ? "border-red-200 bg-red-50"
-        : currentRole?.name === "moderator"
-            ? "border-purple-200 bg-purple-50"
-            : "border-border bg-card";
+    const accent = currentRole?.color || null;
+    const swatch = accent
+        ? { borderColor: accent, backgroundColor: `${accent}14` }
+        : undefined;
 
     return (
         <div className="flex items-center gap-2">
@@ -60,7 +65,8 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={saving}
                 aria-label={t("users_role")}
-                className={`text-xs px-2 py-1 rounded border ${roleColor} cursor-pointer`}
+                className={`text-xs px-2 py-1 rounded border cursor-pointer ${accent ? "" : "border-border bg-card"}`}
+                style={swatch}
             >
                 {roles.map((role) => (
                     <option key={role.id} value={role.id}>

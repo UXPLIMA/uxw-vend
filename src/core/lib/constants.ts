@@ -6,6 +6,18 @@ export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;
 export const BACKUP_CODES_COUNT = 8;
 
+/**
+ * The role priority at which a role counts as staff.
+ *
+ * Roles are the admin's to create, rename and reorder, so "staff" is a
+ * position on that ladder rather than a list of names. Three places measured
+ * it independently and one of them measured something else entirely: the
+ * server-side check accepted the role *name* "moderator" straight off the
+ * session, so demoting that role in the admin panel hid the staff links and
+ * left the endpoints behind them open.
+ */
+export const STAFF_ROLE_PRIORITY = 50;
+
 // Rate limits (defaults, can be overridden by settings)
 export const RATE_LIMIT_AUTH = { maxRequests: 10, windowMs: 60000 };
 export const RATE_LIMIT_API = { maxRequests: 120, windowMs: 60000 };

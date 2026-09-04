@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (!(await isStaff(session.user.id, session.user.role))) {
+    if (!(await isStaff(session.user.id, session.user.role, session.user.rolePriority))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { searchParams } = new URL(request.url);
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (!(await isStaff(session.user.id, session.user.role))) {
+    if (!(await isStaff(session.user.id, session.user.role, session.user.rolePriority))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

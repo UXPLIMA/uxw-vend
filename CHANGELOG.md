@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Demoting the moderator role did not close the doors it opened.** `isStaff`
+  measured two different things depending on which half ran: the fast path
+  accepted the role *name* "moderator" straight off the session, the slow path
+  asked whether the role's priority reached fifty. Roles are the admin's to
+  rename and reorder, so a site that demoted its moderators watched the staff
+  links vanish from the navbar, which reads the priority, while every endpoint
+  behind them kept answering yes. The threshold is now one exported constant
+  and both paths use it; callers pass the priority the session token already
+  carries, so the fast path stays fast and says the same thing as the query.
+  A role the site invented is staff when it ranks high enough, which it always
+  should have been.
+- **Two admin screens assumed the site has exactly three roles.** The
+  maintenance screen offered checkboxes for "admin", "moderator" and "member"
+  whether or not those roles existed, and never for one the admin had added;
+  it now lists the site's real roles, keeps a saved name that no longer
+  matches so it can still be removed, and keeps the free-text field for a role
+  that does not exist yet. The users list painted the role selector red for a
+  role named "admin" and purple for one named "moderator", ignoring the colour
+  the admin chose on the roles screen - the same colour the profile page and
+  the user detail page already use.
+- The maintenance screen's explanation of allowed roles was an English string
+  in the markup, on a page where everything around it was translated.
+
+### Fixed
 - **Seven public pages answered 200 for a URL that named nothing.** A player
   who does not exist, a product id nobody issued, a deactivated help article,
   a form, a custom page, a forum topic: each page looked its subject up in the
