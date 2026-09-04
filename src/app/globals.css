@@ -63,6 +63,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
+ * Room for the mobile bottom navigation.
+ *
+ * `MobileBottomNav` is `fixed bottom-0` and `sm:hidden`, so below the sm
+ * breakpoint it covers the last 3.5rem of every page: a footer, the last row
+ * of a list, the submit button under a form. Nothing compensated for it, so
+ * that content simply could not be reached on a phone.
+ *
+ * A module can add to the bar through the `mobile.nav` slot, which makes it
+ * taller than this; the variable is here so a theme can say so.
+ */
+:root {
+  --uxw-mobile-nav-height: 3.5rem;
+}
+
+@media (max-width: 639.98px) {
+  body {
+    padding-bottom: calc(var(--uxw-mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/*
+ * The bar itself clears the home indicator. This class was already on the nav
+ * and had never been defined anywhere, so on a device that has one the bar sat
+ * underneath it.
+ */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--uxw-color-mutedForeground); opacity: 0.5; border-radius: 999px; }

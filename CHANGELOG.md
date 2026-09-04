@@ -98,6 +98,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   over core under `npm test`.
 
 ### Fixed
+- **The mobile bottom bar covered the end of every page.** It is
+  `fixed bottom-0` and `sm:hidden`, and nothing left room for it, so below the
+  sm breakpoint the last 3.5rem of a page was simply unreachable: a footer, the
+  last row of a list, the submit button under a form. The page clears it now,
+  plus the home indicator on top of that. The `safe-area-bottom` class the nav
+  had carried all along was never defined anywhere, which is why the bar sat
+  under the home indicator; it is a real rule now.
+- **Three tables were cut off on a phone instead of scrolling.** The support
+  ticket list is six columns wide inside a wrapper with `overflow-hidden`,
+  which clips rather than scrolls, and the ticket and punishment admin tables
+  were the same. Core's tables have always used `overflow-x-auto`. A test walks
+  every table in the tree and fails one with no scrolling ancestor. The ticket
+  list also drew its row dividers in a hardcoded light grey, which on a dark
+  theme was a set of near-white lines; it uses the theme token now, and no
+  module may hardcode one again.
+- **The ticket admin dashboard put four stat cards in one row on a phone.**
+  `grid-cols-4` with no responsive prefix. Two rows of two below `lg` now.
 - **Deleting an account could split a conversation in two.** The lookup for an
   existing 1:1 thread asked only that every participant be one of the two
   people, which is vacuously true for a thread with no participants and true
