@@ -1153,6 +1153,60 @@ function checkProviderCallbacksVerify(modulePath: string): CheckResult {
     return { name, passed: true, message: `${declared.length} provider callback(s) authenticate themselves` };
 }
 
+function checkTitleFromPathIsEarned(modulePath: string): CheckResult {
+    const name = "Routes titled from the URL resolve on the server";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) {
+        return { name, passed: true, message: "No manifest to check" };
+    }
+
+    let manifest: { routes?: Array<{ path: string; component: string; titleFromPath?: boolean }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest is unreadable; another check reports that" };
+    }
+
+    const declared = (manifest.routes ?? []).filter((route) => route.titleFromPath);
+    if (declared.length === 0) {
+        return { name, passed: true, message: "No route titles itself from the URL" };
+    }
+
+    // `titleFromPath` tells core the last URL segment names something real, so
+    // core puts it in <title>, og:title and twitter:title. That only holds if a
+    // URL naming nothing answers 404, which needs the lookup to happen on the
+    // server: a client page that fetches and then renders "not found" has
+    // already sent a 200 with the visitor's own text as the page title, and an
+    // unfurled link in chat shows it under the site's name.
+    const offenders: string[] = [];
+    for (const route of declared) {
+        const component = path.join(modulePath, route.component);
+        if (!fs.existsSync(component)) {
+            offenders.push(`${route.path} (component missing)`);
+            continue;
+        }
+        const body = fs.readFileSync(component, "utf8");
+        if (/^\s*["']use client["']/m.test(body)) {
+            offenders.push(`${route.path} (client component)`);
+        } else if (!/\bnotFound\s*\(\s*\)/.test(body)) {
+            offenders.push(`${route.path} (never calls notFound)`);
+        }
+    }
+
+    if (offenders.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${offenders.length} route(s) claim titleFromPath without 404ing on the server: ${offenders.join(", ")}`,
+            suggestion:
+                "Resolve the resource in a server component and call notFound() when there is none, or drop " +
+                "titleFromPath and let core title the page from the route you declared.",
+        };
+    }
+
+    return { name, passed: true, message: `${declared.length} route(s) earn their path-derived title` };
+}
+
 function checkSecretChecksLimited(modulePath: string): CheckResult {
     const name = "Secret checks are rate limited";
     const comparesSecret = /bcrypt\.compare\(|verifyToken\(/;
@@ -1386,6 +1440,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkModuleFetchPaths(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
+        checkTitleFromPathIsEarned(modulePath),
         checkCspOriginsDeclared(modulePath),
         checkHooksEmitted(modulePath),
     ];
