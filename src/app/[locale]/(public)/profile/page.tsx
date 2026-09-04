@@ -426,9 +426,9 @@ export default function ProfilePage() {
                                 <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                             </div>
                             <div>
-                                <h3 id="delete-title" className="font-semibold text-foreground">
+                                <h2 id="delete-title" className="font-semibold text-foreground">
                                     {t("deleteAccountPermanently")}
-                                </h3>
+                                </h2>
                                 <p className="text-sm text-muted-foreground mt-1">
                                     {t("deleteAccountWarning")}
                                 </p>

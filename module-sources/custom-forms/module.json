@@ -2,7 +2,7 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",

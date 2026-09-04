@@ -233,7 +233,7 @@ export default function MediaLibraryPage() {
                         className="relative bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between p-4 border-b border-border">
-                            <h3 id="media-detail-title" className="font-bold truncate">{selected.filename}</h3>
+                            <h2 id="media-detail-title" className="font-bold truncate">{selected.filename}</h2>
                             <button onClick={() => setSelected(null)} aria-label={commonT("close")} className="text-muted-foreground hover:text-foreground">
                                 <X className="w-5 h-5" aria-hidden="true" />
                             </button>

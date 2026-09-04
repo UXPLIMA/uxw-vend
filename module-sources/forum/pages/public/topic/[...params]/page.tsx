@@ -200,7 +200,7 @@ export default function TopicDetailPage() {
                         {/* Replies */}
                         {topic.posts.length > 0 && (
                             <div className="space-y-3 mb-6">
-                                <h3 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h3>
+                                <h2 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h2>
                                 {topic.posts.map((post) => (
                                     <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
                                 ))}
@@ -211,7 +211,7 @@ export default function TopicDetailPage() {
                         {!topic.isLocked ? (
                             <Card>
                                 <CardContent className="p-5">
-                                    <h3 className="font-medium text-foreground mb-3">{t('reply')}</h3>
+                                    <h2 className="font-medium text-foreground mb-3">{t('reply')}</h2>
                                     <Textarea
                                         value={replyContent}
                                         onChange={(e) => setReplyContent(e.target.value)}

@@ -47,7 +47,7 @@ export default async function BlogPage() {
                             <aside className="space-y-6">
                                 {/* Categories */}
                                 <div className="bg-card rounded-xl border border-border p-5">
-                                    <h3 className="font-bold text-foreground mb-4">{t('categories')}</h3>
+                                    <h2 className="font-bold text-foreground mb-4">{t('categories')}</h2>
                                     <div className="space-y-2">
                                         {categories.map((category) => (
                                             <Link
@@ -66,7 +66,7 @@ export default async function BlogPage() {
 
                                 {/* Recent Posts */}
                                 <div className="bg-card rounded-xl border border-border p-5">
-                                    <h3 className="font-bold text-foreground mb-4">{t('recentPosts')}</h3>
+                                    <h2 className="font-bold text-foreground mb-4">{t('recentPosts')}</h2>
                                     <div className="space-y-4">
                                         {articles.slice(0, 5).map((article) => (
                                             <Link
@@ -74,9 +74,9 @@ export default async function BlogPage() {
                                                 href={`/blog/${article.number}/${article.slug}`}
                                                 className="block group"
                                             >
-                                                <h4 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
+                                                <h3 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
                                                     {article.title}
-                                                </h4>
+                                                </h3>
                                                 <p className="text-xs text-muted-foreground mt-1">
                                                     {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
                                                 </p>

@@ -204,7 +204,7 @@ export default function WheelPage() {
 
                         {/* Prize List */}
                         <div className="w-full max-w-sm">
-                            <h3 className="text-sm font-medium text-muted-foreground mb-2">{t('availablePrizes')}</h3>
+                            <h2 className="text-sm font-medium text-muted-foreground mb-2">{t('availablePrizes')}</h2>
                             <div className="space-y-1">
                                 {prizes.map((p) => (
                                     <div key={p.id} className="flex items-center gap-2 text-sm">

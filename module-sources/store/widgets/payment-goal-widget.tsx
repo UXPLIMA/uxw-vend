@@ -36,7 +36,7 @@ export function PaymentGoalWidget() {
         <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center gap-2 mb-4">
                 <Target className="w-4 h-4 text-blue-600" />
-                <h3 className="font-bold text-foreground">{goal.title || sidebarT('paymentGoal')}</h3>
+                <h2 className="font-bold text-foreground">{goal.title || sidebarT('paymentGoal')}</h2>
             </div>
 
             <div className="h-4 bg-muted rounded-full overflow-hidden mb-2 relative">

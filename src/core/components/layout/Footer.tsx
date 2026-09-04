@@ -151,7 +151,7 @@ function DefaultFooter() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-foreground mb-4">{t('quickLinks')}</h4>
+                        <h2 className="font-semibold text-foreground mb-4">{t('quickLinks')}</h2>
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">{commonT('home')}</Link></li>
                             {quickLinks.map(fl => (
@@ -164,7 +164,7 @@ function DefaultFooter() {
                         Core names no legal page of its own. */}
                     {legalLinks.length > 0 && (
                         <div>
-                            <h4 className="font-semibold text-foreground mb-4">{t('legal')}</h4>
+                            <h2 className="font-semibold text-foreground mb-4">{t('legal')}</h2>
                             <ul className="space-y-2 text-sm">
                                 {legalLinks.map(fl => (
                                     <li key={fl.href}><FooterLinkItem link={fl} /></li>
@@ -175,7 +175,7 @@ function DefaultFooter() {
 
                     {/* Settings */}
                     <div>
-                        <h4 className="font-semibold text-foreground mb-4">{commonT('settings')}</h4>
+                        <h2 className="font-semibold text-foreground mb-4">{commonT('settings')}</h2>
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Globe className="w-4 h-4 text-muted-foreground" />

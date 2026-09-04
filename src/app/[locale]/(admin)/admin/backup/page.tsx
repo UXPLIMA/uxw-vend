@@ -349,7 +349,7 @@ export default function BackupAdminPage() {
                                 <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" aria-hidden="true" />
                             </div>
                             <div className="flex-1">
-                                <h3 id="restore-title" className="font-semibold text-foreground mb-1">{t("backup_restoreTitle")}</h3>
+                                <h2 id="restore-title" className="font-semibold text-foreground mb-1">{t("backup_restoreTitle")}</h2>
                                 <p className="text-sm text-muted-foreground">
                                     {t("backup_restoreWarning")}
                                     {" "}<span className="font-mono text-xs break-all">{restoreTarget.filename}</span>.

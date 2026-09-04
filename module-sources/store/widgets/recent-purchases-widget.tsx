@@ -28,7 +28,7 @@ export function RecentPurchasesWidget() {
     return (
         <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-foreground">{sidebarT('recentPurchases')}</h3>
+                <h2 className="font-bold text-foreground">{sidebarT('recentPurchases')}</h2>
                 <span className="text-xs text-green-600 font-medium">● {sidebarT('live')}</span>
             </div>
             <div className="space-y-3">

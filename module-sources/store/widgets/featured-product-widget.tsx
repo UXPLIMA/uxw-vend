@@ -35,7 +35,7 @@ export function FeaturedProductWidget() {
 
     return (
         <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-bold text-foreground mb-4">{sidebarT('featuredProduct')}</h3>
+            <h2 className="font-bold text-foreground mb-4">{sidebarT('featuredProduct')}</h2>
             <div className="text-center">
                 <div className="w-20 h-20 mx-auto mb-3 bg-amber-100 rounded-lg flex items-center justify-center overflow-hidden">
                     {product.image ? (
@@ -45,7 +45,7 @@ export function FeaturedProductWidget() {
                         <Crown className="w-10 h-10 text-amber-500" />
                     )}
                 </div>
-                <h4 className="font-semibold text-foreground mb-1">{product.name}</h4>
+                <h3 className="font-semibold text-foreground mb-1">{product.name}</h3>
                 <p className="text-blue-600 font-bold text-lg mb-3">{formatPrice(product.price)}</p>
                 <Link href={`/store/product/${product.number}/${product.slug}`}>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-none">

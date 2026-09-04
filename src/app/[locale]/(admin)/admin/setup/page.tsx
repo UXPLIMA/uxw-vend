@@ -309,10 +309,10 @@ export default function SetupWizardPage() {
                                             <div className="flex items-center gap-3">
                                                 <span className="text-blue-500"><ModuleIcon name={mod.icon} /></span>
                                                 <div>
-                                                    <h4 className="font-medium text-sm flex items-center gap-1.5">
+                                                    <h2 className="font-medium text-sm flex items-center gap-1.5">
                                                         {mod.name}
                                                         {mod.verified && <CheckCircle className="w-3 h-3 text-blue-500" />}
-                                                    </h4>
+                                                    </h2>
                                                     <p className="text-xs text-muted-foreground line-clamp-1">{mod.description}</p>
                                                 </div>
                                             </div>

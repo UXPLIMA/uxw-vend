@@ -15,9 +15,9 @@ export function DoneStep({ completed, result }: { completed: boolean; result: Se
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-600">
                 <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">
+            <h1 className="text-xl font-bold text-foreground">
                 {completed ? t("title") : t("working")}
-            </h2>
+            </h1>
             <p className="text-sm text-muted-foreground">{completed ? t("body") : t("waiting")}</p>
 
             {completed && installed.length > 0 && (

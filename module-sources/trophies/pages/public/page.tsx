@@ -98,7 +98,7 @@ export default function PublicTrophiesPage() {
                                             <Award className="w-6 h-6" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold truncate">{tr.name}</h3>
+                                            <h2 className="font-semibold truncate">{tr.name}</h2>
                                             {tr.description && (
                                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                                     {tr.description}

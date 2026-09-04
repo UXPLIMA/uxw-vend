@@ -78,7 +78,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                             )}
                             <div className="flex-1">
                                 {state.options.title && (
-                                    <h3 id="confirm-title" className="font-semibold text-foreground mb-1">{state.options.title}</h3>
+                                    <h2 id="confirm-title" className="font-semibold text-foreground mb-1">{state.options.title}</h2>
                                 )}
                                 <p id="confirm-message" className="text-sm text-muted-foreground">{state.options.message}</p>
                             </div>

@@ -68,7 +68,7 @@ export default function AdminModulesPage() {
                         <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
                         {bulkProgress ? (
                             <>
-                                <h3 className="font-semibold text-lg mb-1">{t("modules_installingModules", { current: bulkProgress.current, total: bulkProgress.total })}</h3>
+                                <h2 className="font-semibold text-lg mb-1">{t("modules_installingModules", { current: bulkProgress.current, total: bulkProgress.total })}</h2>
                                 <p className="text-sm text-muted-foreground">{bulkProgress.name}</p>
                                 <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
                                     <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }} />
@@ -76,7 +76,7 @@ export default function AdminModulesPage() {
                             </>
                         ) : installProgress ? (
                             <>
-                                <h3 className="font-semibold text-lg mb-1">{installProgress.name}</h3>
+                                <h2 className="font-semibold text-lg mb-1">{installProgress.name}</h2>
                                 <p className="text-sm text-muted-foreground">{installProgress.step}</p>
                                 <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
                                     <div className="bg-primary h-full rounded-full animate-pulse" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
@@ -112,7 +112,7 @@ export default function AdminModulesPage() {
                 <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h3 className="font-semibold">{t("modules_customModule")}</h3>
+                            <h2 className="font-semibold">{t("modules_customModule")}</h2>
                             <p className="text-sm text-muted-foreground">{t("modules_uploadDesc")}</p>
                         </div>
                         <div>

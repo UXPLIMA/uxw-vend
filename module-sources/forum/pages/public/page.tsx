@@ -104,7 +104,7 @@ export default function ForumPage() {
                     <div className="lg:col-span-1">
                         <Card>
                             <CardContent className="p-4">
-                                <h3 className="font-semibold text-foreground mb-3">{t('categories')}</h3>
+                                <h2 className="font-semibold text-foreground mb-3">{t('categories')}</h2>
                                 <div className="space-y-1">
                                     <button
                                         onClick={() => { setSelectedCategory(null); setPage(1); }}
@@ -164,7 +164,7 @@ export default function ForumPage() {
                                                         <div className="flex items-center gap-2 mb-1">
                                                             {topic.isPinned && <Pin className="w-3 h-3 text-blue-500" />}
                                                             {topic.isLocked && <Lock className="w-3 h-3 text-muted-foreground" />}
-                                                            <h3 className="font-medium text-foreground truncate">{topic.title}</h3>
+                                                            <h2 className="font-medium text-foreground truncate">{topic.title}</h2>
                                                         </div>
                                                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                             <span>{topic.author.username}</span>

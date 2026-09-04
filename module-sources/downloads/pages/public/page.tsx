@@ -68,7 +68,7 @@ export default function DownloadsPage() {
                                         <FileText className="w-6 h-6 text-blue-600" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-medium text-foreground">{dl.title}</h3>
+                                        <h2 className="font-medium text-foreground">{dl.title}</h2>
                                         {dl.description && <p className="text-sm text-muted-foreground line-clamp-1">{dl.description}</p>}
                                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                                             <span>{dl.fileName}</span>

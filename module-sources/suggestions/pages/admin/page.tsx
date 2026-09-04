@@ -141,7 +141,7 @@ export default function AdminSuggestionsPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start gap-2 mb-1">
-                                        <h3 className="font-semibold flex-1">{s.title}</h3>
+                                        <h2 className="font-semibold flex-1">{s.title}</h2>
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBadgeClass(s.status)}`}>
                                             {STATUS_OPTIONS.includes(s.status) ? t(s.status) : s.status}
                                         </span>

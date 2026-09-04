@@ -10,9 +10,9 @@ export default function RootError({
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
             <div className="text-center max-w-md">
-                <h2 className="text-2xl font-bold text-foreground mb-2">
+                <h1 className="text-2xl font-bold text-foreground mb-2">
                     Something went wrong
-                </h2>
+                </h1>
                 {/*
                   * The message stays out of the page. Next redacts a server
                   * error's message in production, but an error thrown in a

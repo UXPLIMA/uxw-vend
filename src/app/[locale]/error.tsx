@@ -46,7 +46,7 @@ export default function Error({
                 <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
             <div className="text-center max-w-md">
-                <h2 className="text-2xl font-bold text-foreground mb-2">{labels.title}</h2>
+                <h1 className="text-2xl font-bold text-foreground mb-2">{labels.title}</h1>
                 <p className="text-muted-foreground text-sm mb-6">
                     {labels.description}
                 </p>

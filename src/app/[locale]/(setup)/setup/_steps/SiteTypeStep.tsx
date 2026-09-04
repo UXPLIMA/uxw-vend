@@ -14,7 +14,7 @@ export function SiteTypeStep({ presets, selected, onSelect }: SiteTypeStepProps)
     const t = useTranslations("setup.type");
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-bold text-foreground">{t("title")}</h2>
+            <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
             <p className="text-sm text-muted-foreground">{t("description")}</p>
             {presets.length === 0 ? (
                 <p className="text-xs text-muted-foreground italic">{t("unavailable")}</p>

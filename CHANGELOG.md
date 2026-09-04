@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every screen skipped a heading level, most of them twice.** Heading rank is
+  what a screen reader user navigates a page by, and a jump from h1 to h3 says
+  a section is missing. `CardTitle` was a hardcoded `<h3>`, and cards sit
+  directly under a page's `<h1>` nearly everywhere here, so every card on every
+  screen skipped a level; the footer titled its three columns with `<h4>`, so
+  every page in the product ended h1 -> h4; and twenty-one page files jumped
+  from their own `<h1>` straight to an `<h3>`. `CardTitle` is now polymorphic
+  and defaults to `h2`, with `as` for a card that genuinely nests inside an h2
+  section. Class names did not change, so nothing moved on screen.
+- **Two screens had no `<h1>` at all.** The setup wizard titled each of its
+  seven steps with an `<h2>` and named the page nowhere, and the theme settings
+  screen was the one settings sub-page that opened at `<h3>` while its six
+  siblings all opened at `<h1>`. The forum's new-topic page and the Steam
+  sign-in callback were unnamed the same way. All of them now name themselves.
+- **The full-page error screens titled themselves `<h2>`.** `app/error.tsx`,
+  the locale error boundary and the admin error boundary each replace the whole
+  page, so their heading is the page title.
+
+### Fixed
 - **`/wp-login.php` answered 200 with the homepage.** The proxy's page matcher
   skips any path containing a dot, which is how it stays off files in
   `/public`, and nothing downstream checked the segment it skipped. So a

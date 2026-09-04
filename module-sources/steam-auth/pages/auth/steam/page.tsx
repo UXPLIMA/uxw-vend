@@ -45,7 +45,7 @@ export default function SteamSignInPage() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center px-4">
             {failed ? (
                 <>
-                    <p className="text-destructive">{t("signInFailed")}</p>
+                    <h1 className="text-destructive">{t("signInFailed")}</h1>
                     <button
                         type="button"
                         onClick={() => router.replace("/auth/login")}
@@ -57,7 +57,7 @@ export default function SteamSignInPage() {
             ) : (
                 <>
                     <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                    <p className="text-muted-foreground">{t("signingIn")}</p>
+                    <h1 className="text-muted-foreground">{t("signingIn")}</h1>
                 </>
             )}
         </div>

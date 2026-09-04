@@ -196,7 +196,7 @@ export default function FormsPage() {
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1 min-w-0">
                                     <FileText className="w-5 h-5 text-muted-foreground mb-1" />
-                                    <h3 className="font-medium">{form.title}</h3>
+                                    <h2 className="font-medium">{form.title}</h2>
                                     {form.description && <p className="text-xs text-muted-foreground">{form.description}</p>}
                                 </div>
                                 <div className="flex gap-1">
