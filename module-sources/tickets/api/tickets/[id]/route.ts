@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRole, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { ticketMessageSchema, ticketUpdateSchema } from "../../../lib/validations";
 import { canAccessTicket } from "../../../lib/can-access-ticket";
@@ -145,6 +145,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const allowed = await rateLimitForRoleAsync(
+        `ticket-update:${session.user.id}`,
+        { maxRequests: 30, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
     }
 
     // Check access - admin bypass, tickets.manage role perm, owner, or

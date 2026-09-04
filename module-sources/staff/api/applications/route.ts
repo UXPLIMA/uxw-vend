@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET - Admin: all applications, User: own applications
@@ -22,6 +22,15 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const allowed = await rateLimitForRoleAsync(
+        `staff-application:${session.user.id}`,
+        { maxRequests: 10, windowMs: 3_600_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
+    }
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;

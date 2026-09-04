@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/core/lib/auth";
+import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { setPreference, getUserPreferences } from "@/core/lib/notif-prefs";
 import { ModuleNotificationTypes } from "@/core/generated/module-notification-types";
 import { getModuleStates } from "@/core/lib/module-cache";
@@ -35,6 +36,15 @@ const updateSchema = z.object({
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const allowed = await rateLimitForRoleAsync(
+        `notif-prefs:${session.user.id}`,
+        { maxRequests: 60, windowMs: 60_000 },
+        session.user.role
+    );
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
+    }
 
     const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;

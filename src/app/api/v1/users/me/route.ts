@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
+import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { prisma } from "@/core/lib/db";
 import { updateUserSchema } from "@/core/lib/validations";
 import { readJsonBody } from "@/core/lib/api-body";
@@ -57,6 +58,15 @@ export async function PATCH(request: NextRequest) {
 
         if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const allowed = await rateLimitForRoleAsync(
+            `profile-update:${session.user.id}`,
+            { maxRequests: 30, windowMs: 60_000 },
+            session.user.role
+        );
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
         }
 
         const body = await readJsonBody(request);

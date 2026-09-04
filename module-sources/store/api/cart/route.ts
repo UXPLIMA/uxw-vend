@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, readJsonBody } from "@/core/sdk/server";
+import { prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -61,6 +61,15 @@ export async function POST(request: NextRequest) {
 
         if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const allowed = await rateLimitForRoleAsync(
+            `cart-write:${session.user.id}`,
+            { maxRequests: 60, windowMs: 60_000 },
+            session.user.role
+        );
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
         }
 
         const body = await readJsonBody(request);
@@ -150,6 +159,15 @@ export async function DELETE() {
 
         if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const allowed = await rateLimitForRoleAsync(
+            `cart-write:${session.user.id}`,
+            { maxRequests: 60, windowMs: 60_000 },
+            session.user.role
+        );
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
         }
 
         await prisma.cartItem.deleteMany({

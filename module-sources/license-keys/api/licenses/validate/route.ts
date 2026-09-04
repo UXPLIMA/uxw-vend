@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { rateLimits, withRateLimit, readJsonBody } from "@/core/sdk/server";
 import { checkLicense } from "../../../lib/licenses";
 
-export const POST = withRateLimit(async (request: NextRequest) => {
+export const POST = withRateLimit("license-validate", async (request: NextRequest) => {
     const body = await readJsonBody(request, { fallback: {} });
     if (body instanceof NextResponse) return body;
     const key = typeof body.key === "string" ? body.key.trim() : "";

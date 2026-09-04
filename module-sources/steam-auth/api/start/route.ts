@@ -11,7 +11,7 @@ import { resolveAppUrl, withRateLimit, rateLimits } from "@/core/sdk/server";
 import { buildLoginUrl } from "../../lib/steam-openid";
 import { steamReturnTo } from "../../lib/steam-urls";
 
-export const GET = withRateLimit(async (_req: NextRequest) => {
+export const GET = withRateLimit("steam-start", async (_req: NextRequest) => {
     if (!process.env.AUTH_STEAM_API_KEY) {
         return NextResponse.json({ error: "Steam login is not configured" }, { status: 503 });
     }

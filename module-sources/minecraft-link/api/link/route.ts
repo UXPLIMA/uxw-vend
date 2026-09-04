@@ -37,7 +37,7 @@ export async function GET() {
 
 // Whispering costs a message in someone else's chat window, so this is
 // deliberately on the auth limiter rather than the general API one.
-export const POST = withRateLimit(async (request: NextRequest) => {
+export const POST = withRateLimit("minecraft-link", async (request: NextRequest) => {
     const userId = await currentUserId();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

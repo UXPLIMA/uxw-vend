@@ -38,7 +38,7 @@ interface ResultGroup {
  * Too long is an error rather than a silent truncation: results for a query
  * the caller did not ask for are a wrong answer dressed as a real one.
  */
-export const GET = withRateLimit(async (request: NextRequest) => {
+export const GET = withRateLimit("search", async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
     if (q.length < 2) {

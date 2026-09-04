@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { canDownload } from "../../lib/can-download";
 import { z } from "zod";
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
 
     const session = await auth();
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || request.headers.get("x-real-ip") || "unknown";
+    const ip = getClientIP(request.headers);
     const rlKey = `download:${session?.user?.id ?? "anon"}:${ip}`;
     const allowed = await rateLimitForRoleAsync(
         rlKey,
