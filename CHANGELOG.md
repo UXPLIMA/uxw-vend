@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **robots.txt blocked nothing it named.** It disallowed `/admin`, `/auth` and
+  `/profile`, and no crawlable URL on this site begins with any of them: every
+  page lives under a locale segment, so the admin panel is served at
+  `/en/admin` and `/tr/admin`. The three prefixes matched only the bare paths,
+  which are 307s. Both files build their lists from the locale table now, so
+  each prefix is disallowed under every locale the install serves. `/api` stays
+  bare, being the one route group with no locale segment.
+- **Every URL in the sitemap was a redirect.** The same locale blindness:
+  `/store` is not a page, it is a 307 to `/en/store`, and the sitemap submitted
+  seven of those and nothing else. Each path is published once per locale now,
+  and each entry carries the `hreflang` alternates - every locale plus an
+  `x-default` pointing at the default one - that tell a crawler the others are
+  the same page in another language. A module's `seo` contributor names a path
+  and never a locale, so core localizes what it returns too.
+- **The sitemap stamped the generation time on every URL as `lastmod`.** Core
+  does not know when a module's page last changed, and a sitemap whose every
+  entry claims to have changed an hour ago teaches a crawler to ignore the
+  field entirely. Entries core cannot date now carry no `lastmod`; a module's
+  own contributor still supplies a real one.
+
+### Fixed
 - **Every screen skipped a heading level, most of them twice.** Heading rank is
   what a screen reader user navigates a page by, and a jump from h1 to h3 says
   a section is missing. `CardTitle` was a hardcoded `<h3>`, and cards sit

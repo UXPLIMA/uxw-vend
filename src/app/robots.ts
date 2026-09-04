@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 import { resolveAppUrl } from "@/core/lib/app-url";
-import { DISALLOWED_PREFIXES } from "@/core/lib/sitemap-routes";
+import { disallowedPaths } from "@/core/lib/sitemap-routes";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
     // `robots.ts` is a Route Handler that Next caches - i.e. prerenders at
@@ -20,7 +20,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: [...DISALLOWED_PREFIXES],
+                // Bare `/admin` matched nothing: every page here is under a
+                // locale segment, so the crawlable URL is `/en/admin`.
+                disallow: disallowedPaths(),
             },
         ],
         sitemap: `${siteUrl}/sitemap.xml`,

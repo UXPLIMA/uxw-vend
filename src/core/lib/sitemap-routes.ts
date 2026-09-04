@@ -1,3 +1,5 @@
+import { locales, defaultLocale, type Locale } from "@/core/lib/i18n/config";
+
 /**
  * What the sitemap and robots.txt agree to publish.
  *
@@ -12,6 +14,13 @@
  * `seo` contributor, which none of the first-party ones do. Every static page
  * an enabled module routes is published now; a contributor is still how a
  * module adds the URLs core cannot know, like one per product.
+ *
+ * The third problem was the locale. Every route in this product lives under a
+ * locale segment - `localePrefix: "always"` - so `/store` is not a page, it is
+ * a 307 to `/en/store`. The sitemap published the bare paths, which made every
+ * URL in it a redirect, and robots.txt disallowed bare `/admin`, `/auth` and
+ * `/profile`, which are prefixes no crawlable URL on this site begins with. It
+ * blocked nothing. Both are built from `localizedPaths` now.
  */
 
 /** Path prefixes robots.txt tells crawlers to skip. */
@@ -28,6 +37,47 @@ export const CORE_STATIC_ROUTES: CoreStaticRoute[] = [
     { path: "/", changeFrequency: "daily", priority: 1.0 },
     { path: "/activity", changeFrequency: "daily", priority: 0.6 },
 ];
+
+/**
+ * The same path under every locale the site serves, in `locales` order.
+ *
+ * The home page is `/en`, not `/en/`: a trailing slash would be a second URL
+ * for the same page and Next redirects it away.
+ */
+export function localizedPaths(path: string): string[] {
+    return locales.map((locale) => localizedPath(path, locale));
+}
+
+export function localizedPath(path: string, locale: Locale | string): string {
+    return path === "/" ? `/${locale}` : `/${locale}${path}`;
+}
+
+/**
+ * `hreflang` alternates for one path: every locale, plus the `x-default` that
+ * tells a crawler which one to show a visitor whose language matches none.
+ */
+export function localeAlternates(siteUrl: string, path: string): Record<string, string> {
+    const languages: Record<string, string> = {};
+    for (const locale of locales) languages[locale] = `${siteUrl}${localizedPath(path, locale)}`;
+    languages["x-default"] = `${siteUrl}${localizedPath(path, defaultLocale)}`;
+    return languages;
+}
+
+/**
+ * What robots.txt actually writes: each disallowed prefix under every locale,
+ * plus the bare prefix. `/api` is the one route group with no locale segment,
+ * and the bare forms still matter because they are what a crawler is redirected
+ * from.
+ */
+export function disallowedPaths(): string[] {
+    const out = new Set<string>();
+    for (const prefix of DISALLOWED_PREFIXES) {
+        out.add(prefix);
+        if (prefix === "/api") continue;
+        for (const locale of locales) out.add(`/${locale}${prefix}`);
+    }
+    return [...out];
+}
 
 export function isCrawlable(path: string): boolean {
     return !DISALLOWED_PREFIXES.some(
