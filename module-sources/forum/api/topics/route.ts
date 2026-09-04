@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { isAdmin, prisma, rateLimitForRole, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumTopicSchema } from "../../lib/validations";
 
@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const validation = forumTopicSchema.safeParse(body);
 
     if (!validation.success) {

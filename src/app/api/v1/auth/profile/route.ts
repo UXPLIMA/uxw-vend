@@ -6,6 +6,7 @@ import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { readJsonBody } from "@/core/lib/api-body";
 
 // GET /api/v1/auth/profile
 export async function GET() {
@@ -38,7 +39,8 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     // Password change
     if (body.currentPassword && body.newPassword) {

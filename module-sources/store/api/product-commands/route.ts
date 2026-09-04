@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, isModuleEnabled, prisma } from "@/core/sdk/server";
+import { isAdmin, isModuleEnabled, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET ?productId=xxx
@@ -26,7 +26,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { productId, command, order, serverId } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { productId, command, order, serverId } = jsonBody;
     if (!productId || !command) return NextResponse.json({ error: "productId and command required" }, { status: 400 });
 
     const cmd = await prisma.productCommand.create({

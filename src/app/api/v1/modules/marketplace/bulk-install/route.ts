@@ -16,6 +16,7 @@ import { MODULES_DIR } from "@/core/lib/runtime-paths";
 import { resolveInstallPlan, installPlanErrorMessage, type CatalogEntry } from "@/core/lib/install-plan";
 import { loadMarketplaceCatalog } from "../_catalog";
 import moduleSystem from "@/core/lib/modules";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
@@ -114,7 +115,9 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-    const { modules } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { modules } = jsonBody;
     if (!Array.isArray(modules) || modules.length === 0) {
         return NextResponse.json({ error: "modules array required" }, { status: 400 });
     }

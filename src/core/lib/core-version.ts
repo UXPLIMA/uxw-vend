@@ -12,6 +12,10 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.5.0 - `readJsonBody` and `INVALID_JSON_BODY` join `@/core/sdk/server`.
+ * A route that calls `request.json()` directly answers a malformed body with
+ * a 500; the helper answers it with the 400 it deserves, in one wording.
+ *
  * 1.4.0 - `authProviders[].standardCallback` lets a module that builds its own
  * provider say the provider still returns through Auth.js's own callback, so
  * the admin panel can show the redirect URL to register. Nothing else needs
@@ -36,4 +40,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.4.0";
+export const CORE_API_VERSION = "1.5.0";

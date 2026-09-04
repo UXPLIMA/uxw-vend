@@ -10,6 +10,7 @@ import { logActivity } from "@/core/lib/activity-log";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
 import { resolveWithin } from "@/core/lib/runtime-paths";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 
@@ -19,7 +20,9 @@ export async function POST(request: NextRequest) {
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     try {
-        const { themeId, zipFile } = await request.json();
+        const jsonBody = await readJsonBody(request);
+        if (jsonBody instanceof NextResponse) return jsonBody;
+        const { themeId, zipFile } = jsonBody;
         if (!themeId || !zipFile) return NextResponse.json({ error: "themeId and zipFile required" }, { status: 400 });
 
         // Validate inputs to prevent SSRF / path traversal

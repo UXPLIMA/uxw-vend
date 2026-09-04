@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/store/coupons/validate - Check coupon validity
@@ -18,7 +18,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const { code, subtotal } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { code, subtotal } = jsonBody;
 
     if (!code) return NextResponse.json({ error: "Code required" }, { status: 400 });
 

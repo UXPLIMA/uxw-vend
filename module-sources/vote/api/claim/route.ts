@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/vote/claim - Claim vote reward
@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const { voteSiteId } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { voteSiteId } = jsonBody;
     if (!voteSiteId) return NextResponse.json({ error: "Vote site ID required" }, { status: 400 });
 
     const site = await prisma.voteSite.findUnique({ where: { id: voteSiteId } });

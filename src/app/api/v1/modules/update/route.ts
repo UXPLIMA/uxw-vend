@@ -22,6 +22,7 @@ import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const MAX_MODULE_SIZE = 50 * 1024 * 1024;
 
@@ -46,7 +47,9 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { moduleId, zipFile } = await request.json();
+        const jsonBody = await readJsonBody(request);
+        if (jsonBody instanceof NextResponse) return jsonBody;
+        const { moduleId, zipFile } = jsonBody;
         if (!moduleId || !zipFile) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
-import { logActivity, prisma, rateLimitForRole } from "@/core/sdk/server";
+import { logActivity, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Too many requests" }, { status: 429 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
         const validation = checkoutSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });

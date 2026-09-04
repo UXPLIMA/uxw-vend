@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/core/sdk/server";
+import { prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // GET /api/v1/linked-accounts
@@ -19,7 +19,9 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { provider, providerId, username, avatar } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { provider, providerId, username, avatar } = jsonBody;
     if (!provider || !providerId) return NextResponse.json({ error: "Provider and ID required" }, { status: 400 });
 
     // Check if already linked to another user
@@ -44,7 +46,9 @@ export async function DELETE(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { provider } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { provider } = jsonBody;
     if (!provider) return NextResponse.json({ error: "Provider required" }, { status: 400 });
 
     await prisma.linkedAccount.deleteMany({

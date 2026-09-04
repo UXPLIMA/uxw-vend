@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { isStaff } from "@/core/lib/permissions";
 import { issueWarning, listWarnings } from "@/core/lib/warnings";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /** GET ?userId=xxx - list warnings for a user (staff only) */
 export async function GET(request: NextRequest) {
@@ -31,7 +32,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const parsed = issueSchema.safeParse(body);
     if (!parsed.success) {
         return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid" }, { status: 400 });

@@ -7,7 +7,7 @@
  * settled - never here.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole } from "@/core/sdk/server";
+import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Too many requests" }, { status: 429 });
         }
 
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
         const validation = buyCreditsSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });

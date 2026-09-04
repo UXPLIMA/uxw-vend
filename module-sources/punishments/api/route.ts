@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /**
@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
         issuerUserId = session.user.id;
     }
 
-    const { playerName, playerUuid, type, reason, duration, punishedBy, expiresAt } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { playerName, playerUuid, type, reason, duration, punishedBy, expiresAt } = jsonBody;
     if (!playerName || !type) return NextResponse.json({ error: "playerName and type required" }, { status: 400 });
 
     const punishment = await prisma.punishment.create({

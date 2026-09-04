@@ -6,6 +6,7 @@ import { prisma } from "@/core/lib/db";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { softDeleteUser } from "@/core/lib/user-deletion";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const deleteSchema = z.object({
     password: z.string().min(1, "Password required"),
@@ -35,12 +36,8 @@ export async function POST(request: Request) {
         );
     }
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON", code: "invalid_input" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {

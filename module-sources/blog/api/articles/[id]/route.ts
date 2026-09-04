@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { blogArticleSchema } from "../../../lib/validations";
 
@@ -74,7 +74,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { recordRevision } = await import("@/core/sdk/server");
     await recordRevision("blog.article", id, article, "update", session.user.id);
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const validation = blogArticleSchema.partial().safeParse(body);
 
     if (!validation.success) {

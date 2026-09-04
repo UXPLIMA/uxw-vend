@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 const CREATOR_DEFAULT_DISCOUNT = 5;
 const CREATOR_DEFAULT_COMMISSION = 10;
@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { code, creatorId, discountPercent, commissionPercent } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { code, creatorId, discountPercent, commissionPercent } = jsonBody;
     if (!code || !creatorId) return NextResponse.json({ error: "Code and creator required" }, { status: 400 });
 
     const existing = await prisma.creatorCode.findUnique({ where: { code: code.toUpperCase() } });

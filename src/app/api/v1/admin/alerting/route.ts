@@ -11,6 +11,7 @@ import {
 } from "@/core/lib/health-alerting";
 import { logActivity } from "@/core/lib/activity-log";
 import { resolveWebhookChannel, validateWebhookUrl } from "@/core/lib/webhook-channels";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * GET  /api/v1/admin/alerting - fetch the current alerting config.
@@ -52,12 +53,8 @@ export async function POST(request: NextRequest) {
     const guard = await requireAdmin();
     if (guard.error) return guard.error;
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {

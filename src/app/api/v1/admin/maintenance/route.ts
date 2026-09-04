@@ -8,6 +8,7 @@ import {
     setMaintenanceConfig,
     type MaintenanceConfig,
 } from "@/core/lib/maintenance";
+import { readJsonBody } from "@/core/lib/api-body";
 
 const configSchema = z.object({
     enabled: z.boolean(),
@@ -37,12 +38,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = configSchema.safeParse(body);
     if (!parsed.success) {

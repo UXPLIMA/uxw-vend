@@ -10,6 +10,7 @@ import { checkPasswordBreach } from "@/core/lib/password-policy";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import { parseChallengeFields, CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
+import { readJsonBody } from "@/core/lib/api-body";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
 // Used at signup so the welcome email goes out in the language the visitor
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
     const rl = await rateLimit(`register:${ip}`, rateLimits.auth);
     if (!rl.success) return NextResponse.json({ error: "Too many attempts. Try again later.", code: "rate_limited" }, { status: 429 });
     try {
-        const body = await request.json();
+        const body = await readJsonBody(request);
+        if (body instanceof NextResponse) return body;
 
         const validation = registerSchema.safeParse(body);
         if (!validation.success) {

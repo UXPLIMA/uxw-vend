@@ -18,6 +18,7 @@ import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom 
 import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { readJsonBody } from "@/core/lib/api-body";
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 const RESERVED_IDS = ["auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes"];
 
@@ -38,7 +39,9 @@ export async function POST(request: NextRequest) {
     let extractedPath: string | null = null;
 
     try {
-        const { moduleId, zipFile } = await request.json();
+        const jsonBody = await readJsonBody(request);
+        if (jsonBody instanceof NextResponse) return jsonBody;
+        const { moduleId, zipFile } = jsonBody;
         if (!moduleId || !zipFile) {
             return NextResponse.json({ error: "moduleId and zipFile required" }, { status: 400 });
         }

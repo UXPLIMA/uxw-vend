@@ -5,6 +5,7 @@ import { prisma } from "@/core/lib/db";
 import { themeRegistry, defaultThemeId } from "@/core/generated/theme-registry";
 import { setActiveTheme } from "@/core/lib/theme-state";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 export async function GET() {
     const row = await prisma.themeState.findFirst();
@@ -26,8 +27,8 @@ export async function PUT(req: NextRequest) {
     if (!session?.user?.id || !(await isAdmin(session.user.id))) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    let body: { themeId?: unknown; mode?: unknown };
-    try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
+    const body = await readJsonBody(req);
+    if (body instanceof NextResponse) return body;
 
     const themeId = typeof body.themeId === "string" ? body.themeId : null;
     const manifest = themeId ? themeRegistry[themeId] : null;

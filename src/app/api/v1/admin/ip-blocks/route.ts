@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { addBlock, isValidIpOrCidr, listBlocks } from "@/core/lib/ip-blocks";
 import { logActivity } from "@/core/lib/activity-log";
+import { readJsonBody } from "@/core/lib/api-body";
 
 /**
  * Admin API for managing the IP allowlist / blocklist.
@@ -42,12 +43,8 @@ export async function POST(request: NextRequest) {
     const guard = await requireAdmin();
     if (guard.error) return guard.error;
 
-    let body: unknown;
-    try {
-        body = await request.json();
-    } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
 
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {

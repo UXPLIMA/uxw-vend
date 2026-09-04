@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A malformed request body answered with a 500.** `request.json()` throws
+  when the body is not JSON - truncated, wrong content, or absent - and an
+  uncaught throw in a route handler is a bare 500. Eighty-seven routes
+  answered that way, and twenty more let a broad handler `catch` turn it into
+  their own "Internal server error" or "Failed to create page". The fault is
+  the caller's, so the answer is a 400; and this platform ships an OpenAPI
+  document and API keys, so its callers are not only its own forms. Filing a
+  bad request as a server error also puts it in front of the health alerting.
+  Eleven routes had already worked this out and hand-rolled the same
+  `let body: unknown; try { … } catch { return 400 }` block, in four
+  different wordings. That block is now `readJsonBody`, in
+  `@/core/sdk/server`, and all a hundred and eighteen call sites use it:
+
+      const body = await readJsonBody(request);
+      if (body instanceof NextResponse) return body;
+
+  A route that treats the body as optional keeps `.json().catch(() => ({}))`,
+  which is a different contract and stays legal - a POST with nothing to send
+  must not become a 400. A gate holds the rest: no bare `request.json()`, the
+  sentinel checked at every call, modules reaching the helper through the SDK
+  rather than core internals, and one wording for the error. CORE_API_VERSION
+  is 1.5.0 and the twenty-seven modules involved are bumped.
+
 - **Every page 500'd for the first request after each cache expiry.** The
   translation service accumulates the nested message tree into
   `Object.create(null)` records - a deliberate second lock against a dotted

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 type RouteParams = { params: Promise<{ slug: string }> };
@@ -21,7 +21,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { slug } = await params;
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const page = await prisma.customPage.findFirst({ where: { OR: [{ slug }, { id: slug }] } });
     if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
 

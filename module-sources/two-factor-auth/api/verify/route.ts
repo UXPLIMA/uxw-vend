@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBackupCodes, prisma, rateLimitStrict, verifyToken } from "@/core/sdk/server";
+import { generateBackupCodes, prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 // POST /api/v1/auth/two-factor/verify - Verify token and enable 2FA
@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { token } = await request.json();
+    const jsonBody = await readJsonBody(request);
+    if (jsonBody instanceof NextResponse) return jsonBody;
+    const { token } = jsonBody;
     if (!token) {
         return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }

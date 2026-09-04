@@ -77,6 +77,12 @@ export {
 // --- API response envelope ---
 export { apiSuccess, apiError, apiPaginated, devOnlyDetail, withRateLimit } from "@/core/lib/api-utils";
 
+// --- Request bodies ---
+// `readJsonBody` returns the parsed body, or the 400 to return when the body
+// is not JSON. A route that calls `request.json()` directly answers a
+// malformed body with a 500.
+export { readJsonBody, INVALID_JSON_BODY } from "@/core/lib/api-body";
+
 // --- Transactional email ---
 export { sendEmail, queueEmail } from "@/core/lib/email";
 

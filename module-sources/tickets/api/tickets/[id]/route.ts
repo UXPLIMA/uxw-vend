@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole } from "@/core/sdk/server";
+import { isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { ticketMessageSchema, ticketUpdateSchema } from "../../../lib/validations";
 import { canAccessTicket } from "../../../lib/can-access-ticket";
@@ -77,7 +77,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
     const adminCheck = await isAdmin(session.user.id);
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const validation = ticketMessageSchema.safeParse(body);
 
     if (!validation.success) {
@@ -160,7 +161,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
     const validation = ticketUpdateSchema.safeParse(body);
 
     if (!validation.success) {
