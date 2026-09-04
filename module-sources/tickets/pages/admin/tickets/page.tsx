@@ -83,7 +83,7 @@ export default function AdminTicketsPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter("OPEN")}>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{t("adm_open")}</CardTitle>
@@ -174,7 +174,7 @@ export default function AdminTicketsPage() {
                     <p className="text-muted-foreground">{t("adm_noTicketsFound")}</p>
                 </div>
             ) : (
-                <div className="bg-card rounded-lg overflow-hidden">
+                <div className="bg-card rounded-lg overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-muted/50">
                             <tr>

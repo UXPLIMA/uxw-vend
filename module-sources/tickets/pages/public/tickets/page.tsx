@@ -120,7 +120,7 @@ export default function SupportPage() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="bg-card rounded-xl border border-border overflow-hidden">
+                    <div className="bg-card rounded-xl border border-border overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-muted">
                                 <tr>
@@ -132,7 +132,7 @@ export default function SupportPage() {
                                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">{t('messages')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-border">
                                 {tickets.map((ticket) => (
                                     <tr key={ticket.id} className="hover:bg-muted">
                                         <td className="px-4 py-4">

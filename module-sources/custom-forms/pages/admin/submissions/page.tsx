@@ -115,7 +115,7 @@ export default function SubmissionsPage() {
                                         {expandedId === sub.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                     </button>
                                     {expandedId === sub.id && (
-                                        <div className="mt-3 pt-3 border-t border-border">
+                                        <div className="mt-3 pt-3 border-t border-border overflow-x-auto">
                                             <table className="w-full text-sm">
                                                 <tbody>
                                                     {Object.entries(sub.data).map(([key, value]) => (

@@ -193,7 +193,7 @@ export default function AdminPunishmentsPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="bg-card rounded-lg overflow-hidden border">
+                <div className="bg-card rounded-lg overflow-x-auto border">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50">
                             <tr>
