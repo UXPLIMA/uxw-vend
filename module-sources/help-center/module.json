@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -74,7 +74,7 @@
   "translations": {
     "en": {
       "nav": {
-        "support": "Support"
+        "helpCenter": "Help"
       },
       "helpCenter": {
         "adm_active": "Active",
@@ -175,7 +175,7 @@
     },
     "tr": {
       "nav": {
-        "support": "Destek"
+        "helpCenter": "Yardım"
       },
       "helpCenter": {
         "adm_active": "Aktif",
@@ -298,6 +298,7 @@
   "navLinks": [
     {
       "label": "Help",
+      "labelKey": "helpCenter",
       "href": "/help",
       "icon": "HelpCircle",
       "position": 50
@@ -306,6 +307,7 @@
   "footerLinks": [
     {
       "label": "Help",
+      "labelKey": "helpCenter",
       "href": "/help",
       "section": "quick"
     }

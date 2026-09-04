@@ -136,8 +136,13 @@ const widgetEntry = z.object({
     defaultVisible: z.boolean(),
 });
 
+// `label` is the fallback shown when the key is missing; `labelKey` is what
+// the navbar, footer and mobile bar actually render, resolved in the `nav`
+// namespace. Without it a module's most visible string - its own name in the
+// navigation - stayed English in every locale, next to a translated "Home".
 const navLink = z.object({
     label: z.string().min(1).max(100),
+    labelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
     href: routePath,
     icon: iconName.optional(),
     position: z.number().int().optional(),
@@ -145,6 +150,7 @@ const navLink = z.object({
 
 const footerLink = z.object({
     label: z.string().min(1).max(100),
+    labelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
     href: routePath,
     section: z.enum(["quick", "legal"]).optional(),
 });

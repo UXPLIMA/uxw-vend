@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -134,6 +134,9 @@
       },
       "activity": {
         "suggestionCreated": "suggested:"
+      },
+      "nav": {
+        "suggestions": "Suggestions"
       }
     },
     "tr": {
@@ -197,6 +200,9 @@
       },
       "activity": {
         "suggestionCreated": "öneri gönderdi:"
+      },
+      "nav": {
+        "suggestions": "Öneriler"
       }
     }
   },
@@ -226,6 +232,7 @@
   "navLinks": [
     {
       "label": "Suggestions",
+      "labelKey": "suggestions",
       "href": "/suggestions",
       "icon": "Lightbulb",
       "position": 70
@@ -234,6 +241,7 @@
   "footerLinks": [
     {
       "label": "Suggestions",
+      "labelKey": "suggestions",
       "href": "/suggestions",
       "section": "quick"
     }

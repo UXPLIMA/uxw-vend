@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -32,6 +32,7 @@
   "navLinks": [
     {
       "label": "Punishments",
+      "labelKey": "punishments",
       "href": "/punishments",
       "icon": "Shield",
       "position": 80
@@ -116,6 +117,9 @@
         "details": "Punishment Details",
         "evidence": "Evidence",
         "server": "Server"
+      },
+      "nav": {
+        "punishments": "Punishments"
       }
     },
     "tr": {
@@ -174,6 +178,9 @@
         "details": "Ceza Detayları",
         "evidence": "Kanıt",
         "server": "Sunucu"
+      },
+      "nav": {
+        "punishments": "Cezalar"
       }
     }
   }

@@ -81,7 +81,14 @@ function DefaultFooter() {
     // rather than vanishing, which is what filtering on `section === "quick"`
     // silently did to it.
     const enabledFooterLinks = ModuleFooterLinks.filter((fl) => isEnabledIn(moduleStatus, fl.module));
-    const toLink = (fl: { label: string; href: string }): FooterLink => ({ ...fl, external: false });
+    // Same as the navbar: the module's own name in the footer follows the
+    // locale when the manifest declares a key, and falls back to the manifest
+    // label when it does not. Links the admin typed have no key and stay put.
+    const toLink = (fl: { label: string; labelKey?: string; href: string }): FooterLink => ({
+        ...fl,
+        label: fl.labelKey && navT.has(fl.labelKey) ? navT(fl.labelKey) : fl.label,
+        external: false,
+    });
     const legalLinks: FooterLink[] = [
         ...parseFooterLinks(settings.footer_legal_links),
         ...enabledFooterLinks.filter((fl) => fl.section === "legal").map(toLink),

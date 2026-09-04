@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -458,6 +458,7 @@
   "navLinks": [
     {
       "label": "Forum",
+      "labelKey": "forum",
       "href": "/forum",
       "icon": "MessageSquare",
       "position": 20
@@ -466,6 +467,7 @@
   "footerLinks": [
     {
       "label": "Forum",
+      "labelKey": "forum",
       "href": "/forum",
       "section": "quick"
     }
