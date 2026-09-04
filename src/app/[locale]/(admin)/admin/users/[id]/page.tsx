@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useId } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Link } from "@/core/lib/i18n/navigation";
@@ -174,15 +175,12 @@ export default function AdminUserDetailPage() {
         }
     };
 
-    // Close delete modal on Escape
-    useEffect(() => {
-        if (!deleteModalOpen) return;
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === "Escape" && !deletingAccount) setDeleteModalOpen(false);
-        };
-        document.addEventListener("keydown", handler);
-        return () => document.removeEventListener("keydown", handler);
-    }, [deleteModalOpen, deletingAccount]);
+    // Escape, the Tab trap and returning focus to the button that opened it.
+    // A delete already in flight is not interruptible, so Escape does nothing
+    // until it finishes.
+    const deleteDialogRef = useModalDialog<HTMLDivElement>(deleteModalOpen, () => {
+        if (!deletingAccount) setDeleteModalOpen(false);
+    });
 
     useEffect(() => {
         Promise.all([
@@ -519,6 +517,7 @@ export default function AdminUserDetailPage() {
                         aria-hidden="true"
                     />
                     <div
+                        ref={deleteDialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="admin-delete-title"

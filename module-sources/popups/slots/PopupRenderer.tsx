@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useModalDialog } from "@/core/sdk/ui";
 import { safeUrl } from "../lib/safe-url";
 
 interface ActivePopup {
@@ -53,15 +54,9 @@ export default function PopupRenderer() {
     }, [popup]);
 
     // A modal that only closes by clicking its backdrop cannot be closed with a
-    // keyboard at all.
-    useEffect(() => {
-        if (!popup) return;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") dismiss();
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [popup, dismiss]);
+    // keyboard at all, and one that does not trap Tab leaves the page behind it
+    // reachable under the scrim.
+    const dialogRef = useModalDialog<HTMLDivElement>(popup !== null, dismiss);
 
     if (!popup) return null;
 
@@ -72,6 +67,7 @@ export default function PopupRenderer() {
         <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4" role="presentation">
             <div className="fixed inset-0 bg-black/50" onClick={dismiss} aria-hidden="true" />
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="popup-title"

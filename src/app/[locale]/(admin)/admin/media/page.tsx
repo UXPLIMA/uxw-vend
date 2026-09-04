@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/core/components/ui/card";
@@ -64,16 +65,9 @@ export default function MediaLibraryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchItems(); }, [page, type]);
 
-    // The detail panel closed only on a backdrop click, which a keyboard user
-    // has no way to perform.
-    useEffect(() => {
-        if (!selected) return;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") setSelected(null);
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [selected]);
+    // Escape to close, Tab kept inside the panel, and focus handed back to the
+    // thumbnail that opened it.
+    const detailRef = useModalDialog<HTMLDivElement>(selected !== null, () => setSelected(null));
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -231,6 +225,7 @@ export default function MediaLibraryPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="presentation">
                     <div className="fixed inset-0 bg-black/50" onClick={() => setSelected(null)} aria-hidden="true" />
                     <div
+                        ref={detailRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="media-detail-title"

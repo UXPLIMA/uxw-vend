@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -170,6 +171,12 @@ export default function BackupAdminPage() {
         setRestoreText("");
     };
 
+    // Restoring a backup overwrites the live database, so the dialog that asks
+    // for it had better be closeable without a mouse.
+    const restoreDialogRef = useModalDialog<HTMLDivElement>(restoreTarget !== null, () =>
+        closeRestoreDialog(),
+    );
+
     const closeRestoreDialog = () => {
         setRestoreTarget(null);
         setRestoreText("");
@@ -331,6 +338,7 @@ export default function BackupAdminPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center" role="presentation">
                     <div className="fixed inset-0 bg-black/60" onClick={closeRestoreDialog} aria-hidden="true" />
                     <div
+                        ref={restoreDialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="restore-title"

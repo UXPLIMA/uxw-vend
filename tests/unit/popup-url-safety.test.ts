@@ -61,7 +61,10 @@ describe("the popup renderer", () => {
     });
 
     it("closes on Escape, not only on a backdrop click", () => {
-        expect(source).toContain('e.key === "Escape"');
+        // Escape, the Tab trap and returning focus all come from the shared
+        // hook now; the popup's job is to use it and hand it `dismiss`.
+        expect(source).toContain("useModalDialog");
+        expect(source).toContain("useModalDialog<HTMLDivElement>(popup !== null, dismiss)");
     });
 
     it("names its dismiss button from the catalogue", () => {

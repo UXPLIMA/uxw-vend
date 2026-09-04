@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { iconNames } from "lucide-react/dynamic";
 import { useTranslations } from "next-intl";
 import { Search, X, ChevronDown } from "lucide-react";
@@ -55,7 +56,6 @@ export function IconPicker({
     const [visible, setVisible] = useState(PAGE_SIZE);
     const triggerRef = useRef<HTMLButtonElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
-    const dialogRef = useRef<HTMLDivElement>(null);
 
     const selected = value ? toIconSlug(value) : "";
     const matches = useMemo(() => searchIconNames(names, query), [names, query]);
@@ -65,14 +65,14 @@ export function IconPicker({
     // inherits the "load more" state of the previous, wider one.
     useEffect(() => { setVisible(PAGE_SIZE); }, [query]);
 
+    // autoFocus is off because the search box wants focus rather than whatever
+    // happens to be first in the dialog. Escape, the Tab trap and handing focus
+    // back are the hook's.
+    const dialogRef = useModalDialog<HTMLDivElement>(open, () => close(), { autoFocus: false });
+
     useEffect(() => {
         if (!open) return;
         searchRef.current?.focus();
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") close();
-        };
-        document.addEventListener("keydown", onKeyDown);
-        return () => document.removeEventListener("keydown", onKeyDown);
     }, [open]);
 
     const close = () => {

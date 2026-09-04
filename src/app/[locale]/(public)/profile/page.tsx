@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useId } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { useSession } from "next-auth/react";
 import { useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -133,15 +134,12 @@ export default function ProfilePage() {
         .filter(t => isEnabledIn(modules, t.module))
         .filter(t => ProfileTabRegistry[t.id]);
 
-    // Close delete modal on Escape
-    useEffect(() => {
-        if (!deleteModalOpen) return;
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === "Escape" && !deletingAccount) setDeleteModalOpen(false);
-        };
-        document.addEventListener("keydown", handler);
-        return () => document.removeEventListener("keydown", handler);
-    }, [deleteModalOpen, deletingAccount]);
+    // Escape, the Tab trap and returning focus to the button that opened it.
+    // A delete already in flight is not interruptible, so Escape does nothing
+    // until it finishes.
+    const deleteDialogRef = useModalDialog<HTMLDivElement>(deleteModalOpen, () => {
+        if (!deletingAccount) setDeleteModalOpen(false);
+    });
 
     useEffect(() => {
         if (authStatus === "unauthenticated") {
@@ -417,6 +415,7 @@ export default function ProfilePage() {
                         aria-hidden="true"
                     />
                     <div
+                        ref={deleteDialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="delete-title"

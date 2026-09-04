@@ -181,10 +181,14 @@ describe("dialogs and popovers", () => {
         "module-sources/popups/slots/PopupRenderer.tsx",
     ];
 
+    // Every `role="dialog"` gets Escape from `useModalDialog`, which owns the
+    // key along with the Tab trap and returning focus. The footer dropdown is
+    // a plain popover with no dialog role and still handles the key itself.
     it("all close on Escape", () => {
-        const missing = CLOSABLE.filter(
-            (file) => !fs.readFileSync(path.join(root, file), "utf8").includes('"Escape"'),
-        );
+        const missing = CLOSABLE.filter((file) => {
+            const source = fs.readFileSync(path.join(root, file), "utf8");
+            return !source.includes("useModalDialog") && !source.includes('"Escape"');
+        });
         expect(missing).toEqual([]);
     });
 

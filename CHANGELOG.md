@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Eleven of the twelve dialogs promised a keyboard behaviour they did not
+  have.** `role="dialog"` with `aria-modal="true"` tells assistive technology
+  the rest of the page is inert, and nothing in the DOM makes that true. Only
+  the confirm dialog trapped Tab. In every other one, Tab walked straight out
+  of the dialog and into the page behind the overlay, which was still fully
+  interactive and, to a sighted keyboard user, hidden under a black scrim:
+  focus landed on controls nobody could see. None of the eleven put focus back
+  where it came from either, so closing a dialog dropped focus on the body and
+  the next Tab started again at the top of the page. Three had no Escape
+  handler at all and could only be closed by clicking their backdrop: the SEO
+  page-metadata form, the notification panel, and the dialog that asks whether
+  to restore a database backup over the live one. The behaviour now lives in
+  `useModalDialog` and all twelve use it, the confirm dialog included, so there
+  is one implementation instead of one implementation and eleven omissions.
+
 - **Updating a module never updated its strings.** A module's translations
   live in the manifest, which is what the repo ships, and in the `Translation`
   table, which is what the site renders. Only `syncModuleTranslations` fills
@@ -77,6 +92,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `src/core/lib/permission-names.ts` now, which both read.
 
 ### Added
+- `useModalDialog`, in `@/core/hooks` and published to modules through
+  `@/core/sdk/ui`: Escape, a Tab trap that wraps at both ends and pulls focus
+  back when something outside has taken it, focus moved in on open and handed
+  back on close. `{ trapFocus: false }` covers a non-modal popover, which wants
+  Escape and focus restoration but must leave the page usable. Core API version
+  1.6.0.
+- `tests/unit/use-modal-dialog.test.tsx` covers the hook's behaviour and
+  `tests/unit/dialogs-are-keyboard-usable.test.ts` requires every component
+  that draws a `role="dialog"` to use it, reach it through the published SDK if
+  it is a module, and keep no hand-rolled Escape listener beside it.
 - `tests/unit/module-writes-sync-translations.test.ts` requires every route
   that validates an incoming module manifest, which is what marks a route as
   one that writes a module's files, to put that module's strings in the
@@ -646,6 +671,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   path, and contributing them twice is exactly what produced the double popup.
 
 ### Changed
+- Two existing gates skipped any directory named `modules`, which was meant to
+  exempt `src/modules` (installed-module state, regenerated on install) but also
+  quietly exempted `src/app/[locale]/(admin)/admin/modules`, core's own screen
+  for managing them. Both now skip by full path. Nothing was hiding there, but
+  the next thing would have been.
 - **The admin panel is readable in Turkish.** Ninety strings across twenty-three
   admin screens were written in English directly in the JSX, so an operator who
   had set the panel to Turkish still read "Refresh", "Save changes", "No results

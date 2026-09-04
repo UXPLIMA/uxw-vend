@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, createContext, useContext } from "react";
+import { useState, useCallback, useRef, createContext, useContext } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Button } from "@/core/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
@@ -35,49 +36,25 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
         resolve: null,
     });
 
-    const dialogRef = useRef<HTMLDivElement>(null);
-    const previousFocusRef = useRef<HTMLElement | null>(null);
+    const stateRef = useRef(state);
+    stateRef.current = state;
 
     const confirm = useCallback((options: ConfirmOptions): Promise<boolean> => {
         return new Promise((resolve) => {
-            previousFocusRef.current = document.activeElement as HTMLElement;
             setState({ open: true, options, resolve });
         });
     }, []);
 
     const handleClose = useCallback((result: boolean) => {
-        state.resolve?.(result);
+        stateRef.current.resolve?.(result);
         setState({ open: false, options: { message: "" }, resolve: null });
-        // Restore focus to trigger element
-        previousFocusRef.current?.focus();
-    }, [state]);
+    }, []);
 
-    // Focus trap + keyboard handling
-    useEffect(() => {
-        if (!state.open || !dialogRef.current) return;
-
-        // Focus the confirm button on open
-        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const firstEl = focusable[0];
-        const lastEl = focusable[focusable.length - 1];
-        firstEl?.focus();
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") { handleClose(false); return; }
-            if (e.key !== "Tab") return;
-
-            if (e.shiftKey) {
-                if (document.activeElement === firstEl) { e.preventDefault(); lastEl?.focus(); }
-            } else {
-                if (document.activeElement === lastEl) { e.preventDefault(); firstEl?.focus(); }
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [state.open, handleClose]);
+    // Escape, the Tab trap and returning focus to whatever opened the dialog
+    // all live in one place now. This component used to be the only one in the
+    // product that had them, which is how the other eleven dialogs came to ship
+    // `aria-modal="true"` over a page Tab could still walk into.
+    const dialogRef = useModalDialog<HTMLDivElement>(state.open, () => handleClose(false));
 
     return (
         <ConfirmContext.Provider value={{ confirm }}>
