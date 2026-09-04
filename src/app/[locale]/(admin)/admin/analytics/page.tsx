@@ -18,6 +18,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 ChartJS.register(
     CategoryScale,
@@ -71,7 +72,7 @@ function formatTotal(total: number, fmt: string | undefined, localeTag: string):
 
 export default function AnalyticsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const moduleStates = useAllModules();
     const [period, setPeriod] = useState<string>("30");
@@ -202,7 +203,7 @@ export default function AnalyticsPage() {
                                                 {t("analytics_total")}
                                             </div>
                                             <div className="text-lg font-bold" style={{ color }}>
-                                                {formatTotal(total, chart.format, "tr-TR")}
+                                                {formatTotal(total, chart.format, __dateTag)}
                                             </div>
                                         </div>
                                     </div>

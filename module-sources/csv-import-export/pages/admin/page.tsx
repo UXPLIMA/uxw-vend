@@ -72,7 +72,7 @@ export default function ExportImportPage() {
                         <div>
                             <Label>{t("adm_importProducts")}</Label>
                             <p className="text-xs text-muted-foreground mb-2">
-                                CSV with columns: name, slug, price, comparePrice, stock, isActive, isFeatured, type, description
+                                {t("adm_productColumns")}
                             </p>
                             <Input
                                 aria-label={t("adm_importProducts")}

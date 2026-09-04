@@ -8,6 +8,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { downloadFromUrl } from "@/core/lib/download";
+import { dateLocaleTag } from "@/core/lib/utils";
 import {
     Database,
     Download,
@@ -44,9 +45,9 @@ function formatBytes(bytes: number): string {
     return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-function formatDate(value: string | null): string {
+function formatDate(value: string | null, tag: string): string {
     if (!value) return "-";
-    return new Date(value).toLocaleString("tr-TR");
+    return new Date(value).toLocaleString(tag);
 }
 
 function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: string }) {
@@ -62,7 +63,7 @@ function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: strin
 
 export default function BackupAdminPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [backups, setBackups] = useState<BackupRow[]>([]);
     const [loading, setLoading] = useState(true);
@@ -234,9 +235,9 @@ export default function BackupAdminPage() {
                         <CardTitle className="text-xs text-muted-foreground uppercase tracking-wide">{t("backup_lastBackup")}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
-                        <div className="text-sm font-medium">{formatDate(lastBackupAt)}</div>
+                        <div className="text-sm font-medium">{formatDate(lastBackupAt, __dateTag)}</div>
                         {lastScheduled && (
-                            <div className="text-xs text-muted-foreground mt-1">{t("backup_lastScheduled")}: {formatDate(lastScheduled)}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{t("backup_lastScheduled")}: {formatDate(lastScheduled, __dateTag)}</div>
                         )}
                     </CardContent>
                 </Card>
@@ -247,7 +248,7 @@ export default function BackupAdminPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 pt-0">
-                        <div className="text-sm font-medium">{formatDate(nextScheduled)}</div>
+                        <div className="text-sm font-medium">{formatDate(nextScheduled, __dateTag)}</div>
                         <div className="text-xs text-muted-foreground mt-1">{t("backup_runsDaily")}</div>
                     </CardContent>
                 </Card>
@@ -283,7 +284,7 @@ export default function BackupAdminPage() {
                                         <td className="px-4 py-3 font-mono text-xs break-all">{row.filename}</td>
                                         <td className="px-4 py-3"><TypeBadge type={row.type} label={row.type === "manual" ? t("backup_manual") : t("backup_scheduled")} /></td>
                                         <td className="px-4 py-3 text-muted-foreground">{row.sizeHuman || formatBytes(row.sizeBytes)}</td>
-                                        <td className="px-4 py-3 text-muted-foreground">{formatDate(row.createdAt)}</td>
+                                        <td className="px-4 py-3 text-muted-foreground">{formatDate(row.createdAt, __dateTag)}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex justify-end gap-1">
                                                 <Button

@@ -7,6 +7,7 @@ import { formatCurrency } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Coupon {
     id: string;
@@ -25,7 +26,7 @@ interface Coupon {
 
 export default function AdminCouponsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("store");
     const { confirm } = useConfirm();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -237,7 +238,7 @@ export default function AdminCouponsPage() {
                                     aria-label={t("adm_description")}
                                     value={form.description}
                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                                    placeholder="Summer sale discount"
+                                    placeholder={t("adm_couponNotePlaceholder")}
                                 />
                             </div>
 
@@ -344,7 +345,7 @@ export default function AdminCouponsPage() {
                                             </td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground">
                                                 {coupon.expiresAt
-                                                    ? new Date(coupon.expiresAt).toLocaleDateString("tr-TR")
+                                                    ? new Date(coupon.expiresAt).toLocaleDateString(__dateTag)
                                                     : t("adm_never")}
                                             </td>
                                             <td className="py-3 px-4">

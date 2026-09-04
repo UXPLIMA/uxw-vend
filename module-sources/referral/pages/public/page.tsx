@@ -8,6 +8,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface ReferralData {
     referralCode: string;
@@ -29,7 +30,7 @@ interface ReferralData {
 
 export default function ReferralPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("referral");
     const { data: session } = useSession();
     const [data, setData] = useState<ReferralData | null>(null);

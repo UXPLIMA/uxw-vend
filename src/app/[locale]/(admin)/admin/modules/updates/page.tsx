@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft, Loader2, Download, Check, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface UpdateInfo {
     moduleId: string;
@@ -18,7 +19,7 @@ interface UpdateInfo {
 
 export default function ModuleUpdatesPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const [updates, setUpdates] = useState<UpdateInfo[]>([]);
     const [loading, setLoading] = useState(true);

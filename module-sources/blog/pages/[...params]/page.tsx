@@ -6,8 +6,9 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import DOMPurify from "isomorphic-dompurify";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { CommentSection } from "../../components/CommentSection";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface PageProps {
     params: Promise<Record<string, unknown>>;
@@ -80,6 +81,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
     const relatedArticles = await getRelatedArticles(article.id, article.categoryId);
     const commonT = await getTranslations("common");
     const t = await getTranslations("blog");
+    const dateTag = dateLocaleTag(await getLocale());
 
     const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "";
     const articleUrl = baseUrl ? `${baseUrl}/blog/${article.number}/${article.slug}` : `/blog/${article.number}/${article.slug}`;
@@ -135,7 +137,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                         {related.title}
                                                     </h4>
                                                     <p className="text-xs text-muted-foreground mt-1">
-                                                        {formatDate(related.publishedAt || new Date())}
+                                                        {formatDate(related.publishedAt || new Date(), undefined, dateTag)}
                                                     </p>
                                                 </Link>
                                             ))}
@@ -212,7 +214,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                 </Link>
                                             )}
                                             <span className="text-sm text-muted-foreground">
-                                                {formatDate(article.publishedAt || article.createdAt)}
+                                                {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
                                             </span>
                                             <span className="text-sm text-muted-foreground">
                                                 {t("views", { count: article.views })}

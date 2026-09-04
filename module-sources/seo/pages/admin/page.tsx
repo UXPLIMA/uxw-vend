@@ -134,7 +134,7 @@ export default function SeoSettingsPage() {
                                 aria-label={t("adm_defaultSiteTitle")}
                                 value={settings.seo_default_title}
                                 onChange={(e) => updateSetting("seo_default_title", e.target.value)}
-                                placeholder="My Awesome Site"
+                                placeholder={t("adm_siteNamePlaceholder")}
                             />
                             <p className="text-xs text-muted-foreground mt-1">{t("adm_defaultSiteTitleDesc")}</p>
                         </div>
@@ -156,7 +156,7 @@ export default function SeoSettingsPage() {
                                 aria-label={t("adm_defaultDescription")}
                                 value={settings.seo_default_description}
                                 onChange={(e) => updateSetting("seo_default_description", e.target.value)}
-                                placeholder="A brief description of your site for search engines..."
+                                placeholder={t("adm_defaultDescriptionPlaceholder")}
                                 rows={3}
                                 className="flex min-h-[80px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
                             />
@@ -170,7 +170,7 @@ export default function SeoSettingsPage() {
                                 onChange={(e) => updateSetting("seo_default_og_image", e.target.value)}
                                 placeholder="https://example.com/og-image.png"
                             />
-                            <p className="text-xs text-muted-foreground mt-1">Default social sharing image (1200x630 recommended)</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t("adm_defaultOgImageHelp")}</p>
                         </div>
 
                         <div className="border-t border-border pt-5">
@@ -184,7 +184,7 @@ export default function SeoSettingsPage() {
                                         onChange={(e) => updateSetting("seo_google_verification", e.target.value)}
                                         placeholder="google-site-verification=..."
                                     />
-                                    <p className="text-xs text-muted-foreground mt-1">Content value from Google Search Console verification meta tag</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("adm_googleVerificationHelp")}</p>
                                 </div>
                                 <div>
                                     <Label className="text-foreground">{t("adm_bingVerification")}</Label>
@@ -194,7 +194,7 @@ export default function SeoSettingsPage() {
                                         onChange={(e) => updateSetting("seo_bing_verification", e.target.value)}
                                         placeholder="msvalidate.01=..."
                                     />
-                                    <p className="text-xs text-muted-foreground mt-1">Content value from Bing Webmaster Tools verification meta tag</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{t("adm_bingVerificationHelp")}</p>
                                 </div>
                             </div>
                         </div>

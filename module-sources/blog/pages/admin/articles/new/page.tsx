@@ -121,7 +121,7 @@ export default function NewBlogArticlePage() {
                                     <RichTextEditor
                                         value={formData.content}
                                         onChange={(value: string) => setFormData({ ...formData, content: value })}
-                                        placeholder="Write your article content here..."
+                                        placeholder={t("adm_contentPlaceholder")}
                                     />
                                 </div>
                             </CardContent>
@@ -142,13 +142,13 @@ export default function NewBlogArticlePage() {
                                         onValueChange={(value: string) => setFormData({ ...formData, status: value })}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder={t("adm_selectStatus")} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="DRAFT">Draft</SelectItem>
-                                            <SelectItem value="PUBLISHED">Published</SelectItem>
-                                            <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                                            <SelectItem value="ARCHIVED">Archived</SelectItem>
+                                            <SelectItem value="DRAFT">{t("adm_draft")}</SelectItem>
+                                            <SelectItem value="PUBLISHED">{t("adm_published")}</SelectItem>
+                                            <SelectItem value="SCHEDULED">{t("adm_scheduled")}</SelectItem>
+                                            <SelectItem value="ARCHIVED">{t("adm_archived")}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -160,10 +160,10 @@ export default function NewBlogArticlePage() {
                                         onValueChange={(value: string) => setFormData({ ...formData, categoryId: value })}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select category" />
+                                            <SelectValue placeholder={t("adm_selectCategory")} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="">No Category</SelectItem>
+                                            <SelectItem value="">{t("adm_noCategory")}</SelectItem>
                                             {categories.map((cat) => (
                                                 <SelectItem key={cat.id} value={cat.id}>
                                                     {cat.name}
@@ -209,7 +209,7 @@ export default function NewBlogArticlePage() {
                                         id="tags"
                                         value={formData.tags}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, tags: e.target.value })}
-                                        placeholder="news, update, event"
+                                        placeholder={t("adm_tagsPlaceholder")}
                                     />
                                 </div>
                             </CardContent>

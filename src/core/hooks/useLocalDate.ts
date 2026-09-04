@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 /**
  * useLocalDate - returns a date formatter bound to the active next-intl
@@ -13,7 +14,7 @@ import { useLocale } from "next-intl";
  */
 export function useLocalDate(options?: Intl.DateTimeFormatOptions) {
     const locale = useLocale();
-    const tag = locale === "tr" ? "tr-TR" : locale;
+    const tag = dateLocaleTag(locale);
     return (date: Date | string | number) => {
         const d = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
         return d.toLocaleDateString(tag, options);

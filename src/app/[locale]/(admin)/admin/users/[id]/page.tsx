@@ -14,6 +14,7 @@ import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 interface UserDetail {
     id: string;
@@ -39,7 +40,7 @@ interface Role {
 export default function AdminUserDetailPage() {
     const t = useTranslations("admin");
     const locale = useLocale();
-    const dateTag = locale === "tr" ? "tr-TR" : locale;
+    const dateTag = dateLocaleTag(locale);
     const params = useParams();
     const userId = params.id as string;
     const { data: session, update: updateSession } = useSession();

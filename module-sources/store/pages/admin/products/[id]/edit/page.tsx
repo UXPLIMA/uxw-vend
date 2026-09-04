@@ -521,8 +521,8 @@ function ProductVariablesEditor({ productId }: { productId: string }) {
                 </div>
             ))}
             <div className="flex gap-2">
-                <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Minecraft Username" className="text-xs" />
-                <Button type="button" variant="outline" size="sm" onClick={addVar}>Add</Button>
+                <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder={t("adm_variableLabelPlaceholder")} className="text-xs" />
+                <Button type="button" variant="outline" size="sm" onClick={addVar}>{t("adm_add")}</Button>
             </div>
         </div>
     );

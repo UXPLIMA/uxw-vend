@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { Link } from "@/core/lib/i18n/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { localizeActivityTitle } from "@/core/lib/activity-title";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 /**
  * Activity feed widget - 5 most recent public feed items.
@@ -12,7 +13,7 @@ export default async function ActivityFeedWidget() {
     const t = await getTranslations("admin");
     const activityT = await getTranslations("activity");
     const locale = await getLocale();
-    const dateTag = locale === "tr" ? "tr-TR" : locale;
+    const dateTag = dateLocaleTag(locale);
     let items: Array<{ id: string; type: string; title: string; createdAt: Date; actor: { username: string } | null }> = [];
     try {
         items = await prisma.activityFeedItem.findMany({

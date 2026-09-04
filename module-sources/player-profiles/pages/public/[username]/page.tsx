@@ -9,6 +9,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
 import { getMinecraftAvatar } from "../../../lib/minecraft";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Player {
     id: string;
@@ -29,7 +30,7 @@ interface PageProps {
 
 export default function PlayerProfilePage({ params }: PageProps) {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const { username } = use(params);
     const t = useTranslations("playerProfiles");
     const [player, setPlayer] = useState<Player | null>(null);

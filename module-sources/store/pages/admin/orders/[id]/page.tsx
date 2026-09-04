@@ -7,7 +7,8 @@ import { auth } from "@/core/sdk/auth";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ArrowLeft, Package } from "lucide-react";
 import { OrderStatusSelect } from "./status-select";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { dateLocaleTag } from "@/core/sdk";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ interface PageProps {
 
 export default async function AdminOrderDetailPage({ params }: PageProps) {
     const t = await getTranslations("store");
+    const dateTag = dateLocaleTag(await getLocale());
     const session = await auth();
     if (!session?.user) redirect("/auth/login");
 
@@ -50,7 +52,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                 </Link>
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold">{t("adm_orderNumber", { number: order.orderNumber })}</h1>
-                    <p className="text-muted-foreground">{formatDate(order.createdAt)}</p>
+                    <p className="text-muted-foreground">{formatDate(order.createdAt, undefined, dateTag)}</p>
                 </div>
                 <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
             </div>
@@ -152,11 +154,11 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                         <CardContent className="space-y-2 text-sm">
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">{t("adm_created")}</span>
-                                <span>{formatDate(order.createdAt)}</span>
+                                <span>{formatDate(order.createdAt, undefined, dateTag)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">{t("adm_updated")}</span>
-                                <span>{formatDate(order.updatedAt)}</span>
+                                <span>{formatDate(order.updatedAt, undefined, dateTag)}</span>
                             </div>
                         </CardContent>
                     </Card>

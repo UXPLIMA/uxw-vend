@@ -6,6 +6,7 @@ import { Button, Card, CardContent, Input } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface PunishmentItem {
     id: string;
@@ -31,7 +32,7 @@ const typeKeys: Record<string, string> = { ban: "ban", mute: "mute", kick: "kick
 
 export default function PunishmentsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("punishments");
     const [punishments, setPunishments] = useState<PunishmentItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -116,7 +117,7 @@ export default function PunishmentsPage() {
                                                 <td className="py-3 px-4 text-sm text-muted-foreground max-w-[200px] truncate">{p.reason || "-"}</td>
                                                 <td className="py-3 px-4 text-sm text-muted-foreground">{p.punishedBy || "Console"}</td>
                                                 <td className="py-3 px-4 text-sm">{p.duration || t("permanent")}</td>
-                                                <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString("tr-TR")}</td>
+                                                <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString(__dateTag)}</td>
                                             </tr>
                                         );
                                     })}

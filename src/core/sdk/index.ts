@@ -38,6 +38,7 @@
 // --- Formatting and string helpers (clsx / tailwind-merge only) ---
 export {
     cn,
+    dateLocaleTag,
     formatCurrency,
     formatDate,
     slugify,

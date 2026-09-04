@@ -76,7 +76,7 @@ export default function AdminReferralPage() {
         return (
             <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
-                    Failed to load referral statistics
+                    {t("adm_failedToLoad")}
                 </CardContent>
             </Card>
         );
@@ -197,7 +197,7 @@ export default function AdminReferralPage() {
                                 placeholder="5.00"
                             />
                             <p className="text-xs text-muted-foreground">
-                                Credits awarded to the referrer when someone uses their code
+                                {t("adm_rewardDescription")}
                             </p>
                         </div>
                         <Button onClick={saveSettings} disabled={saving}>

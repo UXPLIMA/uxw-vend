@@ -210,7 +210,7 @@ export default function SeoPageOverridesPage() {
                         <p className="text-lg font-medium text-foreground mb-1">{t("adm_noPageSeo")}</p>
                         <p className="text-sm text-muted-foreground mb-6">{t("adm_noPageSeoDesc")}</p>
                         <Button onClick={openCreate}>
-                            <Plus className="w-4 h-4 mr-2" /> Add Page
+                            <Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -302,7 +302,7 @@ export default function SeoPageOverridesPage() {
                                     placeholder="/about"
                                     required
                                 />
-                                <p className="text-xs text-muted-foreground mt-1">Must start with / (e.g. /about, /blog/my-post)</p>
+                                <p className="text-xs text-muted-foreground mt-1">{t("adm_urlPathHelp")}</p>
                             </div>
 
                             {/* Meta Tags Section */}
@@ -317,7 +317,7 @@ export default function SeoPageOverridesPage() {
                                             aria-label={t("adm_metaTitle")}
                                             value={form.metaTitle}
                                             onChange={(e) => updateField("metaTitle", e.target.value)}
-                                            placeholder="Page Title"
+                                            placeholder={t("adm_metaTitlePlaceholder")}
                                         />
                                         <p className="text-xs text-muted-foreground mt-1">
                                             {form.metaTitle.length}/60 characters (recommended max)
@@ -329,7 +329,7 @@ export default function SeoPageOverridesPage() {
                                             aria-label={t("adm_metaDescription")}
                                             value={form.metaDescription}
                                             onChange={(e) => updateField("metaDescription", e.target.value)}
-                                            placeholder="Brief description for search results..."
+                                            placeholder={t("adm_metaDescriptionPlaceholder")}
                                             rows={2}
                                             className="flex min-h-[60px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
                                         />
@@ -365,34 +365,34 @@ export default function SeoPageOverridesPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <Label className="text-foreground">OG Title</Label>
+                                        <Label className="text-foreground">{t("adm_ogTitle")}</Label>
                                         <Input
-                                            aria-label="OG Title"
+                                            aria-label={t("adm_ogTitle")}
                                             value={form.ogTitle}
                                             onChange={(e) => updateField("ogTitle", e.target.value)}
-                                            placeholder="Title for social sharing"
+                                            placeholder={t("adm_ogTitlePlaceholder")}
                                         />
                                     </div>
                                     <div>
-                                        <Label className="text-foreground">OG Description</Label>
+                                        <Label className="text-foreground">{t("adm_ogDescription")}</Label>
                                         <textarea
-                                            aria-label="OG Description"
+                                            aria-label={t("adm_ogDescription")}
                                             value={form.ogDescription}
                                             onChange={(e) => updateField("ogDescription", e.target.value)}
-                                            placeholder="Description for social sharing..."
+                                            placeholder={t("adm_ogDescriptionPlaceholder")}
                                             rows={2}
                                             className="flex min-h-[60px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
                                         />
                                     </div>
                                     <div>
-                                        <Label className="text-foreground">OG Image URL</Label>
+                                        <Label className="text-foreground">{t("adm_ogImage")}</Label>
                                         <Input
-                                            aria-label="OG Image URL"
+                                            aria-label={t("adm_ogImage")}
                                             value={form.ogImage}
                                             onChange={(e) => updateField("ogImage", e.target.value)}
                                             placeholder="https://example.com/og-image.png"
                                         />
-                                        <p className="text-xs text-muted-foreground mt-1">Recommended: 1200x630 pixels</p>
+                                        <p className="text-xs text-muted-foreground mt-1">{t("adm_ogImageHelp")}</p>
                                     </div>
                                 </CardContent>
                             </Card>

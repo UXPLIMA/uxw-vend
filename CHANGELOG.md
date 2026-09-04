@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The modules' admin screens were in English, and dates were formatted in
+  Turkish for everyone.** Two defects in the same corner. The admin
+  translation gate covered core's `(admin)` tree only, so every module's own
+  `pages/admin` sat outside it: the blog's article status labels and category
+  dialog, the custom form builder's field types and wizard buttons, the
+  help-center's icon and image pickers, the SEO settings' OpenGraph fields
+  and their hints, the store's coupon and variable-type screens, the trophy
+  editor's placeholders, the ticket staff badge, the CSV importer's column
+  hint. The gate now walks `pages/admin` in every module, with a documented
+  allowance for the format tokens (`{name}`, `YYYY-MM-DD`) that are examples
+  rather than prose.
+- **Twenty-two admin screens formatted their timestamps as `tr-TR` outright**,
+  so an English admin read Turkish dates on the cron page, the email queue,
+  the audit log, the backup list, observability, moderation, warnings,
+  broadcasts, IP blocks, API keys, revisions, activity log, analytics, the
+  user list and detail, the module update list, the sessions tab and the
+  activity feed widget, plus the punishments, staff, player-profile, trophy,
+  ticket, store, referral, webhook-log, suggestion, custom-form and credit
+  screens. Thirty-one more files hand-rolled `locale === "tr" ? "tr-TR" :
+  locale` to avoid exactly that, and ten called the shared `formatDate()`
+  without its locale argument, so its `en-US` default rendered English dates
+  on the public blog and the store order screens no matter who was reading.
+  The mapping is now `dateLocaleTag()` in `src/core/lib/utils.ts`, re-exported
+  from the module SDK, and a gate keeps it the only copy: no BCP 47 tag
+  written inline at a call site, no second mapping, `formatDate()` always
+  given a locale, and modules reaching it through `@/core/sdk`. Currency
+  formatting is deliberately left pinned to `en-US` - a price rendering the
+  same way in every language is a currency decision, not a date one.
+
 - **The modules' own visitor-facing screens were in English, and no gate
   watched them.** The public translation gate covered core's `(public)` tree
   and chrome, the admin gate covered `(admin)`, and everything a module

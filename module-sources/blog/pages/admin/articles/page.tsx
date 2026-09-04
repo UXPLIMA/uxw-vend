@@ -4,7 +4,8 @@ import { formatDate } from "@/core/sdk";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { dateLocaleTag } from "@/core/sdk";
 
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,7 @@ async function getBlogArticles() {
 
 export default async function AdminBlogArticlesPage() {
     const t = await getTranslations("blog");
+    const dateTag = dateLocaleTag(await getLocale());
     const session = await auth();
 
     if (!session?.user) {
@@ -148,7 +150,7 @@ export default async function AdminBlogArticlesPage() {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span className="text-sm text-muted-foreground">
-                                                    {formatDate(article.createdAt)}
+                                                    {formatDate(article.createdAt, undefined, dateTag)}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4 text-right">

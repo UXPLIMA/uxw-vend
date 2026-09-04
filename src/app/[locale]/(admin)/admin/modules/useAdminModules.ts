@@ -20,11 +20,12 @@ import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { compareVersions } from "./module-display";
 import type { Module, MarketplaceModule, SortKey } from "./types";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 export function useAdminModules() {
     const t = useTranslations("admin");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const searchParams = useSearchParams();
     const initialFilterParam = searchParams?.get("filter") ?? null;
 

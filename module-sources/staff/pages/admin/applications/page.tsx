@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent } from "@/core/sdk/ui";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Application {
     id: string;
@@ -25,7 +26,7 @@ const statusColors: Record<string, string> = {
 
 export default function StaffApplicationsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("staff");
     const [apps, setApps] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
@@ -89,7 +90,7 @@ export default function StaffApplicationsPage() {
                                         </div>
                                         <div>
                                             <p className="font-medium">{app.user.username}</p>
-                                            <p className="text-xs text-muted-foreground">{app.user.email} · {new Date(app.createdAt).toLocaleDateString("tr-TR")}</p>
+                                            <p className="text-xs text-muted-foreground">{app.user.email} · {new Date(app.createdAt).toLocaleDateString(__dateTag)}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">

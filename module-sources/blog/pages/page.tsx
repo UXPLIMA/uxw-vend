@@ -4,7 +4,8 @@ import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { NewsGrid } from "../components/news-grid";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { dateLocaleTag } from "@/core/sdk";
 
 export const revalidate = 60;
 
@@ -33,6 +34,7 @@ async function getBlogArticles() {
 export default async function BlogPage() {
     const { articles, categories } = await getBlogArticles();
     const t = await getTranslations('blog');
+    const dateTag = dateLocaleTag(await getLocale());
     const commonT = await getTranslations('common');
 
     return (
@@ -76,7 +78,7 @@ export default async function BlogPage() {
                                                     {article.title}
                                                 </h4>
                                                 <p className="text-xs text-muted-foreground mt-1">
-                                                    {formatDate(article.publishedAt || article.createdAt)}
+                                                    {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
                                                 </p>
                                             </Link>
                                         ))}

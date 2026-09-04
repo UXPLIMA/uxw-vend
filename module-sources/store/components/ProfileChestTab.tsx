@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface ChestItem {
     id: string;
@@ -14,7 +15,7 @@ interface ChestItem {
 
 export function ProfileChestTab() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("store");
     const [chestItems, setChestItems] = useState<ChestItem[]>([]);
     const [loading, setLoading] = useState(true);

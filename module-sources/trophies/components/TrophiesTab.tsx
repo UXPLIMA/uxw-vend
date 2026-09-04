@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Award, Loader2 } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface EarnedTrophy {
     id: string;
@@ -22,7 +23,7 @@ interface EarnedTrophy {
 export default function TrophiesTab() {
     const t = useTranslations("trophies");
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const [earned, setEarned] = useState<EarnedTrophy[]>([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);

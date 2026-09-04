@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, CheckCircle, XCircle } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Log {
     id: string;
@@ -17,7 +18,7 @@ interface Log {
 
 export default function WebhookLogsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("webhookLogs");
     const [logs, setLogs] = useState<Log[]>([]);
     const [loading, setLoading] = useState(true);
@@ -71,7 +72,7 @@ export default function WebhookLogsPage() {
                                                 <code className="text-xs bg-muted px-2 py-0.5 rounded">{log.event}</code>
                                             </td>
                                             <td className="py-3 px-4 text-sm text-muted-foreground max-w-[300px] truncate">{log.url}</td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString("tr-TR")}</td>
+                                            <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(log.createdAt).toLocaleString(__dateTag)}</td>
                                         </tr>
                                     ))}
                                 </tbody>

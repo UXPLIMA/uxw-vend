@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent } from "@/core/sdk/ui";
 import { Loader2, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Form {
     id: string;
@@ -24,7 +25,7 @@ interface Submission {
 
 export default function SubmissionsPage() {
     const __locale = useLocale();
-    const __dateTag = __locale === "tr" ? "tr-TR" : __locale;
+    const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("customForms");
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [forms, setForms] = useState<Form[]>([]);
@@ -106,7 +107,7 @@ export default function SubmissionsPage() {
                                         <div>
                                             <span className="font-medium text-foreground">{sub.form.title}</span>
                                             <span className="text-xs text-muted-foreground ml-3">
-                                                {new Date(sub.createdAt).toLocaleString("tr-TR")}
+                                                {new Date(sub.createdAt).toLocaleString(__dateTag)}
                                             </span>
                                             <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
                                                 {sub.status}
@@ -140,13 +141,13 @@ export default function SubmissionsPage() {
                     {totalPages > 1 && (
                         <div className="flex justify-center gap-2 mt-4">
                             <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                                Previous
+                                {t("adm_previous")}
                             </Button>
                             <span className="flex items-center text-sm text-muted-foreground">
                                 Page {page} of {totalPages}
                             </span>
                             <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                                Next
+                                {t("adm_next")}
                             </Button>
                         </div>
                     )}

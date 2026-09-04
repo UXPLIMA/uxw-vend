@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { dateLocaleTag } from "@/core/lib/utils";
 import { Button } from "@/core/components/ui/button";
 import { CheckCircle, X } from "lucide-react";
 import type { MarketplaceModule } from "./types";
@@ -12,6 +13,7 @@ interface DetailProps {
 }
 
 export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
+    const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("admin");
 
     useEffect(() => {
@@ -41,7 +43,7 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
                             {mod.verified && <CheckCircle className="w-4 h-4 text-blue-500" />}
                         </h3>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                            by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString("tr-TR")}
+                            by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString(__dateTag)}
                         </p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={onClose} aria-label={t("common_close")}>

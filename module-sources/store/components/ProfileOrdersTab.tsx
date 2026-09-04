@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { formatCurrency, formatDate } from "@/core/sdk";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
+import { dateLocaleTag } from "@/core/sdk";
 
 interface Order {
     id: string;
@@ -37,6 +38,7 @@ const statusColor = (status: string) => {
 
 export function ProfileOrdersTab() {
     const t = useTranslations("store");
+    const dateTag = dateLocaleTag(useLocale());
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
@@ -94,7 +96,7 @@ export function ProfileOrdersTab() {
                                 >
                                     <div className="text-left">
                                         <p className="font-medium">{order.orderNumber}</p>
-                                        <p className="text-xs text-muted-foreground">{formatDate(new Date(order.createdAt))}</p>
+                                        <p className="text-xs text-muted-foreground">{formatDate(new Date(order.createdAt), undefined, dateTag)}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="text-right">

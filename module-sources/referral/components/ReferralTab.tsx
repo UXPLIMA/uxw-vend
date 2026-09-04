@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { dateLocaleTag } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
 import { Loader2, UserPlus, Users, Coins, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ interface ReferralData {
 }
 
 export function ReferralTab() {
+    const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("referral");
     const [data, setData] = useState<ReferralData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -124,7 +126,7 @@ export function ReferralTab() {
                                     <div>
                                         <p className="text-sm font-medium">{ref.username || "Unknown"}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(ref.createdAt).toLocaleDateString("tr-TR")}
+                                            {new Date(ref.createdAt).toLocaleDateString(__dateTag)}
                                         </p>
                                     </div>
                                     <div className="text-right">
