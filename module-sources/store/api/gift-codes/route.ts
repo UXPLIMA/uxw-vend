@@ -47,7 +47,10 @@ export async function POST(request: NextRequest) {
     // Generate multiple gift codes
     const codes = [];
     for (let i = 0; i < Math.min(count, 100); i++) {
-        const code = `GIFT-${randomBytes(4).toString("hex").toUpperCase()}`;
+        // 8 bytes, not 4. A code is a bearer secret worth credits and the
+        // redeem endpoint says whether a guess exists, so the code space is
+        // the second half of that defence: 32 bits is walkable, 64 is not.
+        const code = `GIFT-${randomBytes(8).toString("hex").toUpperCase()}`;
 
         const giftCode = await prisma.giftCode.create({
             data: {

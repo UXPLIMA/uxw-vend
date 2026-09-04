@@ -32,6 +32,17 @@ export {
     rateLimitForRoleAsync,
 } from "@/core/lib/rate-limit";
 
+/**
+ * A limit an operator's role multipliers cannot lift.
+ *
+ * `rateLimitForRole` scales its budget by the caller's role, and a multiplier
+ * of 0 means unlimited - the right shape for throughput, the wrong one for a
+ * guard on guessing a secret. Use this for the endpoints where the request
+ * body is a password, a one-time code or a gift code: the ceiling is what
+ * makes the guess unaffordable, so it has to hold for every role.
+ */
+export { rateLimit as rateLimitStrict } from "@/core/lib/rate-limit";
+
 // --- Caching (Redis with in-memory fallback) ---
 export { cached, invalidate } from "@/core/lib/cache";
 

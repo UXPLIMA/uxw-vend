@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { rateLimit } from "@/core/lib/rate-limit";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
 import bcrypt from "bcryptjs";
@@ -41,6 +42,21 @@ export async function PATCH(request: NextRequest) {
 
     // Password change
     if (body.currentPassword && body.newPassword) {
+        // `bcrypt.compare` below turns this branch into a password oracle, and
+        // one bcrypt round at cost 12 per request is a CPU sink besides. The
+        // account deletion route has always had this ceiling; the branch that
+        // changes the password did not.
+        const rl = await rateLimit(`profile-password:${session.user.id}`, {
+            maxRequests: 5,
+            windowMs: 15 * 60 * 1000,
+        });
+        if (!rl.success) {
+            return NextResponse.json(
+                { error: "Too many attempts. Try again later." },
+                { status: 429 },
+            );
+        }
+
         const validation = updatePasswordSchema.safeParse(body);
         if (!validation.success) {
             return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
