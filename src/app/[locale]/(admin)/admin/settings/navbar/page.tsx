@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { IconPicker } from "@/core/components/ui/icon-picker";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 interface NavChild {
     label: string;
@@ -46,7 +47,7 @@ export default function NavbarSettingsPage() {
                     // currently rendering from the module registry, so the
                     // admin sees real state and can edit from there.
                     const registry = ModuleNavLinks
-                        .filter(nl => moduleStatus[nl.module] === true)
+                        .filter(nl => isEnabledIn(moduleStatus, nl.module))
                         .map(nl => ({ label: nl.label, href: nl.href, icon: nl.icon || "" }));
                     setLinks([{ label: "Home", href: "/", icon: "Home" }, ...registry]);
                 }

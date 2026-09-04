@@ -4,6 +4,7 @@ import React from "react";
 import { ModuleSlotContents, SlotContentRegistry } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 /**
  * Named slot - any module's template can declare a <Slot name="xxx"> and
@@ -48,7 +49,7 @@ export function Slot({ name, context, fallback = null }: SlotProps) {
 
     const contributions = ModuleSlotContents
         .filter((sc) => sc.slot === name)
-        .filter((sc) => moduleStatus[sc.module] === true)
+        .filter((sc) => isEnabledIn(moduleStatus, sc.module))
         .filter((sc) => (SlotContentRegistry as Record<string, React.ComponentType<Record<string, unknown>>>)[sc.id])
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 

@@ -65,13 +65,13 @@ function DefaultFooter() {
     // Installed module path prefixes
     const installedModulePaths = new Set<string>();
     for (const nl of ModuleNavLinks) {
-        if (moduleStatus[nl.module] === true) installedModulePaths.add(nl.href);
+        if (isEnabledIn(moduleStatus, nl.module)) installedModulePaths.add(nl.href);
     }
     for (const fl of ModuleFooterLinks) {
-        if (moduleStatus[fl.module] === true) installedModulePaths.add(fl.href);
+        if (isEnabledIn(moduleStatus, fl.module)) installedModulePaths.add(fl.href);
     }
     for (const r of ModuleRoutes) {
-        if (!r.isAdmin && moduleStatus[r.module] === true) {
+        if (!r.isAdmin && isEnabledIn(moduleStatus, r.module)) {
             installedModulePaths.add('/' + r.path.split('/')[0]);
         }
     }
@@ -80,7 +80,7 @@ function DefaultFooter() {
     // two named columns; a link naming any other section joins Quick Links
     // rather than vanishing, which is what filtering on `section === "quick"`
     // silently did to it.
-    const enabledFooterLinks = ModuleFooterLinks.filter((fl) => moduleStatus[fl.module] === true);
+    const enabledFooterLinks = ModuleFooterLinks.filter((fl) => isEnabledIn(moduleStatus, fl.module));
     const toLink = (fl: { label: string; href: string }): FooterLink => ({ ...fl, external: false });
     const legalLinks: FooterLink[] = [
         ...parseFooterLinks(settings.footer_legal_links),
@@ -180,7 +180,7 @@ function DefaultFooter() {
                                 />
                             </div>
                             {ModuleFooterComponents
-                                .filter((fc) => moduleStatus[fc.module] === true && FooterComponentRegistry[fc.id])
+                                .filter((fc) => isEnabledIn(moduleStatus, fc.module) && FooterComponentRegistry[fc.id])
                                 .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
                                 .map((fc) => {
                                     const Comp = FooterComponentRegistry[fc.id];
@@ -228,6 +228,7 @@ function DefaultFooter() {
 }
 
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 export function Footer() {
     return <ThemeComponentSlot name="Footer" fallback={DefaultFooter} />;

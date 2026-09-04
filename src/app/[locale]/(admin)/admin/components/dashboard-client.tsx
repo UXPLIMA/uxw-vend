@@ -8,6 +8,7 @@ import { Package } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useAllModules } from "@/core/providers/module-provider";
 import dynamic from "next/dynamic";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 const DashboardCharts = dynamic(() => import("./dashboard-charts").then(m => ({ default: m.DashboardCharts })), {
     loading: () => <div className="h-[300px] bg-muted animate-pulse rounded-lg" />,
@@ -87,7 +88,7 @@ function useModuleDashboardData() {
         fetch("/api/v1/modules")
             .then(r => r.json())
             .then(async (data) => {
-                const enabledModules = ((data.modules || []) as ModuleManifest[]).filter((m) => modules[m.id] === true);
+                const enabledModules = ((data.modules || []) as ModuleManifest[]).filter((m) => isEnabledIn(modules, m.id));
 
                 const allCards: DashboardCard[] = [];
                 const allStats: Record<string, string | number> = {};

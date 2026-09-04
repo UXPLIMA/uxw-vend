@@ -48,7 +48,13 @@ export async function getAvailableWidgets(): Promise<AvailableWidget[]> {
     const core: AvailableWidget[] = [...CORE_WIDGETS];
     try {
         const { ModuleDashboardCards } = await import("@/core/generated/module-registry");
+        const { getModuleStates } = await import("@/core/lib/module-cache");
+        const { isEnabledIn } = await import("@/core/lib/module-enabled");
+        // A disabled module's card cannot render, so listing it in the
+        // customizer only offered the admin a widget that stays blank.
+        const states = await getModuleStates();
         for (const card of ModuleDashboardCards) {
+            if (!isEnabledIn(states, card.module)) continue;
             core.push({
                 id: `mod:${card.module}:${card.id}`,
                 label: card.label,

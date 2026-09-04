@@ -11,6 +11,7 @@ import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 const DEMO_EMAIL = "admin@example.com";
 const DEMO_PASSWORD = "password123";
@@ -26,7 +27,7 @@ export default function LoginPage() {
     const [remember, setRemember] = useState(false);
     const [isDemo, setIsDemo] = useState(false);
     const allModules = useAllModules();
-    const oauthButtons = ModuleOauthButtons.filter(b => allModules[b.module] === true);
+    const oauthButtons = ModuleOauthButtons.filter(b => isEnabledIn(allModules, b.module));
     const [twoFactorCode, setTwoFactorCode] = useState("");
 
     useEffect(() => {

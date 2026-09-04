@@ -3,6 +3,7 @@
 import React from "react";
 import { ContextProviderRegistry, ModuleContextProviders as ProviderList } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 /**
  * Wraps children with React context providers registered by enabled modules.
@@ -17,7 +18,7 @@ export function ModuleContextProviders({ children }: { children: React.ReactNode
     const moduleStatus = useAllModules();
 
     const enabled = ProviderList
-        .filter((cp) => moduleStatus[cp.module] === true && (ContextProviderRegistry as Record<string, React.ComponentType<{ children: React.ReactNode }>>)[cp.id])
+        .filter((cp) => isEnabledIn(moduleStatus, cp.module) && (ContextProviderRegistry as Record<string, React.ComponentType<{ children: React.ReactNode }>>)[cp.id])
         .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
     // Compose: lowest order = outermost wrap

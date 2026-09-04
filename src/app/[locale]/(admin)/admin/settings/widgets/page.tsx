@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { useTranslations } from "next-intl";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
@@ -17,7 +18,7 @@ export default function WidgetSettingsPage() {
     // Build available widgets from registry, filtered to enabled modules
     const availableWidgets = useMemo(() =>
         ModuleWidgets
-            .filter((w) => modules[w.module] === true)
+            .filter((w) => isEnabledIn(modules, w.module))
             .map((w) => ({
                 id: w.id,
                 name: w.id.replace(/([A-Z])/g, " $1").trim(),

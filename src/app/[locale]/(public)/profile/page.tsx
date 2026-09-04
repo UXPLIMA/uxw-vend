@@ -23,6 +23,7 @@ import { MessagesTab } from "@/core/components/profile/MessagesTab";
 import { SessionsTab } from "@/core/components/profile/SessionsTab";
 import { ActivityTab } from "@/core/components/profile/ActivityTab";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 interface UserProfile {
     id: string;
@@ -126,7 +127,7 @@ export default function ProfilePage() {
 
     // Module profile tabs filtered by enabled modules and registered components
     const moduleProfileTabs = ModuleProfileTabs
-        .filter(t => modules[t.module] === true)
+        .filter(t => isEnabledIn(modules, t.module))
         .filter(t => ProfileTabRegistry[t.id]);
 
     // Close delete modal on Escape

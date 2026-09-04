@@ -3,15 +3,23 @@ import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { setPreference, getUserPreferences } from "@/core/lib/notif-prefs";
 import { ModuleNotificationTypes } from "@/core/generated/module-notification-types";
+import { getModuleStates } from "@/core/lib/module-cache";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 /** GET - list current user's prefs + the available event types */
 export async function GET() {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const prefs = await getUserPreferences(session.user.id);
+    // A disabled module emits nothing, so its event types are toggles that
+    // can never fire. Saved preferences are left alone - re-enabling the
+    // module brings the type, and the user's choice, straight back.
+    const [prefs, moduleStates] = await Promise.all([
+        getUserPreferences(session.user.id),
+        getModuleStates(),
+    ]);
     return NextResponse.json({
-        types: ModuleNotificationTypes,
+        types: ModuleNotificationTypes.filter((t) => isEnabledIn(moduleStates, t.module)),
         prefs,
     });
 }

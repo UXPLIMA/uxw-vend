@@ -7,6 +7,7 @@ import {
     LayoutComponentRegistry,
 } from "@/core/generated/module-registry";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
+import { isEnabledIn } from "@/core/lib/module-enabled";
 
 function matchPattern(path: string, pattern: string): boolean {
     if (pattern === "/*" || pattern === "*") return true;
@@ -21,7 +22,7 @@ export function ModuleLayoutComponents() {
     const cleanPath = pathname?.replace(/^\/[a-z]{2}/, "") || "/";
 
     const enabled = LayoutComponentList
-        .filter(lc => modules[lc.module] === true)
+        .filter(lc => isEnabledIn(modules, lc.module))
         .filter(lc => LayoutComponentRegistry[lc.id])
         .filter(lc => {
             // Check include patterns (default: show everywhere)
