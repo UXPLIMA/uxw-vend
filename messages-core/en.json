@@ -60,7 +60,9 @@
     "title": "Activity Feed",
     "description": "Latest activity across the site",
     "recent": "Recent Activity",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "twoFactorEnabled": "Two-factor authentication enabled",
+    "twoFactorDisabled": "Two-factor authentication disabled"
   },
   "nav": {
     "adminPanel": "Admin Panel",

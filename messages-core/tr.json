@@ -60,7 +60,9 @@
     "title": "Etkinlik Akışı",
     "description": "Sitedeki en son etkinlikler",
     "recent": "Son Etkinlikler",
-    "viewAll": "Tümünü gör"
+    "viewAll": "Tümünü gör",
+    "twoFactorEnabled": "İki adımlı doğrulama etkinleştirildi",
+    "twoFactorDisabled": "İki adımlı doğrulama devre dışı bırakıldı"
   },
   "nav": {
     "adminPanel": "Yönetici Paneli",

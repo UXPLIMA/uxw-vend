@@ -2,7 +2,7 @@
   "id": "announcements",
   "name": "Announcements",
   "description": "Site-wide announcement banners",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -103,6 +103,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_announcements_announcements": "Announcements"
+      },
+      "activity": {
+        "announcementCreated": "announced:"
       }
     },
     "tr": {
@@ -158,6 +161,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_announcements_announcements": "Duyurular"
+      },
+      "activity": {
+        "announcementCreated": "duyuru yaptı:"
       }
     }
   },
@@ -190,6 +196,13 @@
       "id": "publish-scheduled",
       "schedule": "every-5-minutes",
       "handler": "cron/publish-scheduled.ts"
+    }
+  ],
+  "activityTitles": [
+    {
+      "type": "announcements.announcement.created",
+      "prefix": "Announcement: ",
+      "key": "announcementCreated"
     }
   ]
 }

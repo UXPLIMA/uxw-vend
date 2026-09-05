@@ -21,8 +21,12 @@ import { ModuleActivityTitles } from "@/core/generated/module-registry";
 type Translator = ((key: string) => string) & { has?: (key: string) => boolean };
 
 // Core-only activity events. Module events are merged in from the registry.
+// An empty prefix means the stored title is a whole English sentence with no
+// entity in it, so the translation replaces all of it.
 const CORE_PREFIXES: Record<string, { prefix: string; key: string }> = {
     "user.registered": { prefix: "", key: "userRegistered" },
+    "user.2fa.enabled": { prefix: "", key: "twoFactorEnabled" },
+    "user.2fa.disabled": { prefix: "", key: "twoFactorDisabled" },
 };
 
 const PREFIXES: Record<string, { prefix: string; key: string }> = {
