@@ -29,6 +29,7 @@
 
 import fs from "fs";
 import path from "path";
+import { exportedHttpMethods } from "../src/core/lib/http-methods";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
 const CORE_API_DIR = path.join(process.cwd(), "src/app/api");
@@ -447,25 +448,9 @@ interface DiscoveredOperation {
     secured: boolean;
 }
 
-const HTTP_METHODS: HttpMethod[] = ["get", "post", "put", "patch", "delete"];
-
-/**
- * The verbs a route file exports. Both spellings occur in this codebase:
- * `export async function GET` for a handler written here, and
- * `export const { GET, POST } = handlers` for the Auth.js route.
- */
+/** The same reader the dispatcher's route table is built with, lowercased. */
 function exportedMethods(source: string): HttpMethod[] {
-    const found = new Set<HttpMethod>();
-    for (const m of source.matchAll(/export\s+(?:async\s+)?(?:function|const)\s+(GET|POST|PUT|PATCH|DELETE)\b/g)) {
-        found.add(m[1].toLowerCase() as HttpMethod);
-    }
-    for (const m of source.matchAll(/export\s+const\s*\{([^}]*)\}/g)) {
-        for (const name of m[1].split(",")) {
-            const verb = name.split(":")[0].trim().toLowerCase();
-            if ((HTTP_METHODS as string[]).includes(verb)) found.add(verb as HttpMethod);
-        }
-    }
-    return HTTP_METHODS.filter((m) => found.has(m));
+    return exportedHttpMethods(source).map((m) => m.toLowerCase() as HttpMethod);
 }
 
 /**

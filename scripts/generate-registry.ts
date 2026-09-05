@@ -3,6 +3,7 @@ import path from 'path';
 import { moduleManifestSchema, type ValidatedModuleManifest } from '../src/core/lib/module-manifest-schema';
 import { findNavGroupConflicts, type ModuleNavGroupDeclaration } from '../src/core/lib/nav-group-conflicts';
 import type { ModuleSetting } from '../src/core/lib/module-types';
+import { exportedHttpMethods } from '../src/core/lib/http-methods';
 
 function toComponentName(basename: string): string {
     return basename
@@ -79,7 +80,7 @@ function generateRegistry() {
     let mapping = `export const ModuleRegistry: Record<string, ComponentType<any>> = {\n`;
     let apiMapping = `export const ModuleApiRegistry: Record<string, () => Promise<Record<string, unknown>>> = {\n`;
     const routes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean; titleKey?: string }[] = [];
-    const apiRoutes: { path: string; key: string; module: string; handler: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = [];
+    const apiRoutes: { path: string; key: string; module: string; handler: string; method?: string; methods?: string[]; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = [];
     const routeResolvers: { key: string; module: string; handler: string }[] = [];
 
     for (const { moduleName, manifest } of loaded) {
@@ -102,6 +103,10 @@ function generateRegistry() {
         for (const api of manifest.api ?? []) {
             const apiKey = `${moduleName}:api:${api.path}`;
             const handlerImportPath = `@/modules/${moduleName}/${api.handler.replace(/\.ts?$/, '')}`;
+            const handlerFile = path.join(MODULES_DIR, moduleName, api.handler.replace(/^\.?\//, ''));
+            const handlerMethods = fs.existsSync(handlerFile)
+                ? exportedHttpMethods(fs.readFileSync(handlerFile, 'utf8'))
+                : [];
             apiMapping += `  '${apiKey}': () => import('${handlerImportPath}'),\n`;
             apiRoutes.push({
                 path: api.path,
@@ -112,6 +117,10 @@ function generateRegistry() {
                 // to follow the handler or each alias gets its own budget.
                 handler: api.handler.replace(/^\.?\//, ''),
                 method: api.method || 'ALL',
+                // The verbs the handler file exports, so the dispatcher can
+                // answer OPTIONS and put an Allow on a 405 without importing
+                // it. A manifest `method` narrows this; it cannot widen it.
+                ...(handlerMethods.length > 0 ? { methods: handlerMethods } : {}),
                 // Carried into the route table so the dispatcher can pick the
                 // right rate-limit bucket without reading the manifest.
                 ...(api.providerCallback ? { providerCallback: true } : {}),
@@ -124,7 +133,7 @@ function generateRegistry() {
     apiMapping += `};\n\n`;
     // Route tables are plain data - no imports, safe anywhere.
     let routeData = `export const ModuleRoutes: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean; titleKey?: string }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
-    routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; handler: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
+    routeData += `export const ModuleApiRoutes: { path: string; key: string; module: string; handler: string; method?: string; methods?: string[]; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};`;
 
     // Aggregate typed collections across all modules
     const allWidgets: ({ id: string; component: string; defaultOrder: number; defaultVisible: boolean; module: string })[] = [];
@@ -345,7 +354,7 @@ function generateRegistry() {
     const DATA_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-data.ts');
     let dataContent = '// Auto-generated server-safe module data - no dynamic imports\n';
     dataContent += `import type { ModuleSetting } from "@/core/lib/module-types";\n\n`;
-    dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; handler: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
+    dataContent += `export const ModuleApiRoutes: { path: string; key: string; module: string; handler: string; method?: string; methods?: string[]; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }[] = ${JSON.stringify(apiRoutes, null, 2)};\n\n`;
     dataContent += `export const ModuleRoutesList: { path: string; key: string; module: string; isAdmin?: boolean; noindex?: boolean; titleFromPath?: boolean; titleKey?: string }[] = ${JSON.stringify(routes, null, 2)};\n\n`;
     dataContent += `// Outbound webhook channels contributed by modules. Core owns the alert\n`;
     dataContent += `// content and the wire layouts; a channel only names its hosts and layout.\n`;
