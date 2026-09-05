@@ -8,6 +8,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Installing the SEO module gave you a sidebar link to a dead page.** A
+  module page is served by a catch-all, and a catch-all is the App Router's
+  lowest-priority match, so a core file with the same literal segments answers
+  the URL first and the module's page is never reached: no error, no log line,
+  and the sidebar link the module contributed still points at it. Core carried
+  `src/app/[locale]/(admin)/admin/seo/page.tsx`, and the `seo` module mounts
+  its admin screen at exactly `/admin/seo`.
+
+  Core's page was a stub of the module it was blocking. It wrote eight global
+  settings plus a title and a description for every core page and every
+  enabled module, and nothing in the repository read one of them, so its
+  "Saved" toast was a lie whether or not the module was installed. The module
+  is the real implementation: per-page rows in a table, with OpenGraph,
+  canonical, noindex and nofollow, and a `SeoHead` that applies them. Core's
+  page is deleted, along with the thirty-six translation keys that served it
+  and nothing else. Two screens borrowed one of those keys, `seo_saving`, to
+  label their own save button; they now use `common_saving`.
+
+- **Three working admin screens were reachable only by typing their URL.**
+  Core ships forty admin pages. The sidebar lists thirty-four, the
+  `/admin/settings` card grid lists a partly different set, and the spotlight
+  search carries a hardcoded twelve. Nothing compared the three against the
+  pages on disk.
+
+  `/admin/settings/moderation` is the only writer of the `moderation` setting,
+  which `forum` reads to decide whether a new topic is PENDING or APPROVED: an
+  admin could reach the Moderation Queue from the sidebar but not the switch
+  that fills it. `/admin/setup` is an onboarding wizard that installs modules
+  and writes site settings. `/admin/dev` inspects the hook and registry
+  tables. All three are now in the sidebar, next to what they belong with.
+
+  `validate-module` fails a module whose declared route, admin route or API
+  path is answered by a core file, and a test holds core to both rules: every
+  admin page is linked from somewhere, and no core page shadows a module
+  route. Five of its twelve assertions fail on the previous commit.
+
 - **Every module page had an English browser tab, whatever language it was
   in.** A module page is a component in a registry rather than a route segment
   file, so it cannot export `generateMetadata` and core's catch-all titles it.

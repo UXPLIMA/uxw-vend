@@ -1663,6 +1663,99 @@ function checkRouteTitlesAreTranslated(modulePath: string): CheckResult {
     return { name, passed: true, message: `${routes.length} page(s) named in ${locales.length} locale(s)` };
 }
 
+/**
+ * A page core renders itself is not a page a module can render.
+ *
+ * Module pages are served by three catch-alls - `[locale]/[...slug]`,
+ * `[locale]/(admin)/admin/[...slug]` and `api/v1/[...path]` - and a catch-all
+ * is the lowest-priority match in the App Router. A core file at the same
+ * depth with the same literal segments therefore answers the URL first, and
+ * the module's page is simply never reached: no error, no log line, and the
+ * sidebar link the module contributed still points at it.
+ *
+ * `seo` shipped that way. It declared the admin route `/seo`, core carried a
+ * dead screen at `src/app/[locale]/(admin)/admin/seo/page.tsx`, and installing
+ * SEO Manager put a working link in the sidebar that landed on core's stub.
+ */
+function checkRoutesAreNotShadowed(modulePath: string): CheckResult {
+    const name = "Routes are not shadowed by core";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: {
+        routes?: { path: string }[];
+        adminRoutes?: { path: string }[];
+        api?: { path: string }[];
+    };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const declared: { kind: string; url: string }[] = [
+        ...(manifest.routes ?? []).map((r) => ({ kind: "route", url: r.path })),
+        ...(manifest.adminRoutes ?? []).map((r) => ({ kind: "adminRoute", url: `/admin${r.path}` })),
+        ...(manifest.api ?? []).map((r) => ({ kind: "api", url: `/api/v1${r.path}` })),
+    ];
+    if (declared.length === 0) return { name, passed: true, message: "Declares no routes" };
+
+    const core = coreRouteUrls();
+    const problems: string[] = [];
+    for (const { kind, url } of declared) {
+        const owner = core.find((c) => shadows(c.url, url));
+        if (owner) problems.push(`${kind} ${url} is answered by ${owner.file}`);
+    }
+
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} shadowed route(s):\n      ${problems.join("\n      ")}`,
+            suggestion: "Pick a path core does not already render, or delete the core page if the module is meant to replace it.",
+        };
+    }
+    return { name, passed: true, message: `${declared.length} route(s) reach the module` };
+}
+
+/**
+ * Every URL core answers with a file of its own, catch-alls excluded: those
+ * are the dispatchers that serve modules, not competitors for a path.
+ */
+function coreRouteUrls(): { url: string; file: string }[] {
+    const out: { url: string; file: string }[] = [];
+    const collect = (base: string, prefix: string, leaf: string) => {
+        const walk = (dir: string, url: string) => {
+            if (!fs.existsSync(dir)) return;
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            if (entries.some((e) => e.isFile() && e.name === leaf)) {
+                out.push({ url: url || "/", file: path.relative(ROOT, path.join(dir, leaf)) });
+            }
+            for (const entry of entries) {
+                if (!entry.isDirectory()) continue;
+                // A route group - `(admin)` - names no URL segment.
+                const grouped = entry.name.startsWith("(") && entry.name.endsWith(")");
+                const segment = grouped ? "" : `/${entry.name}`;
+                if (/^\[\[?\.\.\./.test(entry.name)) continue;
+                walk(path.join(dir, entry.name), url + segment);
+            }
+        };
+        walk(path.join(ROOT, base), prefix);
+    };
+    collect("src/app/[locale]", "", "page.tsx");
+    collect("src/app/api/v1", "/api/v1", "route.ts");
+    return out;
+}
+
+/** True when a core URL answers a module URL: same depth, segment by segment. */
+function shadows(coreUrl: string, moduleUrl: string): boolean {
+    const a = coreUrl.split("/").filter(Boolean);
+    const b = moduleUrl.split("/").filter(Boolean);
+    if (a.length !== b.length) return false;
+    // A dynamic core segment still outranks a catch-all, so it shadows too.
+    return a.every((seg, i) => seg.startsWith("[") || seg === b[i]);
+}
+
 function checkModuleFetchPaths(modulePath: string): CheckResult {
     const name = "Fetched API paths exist";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1925,6 +2018,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkApiAliasesAgree(modulePath),
         checkErasureIsDeclared(modulePath),
         checkRouteTitlesAreTranslated(modulePath),
+        checkRoutesAreNotShadowed(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),

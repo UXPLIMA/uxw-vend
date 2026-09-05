@@ -65,6 +65,9 @@ import {
     Megaphone,
     Server,
     Cog,
+    SlidersHorizontal,
+    Cpu,
+    Rocket,
 } from "lucide-react";
 
 /** Lucide-compatible icon component used across the admin sidebar. */
@@ -147,13 +150,14 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: FileText,
         label: "Content",
         labelKey: "sidebar_content",
-        pathPrefix: ["/admin/moderation", "/admin/revisions", "/admin/broadcasts"],
+        pathPrefix: ["/admin/moderation", "/admin/settings/moderation", "/admin/revisions", "/admin/broadcasts"],
         sections: [
             {
                 header: "Workflow",
                 headerKey: "sidebar_workflow",
                 items: [
                     { href: "/admin/moderation", label: "Moderation Queue", labelKey: "sidebar_moderationQueue", icon: ShieldAlert },
+                    { href: "/admin/settings/moderation", label: "Moderation Settings", labelKey: "sidebar_moderationSettings", icon: SlidersHorizontal },
                     { href: "/admin/revisions", label: "Revisions", labelKey: "sidebar_revisions", icon: History },
                     { href: "/admin/broadcasts", label: "Broadcasts", labelKey: "sidebar_broadcasts", icon: Megaphone },
                 ],
@@ -229,7 +233,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Wrench,
         label: "Advanced",
         labelKey: "sidebar_advanced",
-        pathPrefix: ["/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/api-docs", "/admin/api-keys", "/admin/system", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
+        pathPrefix: ["/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/api-docs", "/admin/api-keys", "/admin/dev", "/admin/system", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
         sections: [
             {
                 header: "Operations",
@@ -256,6 +260,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 items: [
                     { href: "/admin/api-docs", label: "API Reference", labelKey: "sidebar_apiDocs", icon: FileJson },
                     { href: "/admin/api-keys", label: "API Keys", labelKey: "sidebar_apiKeys", icon: KeyRound },
+                    { href: "/admin/dev", label: "Hooks & Registries", labelKey: "sidebar_devTools", icon: Cpu },
                 ],
             },
         ],
@@ -265,13 +270,14 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Settings,
         label: "Settings",
         labelKey: "sidebar_settings",
-        pathPrefix: ["/admin/settings"],
+        pathPrefix: ["/admin/settings", "/admin/setup"],
         sections: [
             {
                 items: [
                     { href: "/admin/settings/general", label: "General", labelKey: "sidebar_general", icon: Cog },
                     { href: "/admin/settings/site", label: "Site Config", labelKey: "sidebar_siteConfig", icon: Globe },
                     { href: "/admin/settings", label: "All Settings", labelKey: "sidebar_allSettings", icon: Settings },
+                    { href: "/admin/setup", label: "Setup Wizard", labelKey: "sidebar_setupWizard", icon: Rocket },
                 ],
             },
         ],
