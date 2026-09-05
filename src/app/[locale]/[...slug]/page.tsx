@@ -70,6 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             messages,
         }),
         url: "/" + (slug?.join("/") || ""),
+        locale,
         type: "article",
     });
 

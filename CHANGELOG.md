@@ -8,6 +8,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Nine core pages had no title and no description of their own.** Only
+  `generateMetadata` can name a page, it is a server export, and these pages
+  are client components, so the root layout's `title.default` was all that was
+  left. Measured on the demo, in English:
+
+      /auth/login            title "uxwVend"   description none
+      /auth/register         title "uxwVend"   description none
+      /auth/forgot-password  title "uxwVend"   description none
+      /auth/reset-password   title "uxwVend"   description none
+      /auth/verify-email     title "uxwVend"   description none
+      /auth/error            title "uxwVend"   description none
+      /profile               title "uxwVend"   description none
+      /search                title "uxwVend"   description none
+      /maintenance           title "uxwVend"   description none
+
+  Every one of them already shipped a translated heading: the h1 on the login
+  screen reads "Welcome Back" and "Hos Geldin", and the tab read the site name
+  in both. `/activity` was the only page with a description at all.
+
+  Each now reads its title and description from `CORE_SCREENS`, a table of
+  `path -> namespace.key`, resolved in the visitor's language. The pages stay
+  client components; the metadata comes from a sibling layout that renders its
+  children untouched, except `/maintenance`, which is a server component and
+  exports it directly. A key that does not resolve drops the title rather than
+  blanking the tab or printing itself.
+
+  `/search` and `/maintenance` are marked `noindex, follow`: site search
+  answers an unbounded set of `?q=` URLs with one shell, and the maintenance
+  screen is a page whose whole content is an apology for the site being down.
+  `/auth` and `/profile` are not, deliberately - robots.txt already tells a
+  crawler not to fetch them, and a page nobody fetches is a page whose meta
+  tag nobody reads.
+
+- **No page emitted a canonical URL or its hreflang alternates.** Every route
+  on this site lives under a locale segment, so `/store` is a 307 and
+  `/en/store` is the page. The sitemap has published the `hreflang` set for a
+  while and the pages themselves said nothing, leaving the claim on one side
+  only. `buildPageMeta` emits both when the caller passes the locale, and
+  emits neither when it does not: a canonical naming the wrong URL is worse
+  than no canonical. Module pages, `/activity` and the nine screens above pass
+  it.
+
+  The root layout still emits neither, on purpose. Metadata is inherited, so
+  `alternates` set there would be inherited by every page that sets none of
+  its own - every admin screen, the setup wizard - each then claiming to be
+  the home page.
+
 - **Installing the SEO module gave you a sidebar link to a dead page.** A
   module page is served by a catch-all, and a catch-all is the App Router's
   lowest-priority match, so a core file with the same literal segments answers

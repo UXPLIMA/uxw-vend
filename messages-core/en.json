@@ -1258,7 +1258,8 @@
     "profileTab_ProfileOrdersTab": "Orders",
     "profileTab_ProfileChestTab": "Chest",
     "profileTab_ProfileSecurityTab": "Security",
-    "profileTab_referrals": "Referrals"
+    "profileTab_referrals": "Referrals",
+    "metaDescription": "Your account settings, sessions and privacy controls."
   },
   "auth": {
     "accountLocked": "Too many failed attempts. Your account is temporarily locked. Check your email or try again in a few minutes.",
@@ -1351,7 +1352,8 @@
     "verifyFailedBody": "This verification link is invalid or has expired. Request a new one from your profile.",
     "verifySuccess": "Email verified!",
     "verifySuccessBody": "Your email has been verified. You can now use all features of your account.",
-    "verifyTitle": "Verify Email"
+    "verifyTitle": "Verify Email",
+    "verifyMetaDescription": "Confirm your email address to finish setting up your account."
   },
   "search": {
     "title": "Search",
@@ -1365,7 +1367,8 @@
     "result": "result",
     "results": "results",
     "source": "source",
-    "sources": "sources"
+    "sources": "sources",
+    "metaDescription": "Search everything this site publishes."
   },
   "setup": {
     "title": "uxwVend Setup",
