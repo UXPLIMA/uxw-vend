@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T22:58:52Z",
+  "updatedAt": "2026-09-05T23:06:34Z",
   "modules": [
     {
       "id": "announcements",
@@ -2217,13 +2217,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.0.18",
+      "version": "1.0.19",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T21:20:42Z",
+      "updatedAt": "2026-09-05T23:06:34Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2429,13 +2429,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.25",
+      "version": "2.2.26",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T22:05:22Z",
+      "updatedAt": "2026-09-05T23:06:34Z",
       "screenshots": [],
       "tags": [
         "commerce"

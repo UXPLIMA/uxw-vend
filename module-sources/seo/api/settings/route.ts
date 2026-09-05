@@ -54,16 +54,18 @@ export async function PATCH(request: NextRequest) {
 
         const data = validation.data;
 
-        for (const key of SEO_KEYS) {
-            const value = data[key];
-            if (value !== undefined) {
-                await prisma.setting.upsert({
+        // One transaction: this form sends every SEO key at once, and a
+        // failure partway used to leave the title written and the description
+        // not, under a message that said nothing had been saved.
+        await prisma.$transaction(
+            SEO_KEYS
+                .filter((key) => data[key] !== undefined)
+                .map((key) => prisma.setting.upsert({
                     where: { key },
-                    update: { value: value as string, module: "seo" },
-                    create: { key, value: value as string, module: "seo" },
-                });
-            }
-        }
+                    update: { value: data[key] as string, module: "seo" },
+                    create: { key, value: data[key] as string, module: "seo" },
+                })),
+        );
 
         return NextResponse.json({ success: true });
     } catch {

@@ -66,26 +66,25 @@ export async function POST(request: NextRequest) {
     const { value, description, expiresAt } = parsed.data;
     const count = parsed.data.count ?? 1;
 
-    // Generate multiple gift codes
-    const codes = [];
-    for (let i = 0; i < Math.min(count, 100); i++) {
-        // 8 bytes, not 4. A code is a bearer secret worth credits and the
-        // redeem endpoint says whether a guess exists, so the code space is
-        // the second half of that defence: 32 bits is walkable, 64 is not.
-        const code = `GIFT-${randomBytes(8).toString("hex").toUpperCase()}`;
-
-        const giftCode = await prisma.giftCode.create({
+    // Generate multiple gift codes, in one transaction. Creating them one at
+    // a time meant a failure on the fiftieth of a hundred answered with an
+    // error while fifty live codes, each worth credits, already existed - and
+    // the admin, told the request failed, has no list of what was made.
+    //
+    // 8 bytes, not 4. A code is a bearer secret worth credits and the redeem
+    // endpoint says whether a guess exists, so the code space is the second
+    // half of that defence: 32 bits is walkable, 64 is not.
+    const codes = await prisma.$transaction(
+        Array.from({ length: Math.min(count, 100) }, () => prisma.giftCode.create({
             data: {
-                code,
+                code: `GIFT-${randomBytes(8).toString("hex").toUpperCase()}`,
                 value,
                 description: description || null,
                 expiresAt: expiresAt ? new Date(expiresAt) : null,
                 createdById: session.user.id,
             },
-        });
-
-        codes.push(giftCode);
-    }
+        })),
+    );
 
     return NextResponse.json({ giftCodes: codes, count: codes.length }, { status: 201 });
 }

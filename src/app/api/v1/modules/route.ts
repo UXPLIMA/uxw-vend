@@ -198,20 +198,25 @@ export async function PATCH(request: NextRequest) {
                 }, { status: 400 });
             }
 
-            // Force mode: cascade-disable all dependents
-            for (const depId of dependents) {
-                const depDef = moduleSystem.getDefinition(depId);
-                await prisma.moduleConfig.upsert({
-                    where: { id: depId },
-                    create: {
-                        id: depId,
-                        name: depDef?.name ?? depId,
-                        enabled: false,
-                        config: {},
-                    },
-                    update: { enabled: false },
-                });
-            }
+            // Force mode: cascade-disable all dependents, in one transaction
+            // with nothing half-done. A cascade that stopped in the middle
+            // left some dependents disabled and the module they depend on
+            // still enabled, which is the state this branch exists to avoid.
+            await prisma.$transaction(
+                dependents.map((depId) => {
+                    const depDef = moduleSystem.getDefinition(depId);
+                    return prisma.moduleConfig.upsert({
+                        where: { id: depId },
+                        create: {
+                            id: depId,
+                            name: depDef?.name ?? depId,
+                            enabled: false,
+                            config: {},
+                        },
+                        update: { enabled: false },
+                    });
+                }),
+            );
         }
     }
 

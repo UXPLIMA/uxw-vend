@@ -70,13 +70,15 @@ export async function PATCH(request: NextRequest) {
     if (fields.title !== undefined) updates.push({ key: "community_goal_title", value: fields.title });
     if (fields.endDate !== undefined) updates.push({ key: "community_goal_end_date", value: fields.endDate });
 
-    for (const { key, value } of updates) {
-        await prisma.setting.upsert({
+    // One transaction: a goal with its new target written and its old title
+    // still in place is a goal nobody set.
+    await prisma.$transaction(
+        updates.map(({ key, value }) => prisma.setting.upsert({
             where: { key },
             update: { value: value as string },
             create: { key, value: value as string, module: "store" },
-        });
-    }
+        })),
+    );
 
     return NextResponse.json({ message: "Goal updated" });
 }

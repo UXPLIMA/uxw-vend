@@ -99,17 +99,25 @@ export async function PATCH(request: NextRequest) {
     // String values for CSS-sanitized keys are scrubbed so a compromised
     // admin account cannot persist a payload that breaks out of the <style>
     // tag injected on every public page.
-    for (const [key, rawValue] of Object.entries(parsed.data)) {
-        const value = CSS_SANITIZED_SETTING_KEYS.has(key)
-            ? sanitizeCustomCss(rawValue)
-            : rawValue;
-        const jsonValue = (value ?? Prisma.JsonNull) as Prisma.InputJsonValue;
-        await prisma.setting.upsert({
-            where: { key },
-            update: { value: jsonValue },
-            create: { key, value: jsonValue },
-        });
-    }
+    //
+    // One transaction, because a settings form is one save: the site form
+    // sends nine keys and the general form sends more, and a failure on the
+    // fifth used to leave four of them written under a message that said the
+    // save had failed. The pre-flight above already keeps a *rejection* from
+    // writing anything; this covers the write itself giving out halfway.
+    await prisma.$transaction(
+        Object.entries(parsed.data).map(([key, rawValue]) => {
+            const value = CSS_SANITIZED_SETTING_KEYS.has(key)
+                ? sanitizeCustomCss(rawValue)
+                : rawValue;
+            const jsonValue = (value ?? Prisma.JsonNull) as Prisma.InputJsonValue;
+            return prisma.setting.upsert({
+                where: { key },
+                update: { value: jsonValue },
+                create: { key, value: jsonValue },
+            });
+        }),
+    );
 
     // Drop the cached public-settings payload so clients see fresh values
     // immediately instead of waiting out the 60s TTL.
