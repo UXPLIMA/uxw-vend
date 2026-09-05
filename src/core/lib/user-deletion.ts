@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { ModuleUserDataTables } from "@/core/generated/module-registry";
 
 /**
  * "Right to be forgotten" soft-deletion.
@@ -8,16 +9,21 @@ import { prisma } from "./db";
  * delete would either cascade those away - destroying the public record
  * and breaking audit history - or fail entirely.
  *
- * Instead we anonymise the User row in place and then prune a small set
- * of tables that are explicitly "private and not audit-relevant":
- * sessions, linked accounts, notification preferences, direct messages,
- * and shopping carts. Anything with moderation or public-record value
- * (warnings, activity feed, forum posts, orders, tickets) is kept; its
- * join back to the user now resolves to the anonymised row.
+ * Instead we anonymise the User row in place and then prune the tables
+ * that are private and not audit-relevant: sessions, notification
+ * preferences, direct messages, and whatever each module says of its own
+ * tables. Anything with moderation or public-record value (warnings,
+ * activity feed, forum posts, orders, tickets) is kept; its join back to
+ * the user now resolves to the anonymised row.
  *
- * This file knows nothing about any specific module - it only touches
- * models exposed by the generated Prisma client and wraps each delete in
- * try/catch so an uninstalled module never breaks the flow.
+ * The claim that this file "knows nothing about any specific module" used
+ * to be written here while the purge list named `linkedAccount`,
+ * `notification`, `cartItem`, `forumTopicLike`, `forumPostLike` and
+ * `suggestionVote` - six tables belonging to five modules. A module core
+ * had never heard of could not have its private data erased at all, and
+ * the six that could were erased because someone had edited core. Now
+ * every module states the disposition of each table it already declares
+ * for the data export, and core reads the registry.
  */
 
 export interface SoftDeleteResult {
@@ -57,24 +63,43 @@ async function safeDeleteMany(
 }
 
 /**
- * Models hard-deleted because they hold private content with no audit /
- * public-record value. Uninstalled models are silently skipped.
+ * Core models hard-deleted because they hold private content with no
+ * audit or public-record value. Module tables are not listed here: they
+ * come from the registry below.
  */
-const PRIVATE_MODELS_TO_PURGE: Array<{ model: string; column: string }> = [
+const CORE_MODELS_TO_PURGE: Array<{ model: string; column: string }> = [
     { model: "userSession", column: "userId" },
-    { model: "linkedAccount", column: "userId" },
     { model: "notificationPreference", column: "userId" },
     { model: "account", column: "userId" },
     { model: "session", column: "userId" },
     { model: "apiKey", column: "userId" },
-    { model: "notification", column: "userId" },
-    { model: "cartItem", column: "userId" },
     { model: "message", column: "authorId" },
     { model: "conversationParticipant", column: "userId" },
-    { model: "forumTopicLike", column: "userId" },
-    { model: "forumPostLike", column: "userId" },
-    { model: "suggestionVote", column: "userId" },
 ];
+
+/**
+ * Module tables to purge, as their own manifests declare them. A table a
+ * module exports with `"erasure": "purge"` is deleted; one marked
+ * "retain", or one that says nothing, is kept and re-joins the anonymised
+ * row. Uninstalled models are silently skipped, so the registry going
+ * stale never breaks the flow.
+ */
+export function modulePurgeTargets(
+    tables: ReadonlyArray<{ model: string; column: string; erasure?: string }> = ModuleUserDataTables,
+): Array<{ model: string; column: string }> {
+    const seen = new Set<string>();
+    const out: Array<{ model: string; column: string }> = [];
+    for (const table of tables) {
+        if (table.erasure !== "purge") continue;
+        // Two keys can name one table (the store lists several routes twice
+        // over); deleting it once is enough.
+        const id = `${table.model}:${table.column}`;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        out.push({ model: table.model, column: table.column });
+    }
+    return out;
+}
 
 export async function softDeleteUser(
     userId: string,
@@ -94,7 +119,7 @@ export async function softDeleteUser(
 
         // Purge private data first. Each delete is independently
         // wrapped so one missing module can't abort the whole run.
-        for (const entry of PRIVATE_MODELS_TO_PURGE) {
+        for (const entry of [...CORE_MODELS_TO_PURGE, ...modulePurgeTargets()]) {
             await safeDeleteMany(entry.model, { [entry.column]: userId });
         }
 

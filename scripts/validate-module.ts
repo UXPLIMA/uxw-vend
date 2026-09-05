@@ -1541,6 +1541,68 @@ function checkApiAliasesAgree(modulePath: string): CheckResult {
     return { name, passed: true, message: aliased === 0 ? "No handler is aliased" : `${aliased} aliased handler(s) agree` };
 }
 
+/**
+ * A user table has to say what the right to be forgotten does with it.
+ *
+ * Core used to hold the list, naming six tables belonging to five modules,
+ * so a module core had never been edited for could not have its private data
+ * erased at all. The disposition now lives with the module. Omitting it is
+ * legal and means "retain", which is what an undeclared table always did, but
+ * a module that ships user tables should have made the choice on purpose.
+ */
+function checkErasureIsDeclared(modulePath: string): CheckResult {
+    const name = "User tables state their erasure";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { userDataExport?: Array<{ model: string; column: string; erasure?: string }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const tables = manifest.userDataExport ?? [];
+    if (tables.length === 0) return { name, passed: true, message: "Declares no user tables" };
+
+    const silent = tables
+        .filter((t) => t.erasure !== "purge" && t.erasure !== "retain")
+        .map((t) => t.model);
+    if (silent.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${silent.length} table(s) with no erasure: ${silent.join(", ")}`,
+            suggestion: 'Add "erasure": "purge" for private data the user can ask to have deleted, or "retain" for anything with public-record or moderation value.',
+        };
+    }
+
+    const schemaPath = path.join(modulePath, "schema.prisma");
+    const schema = fs.existsSync(schemaPath) ? fs.readFileSync(schemaPath, "utf8") : "";
+    const problems: string[] = [];
+    for (const table of tables) {
+        if (table.erasure !== "purge") continue;
+        const model = table.model[0].toUpperCase() + table.model.slice(1);
+        const match = new RegExp(`model\\s+${model}\\s*\\{([\\s\\S]*?)\\n\\}`).exec(schema);
+        if (!match) {
+            problems.push(`${table.model} is purged but is not in this module's schema.prisma`);
+        } else if (!new RegExp(`^\\s*${table.column}\\s+\\S`, "m").test(match[1])) {
+            problems.push(`${table.model} is purged on ${table.column}, which it has no column for`);
+        }
+    }
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} problem(s):\n      ${problems.join("\n      ")}`,
+            suggestion: "A purge runs deleteMany on that model and column; both have to exist or the erasure silently deletes nothing.",
+        };
+    }
+
+    const purged = tables.filter((t) => t.erasure === "purge").length;
+    return { name, passed: true, message: `${tables.length} table(s), ${purged} purged on erasure` };
+}
+
 function checkModuleFetchPaths(modulePath: string): CheckResult {
     const name = "Fetched API paths exist";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1801,6 +1863,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkAdminKeyPrefix(modulePath),
         checkModuleFetchPaths(modulePath),
         checkApiAliasesAgree(modulePath),
+        checkErasureIsDeclared(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),

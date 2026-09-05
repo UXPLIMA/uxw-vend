@@ -9,6 +9,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  */
 
 interface DeleteCall { model: string; where: Record<string, unknown> }
+interface UserDataTable { model: string; key: string; column: string; erasure?: string; module: string }
+
+/** What the installed modules say about their own tables. */
+let moduleTables: UserDataTable[];
 
 const deleteCalls: DeleteCall[] = [];
 let userRow: { id: string; isDeleted: boolean } | null;
@@ -34,6 +38,10 @@ function makeDelegate(model: string) {
         },
     };
 }
+
+vi.mock("@/core/generated/module-registry", () => ({
+    get ModuleUserDataTables() { return moduleTables; },
+}));
 
 vi.mock("@/core/lib/db", () => {
     const target = {
@@ -69,11 +77,29 @@ vi.mock("@/core/lib/db", () => {
     return { prisma };
 });
 
-const ALL_PRIVATE_MODELS = [
-    "userSession", "linkedAccount", "notificationPreference", "account",
-    "session", "apiKey", "notification", "cartItem", "message",
-    "conversationParticipant", "forumTopicLike", "forumPostLike", "suggestionVote",
+/** Core's own private tables, in the order the purge runs them. */
+const CORE_PRIVATE_MODELS = [
+    "userSession", "notificationPreference", "account",
+    "session", "apiKey", "message", "conversationParticipant",
 ];
+
+/**
+ * The six module tables core used to name in its own source, now declared
+ * by the five modules that own them.
+ */
+const MODULE_TABLES: UserDataTable[] = [
+    { model: "linkedAccount", key: "playerProfiles.linkedAccounts", column: "userId", erasure: "purge", module: "player-profiles" },
+    { model: "notification", key: "notifications.items", column: "userId", erasure: "purge", module: "in-app-notifications" },
+    { model: "cartItem", key: "store.cart", column: "userId", erasure: "purge", module: "store" },
+    { model: "order", key: "store.orders", column: "userId", erasure: "retain", module: "store" },
+    { model: "forumTopicLike", key: "forum.topicLikes", column: "userId", erasure: "purge", module: "forum" },
+    { model: "forumPostLike", key: "forum.postLikes", column: "userId", erasure: "purge", module: "forum" },
+    { model: "forumTopic", key: "forum.topics", column: "authorId", erasure: "retain", module: "forum" },
+    { model: "suggestionVote", key: "suggestions.votes", column: "userId", erasure: "purge", module: "suggestions" },
+];
+
+const MODULE_PRIVATE_MODELS = MODULE_TABLES.filter((t) => t.erasure === "purge").map((t) => t.model);
+const ALL_PRIVATE_MODELS = [...CORE_PRIVATE_MODELS, ...MODULE_PRIVATE_MODELS];
 
 /** Models the design says must survive an erasure. */
 const PUBLIC_RECORD_MODELS = [
@@ -90,6 +116,7 @@ beforeEach(() => {
     failingModels = new Set();
     bogusModels = new Set();
     opLog = [];
+    moduleTables = [...MODULE_TABLES];
     installedModels = new Set([...ALL_PRIVATE_MODELS, ...PUBLIC_RECORD_MODELS]);
 });
 
@@ -97,6 +124,81 @@ async function softDeleteUser(...args: [string, string?]) {
     const mod = await import("@/core/lib/user-deletion");
     return mod.softDeleteUser(...args);
 }
+
+describe("what a module says about its own tables", () => {
+    async function purgeTargets(tables?: UserDataTable[]) {
+        const mod = await import("@/core/lib/user-deletion");
+        return mod.modulePurgeTargets(tables);
+    }
+
+    it("purges a table the module marked purge, and only on the column it named", async () => {
+        await softDeleteUser("usr_1");
+
+        for (const model of MODULE_PRIVATE_MODELS) {
+            expect(deleteCalls.some((c) => c.model === model), model).toBe(true);
+        }
+        expect(deleteCalls.find((c) => c.model === "linkedAccount")!.where).toEqual({ userId: "usr_1" });
+        expect(deleteCalls.find((c) => c.model === "forumTopicLike")!.where).toEqual({ userId: "usr_1" });
+    });
+
+    it("keeps a table the module marked retain", async () => {
+        await softDeleteUser("usr_1");
+
+        // Orders and forum topics are the public record the design keeps;
+        // they re-join the anonymised row.
+        expect(deleteCalls.some((c) => c.model === "order")).toBe(false);
+        expect(deleteCalls.some((c) => c.model === "forumTopic")).toBe(false);
+    });
+
+    it("keeps a table that says nothing, because retain is what every table did before", async () => {
+        moduleTables = [{ model: "cartItem", key: "store.cart", column: "userId", module: "store" }];
+        installedModels = new Set(["userSession", "cartItem"]);
+
+        await softDeleteUser("usr_1");
+
+        expect(deleteCalls.map((c) => c.model)).toEqual(["userSession"]);
+    });
+
+    it("purges a module core has never heard of", async () => {
+        // The point of the registry: core named six tables belonging to five
+        // modules in its own source, so a sixth module's private data could
+        // not be erased at all without editing core.
+        moduleTables = [
+            { model: "kudosVote", key: "kudos.votes", column: "voterId", erasure: "purge", module: "kudos" },
+        ];
+        installedModels = new Set(["userSession", "kudosVote"]);
+
+        await softDeleteUser("usr_1");
+
+        expect(deleteCalls.find((c) => c.model === "kudosVote")!.where).toEqual({ voterId: "usr_1" });
+    });
+
+    it("deletes a table declared under two keys only once", async () => {
+        const targets = await purgeTargets([
+            { model: "chestItem", key: "store.chest", column: "userId", erasure: "purge", module: "store" },
+            { model: "chestItem", key: "store.chestItems", column: "userId", erasure: "purge", module: "store" },
+        ]);
+        expect(targets).toEqual([{ model: "chestItem", column: "userId" }]);
+    });
+
+    it("keeps two columns of one table apart", async () => {
+        const targets = await purgeTargets([
+            { model: "referral", key: "referral.made", column: "referrerId", erasure: "purge", module: "referral" },
+            { model: "referral", key: "referral.taken", column: "referredId", erasure: "purge", module: "referral" },
+        ]);
+        expect(targets).toHaveLength(2);
+    });
+
+    it("reads nothing but purge out of the registry", async () => {
+        const targets = await purgeTargets([
+            { model: "a", key: "a", column: "userId", erasure: "purge", module: "m" },
+            { model: "b", key: "b", column: "userId", erasure: "retain", module: "m" },
+            { model: "c", key: "c", column: "userId", module: "m" },
+            { model: "d", key: "d", column: "userId", erasure: "PURGE", module: "m" },
+        ]);
+        expect(targets.map((t) => t.model)).toEqual(["a"]);
+    });
+});
 
 describe("softDeleteUser", () => {
     it("purges every private model on the user's own column", async () => {

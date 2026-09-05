@@ -153,7 +153,7 @@ function generateRegistry() {
     const allWebhookReceivers: ({ provider: string; handler: string; signatureHeader?: string; secretEnv?: string; verifiesInHandler?: boolean; timestampHeader?: string; module: string })[] = [];
     const allNotificationTypes: ({ eventType: string; label: string; description?: string; channels?: string[]; module: string })[] = [];
     const allSeoRoutes: ({ module: string; handler: string })[] = [];
-    const allUserDataTables: ({ model: string; key: string; column: string; module: string })[] = [];
+    const allUserDataTables: ({ model: string; key: string; column: string; erasure?: "purge" | "retain"; module: string })[] = [];
     const allModerationProviders: ({ id: string; label: string; labelKey?: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string; handler: string; module: string })[] = [];
     const allSettings: Record<string, ModuleSetting[]> = {};
 
@@ -253,8 +253,8 @@ function generateRegistry() {
     widgetRegistry += `// Admin nav groups declared by modules. A group with no items is never rendered.\n`;
     widgetRegistry += `export const ModuleNavGroups: { id: string; label: string; icon?: string; order?: number; module: string }[] = ${JSON.stringify(allNavGroups, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleSettingsCards: { title: string; description: string; href: string; icon: string; color: string; module: string }[] = ${JSON.stringify(allSettingsCards, null, 2)};\n\n`;
-    widgetRegistry += `// User-data-export registry: tables modules contribute to GDPR personal-data exports.\n`;
-    widgetRegistry += `export const ModuleUserDataTables: { model: string; key: string; column: string; module: string }[] = ${JSON.stringify(allUserDataTables, null, 2)};\n`;
+    widgetRegistry += `// User-data registry: tables modules contribute to GDPR personal-data exports,\n// each saying whether erasure purges it or keeps it. See user-deletion.ts.\n`;
+    widgetRegistry += `export const ModuleUserDataTables: { model: string; key: string; column: string; erasure?: "purge" | "retain"; module: string }[] = ${JSON.stringify(allUserDataTables, null, 2)};\n`;
 
     let layoutImports = emitDynamicRegistry('Layout component registry (rendered on every page)', 'LayoutComponentRegistry', allLayoutComponents);
     layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;

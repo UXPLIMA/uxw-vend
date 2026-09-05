@@ -76,6 +76,8 @@ const UNGATED_BY_DESIGN: Record<string, string> = {
         "Pure path matching. The proxy resolves a module id from the same route map and 404s a disabled one before this runs.",
     "src/core/lib/user-data-export.ts":
         "GDPR export. A user is owed every row the platform holds about them, and disabling a module deletes nothing - excluding its tables would silently truncate the export.",
+    "src/core/lib/user-deletion.ts":
+        "Right to be forgotten. Disabling a module deletes nothing, so its rows are still there and still the user's; skipping them would leave the data an erasure exists to remove.",
     "src/core/lib/module-settings.ts":
         "Reads a module's own settings declaration. It is called by that module's own code, which the proxy has already gated - and an admin editing a disabled module's settings before turning it on must still see them.",
     "src/app/[locale]/[...slug]/page.tsx": "Module page catch-all, gated by the proxy.",

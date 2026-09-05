@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1655,42 +1655,50 @@
     {
       "model": "order",
       "key": "store.orders",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     },
     {
       "model": "cartItem",
       "key": "store.cart",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     },
     {
       "model": "ownedProduct",
       "key": "store.ownedProducts",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     },
     {
       "model": "chestItem",
       "key": "store.chestItems",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     },
     {
       "model": "subscription",
       "key": "store.subscriptions",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     },
     {
       "model": "creditTransaction",
       "key": "store.creditTransactions",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     },
     {
       "model": "giftCode",
       "key": "store.giftCodesRedeemed",
-      "column": "redeemedById"
+      "column": "redeemedById",
+      "erasure": "retain"
     },
     {
       "model": "creatorCode",
       "key": "store.creatorCodes",
-      "column": "creatorId"
+      "column": "creatorId",
+      "erasure": "retain"
     }
   ],
   "widgets": [

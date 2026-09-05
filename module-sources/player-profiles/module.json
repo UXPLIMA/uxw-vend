@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Player Profiles",
   "description": "Public player profile pages",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -115,7 +115,8 @@
     {
       "model": "linkedAccount",
       "key": "playerProfiles.linkedAccounts",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     }
   ]
 }

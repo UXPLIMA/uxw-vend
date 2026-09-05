@@ -2,7 +2,7 @@
   "id": "in-app-notifications",
   "name": "In-App Notifications",
   "description": "In-app notification system with bell icon",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -93,7 +93,8 @@
     {
       "model": "notification",
       "key": "notifications.items",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     }
   ]
 }
