@@ -69,19 +69,84 @@ describe("every gateway callback", () => {
         expect(undeclared).toEqual([]);
     });
 
+    /**
+     * What the route does before it settles anything, and what that proves.
+     *
+     * A comment is not a mechanism. This test used to accept the presence of
+     * the `@provider-callback` tag as evidence that the route authenticated
+     * its caller, which means a gateway that checked nothing at all would
+     * have passed by documenting that it did.
+     *
+     * There are only two things that actually prove the money is real. Either
+     * the route compares a signature the provider computed with a secret only
+     * the two of them know, or it throws the posted body away and reads the
+     * payment back from the provider over a connection it opened itself, with
+     * this site's own credentials. Both must happen before the settle filter
+     * runs, because after it the order is already paid.
+     *
+     * A config read is neither: `getMollieConfig()` loads a row of settings.
+     * The call has to reach the provider.
+     */
+    const proof = (source: string) => {
+        const settles = source.indexOf('applyFiltersAsync("payment.');
+        const before = settles >= 0 ? source.slice(0, settles) : source;
+
+        if (/timingSafeEqual|constructEvent/.test(before)) return "signature";
+
+        const clients = new Set<string>();
+        for (const imported of source.matchAll(/import\s*(?:type\s*)?\{([^}]*)\}\s*from\s*"(\.[^"]*)"/g)) {
+            if (!imported[2].includes("lib")) continue;
+            for (const raw of imported[1].split(",")) {
+                const name = raw.trim().split(" as ").pop()?.trim();
+                // `getStripeConfig` reads settings out of the database.
+                if (name && !/^get\w*Config$/.test(name)) clients.add(name);
+            }
+        }
+        for (const client of clients) {
+            if (new RegExp(`await\\s+${client}\\s*(?:<[^;]*?>)?\\s*\\(`).test(before)) return `read-back via ${client}`;
+        }
+        return null;
+    };
+
     it("authenticates the request itself, since it skips the origin check", () => {
         const unverified: string[] = [];
         for (const { name, manifest } of modules) {
             for (const entry of (manifest.api ?? []).filter((e) => e.providerCallback)) {
                 const handler = path.join(root, "module-sources", name, entry.handler);
                 expect(fs.existsSync(handler), `${name} ${entry.path}: handler missing`).toBe(true);
-                const source = fs.readFileSync(handler, "utf8");
-                if (!/timingSafeEqual|constructEvent|@provider-callback/.test(source)) {
-                    unverified.push(`${name} ${entry.path}`);
-                }
+                if (!proof(fs.readFileSync(handler, "utf8"))) unverified.push(`${name} ${entry.path}`);
             }
         }
         expect(unverified).toEqual([]);
+    });
+
+    it("says which of the two mechanisms each gateway uses", () => {
+        // Not an assertion about any one gateway so much as a check that the
+        // reading above distinguishes them, rather than passing everything.
+        const mechanisms = new Map<string, string>();
+        for (const { name, manifest } of modules) {
+            for (const entry of (manifest.api ?? []).filter((e) => e.providerCallback)) {
+                const found = proof(fs.readFileSync(path.join(root, "module-sources", name, entry.handler), "utf8"));
+                if (found) mechanisms.set(name, found);
+            }
+        }
+        expect([...mechanisms.values()].filter((m) => m === "signature").length).toBeGreaterThan(4);
+        expect([...mechanisms.values()].filter((m) => m.startsWith("read-back")).length).toBeGreaterThan(2);
+        expect(mechanisms.get("stripe-gateway")).toBe("signature");
+        expect(mechanisms.get("mollie-gateway")).toBe("read-back via mollieGet");
+    });
+
+    it("still documents the reasoning where there is no signature to check", () => {
+        // The tag is not proof, but a read-back gateway is the one a reader is
+        // most likely to mistake for an unauthenticated route.
+        for (const { name, manifest } of modules) {
+            for (const entry of (manifest.api ?? []).filter((e) => e.providerCallback)) {
+                const source = fs.readFileSync(path.join(root, "module-sources", name, entry.handler), "utf8");
+                if (proof(source)?.startsWith("read-back")) {
+                    expect(source, `${name} ${entry.path}`).toContain("@provider-callback");
+                }
+            }
+        }
     });
 
     it("covers all twelve payment gateways", () => {
