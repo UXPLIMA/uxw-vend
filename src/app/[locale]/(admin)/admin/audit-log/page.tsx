@@ -17,6 +17,8 @@ import {
     ChevronDown,
     ChevronUp,
 } from "lucide-react";
+import { userProfilePath } from "@/core/lib/user-profile-link";
+import { useAllModules } from "@/core/providers/module-provider";
 
 interface AuditLogEntry {
     id: string;
@@ -142,6 +144,7 @@ export default function AuditLogPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
+    const modules = useAllModules();
     const commonT = useTranslations("common");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -341,6 +344,7 @@ export default function AuditLogPage() {
                                 <tbody>
                                     {logs.map((log) => {
                                         const color = classifyAction(log.action);
+                                        const profilePath = userProfilePath(log.user?.username, modules);
                                         return (
                                             <tr
                                                 key={log.id}
@@ -351,12 +355,16 @@ export default function AuditLogPage() {
                                                 </td>
                                                 <td className="py-2 px-4 whitespace-nowrap">
                                                     {log.user ? (
-                                                        <Link
-                                                            href={`/profile/${log.user.username}`}
-                                                            className="text-primary hover:underline"
-                                                        >
-                                                            {log.user.username}
-                                                        </Link>
+                                                        profilePath ? (
+                                                            <Link
+                                                                href={profilePath}
+                                                                className="text-primary hover:underline"
+                                                            >
+                                                                {log.user.username}
+                                                            </Link>
+                                                        ) : (
+                                                            <span>{log.user.username}</span>
+                                                        )
                                                     ) : (
                                                         <span className="text-muted-foreground italic">
                                                             system

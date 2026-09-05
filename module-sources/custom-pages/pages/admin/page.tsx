@@ -181,7 +181,7 @@ export default function CustomPagesAdminPage() {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Link href={`/admin/page-builder/${page.id}`}>
+                                    <Link href={`/admin/custom-pages/builder/${page.id}`}>
                                         <Button variant="ghost" size="sm" title={t("adm_openInBuilder")}>
                                             <LayoutDashboard className="w-3 h-3" />
                                         </Button>

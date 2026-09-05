@@ -2,6 +2,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { Activity, ChevronRight } from "lucide-react";
 import { prisma } from "@/core/lib/db";
+import { getModuleStates } from "@/core/lib/module-cache";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
 
 /**
@@ -13,6 +14,7 @@ import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/
  */
 export async function ActivityFeedSection({ limit = 10 }: { limit?: number } = {}) {
     const t = await getTranslations("activity");
+    const moduleStates = await getModuleStates();
     let items: ActivityItem[] = [];
     try {
         const rows = await prisma.activityFeedItem.findMany({
@@ -49,7 +51,7 @@ export async function ActivityFeedSection({ limit = 10 }: { limit?: number } = {
                     {t("viewAll")} <ChevronRight className="w-3 h-3" aria-hidden="true" />
                 </Link>
             </div>
-            <ActivityFeedList items={items} />
+            <ActivityFeedList items={items} moduleStates={moduleStates} />
         </section>
     );
 }

@@ -47,6 +47,8 @@ export interface ModuleManifest {
         path: string;
         component: string; // Relative path to component file from module root
         layout?: string;   // Optional layout component
+        /** This route serves a person's public profile. See the manifest schema. */
+        userProfile?: boolean;
     }[];
     adminRoutes?: {
         path: string; // Relative to /admin. e.g. "/store/products" -> /admin/store/products

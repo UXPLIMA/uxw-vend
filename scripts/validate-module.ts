@@ -1614,6 +1614,53 @@ function checkErasureIsDeclared(modulePath: string): CheckResult {
  * "Vip", which is not a word in either language. A route now declares
  * `titleKey`, and it has to resolve in every locale the module ships.
  */
+/**
+ * A route claiming to serve profiles has to be able to name one person.
+ *
+ * Core writes a username in the activity feed and the audit log and asks the
+ * registry where it points. A `userProfile` route with no dynamic segment
+ * would send every person to the same page; one with two would leave a
+ * literal `[something]` in the URL. Both are worse than not linking at all,
+ * which is what core does when no module claims the capability.
+ */
+function checkUserProfileRoute(modulePath: string): CheckResult {
+    const name = "User profile route names one person";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { routes?: Array<{ path: string; userProfile?: boolean; resolver?: string }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const claimed = (manifest.routes ?? []).filter((r) => r.userProfile);
+    if (claimed.length === 0) return { name, passed: true, message: "Claims no profile route" };
+
+    const problems: string[] = [];
+    if (claimed.length > 1) {
+        problems.push(`${claimed.length} routes claim userProfile; a module serves profiles at one path`);
+    }
+    for (const route of claimed) {
+        const dynamic = route.path.match(/\[[^\]]+\]/g) ?? [];
+        if (dynamic.length !== 1) {
+            problems.push(`${route.path} has ${dynamic.length} dynamic segments, needs exactly 1 (the username)`);
+        } else if (dynamic[0].startsWith("[...")) {
+            problems.push(`${route.path} is a catch-all; a profile route takes one username`);
+        }
+        if (!route.resolver) {
+            // A profile page that answers 200 for a name nobody has is a soft
+            // 404, and core links to this path from its own pages.
+            problems.push(`${route.path} needs a resolver so an unknown username answers 404`);
+        }
+    }
+
+    return problems.length === 0
+        ? { name, passed: true, message: `${claimed[0].path} serves profiles` }
+        : { name, passed: false, message: problems.join("; ") };
+}
+
 function checkRouteTitlesAreTranslated(modulePath: string): CheckResult {
     const name = "Route titles are translated";
     const manifestPath = path.join(modulePath, "module.json");
@@ -2019,6 +2066,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkErasureIsDeclared(modulePath),
         checkRouteTitlesAreTranslated(modulePath),
         checkRoutesAreNotShadowed(modulePath),
+        checkUserProfileRoute(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),

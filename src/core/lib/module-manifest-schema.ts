@@ -124,6 +124,21 @@ const routeEntry = z.object({
      * `notFound()`. Only routes with a dynamic segment need one.
      */
     resolver: relativePath("resolver").optional(),
+    /**
+     * This route is where a person's public profile lives.
+     *
+     * Core writes a username in a few places of its own - the activity feed
+     * on the home page, the audit log - and used to link every one of them to
+     * `/profile/<username>`, which is not a route: `/profile` is the signed-in
+     * visitor's own page and takes no segment. Every one of those links was a
+     * 404, and core cannot fix it by hardcoding `/player/<username>` either,
+     * because that path belongs to a module that may not be installed.
+     *
+     * So the module that serves profiles says so, core asks the registry, and
+     * a username with nowhere to point renders as plain text. Exactly one
+     * dynamic segment, which is the username; `validate-module` checks that.
+     */
+    userProfile: z.boolean().optional(),
 });
 
 const adminRouteEntry = z.object({

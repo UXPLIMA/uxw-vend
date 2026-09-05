@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import { Activity, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
+import { useAllModules } from "@/core/providers/module-provider";
 
 export function ActivityTab() {
     const t = useTranslations("profile");
+    const modules = useAllModules();
     const [items, setItems] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -41,7 +43,7 @@ export function ActivityTab() {
                         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                     </div>
                 ) : (
-                    <ActivityFeedList items={items} emptyMessage={t("noRecentActivity")} />
+                    <ActivityFeedList items={items} moduleStates={modules} emptyMessage={t("noRecentActivity")} />
                 )}
             </CardContent>
         </Card>

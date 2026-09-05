@@ -171,7 +171,7 @@ export default function TopicDetailPage() {
                     <Card>
                         <CardContent className="py-12 text-center space-y-3">
                             <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
-                            <Link href="/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                            <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
                         </CardContent>
                     </Card>
                 ) : !topic ? (

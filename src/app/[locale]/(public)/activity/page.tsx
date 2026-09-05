@@ -4,6 +4,7 @@ import { Activity } from "lucide-react";
 import { Navbar, Footer } from "@/core/components/layout";
 import { ActivityFeedList, type ActivityItem } from "@/core/components/activity/ActivityFeedList";
 import { prisma } from "@/core/lib/db";
+import { getModuleStates } from "@/core/lib/module-cache";
 import { buildPageMeta } from "@/core/lib/seo";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 
@@ -54,6 +55,7 @@ async function fetchPublicFeed(limit = 20): Promise<ActivityItem[]> {
 export default async function ActivityFeedPage() {
     const t = await getTranslations("activity");
     const items = await fetchPublicFeed(20);
+    const moduleStates = await getModuleStates();
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
@@ -69,7 +71,7 @@ export default async function ActivityFeedPage() {
                     <p className="text-muted-foreground">{t("description")}</p>
                 </div>
 
-                <ActivityFeedList items={items} />
+                <ActivityFeedList items={items} moduleStates={moduleStates} />
             </main>
 
             <Footer />
