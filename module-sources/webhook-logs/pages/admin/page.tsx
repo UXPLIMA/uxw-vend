@@ -27,12 +27,22 @@ export default function WebhookLogsPage() {
     const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
+        let cancelled = false;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/api/v1/webhook-logs?page=${page}`)
             .then((r) => r.json())
-            .then((d) => { setLogs(d.logs || []); setTotalPages(d.pages || 1); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((d) => {
+                if (cancelled) return;
+                setLogs(d.logs || []);
+                setTotalPages(d.pages || 1);
+                setLoading(false);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [page]);
 
     return (

@@ -38,9 +38,11 @@ export default function WidgetSettingsPage() {
     const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/settings")
             .then((r) => r.json())
             .then((data) => {
+                if (cancelled) return;
                 const s = data.settings || {};
                 const config = s.widget_visibility || {};
                 const widgetIds = availableWidgets.map((w) => w.id);
@@ -60,7 +62,11 @@ export default function WidgetSettingsPage() {
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [availableWidgets]);
 
     const toggle = (id: string) => {

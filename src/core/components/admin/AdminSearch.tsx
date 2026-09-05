@@ -29,13 +29,24 @@ export function AdminSearch() {
     useEffect(() => {
          
         if (query.length < 2) { setResults([]); return; }
+        // The timer covers a keystroke landing before the request goes out;
+        // `cancelled` covers one landing after it, whose answer would otherwise
+        // arrive late and put the previous query's results under the new one.
+        let cancelled = false;
         const timer = setTimeout(() => {
             fetch(`/api/v1/admin/search?q=${encodeURIComponent(query)}`)
                 .then((r) => r.json())
-                .then((d) => { setResults(d.results || []); setOpen(true); })
+                .then((d) => {
+                    if (cancelled) return;
+                    setResults(d.results || []);
+                    setOpen(true);
+                })
                 .catch(() => {});
         }, 300);
-        return () => clearTimeout(timer);
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
     }, [query]);
 
     useEffect(() => {

@@ -35,16 +35,22 @@ export function DashboardCustomizer() {
     const dialogRef = useModalDialog<HTMLDivElement>(open, () => setOpen(false));
 
     useEffect(() => {
+        let cancelled = false;
         if (!open) return;
         setLoading(true);
         fetch("/api/v1/admin/dashboard-layout")
             .then((r) => r.json())
             .then((d: { layout: DashboardWidget[]; available: AvailableWidget[] }) => {
+                if (cancelled) return;
                 setLayout(d.layout || []);
                 setAvailable(d.available || []);
             })
             .catch(() => toast.error(t("customizer_loadError")))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [open, t]);
 
     const toggle = (id: string) => {

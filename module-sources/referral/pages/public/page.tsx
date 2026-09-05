@@ -40,15 +40,23 @@ export default function ReferralPage() {
     const [applying, setApplying] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         if (!session?.user) {
             setLoading(false);
             return;
         }
         fetch("/api/v1/referral")
             .then(r => r.json())
-            .then(d => setData(d))
+            .then(d => {
+                if (cancelled) return;
+                setData(d);
+            })
             .catch(() => {})
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [session]);
 
     const copyLink = async () => {

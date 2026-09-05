@@ -38,10 +38,19 @@ export default function FormPage({ params }: PageProps) {
     const [values, setValues] = useState<Record<string, string>>({});
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/forms/${slug}`)
             .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-            .then((d) => { setForm(d.form); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((d) => {
+                if (cancelled) return;
+                setForm(d.form);
+                setLoading(false);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [slug]);
 
     const handleSubmit = async (e: React.FormEvent) => {

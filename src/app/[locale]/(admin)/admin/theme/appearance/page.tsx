@@ -32,15 +32,21 @@ export default function ActiveThemeAppearancePage() {
     const modes = Object.keys(activeTheme?.modes?.available ?? {});
 
     useEffect(() => {
+        let cancelled = false;
         if (!themeId) return;
         fetch(`/api/v1/themes/${themeId}/customization`)
             .then((r) => r.json())
             .then((data) => {
+                if (cancelled) return;
                 const modeOverrides = data?.overrides?.[currentMode];
                 const colors = (modeOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors ?? {};
                 setColorOverrides(colors);
             })
-            .catch(() => setColorOverrides({}));
+            .catch(() => {
+                if (cancelled) return;
+                setColorOverrides({});
+            });
+        return () => { cancelled = true; };
     }, [themeId, currentMode]);
 
     const saveColors = async () => {

@@ -25,16 +25,24 @@ export default function CloudflareTurnstileAdminPage() {
     });
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/security/turnstile/settings")
             .then((r) => r.json())
-            .then((d) => setConfig({
-                siteKey: d.siteKey || "",
-                secretKey: d.secretKey || "",
-                enableOnLogin: !!d.enableOnLogin,
-                enableOnRegister: !!d.enableOnRegister,
-            }))
+            .then((d) => {
+                if (cancelled) return;
+                setConfig({
+                    siteKey: d.siteKey || "",
+                    secretKey: d.secretKey || "",
+                    enableOnLogin: !!d.enableOnLogin,
+                    enableOnRegister: !!d.enableOnRegister,
+                });
+            })
             .catch(() => toast.error(t("saveError")))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [t]);
 
     const save = async () => {

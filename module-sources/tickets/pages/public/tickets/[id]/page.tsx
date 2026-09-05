@@ -56,6 +56,7 @@ export default function TicketDetailPage({ params }: PageProps) {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         if (session?.user) {
             fetch(`/api/v1/tickets/${id}`)
                 .then((res) => {
@@ -63,16 +64,19 @@ export default function TicketDetailPage({ params }: PageProps) {
                     return res.json();
                 })
                 .then((data) => {
+                    if (cancelled) return;
                     setTicket(data);
                     setLoading(false);
                 })
                 .catch((err) => {
+                    if (cancelled) return;
                     setError(err.message);
                     setLoading(false);
                 });
         } else {
             setLoading(false);
         }
+        return () => { cancelled = true; };
     }, [session, id]);
 
     const handleReply = async (e: React.FormEvent) => {

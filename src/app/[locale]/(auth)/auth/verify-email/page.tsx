@@ -17,6 +17,7 @@ export default function VerifyEmailPage() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         const token = params.get("token");
         const email = params.get("email");
         if (!token || !email) {
@@ -28,17 +29,22 @@ export default function VerifyEmailPage() {
         const url = `/api/v1/auth/verify-email?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
         fetch(url)
             .then(async (res) => {
+                if (cancelled) return;
                 if (res.ok) {
                     setStatus("success");
                 } else {
                     setStatus("failed");
                     try {
                         const data = await res.json();
-                        setErrorMessage(authErrorMessage(t, data, t('genericError')));
-                    } catch { /* ignore */ }
+                        if (!cancelled) setErrorMessage(authErrorMessage(t, data, t('genericError')));
+                    } catch { /* no body, or not JSON: the generic message stands */ }
                 }
             })
-            .catch(() => setStatus("failed"));
+            .catch(() => {
+                if (cancelled) return;
+                setStatus("failed");
+            });
+        return () => { cancelled = true; };
     }, [params, t]);
 
     return (

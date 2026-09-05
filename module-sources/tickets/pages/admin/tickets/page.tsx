@@ -49,6 +49,7 @@ export default function AdminTicketsPage() {
     const [stats, setStats] = useState({ open: 0, inProgress: 0, waiting: 0, closed: 0 });
 
     useEffect(() => {
+        let cancelled = false;
         const url = statusFilter
             ? `/api/v1/tickets?status=${statusFilter}`
             : "/api/v1/tickets";
@@ -56,10 +57,15 @@ export default function AdminTicketsPage() {
         fetch(url)
             .then((res) => res.json())
             .then((data) => {
+                if (cancelled) return;
                 setTickets(data.tickets || []);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [statusFilter]);
 
     useEffect(() => {

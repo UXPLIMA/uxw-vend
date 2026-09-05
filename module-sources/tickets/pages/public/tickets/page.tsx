@@ -47,18 +47,24 @@ export default function SupportPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         if (session?.user) {
             fetch("/api/v1/tickets")
                 .then((res) => res.json())
                 .then((data) => {
+                    if (cancelled) return;
                     setTickets(data.tickets || []);
                     setLoading(false);
                 })
-                .catch(() => setLoading(false));
+                .catch(() => {
+                    if (cancelled) return;
+                    setLoading(false);
+                });
         } else {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
         }
+        return () => { cancelled = true; };
     }, [session]);
 
     return (

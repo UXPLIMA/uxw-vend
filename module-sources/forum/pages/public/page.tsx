@@ -54,6 +54,7 @@ export default function ForumPage() {
     }, []);
 
     useEffect(() => {
+        let cancelled = false;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         // No `limit` here on purpose: the page size is the admin's
@@ -64,17 +65,23 @@ export default function ForumPage() {
 
         fetch(`/api/v1/forum/topics?${params}`)
             .then(async (r) => {
+                if (cancelled) return;
                 if (r.status === 403) { setRestricted(true); return null; }
                 return r.json();
             })
             .then((d) => {
+                if (cancelled) return;
                 if (d) {
                     setTopics(d.topics || []);
                     setTotalPages(d.pages || 1);
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [selectedCategory, page, searchQuery]);
 
     return (

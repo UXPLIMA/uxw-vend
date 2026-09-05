@@ -32,13 +32,21 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
     const [pending, setPending] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         if (!id) { setLoading(false); return; }
         fetch(`/api/v1/blog/comments?articleId=${encodeURIComponent(id)}`)
             .then(r => r.ok ? r.json() : [])
-            .then(data => setComments(Array.isArray(data) ? data : []))
+            .then(data => {
+                if (cancelled) return;
+                setComments(Array.isArray(data) ? data : []);
+            })
             .catch(() => {})
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [id]);
 
     const handleSubmit = async (e: React.FormEvent) => {

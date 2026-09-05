@@ -41,10 +41,12 @@ export default function EditBlogArticlePage(props: PageProps) {
     });
 
     useEffect(() => {
+        let cancelled = false;
         Promise.all([
             fetch(`/api/v1/blog/articles/${articleId}`).then((r) => r.json()),
             fetch("/api/v1/blog/categories").then((r) => r.json()),
         ]).then(([articleData, catData]) => {
+            if (cancelled) return;
             const a = articleData.article || articleData;
             if (a) {
                 setFormData({
@@ -59,7 +61,11 @@ export default function EditBlogArticlePage(props: PageProps) {
             }
             setCategories(Array.isArray(catData) ? catData : catData.categories || []);
             setLoading(false);
-        }).catch(() => setLoading(false));
+        }).catch(() => {
+            if (cancelled) return;
+            setLoading(false);
+        });
+        return () => { cancelled = true; };
     }, [articleId]);
 
     const handleSubmit = async (e: React.FormEvent) => {

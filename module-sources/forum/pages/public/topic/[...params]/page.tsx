@@ -59,29 +59,43 @@ export default function TopicDetailPage() {
     const [postsPages, setPostsPages] = useState(1);
     const [restricted, setRestricted] = useState(false);
 
-    const fetchTopic = (page = postsPage) => {
+    // `isStale` lets the effect below drop a response for a page the reader has
+    // already left. Action handlers call fetchTopic with no predicate: their
+    // response is always the one wanted.
+    const fetchTopic = (page = postsPage, isStale: () => boolean = () => false) => {
         fetch(`/api/v1/forum/topics/${topicId}?postsPage=${page}`)
             .then(async (r) => {
+                if (isStale()) return null;
                 if (r.status === 403) { setRestricted(true); return null; }
                 return r.json();
             })
             .then((d) => {
+                if (isStale()) return;
                 if (d) {
                     setTopic(d.topic || null);
                     setPostsPages(d.postsPages || 1);
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (isStale()) return;
+                setLoading(false);
+            });
     };
 
     useEffect(() => {
-        fetchTopic(postsPage);
+        let cancelled = false;
+        fetchTopic(postsPage, () => cancelled);
         // Check like status
         fetch(`/api/v1/forum/topics/${topicId}/like`)
             .then((r) => r.json())
-            .then((d) => { setLiked(d.liked); setLikeCount(d.count); })
+            .then((d) => {
+                if (cancelled) return;
+                setLiked(d.liked);
+                setLikeCount(d.count);
+            })
             .catch(() => {});
+        return () => { cancelled = true; };
     }, [topicId, postsPage]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     const toggleLike = async () => {
