@@ -1,8 +1,8 @@
 {
   "id": "login-protection",
   "name": "Login Protection",
-  "description": "CAPTCHA, login throttling, and account security",
-  "version": "1.0.1",
+  "description": "Login throttling: how many failed attempts lock an account",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -23,7 +23,7 @@
   "settingsCards": [
     {
       "title": "Security",
-      "description": "CAPTCHA, login protection, and security settings.",
+      "description": "How many failed sign-ins lock an account.",
       "href": "/security",
       "icon": "Shield",
       "color": "text-red-500"

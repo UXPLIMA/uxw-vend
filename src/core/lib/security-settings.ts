@@ -19,14 +19,18 @@ export const SETTING_KEYS = {
     passwordResetExpiryMinutes: "password_reset_expiry_minutes",
     emailVerifyExpiryHours: "email_verify_expiry_hours",
     settingsCacheSeconds: "settings_cache_seconds",
+    maxLoginAttempts: "max_login_attempts",
 } as const;
 
-export interface DurationSetting {
+export interface BoundedSetting {
     key: string;
     /** Used when the row is missing or unusable. */
     defaultValue: number;
     min: number;
     max: number;
+}
+
+export interface DurationSetting extends BoundedSetting {
     /** Milliseconds per unit, for converting the stored value. */
     unitMs: number;
 }
@@ -58,6 +62,29 @@ export const SETTINGS_CACHE: DurationSetting = {
     unitMs: 1000,
 };
 
+/**
+ * Failed password attempts before the account locks, as a count rather than a
+ * duration.
+ *
+ * The environment variable is the install's default - it is what a Docker
+ * deployment sets once - and the admin screen overrides it per site. The
+ * login-protection module has offered this field since it shipped and nothing
+ * read the row, so an operator who set it to 3 still got 10.
+ *
+ * The floor is 3 rather than 1: a control that locks an account on the first
+ * typo is a denial-of-service an attacker can aim at any account whose
+ * username they know.
+ */
+export const MAX_LOGIN_ATTEMPTS: BoundedSetting = {
+    key: SETTING_KEYS.maxLoginAttempts,
+    defaultValue: (() => {
+        const raw = Number(process.env.ACCOUNT_LOCKOUT_ATTEMPTS);
+        return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 10;
+    })(),
+    min: 3,
+    max: 100,
+};
+
 function toNumber(raw: unknown): number | null {
     if (typeof raw === "number") return Number.isFinite(raw) ? raw : null;
     if (typeof raw === "string" && raw.trim()) {
@@ -67,10 +94,14 @@ function toNumber(raw: unknown): number | null {
     return null;
 }
 
-export function clampDuration(raw: unknown, setting: DurationSetting): number {
+export function clampBounded(raw: unknown, setting: BoundedSetting): number {
     const n = toNumber(raw);
     if (n === null) return setting.defaultValue;
     return Math.min(setting.max, Math.max(setting.min, Math.floor(n)));
+}
+
+export function clampDuration(raw: unknown, setting: DurationSetting): number {
+    return clampBounded(raw, setting);
 }
 
 export function clampMinPasswordLength(raw: unknown): number {
@@ -95,6 +126,10 @@ export async function getPasswordMinLength(): Promise<number> {
 
 export async function getDurationMs(setting: DurationSetting): Promise<number> {
     return clampDuration(await readSetting(setting.key), setting) * setting.unitMs;
+}
+
+export async function getBounded(setting: BoundedSetting): Promise<number> {
+    return clampBounded(await readSetting(setting.key), setting);
 }
 
 /**

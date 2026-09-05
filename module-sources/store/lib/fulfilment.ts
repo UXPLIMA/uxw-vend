@@ -8,7 +8,7 @@
  * rest of the site. A gateway only reports that money moved.
  */
 import { prisma, log } from "@/core/sdk/server";
-import { sendOrderConfirmationEmail } from "./email";
+import { sendOrderConfirmationEmail } from "./order-email";
 import { deliverProduct } from "./delivery";
 import { announceOrderCompleted } from "./order-events";
 
@@ -38,7 +38,7 @@ function creditLedgerId(provider: string, providerRef: string): string {
 export async function settleOrder(settlement: PaymentSettlement): Promise<PaymentOutcome> {
     const order = await prisma.order.findUnique({
         where: { id: settlement.reference },
-        include: { user: { select: { email: true, username: true } }, items: true },
+        include: { user: { select: { email: true, username: true, locale: true } }, items: true },
     });
     if (!order) return failed("unknown order");
     // Webhooks retry, and a buyer can reload a return URL. Both arrive here.
@@ -119,7 +119,12 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
 
     // Neither of these may hold up the answer to the gateway: the order is
     // paid and granted either way, and a webhook left waiting gets retried.
-    sendOrderConfirmationEmail(buyer.email, order.orderNumber, Number(order.total)).catch((error) =>
+    sendOrderConfirmationEmail({
+        to: buyer.email,
+        orderNumber: order.orderNumber,
+        total: Number(order.total),
+        locale: buyer.locale,
+    }).catch((error: unknown) =>
         log.error("[store] order confirmation email failed", { orderId: order.id, error: String(error) }),
     );
 

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { logActivity } from "@/core/lib/activity-log";
 import { invalidate } from "@/core/lib/cache";
+import { invalidateEmailConfig } from "@/core/lib/email-config";
 import { sanitizeCustomCss, CSS_SANITIZED_SETTING_KEYS } from "@/core/lib/css-sanitizer";
 import { readJsonBody } from "@/core/lib/api-body";
 
@@ -113,6 +114,9 @@ export async function PATCH(request: NextRequest) {
     // Drop the cached public-settings payload so clients see fresh values
     // immediately instead of waiting out the 60s TTL.
     await invalidate("public-settings");
+    // The mailer keeps its transport for ten seconds; an admin who has just
+    // pasted an API key should be able to send a test message straight away.
+    invalidateEmailConfig();
 
     logActivity({
         userId: session.user.id,

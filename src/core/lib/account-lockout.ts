@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { MAX_LOGIN_ATTEMPTS, getBounded } from "./security-settings";
 
 /**
  * Progressive account lockout after repeated failed logins.
@@ -7,19 +8,19 @@ import { prisma } from "./db";
  * credential-stuffing campaign can spray a victim account from thousands
  * of addresses without tripping any IP bucket. Per-account throttling is
  * the mitigation: every wrong password increments a counter; once the
- * counter crosses MAX_ATTEMPTS in MAX_WINDOW_MS, the account is locked
+ * counter crosses the attempt threshold in MAX_WINDOW_MS, the account is locked
  * for LOCKOUT_MS and further password checks short-circuit with the
  * same "invalid credentials" signal so the attacker gets no information
  * about why the attempt failed.
  *
  * A successful login always resets the counter - legitimate users who
  * mistype twice then get it right never see the lock.
+ *
+ * The threshold is the one setting of the three an admin can reach: the
+ * `max_login_attempts` row, clamped in `security-settings`, falling back to
+ * ACCOUNT_LOCKOUT_ATTEMPTS and then to ten. The window and the lock duration
+ * stay environment-only, because neither has a screen offering to change it.
  */
-
-const MAX_ATTEMPTS = (() => {
-    const raw = Number(process.env.ACCOUNT_LOCKOUT_ATTEMPTS);
-    return Number.isFinite(raw) && raw > 0 ? raw : 10;
-})();
 
 const MAX_WINDOW_MS = (() => {
     const raw = Number(process.env.ACCOUNT_LOCKOUT_WINDOW_MS);
@@ -82,7 +83,7 @@ export async function registerFailedLogin(
         // MAX_WINDOW_MS resets the counter").
         const withinWindow = now - lastAt < MAX_WINDOW_MS;
         const nextAttempts = (withinWindow ? existing.failedLoginAttempts : 0) + 1;
-        const shouldLock = nextAttempts >= MAX_ATTEMPTS;
+        const shouldLock = nextAttempts >= (await getBounded(MAX_LOGIN_ATTEMPTS));
         const alreadyLocked = (existing.lockedUntil?.getTime() ?? 0) > now;
         const lockedUntil = shouldLock ? new Date(now + LOCKOUT_MS) : existing.lockedUntil;
 
@@ -138,7 +139,8 @@ export async function resetFailedLogins(userId: string): Promise<void> {
 }
 
 export const ACCOUNT_LOCKOUT_CONFIG = {
-    MAX_ATTEMPTS,
+    /** The default only. The effective threshold is the admin's row. */
+    MAX_ATTEMPTS: MAX_LOGIN_ATTEMPTS.defaultValue,
     MAX_WINDOW_MS,
     LOCKOUT_MS,
 };
