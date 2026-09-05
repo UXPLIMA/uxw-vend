@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { Award, Loader2 } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -27,17 +27,22 @@ export default function TrophiesTab() {
     const [earned, setEarned] = useState<EarnedTrophy[]>([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/me/trophies")
-            .then(r => r.ok ? r.json() : { earned: [], total: 0 })
-            .then(d => {
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then(d => { if (cancelled) return;
                 setEarned(Array.isArray(d.earned) ? d.earned : []);
                 setTotal(Number(d.total) || 0);
+                setFailed(false);
             })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     return (
         <Card>
@@ -55,6 +60,8 @@ export default function TrophiesTab() {
                     <div className="flex justify-center py-6">
                         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                     </div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : earned.length === 0 ? (
                     <div className="text-sm text-muted-foreground">
                         {t("noneYet")}{" "}

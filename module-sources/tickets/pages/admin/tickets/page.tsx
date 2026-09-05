@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
 
@@ -44,6 +44,8 @@ export default function AdminTicketsPage() {
     const t = useTranslations("tickets");
     const relativeTime = useRelativeTime();
     const [tickets, setTickets] = useState<Ticket[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("");
     const [stats, setStats] = useState({ open: 0, inProgress: 0, waiting: 0, closed: 0 });
@@ -55,18 +57,20 @@ export default function AdminTicketsPage() {
             : "/api/v1/tickets";
 
         fetch(url)
-            .then((res) => res.json())
+            .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
             .then((data) => {
                 if (cancelled) return;
                 setTickets(data.tickets || []);
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setFailed(true);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [statusFilter]);
+    }, [statusFilter, reloadKey]);
 
     useEffect(() => {
         // Fetch stats
@@ -179,6 +183,8 @@ export default function AdminTicketsPage() {
                 <div className="bg-card rounded-lg p-8 text-center">
                     <p className="text-muted-foreground">{t("adm_loading")}</p>
                 </div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : tickets.length === 0 ? (
                 <div className="bg-card rounded-lg p-8 text-center">
                     <p className="text-muted-foreground">{t("adm_noTicketsFound")}</p>

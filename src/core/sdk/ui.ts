@@ -45,3 +45,9 @@ export { useModalDialog, type ModalDialogOptions } from "@/core/hooks/useModalDi
 // This sat in the tree unreachable from a module, so the store hand-rolled
 // its own - and that copy was the one whose crumbs a keyboard could not reach.
 export { Breadcrumb } from "@/core/components/ui/breadcrumb";
+
+// A list screen has two ways to be empty: nothing was created yet, or the
+// request never came back. Forty screens rendered the same "nothing here yet"
+// for both, so a module that fetches its own content needs this panel as much
+// as core does.
+export { LoadFailed } from "@/core/components/ui/load-failed";

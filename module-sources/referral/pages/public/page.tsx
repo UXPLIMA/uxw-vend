@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
@@ -38,6 +38,8 @@ export default function ReferralPage() {
     const [copied, setCopied] = useState(false);
     const [referralCodeInput, setReferralCodeInput] = useState("");
     const [applying, setApplying] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -46,18 +48,19 @@ export default function ReferralPage() {
             return;
         }
         fetch("/api/v1/referral")
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then(d => {
                 if (cancelled) return;
                 setData(d);
+                setFailed(false);
             })
-            .catch(() => {})
+            .catch(() => { if (!cancelled) setFailed(true); })
             .finally(() => {
                 if (cancelled) return;
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [session]);
+    }, [session, reloadKey]);
 
     const copyLink = async () => {
         if (!data) return;
@@ -241,7 +244,9 @@ export default function ReferralPage() {
                                 <CardTitle>{t("referralHistory")}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {data.referrals.length === 0 ? (
+                                {failed ? (
+                                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                                ) : data.referrals.length === 0 ? (
                                     <p className="text-center text-muted-foreground py-8">
                                         {t("noReferrals")}
                                     </p>

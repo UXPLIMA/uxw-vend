@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, ExternalLink, Gift } from "lucide-react";
@@ -22,15 +22,19 @@ export default function VotePage() {
     const { data: session } = useSession();
     const t = useTranslations("vote");
     const [sites, setSites] = useState<VoteSite[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
     const [claiming, setClaiming] = useState<string | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/vote/sites")
-            .then((r) => r.json())
-            .then((d) => { setSites(d.sites || []); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setSites(d.sites || []); setFailed(false); setLoading(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const claimReward = async (siteId: string) => {
         setClaiming(siteId);
@@ -58,6 +62,8 @@ export default function VotePage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : sites.length === 0 ? (
                     <Card><CardContent className="py-12 text-center text-muted-foreground">{t("noSites")}</CardContent></Card>
                 ) : (

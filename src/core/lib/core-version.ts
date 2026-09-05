@@ -12,6 +12,11 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.9.0 - `LoadFailed` joins `@/core/sdk/ui`. A module that fetches its own
+ * content has the same two ways of being empty core does, and had the same
+ * one way of saying so; this is the panel for the other one. An addition, so
+ * a module written against 1.8.0 is unaffected.
+ *
  * 1.8.0 - `useSiteCurrency` joins `@/core/sdk/ui`, and core mounts the
  * provider behind it. A module that shows a price no longer has to guess the
  * currency: the base is the setting the payment gateways charge in, the
@@ -57,4 +62,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.8.0";
+export const CORE_API_VERSION = "1.9.0";

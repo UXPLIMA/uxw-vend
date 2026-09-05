@@ -21,6 +21,7 @@
     "increaseQuantity": "Adedi artır",
     "install": "Kur",
     "language": "Dil",
+    "loadFailed": "Bu içerik yüklenemedi. Bir bağlantı sorunu olabilir.",
     "loading": "Yükleniyor...",
     "login": "Giriş Yap",
     "logout": "Çıkış Yap",

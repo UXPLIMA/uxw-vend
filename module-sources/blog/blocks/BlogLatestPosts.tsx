@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
+import { LoadFailed } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: BlogLatestPosts
@@ -29,6 +30,8 @@ interface ArticleSummary {
 function BlogLatestPostsRender({ count, categoryId, heading }: BlogLatestPostsProps): React.ReactElement {
     const t = useTranslations("blog");
     const [articles, setArticles] = useState<ArticleSummary[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -38,19 +41,22 @@ function BlogLatestPostsRender({ count, categoryId, heading }: BlogLatestPostsPr
 
         let cancelled = false;
         fetch(`/api/v1/blog/articles?${params.toString()}`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 const list: ArticleSummary[] = Array.isArray(d) ? d : d.articles || d.data || [];
                 setArticles(list.slice(0, count || 3));
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
-                if (!cancelled) setLoading(false);
+                if (cancelled) return;
+                setFailed(true);
+                setLoading(false);
             });
 
         return () => { cancelled = true; };
-    }, [count, categoryId]);
+    }, [count, categoryId, reloadKey]);
 
     return (
         <section className="container mx-auto px-4 py-8">
@@ -63,6 +69,8 @@ function BlogLatestPostsRender({ count, categoryId, heading }: BlogLatestPostsPr
                         <div key={i} className="h-48 rounded-lg bg-muted animate-pulse" />
                     ))}
                 </div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : articles.length === 0 ? (
                 <div className="text-muted-foreground text-sm">{t("noArticles")}</div>
             ) : (

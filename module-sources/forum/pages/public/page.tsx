@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
@@ -43,6 +43,8 @@ export default function ForumPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
     const [restricted, setRestricted] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const t = useTranslations('forum');
     const relativeTime = useRelativeTime();
 
@@ -65,8 +67,10 @@ export default function ForumPage() {
 
         fetch(`/api/v1/forum/topics?${params}`)
             .then(async (r) => {
-                if (cancelled) return;
+                if (cancelled) return null;
                 if (r.status === 403) { setRestricted(true); return null; }
+                // Any other refusal is a failure to load, not an empty forum.
+                if (!r.ok) throw new Error("load failed");
                 return r.json();
             })
             .then((d) => {
@@ -75,14 +79,16 @@ export default function ForumPage() {
                     setTopics(d.topics || []);
                     setTotalPages(d.pages || 1);
                 }
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setFailed(true);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [selectedCategory, page, searchQuery]);
+    }, [selectedCategory, page, searchQuery, reloadKey]);
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
@@ -159,6 +165,8 @@ export default function ForumPage() {
                                     <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
                                 </CardContent>
                             </Card>
+                        ) : failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : topics.length === 0 ? (
                             <Card>
                                 <CardContent className="py-12 text-center">

@@ -8,7 +8,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
-import { useSiteCurrency } from "@/core/sdk/ui";
+import { LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
     id: string;
     name: string;
@@ -48,18 +48,23 @@ export default function StorePage() {
 
     const t = useTranslations('store');
     const commonT = useTranslations('common');
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const { format: formatPrice } = useSiteCurrency();
 
     // Fetch Categories
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/store/categories")
-            .then((res) => res.json())
-            .then((data) => {
+            .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
+            .then((data) => { if (cancelled) return;
                 setCategories(data.categories || []);
+                setFailed(false);
                 setLoadingCategories(false);
             })
-            .catch(() => setLoadingCategories(false));
-    }, []);
+            .catch(() => { if (cancelled) return; setFailed(true); setLoadingCategories(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     // Fetch Products when category changes
     useEffect(() => {
@@ -68,21 +73,23 @@ export default function StorePage() {
         if (categorySlug) {
             setLoadingProducts(true);
             fetch(`/api/v1/store/products?category=${categorySlug}&limit=12&sort=${sortBy}`)
-                .then((res) => res.json())
+                .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
                 .then((data) => {
                     if (cancelled) return;
                     setProducts(data.products || []);
+                    setFailed(false);
                     setLoadingProducts(false);
                 })
                 .catch(() => {
                     if (cancelled) return;
+                    setFailed(true);
                     setLoadingProducts(false);
                 });
         } else {
             setProducts([]);
         }
         return () => { cancelled = true; };
-    }, [activeCategory, activeMode, sortBy]);
+    }, [activeCategory, activeMode, sortBy, reloadKey]);
 
     // Derived state
     const rootCategories = categories.filter((c) => c.parentId === null);
@@ -242,6 +249,8 @@ export default function StorePage() {
                         <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
                         {loadingCategories ? (
                             <SkeletonServerModes />
+                        ) : failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : rootCategories.length === 0 ? (
                             <div className="text-center py-12 bg-card rounded-xl">
                                 <p className="text-muted-foreground">{t('noCategories')}</p>
@@ -337,6 +346,8 @@ export default function StorePage() {
                         </div>
                         {loadingProducts ? (
                             <SkeletonProductGrid count={4} />
+                        ) : failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : products.length === 0 ? (
                             <div className="bg-card rounded-xl p-8 text-center border border-border">
                                 <p className="text-muted-foreground">{t('noProducts')}</p>

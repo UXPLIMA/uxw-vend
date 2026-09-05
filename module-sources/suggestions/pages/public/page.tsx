@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { stripHtmlTags } from "@/core/sdk";
@@ -62,6 +62,7 @@ export default function SuggestionsPage() {
         });
     };
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+    const [failed, setFailed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [title, setTitle] = useState("");
@@ -77,9 +78,9 @@ export default function SuggestionsPage() {
         if (filter) params.set("status", filter);
 
         fetch(`/api/v1/suggestions?${params}`)
-            .then((r) => r.json())
-            .then((d) => { setSuggestions(d.suggestions || []); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { setSuggestions(d.suggestions || []); setFailed(false); setLoading(false); })
+            .catch(() => { setFailed(true); setLoading(false); });
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,6 +187,8 @@ export default function SuggestionsPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={fetchSuggestions} />
                 ) : suggestions.length === 0 ? (
                     <Card><CardContent className="py-12 text-center">
                         <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-2" />

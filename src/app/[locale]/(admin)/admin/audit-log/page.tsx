@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { userProfilePath } from "@/core/lib/user-profile-link";
 import { useAllModules } from "@/core/providers/module-provider";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 interface AuditLogEntry {
     id: string;
@@ -145,6 +146,7 @@ export default function AuditLogPage() {
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const modules = useAllModules();
+    const [failed, setFailed] = useState(false);
     const commonT = useTranslations("common");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -173,15 +175,16 @@ export default function AuditLogPage() {
     const fetchLogs = useCallback(() => {
         setLoading(true);
         fetch(`/api/v1/admin/audit-log?${queryString}`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d: AuditLogResponse) => {
                 setLogs(d.logs || []);
                 setTotal(d.total || 0);
                 setPages(d.pages || 1);
                 setActions(d.actions || []);
+                setFailed(false);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => { setFailed(true); setLoading(false); });
     }, [queryString]);
 
      
@@ -315,6 +318,8 @@ export default function AuditLogPage() {
                         <div className="flex justify-center py-12">
                             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                         </div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={fetchLogs} />
                     ) : logs.length === 0 ? (
                         <p className="text-muted-foreground text-center py-12">
                             {t("auditLog_noLogs")}

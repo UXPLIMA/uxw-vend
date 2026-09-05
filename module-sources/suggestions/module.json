@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",

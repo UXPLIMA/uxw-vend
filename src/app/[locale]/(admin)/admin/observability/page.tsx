@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 interface HealthData {
     status: "ok" | "degraded" | "down";
@@ -65,6 +66,11 @@ export default function ObservabilityPage() {
     const [loading, setLoading] = useState(true);
     const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    // Per panel, because they arrive from four independent requests. "No
+    // errors" is the worst thing this page can say when it simply did not
+    // hear back, so a panel that failed says so rather than reading clean.
+    const [errorsFailed, setErrorsFailed] = useState(false);
+    const [emailsFailed, setEmailsFailed] = useState(false);
 
     const fetchAll = useCallback(async () => {
         setRefreshing(true);
@@ -81,7 +87,9 @@ export default function ObservabilityPage() {
                 setHealth(healthRes as HealthData);
             }
             if (errorsRes?.data) setErrors(errorsRes.data as CronError[]);
+            setErrorsFailed(!errorsRes?.data);
             if (emailsRes?.data) setEmails(emailsRes.data as FailedEmail[]);
+            setEmailsFailed(!emailsRes?.data);
             if (statsRes?.data) setStats(statsRes.data as StatsData);
             setLastRefresh(new Date());
         } finally {
@@ -276,7 +284,9 @@ export default function ObservabilityPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {errors.length === 0 ? (
+                        {errorsFailed ? (
+                            <LoadFailed onRetry={fetchAll} />
+                        ) : errors.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
                                 {t("observability_noErrors")}
                             </p>
@@ -306,7 +316,9 @@ export default function ObservabilityPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {emails.length === 0 ? (
+                        {emailsFailed ? (
+                            <LoadFailed onRetry={fetchAll} />
+                        ) : emails.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
                                 {t("observability_noFailedEmails")}
                             </p>

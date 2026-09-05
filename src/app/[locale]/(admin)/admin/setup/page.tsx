@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { defaultThemeId } from "@/core/generated/theme-registry";
 import { writeError } from "@/core/lib/write-result";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 const steps = ["Welcome", "Site Info", "Modules", "Theme", "Done"];
 
@@ -94,28 +95,37 @@ export default function SetupWizardPage() {
     const [themes, setThemes] = useState<ThemeInfo[]>([]);
     const [selectedTheme, setSelectedTheme] = useState<string>(defaultThemeId);
     const [loadingThemes, setLoadingThemes] = useState(true);
+    // The module panel needs both requests: the recommendation is the
+    // marketplace list minus what is already installed, so either one failing
+    // makes the answer wrong. It used to read "everything is installed".
+    const [modulesFailed, setModulesFailed] = useState(false);
+    const [themesFailed, setThemesFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
         // Fetch marketplace modules
-        fetch("/api/v1/modules/marketplace")
-            .then(res => res.json())
-            .then(data => setMarketplaceModules(data.modules || []))
-            .catch(() => {})
-            .finally(() => setLoadingModules(false));
+        const read = (url: string) => fetch(url).then(res => {
+            if (!res.ok) throw new Error("load failed");
+            return res.json();
+        });
 
-        // Fetch installed modules
-        fetch("/api/v1/modules")
-            .then(res => res.json())
-            .then(data => setInstalledModules(data.modules || []))
-            .catch(() => {});
+        Promise.all([read("/api/v1/modules/marketplace"), read("/api/v1/modules")])
+            .then(([marketplace, installed]) => { if (cancelled) return;
+                setMarketplaceModules(marketplace.modules || []);
+                setInstalledModules(installed.modules || []);
+                setModulesFailed(false);
+            })
+            .catch(() => { if (cancelled) return; setModulesFailed(true); })
+            .finally(() => { if (cancelled) return; setLoadingModules(false); });
 
         // Fetch themes
-        fetch("/api/v1/themes")
-            .then(res => res.json())
-            .then(data => setThemes(data.themes || []))
-            .catch(() => {})
-            .finally(() => setLoadingThemes(false));
-    }, []);
+        read("/api/v1/themes")
+            .then(data => { if (cancelled) return; setThemes(data.themes || []); setThemesFailed(false); })
+            .catch(() => { if (cancelled) return; setThemesFailed(true); })
+            .finally(() => { if (cancelled) return; setLoadingThemes(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const installedIds = new Set(installedModules.map(m => m.id));
 
@@ -308,6 +318,8 @@ export default function SetupWizardPage() {
                             <div className="flex justify-center py-8">
                                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                             </div>
+                        ) : modulesFailed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : recommendedModules.length === 0 ? (
                             <div className="py-8 text-center text-muted-foreground">
                                 <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
@@ -376,6 +388,8 @@ export default function SetupWizardPage() {
                             <div className="flex justify-center py-8">
                                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                             </div>
+                        ) : themesFailed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : themes.length === 0 ? (
                             <div className="py-8 text-center text-muted-foreground">
                                 <p>{t("setup_noThemes")}</p>

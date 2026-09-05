@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Check, X, Crown, Loader2 } from "lucide-react";
@@ -36,18 +36,23 @@ export default function VipTablePage() {
     const t = useTranslations("store");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const { format: formatPrice } = useSiteCurrency();
 
     useEffect(() => {
+        let cancelled = false;
         // Fetch featured products to use as VIP ranks
         fetch("/api/v1/store/products?featured=true&limit=10")
-            .then((r) => r.json())
-            .then((data) => {
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((data) => { if (cancelled) return;
                 setProducts(data.products || []);
+                setFailed(false);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
-    }, []);
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     if (loading) {
         return (
@@ -83,7 +88,9 @@ export default function VipTablePage() {
                     <p className="text-muted-foreground">{t("vip_subtitle")}</p>
                 </div>
 
-                {products.length === 0 ? (
+                {failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                ) : products.length === 0 ? (
                     <div className="text-center py-12 bg-card rounded-xl border">
                         <Crown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                         <p className="text-muted-foreground">{t("vip_empty")}</p>

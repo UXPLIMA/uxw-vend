@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { formatDate } from "@/core/sdk";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { ORDER_STATUS_KEYS, orderStatusLabel } from "../lib/order-status";
@@ -43,17 +43,21 @@ export function ProfileOrdersTab() {
     const dateTag = dateLocaleTag(useLocale());
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
     const statusLabel = (status: string) => orderStatusLabel(t, ORDER_STATUS_KEYS, status);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/store/orders?limit=10")
-            .then(r => r.ok ? r.json() : { orders: [] })
-            .then(data => setOrders(data.orders || []))
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then(data => { if (cancelled) return; setOrders(data.orders || []); setFailed(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     if (loading) {
         return (
@@ -71,7 +75,9 @@ export function ProfileOrdersTab() {
                 <CardTitle>{t("tab_orders_title")}</CardTitle>
             </CardHeader>
             <CardContent>
-                {orders.length === 0 ? (
+                {failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                ) : orders.length === 0 ? (
                     <div className="text-center py-8">
                         <ShoppingCart className="w-10 h-10 text-gray-300 mx-auto mb-2" />
                         <p className="text-muted-foreground">{t("tab_orders_empty")}</p>

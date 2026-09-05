@@ -21,6 +21,7 @@
     "increaseQuantity": "Increase quantity",
     "install": "Install",
     "language": "Language",
+    "loadFailed": "This could not be loaded. It may be a connection problem.",
     "loading": "Loading...",
     "login": "Login",
     "logout": "Logout",

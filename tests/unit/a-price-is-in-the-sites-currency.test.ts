@@ -145,7 +145,12 @@ describe("the currency contract", () => {
 
     it("is exported from the module SDK, so a module need not guess", () => {
         expect(read("src/core/sdk/ui.ts")).toContain("useSiteCurrency");
-        expect(read("src/core/lib/core-version.ts")).toContain('CORE_API_VERSION = "1.8.0"');
+        // The addition is what matters, not the number it landed on: the
+        // changelog entry has to survive later bumps to stay useful.
+        const version = read("src/core/lib/core-version.ts");
+        expect(version).toContain("1.8.0 - `useSiteCurrency` joins `@/core/sdk/ui`");
+        const [major, minor] = /CORE_API_VERSION = "(\d+)\.(\d+)/.exec(version)!.slice(1).map(Number);
+        expect(major * 1000 + minor).toBeGreaterThanOrEqual(1008);
     });
 
     it("is mounted where every page can reach it", () => {

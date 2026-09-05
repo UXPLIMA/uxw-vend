@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { dateLocaleTag } from "@/core/sdk";
 
 interface ChestItem {
@@ -19,14 +19,18 @@ export function ProfileChestTab() {
     const t = useTranslations("store");
     const [chestItems, setChestItems] = useState<ChestItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/chest")
-            .then(r => r.ok ? r.json() : { items: [] })
-            .then(data => setChestItems(data.items || []))
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then(data => { if (cancelled) return; setChestItems(data.items || []); setFailed(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const redeem = async (id: string) => {
         try {
@@ -56,7 +60,9 @@ export function ProfileChestTab() {
         <Card>
             <CardHeader><CardTitle>{t("tab_chest_title")}</CardTitle></CardHeader>
             <CardContent>
-                {chestItems.length === 0 ? (
+                {failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                ) : chestItems.length === 0 ? (
                     <p className="text-muted-foreground text-center py-8">{t("tab_chest_empty")}</p>
                 ) : (
                     <div className="space-y-3">

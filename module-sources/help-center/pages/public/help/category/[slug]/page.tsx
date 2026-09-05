@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Footer, Navbar } from "@/core/sdk/layout";
+import { LoadFailed } from "@/core/sdk/ui";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 interface Article {
@@ -31,34 +32,42 @@ export default function HelpCategoryPage({ params }: PageProps) {
     const [category, setCategory] = useState<Category | null>(null);
     const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
+        // A category that does not exist gets its own message below. This
+        // tracks the other case: the request never arrived, which used to
+        // render "no articles in this category" for a server that was down.
+        let known = true;
         fetch("/api/v1/help/categories")
-            .then((res) => res.json())
+            .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
             .then((categories) => {
-                if (cancelled) return;
+                if (cancelled) return null;
                 const cat = categories.find((c: Category) => c.slug === slug);
-                if (cat) {
-                    setCategory(cat);
-                    return fetch(`/api/v1/help/articles?categoryId=${cat.id}`);
-                }
-                throw new Error("Category not found");
+                if (!cat) { known = false; throw new Error("Category not found"); }
+                setCategory(cat);
+                return fetch(`/api/v1/help/articles?categoryId=${cat.id}`);
             })
-            // `res` is undefined when the step above bailed out on a cancelled
-            // effect; there is nothing left to read in that case.
-            .then((res) => (res ? res.json() : null))
+            .then((res) => {
+                if (!res) return null;
+                if (!res.ok) throw new Error("load failed");
+                return res.json();
+            })
             .then((data) => {
                 if (cancelled) return;
                 setArticles(data || []);
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setFailed(known);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [slug]);
+    }, [slug, reloadKey]);
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
@@ -96,7 +105,9 @@ export default function HelpCategoryPage({ params }: PageProps) {
                             )}
                         </div>
 
-                        {articles.length > 0 ? (
+                        {failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                        ) : articles.length > 0 ? (
                             <div className="bg-card rounded-xl border border-border divide-y">
                                 {articles.map((article) => (
                                     <Link
