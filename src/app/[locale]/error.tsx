@@ -43,8 +43,8 @@ export default function Error({
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 bg-muted">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-destructive" />
             </div>
             <div className="text-center max-w-md">
                 <h1 className="text-2xl font-bold text-foreground mb-2">{labels.title}</h1>
@@ -68,7 +68,7 @@ export default function Error({
                 </Button>
             </div>
             {process.env.NODE_ENV === "development" && (
-                <pre className="mt-4 p-4 bg-gray-900 text-red-400 rounded-lg text-xs max-w-2xl overflow-auto font-mono">
+                <pre className="mt-4 p-4 bg-card border border-border text-destructive rounded-lg text-xs max-w-2xl overflow-auto font-mono">
                     {error.message}
                 </pre>
             )}

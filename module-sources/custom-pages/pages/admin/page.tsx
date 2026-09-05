@@ -164,8 +164,8 @@ export default function CustomPagesAdminPage() {
                                     {t("adm_published")}
                                 </label>
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-sm">{t("adm_order")}</Label>
-                                    <Input aria-label={t("adm_order")} type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
+                                    <Label className="text-sm">{t("adm_sortOrder")}</Label>
+                                    <Input aria-label={t("adm_sortOrder")} type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
                             <div className="flex gap-2">

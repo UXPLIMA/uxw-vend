@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -64,15 +64,7 @@ interface AdminCrudPageProps {
  * two more files per module. The address changes, the back button works and
  * the form owns the screen, which is what the path segment was for.
  */
-export function AdminCrudPage(props: AdminCrudPageProps) {
-    return (
-        <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>}>
-            <AdminCrudPageInner {...props} />
-        </Suspense>
-    );
-}
-
-function AdminCrudPageInner({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
+export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
     const ct = useTranslations("admin");
     const commonT = useTranslations("common");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);

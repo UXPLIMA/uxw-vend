@@ -83,16 +83,12 @@ export function usePagedRows<T>(rows: T[], pageSize = 10) {
 }
 
 export function Pagination(props: PaginationProps) {
-    // `useSearchParams` is only reached by the URL form, and only inside its
-    // own Suspense boundary: a page that pages through state must not be
-    // pushed into client-side rendering by a hook it never uses.
-    if (props.pageParam) {
-        return (
-            <React.Suspense fallback={null}>
-                <UrlPagination {...props} />
-            </React.Suspense>
-        );
-    }
+    // `useSearchParams` is only reached by the URL form: a screen that pages
+    // through state must not touch it at all. No Suspense boundary around it -
+    // every admin route is `force-dynamic`, so there is no prerender to bail
+    // out of, and an extra boundary the server has to finish is a boundary
+    // that can fail to finish.
+    if (props.pageParam) return <UrlPagination {...props} />;
     return <PaginationBar {...props} hrefFor={null} />;
 }
 

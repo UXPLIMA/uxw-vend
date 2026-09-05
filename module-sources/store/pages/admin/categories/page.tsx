@@ -186,9 +186,9 @@ export default function AdminStoreCategoriesPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>{t("adm_order")}</Label>
+                                    <Label>{t("adm_sortOrder")}</Label>
                                     <Input
-                                        aria-label={t("adm_order")}
+                                        aria-label={t("adm_sortOrder")}
                                         type="number"
                                         value={form.order}
                                         onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}

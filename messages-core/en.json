@@ -11,6 +11,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "error_description": "An unexpected error occurred. Please try again.",
+    "error_id": "Error ID",
     "error_title": "Something went wrong",
     "fileUploaded": "File uploaded",
     "go_home": "Go home",

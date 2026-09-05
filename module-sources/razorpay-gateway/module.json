@@ -2,7 +2,7 @@
   "id": "razorpay-gateway",
   "name": "Razorpay Gateway",
   "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -90,7 +90,7 @@
         "adm_subtitle": "Razorpay ile ödeme almak için gereken anahtarlar.",
         "adm_keyId": "Anahtar Kimliği",
         "adm_keyIdDesc": "Razorpay panelinden alınır.",
-        "adm_keySecret": "Anahtar Gizi",
+        "adm_keySecret": "Gizli Anahtar",
         "adm_keySecretDesc": "Razorpay panelinden alınır.",
         "adm_webhookSecret": "Webhook Gizli Anahtarı",
         "adm_webhookSecretDesc": "Razorpay panelinden alınır. Razorpay bildirim adresini /api/v1/razorpay/webhook olarak ayarlayın."
