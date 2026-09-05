@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -469,12 +469,12 @@
   ],
   "activityTitles": [
     {
-      "type": "tickets.ticket.created",
+      "type": "tickets.ticket.opened",
       "prefix": "Opened ticket: ",
       "key": "ticketCreated"
     },
     {
-      "type": "tickets.reply.created",
+      "type": "tickets.ticket.replied",
       "prefix": "Replied to ticket: ",
       "key": "ticketReplyCreated"
     }

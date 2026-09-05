@@ -36,7 +36,14 @@ export function localizeActivityTitle(type: string, title: string, t: Translator
     const cfg = PREFIXES[type];
     if (!cfg) return title;
     // For prefixed entries, strip the English prefix and substitute.
-    if (cfg.prefix && title.startsWith(cfg.prefix)) {
+    if (cfg.prefix) {
+        // A declared prefix that does not match is a declaration about a title
+        // this row does not have, so nothing here knows where the entity ends.
+        // Substituting the label anyway threw the entity away: the store
+        // declared "Purchased: " for rows written as "Completed order #1412",
+        // and every one of them rendered as a bare "purchased:" with the order
+        // number gone. The raw title is at least the whole sentence.
+        if (!title.startsWith(cfg.prefix)) return title;
         const entity = title.slice(cfg.prefix.length);
         return t.has?.(cfg.key) === false ? title : `${t(cfg.key)} ${entity}`.trim();
     }

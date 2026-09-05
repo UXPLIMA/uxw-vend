@@ -77,7 +77,10 @@ describe("every file under src/core", () => {
         expect(core.length).toBeGreaterThan(100);
     });
 
-    it("is reachable from somewhere", () => {
+    // Quadratic in the size of core - every file's specifiers against every
+    // other file's text - so it runs in a couple of seconds idle and blew the
+    // 5s default on a loaded host, failing a green suite for no reason.
+    it("is reachable from somewhere", { timeout: 60_000 }, () => {
         const unreachable: string[] = [];
 
         for (const file of core) {
