@@ -12,9 +12,17 @@
  * Every one of them is a token now: `bg-success/10 text-success`, and the
  * tokens are redefined per mode and per theme. This keeps the palette out.
  *
- * Scope is the admin: the panel is core's own surface and follows the site's
- * theme. A public theme under src/themes IS a design and names whatever
- * colours it likes.
+ * Scope is core's own surface, which is both halves of the site: the admin
+ * panel and the public chrome core draws around a theme - the navbar, the
+ * footer, the profile screen, the homepage shell. All of it recolours with
+ * the theme, and all of it had the same drift: a blue avatar circle, a red
+ * error box, a sign-out in `text-red-600 hover:bg-red-50`, a breadcrumb
+ * hovering blue on a site with no blue in it.
+ *
+ * A theme under src/themes IS a design and names whatever colours it likes,
+ * and so does a module's own public page. Brand marks are the one exception
+ * inside core: a Facebook button hovering Facebook blue is not drift, it is
+ * the mark, so the footer's social links name their own colours below.
  */
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, existsSync, statSync } from "fs";
@@ -27,10 +35,21 @@ const FIXED = new RegExp(String.raw`\b(?:bg|text|border|ring|from|to|via)-(?:${P
 /** Tailwind's own dark variant, which this project does not switch on. */
 const OS_DARK = /\bdark:[a-z-]+\b/g;
 
-function adminRoots(): string[] {
+/**
+ * Lines that name a third party's own colour. A social button that hovers in
+ * the network's blue is the mark, not the theme.
+ */
+function isBrandMark(line: string): boolean {
+    return /aria-label="(?:Facebook|Instagram|X \(Twitter\)|YouTube|Twitch|TikTok|Discord)"/.test(line);
+}
+
+function coreRoots(): string[] {
     const roots = [
         join(ROOT, "src/app/[locale]/(admin)"),
+        join(ROOT, "src/app/[locale]/(public)"),
+        join(ROOT, "src/app/[locale]/page.tsx"),
         join(ROOT, "src/core/components/admin"),
+        join(ROOT, "src/core/components/layout"),
         join(ROOT, "src/core/components/ui"),
     ];
     const sources = join(ROOT, "module-sources");
@@ -44,6 +63,11 @@ function adminRoots(): string[] {
 }
 
 function tsxFiles(dir: string, into: string[] = []): string[] {
+    // A root may name one file rather than a directory.
+    if (!statSync(dir).isDirectory()) {
+        if (dir.endsWith(".tsx")) into.push(dir);
+        return into;
+    }
     for (const entry of readdirSync(dir)) {
         const full = join(dir, entry);
         if (statSync(full).isDirectory()) tsxFiles(full, into);
@@ -57,11 +81,12 @@ function classAttributes(source: string): string {
     return source
         .split("\n")
         .filter((line) => !/^\s*(?:\*|\/\/|\/\*)/.test(line))
+        .filter((line) => !isBrandMark(line))
         .join("\n");
 }
 
-describe("the admin panel", () => {
-    const files = adminRoots().flatMap((r) => tsxFiles(r));
+describe("core's own screens", () => {
+    const files = coreRoots().flatMap((r) => tsxFiles(r));
 
     it("has screens to check", () => {
         expect(files.length).toBeGreaterThan(80);

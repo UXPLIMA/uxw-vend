@@ -227,7 +227,7 @@ export default function ProfilePage() {
             <main id="main-content" tabIndex={-1} className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                    <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold overflow-hidden">
                         {profile?.avatar ? (
                             <Image src={profile.avatar} alt="" width={64} height={64} className="w-full h-full object-cover" unoptimized />
                         ) : (
@@ -291,7 +291,7 @@ export default function ProfilePage() {
                         <CardContent>
                             <form onSubmit={saveProfile} className="space-y-4">
                                 {profileError && (
-                                    <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">{profileError}</div>
+                                    <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">{profileError}</div>
                                 )}
                                 <div>
                                     <Label htmlFor={usernameId}>{t("username")}</Label>
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Download className="w-5 h-5 text-blue-500" />
+                                <Download className="w-5 h-5 text-primary" />
                                 {t("privacy")}
                             </CardTitle>
                         </CardHeader>
@@ -428,8 +428,8 @@ export default function ProfilePage() {
                         className="relative bg-card border border-[var(--uxw-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-start gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
                             </div>
                             <div>
                                 <h2 id="delete-title" className="font-semibold text-foreground">
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                         </div>
 
                         {deleteError && (
-                            <div className="mb-3 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                            <div className="mb-3 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                 {deleteError}
                             </div>
                         )}

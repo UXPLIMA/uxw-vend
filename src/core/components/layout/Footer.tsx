@@ -221,9 +221,9 @@ function DefaultFooter() {
                         </p>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span>{t('builtWith')}</span>
-                            <Heart className="w-4 h-4 text-red-400 fill-red-400" />
+                            <Heart className="w-4 h-4 text-primary fill-primary" />
                             <span>{t('by')}</span>
-                            <span className="text-blue-400 font-medium">{siteName}</span>
+                            <span className="text-primary font-medium">{siteName}</span>
                         </div>
                     </div>
                 </div>

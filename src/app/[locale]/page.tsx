@@ -56,7 +56,7 @@ export default function HomePage() {
         <h1 className="sr-only">{(settings.site_name as string) || commonT('home')}</h1>
 
         <div className="text-sm text-muted-foreground mb-4">
-          <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+          <Link href="/" className="hover:text-primary transition-colors">{commonT('home')}</Link>
         </div>
 
         {(() => {
