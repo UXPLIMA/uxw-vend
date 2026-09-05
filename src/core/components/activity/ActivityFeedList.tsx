@@ -23,6 +23,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { useTranslations } from "next-intl";
 import { localizeActivityTitle } from "@/core/lib/activity-title";
+import { userProfilePath } from "@/core/lib/user-profile-link";
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -64,8 +65,14 @@ export interface ActivityItem {
     actor: { id: string; username: string; avatar: string | null } | null;
 }
 
-export function ActivityFeedList({ items, emptyMessage = "No recent activity yet." }: {
+/**
+ * `moduleStates` decides whether an actor's name links to their profile. It
+ * arrives as a prop rather than from `useAllModules` because two of the three
+ * callers are server components, where a context read is not available.
+ */
+export function ActivityFeedList({ items, moduleStates, emptyMessage = "No recent activity yet." }: {
     items: ActivityItem[];
+    moduleStates: Record<string, boolean>;
     emptyMessage?: string;
 }) {
     const activityT = useTranslations("activity");
@@ -84,6 +91,7 @@ export function ActivityFeedList({ items, emptyMessage = "No recent activity yet
             {items.map((item) => {
                 const Icon = getActivityIcon(item.icon);
                 const when = formatDistanceToNow(new Date(item.createdAt), { addSuffix: true });
+                const profilePath = userProfilePath(item.actor?.username, moduleStates);
                 return (
                     <Card key={item.id} className="hover:border-primary/50 transition-colors">
                         <CardContent className="p-3 flex items-start gap-3">
@@ -103,9 +111,13 @@ export function ActivityFeedList({ items, emptyMessage = "No recent activity yet
                                 </div>
                                 {item.actor && (
                                     <div className="text-xs text-muted-foreground mt-0.5">
-                                        <Link href={`/profile/${item.actor.username}`} className="hover:text-primary">
-                                            {item.actor.username}
-                                        </Link>
+                                        {profilePath ? (
+                                            <Link href={profilePath} className="hover:text-primary">
+                                                {item.actor.username}
+                                            </Link>
+                                        ) : (
+                                            <span>{item.actor.username}</span>
+                                        )}
                                     </div>
                                 )}
                                 {item.body && (

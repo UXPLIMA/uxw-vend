@@ -156,7 +156,7 @@ export default function ForumPage() {
                                 <CardContent className="py-12 text-center space-y-3">
                                     <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                                     <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
-                                    <Link href="/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                                    <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
                                 </CardContent>
                             </Card>
                         ) : topics.length === 0 ? (

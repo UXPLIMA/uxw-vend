@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `userProfile: true` on a module manifest route. Core writes a username in a
+  few places of its own and had no way to say where a person's profile lives,
+  because that page belongs to a module that may not be installed. The module
+  that serves profiles now claims the capability, core asks the registry
+  through `userProfilePath(username, moduleStates)`, and with no such module -
+  or with it turned off - a username renders as text instead of a link to
+  nowhere. `validate-module` checks that the claiming route names exactly one
+  person and has a resolver behind it.
+
 - `useSiteCurrency` joins `@/core/sdk/ui` and `siteCurrency` / `formatSiteCurrency`
   join `@/core/sdk/server` (CORE_API_VERSION 1.8.0). Core mounts the provider in
   the root layout, outside the module providers, so a module that knows exchange
@@ -23,6 +32,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Nine links pointed at pages this product does not serve.** Nothing checked
+  them, and the App Router hides the mistake: the catch-all route answers 404
+  for anything it cannot resolve, so a wrong href fails no build and no
+  type-check. The blog's entire browsing was dead - every category in the
+  sidebar, every article's category line and every tag chip linked to
+  `/blog/category/<slug>` or `/blog/tag/<slug>`, which the `[...params]` route
+  read as an article lookup. The index now filters on `?category=` / `?tag=`,
+  keeps the filter while paging, names the active filter in the heading and
+  offers a way back to everything. Two forum screens sent a signed-out visitor
+  to `/login` instead of `/auth/login`; the custom-pages admin opened
+  `/admin/page-builder/<id>` instead of the route it declares; and core's
+  activity feed and audit log linked every username to `/profile/<username>`,
+  where `/profile` is the visitor's own page and takes no segment. A gate now
+  builds the route table from core's pages plus every manifest and checks each
+  internal href against it, with catch-alls modelled honestly so a slug route
+  cannot vouch for a path it would 404.
+
 - **Every price on the site was in dollars, whatever the site charged in.**
   There were four answers to "what currency is this?" and none of them was the
   setting the payment gateways read.

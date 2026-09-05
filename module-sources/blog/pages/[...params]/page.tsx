@@ -180,7 +180,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                     {article.category && (
                                         <>
                                             <span className="mx-2">/</span>
-                                            <Link href={`/blog/category/${article.category.slug}`} className="hover:text-blue-600">
+                                            <Link href={`/blog?category=${encodeURIComponent(article.category.slug)}`} className="hover:text-blue-600">
                                                 {article.category.name}
                                             </Link>
                                         </>
@@ -208,7 +208,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                         <div className="flex items-center gap-4 mb-4">
                                             {article.category && (
                                                 <Link
-                                                    href={`/blog/category/${article.category.slug}`}
+                                                    href={`/blog?category=${encodeURIComponent(article.category.slug)}`}
                                                     className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium hover:bg-blue-200 transition-colors"
                                                 >
                                                     {article.category.name}
@@ -264,7 +264,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                     {article.tags.map((tag) => (
                                                         <Link
                                                             key={tag.slug}
-                                                            href={`/blog/tag/${tag.slug}`}
+                                                            href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
                                                             className="px-3 py-1 rounded-full bg-muted text-foreground text-sm hover:bg-muted transition-colors"
                                                         >
                                                             #{tag.name}
