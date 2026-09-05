@@ -63,7 +63,7 @@ export default function NotificationsPage() {
         if (res.ok) {
             setItems(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
         } else {
-            toast.error(t.has("markFailed") ? t("markFailed") : "Failed to mark as read");
+            toast.error(t("markFailed"));
         }
     };
 
@@ -77,7 +77,7 @@ export default function NotificationsPage() {
             setItems(prev => prev.map(n => ({ ...n, isRead: true })));
             toast.success(t("markAllRead"));
         } else {
-            toast.error(t.has("markFailed") ? t("markFailed") : "Failed to mark all as read");
+            toast.error(t("markFailed"));
         }
     };
 
@@ -97,7 +97,7 @@ export default function NotificationsPage() {
                         </h1>
                         {unreadCount > 0 && (
                             <p className="text-sm text-muted-foreground">
-                                {t.has("unreadCount") ? t("unreadCount", { count: unreadCount }) : `${unreadCount} unread`}
+                                {t("unreadCount", { count: unreadCount })}
                             </p>
                         )}
                     </div>
@@ -126,7 +126,7 @@ export default function NotificationsPage() {
                 ) : !session?.user ? (
                     <Card>
                         <CardContent className="py-12 text-center text-muted-foreground">
-                            {t.has("loginRequired") ? t("loginRequired") : "Please log in to view your notifications."}
+                            {t("loginRequired")}
                         </CardContent>
                     </Card>
                 ) : filtered.length === 0 ? (

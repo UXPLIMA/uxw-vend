@@ -47,7 +47,7 @@ export default function AdminReferralPage() {
     const saveSettings = async () => {
         const amount = parseFloat(rewardAmount);
         if (isNaN(amount) || amount < 0) {
-            toast.error(t.has("adm_invalidReward") ? t("adm_invalidReward") : "Invalid reward amount");
+            toast.error(t("adm_invalidReward"));
             return;
         }
         setSaving(true);

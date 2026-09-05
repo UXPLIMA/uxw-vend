@@ -52,6 +52,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **246 English fallbacks that could never be read.** A screen that may be
+  asked for a key it does not have has one supported escape hatch:
+  `t.has(key) ? t(key) : "English"`. It is the right call when the key is
+  built at runtime - a module contributing a sidebar label, a status map
+  keyed off a database column, a notification channel that depends on what
+  the install enabled. Written against a key spelled out in the source it
+  answers a question that was already settled, and it settles it the wrong
+  way twice over: if the catalogue has the key the English branch is dead
+  code, and if it does not, every locale quietly reads English forever and
+  no build, test or log ever says so. The unguarded call is strictly better,
+  because next-intl renders the key path for a missing message and someone
+  notices.
+
+  There were 88 written inline and 158 more behind a
+  `fallback(key, en)` helper in five admin screens, across 26 files, and a
+  scan of every literal key in `src/app`, `src/core` and `module-sources`
+  against both catalogues found that not one of them was missing. All 246
+  are now plain `t()` calls. `a-guard-is-not-a-translation` checks core's own
+  keys the way `module-translation-keys` already checked each module's, holds
+  the two locales to the same key set, and refuses a literal-key guard or a
+  two-string helper that hides one. The single allowlisted exception is
+  `src/app/[locale]/error.tsx`, where the catalogue may be exactly what
+  failed to load.
+
+  Two thumbnail buttons on the store product page were carrying their
+  accessible name only through the alt text of the image inside them; the
+  guard removal shortened the markup enough for the icon-only-control gate to
+  see them, and they now carry an `aria-label`.
+
+
 - **Deleting a principal left the rows that named it.** Almost everything
   belonging to a user reaches it through a Prisma relation, so a cascade
   removes it and the erasure sweep finds it by walking the schema. Two stores

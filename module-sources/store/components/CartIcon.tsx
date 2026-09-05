@@ -31,7 +31,7 @@ export function CartIcon() {
 
     if (!session?.user) return null;
 
-    const ariaLabel = t.has("cartAriaLabel") ? t("cartAriaLabel") : "Cart";
+    const ariaLabel = t("cartAriaLabel");
 
     return (
         <Link

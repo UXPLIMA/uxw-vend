@@ -78,22 +78,22 @@ export default function AdminForumTopicsPage() {
 
     const deleteTopic = async (topicId: string) => {
         const ok = await confirm({
-            title: t.has("adm_deleteTopicTitle") ? t("adm_deleteTopicTitle") : "Delete topic?",
-            message: t.has("adm_deleteTopicConfirm") ? t("adm_deleteTopicConfirm") : "Delete this topic and all its replies? This cannot be undone.",
-            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+            title: t("adm_deleteTopicTitle"),
+            message: t("adm_deleteTopicConfirm"),
+            confirmText: t("adm_delete"),
             variant: "danger",
         });
         if (!ok) return;
         try {
             const res = await fetch(`/api/v1/forum/topics/${topicId}`, { method: "DELETE" });
             if (!res.ok) {
-                toast.error(t.has("adm_deleteTopicError") ? t("adm_deleteTopicError") : "Failed to delete topic");
+                toast.error(t("adm_deleteTopicError"));
                 return;
             }
-            toast.success(t.has("adm_topicDeleted") ? t("adm_topicDeleted") : "Topic deleted");
+            toast.success(t("adm_topicDeleted"));
             fetchTopics();
         } catch {
-            toast.error(t.has("adm_deleteTopicError") ? t("adm_deleteTopicError") : "Failed to delete topic");
+            toast.error(t("adm_deleteTopicError"));
         }
     };
 

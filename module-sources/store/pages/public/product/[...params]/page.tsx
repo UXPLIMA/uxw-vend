@@ -41,9 +41,9 @@ export default function ProductDetailPage() {
     const commonT = useTranslations('common');
 
     const requireLogin = () => {
-        toast.error(t.has("loginRequired") ? t("loginRequired") : "Please log in to continue", {
+        toast.error(t("loginRequired"), {
             action: {
-                label: t.has("login") ? t("login") : "Log in",
+                label: t("login"),
                 onClick: () => router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/")}`),
             },
         });
@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
             });
             if (res.ok) {
                 setAddedToCart(true);
-                toast.success(t.has("addedToCartToast") ? t("addedToCartToast", { name: product.name }) : `${product.name} added to cart`);
+                toast.success(t("addedToCartToast", { name: product.name }));
                 if (typeof window !== "undefined") {
                     window.dispatchEvent(new CustomEvent("cart:updated"));
                 }
@@ -125,11 +125,11 @@ export default function ProductDetailPage() {
                 requireLogin();
             } else {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || (t.has("addToCartError") ? t("addToCartError") : "Failed to add to cart"));
+                toast.error(body.error || t("addToCartError"));
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);
-            toast.error(t.has("addToCartError") ? t("addToCartError") : "Failed to add to cart");
+            toast.error(t("addToCartError"));
         } finally {
             setAddingToCart(false);
         }
@@ -288,11 +288,12 @@ export default function ProductDetailPage() {
                                     <button
                                         key={index}
                                         onClick={() => setCurrentImageIndex(index)}
+                                        aria-label={t("product_thumbnail", { n: index + 1 })}
                                         className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${index === currentImageIndex ? 'border-blue-600' : 'border-border hover:border-border'}`}
                                     >
                                         <Image
                                             src={img}
-                                            alt={t.has("product_thumbnail") ? t("product_thumbnail", { n: index + 1 }) : `Thumbnail ${index + 1}`}
+                                            alt={t("product_thumbnail", { n: index + 1 })}
                                             fill
                                             className="object-cover"
                                         />
@@ -380,7 +381,7 @@ export default function ProductDetailPage() {
                                                     className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                                                     required={v.required}
                                                 >
-                                                    <option value="">{t.has("product_selectOption") ? t("product_selectOption") : "Select…"}</option>
+                                                    <option value="">{t("product_selectOption")}</option>
                                                     {v.options.split(",").map((opt) => (
                                                         <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
                                                     ))}

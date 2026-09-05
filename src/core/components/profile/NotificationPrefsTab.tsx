@@ -133,9 +133,7 @@ export function NotificationPrefsTab() {
                                                             onClick={() => toggle(type.eventType, channel)}
                                                             role="switch"
                                                             aria-checked={enabled}
-                                                            aria-label={t.has("toggleChannelAria")
-                                                                ? t("toggleChannelAria", { event: type.label, channel })
-                                                                : `Toggle ${type.label} via ${channel}`}
+                                                            aria-label={t("toggleChannelAria", { event: type.label, channel })}
                                                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                                                                 enabled ? "bg-primary" : "bg-muted"
                                                             }`}

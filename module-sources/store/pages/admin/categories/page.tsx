@@ -92,9 +92,9 @@ export default function AdminStoreCategoriesPage() {
 
     const deleteCategory = async (id: string) => {
         const ok = await confirm({
-            title: t.has("cat_deleteTitle") ? t("cat_deleteTitle") : "Delete category?",
-            message: t.has("cat_deleteConfirm") ? t("cat_deleteConfirm") : "Delete this category? Products will be unlinked.",
-            confirmText: t.has("cat_delete") ? t("cat_delete") : "Delete",
+            title: t("cat_deleteTitle"),
+            message: t("cat_deleteConfirm"),
+            confirmText: t("cat_delete"),
             variant: "danger",
         });
         if (!ok) return;
@@ -102,13 +102,13 @@ export default function AdminStoreCategoriesPage() {
             const res = await fetch(`/api/v1/store/categories/${id}`, { method: "DELETE" });
             if (res.ok) {
                 fetchCategories();
-                toast.success(t.has("cat_deletedToast") ? t("cat_deletedToast") : "Category deleted");
+                toast.success(t("cat_deletedToast"));
             } else {
                 const data = await res.json();
-                toast.error(data.error || (t.has("cat_deleteError") ? t("cat_deleteError") : "Failed to delete"));
+                toast.error(data.error || (t("cat_deleteError")));
             }
         } catch {
-            toast.error(t.has("cat_deleteError") ? t("cat_deleteError") : "Failed to delete category");
+            toast.error(t("cat_deleteError"));
         }
     };
 

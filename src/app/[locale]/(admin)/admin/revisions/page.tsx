@@ -95,28 +95,23 @@ export default function RevisionsPage() {
         );
     };
 
-    const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
-
     return (
         <>
             <div className="mb-6">
                 <h1 className="text-xl font-semibold">
-                    {fallback("revisions_title", "Revision History")}
+                    {t("revisions_title")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                    {fallback(
-                        "revisions_subtitle",
-                        "Audit trail of every content update and delete across modules.",
-                    )}
+                    {t("revisions_subtitle")}
                 </p>
             </div>
 
             <Card className="mb-4">
                 <CardContent className="p-4 grid md:grid-cols-3 gap-3">
                     <div>
-                        <Label>{fallback("revisions_filterResource", "Resource")}</Label>
+                        <Label>{t("revisions_filterResource")}</Label>
                         <select
-                            aria-label={fallback("revisions_filterResource", "Resource")}
+                            aria-label={t("revisions_filterResource")}
                             value={resourceFilter}
                             onChange={(e) => {
                                 setPage(1);
@@ -124,7 +119,7 @@ export default function RevisionsPage() {
                             }}
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         >
-                            <option value="">{fallback("revisions_allResources", "All resources")}</option>
+                            <option value="">{t("revisions_allResources")}</option>
                             {resources.map((r) => (
                                 <option key={r} value={r}>
                                     {r}
@@ -133,19 +128,19 @@ export default function RevisionsPage() {
                         </select>
                     </div>
                     <div>
-                        <Label>{fallback("revisions_filterResourceId", "Resource ID")}</Label>
+                        <Label>{t("revisions_filterResourceId")}</Label>
                         <Input
-                            aria-label={fallback("revisions_filterResourceId", "Resource ID")}
+                            aria-label={t("revisions_filterResourceId")}
                             value={resourceIdFilter}
                             onChange={(e) => {
                                 setPage(1);
                                 setResourceIdFilter(e.target.value);
                             }}
-                            placeholder={fallback("revisions_resourceIdPlaceholder", "Optional entity ID")}
+                            placeholder={t("revisions_resourceIdPlaceholder")}
                         />
                     </div>
                     <div className="flex items-end text-sm text-muted-foreground">
-                        {total} {fallback("revisions_totalSuffix", "revisions")}
+                        {total} {t("revisions_totalSuffix")}
                     </div>
                 </CardContent>
             </Card>
@@ -158,7 +153,7 @@ export default function RevisionsPage() {
                         </div>
                     ) : revisions.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">
-                            {fallback("revisions_none", "No revisions recorded yet.")}
+                            {t("revisions_none")}
                         </p>
                     ) : (
                         <div className="divide-y">
@@ -190,7 +185,7 @@ export default function RevisionsPage() {
                                                 </span>
                                                 <span>{actionBadge(rev.action)}</span>
                                                 <span className="text-xs text-muted-foreground truncate">
-                                                    {rev.author?.username || fallback("revisions_system", "system")}
+                                                    {rev.author?.username || t("revisions_system")}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground text-right md:text-left">
                                                     {new Date(rev.createdAt).toLocaleString(__dateTag)}
@@ -212,7 +207,7 @@ export default function RevisionsPage() {
                     {pages > 1 && (
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">
-                                {fallback("revisions_page", "Page")} {page} / {pages}
+                                {t("revisions_page")} {page} / {pages}
                             </span>
                             <div className="flex gap-1">
                                 <Button

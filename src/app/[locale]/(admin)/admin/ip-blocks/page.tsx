@@ -26,7 +26,6 @@ export default function IpBlocksPage() {
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
-    const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [blocks, setBlocks] = useState<IpBlock[]>([]);
     const [loading, setLoading] = useState(true);
@@ -68,7 +67,7 @@ export default function IpBlocksPage() {
     const createBlock = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!ip.trim()) {
-            toast.error(fallback("ipBlocks_ipRequired", "IP address is required."));
+            toast.error(t("ipBlocks_ipRequired"));
             return;
         }
         setSaving(true);
@@ -84,12 +83,12 @@ export default function IpBlocksPage() {
                 }),
             });
             if (res.ok) {
-                toast.success(fallback("ipBlocks_created", "IP blocked."));
+                toast.success(t("ipBlocks_created"));
                 resetForm();
                 fetchBlocks();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || fallback("ipBlocks_createFailed", "Failed to create block."));
+                toast.error(data.error || t("ipBlocks_createFailed"));
             }
         } finally {
             setSaving(false);
@@ -98,24 +97,24 @@ export default function IpBlocksPage() {
 
     const deleteBlock = async (b: IpBlock) => {
         const ok = await confirm({
-            title: fallback("ipBlocks_removeTitle", "Remove block"),
-            message: fallback("ipBlocks_removeConfirm", "Unblock this IP? It will regain access immediately."),
+            title: t("ipBlocks_removeTitle"),
+            message: t("ipBlocks_removeConfirm"),
             variant: "danger",
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/admin/ip-blocks/${b.id}`, { method: "DELETE" });
         if (res.ok) {
-            toast.success(fallback("ipBlocks_removed", "IP unblocked."));
+            toast.success(t("ipBlocks_removed"));
             fetchBlocks();
         } else {
-            toast.error(fallback("ipBlocks_removeFailed", "Failed to remove block."));
+            toast.error(t("ipBlocks_removeFailed"));
         }
     };
 
     const scopeLabel = (s: string): string => {
-        if (s === "admin") return fallback("ipBlocks_scopeAdmin", "Admin only");
-        if (s === "api") return fallback("ipBlocks_scopeApi", "API only");
-        return fallback("ipBlocks_scopeAll", "Entire site");
+        if (s === "admin") return t("ipBlocks_scopeAdmin");
+        if (s === "api") return t("ipBlocks_scopeApi");
+        return t("ipBlocks_scopeAll");
     };
 
     return (
@@ -123,23 +122,20 @@ export default function IpBlocksPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-xl font-semibold">
-                        {fallback("ipBlocks_title", "IP Blocks")}
+                        {t("ipBlocks_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        {fallback(
-                            "ipBlocks_subtitle",
-                            "Ban specific IPs or CIDR ranges from accessing the site or admin panel.",
-                        )}
+                        {t("ipBlocks_subtitle")}
                     </p>
                 </div>
                 <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
                     {showForm ? (
                         <>
-                            <X className="w-4 h-4 mr-2" /> {fallback("ipBlocks_cancel", "Cancel")}
+                            <X className="w-4 h-4 mr-2" /> {t("ipBlocks_cancel")}
                         </>
                     ) : (
                         <>
-                            <Plus className="w-4 h-4 mr-2" /> {fallback("ipBlocks_add", "Block IP")}
+                            <Plus className="w-4 h-4 mr-2" /> {t("ipBlocks_add")}
                         </>
                     )}
                 </Button>
@@ -148,14 +144,14 @@ export default function IpBlocksPage() {
             {showForm && (
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>{fallback("ipBlocks_newTitle", "New block")}</CardTitle>
+                        <CardTitle>{t("ipBlocks_newTitle")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={createBlock} className="space-y-4">
                             <div>
-                                <Label>{fallback("ipBlocks_ipLabel", "IP or CIDR")}</Label>
+                                <Label>{t("ipBlocks_ipLabel")}</Label>
                                 <Input
-                                    aria-label={fallback("ipBlocks_ipLabel", "IP or CIDR")}
+                                    aria-label={t("ipBlocks_ipLabel")}
                                     value={ip}
                                     onChange={(e) => setIp(e.target.value)}
                                     placeholder="1.2.3.4 or 192.168.0.0/24"
@@ -163,54 +159,51 @@ export default function IpBlocksPage() {
                                     required
                                 />
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {fallback(
-                                        "ipBlocks_ipHint",
-                                        "Enter a single IPv4 address or an IPv4 CIDR range.",
-                                    )}
+                                    {t("ipBlocks_ipHint")}
                                 </p>
                             </div>
                             <div>
-                                <Label>{fallback("ipBlocks_scope", "Scope")}</Label>
+                                <Label>{t("ipBlocks_scope")}</Label>
                                 <select
-                                    aria-label={fallback("ipBlocks_scope", "Scope")}
+                                    aria-label={t("ipBlocks_scope")}
                                     value={scope}
                                     onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")}
                                     className="w-full h-9 px-3 rounded-md border bg-background text-sm"
                                 >
-                                    <option value="all">{fallback("ipBlocks_scopeAll", "Entire site")}</option>
-                                    <option value="admin">{fallback("ipBlocks_scopeAdmin", "Admin only")}</option>
-                                    <option value="api">{fallback("ipBlocks_scopeApi", "API only")}</option>
+                                    <option value="all">{t("ipBlocks_scopeAll")}</option>
+                                    <option value="admin">{t("ipBlocks_scopeAdmin")}</option>
+                                    <option value="api">{t("ipBlocks_scopeApi")}</option>
                                 </select>
                             </div>
                             <div>
-                                <Label>{fallback("ipBlocks_reason", "Reason (optional)")}</Label>
+                                <Label>{t("ipBlocks_reason")}</Label>
                                 <Input
-                                    aria-label={fallback("ipBlocks_reason", "Reason (optional)")}
+                                    aria-label={t("ipBlocks_reason")}
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
-                                    placeholder={fallback("ipBlocks_reasonPlaceholder", "Abuse, spam, ...")}
+                                    placeholder={t("ipBlocks_reasonPlaceholder")}
                                 />
                             </div>
                             <div>
-                                <Label>{fallback("ipBlocks_expiresAt", "Expires at (optional)")}</Label>
+                                <Label>{t("ipBlocks_expiresAt")}</Label>
                                 <Input
-                                    aria-label={fallback("ipBlocks_expiresAt", "Expires at (optional)")}
+                                    aria-label={t("ipBlocks_expiresAt")}
                                     type="datetime-local"
                                     value={expiresAt}
                                     onChange={(e) => setExpiresAt(e.target.value)}
                                 />
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {fallback("ipBlocks_expiresHint", "Leave empty for a permanent block.")}
+                                    {t("ipBlocks_expiresHint")}
                                 </p>
                             </div>
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        {fallback("ipBlocks_saving", "Saving...")}
+                                        {t("ipBlocks_saving")}
                                     </>
                                 ) : (
-                                    fallback("ipBlocks_save", "Block IP")
+                                    t("ipBlocks_save")
                                 )}
                             </Button>
                         </form>
@@ -226,19 +219,19 @@ export default function IpBlocksPage() {
                         </div>
                     ) : blocks.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">
-                            {fallback("ipBlocks_none", "No IPs are currently blocked.")}
+                            {t("ipBlocks_none")}
                         </p>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead className="text-xs uppercase text-muted-foreground border-b">
                                     <tr>
-                                        <th className="text-left p-3">{fallback("ipBlocks_colIp", "IP / CIDR")}</th>
-                                        <th className="text-left p-3">{fallback("ipBlocks_colScope", "Scope")}</th>
-                                        <th className="text-left p-3">{fallback("ipBlocks_colReason", "Reason")}</th>
-                                        <th className="text-left p-3">{fallback("ipBlocks_colExpires", "Expires")}</th>
-                                        <th className="text-left p-3">{fallback("ipBlocks_colCreated", "Created")}</th>
-                                        <th className="text-right p-3">{fallback("ipBlocks_colActions", "Actions")}</th>
+                                        <th className="text-left p-3">{t("ipBlocks_colIp")}</th>
+                                        <th className="text-left p-3">{t("ipBlocks_colScope")}</th>
+                                        <th className="text-left p-3">{t("ipBlocks_colReason")}</th>
+                                        <th className="text-left p-3">{t("ipBlocks_colExpires")}</th>
+                                        <th className="text-left p-3">{t("ipBlocks_colCreated")}</th>
+                                        <th className="text-right p-3">{t("ipBlocks_colActions")}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -257,7 +250,7 @@ export default function IpBlocksPage() {
                                                             {new Date(b.expiresAt).toLocaleString(__dateTag)}
                                                         </span>
                                                     ) : (
-                                                        fallback("ipBlocks_permanent", "Permanent")
+                                                        t("ipBlocks_permanent")
                                                     )}
                                                 </td>
                                                 <td className="p-3 text-muted-foreground">
