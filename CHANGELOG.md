@@ -52,6 +52,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Deleting a principal left the rows that named it.** Almost everything
+  belonging to a user reaches it through a Prisma relation, so a cascade
+  removes it and the erasure sweep finds it by walking the schema. Two stores
+  do not work that way. `ResourcePermission` is polymorphic - `principalType`
+  says "role" or "user" and `principalId` holds the id, with no relation to
+  either table - so `prisma.role.delete()` cascaded nothing and the admin
+  grants list rendered a deleted role as a bare cuid, while an erased user
+  kept every per-account grant written against them. `Setting` holds one row
+  per admin under `dashboard_layout:<userId>`; the notification preferences
+  beside it are a real table and were purged, this one was never seen. Both
+  now go with the principal, through one documented sweep in
+  `principal-rows.ts` that the user erasure and the role delete share. A cuid
+  is never reissued, so a stale grant was inert rather than a way in; what was
+  wrong is that data about a person outlived their erasure.
+
+- **The same two were missing from the personal data export.** That is the
+  blind spot read from the other end: the export's gate finds a table by its
+  `@relation` to User, and these have none, so a person could be handed a
+  bundle that claimed to hold "every row in our database that references your
+  account" while permission grants recorded against them were not in it.
+  `resourcePermissions` and `dashboardLayout` are in the bundle and the README
+  now, and a core table may join on a non-relation column only when it names
+  the filter that makes the column mean one principal.
+
 - **A Turkish visitor was sent to the English page.** `localePrefix` is
   `always`, so a navigation written without a prefix is not a broken link - the
   proxy rewrites it to the default locale - which is why seventy-three of them

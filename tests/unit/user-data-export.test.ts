@@ -216,7 +216,8 @@ describe("exportUserData", () => {
         // the bundle contradict its own documentation.
         expect(Object.keys(result).sort()).toEqual([
             "accounts", "activityFeed", "apiKeys", "auditLog", "conversations",
-            "media", "messages", "modules", "notificationPrefs", "revisions",
+            "dashboardLayout", "media", "messages", "modules",
+            "notificationPrefs", "resourcePermissions", "revisions",
             "sessions", "user", "warnings",
         ]);
     });

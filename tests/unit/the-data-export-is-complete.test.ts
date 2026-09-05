@@ -120,9 +120,18 @@ describe("the core tables", () => {
                 wrong.push(`${table.model} is not in the core schema`);
                 continue;
             }
-            if (!model.userColumns.includes(table.column)) {
-                wrong.push(`${table.model}.${table.column} is not a User foreign key (has ${model.userColumns.join(", ")})`);
+            if (model.userColumns.includes(table.column)) continue;
+            // A polymorphic principal has no foreign key to anything: the
+            // column holds a role id as readily as a user id, and the entry
+            // says which with a `where`. Requiring that filter is what keeps
+            // "no relation" from becoming "any column will do".
+            if (table.where && Object.keys(table.where).length > 0) {
+                if (!model.columns.includes(table.column)) {
+                    wrong.push(`${table.model}.${table.column} is not a column of the model`);
+                }
+                continue;
             }
+            wrong.push(`${table.model}.${table.column} is not a User foreign key (has ${model.userColumns.join(", ")})`);
         }
         expect(wrong).toEqual([]);
     });

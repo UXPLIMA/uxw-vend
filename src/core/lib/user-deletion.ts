@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { ModuleUserDataTables } from "@/core/generated/module-registry";
+import { purgeUserPrincipalRows } from "./principal-rows";
 
 /**
  * "Right to be forgotten" soft-deletion.
@@ -122,6 +123,12 @@ export async function softDeleteUser(
         for (const entry of [...CORE_MODELS_TO_PURGE, ...modulePurgeTargets()]) {
             await safeDeleteMany(entry.model, { [entry.column]: userId });
         }
+
+        // The two stores that hold a user without a relation to `User`, so
+        // neither the loop above nor a database cascade reaches them: the
+        // polymorphic permission grants and the dashboard arrangement whose
+        // Setting key embeds the id.
+        await purgeUserPrincipalRows(userId);
 
         // Anonymise the User row. Email/username are rewritten to keep
         // the @unique constraints satisfied while being obviously

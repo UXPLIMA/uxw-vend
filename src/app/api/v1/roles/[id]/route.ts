@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { roleSchema } from "@/core/lib/validations";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { purgeRolePrincipalRows } from "@/core/lib/principal-rows";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -107,6 +108,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     await prisma.role.delete({ where: { id } });
+
+    // `ResourcePermission` names its principal with a plain string, so the
+    // delete above cascades nothing: a deleted role's grants stayed in the
+    // table and showed in the admin list as a bare cuid.
+    await purgeRolePrincipalRows(id);
 
     logActivity({
         userId: session.user.id,
