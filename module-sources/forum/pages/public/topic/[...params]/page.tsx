@@ -11,7 +11,7 @@ import { Button, Card, CardContent, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 import { useTranslations } from "next-intl";
 
 interface Post {

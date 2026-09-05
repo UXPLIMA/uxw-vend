@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
+import { writeError } from "@/core/lib/write-result";
 
 interface Role {
     id: string;
@@ -162,13 +163,13 @@ export default function ResourcePermissionsPage() {
                     allow: formAllow === "true",
                 }),
             });
-            if (res.ok) {
+            const failed = await writeError(res, commonT("somethingWentWrong"), t);
+            if (failed) {
+                toast.error(failed);
+            } else {
                 toast.success(fallback("rp_created", "Permission granted."));
                 resetForm();
                 fetchGrants();
-            } else {
-                const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Failed");
             }
         } finally {
             setSaving(false);

@@ -114,16 +114,16 @@ export default function AdminCouponsPage() {
                 }),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create coupon");
+            const failed = await writeError(res, t("adm_createCouponFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             resetForm();
             fetchCoupons();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

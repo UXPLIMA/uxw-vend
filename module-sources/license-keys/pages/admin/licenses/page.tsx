@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useLocalDate } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Ban, RotateCcw, Copy, Check, KeyRound } from "lucide-react";
 
 interface License {
@@ -33,6 +33,7 @@ interface License {
 
 export default function LicensesPage() {
     const t = useTranslations("licenseKeys");
+    const formatLocalDate = useLocalDate();
     const { confirm } = useConfirm();
 
     const [licenses, setLicenses] = useState<License[]>([]);
@@ -314,7 +315,7 @@ export default function LicensesPage() {
                                         </td>
                                         <td className="p-3">
                                             {license.expiresAt
-                                                ? new Date(license.expiresAt).toLocaleDateString()
+                                                ? formatLocalDate(license.expiresAt)
                                                 : t("adm_never")}
                                         </td>
                                         <td className="p-3 text-right whitespace-nowrap">

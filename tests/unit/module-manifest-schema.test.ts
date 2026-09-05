@@ -101,7 +101,14 @@ describe("moduleManifestSchema - scaffold template", () => {
                 return /\.tsx?$/.test(e.name) ? [full] : [];
             });
 
-        const deepImport = /["']@\/core\/(lib|components)\/[^"']*["']/;
+        // Anything under `@/core/` that is not the published SDK. It used to name
+        // `lib` and `components` only, and thirteen module files walked straight
+        // through the gap into `@/core/hooks/*` - two formatters the SDK simply
+        // did not carry, so the boundary was holding back the wrong thing. The
+        // generated contract types are the one exception: `@/core/generated/*` is
+        // where a module reads the shape of a contribution it declares, and that
+        // is the intended way in.
+        const deepImport = /["']@\/core\/(?!sdk\b|generated\/)[^"']*["']/;
         const violations = walk(root).flatMap((file) =>
             fs
                 .readFileSync(file, "utf8")

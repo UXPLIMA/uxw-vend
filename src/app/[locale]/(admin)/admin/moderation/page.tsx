@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { writeError } from "@/core/lib/write-result";
 
 interface ModerationItem {
     id: string;
@@ -162,9 +163,9 @@ export default function ModerationPage() {
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ ids, type, action }),
         });
-        if (!res.ok) {
-            const data = (await res.json().catch(() => null)) as { error?: string } | null;
-            toast.error(data?.error || "Failed");
+        const failed = await writeError(res, commonT("somethingWentWrong"), t);
+        if (failed) {
+            toast.error(failed);
             return false;
         }
         return true;

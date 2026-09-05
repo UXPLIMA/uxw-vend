@@ -7,6 +7,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -17,6 +18,7 @@ interface Category {
 export default function NewTopicPage() {
     const router = useRouter();
     const t = useTranslations('forum');
+    const commonT = useTranslations('common');
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [failed, setFailed] = useState(false);
@@ -52,16 +54,16 @@ export default function NewTopicPage() {
                 body: JSON.stringify(form),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create topic");
+            const failed = await writeError(res, t('createTopicFailed'), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             const data = await res.json();
             router.push(`/forum/topic/${data.topic.number}/${data.topic.slug}`);
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

@@ -7,6 +7,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { writeError } from "@/core/sdk";
 
 interface Department {
     id: string;
@@ -51,15 +52,15 @@ export default function NewTicketPage() {
                 body: JSON.stringify(formData),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to create ticket");
+            const failed = await writeError(res, t('createTicketFailed'), t);
+            if (failed) {
+                throw new Error(failed);
             }
 
             const ticket = await res.json();
             router.push(`/support/${ticket.id}`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError(err instanceof Error ? err.message : commonT('somethingWentWrong'));
         } finally {
             setLoading(false);
         }

@@ -67,7 +67,7 @@ export default function GiftCodesPage() {
             setShowForm(false);
             setPage(1);
             fetchCodes(1);
-        } else toast.error("Failed to generate");
+        } else toast.error(t("adm_giftCodeFailed"));
         setSaving(false);
     };
 

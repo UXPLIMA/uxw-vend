@@ -45,7 +45,7 @@ export function ReferralTab() {
         const link = `${window.location.origin}?ref=${data.referralCode}`;
         navigator.clipboard.writeText(link);
         setCopied(true);
-        toast.success("Link copied to clipboard");
+        toast.success(t("linkCopied"));
         setTimeout(() => setCopied(false), 2000);
     };
 

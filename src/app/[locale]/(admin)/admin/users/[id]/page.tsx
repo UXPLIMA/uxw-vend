@@ -13,7 +13,7 @@ import { Label } from "@/core/components/ui/label";
 import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle, UserCog } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
-import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { useConfirm, usePrompt } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
@@ -47,6 +47,7 @@ export default function AdminUserDetailPage() {
     const userId = params.id as string;
     const { data: session, update: updateSession } = useSession();
     const { confirm } = useConfirm();
+    const ask = usePrompt();
 
     const [user, setUser] = useState<UserDetail | null>(null);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -418,7 +419,11 @@ export default function AdminUserDetailPage() {
                                     variant="destructive"
                                     size="sm"
                                     onClick={async () => {
-                                        const reason = prompt("Ban reason (optional):");
+                                        const reason = await ask({
+                                            title: t("users_banUser"),
+                                            message: t("users_banReasonLabel"),
+                                            placeholder: t("users_banReasonPlaceholder"),
+                                        });
                                         if (reason === null) return;
                                         const res = await fetch(`/api/v1/users/${userId}`, {
                                             method: "PATCH",
@@ -582,7 +587,7 @@ export default function AdminUserDetailPage() {
                                     id={deleteReasonId}
                                     value={deleteReason}
                                     onChange={(e) => setDeleteReason(e.target.value)}
-                                    placeholder="e.g. GDPR request ticket #123"
+                                    placeholder={t("users_reasonPlaceholder")}
                                 />
                             </div>
                         </div>

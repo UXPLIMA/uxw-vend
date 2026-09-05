@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor } from "@/core/sdk/ui";
 import { Loader2, Plus, X } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -20,6 +21,7 @@ interface Category {
 
 export default function AdminForumCategoriesPage() {
     const t = useTranslations("forum");
+    const commonT = useTranslations("common");
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -64,9 +66,9 @@ export default function AdminForumCategoriesPage() {
                 body: JSON.stringify(form),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create category");
+            const failed = await writeError(res, t("adm_createCategoryFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
@@ -74,7 +76,7 @@ export default function AdminForumCategoriesPage() {
             setForm({ name: "", description: "", icon: "", color: "#6366f1", order: 0 });
             fetchCategories();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

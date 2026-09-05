@@ -51,3 +51,17 @@ export { Breadcrumb } from "@/core/components/ui/breadcrumb";
 // for both, so a module that fetches its own content needs this panel as much
 // as core does.
 export { LoadFailed } from "@/core/components/ui/load-failed";
+
+// The browser's `prompt()` renders in the browser's chrome, in the browser's
+// language, and some contexts suppress it outright. Two admin screens asked
+// for a reason that way. This is the same dialog `useConfirm` opens, with a
+// field in it.
+export { usePrompt, type PromptOptions } from "@/core/components/ui/confirm-dialog";
+
+// Two formatters bound to the reader's locale. They were core-only, so eleven
+// modules reached past the SDK for them and three others fell back to a bare
+// `toLocaleDateString()`, which formats in the browser's language whatever the
+// site is set to. The boundary check now catches that reach, so these have to
+// be here.
+export { useLocalDate } from "@/core/hooks/useLocalDate";
+export { useRelativeTime } from "@/core/hooks/useRelativeTime";

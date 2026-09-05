@@ -2,7 +2,7 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -74,6 +74,11 @@
   "translations": {
     "en": {
       "staff": {
+        "adm_applicationUpdated": "Application updated",
+        "adm_rejectReasonLabel": "Why is this application being rejected?",
+        "adm_rejectReasonPlaceholder": "Optional - kept with the application",
+        "adm_rejectTitle": "Reject application",
+        "adm_writeFailed": "That change could not be saved.",
         "title": "Our team",
         "description": "Meet our staff members",
         "members": "Staff Members",
@@ -163,6 +168,11 @@
     },
     "tr": {
       "staff": {
+        "adm_applicationUpdated": "Başvuru güncellendi",
+        "adm_rejectReasonLabel": "Bu başvuru neden reddediliyor?",
+        "adm_rejectReasonPlaceholder": "İsteğe bağlı - başvuruyla birlikte saklanır",
+        "adm_rejectTitle": "Başvuruyu reddet",
+        "adm_writeFailed": "Bu değişiklik kaydedilemedi.",
         "title": "Ekibimiz",
         "description": "Ekip uyelerimizle tanisin",
         "members": "Ekip Uyeleri",

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import "react-quill-new/dist/quill.snow.css";
 
 interface RichTextEditorProps {
@@ -32,10 +33,11 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
 export function RichTextEditor({
     value,
     onChange,
-    placeholder = "Write your content here...",
+    placeholder,
     className = "",
     labelledBy,
 }: RichTextEditorProps) {
+    const t = useTranslations("common");
     // Quill modules configuration
     const modules = useMemo(
         () => ({
@@ -89,7 +91,7 @@ export function RichTextEditor({
                 onChange={onChange}
                 modules={modules}
                 formats={formats}
-                placeholder={placeholder}
+                placeholder={placeholder ?? t("writeContentHere")}
                 className="bg-background rounded-md"
             />
             <style jsx global>{`

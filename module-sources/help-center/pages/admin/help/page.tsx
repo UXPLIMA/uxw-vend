@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea } from "@/core/sdk/ui";
 import { Loader2, Plus, X } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface HelpCategory {
     id: string;
@@ -30,6 +31,7 @@ interface HelpArticle {
 
 export default function AdminHelpCenterPage() {
     const t = useTranslations("helpCenter");
+    const commonT = useTranslations("common");
     const [categories, setCategories] = useState<HelpCategory[]>([]);
     const [articles, setArticles] = useState<HelpArticle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -83,16 +85,16 @@ export default function AdminHelpCenterPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(articleForm),
             });
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create article");
+            const failed = await writeError(res, t("adm_createArticleFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
             setShowArticleForm(false);
             setArticleForm({ title: "", content: "", categoryId: "", isActive: true });
             fetchData();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSavingArticle(false);
         }
@@ -108,16 +110,16 @@ export default function AdminHelpCenterPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(categoryForm),
             });
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create category");
+            const failed = await writeError(res, t("adm_createCategoryFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
             setShowCategoryForm(false);
             setCategoryForm({ name: "", description: "", icon: "", image: "", isActive: true });
             fetchData();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSavingCategory(false);
         }

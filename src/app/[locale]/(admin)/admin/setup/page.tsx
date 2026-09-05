@@ -271,7 +271,7 @@ export default function SetupWizardPage() {
                             <Label>{t("setup_logo")}</Label>
                             <div className="flex items-center gap-4 mt-1">
                                 {logoPreview ? (
-                                    <Image src={logoPreview} alt="Logo preview" width={64} height={64} className="w-16 h-16 rounded-lg object-contain border" />
+                                    <Image src={logoPreview} alt={commonT("preview")} width={64} height={64} className="w-16 h-16 rounded-lg object-contain border" />
                                 ) : (
                                     <div className="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center text-muted-foreground">
                                         <ImageIcon className="w-6 h-6" />

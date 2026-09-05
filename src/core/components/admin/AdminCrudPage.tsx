@@ -116,13 +116,13 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             body: JSON.stringify(payload),
         });
 
-        if (res.ok) {
-            toast.success(editingId ? "Updated" : "Created");
+        const failed = await writeError(res, commonT("somethingWentWrong"), ct);
+        if (failed) {
+            toast.error(failed);
+        } else {
+            toast.success(ct(editingId ? "crud_updated" : "crud_created"));
             resetForm();
             fetchItems();
-        } else {
-            const data = await res.json().catch(() => ({}));
-            toast.error(data.error || "Failed");
         }
         setSaving(false);
     };

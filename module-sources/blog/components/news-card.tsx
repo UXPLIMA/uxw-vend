@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useLocalDate } from "@/core/hooks/useLocalDate";
+import { useLocalDate } from "@/core/sdk/ui";
 
 interface BlogPost {
     id: string;

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
 import { Button } from "@/core/sdk/ui";
-import { useLocalDate } from "@/core/hooks/useLocalDate";
+import { useLocalDate } from "@/core/sdk/ui";
 import { ChevronRight, ChevronLeft, Newspaper } from "lucide-react";
 import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";

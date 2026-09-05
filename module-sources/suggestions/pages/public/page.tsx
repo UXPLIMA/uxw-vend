@@ -9,7 +9,7 @@ import { Button, Card, CardContent, Input, LoadFailed, Textarea } from "@/core/s
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { stripHtmlTags } from "@/core/sdk";
-import { useLocalDate } from "@/core/hooks/useLocalDate";
+import { useLocalDate } from "@/core/sdk/ui";
 import { toast } from "sonner";
 import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
 
@@ -101,8 +101,7 @@ export default function SuggestionsPage() {
             } else if (res.status === 401) {
                 requireLogin();
             } else {
-                const body = await res.json().catch(() => ({}));
-                toast.error(body.error || "Failed to submit suggestion");
+                toast.error(t("submitFailed"));
             }
         } finally {
             setSaving(false);

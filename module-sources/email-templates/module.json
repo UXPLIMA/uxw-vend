@@ -2,7 +2,7 @@
   "id": "email-templates",
   "name": "Email Templates",
   "description": "Email service configuration and templates",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -30,6 +30,7 @@
         "menu_email-templates_email_settings": "Email Settings"
       },
       "emailTemplates": {
+        "adm_resetSubjectPlaceholder": "Reset your password",
         "title": "Email System",
         "settings": "Email Settings",
         "smtpHost": "SMTP Host",
@@ -96,6 +97,7 @@
         "menu_email-templates_email_settings": "E-posta Ayarları"
       },
       "emailTemplates": {
+        "adm_resetSubjectPlaceholder": "Şifrenizi sıfırlayın",
         "title": "E-posta Sistemi",
         "settings": "E-posta Ayarları",
         "smtpHost": "SMTP Sunucusu",

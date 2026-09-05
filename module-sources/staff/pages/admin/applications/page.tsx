@@ -3,10 +3,10 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, usePrompt } from "@/core/sdk/ui";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { dateLocaleTag } from "@/core/sdk";
+import { dateLocaleTag, writeError } from "@/core/sdk";
 
 interface Application {
     id: string;
@@ -43,6 +43,7 @@ export default function StaffApplicationsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("staff");
+    const ask = usePrompt();
     const [apps, setApps] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("");
@@ -57,13 +58,27 @@ export default function StaffApplicationsPage() {
     useEffect(() => { fetchApps(); }, []);
 
     const updateStatus = async (id: string, status: string) => {
-        const adminNote = status === "rejected" ? prompt("Rejection reason (optional):") : null;
+        let adminNote: string | null = null;
+        if (status === "rejected") {
+            adminNote = await ask({
+                title: t("adm_rejectTitle"),
+                message: t("adm_rejectReasonLabel"),
+                placeholder: t("adm_rejectReasonPlaceholder"),
+            });
+            // Backing out of the reason backs out of the rejection: the
+            // browser prompt returned null here too, and the code sent it
+            // anyway, so a stray Escape rejected the application.
+            if (adminNote === null) return;
+        }
         const res = await fetch(`/api/v1/staff-applications/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status, adminNote }),
         });
-        if (res.ok) { toast.success(`Application ${status}`); fetchApps(); }
+        const failed = await writeError(res, t("adm_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
+        toast.success(t("adm_applicationUpdated"));
+        fetchApps();
     };
 
     const filtered = filter ? apps.filter((a) => a.status === filter) : apps;
