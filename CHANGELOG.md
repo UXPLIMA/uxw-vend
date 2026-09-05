@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Three API responses handed back columns the schema keeps secret.**
+  Prisma returns every column when a query names no `select`, so a handler that
+  writes a row and answers with what it got back ships the whole row.
+  `POST /api/v1/servers` and `PATCH /api/v1/servers/[id]` returned the
+  encrypted RCON password the admin had just typed, together with the RCON
+  port it opens, into the browser and whatever sits between: a proxy log, an
+  error reporter, the page's memory. The list endpoint next to them had always
+  selected around both. `GET /api/v1/sessions` returned `tokenId`, the claim
+  the JWT carries and the key that table is looked up by when a session is
+  checked for revocation. None of the three was read by the screen that asked:
+  the device list uses the name, the address and the last-seen time, and the
+  admin table reloads itself after a write.
+
+  All three now select. The server fields live in one list,
+  `module-sources/servers/lib/server-fields.ts`, used by the read and both
+  writes. `tests/unit/secret-columns-are-selected.test.ts` reads the secret
+  column names out of the schemas rather than carrying its own list, so a model
+  added later is covered on the day it lands, and fails the build when a
+  handler answers with a row it did not narrow.
 - **Correction to the entry below: the served 404 body is still empty.**
   Removing the nested document from `app/[locale]/not-found.tsx` was right and
   is what the prerendered `_not-found.html` needed - that file now carries the
