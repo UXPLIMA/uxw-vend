@@ -1,9 +1,27 @@
 /**
- * Generate OpenAPI 3.0 spec from module manifests + core endpoints.
+ * Generate the OpenAPI 3.0 spec that /admin/api-docs renders.
  *
- * Reads all modules from src/modules, walks each module.json's `api` array,
- * combines with a hardcoded list of core endpoints, and writes a single
- * static JSON file at src/core/generated/openapi.json.
+ * Every operation in the spec is discovered from code that exists:
+ *
+ *   - Core operations come from the verbs each `src/app/api/**\/route.ts`
+ *     actually exports.
+ *   - Module operations come from the verbs each declared handler exports,
+ *     with the manifest's `method` as the fallback when the file cannot be
+ *     read.
+ *
+ * CORE_ENDPOINT_DOCS below adds prose - a summary, a request body, the
+ * response codes - to operations that have it. It cannot add an operation:
+ * an entry naming a path and verb no route exports is a build error.
+ *
+ * It used to work the other way round. The core half was a hand-written list
+ * of twenty-nine operations against a real surface of a hundred and
+ * thirty-five, and two of the twenty-nine did not exist: `POST
+ * /api/v1/auth/login`, which is the first call anyone integrating writes and
+ * which 404s because sign-in goes through Auth.js, and `DELETE
+ * /api/v1/users/{id}`, which no file exports. The module half guessed: an
+ * entry with no explicit `method` was published as GET and POST, so
+ * thirty-nine of sixty-three installed endpoints were documented with verbs
+ * they reject while the DELETE and PATCH they do accept went unmentioned.
  *
  * Runs as part of `prebuild`. Can also be invoked manually:
  *   npx tsx scripts/generate-openapi.ts
@@ -13,6 +31,7 @@ import fs from "fs";
 import path from "path";
 
 const MODULES_DIR = path.join(process.cwd(), "src/modules");
+const CORE_API_DIR = path.join(process.cwd(), "src/app/api");
 const OUTPUT_FILE = path.join(
     process.cwd(),
     "src/core/generated/openapi.json",
@@ -73,15 +92,22 @@ interface CoreEndpoint {
     responses?: OpenApiOperation["responses"];
 }
 
-// Hand-written core endpoints. Keep this list focused on the most
-// important entry points - authoritative surface of the core API.
-const CORE_ENDPOINTS: CoreEndpoint[] = [
+/**
+ * Prose for core operations that deserve more than their path and verb.
+ * Every entry must name a route that exports that verb; `generate()` exits if
+ * one does not. Operations with no entry here are still published, with a
+ * summary built from the method and the path.
+ */
+const CORE_ENDPOINT_DOCS: CoreEndpoint[] = [
     // --- Auth ---
     {
-        path: "/api/v1/auth/login",
+        // Sign-in is Auth.js, not a core route: this is where the credentials
+        // actually go. The list used to claim `/api/v1/auth/login`, which no
+        // file has ever exported.
+        path: "/api/auth/{nextauth}",
         method: "post",
-        summary: "Log in with credentials",
-        description: "Authenticate a user with email/username and password; returns a session cookie and enforces 2FA when enabled.",
+        summary: "Sign in, sign out, callback, session (Auth.js)",
+        description: "Authenticate a user with email/username and password; returns a session cookie and enforces 2FA when enabled. The trailing segment selects the Auth.js action, e.g. `callback/credentials`.",
         tags: ["Auth"],
         requestBody: {
             content: {
@@ -212,23 +238,6 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
             },
         ],
         responses: { "200": { description: "Updated" } },
-    },
-    {
-        path: "/api/v1/users/{id}",
-        method: "delete",
-        summary: "Delete user (admin)",
-        description: "Permanently delete a user account and its owned records; admin-only.",
-        tags: ["Users"],
-        secured: true,
-        parameters: [
-            {
-                name: "id",
-                in: "path",
-                required: true,
-                schema: { type: "string" },
-            },
-        ],
-        responses: { "204": { description: "Deleted" } },
     },
 
     // --- Roles ---
@@ -430,6 +439,101 @@ const CORE_ENDPOINTS: CoreEndpoint[] = [
     },
 ];
 
+/** One operation some file in this repository actually exports. */
+interface DiscoveredOperation {
+    path: string;
+    method: HttpMethod;
+    file: string;
+    secured: boolean;
+}
+
+const HTTP_METHODS: HttpMethod[] = ["get", "post", "put", "patch", "delete"];
+
+/**
+ * The verbs a route file exports. Both spellings occur in this codebase:
+ * `export async function GET` for a handler written here, and
+ * `export const { GET, POST } = handlers` for the Auth.js route.
+ */
+function exportedMethods(source: string): HttpMethod[] {
+    const found = new Set<HttpMethod>();
+    for (const m of source.matchAll(/export\s+(?:async\s+)?(?:function|const)\s+(GET|POST|PUT|PATCH|DELETE)\b/g)) {
+        found.add(m[1].toLowerCase() as HttpMethod);
+    }
+    for (const m of source.matchAll(/export\s+const\s*\{([^}]*)\}/g)) {
+        for (const name of m[1].split(",")) {
+            const verb = name.split(":")[0].trim().toLowerCase();
+            if ((HTTP_METHODS as string[]).includes(verb)) found.add(verb as HttpMethod);
+        }
+    }
+    return HTTP_METHODS.filter((m) => found.has(m));
+}
+
+/**
+ * Whether the handler refuses an anonymous caller. Read off the source rather
+ * than declared, because a `secured: true` that nobody checks is the same
+ * class of claim this whole file exists to stop making.
+ */
+function looksSecured(source: string): boolean {
+    // No trailing \b: `auth()` ends in `)` and the `;` after it is not a word
+    // character either, so the boundary never matched and the only endpoint
+    // guarded by `await auth()` alone was published as open.
+    return /\bauth\(\)/.test(source) || /\b(isAdmin|requireAdmin|requireApiKey|authenticateApiKey|getServerSession)\b/.test(source);
+}
+
+/**
+ * The module dispatcher. Its five verbs stand for every installed module's
+ * routes, which are published from the manifests instead, so publishing the
+ * wildcard as well would document one path that swallows two hundred.
+ */
+const NOT_AN_OPERATION = ["/api/v1/{path}"];
+
+/** Every operation core exports, discovered from the route files. */
+function discoverCoreOperations(): DiscoveredOperation[] {
+    const out: DiscoveredOperation[] = [];
+    const walk = (dir: string, url: string) => {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                walk(full, `${url}/${entry.name}`);
+                continue;
+            }
+            if (entry.name !== "route.ts") continue;
+            const openApiPath = url
+                .replace(/\[\.\.\.(.+?)\]/g, "{$1}")
+                .replace(/\[(.+?)\]/g, "{$1}");
+            if (NOT_AN_OPERATION.includes(openApiPath)) continue;
+            const source = fs.readFileSync(full, "utf8");
+            const secured = looksSecured(source);
+            for (const method of exportedMethods(source)) {
+                out.push({ path: openApiPath, method, file: path.relative(process.cwd(), full), secured });
+            }
+        }
+    };
+    walk(CORE_API_DIR, "/api");
+    return out;
+}
+
+/** Which group an undocumented core operation is filed under. */
+function tagFor(url: string): string {
+    const rules: [RegExp, string][] = [
+        [/^\/api\/auth\//, "Auth"],
+        [/^\/api\/v1\/auth\//, "Auth"],
+        [/^\/api\/v1\/admin\//, "Admin"],
+        [/^\/api\/v1\/users\b/, "Users"],
+        [/^\/api\/v1\/(roles|permissions|resource-permissions)\b/, "Roles"],
+        [/^\/api\/v1\/modules\b/, "Modules"],
+        [/^\/api\/v1\/(settings|public-settings|themes)\b/, "Settings"],
+        [/^\/api\/v1\/(media|upload)\b/, "Media"],
+        [/^\/api\/v1\/search\b/, "Search"],
+        [/^\/api\/v1\/api-keys\b/, "API Keys"],
+        [/^\/api\/v1\/stats\b/, "Stats"],
+        [/^\/api\/(health|v1\/(metrics|cron|backup))\b/, "System"],
+    ];
+    for (const [pattern, tag] of rules) if (pattern.test(url)) return tag;
+    return "Core";
+}
+
 // Read installed modules from disk (mirrors generate-registry.ts approach).
 function loadModules(): ModuleManifestLite[] {
     if (!fs.existsSync(MODULES_DIR)) return [];
@@ -469,15 +573,28 @@ function normalizePath(modulePath: string): string {
         .replace(/\[(.+?)\]/g, "{$1}");
 }
 
-function methodsForManifestEntry(
-    method: ModuleApiEntry["method"],
+/**
+ * The verbs a module endpoint really answers.
+ *
+ * A manifest's `method` is optional and sixty of the sixty-three installed
+ * entries omit it, which used to be published as "GET and POST" - a guess
+ * that was wrong for thirty-nine of them, advertising verbs the handler
+ * rejects while leaving out every DELETE and PATCH it accepts. The handler
+ * file says which verbs it exports, so read it; the manifest is the fallback
+ * for a handler that cannot be read.
+ */
+function methodsForModuleEntry(
+    moduleDir: string,
+    entry: ModuleApiEntry,
 ): HttpMethod[] {
-    if (!method || method === "ALL") {
-        // A handler exporting multiple HTTP verbs is common in Next App Router.
-        // For the OpenAPI surface, default to the most common verbs.
-        return ["get", "post"];
+    const handler = path.join(moduleDir, entry.handler.replace(/^\.?\//, ""));
+    if (fs.existsSync(handler)) {
+        const exported = exportedMethods(fs.readFileSync(handler, "utf8"));
+        if (exported.length > 0) return exported;
     }
-    return [method.toLowerCase() as HttpMethod];
+    if (entry.method && entry.method !== "ALL") return [entry.method.toLowerCase() as HttpMethod];
+    console.warn(`[openapi] ${entry.path}: no verbs found in ${entry.handler}, publishing GET`);
+    return ["get"];
 }
 
 function buildPathsFromModules(
@@ -489,7 +606,7 @@ function buildPathsFromModules(
         if (!mod.api) continue;
         for (const entry of mod.api) {
             const openApiPath = normalizePath(entry.path);
-            const methods = methodsForManifestEntry(entry.method);
+            const methods = methodsForModuleEntry(path.join(MODULES_DIR, mod.id), entry);
 
             if (!paths[openApiPath]) paths[openApiPath] = {};
             const pathItem = paths[openApiPath];
@@ -531,29 +648,65 @@ function buildPathsFromModules(
     return paths;
 }
 
-function buildPathsFromCore(): Record<string, PathItem> {
+/** Path parameters read straight out of the URL template. */
+function pathParameters(url: string): OpenApiOperation["parameters"] {
+    const names = Array.from(url.matchAll(/\{(.+?)\}/g)).map((m) => m[1]);
+    if (names.length === 0) return undefined;
+    return names.map((name) => ({
+        name,
+        in: "path" as const,
+        required: true,
+        schema: { type: "string" },
+    }));
+}
+
+/**
+ * The core half of the spec: one operation per exported verb, with the prose
+ * from CORE_ENDPOINT_DOCS layered on where there is any. Exits if a doc entry
+ * names an operation no route exports - that is how the two dead entries got
+ * to ship, and it must not be possible again.
+ */
+function buildPathsFromCore(operations: DiscoveredOperation[]): Record<string, PathItem> {
+    const docs = new Map<string, CoreEndpoint>();
+    for (const ep of CORE_ENDPOINT_DOCS) docs.set(`${ep.method} ${ep.path}`, ep);
+
+    const real = new Set(operations.map((op) => `${op.method} ${op.path}`));
+    const dead = [...docs.keys()].filter((k) => !real.has(k));
+    if (dead.length > 0) {
+        console.error(
+            `[openapi] ${dead.length} documented operation(s) that no route exports:\n  ` +
+                dead.map((d) => d.replace(/^(\w+) /, (_, verb) => `${verb.toUpperCase()} `)).join("\n  ") +
+                "\nRemove the entry, or add the handler.",
+        );
+        process.exit(1);
+    }
+
     const paths: Record<string, PathItem> = {};
-    for (const ep of CORE_ENDPOINTS) {
-        if (!paths[ep.path]) paths[ep.path] = {};
+    for (const operation of operations) {
+        const doc = docs.get(`${operation.method} ${operation.path}`);
         const op: OpenApiOperation = {
-            summary: ep.summary,
-            tags: ep.tags,
-            responses: ep.responses || {
-                "200": { description: "Success" },
-            },
+            summary: doc?.summary ?? `${operation.method.toUpperCase()} ${operation.path}`,
+            tags: doc?.tags ?? [tagFor(operation.path)],
+            responses: doc?.responses ?? { "200": { description: "Success" } },
         };
-        if (ep.description) op.description = ep.description;
-        if (ep.secured) op.security = [{ bearerAuth: [] }];
-        if (ep.parameters) op.parameters = ep.parameters;
-        if (ep.requestBody) op.requestBody = ep.requestBody;
-        paths[ep.path][ep.method] = op;
+        if (doc?.description) op.description = doc.description;
+        // Declared beats detected, but detection is what covers the
+        // operations nobody wrote an entry for.
+        if (doc ? doc.secured : operation.secured) op.security = [{ bearerAuth: [] }];
+        const parameters = doc?.parameters ?? pathParameters(operation.path);
+        if (parameters) op.parameters = parameters;
+        if (doc?.requestBody) op.requestBody = doc.requestBody;
+
+        if (!paths[operation.path]) paths[operation.path] = {};
+        paths[operation.path][operation.method] = op;
     }
     return paths;
 }
 
 function generate() {
     const modules = loadModules();
-    const corePaths = buildPathsFromCore();
+    const coreOperations = discoverCoreOperations();
+    const corePaths = buildPathsFromCore(coreOperations);
     const modulePaths = buildPathsFromModules(modules);
 
     // Merge - core paths win in the event of a collision (should not happen
@@ -572,7 +725,7 @@ function generate() {
         info: {
             title: "uxwVend API",
             description:
-                "Auto-generated API surface for uxwVend. Core endpoints are hand-curated; module endpoints are derived from each installed module's `module.json` manifest.",
+                "The API surface uxwVend exports, discovered from the code: core operations from the verbs each route file exports, module operations from the verbs each declared handler exports. Nothing here is documented that is not implemented.",
             version: "1.0.0",
             contact: {
                 name: "uxwVend",
@@ -606,6 +759,8 @@ function generate() {
             { name: "API Keys", description: "API key management" },
             { name: "System", description: "Health, metrics, backups" },
             { name: "Stats", description: "Dashboard statistics" },
+            { name: "Admin", description: "Administration endpoints" },
+            { name: "Core", description: "Everything else core exports" },
             ...moduleTags,
         ],
     };
@@ -615,8 +770,10 @@ function generate() {
 
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(spec, null, 2));
     const pathCount = Object.keys(paths).length;
+    const opCount = Object.values(paths).reduce((n, item) => n + Object.keys(item).length, 0);
     console.log(
-        `[openapi] Wrote ${OUTPUT_FILE} - ${pathCount} paths (${modules.length} modules scanned)`,
+        `[openapi] Wrote ${OUTPUT_FILE} - ${pathCount} paths, ${opCount} operations ` +
+            `(${coreOperations.length} from core routes, ${modules.length} modules scanned)`,
     );
 }
 

@@ -8,6 +8,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The API Reference described endpoints that do not exist, and left out a
+  hundred that do.** `/admin/api-docs` renders a generated OpenAPI document,
+  and it is the only description of this platform's HTTP surface anyone gets.
+  Both halves of it were written rather than read.
+
+  The core half was a hand-written list of twenty-nine operations against a
+  real surface of a hundred and thirty-two, and two of the twenty-nine had no
+  implementation at all. `POST /api/v1/auth/login` is the first call anyone
+  integrating writes, and no file has ever exported it: sign-in goes through
+  Auth.js at `/api/auth/[...nextauth]`. `DELETE /api/v1/users/{id}` promised
+  an account-deletion endpoint, while `src/app/api/v1/users/[id]/route.ts`
+  exports GET and PATCH and nothing else.
+
+  The module half guessed. A manifest's `method` is optional, sixty of the
+  sixty-three installed entries omit it, and each of those was published as
+  "GET and POST". Thirty-nine of the sixty-three were wrong:
+
+      /api/v1/announcements/{id}   published GET POST   exports DELETE PATCH
+      /api/v1/store/cart           published GET POST   exports GET POST DELETE
+      /api/v1/store/checkout       published GET POST   exports POST
+      /api/v1/gift-codes/{id}      published GET POST   exports DELETE
+
+  Every DELETE and PATCH in the installed module surface was missing from the
+  reference, and every GET-only endpoint was advertised as accepting POST.
+
+  Both halves are discovered from the exported verbs now: core from each
+  `src/app/api/**/route.ts`, modules from each declared handler, with the
+  manifest's `method` as the fallback for a handler that cannot be read. The
+  document went from 84 paths to 159, and from a guess to a reading. Prose is
+  still hand-written, in `CORE_ENDPOINT_DOCS`, but it can no longer invent an
+  operation: an entry naming a path and verb nothing exports fails the build.
+  The module dispatcher stays out, so one wildcard path does not stand in for
+  two hundred real ones.
+
+  Whether an operation needs credentials is read off the handler too. The
+  detector missed `await auth();` because the pattern ended in a word boundary
+  and `)` is not a word character, so the one admin endpoint guarded by that
+  alone, `POST /api/v1/admin/impersonate/stop`, was published as open.
+
 - **Nine core pages had no title and no description of their own.** Only
   `generateMetadata` can name a page, it is a server export, and these pages
   are client components, so the root layout's `title.default` was all that was
