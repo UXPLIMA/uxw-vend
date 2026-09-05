@@ -12,6 +12,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 interface Grant {
     id: string;
@@ -181,11 +182,7 @@ export default function ResourcePermissionsPage() {
                                             <span className="font-medium">{g.principalLabel}</span>
                                         </span>
                                         <span
-                                            className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono w-fit ${
-                                                g.allow
-                                                    ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
-                                                    : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                                            }`}
+                                            className={badgeClassName(g.allow ? "success" : "danger", "uppercase font-mono w-fit")}
                                         >
                                             {g.allow
                                                 ? t("rp_allow")

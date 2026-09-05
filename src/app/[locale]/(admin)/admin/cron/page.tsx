@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
 
 interface CronJobRow {
     key: string;
@@ -19,10 +20,7 @@ interface CronJobRow {
     nextRunAt: string | null;
 }
 
-const STATUS_BADGE: Record<string, string> = {
-    ok: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
-    error: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
-};
+const STATUS_TONE: Record<string, BadgeTone> = { ok: "success", error: "danger" };
 
 function formatDate(value: string | null, tag: string): string {
     if (!value) return "-";
@@ -147,7 +145,7 @@ export default function CronAdminPage() {
                                                 <td className="px-4 py-3">
                                                     {job.lastStatus ? (
                                                         <span
-                                                            className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${STATUS_BADGE[job.lastStatus] || "bg-muted text-muted-foreground"}`}
+                                                            className={badgeClassName(STATUS_TONE[job.lastStatus] ?? "neutral", "uppercase font-mono")}
                                                             title={hasError ? job.lastError ?? "" : undefined}
                                                         >
                                                             {job.lastStatus}

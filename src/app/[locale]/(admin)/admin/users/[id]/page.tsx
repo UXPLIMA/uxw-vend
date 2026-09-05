@@ -381,10 +381,10 @@ export default function AdminUserDetailPage() {
                     </Card>
 
                     {/* Ban/Unban */}
-                    <Card className={user.isBanned ? "border-red-200" : ""}>
+                    <Card className={user.isBanned ? "border-destructive/30" : ""}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                {user.isBanned ? <Ban className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-green-500" />}
+                                {user.isBanned ? <Ban className="w-4 h-4 text-destructive" /> : <ShieldCheck className="w-4 h-4 text-success" />}
                                 {user.isBanned ? t("users_banned") : t("users_accountActive")}
                             </CardTitle>
                         </CardHeader>
@@ -445,7 +445,7 @@ export default function AdminUserDetailPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <UserCog className="w-4 h-4 text-yellow-600" />
+                                    <UserCog className="w-4 h-4 text-warning" />
                                     {t("users_impersonate")}
                                 </CardTitle>
                             </CardHeader>
@@ -479,7 +479,7 @@ export default function AdminUserDetailPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Download className="w-4 h-4 text-blue-500" />
+                                <Download className="w-4 h-4 text-primary" />
                                 GDPR
                             </CardTitle>
                         </CardHeader>
@@ -540,8 +540,8 @@ export default function AdminUserDetailPage() {
                         className="relative bg-card border border-[var(--uxw-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
                     >
                         <div className="flex items-start gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
                             </div>
                             <div>
                                 <h2
@@ -557,7 +557,7 @@ export default function AdminUserDetailPage() {
                         </div>
 
                         {deleteError && (
-                            <div className="mb-3 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                            <div className="mb-3 p-3 bg-destructive/10 border border-destructive/25 text-destructive text-sm rounded-lg">
                                 {deleteError}
                             </div>
                         )}
@@ -568,7 +568,7 @@ export default function AdminUserDetailPage() {
                                     {t.rich("users_deleteTypeToConfirm", {
                                         username: user.username,
                                         name: (chunks) => (
-                                            <span className="font-mono text-red-600">{chunks}</span>
+                                            <span className="font-mono text-destructive">{chunks}</span>
                                         ),
                                     })}
                                 </Label>

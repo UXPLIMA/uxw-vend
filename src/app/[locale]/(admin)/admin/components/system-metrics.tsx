@@ -32,10 +32,10 @@ export function SystemMetrics() {
     if (!data) return null;
 
     const statCards = [
-        { label: "Requests (5m)", value: data.last5min.requests, icon: Activity, color: "text-blue-500" },
-        { label: "Avg Response", value: `${data.last5min.avgResponseMs}ms`, icon: Clock, color: "text-green-500" },
-        { label: "P95 Response", value: `${data.last5min.p95ResponseMs}ms`, icon: Zap, color: "text-purple-500" },
-        { label: "Error Rate", value: `${data.last5min.errorRate}%`, icon: AlertTriangle, color: data.last5min.errorRate > 5 ? "text-red-500" : "text-green-500" },
+        { label: "Requests (5m)", value: data.last5min.requests, icon: Activity, color: "text-primary" },
+        { label: "Avg Response", value: `${data.last5min.avgResponseMs}ms`, icon: Clock, color: "text-success" },
+        { label: "P95 Response", value: `${data.last5min.p95ResponseMs}ms`, icon: Zap, color: "text-secondary" },
+        { label: "Error Rate", value: `${data.last5min.errorRate}%`, icon: AlertTriangle, color: data.last5min.errorRate > 5 ? "text-destructive" : "text-success" },
     ];
 
     return (
@@ -69,7 +69,7 @@ export function SystemMetrics() {
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                         <span>{ep.count}x</span>
                                         <span className="font-medium text-foreground">{ep.avgMs}ms</span>
-                                        {ep.errors > 0 && <span className="text-red-500">{ep.errors} err</span>}
+                                        {ep.errors > 0 && <span className="text-destructive">{ep.errors} err</span>}
                                     </div>
                                 </div>
                             ))}

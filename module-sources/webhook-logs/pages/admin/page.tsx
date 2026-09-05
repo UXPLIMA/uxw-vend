@@ -80,9 +80,9 @@ export default function WebhookLogsPage() {
                                         <tr key={log.id} className="border-b last:border-0 hover:bg-muted/50">
                                             <td className="py-3 px-4">
                                                 {log.status && log.status < 300 ? (
-                                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                                    <CheckCircle className="w-4 h-4 text-success" />
                                                 ) : (
-                                                    <XCircle className="w-4 h-4 text-red-500" />
+                                                    <XCircle className="w-4 h-4 text-destructive" />
                                                 )}
                                             </td>
                                             <td className="py-3 px-4">

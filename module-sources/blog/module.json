@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.1.15",
+  "version": "1.1.17",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -50,12 +50,14 @@
     {
       "label": "Articles",
       "path": "/blog/articles",
-      "icon": "FileText"
+      "icon": "FileText",
+      "group": "content"
     },
     {
       "label": "Blog Categories",
       "path": "/blog/categories",
-      "icon": "FolderOpen"
+      "icon": "FolderOpen",
+      "group": "content"
     }
   ],
   "api": [
@@ -263,7 +265,9 @@
         "menu_blog_0": "Articles",
         "menu_blog_1": "Blog Categories",
         "menu_blog_articles": "Articles",
-        "menu_blog_blog_categories": "Blog Categories"
+        "menu_blog_blog_categories": "Blog Categories",
+        "module_blog_name": "Blog Module",
+        "module_blog_description": "News and announcements system"
       },
       "activity": {
         "blogArticlePublished": "published:"
@@ -393,7 +397,9 @@
         "menu_blog_0": "Makaleler",
         "menu_blog_1": "Blog Kategorileri",
         "menu_blog_articles": "Makaleler",
-        "menu_blog_blog_categories": "Blog Kategorileri"
+        "menu_blog_blog_categories": "Blog Kategorileri",
+        "module_blog_name": "Blog Modülü",
+        "module_blog_description": "Haber ve duyuru sistemi"
       },
       "activity": {
         "blogArticlePublished": "yayınladı:"

@@ -2,7 +2,7 @@
   "id": "announcements",
   "name": "Announcements",
   "description": "Site-wide announcement banners",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Announcements",
       "path": "/announcements",
-      "icon": "Megaphone"
+      "icon": "Megaphone",
+      "group": "content"
     }
   ],
   "adminRoutes": [
@@ -102,7 +103,9 @@
         "menu_announcements": "Announcements",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_announcements_announcements": "Announcements"
+        "menu_announcements_announcements": "Announcements",
+        "module_announcements_name": "Announcements",
+        "module_announcements_description": "Site-wide announcement banners"
       },
       "activity": {
         "announcementCreated": "announced:"
@@ -160,7 +163,9 @@
         "menu_announcements": "Duyurular",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_announcements_announcements": "Duyurular"
+        "menu_announcements_announcements": "Duyurular",
+        "module_announcements_name": "Duyurular",
+        "module_announcements_description": "Site genelinde duyuru bantları"
       },
       "activity": {
         "announcementCreated": "duyuru yaptı:"

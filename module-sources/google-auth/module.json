@@ -2,7 +2,7 @@
   "id": "google-auth",
   "name": "Google Login",
   "description": "Allow users to sign in with their Google account",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -67,7 +67,9 @@
       },
       "admin": {
         "title": "Admin Panel",
-        "subtitle": "Manage your platform settings and content"
+        "subtitle": "Manage your platform settings and content",
+        "module_google-auth_name": "Google Login",
+        "module_google-auth_description": "Allow users to sign in with their Google account"
       }
     },
     "tr": {
@@ -98,7 +100,9 @@
       },
       "admin": {
         "title": "Yönetim Paneli",
-        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "module_google-auth_name": "Google ile Giriş",
+        "module_google-auth_description": "Kullanıcıların Google hesabıyla giriş yapmasına izin verin"
       }
     }
   }

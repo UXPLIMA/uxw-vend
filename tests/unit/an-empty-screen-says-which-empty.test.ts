@@ -50,8 +50,6 @@ const MAY_STAY_SILENT: Record<string, string> = {
         "Four independent panels; the two that answer a question - recent errors and failed emails - carry their own failure flags. Health and stats render nothing rather than a clean reading.",
     "src/app/[locale]/(admin)/admin/roles/page.tsx":
         "Loads the module permission groups offered in the role editor. The comment says what a failure means: core permissions only.",
-    "src/app/[locale]/(admin)/admin/setup/page.tsx":
-        "The logo upload inside the wizard's submit. It is a write, and it reports through writeError.",
 };
 
 function walk(dir: string, out: string[] = []): string[] {

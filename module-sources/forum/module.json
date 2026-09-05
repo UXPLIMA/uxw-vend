@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.15",
+  "version": "1.1.17",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -43,12 +43,14 @@
     {
       "label": "Forum Topics",
       "path": "/forum/topics",
-      "icon": "MessageSquare"
+      "icon": "MessageSquare",
+      "group": "community"
     },
     {
       "label": "Forum Categories",
       "path": "/forum/categories",
-      "icon": "LayoutList"
+      "icon": "LayoutList",
+      "group": "community"
     }
   ],
   "routes": [
@@ -289,7 +291,10 @@
         "next": "Next",
         "pageOf": "Page {page} of {totalPages}",
         "menu_forum_forum_topics": "Forum Topics",
-        "menu_forum_forum_categories": "Forum Categories"
+        "menu_forum_forum_categories": "Forum Categories",
+        "navGroup_community": "Community",
+        "module_forum_name": "Forum Module",
+        "module_forum_description": "Community discussion forum with categories, topics, and replies"
       },
       "activity": {
         "forumTopicCreated": "started a new topic:",
@@ -423,7 +428,10 @@
         "next": "Sonraki",
         "pageOf": "Sayfa {page} / {totalPages}",
         "menu_forum_forum_topics": "Forum Konuları",
-        "menu_forum_forum_categories": "Forum Kategorileri"
+        "menu_forum_forum_categories": "Forum Kategorileri",
+        "navGroup_community": "Topluluk",
+        "module_forum_name": "Forum Modülü",
+        "module_forum_description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
       },
       "activity": {
         "forumTopicCreated": "yeni konu açtı:",
@@ -544,5 +552,13 @@
   "permissionResources": [
     "forum.topic",
     "forum.category"
+  ],
+  "navGroups": [
+    {
+      "id": "community",
+      "label": "Community",
+      "icon": "MessagesSquare",
+      "order": 20
+    }
   ]
 }

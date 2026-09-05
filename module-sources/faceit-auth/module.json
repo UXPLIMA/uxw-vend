@@ -2,7 +2,7 @@
   "id": "faceit-auth",
   "name": "FACEIT Login",
   "description": "Allow users to sign in with their FACEIT account",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -67,7 +67,9 @@
       },
       "admin": {
         "title": "Admin Panel",
-        "subtitle": "Manage your platform settings and content"
+        "subtitle": "Manage your platform settings and content",
+        "module_faceit-auth_name": "FACEIT Login",
+        "module_faceit-auth_description": "Allow users to sign in with their FACEIT account"
       }
     },
     "tr": {
@@ -98,7 +100,9 @@
       },
       "admin": {
         "title": "Yönetim Paneli",
-        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "module_faceit-auth_name": "FACEIT ile Giriş",
+        "module_faceit-auth_description": "Kullanıcıların FACEIT hesabıyla giriş yapmasına izin verin"
       }
     }
   }

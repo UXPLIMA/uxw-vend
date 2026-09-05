@@ -10,6 +10,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 interface Warning {
     id: string;
@@ -127,11 +128,7 @@ export default function WarningsPage() {
                                                 {w.user?.username || "-"}
                                             </span>
                                             <span
-                                                className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${
-                                                    w.isActive
-                                                        ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                                                        : "bg-muted text-muted-foreground"
-                                                }`}
+                                                className={badgeClassName(w.isActive ? "danger" : "neutral", "uppercase font-mono")}
                                             >
                                                 {w.isActive
                                                     ? t("warnings_active")

@@ -2,7 +2,7 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -11,7 +11,8 @@
     {
       "label": "Discord",
       "path": "/discord",
-      "icon": "MessageSquare"
+      "icon": "MessageSquare",
+      "group": "settings"
     }
   ],
   "adminRoutes": [
@@ -130,7 +131,9 @@
         "saved": "Saved",
         "saveWebhooks": "Save Webhooks",
         "howToGetWebhook": "How to get a webhook URL:",
-        "menu_discord-integration_discord": "Discord"
+        "menu_discord-integration_discord": "Discord",
+        "module_discord-integration_name": "Discord Integration",
+        "module_discord-integration_description": "Discord webhook notifications and settings"
       }
     },
     "tr": {
@@ -189,7 +192,9 @@
         "saved": "Kaydedildi",
         "saveWebhooks": "Webhook'ları Kaydet",
         "howToGetWebhook": "Webhook URL nasıl alınır:",
-        "menu_discord-integration_discord": "Discord"
+        "menu_discord-integration_discord": "Discord",
+        "module_discord-integration_name": "Discord Entegrasyonu",
+        "module_discord-integration_description": "Discord webhook bildirimleri ve ayarları"
       }
     }
   }

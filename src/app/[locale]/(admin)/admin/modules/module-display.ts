@@ -4,10 +4,10 @@ import { parseDependency } from "@/core/lib/install-plan";
 import { satisfiesRange } from "@/core/lib/semver-range";
 
 export const categoryColors: Record<string, string> = {
-    commerce: "bg-blue-100 text-blue-700",
-    community: "bg-green-100 text-green-700",
-    management: "bg-purple-100 text-purple-700",
-    gaming: "bg-orange-100 text-orange-700",
+    commerce: "bg-primary/10 text-primary",
+    community: "bg-success/10 text-success",
+    management: "bg-secondary/10 text-secondary",
+    gaming: "bg-warning/10 text-warning",
     content: "bg-muted text-foreground",
 };
 

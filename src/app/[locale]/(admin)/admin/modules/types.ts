@@ -40,6 +40,12 @@ export interface MarketplaceModule {
     id: string;
     name: string;
     description: string;
+    /**
+     * Name and description per locale, carried by the catalogue itself.
+     * A module that is not installed has no rows in the Translation table,
+     * so the browser cannot look its name up the usual way.
+     */
+    i18n?: Record<string, { name: string; description: string }>;
     version: string;
     author: string;
     icon: string;

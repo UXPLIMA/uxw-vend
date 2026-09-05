@@ -2,7 +2,7 @@
   "id": "facebook-auth",
   "name": "Facebook Login",
   "description": "Allow users to sign in with their Facebook account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -44,6 +44,10 @@
         "adm_title": "Facebook Login Settings",
         "adm_subtitle": "Set up Facebook OAuth sign-in for your site.",
         "signInWith": "Sign in with Facebook"
+      },
+      "admin": {
+        "module_facebook-auth_name": "Facebook Login",
+        "module_facebook-auth_description": "Allow users to sign in with their Facebook account"
       }
     },
     "tr": {
@@ -51,6 +55,10 @@
         "adm_title": "Facebook ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Facebook ile OAuth girişini yapılandırın.",
         "signInWith": "Facebook ile giriş yap"
+      },
+      "admin": {
+        "module_facebook-auth_name": "Facebook ile Giriş",
+        "module_facebook-auth_description": "Kullanıcıların Facebook hesabıyla giriş yapmasına izin verin"
       }
     }
   }

@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.20",
+  "version": "2.2.22",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1080,7 +1080,10 @@
         "cc_commissionPercentLabel": "Creator Commission %",
         "cc_commissionPercentPlaceholder": "5",
         "cc_isActiveLabel": "Active",
-        "cc_secondarySuffix": "{discount}% off / {commission}% commission"
+        "cc_secondarySuffix": "{discount}% off / {commission}% commission",
+        "navGroup_commerce": "Commerce",
+        "module_store_name": "Store Module",
+        "module_store_description": "Complete e-commerce functionality with products, categories, cart and orders"
       },
       "activity": {
         "storeOrderCompleted": "purchased:"
@@ -1667,7 +1670,10 @@
         "cc_commissionPercentLabel": "Üretici Komisyonu %",
         "cc_commissionPercentPlaceholder": "5",
         "cc_isActiveLabel": "Aktif",
-        "cc_secondarySuffix": "%{discount} indirim / %{commission} komisyon"
+        "cc_secondarySuffix": "%{discount} indirim / %{commission} komisyon",
+        "navGroup_commerce": "Ticaret",
+        "module_store_name": "Mağaza Modülü",
+        "module_store_description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
       },
       "activity": {
         "storeOrderCompleted": "satın aldı:"

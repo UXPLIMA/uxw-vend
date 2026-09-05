@@ -42,18 +42,18 @@ const statusOptions = ["OPEN", "IN_PROGRESS", "WAITING_REPLY", "RESOLVED", "CLOS
 const priorityOptions = ["LOW", "MEDIUM", "HIGH", "URGENT"];
 
 const statusColors: Record<string, string> = {
-    OPEN: "bg-blue-100 text-blue-700",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-700",
-    WAITING_REPLY: "bg-purple-100 text-purple-700",
-    RESOLVED: "bg-green-100 text-green-700",
+    OPEN: "bg-primary/10 text-primary",
+    IN_PROGRESS: "bg-warning/10 text-warning",
+    WAITING_REPLY: "bg-secondary/10 text-secondary",
+    RESOLVED: "bg-success/10 text-success",
     CLOSED: "bg-muted text-foreground",
 };
 
 const priorityColors: Record<string, string> = {
     LOW: "bg-muted text-foreground",
-    MEDIUM: "bg-blue-100 text-blue-700",
-    HIGH: "bg-orange-100 text-orange-700",
-    URGENT: "bg-red-100 text-red-700",
+    MEDIUM: "bg-primary/10 text-primary",
+    HIGH: "bg-warning/10 text-warning",
+    URGENT: "bg-destructive/10 text-destructive",
 };
 
 interface PageProps {
@@ -181,7 +181,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
                                         <p className="text-sm font-medium">
                                             {msg.user.username}
                                             {msg.isStaffReply && (
-                                                <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{t("staff")}</span>
+                                                <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">{t("staff")}</span>
                                             )}
                                         </p>
                                         <p className="text-xs text-muted-foreground">

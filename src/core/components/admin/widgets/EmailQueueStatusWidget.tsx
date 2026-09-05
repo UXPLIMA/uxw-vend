@@ -26,7 +26,7 @@ export default async function EmailQueueStatusWidget() {
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("widget_emailQueue")}</span>
-                        <Inbox className="w-4 h-4 text-cyan-500" />
+                        <Inbox className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex items-baseline gap-3">
                         <div>
@@ -34,7 +34,7 @@ export default async function EmailQueueStatusWidget() {
                             <div className="text-[10px] uppercase text-muted-foreground">{t("widget_pending")}</div>
                         </div>
                         <div>
-                            <div className={`text-2xl font-bold ${failed > 0 ? "text-red-500" : ""}`}>{failed}</div>
+                            <div className={`text-2xl font-bold ${failed > 0 ? "text-destructive" : ""}`}>{failed}</div>
                             <div className="text-[10px] uppercase text-muted-foreground">{t("widget_failed")}</div>
                         </div>
                     </div>

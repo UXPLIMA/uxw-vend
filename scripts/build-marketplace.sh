@@ -81,6 +81,33 @@ if os.path.isfile(_existing_path):
 # place in the repo where adding a module meant editing a shared file.
 FALLBACK_CATEGORY = "content"
 
+# The locales core ships. A catalog row carries its own translations because
+# the browser reads it before the module is installed - nothing about an
+# uninstalled module is in the Translation table, so an admin browsing the
+# marketplace in Turkish was reading seventy-eight English names.
+LOCALES = sorted(
+    os.path.splitext(f)[0]
+    for f in os.listdir("messages-core")
+    if f.endswith(".json")
+)
+
+
+def catalog_i18n(manifest):
+    """{locale: {name, description}} for every locale but the manifest's own."""
+    out = {}
+    for locale in LOCALES:
+        if locale == "en":
+            continue
+        admin = ((manifest.get("translations") or {}).get(locale) or {}).get("admin") or {}
+        name = admin.get(f"module_{manifest['id']}_name")
+        description = admin.get(f"module_{manifest['id']}_description")
+        if name or description:
+            out[locale] = {
+                "name": name or manifest["name"],
+                "description": description or manifest.get("description", ""),
+            }
+    return out
+
 # The SDK boundary, scanned as text so a violation can't reach a ZIP. The
 # authoritative check with explanations is scripts/validate-module.ts; this is
 # the same rule applied to every module at once.
@@ -152,6 +179,7 @@ for name in sorted(os.listdir(SOURCES_DIR)):
         "id": m["id"],
         "name": m["name"],
         "description": m.get("description", ""),
+        "i18n": catalog_i18n(m),
         "version": version,
         "coreVersion": m.get("coreVersion"),
         "author": m.get("author", "uxwVend"),

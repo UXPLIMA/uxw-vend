@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.1.11",
+  "version": "1.1.13",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -38,7 +38,8 @@
     {
       "label": "Help Center",
       "path": "/help",
-      "icon": "HelpCircle"
+      "icon": "HelpCircle",
+      "group": "content"
     }
   ],
   "routes": [
@@ -196,7 +197,9 @@
         "description": "Description",
         "icon": "Icon",
         "noDescription": "No description",
-        "menu_help-center_help_center": "Help Center"
+        "menu_help-center_help_center": "Help Center",
+        "module_help-center_name": "Help Center",
+        "module_help-center_description": "Knowledge base with categories and searchable articles"
       },
       "activity": {
         "helpArticleCreated": "added a help article:"
@@ -308,7 +311,9 @@
         "description": "Açıklama",
         "icon": "Simge",
         "noDescription": "Açıklama yok",
-        "menu_help-center_help_center": "Yardım Merkezi"
+        "menu_help-center_help_center": "Yardım Merkezi",
+        "module_help-center_name": "Yardım Merkezi",
+        "module_help-center_description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
       },
       "activity": {
         "helpArticleCreated": "yardım makalesi ekledi:"

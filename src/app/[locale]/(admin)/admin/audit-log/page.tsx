@@ -55,17 +55,17 @@ function classifyAction(action: string): ActionColor {
         action.startsWith("user.role.")
     ) {
         return {
-            bg: "bg-purple-500/10",
-            text: "text-purple-700 dark:text-purple-300",
-            border: "border-purple-500/30",
+            bg: "bg-secondary/10",
+            text: "text-secondary",
+            border: "border-secondary/40",
             label: "sensitive",
         };
     }
     if (action.endsWith(".install") || action.endsWith(".activate")) {
         return {
-            bg: "bg-cyan-500/10",
-            text: "text-cyan-700 dark:text-cyan-300",
-            border: "border-cyan-500/30",
+            bg: "bg-primary/10",
+            text: "text-primary",
+            border: "border-primary/40",
             label: "install",
         };
     }
@@ -75,32 +75,32 @@ function classifyAction(action: string): ActionColor {
         action.endsWith(".uninstall")
     ) {
         return {
-            bg: "bg-red-500/10",
-            text: "text-red-700 dark:text-red-300",
-            border: "border-red-500/30",
+            bg: "bg-destructive/10",
+            text: "text-destructive",
+            border: "border-destructive/40",
             label: "destructive",
         };
     }
     if (action.endsWith(".create")) {
         return {
-            bg: "bg-emerald-500/10",
-            text: "text-emerald-700 dark:text-emerald-300",
-            border: "border-emerald-500/30",
+            bg: "bg-success/10",
+            text: "text-success",
+            border: "border-success/40",
             label: "create",
         };
     }
     if (action.endsWith(".update")) {
         return {
-            bg: "bg-blue-500/10",
-            text: "text-blue-700 dark:text-blue-300",
-            border: "border-blue-500/30",
+            bg: "bg-primary/10",
+            text: "text-primary",
+            border: "border-primary/40",
             label: "update",
         };
     }
     return {
-        bg: "bg-gray-500/10",
-        text: "text-gray-700 dark:text-gray-300",
-        border: "border-gray-500/30",
+        bg: "bg-muted",
+        text: "text-muted-foreground",
+        border: "border-border",
         label: "other",
     };
 }

@@ -2,7 +2,7 @@
   "id": "discord-widget",
   "name": "Discord Widget",
   "description": "Discord server widget on homepage sidebar",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -43,7 +43,9 @@
   "translations": {
     "en": {
       "admin": {
-        "menu_discord-widget": "Discord Widget"
+        "menu_discord-widget": "Discord Widget",
+        "module_discord-widget_name": "Discord Widget",
+        "module_discord-widget_description": "Discord server widget on homepage sidebar"
       },
       "discordWidget": {
         "adm_title": "Discord Widget Settings",
@@ -68,7 +70,9 @@
     },
     "tr": {
       "admin": {
-        "menu_discord-widget": "Discord Widget'ı"
+        "menu_discord-widget": "Discord Widget'ı",
+        "module_discord-widget_name": "Discord Bileşeni",
+        "module_discord-widget_description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
       },
       "discordWidget": {
         "adm_title": "Discord Widget Ayarları",

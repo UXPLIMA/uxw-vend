@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
         return NextResponse.json({ error: "Name and URL required" }, { status: 400 });
     }
-    const { name, url, reward, icon } = parsed.data;
+    const { name, url, icon } = parsed.data;
 
     const site = await prisma.voteSite.create({
-        data: { name, url, reward: reward || 0, icon: icon || null },
+        data: { name, url, icon: icon || null },
     });
 
     return NextResponse.json({ site }, { status: 201 });

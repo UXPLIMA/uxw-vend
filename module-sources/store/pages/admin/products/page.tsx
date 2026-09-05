@@ -130,13 +130,13 @@ export default function AdminProductsPage() {
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     <span className={`text-xs px-2 py-1 rounded ${product.isActive
-                                                        ? "bg-green-100 text-green-700"
+                                                        ? "bg-success/10 text-success"
                                                         : "bg-muted text-muted-foreground"
                                                         }`}>
                                                         {product.isActive ? t("adm_active") : t("adm_inactive")}
                                                     </span>
                                                     {product.isFeatured && (
-                                                        <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 ml-1">
+                                                        <span className="text-xs px-2 py-1 rounded bg-warning/10 text-warning ml-1">
                                                             {t("adm_featured")}
                                                         </span>
                                                     )}

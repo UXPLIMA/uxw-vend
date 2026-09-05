@@ -10,6 +10,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import dynamic from "next/dynamic";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { useSiteCurrency } from "@/core/components/currency/site-currency";
+import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
 
 const DashboardCharts = dynamic(() => import("./dashboard-charts").then(m => ({ default: m.DashboardCharts })), {
     loading: () => <div className="h-[300px] bg-muted animate-pulse rounded-lg" />,
@@ -36,12 +37,15 @@ function CardIcon({ name, className }: { name: string; className?: string }) {
     );
 }
 
-const badgeColors: Record<string, string> = {
-    green: "bg-green-100 text-green-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    blue: "bg-blue-100 text-blue-700",
-    red: "bg-red-100 text-red-700",
-    gray: "bg-muted text-muted-foreground",
+// A module names a colour in its manifest, from a fixed list. They map onto
+// the badge's tones rather than onto Tailwind's palette, so a module's badge
+// follows the theme like every other one.
+const badgeTones: Record<string, BadgeTone> = {
+    green: "success",
+    yellow: "warning",
+    blue: "info",
+    red: "danger",
+    gray: "neutral",
 };
 
 interface DashboardCard {
@@ -279,7 +283,7 @@ export function ModuleSections() {
                                             <div className="flex items-center gap-2 ml-3 flex-shrink-0">
                                                 {item.value && <span className="font-bold text-sm">{item.value}</span>}
                                                 {item.badge && (
-                                                    <span className={`text-xs px-2 py-0.5 rounded ${badgeColors[item.badgeColor || "gray"]}`}>
+                                                    <span className={badgeClassName(badgeTones[item.badgeColor || "gray"] ?? "neutral")}>
                                                         {item.badge}
                                                     </span>
                                                 )}

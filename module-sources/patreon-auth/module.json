@@ -2,7 +2,7 @@
   "id": "patreon-auth",
   "name": "Patreon Login",
   "description": "Allow users to sign in with their Patreon account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -44,6 +44,10 @@
         "adm_title": "Patreon Login Settings",
         "adm_subtitle": "Set up Patreon OAuth sign-in for your site.",
         "signInWith": "Sign in with Patreon"
+      },
+      "admin": {
+        "module_patreon-auth_name": "Patreon Login",
+        "module_patreon-auth_description": "Allow users to sign in with their Patreon account"
       }
     },
     "tr": {
@@ -51,6 +55,10 @@
         "adm_title": "Patreon ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Patreon ile OAuth girişini yapılandırın.",
         "signInWith": "Patreon ile giriş yap"
+      },
+      "admin": {
+        "module_patreon-auth_name": "Patreon ile Giriş",
+        "module_patreon-auth_description": "Kullanıcıların Patreon hesabıyla giriş yapmasına izin verin"
       }
     }
   }

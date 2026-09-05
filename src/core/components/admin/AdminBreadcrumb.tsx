@@ -3,16 +3,31 @@
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { Home, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { navLabels } from "@/core/lib/admin-nav-groups";
+import { useAdminNav, type AdminNavModule } from "@/core/hooks/useAdminNav";
 
 /**
  * Small breadcrumb rendered in the admin top bar.
- * Derives labels from the current pathname. Segments are lowercased
- * path pieces turned into Title Case; the first crumb is always a
- * Home icon linking to /admin.
+ *
+ * A crumb names a route, and the sidebar already knows what every route is
+ * called - in the reader's language, including the ones a module contributed.
+ * So the label comes from the navigation first. `crumb_<slug>` covers the
+ * routes that have no sidebar entry of their own (a detail page, a form), and
+ * titlecasing the URL segment is the last resort, which is what the whole
+ * thing used to do: on /admin/settings/payments it read "Ayarlar > Payments",
+ * because an English path is not a translation.
  */
-export function AdminBreadcrumb() {
+export function AdminBreadcrumb({
+    modules = [],
+    activeThemeId,
+}: {
+    modules?: AdminNavModule[];
+    activeThemeId?: string;
+}) {
     const pathname = usePathname();
     const t = useTranslations("admin");
+    const groups = useAdminNav(modules, activeThemeId);
+    const labels = navLabels(groups, (key, fallback) => (t.has(key) ? t(key) : fallback));
 
     // Strip /admin prefix and split
     const raw = pathname.replace(/^\/+/, "");
@@ -20,7 +35,9 @@ export function AdminBreadcrumb() {
     // parts[0] is "admin" - drop it
     const crumbs = parts.slice(1);
 
-    const titleize = (slug: string) => {
+    const titleize = (slug: string, href: string) => {
+        const named = labels.get(href);
+        if (named) return named;
         const key = `crumb_${slug}`;
         if (t.has(key)) return t(key);
         return slug
@@ -49,10 +66,10 @@ export function AdminBreadcrumb() {
                     <span key={href} className="flex items-center gap-1.5">
                         <ChevronRight size={12} className="opacity-50" />
                         {isLast ? (
-                            <span className="text-foreground font-medium">{titleize(seg)}</span>
+                            <span className="text-foreground font-medium">{titleize(seg, href)}</span>
                         ) : (
                             <Link href={href} className="hover:text-foreground transition">
-                                {titleize(seg)}
+                                {titleize(seg, href)}
                             </Link>
                         )}
                     </span>

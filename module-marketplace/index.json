@@ -1,19 +1,25 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T19:06:53Z",
+  "updatedAt": "2026-09-05T20:06:18Z",
   "modules": [
     {
       "id": "announcements",
       "name": "Announcements",
       "description": "Site-wide announcement banners",
-      "version": "1.0.8",
+      "i18n": {
+        "tr": {
+          "name": "Duyurular",
+          "description": "Site genelinde duyuru bantları"
+        }
+      },
+      "version": "1.0.10",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T03:57:42Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -40,13 +46,19 @@
       "id": "apple-auth",
       "name": "Apple Login",
       "description": "Allow users to sign in with their Apple account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Apple ile Giriş",
+          "description": "Kullanıcıların Apple hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.4.0",
       "author": "uxwVend",
       "icon": "Apple",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -69,13 +81,19 @@
       "id": "battlenet-auth",
       "name": "Battle.net Login",
       "description": "Allow users to sign in with their Battle.net account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Battle.net ile Giriş",
+          "description": "Kullanıcıların Battle.net hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.4.0",
       "author": "uxwVend",
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -98,13 +116,19 @@
       "id": "blog",
       "name": "Blog Module",
       "description": "News and announcements system",
-      "version": "1.1.15",
+      "i18n": {
+        "tr": {
+          "name": "Blog Modülü",
+          "description": "Haber ve duyuru sistemi"
+        }
+      },
+      "version": "1.1.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T17:41:34Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -136,13 +160,19 @@
       "id": "changelog",
       "name": "Changelog",
       "description": "Release notes and update history",
-      "version": "1.0.11",
+      "i18n": {
+        "tr": {
+          "name": "Değişiklik Günlüğü",
+          "description": "Sürüm notları ve güncelleme geçmişi"
+        }
+      },
+      "version": "1.0.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T11:49:24Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -169,13 +199,19 @@
       "id": "cloudflare-r2",
       "name": "Cloudflare R2 Storage",
       "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
-      "version": "1.0.6",
+      "i18n": {
+        "tr": {
+          "name": "Cloudflare R2 Depolama",
+          "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
+        }
+      },
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -198,13 +234,19 @@
       "id": "cloudflare-turnstile",
       "name": "Cloudflare Turnstile",
       "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
-      "version": "1.1.3",
+      "i18n": {
+        "tr": {
+          "name": "Cloudflare Turnstile",
+          "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
+        }
+      },
+      "version": "1.1.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -229,13 +271,19 @@
       "id": "coinbase-commerce-gateway",
       "name": "Coinbase Commerce Gateway",
       "description": "Take Bitcoin, Ethereum, USDC and other crypto payments through Coinbase Commerce",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Coinbase Commerce Altyapısı",
+          "description": "Coinbase Commerce üzerinden Bitcoin, Ethereum, USDC ve diğer kripto ödemelerini alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -266,13 +314,19 @@
       "id": "coinpayments-gateway",
       "name": "CoinPayments Gateway",
       "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "CoinPayments Altyapısı",
+          "description": "CoinPayments üzerinden Bitcoin, Litecoin, USDT ve diğer kripto ödemelerini alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -303,13 +357,19 @@
       "id": "cookie-consent",
       "name": "Cookie Consent",
       "description": "GDPR cookie consent banner",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Çerez Onayı",
+          "description": "KVKK ve GDPR uyumlu çerez onay bandı"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -332,13 +392,19 @@
       "id": "credits",
       "name": "Credit System",
       "description": "Virtual currency wallet for users",
-      "version": "1.0.6",
+      "i18n": {
+        "tr": {
+          "name": "Kredi Sistemi",
+          "description": "Kullanıcılar için sanal para cüzdanı"
+        }
+      },
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T11:03:13Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -363,13 +429,19 @@
       "id": "csv-import-export",
       "name": "CSV Import/Export",
       "description": "CSV export and import utilities for data backup",
-      "version": "1.0.4",
+      "i18n": {
+        "tr": {
+          "name": "CSV İçe/Dışa Aktarma",
+          "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
+        }
+      },
+      "version": "1.0.6",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T11:49:24Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -392,13 +464,19 @@
       "id": "currency",
       "name": "Multi-Currency",
       "description": "Multi-currency support with automatic conversion",
-      "version": "1.1.0",
+      "i18n": {
+        "tr": {
+          "name": "Çoklu Para Birimi",
+          "description": "Otomatik dönüşümle çoklu para birimi desteği"
+        }
+      },
+      "version": "1.1.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T09:02:28Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -421,13 +499,19 @@
       "id": "custom-forms",
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
-      "version": "1.0.26",
+      "i18n": {
+        "tr": {
+          "name": "Özel Formlar",
+          "description": "Gönderim takipli dinamik form oluşturucu"
+        }
+      },
+      "version": "1.0.28",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -455,13 +539,19 @@
       "id": "custom-pages",
       "name": "Custom Pages",
       "description": "Admin-created HTML content pages",
-      "version": "1.0.18",
+      "i18n": {
+        "tr": {
+          "name": "Özel Sayfalar",
+          "description": "Yöneticinin oluşturduğu HTML içerik sayfaları"
+        }
+      },
+      "version": "1.0.20",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -484,13 +574,19 @@
       "id": "discord-auth",
       "name": "Discord Login",
       "description": "Allow users to sign in with their Discord account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Discord ile Giriş",
+          "description": "Kullanıcıların Discord hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -513,13 +609,19 @@
       "id": "discord-integration",
       "name": "Discord Integration",
       "description": "Discord webhook notifications and settings",
-      "version": "1.0.7",
+      "i18n": {
+        "tr": {
+          "name": "Discord Entegrasyonu",
+          "description": "Discord webhook bildirimleri ve ayarları"
+        }
+      },
+      "version": "1.0.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -549,13 +651,19 @@
       "id": "discord-widget",
       "name": "Discord Widget",
       "description": "Discord server widget on homepage sidebar",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "Discord Bileşeni",
+          "description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -580,13 +688,19 @@
       "id": "downloads",
       "name": "Downloads",
       "description": "File download center for resources and mods",
-      "version": "1.0.9",
+      "i18n": {
+        "tr": {
+          "name": "İndirmeler",
+          "description": "Kaynaklar ve modlar için dosya indirme merkezi"
+        }
+      },
+      "version": "1.0.11",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T11:03:13Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -611,13 +725,19 @@
       "id": "email-templates",
       "name": "Email Templates",
       "description": "Email service configuration and templates",
-      "version": "1.0.4",
+      "i18n": {
+        "tr": {
+          "name": "E-posta Şablonları",
+          "description": "E-posta servisi yapılandırması ve şablonları"
+        }
+      },
+      "version": "1.0.6",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -640,13 +760,19 @@
       "id": "epicgames-auth",
       "name": "Epic Games Login",
       "description": "Allow users to sign in with their Epic Games account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Epic Games ile Giriş",
+          "description": "Kullanıcıların Epic Games hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.4.0",
       "author": "uxwVend",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -669,13 +795,19 @@
       "id": "facebook-auth",
       "name": "Facebook Login",
       "description": "Allow users to sign in with their Facebook account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Facebook ile Giriş",
+          "description": "Kullanıcıların Facebook hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -698,13 +830,19 @@
       "id": "faceit-auth",
       "name": "FACEIT Login",
       "description": "Allow users to sign in with their FACEIT account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "FACEIT ile Giriş",
+          "description": "Kullanıcıların FACEIT hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -727,13 +865,19 @@
       "id": "forum",
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
-      "version": "1.1.15",
+      "i18n": {
+        "tr": {
+          "name": "Forum Modülü",
+          "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
+        }
+      },
+      "version": "1.1.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -763,13 +907,19 @@
       "id": "github-auth",
       "name": "GitHub Login",
       "description": "Allow users to sign in with their GitHub account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "GitHub ile Giriş",
+          "description": "Kullanıcıların GitHub hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Code2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -792,13 +942,19 @@
       "id": "google-analytics",
       "name": "Google Analytics",
       "description": "Google Analytics tracking integration",
-      "version": "1.0.5",
+      "i18n": {
+        "tr": {
+          "name": "Google Analytics",
+          "description": "Google Analytics takip entegrasyonu"
+        }
+      },
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -821,13 +977,19 @@
       "id": "google-auth",
       "name": "Google Login",
       "description": "Allow users to sign in with their Google account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Google ile Giriş",
+          "description": "Kullanıcıların Google hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -850,13 +1012,19 @@
       "id": "help-center",
       "name": "Help Center",
       "description": "Knowledge base with categories and searchable articles",
-      "version": "1.1.11",
+      "i18n": {
+        "tr": {
+          "name": "Yardım Merkezi",
+          "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
+        }
+      },
+      "version": "1.1.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T17:41:34Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -881,13 +1049,19 @@
       "id": "in-app-notifications",
       "name": "In-App Notifications",
       "description": "In-app notification system with bell icon",
-      "version": "1.0.10",
+      "i18n": {
+        "tr": {
+          "name": "Uygulama İçi Bildirimler",
+          "description": "Zil simgeli uygulama içi bildirim sistemi"
+        }
+      },
+      "version": "1.0.12",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T14:10:25Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -910,13 +1084,19 @@
       "id": "instagram-auth",
       "name": "Instagram Login",
       "description": "Allow users to sign in with their Instagram account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Instagram ile Giriş",
+          "description": "Kullanıcıların Instagram hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.4.0",
       "author": "uxwVend",
       "icon": "Camera",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -939,13 +1119,19 @@
       "id": "iyzico-gateway",
       "name": "iyzico Payment Gateway",
       "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "iyzico Ödeme Altyapısı",
+          "description": "iyzico üzerinden taksit ve 3D Secure destekli Türk kartı ödemelerini alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -975,13 +1161,19 @@
       "id": "kakao-auth",
       "name": "Kakao Login",
       "description": "Allow users to sign in with their Kakao account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Kakao ile Giriş",
+          "description": "Kullanıcıların Kakao hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1004,13 +1196,19 @@
       "id": "kick-auth",
       "name": "Kick Login",
       "description": "Allow users to sign in with their Kick account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Kick ile Giriş",
+          "description": "Kullanıcıların Kick hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.4.0",
       "author": "uxwVend",
       "icon": "Radio",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1033,13 +1231,19 @@
       "id": "leaderboard",
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
-      "version": "1.1.6",
+      "i18n": {
+        "tr": {
+          "name": "Liderlik Tablosu",
+          "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
+        }
+      },
+      "version": "1.1.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T11:03:13Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1064,13 +1268,19 @@
       "id": "license-keys",
       "name": "License Keys",
       "description": "Generate, deliver and activate license keys for digital products, with a machine limit per key",
-      "version": "1.0.10",
+      "i18n": {
+        "tr": {
+          "name": "Lisans Anahtarları",
+          "description": "Dijital ürünler için lisans anahtarı üretin, teslim edin ve etkinleştirin; anahtar başına makine sınırı ile"
+        }
+      },
+      "version": "1.0.12",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T17:41:34Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1097,13 +1307,19 @@
       "id": "line-auth",
       "name": "LINE Login",
       "description": "Allow users to sign in with their LINE account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "LINE ile Giriş",
+          "description": "Kullanıcıların LINE hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1126,13 +1342,19 @@
       "id": "login-protection",
       "name": "Login Protection",
       "description": "Login throttling: how many failed attempts lock an account",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "Giriş Koruması",
+          "description": "Giriş sınırlaması: kaç başarısız denemenin hesabı kilitleyeceği"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1155,13 +1377,19 @@
       "id": "mercadopago-gateway",
       "name": "Mercado Pago Gateway",
       "description": "Take card, Pix, boleto and cash payments across Latin America through Mercado Pago",
-      "version": "1.0.4",
+      "i18n": {
+        "tr": {
+          "name": "Mercado Pago Altyapısı",
+          "description": "Mercado Pago üzerinden Latin Amerika genelinde kart, Pix, boleto ve nakit ödemelerini alın"
+        }
+      },
+      "version": "1.0.6",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1193,13 +1421,19 @@
       "id": "microsoft-auth",
       "name": "Microsoft and Xbox Login",
       "description": "Allow users to sign in with their Microsoft or Xbox account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Microsoft ve Xbox ile Giriş",
+          "description": "Kullanıcıların Microsoft veya Xbox hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1222,13 +1456,19 @@
       "id": "midtrans-gateway",
       "name": "Midtrans Gateway",
       "description": "Take bank transfer, e-wallet, convenience store and card payments in Indonesia through Midtrans",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "Midtrans Altyapısı",
+          "description": "Midtrans üzerinden Endonezya'da havale, e-cüzdan, market ve kart ödemelerini alın"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1260,13 +1500,19 @@
       "id": "minecraft-link",
       "name": "Minecraft Link",
       "description": "Let players prove they own an in-game Minecraft account by reading a code whispered to them on the server",
-      "version": "1.0.5",
+      "i18n": {
+        "tr": {
+          "name": "Minecraft Bağlama",
+          "description": "Oyuncuların sunucuda kendilerine fısıldanan bir kodu okuyarak Minecraft hesabının sahibi olduklarını kanıtlamasını sağlayın"
+        }
+      },
+      "version": "1.0.7",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T08:38:38Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1295,13 +1541,19 @@
       "id": "mollie-gateway",
       "name": "Mollie Payment Gateway",
       "description": "Take iDEAL, Bancontact, SEPA and card payments through Mollie",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Mollie Ödeme Altyapısı",
+          "description": "Mollie üzerinden iDEAL, Bancontact, SEPA ve kart ödemelerini alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1333,13 +1585,19 @@
       "id": "naver-auth",
       "name": "Naver Login",
       "description": "Allow users to sign in with their Naver account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Naver ile Giriş",
+          "description": "Kullanıcıların Naver hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Compass",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1362,13 +1620,19 @@
       "id": "nowpayments-gateway",
       "name": "NOWPayments Gateway",
       "description": "Take payments in 200+ cryptocurrencies through NOWPayments",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "NOWPayments Altyapısı",
+          "description": "NOWPayments üzerinden 200'den fazla kripto para ile ödeme alın"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1400,13 +1664,19 @@
       "id": "param-gateway",
       "name": "Param Payment Gateway",
       "description": "Take Turkish card and instalment payments through Param (TurkPos)",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Param Ödeme Altyapısı",
+          "description": "Param (TurkPos) üzerinden Türk kartı ve taksitli ödemeleri alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1437,13 +1707,19 @@
       "id": "patreon-auth",
       "name": "Patreon Login",
       "description": "Allow users to sign in with their Patreon account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Patreon ile Giriş",
+          "description": "Kullanıcıların Patreon hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Heart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1466,13 +1742,19 @@
       "id": "paymentwall-gateway",
       "name": "Paymentwall Gateway",
       "description": "Take local payments, wallets and mobile billing through Paymentwall",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Paymentwall Altyapısı",
+          "description": "Paymentwall üzerinden yerel ödemeleri, cüzdanları ve mobil faturalandırmayı kullanın"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1503,13 +1785,19 @@
       "id": "paypal-gateway",
       "name": "PayPal Payment Gateway",
       "description": "Take payments through PayPal, with a balance or a linked card",
-      "version": "2.0.2",
+      "i18n": {
+        "tr": {
+          "name": "PayPal Ödeme Altyapısı",
+          "description": "PayPal üzerinden bakiye veya bağlı kartla ödeme alın"
+        }
+      },
+      "version": "2.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1539,13 +1827,19 @@
       "id": "paysafecard-gateway",
       "name": "paysafecard Gateway",
       "description": "Take prepaid voucher payments through paysafecard, for buyers with no card or bank account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "paysafecard Altyapısı",
+          "description": "Kartı ya da banka hesabı olmayan alıcılar için paysafecard ön ödemeli kupon ödemelerini alın"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1576,13 +1870,19 @@
       "id": "paytr-gateway",
       "name": "PayTR Payment Gateway",
       "description": "Take Turkish card, instalment and bank transfer payments through PayTR",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "PayTR Ödeme Altyapısı",
+          "description": "PayTR üzerinden Türk kartı, taksit ve havale ödemelerini alın"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1613,13 +1913,19 @@
       "id": "player-profiles",
       "name": "Player Profiles",
       "description": "Public player profile pages",
-      "version": "1.1.12",
+      "i18n": {
+        "tr": {
+          "name": "Oyuncu Profilleri",
+          "description": "Herkese açık oyuncu profil sayfaları"
+        }
+      },
+      "version": "1.1.14",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T14:10:25Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1642,13 +1948,19 @@
       "id": "popups",
       "name": "Popups",
       "description": "Modal popup notifications and promotions",
-      "version": "1.1.5",
+      "i18n": {
+        "tr": {
+          "name": "Açılır Pencereler",
+          "description": "Modal açılır pencere bildirimleri ve tanıtımları"
+        }
+      },
+      "version": "1.1.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1671,13 +1983,19 @@
       "id": "punishments",
       "name": "Punishments",
       "description": "Player punishment history and ban management",
-      "version": "1.0.13",
+      "i18n": {
+        "tr": {
+          "name": "Cezalar",
+          "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
+        }
+      },
+      "version": "1.0.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T17:41:34Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1703,13 +2021,19 @@
       "id": "razorpay-gateway",
       "name": "Razorpay Gateway",
       "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
-      "version": "1.0.3",
+      "i18n": {
+        "tr": {
+          "name": "Razorpay Altyapısı",
+          "description": "Razorpay üzerinden Hindistan'da UPI, kart, internet bankacılığı ve cüzdan ödemelerini alın"
+        }
+      },
+      "version": "1.0.5",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1741,13 +2065,19 @@
       "id": "reddit-auth",
       "name": "Reddit Login",
       "description": "Allow users to sign in with their Reddit account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Reddit ile Giriş",
+          "description": "Kullanıcıların Reddit hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1770,13 +2100,19 @@
       "id": "referral",
       "name": "Referral System",
       "description": "Earn credits by referring new users",
-      "version": "1.0.17",
+      "i18n": {
+        "tr": {
+          "name": "Referans Sistemi",
+          "description": "Yeni kullanıcı davet ederek kredi kazanın"
+        }
+      },
+      "version": "1.0.19",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T14:10:25Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1803,13 +2139,19 @@
       "id": "resend-provider",
       "name": "Resend Email Provider",
       "description": "Send emails via Resend API",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Resend E-posta Sağlayıcısı",
+          "description": "Resend API üzerinden e-posta gönderin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1834,13 +2176,19 @@
       "id": "roblox-auth",
       "name": "Roblox Login",
       "description": "Allow users to sign in with their Roblox account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Roblox ile Giriş",
+          "description": "Kullanıcıların Roblox hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Boxes",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1863,13 +2211,19 @@
       "id": "seo",
       "name": "SEO Manager",
       "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
-      "version": "1.0.14",
+      "i18n": {
+        "tr": {
+          "name": "SEO Yöneticisi",
+          "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
+        }
+      },
+      "version": "1.0.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1892,13 +2246,19 @@
       "id": "servers",
       "name": "Game Servers",
       "description": "Game server management, RCON, and status monitoring",
-      "version": "1.1.7",
+      "i18n": {
+        "tr": {
+          "name": "Oyun Sunucuları",
+          "description": "Oyun sunucusu yönetimi, RCON ve durum izleme"
+        }
+      },
+      "version": "1.1.9",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1923,13 +2283,19 @@
       "id": "slider",
       "name": "Slider",
       "description": "Homepage image carousel and banners",
-      "version": "1.0.9",
+      "i18n": {
+        "tr": {
+          "name": "Slayt Gösterisi",
+          "description": "Ana sayfa görsel galerisi ve bantları"
+        }
+      },
+      "version": "1.0.11",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1952,13 +2318,19 @@
       "id": "spotify-auth",
       "name": "Spotify Login",
       "description": "Allow users to sign in with their Spotify account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Spotify ile Giriş",
+          "description": "Kullanıcıların Spotify hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Music",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1981,13 +2353,19 @@
       "id": "staff",
       "name": "Staff",
       "description": "Staff member listing and applications",
-      "version": "1.0.13",
+      "i18n": {
+        "tr": {
+          "name": "Ekip",
+          "description": "Ekip üyesi listesi ve başvurular"
+        }
+      },
+      "version": "1.0.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2010,13 +2388,19 @@
       "id": "steam-auth",
       "name": "Steam Login",
       "description": "Allow users to sign in with their Steam account",
-      "version": "1.0.5",
+      "i18n": {
+        "tr": {
+          "name": "Steam ile Giriş",
+          "description": "Kullanıcıların Steam hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T13:17:00Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2039,13 +2423,19 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.20",
+      "i18n": {
+        "tr": {
+          "name": "Mağaza Modülü",
+          "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
+        }
+      },
+      "version": "2.2.22",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2084,13 +2474,19 @@
       "id": "stripe-gateway",
       "name": "Stripe Payment Gateway",
       "description": "Take card, Apple Pay and Google Pay payments through Stripe, including subscriptions",
-      "version": "2.0.3",
+      "i18n": {
+        "tr": {
+          "name": "Stripe Ödeme Altyapısı",
+          "description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
+        }
+      },
+      "version": "2.0.5",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2123,13 +2519,19 @@
       "id": "suggestions",
       "name": "Suggestions",
       "description": "Community feature suggestions with voting",
-      "version": "1.0.15",
+      "i18n": {
+        "tr": {
+          "name": "Öneriler",
+          "description": "Oylamalı topluluk özellik önerileri"
+        }
+      },
+      "version": "1.0.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T15:59:26Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2159,13 +2561,19 @@
       "id": "tickets",
       "name": "Support Tickets",
       "description": "Customer support ticket system with departments and priority levels",
-      "version": "1.0.31",
+      "i18n": {
+        "tr": {
+          "name": "Destek Talepleri",
+          "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
+        }
+      },
+      "version": "1.0.33",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T16:12:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2193,13 +2601,19 @@
       "id": "tiktok-auth",
       "name": "TikTok Login",
       "description": "Allow users to sign in with their TikTok account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "TikTok ile Giriş",
+          "description": "Kullanıcıların TikTok hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2222,13 +2636,19 @@
       "id": "trophies",
       "name": "Trophies",
       "description": "Achievement badges with rule-based auto-award engine",
-      "version": "1.0.17",
+      "i18n": {
+        "tr": {
+          "name": "Kupalar",
+          "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
+        }
+      },
+      "version": "1.0.19",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T17:41:34Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2253,13 +2673,19 @@
       "id": "twitch-auth",
       "name": "Twitch Login",
       "description": "Allow users to sign in with their Twitch account",
-      "version": "1.0.2",
+      "i18n": {
+        "tr": {
+          "name": "Twitch ile Giriş",
+          "description": "Kullanıcıların Twitch hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2282,13 +2708,19 @@
       "id": "two-factor-auth",
       "name": "Two-Factor Authentication",
       "description": "TOTP-based 2FA with backup codes for enhanced account security",
-      "version": "1.0.9",
+      "i18n": {
+        "tr": {
+          "name": "İki Adımlı Doğrulama",
+          "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
+        }
+      },
+      "version": "1.0.11",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T14:10:25Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2316,13 +2748,19 @@
       "id": "vk-auth",
       "name": "VK Login",
       "description": "Allow users to sign in with their VK account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "VK ile Giriş",
+          "description": "Kullanıcıların VK hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessagesSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2343,23 +2781,27 @@
     },
     {
       "id": "vote",
-      "name": "Vote System",
-      "description": "Vote-for-rewards system with configurable sites and cooldowns",
-      "version": "1.0.13",
+      "name": "Vote Sites",
+      "description": "Send players to the server listings you are ranked on, and count who voted",
+      "i18n": {
+        "tr": {
+          "name": "Oy Siteleri",
+          "description": "Oyuncuları sıralamada yer aldığınız sunucu listelerine yönlendirin ve kimin oy verdiğini sayın"
+        }
+      },
+      "version": "1.1.1",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "vote.zip",
-      "dependencies": [
-        "credits"
-      ],
+      "dependencies": [],
       "conflicts": [],
       "hooks": {
         "emits": [
@@ -2378,13 +2820,19 @@
       "id": "webhook-logs",
       "name": "Webhook Logs",
       "description": "View and manage webhook delivery logs",
-      "version": "1.0.6",
+      "i18n": {
+        "tr": {
+          "name": "Webhook Kayıtları",
+          "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
+        }
+      },
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2407,13 +2855,19 @@
       "id": "wheel",
       "name": "Wheel of Fortune",
       "description": "Spin-to-win game with configurable prizes and cooldowns",
-      "version": "1.0.11",
+      "i18n": {
+        "tr": {
+          "name": "Şans Çarkı",
+          "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
+        }
+      },
+      "version": "1.0.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T19:06:53Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2441,13 +2895,19 @@
       "id": "x-auth",
       "name": "X Login",
       "description": "Allow users to sign in with their X (Twitter) account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "X ile Giriş",
+          "description": "Kullanıcıların X (Twitter) hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "AtSign",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2470,13 +2930,19 @@
       "id": "yandex-auth",
       "name": "Yandex Login",
       "description": "Allow users to sign in with their Yandex account",
-      "version": "1.0.1",
+      "i18n": {
+        "tr": {
+          "name": "Yandex ile Giriş",
+          "description": "Kullanıcıların Yandex hesabıyla giriş yapmasına izin verin"
+        }
+      },
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T20:06:18Z",
       "screenshots": [],
       "tags": [
         "integration"

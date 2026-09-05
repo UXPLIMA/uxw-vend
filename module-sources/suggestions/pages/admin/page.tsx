@@ -28,11 +28,11 @@ const FILTERS: { key: "all" | "open" | "planned" | "completed" | "declined"; sta
 
 const statusBadgeClass = (status: string) => {
     switch (status) {
-        case "completed": return "bg-green-100 text-green-700";
+        case "completed": return "bg-success/10 text-success";
         case "planned":
-        case "inProgress": return "bg-blue-100 text-blue-700";
-        case "declined": return "bg-red-100 text-red-700";
-        case "underReview": return "bg-yellow-100 text-yellow-700";
+        case "inProgress": return "bg-primary/10 text-primary";
+        case "declined": return "bg-destructive/10 text-destructive";
+        case "underReview": return "bg-warning/10 text-warning";
         default: return "bg-muted text-muted-foreground";
     }
 };

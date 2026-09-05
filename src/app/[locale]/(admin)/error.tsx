@@ -19,7 +19,7 @@ import { Card, CardContent } from "@/core/components/ui/card";
  * cannot read admin strings, and the screen rendered `admin.error_title` as
  * its heading. Its wording comes from `common` now, which every page has.
  *
- * And it was painted in `bg-white`, `border-red-200`, `text-zinc-900` with
+ * And it was painted in `bg-white`, `border-destructive/30`, `text-zinc-900` with
  * `dark:` variants - which do nothing here, because this project switches
  * themes on `[data-mode="dark"]` rather than Tailwind's media-query variant.
  * On a dark panel it was a white card with black text. It uses the theme's

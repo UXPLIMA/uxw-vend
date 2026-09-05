@@ -15,6 +15,9 @@ import type { Module, ModuleSettingValues } from "./types";
  * labelled, bounded control here, with no core change - the same contract every
  * other module surface follows. Before this existed the declarations were
  * invisible: an admin had no way to reach a single one of them.
+ *
+ * It renders on the module's own screen, not folded into its card in the
+ * marketplace listing - see that screen for why.
  */
 export function ModuleSettingsPanel({
     module: mod,
@@ -47,22 +50,19 @@ export function ModuleSettingsPanel({
     };
 
     return (
-        <div className="mb-3 border-t pt-3 space-y-3">
-            <h4 className="text-xs font-semibold uppercase text-muted-foreground">
-                {t("modules_settings")}
-            </h4>
+        <div className="space-y-4 max-w-xl">
 
             {declarations.map((setting) => {
                 const id = `module-setting-${mod.id}-${setting.key}`;
                 const value = values[setting.key];
                 return (
-                    <div key={setting.key} className="text-xs">
+                    <div key={setting.key} className="text-sm">
                         {setting.type === "boolean" ? (
                             <label htmlFor={id} className="flex items-start gap-2 cursor-pointer">
                                 <input
                                     id={id}
                                     type="checkbox"
-                                    className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-primary"
+                                    className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
                                     checked={value === true}
                                     onChange={(e) =>
                                         setValues((v) => ({ ...v, [setting.key]: e.target.checked }))
@@ -83,7 +83,7 @@ export function ModuleSettingsPanel({
                                 )}
                                 <Input
                                     id={id}
-                                    className="h-8 text-xs"
+                                    className="text-sm"
                                     type={setting.type === "number" ? "number" : "text"}
                                     min={setting.min}
                                     max={setting.max}
@@ -108,8 +108,8 @@ export function ModuleSettingsPanel({
                 );
             })}
 
-            <Button size="sm" className="w-full text-xs" disabled={!dirty || saving} onClick={save}>
-                {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : t("modules_settingsSave")}
+            <Button disabled={!dirty || saving} onClick={save}>
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t("modules_settingsSave")}
             </Button>
         </div>
     );

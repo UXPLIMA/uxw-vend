@@ -122,8 +122,8 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                     >
                         <div className="flex items-start gap-4">
                             {state.options.variant === "danger" && (
-                                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                                    <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                                <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                                    <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
                                 </div>
                             )}
                             <div className="flex-1">

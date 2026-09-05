@@ -434,7 +434,7 @@ export default function SeoPageOverridesPage() {
                                                         <EyeOff className="w-3 h-3" /> noindex
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
+                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-success/10 text-success">
                                                         indexed
                                                     </span>
                                                 )}

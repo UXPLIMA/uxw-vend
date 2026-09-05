@@ -2,7 +2,7 @@
   "id": "spotify-auth",
   "name": "Spotify Login",
   "description": "Allow users to sign in with their Spotify account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -44,6 +44,10 @@
         "adm_title": "Spotify Login Settings",
         "adm_subtitle": "Set up Spotify OAuth sign-in for your site.",
         "signInWith": "Sign in with Spotify"
+      },
+      "admin": {
+        "module_spotify-auth_name": "Spotify Login",
+        "module_spotify-auth_description": "Allow users to sign in with their Spotify account"
       }
     },
     "tr": {
@@ -51,6 +55,10 @@
         "adm_title": "Spotify ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Spotify ile OAuth girişini yapılandırın.",
         "signInWith": "Spotify ile giriş yap"
+      },
+      "admin": {
+        "module_spotify-auth_name": "Spotify ile Giriş",
+        "module_spotify-auth_description": "Kullanıcıların Spotify hesabıyla giriş yapmasına izin verin"
       }
     }
   }

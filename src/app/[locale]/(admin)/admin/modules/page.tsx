@@ -1,23 +1,26 @@
 "use client";
 
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
+import { Badge } from "@/core/components/ui/badge";
+import { Link } from "@/core/lib/i18n/navigation";
 import {
-    Package, Upload, Loader2, Trash2, Download, CheckCircle,
+    Package, Upload, Loader2, Trash2, Download, CheckCircle, Cog,
     Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { categoryColors, resolveDependencyBadge } from "./module-display";
+import { moduleDescription, moduleName } from "./module-name";
 import type { SortKey } from "./types";
 import { useAdminModules } from "./useAdminModules";
 import { ModuleIcon } from "./ModuleIcon";
 import { ModuleDetailModal } from "./ModuleDetailModal";
-import { ModuleSettingsPanel } from "./ModuleSettingsPanel";
 import { NativeSelect } from "@/core/components/ui/native-select";
 
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
+    const locale = useLocale();
     const {
         modules,
         marketplace,
@@ -48,7 +51,6 @@ export default function AdminModulesPage() {
         marketplaceById,
         updatesAvailableCount,
         toggleModule,
-        saveSettings,
         handleUpload,
         handleDelete,
         handleUpdate,
@@ -96,10 +98,10 @@ export default function AdminModulesPage() {
             </div>
 
             {updatesOnly && updatesAvailableCount > 0 && (
-                <Card className="mb-6 border-amber-300 bg-amber-50/50 dark:bg-amber-950/20">
+                <Card className="mb-6 border-warning/40 bg-warning/10">
                     <CardContent className="p-4 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 text-sm">
-                            <ArrowUp className="w-4 h-4 text-amber-600" />
+                            <ArrowUp className="w-4 h-4 text-warning" />
                             <span className="font-medium">
                                 {t("modules_updatesAvailable", { count: updatesAvailableCount })}
                             </span>
@@ -158,38 +160,36 @@ export default function AdminModulesPage() {
                                                 <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
                                                 <div>
                                                     <h3 className="font-semibold text-sm flex items-center gap-1.5 flex-wrap">
-                                                        {mod.name}
-                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground">
-                                                            v{mod.version}
-                                                        </span>
+                                                        {moduleName(mod, locale, t)}
+                                                        <Badge className="font-mono">v{mod.version}</Badge>
                                                         {mod.updateAvailable && mod.latestVersion && (
-                                                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800 inline-flex items-center gap-1">
+                                                            <Badge tone="warning">
                                                                 <ArrowUp className="w-2.5 h-2.5" />
                                                                 {t("modules_updateToLatest", { version: mod.latestVersion })}
-                                                            </span>
+                                                            </Badge>
                                                         )}
                                                     </h3>
                                                 </div>
                                             </div>
-                                            <span className={`text-xs px-2 py-0.5 rounded font-medium ${mod.enabled ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                                            <Badge tone={mod.enabled ? "success" : "neutral"}>
                                                 {mod.enabled ? t("modules_on") : t("modules_off")}
-                                            </span>
+                                            </Badge>
                                         </div>
 
-                                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
+                                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{moduleDescription(mod, locale, t)}</p>
 
                                         {((mod.dependencies && mod.dependencies.length > 0) || (mod.conflicts && mod.conflicts.length > 0)) && (
                                             <div className="mb-3 space-y-1">
                                                 {mod.dependencies && mod.dependencies.length > 0 && (
                                                     <div className="flex items-center gap-1.5 text-xs">
-                                                        <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
+                                                        <span className="text-warning font-medium">{t("modules_requires")}</span>
                                                         <div className="flex gap-1 flex-wrap">
                                                             {mod.dependencies.map(dep => {
                                                                 const badge = resolveDependencyBadge(dep, modules, marketplace);
                                                                 return (
-                                                                    <span key={badge.spec} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${badge.satisfied ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                                                                    <Badge key={badge.spec} tone={badge.satisfied ? "success" : "danger"}>
                                                                         {badge.label} {badge.satisfied ? "" : badge.versionMismatch ? t("modules_versionMismatch") : t("modules_missing")}
-                                                                    </span>
+                                                                    </Badge>
                                                                 );
                                                             })}
                                                         </div>
@@ -197,14 +197,14 @@ export default function AdminModulesPage() {
                                                 )}
                                                 {mod.conflicts && mod.conflicts.length > 0 && (
                                                     <div className="flex items-center gap-1.5 text-xs">
-                                                        <span className="text-red-500 font-medium">{t("modules_incompatible")}</span>
+                                                        <span className="text-destructive font-medium">{t("modules_incompatible")}</span>
                                                         <div className="flex gap-1 flex-wrap">
                                                             {mod.conflicts.map(cId => {
                                                                 const cMod = modules.find(m => m.id === cId);
                                                                 return (
-                                                                    <span key={cId} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-600 border border-red-200">
+                                                                    <Badge key={cId} tone="danger">
                                                                         {cMod?.name || cId}
-                                                                    </span>
+                                                                    </Badge>
                                                                 );
                                                             })}
                                                         </div>
@@ -212,8 +212,6 @@ export default function AdminModulesPage() {
                                                 )}
                                             </div>
                                         )}
-
-                                        <ModuleSettingsPanel module={mod} onSave={saveSettings} />
 
                                         <div className="flex gap-2">
                                             <Button
@@ -225,6 +223,16 @@ export default function AdminModulesPage() {
                                             >
                                                 {updating === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : mod.enabled ? t("modules_disable") : t("modules_enable")}
                                             </Button>
+                                            {(mod.settings ?? []).length > 0 && (
+                                                <Link
+                                                    href={`/admin/modules/${mod.id}`}
+                                                    aria-label={t("modules_settings")}
+                                                    title={t("modules_settings")}
+                                                    className={buttonClassName("ghost", "sm")}
+                                                >
+                                                    <Cog className="w-3 h-3" />
+                                                </Link>
+                                            )}
                                             {mp && (
                                                 <Button
                                                     variant="ghost"
@@ -241,7 +249,7 @@ export default function AdminModulesPage() {
                                                     size="sm"
                                                     disabled={updatingModule === mod.id}
                                                     onClick={() => handleUpdate(mod)}
-                                                    className="text-amber-600 hover:text-amber-700 border-amber-300"
+                                                    className="text-warning hover:text-warning border-warning/30"
                                                     title={t("modules_updateToVersion", { version: mod.latestVersion ?? "" })}
                                                 >
                                                     {updatingModule === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowUp className="w-3 h-3" />}
@@ -252,7 +260,7 @@ export default function AdminModulesPage() {
                                                 variant="ghost"
                                                 size="sm"
                                                 disabled={deleting === mod.id}
-                                                onClick={() => handleDelete(mod.id, mod.name)}
+                                                onClick={() => handleDelete(mod.id, moduleName(mod, locale, t))}
                                                 className="text-destructive hover:text-destructive"
                                             >
                                                 {deleting === mod.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
@@ -272,7 +280,7 @@ export default function AdminModulesPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
                             <h2 className="text-xl font-bold flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-blue-500" />
+                                <CheckCircle className="w-5 h-5 text-primary" />
                                 {t("modules_verifiedModules")}
                             </h2>
                             <p className="text-sm text-muted-foreground">{t("modules_officialModules")}</p>
@@ -374,19 +382,19 @@ export default function AdminModulesPage() {
                                                 aria-label={t("common_selectRow")}
                                                 className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                                             />
-                                            <span className="text-blue-500"><ModuleIcon name={mod.icon} /></span>
+                                            <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
                                             <div>
                                                 <button
                                                     type="button"
                                                     onClick={() => setDetailModule(mod)}
                                                     className="font-semibold text-sm flex items-center gap-1.5 hover:underline text-left"
                                                 >
-                                                    {mod.name}
-                                                    {mod.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
+                                                    {moduleName(mod, locale, t)}
+                                                    {mod.verified && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
                                                 </button>
                                                 <p className="text-xs text-muted-foreground">
                                                     <span className="font-mono">v{mod.version}</span>
-                                                    {" "}by {mod.author}
+                                                    {" "}{t("modules_byAuthor", { author: mod.author })}
                                                 </p>
                                             </div>
                                         </div>
@@ -395,7 +403,7 @@ export default function AdminModulesPage() {
                                         </span>
                                     </div>
 
-                                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{mod.description}</p>
+                                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{moduleDescription(mod, locale, t)}</p>
 
                                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                                         {mod.stats.publicRoutes > 0 && <span>{t("modules_pages", { count: mod.stats.publicRoutes })}</span>}
@@ -406,14 +414,14 @@ export default function AdminModulesPage() {
 
                                     {mod.dependencies.length > 0 && (
                                         <div className="flex items-center gap-1.5 text-xs mb-3">
-                                            <span className="text-amber-600 font-medium">{t("modules_requires")}</span>
+                                            <span className="text-warning font-medium">{t("modules_requires")}</span>
                                             <div className="flex gap-1 flex-wrap">
                                                 {mod.dependencies.map((dep: string) => {
                                                     const badge = resolveDependencyBadge(dep, modules, marketplace);
                                                     return (
-                                                        <span key={badge.spec} className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${badge.satisfied ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                                                        <Badge key={badge.spec} tone={badge.satisfied ? "success" : "warning"}>
                                                             {badge.label}
-                                                        </span>
+                                                        </Badge>
                                                     );
                                                 })}
                                             </div>

@@ -90,7 +90,7 @@ export default function SubmissionsPage() {
             ) : submissions.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                        <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                         <p className="text-muted-foreground">{t("adm_noSubmissions")}</p>
                     </CardContent>
                 </Card>
@@ -109,7 +109,7 @@ export default function SubmissionsPage() {
                                             <span className="text-xs text-muted-foreground ml-3">
                                                 {new Date(sub.createdAt).toLocaleString(__dateTag)}
                                             </span>
-                                            <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                                            <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                                                 {sub.status === "new" ? t("adm_submissionNew") : sub.status}
                                             </span>
                                         </div>

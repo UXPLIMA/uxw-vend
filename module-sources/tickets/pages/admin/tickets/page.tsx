@@ -26,18 +26,18 @@ interface Ticket {
 }
 
 const statusColors: Record<string, string> = {
-    OPEN: "bg-blue-100 text-blue-700",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-700",
-    WAITING_REPLY: "bg-purple-100 text-purple-700",
-    RESOLVED: "bg-green-100 text-green-700",
+    OPEN: "bg-primary/10 text-primary",
+    IN_PROGRESS: "bg-warning/10 text-warning",
+    WAITING_REPLY: "bg-secondary/10 text-secondary",
+    RESOLVED: "bg-success/10 text-success",
     CLOSED: "bg-muted text-muted-foreground",
 };
 
 const priorityColors: Record<string, string> = {
     LOW: "text-muted-foreground",
-    MEDIUM: "text-blue-500",
-    HIGH: "text-orange-500",
-    URGENT: "text-red-500",
+    MEDIUM: "text-primary",
+    HIGH: "text-warning",
+    URGENT: "text-destructive",
 };
 
 export default function AdminTicketsPage() {
@@ -103,7 +103,7 @@ export default function AdminTicketsPage() {
                         <CardTitle className="text-sm font-medium text-muted-foreground">{t("adm_open")}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-blue-600">{stats.open}</p>
+                        <p className="text-2xl font-bold text-primary">{stats.open}</p>
                     </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter("IN_PROGRESS")}>
@@ -111,7 +111,7 @@ export default function AdminTicketsPage() {
                         <CardTitle className="text-sm font-medium text-muted-foreground">{t("adm_inProgress")}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-yellow-600">{stats.inProgress}</p>
+                        <p className="text-2xl font-bold text-warning">{stats.inProgress}</p>
                     </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter("WAITING_REPLY")}>
@@ -119,7 +119,7 @@ export default function AdminTicketsPage() {
                         <CardTitle className="text-sm font-medium text-muted-foreground">{t("adm_waitingReply")}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-purple-600">{stats.waiting}</p>
+                        <p className="text-2xl font-bold text-secondary">{stats.waiting}</p>
                     </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter("")}>

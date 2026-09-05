@@ -40,9 +40,9 @@ export default function HealthSnapshotWidget() {
 
     const status = data?.status;
     const statusColor =
-        status === "ok" ? "text-green-500" :
-        status === "degraded" ? "text-amber-500" :
-        status === "down" ? "text-red-500" :
+        status === "ok" ? "text-success" :
+        status === "degraded" ? "text-warning" :
+        status === "down" ? "text-destructive" :
         "text-muted-foreground";
     const statusLabel =
         status === "ok" ? (t("health_ok")) :

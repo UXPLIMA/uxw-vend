@@ -2,7 +2,7 @@
   "id": "x-auth",
   "name": "X Login",
   "description": "Allow users to sign in with their X (Twitter) account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -44,6 +44,10 @@
         "adm_title": "X Login Settings",
         "adm_subtitle": "Set up X OAuth sign-in for your site.",
         "signInWith": "Sign in with X"
+      },
+      "admin": {
+        "module_x-auth_name": "X Login",
+        "module_x-auth_description": "Allow users to sign in with their X (Twitter) account"
       }
     },
     "tr": {
@@ -51,6 +55,10 @@
         "adm_title": "X ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için X ile OAuth girişini yapılandırın.",
         "signInWith": "X ile giriş yap"
+      },
+      "admin": {
+        "module_x-auth_name": "X ile Giriş",
+        "module_x-auth_description": "Kullanıcıların X (Twitter) hesabıyla giriş yapmasına izin verin"
       }
     }
   }

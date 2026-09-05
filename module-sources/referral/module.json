@@ -2,7 +2,7 @@
   "id": "referral",
   "name": "Referral System",
   "description": "Earn credits by referring new users",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -42,7 +42,8 @@
     {
       "label": "Referrals",
       "path": "/referral",
-      "icon": "UserPlus"
+      "icon": "UserPlus",
+      "group": "commerce"
     }
   ],
   "profileTabs": [
@@ -138,7 +139,9 @@
         "rewardPerReferral": "Reward per Referral (credits)",
         "rewardDescription": "Credits awarded to the referrer when someone uses their code",
         "saveSettings": "Save Settings",
-        "menu_referral_referrals": "Referrals"
+        "menu_referral_referrals": "Referrals",
+        "module_referral_name": "Referral System",
+        "module_referral_description": "Earn credits by referring new users"
       },
       "activity": {
         "referralUsed": "referred by:"
@@ -225,7 +228,9 @@
         "rewardPerReferral": "Referans Başına Ödül (kredi)",
         "rewardDescription": "Birisi kodunu kullandığında referans verene verilen krediler",
         "saveSettings": "Ayarları Kaydet",
-        "menu_referral_referrals": "Referanslar"
+        "menu_referral_referrals": "Referanslar",
+        "module_referral_name": "Referans Sistemi",
+        "module_referral_description": "Yeni kullanıcı davet ederek kredi kazanın"
       },
       "activity": {
         "referralUsed": "davet eden:"

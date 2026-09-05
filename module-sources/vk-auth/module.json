@@ -2,7 +2,7 @@
   "id": "vk-auth",
   "name": "VK Login",
   "description": "Allow users to sign in with their VK account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -45,6 +45,10 @@
         "adm_subtitle": "Set up VK OAuth sign-in for your site.",
         "signInWith": "Sign in with VK",
         "adm_emailNote": "VK only passes on an email address when the account has a confirmed one and the person allows it. Without it the account gets a placeholder address that can never receive mail, and the user can set a real one in their profile."
+      },
+      "admin": {
+        "module_vk-auth_name": "VK Login",
+        "module_vk-auth_description": "Allow users to sign in with their VK account"
       }
     },
     "tr": {
@@ -53,6 +57,10 @@
         "adm_subtitle": "Siteniz için VK ile OAuth girişini yapılandırın.",
         "signInWith": "VK ile giriş yap",
         "adm_emailNote": "VK, yalnızca hesapta doğrulanmış bir e-posta varsa ve kişi izin verirse adresi paylaşır. Paylaşılmazsa hesaba posta alamayan geçici bir adres atanır; kullanıcı profilinden gerçek bir adres tanımlayabilir."
+      },
+      "admin": {
+        "module_vk-auth_name": "VK ile Giriş",
+        "module_vk-auth_description": "Kullanıcıların VK hesabıyla giriş yapmasına izin verin"
       }
     }
   }

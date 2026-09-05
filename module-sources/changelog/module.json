@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Changelog",
       "path": "/changelog",
-      "icon": "History"
+      "icon": "History",
+      "group": "content"
     }
   ],
   "routes": [
@@ -105,7 +106,9 @@
         "menu_changelog": "Changelog",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_changelog_changelog": "Changelog"
+        "menu_changelog_changelog": "Changelog",
+        "module_changelog_name": "Changelog",
+        "module_changelog_description": "Release notes and update history"
       },
       "nav": {
         "changelog": "Changelog"
@@ -165,7 +168,9 @@
         "menu_changelog": "Değişiklik Günlüğü",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_changelog_changelog": "Değişiklik Günlüğü"
+        "menu_changelog_changelog": "Değişiklik Günlüğü",
+        "module_changelog_name": "Değişiklik Günlüğü",
+        "module_changelog_description": "Sürüm notları ve güncelleme geçmişi"
       },
       "nav": {
         "changelog": "Değişiklikler"

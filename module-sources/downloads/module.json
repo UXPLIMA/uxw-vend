@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Downloads",
       "path": "/downloads",
-      "icon": "Download"
+      "icon": "Download",
+      "group": "content"
     }
   ],
   "routes": [
@@ -106,7 +107,9 @@
         "menu_downloads": "Downloads",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_downloads_downloads": "Downloads"
+        "menu_downloads_downloads": "Downloads",
+        "module_downloads_name": "Downloads",
+        "module_downloads_description": "File download center for resources and mods"
       },
       "activity": {
         "fileDownloaded": "downloaded"
@@ -172,7 +175,9 @@
         "menu_downloads": "İndirmeler",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_downloads_downloads": "İndirmeler"
+        "menu_downloads_downloads": "İndirmeler",
+        "module_downloads_name": "İndirmeler",
+        "module_downloads_description": "Kaynaklar ve modlar için dosya indirme merkezi"
       },
       "activity": {
         "fileDownloaded": "indirdi:"

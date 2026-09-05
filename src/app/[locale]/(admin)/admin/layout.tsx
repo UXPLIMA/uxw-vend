@@ -63,7 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             >
                 <header className="sticky top-0 z-20 bg-card/80 backdrop-blur-sm border-b border-border">
                     <div className="flex items-center justify-between gap-4 px-4 lg:px-6 h-14 pl-16 lg:pl-6">
-                        <AdminBreadcrumb />
+                        <AdminBreadcrumb modules={modules} activeThemeId={themeId} />
                         <div className="flex items-center gap-3">
                             <div className="hidden md:block w-64">
                                 <AdminSearch />

@@ -2,7 +2,7 @@
   "id": "csv-import-export",
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Export/Import",
       "path": "/export",
-      "icon": "Download"
+      "icon": "Download",
+      "group": "advanced"
     }
   ],
   "adminRoutes": [
@@ -49,7 +50,9 @@
         "importProducts": "Import Products (CSV)",
         "importing": "Importing...",
         "menu_csv-import-export": "Csv Import Export",
-        "menu_csv-import-export_export/import": "Export/Import"
+        "menu_csv-import-export_export/import": "Export/Import",
+        "module_csv-import-export_name": "CSV Import/Export",
+        "module_csv-import-export_description": "CSV export and import utilities for data backup"
       },
       "csvImportExport": {
         "adm_export": "Export",
@@ -108,7 +111,9 @@
         "importProducts": "Ürünleri İçe Aktar (CSV)",
         "importing": "İçe aktarılıyor...",
         "menu_csv-import-export": "Dışa/İçe Aktarma",
-        "menu_csv-import-export_export/import": "Dışa/İçe Aktarma"
+        "menu_csv-import-export_export/import": "Dışa/İçe Aktarma",
+        "module_csv-import-export_name": "CSV İçe/Dışa Aktarma",
+        "module_csv-import-export_description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
       },
       "csvImportExport": {
         "adm_export": "Dışa Aktar",

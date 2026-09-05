@@ -67,7 +67,6 @@ import {
     Cog,
     SlidersHorizontal,
     Cpu,
-    Rocket,
 } from "lucide-react";
 
 /** Lucide-compatible icon component used across the admin sidebar. */
@@ -270,14 +269,12 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Settings,
         label: "Settings",
         labelKey: "sidebar_settings",
-        pathPrefix: ["/admin/settings", "/admin/setup"],
+        pathPrefix: ["/admin/settings"],
         sections: [
             {
                 items: [
                     { href: "/admin/settings/general", label: "General", labelKey: "sidebar_general", icon: Cog },
                     { href: "/admin/settings/site", label: "Site Config", labelKey: "sidebar_siteConfig", icon: Globe },
-                    { href: "/admin/settings", label: "All Settings", labelKey: "sidebar_allSettings", icon: Settings },
-                    { href: "/admin/setup", label: "Setup Wizard", labelKey: "sidebar_setupWizard", icon: Rocket },
                 ],
             },
         ],
@@ -388,7 +385,11 @@ export function buildNavGroups({
         groups.push({
             id: declaration.id,
             icon: resolveIcon(declaration.icon),
-            label: declaration.label,
+            // The manifest's label is English, the way a manifest's strings
+            // always are; the declaring module ships the translation under
+            // the derived key, the same as it does for its menu entries.
+            label: translate(`navGroup_${declaration.id}`, declaration.label),
+            labelKey: `navGroup_${declaration.id}`,
             sections: [],
         });
         sortOrder.set(declaration.id, MODULE_GROUP_ORDER_BASE + (declaration.order ?? 0));
@@ -447,6 +448,29 @@ export function buildNavGroups({
         .map((group) => ({ ...group, sections: group.sections.filter((s) => s.items.length > 0) }))
         .filter((group) => group.sections.length > 0)
         .sort((a, b) => (sortOrder.get(a.id) ?? 0) - (sortOrder.get(b.id) ?? 0) || a.id.localeCompare(b.id));
+}
+
+/**
+ * Every route the navigation can name, mapped to the label it shows for it.
+ *
+ * The breadcrumb used to titlecase the URL segment, which is why a module's
+ * settings page read "Payments" under a sidebar that said "Ödeme Ayarları":
+ * the segment is an English path, and a path is not a translation. Core items
+ * carry a `labelKey`; module items were translated when the group was built.
+ */
+export function navLabels(
+    groups: NavGroup[],
+    translate: (key: string, fallback: string) => string,
+): Map<string, string> {
+    const labels = new Map<string, string>();
+    for (const group of groups) {
+        for (const section of group.sections) {
+            for (const item of section.items) {
+                labels.set(item.href, item.labelKey ? translate(item.labelKey, item.label) : item.label);
+            }
+        }
+    }
+    return labels;
 }
 
 /**

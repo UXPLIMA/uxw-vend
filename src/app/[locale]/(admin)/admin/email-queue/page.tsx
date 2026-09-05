@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
 
 type EmailStatus = "pending" | "sending" | "sent" | "failed";
 type StatusFilter = "all" | EmailStatus;
@@ -44,18 +45,18 @@ const STATUS_LABEL: Record<string, string> = {
     failed: "emailQueue_failed",
 };
 
-const STATUS_BADGE: Record<string, string> = {
-    pending: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-    sending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
-    sent: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
-    failed: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+const STATUS_TONE: Record<string, BadgeTone> = {
+    pending: "info",
+    sending: "warning",
+    sent: "success",
+    failed: "danger",
 };
 
 const STATUS_CARD: { key: EmailStatus; labelKey: string; color: string }[] = [
-    { key: "pending", labelKey: "emailQueue_pending", color: "text-blue-500" },
-    { key: "sending", labelKey: "emailQueue_sending", color: "text-yellow-500" },
-    { key: "sent", labelKey: "emailQueue_sent", color: "text-green-500" },
-    { key: "failed", labelKey: "emailQueue_failed", color: "text-red-500" },
+    { key: "pending", labelKey: "emailQueue_pending", color: "text-primary" },
+    { key: "sending", labelKey: "emailQueue_sending", color: "text-warning" },
+    { key: "sent", labelKey: "emailQueue_sent", color: "text-success" },
+    { key: "failed", labelKey: "emailQueue_failed", color: "text-destructive" },
 ];
 
 const TABS: { key: StatusFilter; labelKey: string }[] = [
@@ -272,7 +273,7 @@ export default function EmailQueueAdminPage() {
                                                 <td className="px-4 py-3 truncate max-w-[260px]">{job.subject}</td>
                                                 <td className="px-4 py-3">
                                                     <span
-                                                        className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${STATUS_BADGE[job.status] || "bg-muted text-muted-foreground"}`}
+                                                        className={badgeClassName(STATUS_TONE[job.status] ?? "neutral", "uppercase font-mono")}
                                                     >
                                                         {STATUS_LABEL[job.status] && t.has(STATUS_LABEL[job.status]) ? t(STATUS_LABEL[job.status]) : job.status}
                                                     </span>

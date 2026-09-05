@@ -104,10 +104,6 @@ const FIRE_AND_FORGET: Record<string, { calls: number; reason: string }> = {
         calls: 1,
         reason: "Reports the error that just broke the page. If the report fails too, a toast about the report is not what the reader needs.",
     },
-    "src/app/[locale]/(admin)/admin/setup/page.tsx": {
-        calls: 1,
-        reason: "handleSelectTheme saves the pick as the admin makes it; the final step writes the same value again, so a failure here costs nothing.",
-    },
     "module-sources/trophies/pages/admin/page.tsx": {
         calls: 1,
         reason: "reloadEngine asks the trophy engine to re-read its rules. It re-reads on its own schedule anyway.",
@@ -157,13 +153,6 @@ describe("the screens this was found on", () => {
         const end = source.indexOf("\n    };", start);
         return source.slice(start, end === -1 ? undefined : end);
     };
-
-    it("does not congratulate the admin on a setup the server refused", () => {
-        const save = handler(read("src/app/[locale]/(admin)/admin/setup/page.tsx"), "saveAll");
-        expect(save).toContain("setup_completed");
-        // The success toast has to sit after the check, not before it.
-        expect(save.indexOf("writeError")).toBeLessThan(save.indexOf('toast.success(t("setup_complete"))'));
-    });
 
     it("does not reload the user page as though a ban went through", () => {
         const source = read("src/app/[locale]/(admin)/admin/users/[id]/page.tsx");

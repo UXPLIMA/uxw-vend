@@ -13,6 +13,7 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 interface Revision {
     id: string;
@@ -82,12 +83,8 @@ export default function RevisionsPage() {
     };
 
     const actionBadge = (action: string) => {
-        const cls =
-            action === "delete"
-                ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                : "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300";
         return (
-            <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${cls}`}>
+            <span className={badgeClassName(action === "delete" ? "danger" : "info", "uppercase font-mono")}>
                 {action}
             </span>
         );

@@ -2,7 +2,7 @@
   "id": "github-auth",
   "name": "GitHub Login",
   "description": "Allow users to sign in with their GitHub account",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -67,7 +67,9 @@
       },
       "admin": {
         "title": "Admin Panel",
-        "subtitle": "Manage your platform settings and content"
+        "subtitle": "Manage your platform settings and content",
+        "module_github-auth_name": "GitHub Login",
+        "module_github-auth_description": "Allow users to sign in with their GitHub account"
       }
     },
     "tr": {
@@ -98,7 +100,9 @@
       },
       "admin": {
         "title": "Yönetim Paneli",
-        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "module_github-auth_name": "GitHub ile Giriş",
+        "module_github-auth_description": "Kullanıcıların GitHub hesabıyla giriş yapmasına izin verin"
       }
     }
   }

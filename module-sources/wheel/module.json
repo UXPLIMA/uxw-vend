@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Wheel Prizes",
       "path": "/wheel-prizes",
-      "icon": "Dices"
+      "icon": "Dices",
+      "group": "commerce"
     }
   ],
   "routes": [
@@ -106,7 +107,9 @@
         "menu_wheel": "Wheel",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_wheel_wheel_prizes": "Wheel Prizes"
+        "menu_wheel_wheel_prizes": "Wheel Prizes",
+        "module_wheel_name": "Wheel of Fortune",
+        "module_wheel_description": "Spin-to-win game with configurable prizes and cooldowns"
       },
       "pageTitles": {
         "wheel": "Wheel"
@@ -153,7 +156,9 @@
         "menu_wheel": "Çark Ödülleri",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_wheel_wheel_prizes": "Çark Ödülleri"
+        "menu_wheel_wheel_prizes": "Çark Ödülleri",
+        "module_wheel_name": "Şans Çarkı",
+        "module_wheel_description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
       },
       "pageTitles": {
         "wheel": "Çark"

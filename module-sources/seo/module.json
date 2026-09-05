@@ -2,7 +2,7 @@
   "id": "seo",
   "name": "SEO Manager",
   "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
-  "version": "1.0.14",
+  "version": "1.0.16",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -46,7 +46,8 @@
     {
       "label": "SEO Manager",
       "path": "/seo",
-      "icon": "Search"
+      "icon": "Search",
+      "group": "content"
     }
   ],
   "layoutComponents": [
@@ -203,7 +204,9 @@
         "cancel": "Cancel",
         "update": "Update",
         "create": "Create",
-        "menu_seo_seo_manager": "SEO Manager"
+        "menu_seo_seo_manager": "SEO Manager",
+        "module_seo_name": "SEO Manager",
+        "module_seo_description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data"
       }
     },
     "tr": {
@@ -344,7 +347,9 @@
         "cancel": "İptal",
         "update": "Güncelle",
         "create": "Oluştur",
-        "menu_seo_seo_manager": "SEO Yöneticisi"
+        "menu_seo_seo_manager": "SEO Yöneticisi",
+        "module_seo_name": "SEO Yöneticisi",
+        "module_seo_description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
       }
     }
   }

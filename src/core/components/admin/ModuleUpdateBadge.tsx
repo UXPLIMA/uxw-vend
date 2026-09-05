@@ -40,7 +40,7 @@ export function ModuleUpdateBadge() {
     return (
         <Link
             href="/admin/modules/updates"
-            className="relative inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 text-xs font-medium hover:bg-orange-200 dark:hover:bg-orange-950/60 transition-colors"
+            className="relative inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-warning/10 text-warning text-xs font-medium hover:bg-warning/20 transition-colors"
             title={t("modules_updatesBadgeTitle", { count })}
         >
             <Bell className="w-3 h-3" />

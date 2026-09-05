@@ -2,7 +2,7 @@
   "id": "google-analytics",
   "name": "Google Analytics",
   "description": "Google Analytics tracking integration",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -40,7 +40,8 @@
     {
       "label": "Google Analytics",
       "path": "/google-analytics",
-      "icon": "BarChart"
+      "icon": "BarChart",
+      "group": "settings"
     }
   ],
   "translations": {
@@ -50,7 +51,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_google-analytics": "Google Analytics",
-        "menu_google-analytics_google_analytics": "Google Analytics"
+        "menu_google-analytics_google_analytics": "Google Analytics",
+        "module_google-analytics_name": "Google Analytics",
+        "module_google-analytics_description": "Google Analytics tracking integration"
       },
       "googleAnalytics": {
         "title": "Google Analytics",
@@ -81,7 +84,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_google-analytics": "Google Analytics",
-        "menu_google-analytics_google_analytics": "Google Analytics"
+        "menu_google-analytics_google_analytics": "Google Analytics",
+        "module_google-analytics_name": "Google Analytics",
+        "module_google-analytics_description": "Google Analytics takip entegrasyonu"
       },
       "googleAnalytics": {
         "title": "Google Analytics",

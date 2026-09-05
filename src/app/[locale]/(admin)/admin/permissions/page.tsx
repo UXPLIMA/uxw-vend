@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { ModulePermissionResources } from "@/core/generated/module-registry";
 import { writeError } from "@/core/lib/write-result";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 interface Role {
     id: string;
@@ -182,11 +183,10 @@ export default function PermissionsMatrixPage() {
                                                         <button
                                                             type="button"
                                                             onClick={() => toggleGrant(resource, action, role.id)}
-                                                            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                                                                state === "allow" ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-950 dark:text-green-300" :
-                                                                state === "deny" ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-950 dark:text-red-300" :
-                                                                "bg-muted text-muted-foreground hover:bg-muted/70"
-                                                            }`}
+                                                            className={badgeClassName(
+                                                                state === "allow" ? "success" : state === "deny" ? "danger" : "neutral",
+                                                                "px-3 py-1 transition-colors hover:brightness-95",
+                                                            )}
                                                             title={t("permissions_clickHint")}
                                                         >
                                                             {state === "allow" ? `✓ ${t("permissions_allow")}` : state === "deny" ? `✗ ${t("permissions_deny")}` : "-"}

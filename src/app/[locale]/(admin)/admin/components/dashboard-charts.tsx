@@ -85,7 +85,7 @@ export function DashboardCharts() {
             <Card>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard_newUsers")}</CardTitle>
-                    <p className="text-2xl font-bold text-purple-600">{data.totals.users}</p>
+                    <p className="text-2xl font-bold text-secondary">{data.totals.users}</p>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[200px]">

@@ -2,7 +2,7 @@
   "id": "stripe-gateway",
   "name": "Stripe Payment Gateway",
   "description": "Take card, Apple Pay and Google Pay payments through Stripe, including subscriptions",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -23,7 +23,8 @@
     {
       "label": "Stripe Settings",
       "path": "/settings/stripe",
-      "icon": "CreditCard"
+      "icon": "CreditCard",
+      "group": "settings"
     }
   ],
   "adminRoutes": [
@@ -70,7 +71,9 @@
         "menu_stripe-gateway": "Stripe Gateway",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_stripe-gateway_stripe_settings": "Stripe Settings"
+        "menu_stripe-gateway_stripe_settings": "Stripe Settings",
+        "module_stripe-gateway_name": "Stripe Payment Gateway",
+        "module_stripe-gateway_description": "Take card, Apple Pay and Google Pay payments through Stripe, including subscriptions"
       }
     },
     "tr": {
@@ -110,7 +113,9 @@
         "menu_stripe-gateway": "Stripe Ayarları",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_stripe-gateway_stripe_settings": "Stripe Ayarları"
+        "menu_stripe-gateway_stripe_settings": "Stripe Ayarları",
+        "module_stripe-gateway_name": "Stripe Ödeme Altyapısı",
+        "module_stripe-gateway_description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
       }
     }
   },

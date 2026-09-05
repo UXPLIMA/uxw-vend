@@ -2,7 +2,7 @@
   "id": "razorpay-gateway",
   "name": "Razorpay Gateway",
   "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -23,7 +23,8 @@
     {
       "label": "Razorpay Settings",
       "path": "/settings/razorpay",
-      "icon": "Smartphone"
+      "icon": "Smartphone",
+      "group": "settings"
     }
   ],
   "adminRoutes": [
@@ -81,7 +82,9 @@
       },
       "admin": {
         "menu_razorpay-gateway": "Razorpay Gateway",
-        "menu_razorpay-gateway_razorpay_settings": "Razorpay Settings"
+        "menu_razorpay-gateway_razorpay_settings": "Razorpay Settings",
+        "module_razorpay-gateway_name": "Razorpay Gateway",
+        "module_razorpay-gateway_description": "Take UPI, card, netbanking and wallet payments in India through Razorpay"
       }
     },
     "tr": {
@@ -97,7 +100,9 @@
       },
       "admin": {
         "menu_razorpay-gateway": "Razorpay Ödeme",
-        "menu_razorpay-gateway_razorpay_settings": "Razorpay Ayarları"
+        "menu_razorpay-gateway_razorpay_settings": "Razorpay Ayarları",
+        "module_razorpay-gateway_name": "Razorpay Altyapısı",
+        "module_razorpay-gateway_description": "Razorpay üzerinden Hindistan'da UPI, kart, internet bankacılığı ve cüzdan ödemelerini alın"
       }
     }
   }

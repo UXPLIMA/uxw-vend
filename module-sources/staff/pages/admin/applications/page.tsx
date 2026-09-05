@@ -34,9 +34,9 @@ const statusKeys: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-700",
-    accepted: "bg-green-100 text-green-700",
-    rejected: "bg-red-100 text-red-700",
+    pending: "bg-warning/10 text-warning",
+    accepted: "bg-success/10 text-success",
+    rejected: "bg-destructive/10 text-destructive",
 };
 
 export default function StaffApplicationsPage() {
@@ -137,7 +137,7 @@ export default function StaffApplicationsPage() {
 
                                 {app.status === "pending" && (
                                     <div className="flex gap-2">
-                                        <Button size="sm" onClick={() => updateStatus(app.id, "accepted")} className="bg-green-600 hover:bg-green-700">
+                                        <Button size="sm" onClick={() => updateStatus(app.id, "accepted")} className="bg-success text-success-foreground hover:bg-success/90">
                                             <Check className="w-3 h-3 mr-1" /> {t("adm_accept")}
                                         </Button>
                                         <Button size="sm" variant="destructive" onClick={() => updateStatus(app.id, "rejected")}>

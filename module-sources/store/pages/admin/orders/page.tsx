@@ -26,10 +26,10 @@ interface Order {
 const statuses = ["ALL", "PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "REFUNDED"];
 
 const statusColors: Record<string, string> = {
-    COMPLETED: "bg-green-100 text-green-700",
-    PENDING: "bg-yellow-100 text-yellow-700",
-    PROCESSING: "bg-blue-100 text-blue-700",
-    CANCELLED: "bg-red-100 text-red-700",
+    COMPLETED: "bg-success/10 text-success",
+    PENDING: "bg-warning/10 text-warning",
+    PROCESSING: "bg-primary/10 text-primary",
+    CANCELLED: "bg-destructive/10 text-destructive",
     REFUNDED: "bg-muted text-muted-foreground",
 };
 

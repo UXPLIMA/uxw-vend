@@ -217,7 +217,7 @@ export default function MaintenanceSettingsPage() {
                 <Button
                     onClick={onSave}
                     disabled={saving}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    
                 >
                     {saving ? (
                         <>

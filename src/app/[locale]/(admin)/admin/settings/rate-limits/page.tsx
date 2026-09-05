@@ -155,7 +155,7 @@ export default function RateLimitsSettingsPage() {
                                             aria-label={`${role.displayName} ${multiplierLabel} input`}
                                         />
                                         {isUnlimited ? (
-                                            <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+                                            <span className="text-xs font-medium text-success flex items-center gap-1">
                                                 <InfinityIcon className="w-3 h-3" /> {unlimitedLabel}
                                             </span>
                                         ) : (

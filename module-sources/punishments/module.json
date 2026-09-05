@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -27,7 +27,8 @@
     {
       "label": "Punishments",
       "path": "/punishments",
-      "icon": "Shield"
+      "icon": "Shield",
+      "group": "gaming"
     }
   ],
   "navLinks": [
@@ -65,7 +66,9 @@
     "en": {
       "admin": {
         "menu_punishments": "Punishments",
-        "menu_punishments_punishments": "All Punishments"
+        "menu_punishments_punishments": "All Punishments",
+        "module_punishments_name": "Punishments",
+        "module_punishments_description": "Player punishment history and ban management"
       },
       "punishments": {
         "adm_title": "Punishments",
@@ -130,7 +133,9 @@
     "tr": {
       "admin": {
         "menu_punishments": "Cezalar",
-        "menu_punishments_punishments": "Tüm Cezalar"
+        "menu_punishments_punishments": "Tüm Cezalar",
+        "module_punishments_name": "Cezalar",
+        "module_punishments_description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
       },
       "punishments": {
         "adm_title": "Cezalar",

@@ -76,7 +76,7 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
                 ))}
             </NativeSelect>
             {saving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
-            {saved && <Check className="w-3 h-3 text-green-500" />}
+            {saved && <Check className="w-3 h-3 text-success" />}
         </div>
     );
 }

@@ -99,8 +99,8 @@ export default function AdminReferralPage() {
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <Users className="w-5 h-5 text-blue-600" />
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <Users className="w-5 h-5 text-primary" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold">{stats.totalReferrals}</p>
@@ -112,8 +112,8 @@ export default function AdminReferralPage() {
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                                <UserPlus className="w-5 h-5 text-green-600" />
+                            <div className="p-2 bg-success/10 rounded-lg">
+                                <UserPlus className="w-5 h-5 text-success" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold">{stats.completedReferrals}</p>
@@ -125,8 +125,8 @@ export default function AdminReferralPage() {
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-yellow-100 rounded-lg">
-                                <Clock className="w-5 h-5 text-yellow-600" />
+                            <div className="p-2 bg-warning/10 rounded-lg">
+                                <Clock className="w-5 h-5 text-warning" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold">{stats.pendingReferrals}</p>
@@ -138,8 +138,8 @@ export default function AdminReferralPage() {
                 <Card>
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-100 rounded-lg">
-                                <Coins className="w-5 h-5 text-emerald-600" />
+                            <div className="p-2 bg-success/10 rounded-lg">
+                                <Coins className="w-5 h-5 text-success" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold">{(Number(stats.totalRewards) || 0).toFixed(2)}</p>

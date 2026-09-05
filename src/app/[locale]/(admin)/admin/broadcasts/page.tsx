@@ -13,6 +13,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
+import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
 
 interface Broadcast {
     id: string;
@@ -134,12 +135,12 @@ export default function BroadcastsPage() {
         failed: "broadcasts_failed",
     };
 
-    const STATUS_BADGE: Record<string, string> = {
-        draft: "bg-muted text-muted-foreground",
-        queued: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-        sending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
-        sent: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
-        failed: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+    const STATUS_TONE: Record<string, BadgeTone> = {
+        draft: "neutral",
+        queued: "info",
+        sending: "warning",
+        sent: "success",
+        failed: "danger",
     };
 
     return (
@@ -194,7 +195,7 @@ export default function BroadcastsPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                         <h2 className="font-medium text-foreground truncate">{b.subject}</h2>
-                                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${STATUS_BADGE[b.status] || ""}`}>
+                                        <span className={badgeClassName(STATUS_TONE[b.status] ?? "neutral", "uppercase font-mono")}>
                                             {STATUS_LABEL[b.status] && t.has(STATUS_LABEL[b.status]) ? t(STATUS_LABEL[b.status]) : b.status}
                                         </span>
                                     </div>

@@ -2,7 +2,7 @@
   "id": "currency",
   "name": "Multi-Currency",
   "description": "Multi-currency support with automatic conversion",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -11,7 +11,8 @@
     {
       "label": "Currency",
       "path": "/currency",
-      "icon": "DollarSign"
+      "icon": "DollarSign",
+      "group": "commerce"
     }
   ],
   "adminRoutes": [
@@ -78,7 +79,9 @@
       },
       "admin": {
         "menu_currency": "Currency",
-        "menu_currency_currency": "Currency"
+        "menu_currency_currency": "Currency",
+        "module_currency_name": "Multi-Currency",
+        "module_currency_description": "Multi-currency support with automatic conversion"
       }
     },
     "tr": {
@@ -108,7 +111,9 @@
       },
       "admin": {
         "menu_currency": "Para Birimi",
-        "menu_currency_currency": "Para Birimi"
+        "menu_currency_currency": "Para Birimi",
+        "module_currency_name": "Çoklu Para Birimi",
+        "module_currency_description": "Otomatik dönüşümle çoklu para birimi desteği"
       }
     }
   }

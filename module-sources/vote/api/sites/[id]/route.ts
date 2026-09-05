@@ -26,7 +26,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const data: Record<string, unknown> = {};
     if (fields.name !== undefined) data.name = fields.name;
     if (fields.url !== undefined) data.url = fields.url;
-    if (fields.reward !== undefined) data.reward = fields.reward;
     if (fields.icon !== undefined) data.icon = fields.icon;
     if (fields.order !== undefined) data.order = fields.order;
     if (fields.isActive !== undefined) data.isActive = fields.isActive;

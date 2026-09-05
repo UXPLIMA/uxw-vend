@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.14.0 - `Badge` joins `@/core/sdk/ui`. Every screen had hand-rolled its
+ * own status pill out of `bg-green-100 text-green-700` and friends, so a
+ * badge was a fixed light chip whatever the theme said, unreadable on a dark
+ * panel, and no two of them agreed on radius, padding or shade. The component
+ * has five tones drawn from the theme's own colour tokens, which dark mode
+ * and every theme already redefine. An addition.
+ *
  * 1.13.0 - `useFormRoute` joins `@/core/sdk/ui`. A create or edit form used
  * to unfold as a card above the list it belonged to, which on a screen with
  * two hundred rows pushes the row you came to edit off the bottom, gives the
@@ -90,4 +97,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.13.0";
+export const CORE_API_VERSION = "1.14.0";

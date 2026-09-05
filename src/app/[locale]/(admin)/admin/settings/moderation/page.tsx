@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 type ModerationMode = "auto" | "manual";
 
@@ -142,10 +143,7 @@ export default function ModerationSettingsPage() {
                                     )}
                                 </div>
                                 <span
-                                    className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${config[field.settingKey] === "manual"
-                                        ? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
-                                        : "bg-muted text-muted-foreground"
-                                        }`}
+                                    className={badgeClassName(config[field.settingKey] === "manual" ? "warning" : "neutral", "uppercase font-mono")}
                                 >
                                     {config[field.settingKey]}
                                 </span>

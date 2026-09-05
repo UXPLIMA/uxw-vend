@@ -207,7 +207,7 @@ export default function CustomPagesAdminPage() {
                                     <h2 className="font-medium text-foreground">{page.title}</h2>
                                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                                         <ExternalLink className="w-3 h-3" /> /page/{page.slug}
-                                        <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${page.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                        <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${page.isActive ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                                             {page.isActive ? t("adm_published") : t("adm_draft")}
                                         </span>
                                     </p>

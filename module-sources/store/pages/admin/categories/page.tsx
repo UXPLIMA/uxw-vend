@@ -249,7 +249,7 @@ export default function AdminStoreCategoriesPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className={`text-xs px-2 py-1 rounded ${cat.isActive ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                                        <span className={`text-xs px-2 py-1 rounded ${cat.isActive ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                                             {cat.isActive ? t("adm_active") : t("adm_inactive")}
                                         </span>
                                         <Button

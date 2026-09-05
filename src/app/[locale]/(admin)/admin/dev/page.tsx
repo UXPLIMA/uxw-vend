@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, Zap, Layers, Cpu } from "lucide-react";
+import { badgeClassName } from "@/core/components/ui/badge";
 
 interface DevData {
     hooks: {
@@ -114,7 +115,7 @@ export default function DevToolsPage() {
                                 <div className="space-y-1">
                                     {data.hooks.registered.map((l, i) => (
                                         <div key={i} className="flex items-center gap-3 text-sm py-1">
-                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono uppercase ${l.type === "action" ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300" : "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"}`}>
+                                            <span className={badgeClassName(l.type === "action" ? "info" : "neutral", "font-mono uppercase")}>
                                                 {l.type}
                                             </span>
                                             <code className="font-mono text-xs text-foreground">{l.hook}</code>

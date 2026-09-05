@@ -40,14 +40,14 @@ export default function SystemPage() {
     if (!system) return <p className="text-muted-foreground text-center py-8">{t("system_failedToLoad")}</p>;
 
     const stats = [
-        { label: t("system_databaseSize"), value: system.database.size, icon: Database, color: "text-blue-500" },
-        { label: t("system_totalUsers"), value: system.database.totalUsers, icon: Users, color: "text-green-500" },
-        { label: t("system_newUsers7d"), value: system.database.newUsersWeek, icon: Activity, color: "text-purple-500" },
-        { label: t("system_modules"), value: `${system.database.enabledModules}/${system.database.totalModules}`, icon: Puzzle, color: "text-orange-500" },
-        { label: t("system_diskUsed"), value: system.disk.used, icon: HardDrive, color: "text-red-500" },
-        { label: t("system_diskFree"), value: system.disk.free, icon: HardDrive, color: "text-emerald-500" },
-        { label: t("system_cpuCores"), value: system.system.cpuCount, icon: Cpu, color: "text-indigo-500" },
-        { label: t("system_uptime"), value: `${system.system.uptimeHours}h`, icon: Clock, color: "text-amber-500" },
+        { label: t("system_databaseSize"), value: system.database.size, icon: Database, color: "text-primary" },
+        { label: t("system_totalUsers"), value: system.database.totalUsers, icon: Users, color: "text-success" },
+        { label: t("system_newUsers7d"), value: system.database.newUsersWeek, icon: Activity, color: "text-secondary" },
+        { label: t("system_modules"), value: `${system.database.enabledModules}/${system.database.totalModules}`, icon: Puzzle, color: "text-warning" },
+        { label: t("system_diskUsed"), value: system.disk.used, icon: HardDrive, color: "text-destructive" },
+        { label: t("system_diskFree"), value: system.disk.free, icon: HardDrive, color: "text-success" },
+        { label: t("system_cpuCores"), value: system.system.cpuCount, icon: Cpu, color: "text-primary" },
+        { label: t("system_uptime"), value: `${system.system.uptimeHours}h`, icon: Clock, color: "text-warning" },
     ];
 
     return (

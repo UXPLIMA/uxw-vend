@@ -137,7 +137,7 @@ export default function AdminForumTopicsPage() {
                                         <tr key={topic.id} className="hover:bg-muted/50">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-2">
-                                                    {topic.isPinned && <Pin className="w-3 h-3 text-blue-500 flex-shrink-0" />}
+                                                    {topic.isPinned && <Pin className="w-3 h-3 text-primary flex-shrink-0" />}
                                                     {topic.isLocked && <Lock className="w-3 h-3 text-muted-foreground flex-shrink-0" />}
                                                     <div>
                                                         <p className="font-medium line-clamp-1">{topic.title}</p>
@@ -167,7 +167,7 @@ export default function AdminForumTopicsPage() {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <div className="flex gap-1">
-                                                    {topic.isPinned && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{t("adm_pinned")}</span>}
+                                                    {topic.isPinned && <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{t("adm_pinned")}</span>}
                                                     {topic.isLocked && <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{t("adm_locked")}</span>}
                                                 </div>
                                             </td>

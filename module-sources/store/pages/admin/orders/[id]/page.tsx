@@ -105,7 +105,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                                     <span>{money(Number(order.subtotal))}</span>
                                 </div>
                                 {Number(order.discount) > 0 && (
-                                    <div className="flex justify-between text-green-600">
+                                    <div className="flex justify-between text-success">
                                         <span>{t("adm_discount")}</span>
                                         <span>-{money(Number(order.discount))}</span>
                                     </div>

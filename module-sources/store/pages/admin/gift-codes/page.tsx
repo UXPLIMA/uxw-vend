@@ -184,7 +184,7 @@ export default function GiftCodesPage() {
                                             </td>
                                             <td className="py-3 px-4 font-medium">{money(Number(code.value))}</td>
                                             <td className="py-3 px-4">
-                                                <span className={`text-xs px-2 py-1 rounded ${code.isRedeemed ? "bg-muted text-muted-foreground" : "bg-green-100 text-green-700"}`}>
+                                                <span className={`text-xs px-2 py-1 rounded ${code.isRedeemed ? "bg-muted text-muted-foreground" : "bg-success/10 text-success"}`}>
                                                     {code.isRedeemed ? t("adm_redeemed") : t("adm_available")}
                                                 </span>
                                             </td>
@@ -194,7 +194,7 @@ export default function GiftCodesPage() {
                                             <td className="py-3 px-4 text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <Button aria-label={commonT("copy")} variant="ghost" size="sm" onClick={() => copyCode(code.code, code.id)}>
-                                                        {copiedId === code.id ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                                                        {copiedId === code.id ? <Check className="w-3 h-3 text-success" /> : <Copy className="w-3 h-3" />}
                                                     </Button>
                                                     <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteCode(code.id)}>
                                                         <Trash2 className="w-3 h-3" />

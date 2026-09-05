@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -50,6 +50,10 @@
       },
       "pageTitles": {
         "leaderboard": "Leaderboard"
+      },
+      "admin": {
+        "module_leaderboard_name": "Leaderboard",
+        "module_leaderboard_description": "Player rankings by purchases, votes, and activity"
       }
     },
     "tr": {
@@ -77,6 +81,10 @@
       },
       "pageTitles": {
         "leaderboard": "Sıralama"
+      },
+      "admin": {
+        "module_leaderboard_name": "Liderlik Tablosu",
+        "module_leaderboard_description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
       }
     }
   },

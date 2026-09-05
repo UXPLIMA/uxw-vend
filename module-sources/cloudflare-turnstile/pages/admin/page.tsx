@@ -78,7 +78,7 @@ export default function CloudflareTurnstileAdminPage() {
         <div className="max-w-2xl">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Shield className="w-7 h-7 text-orange-500" />
+                    <Shield className="w-7 h-7 text-warning" />
                     {t("title")}
                 </h1>
                 <p className="text-muted-foreground">{t("subtitle")}</p>

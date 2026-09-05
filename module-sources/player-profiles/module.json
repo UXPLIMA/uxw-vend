@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Player Profiles",
   "description": "Public player profile pages",
-  "version": "1.1.12",
+  "version": "1.1.14",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -78,6 +78,10 @@
       },
       "pageTitles": {
         "player": "Player Profile"
+      },
+      "admin": {
+        "module_player-profiles_name": "Player Profiles",
+        "module_player-profiles_description": "Public player profile pages"
       }
     },
     "tr": {
@@ -116,6 +120,10 @@
       },
       "pageTitles": {
         "player": "Oyuncu Profili"
+      },
+      "admin": {
+        "module_player-profiles_name": "Oyuncu Profilleri",
+        "module_player-profiles_description": "Herkese açık oyuncu profil sayfaları"
       }
     }
   },

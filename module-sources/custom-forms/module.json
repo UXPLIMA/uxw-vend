@@ -2,7 +2,7 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.26",
+  "version": "1.0.28",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -14,12 +14,14 @@
     {
       "label": "Custom Forms",
       "path": "/forms",
-      "icon": "FileEdit"
+      "icon": "FileEdit",
+      "group": "content"
     },
     {
       "label": "Form Submissions",
       "path": "/form-submissions",
-      "icon": "Inbox"
+      "icon": "Inbox",
+      "group": "content"
     }
   ],
   "routes": [
@@ -183,7 +185,9 @@
         "previous": "Previous",
         "next": "Next",
         "menu_custom-forms_custom_forms": "Custom Forms",
-        "menu_custom-forms_form_submissions": "Form Submissions"
+        "menu_custom-forms_form_submissions": "Form Submissions",
+        "module_custom-forms_name": "Custom Forms",
+        "module_custom-forms_description": "Dynamic form builder with submissions"
       },
       "activity": {
         "formSubmissionCreated": "submitted the form:"
@@ -299,7 +303,9 @@
         "previous": "Önceki",
         "next": "Sonraki",
         "menu_custom-forms_custom_forms": "Özel Formlar",
-        "menu_custom-forms_form_submissions": "Form Gönderileri"
+        "menu_custom-forms_form_submissions": "Form Gönderileri",
+        "module_custom-forms_name": "Özel Formlar",
+        "module_custom-forms_description": "Gönderim takipli dinamik form oluşturucu"
       },
       "activity": {
         "formSubmissionCreated": "formu gönderdi:"

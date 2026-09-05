@@ -2,7 +2,7 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -70,6 +70,10 @@
         "deductSuccess": "Credits deducted successfully",
         "manageCredits": "Manage Credits",
         "userCredits": "User Credits"
+      },
+      "admin": {
+        "module_credits_name": "Credit System",
+        "module_credits_description": "Virtual currency wallet for users"
       }
     },
     "tr": {
@@ -104,6 +108,10 @@
         "deductSuccess": "Krediler başarıyla düşüldü",
         "manageCredits": "Kredileri Yönet",
         "userCredits": "Kullanıcı Kredileri"
+      },
+      "admin": {
+        "module_credits_name": "Kredi Sistemi",
+        "module_credits_description": "Kullanıcılar için sanal para cüzdanı"
       }
     }
   }

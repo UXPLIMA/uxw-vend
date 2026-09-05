@@ -6,6 +6,7 @@ import { dateLocaleTag } from "@/core/lib/utils";
 import { Button } from "@/core/components/ui/button";
 import { CheckCircle, X } from "lucide-react";
 import type { MarketplaceModule } from "./types";
+import { moduleDescription, moduleName } from "./module-name";
 
 interface DetailProps {
     module: MarketplaceModule;
@@ -13,7 +14,8 @@ interface DetailProps {
 }
 
 export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
-    const __dateTag = dateLocaleTag(useLocale());
+    const locale = useLocale();
+    const __dateTag = dateLocaleTag(locale);
     const t = useTranslations("admin");
 
     // The modal is only ever rendered while it is open, so the hook is always
@@ -33,11 +35,11 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
                 <div className="flex items-start justify-between p-5 border-b">
                     <div className="min-w-0">
                         <h2 id="module-detail-title" className="text-lg font-semibold flex items-center gap-2 flex-wrap">
-                            {mod.name}
+                            {moduleName(mod, locale, t)}
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground">
                                 v{mod.version}
                             </span>
-                            {mod.verified && <CheckCircle className="w-4 h-4 text-blue-500" />}
+                            {mod.verified && <CheckCircle className="w-4 h-4 text-primary" />}
                         </h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                             by {mod.author} · updated {new Date(mod.updatedAt).toLocaleDateString(__dateTag)}
@@ -50,7 +52,7 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
 
                 <div className="overflow-y-auto flex-1 p-5 space-y-5">
                     <div>
-                        <p className="text-sm">{mod.description}</p>
+                        <p className="text-sm">{moduleDescription(mod, locale, t)}</p>
                     </div>
 
                     {mod.tags && mod.tags.length > 0 && (

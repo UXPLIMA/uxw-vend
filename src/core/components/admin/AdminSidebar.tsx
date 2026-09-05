@@ -1,41 +1,22 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
-import * as LucideIcons from "lucide-react";
-import { ModuleNavGroups } from "@/core/generated/module-registry";
-import { Menu, X, Sun, Moon, Package } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import {
-    buildNavGroups,
-    buildThemeNavGroup,
     findActiveGroupId,
     type NavGroup,
     type NavItem,
     type NavSection,
-    type NavIconComponent as IconComponent,
 } from "@/core/lib/admin-nav-groups";
-
-/**
- * Resolves a Lucide icon name (as stored on a module menu item) to its
- * React component. Falls back to Package so unknown icons still render.
- */
-function resolveIcon(name: string | undefined): IconComponent {
-    if (!name) return Package;
-    const lib = LucideIcons as unknown as Record<string, IconComponent>;
-    return lib[name] || Package;
-}
-
-interface SidebarModule {
-    id: string;
-    menu?: { path: string; label: string; icon?: string; group?: string }[];
-}
+import { useAdminNav, type AdminNavModule } from "@/core/hooks/useAdminNav";
 
 interface AdminSidebarProps {
     userName?: string;
     userEmail?: string;
-    modules?: SidebarModule[];
+    modules?: AdminNavModule[];
     /**
      * Active theme id - used to build the dynamic "Theme" nav group on the
      * client. Passing the id (a string) rather than the full NavGroup keeps
@@ -69,20 +50,9 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
 
-    // Merge module menus into the nav groups. `buildNavGroups` owns the
-    // merge and the pruning, so anything that arrives here has items to show.
-    const groups: NavGroup[] = useMemo(() => {
-        // Only groups declared by a module that is actually installed here -
-        // the registry lists every module's declaration, installed or not.
-        const enabled = new Set(modules.map((m) => m.id));
-        return buildNavGroups({
-            modules,
-            navGroups: ModuleNavGroups.filter((g) => enabled.has(g.module)),
-            themeGroup: activeThemeId ? buildThemeNavGroup(activeThemeId) : null,
-            translate: (key, fallback) => (t.has(key) ? t(key) : fallback),
-            resolveIcon,
-        });
-    }, [modules, activeThemeId, t]);
+    // The breadcrumb builds the same groups from the same hook, so the two
+    // never disagree about what a route is called.
+    const groups: NavGroup[] = useAdminNav(modules, activeThemeId);
 
     // Selection state machine:
     //   - `pathDerivedId` is the group the current URL resolves to

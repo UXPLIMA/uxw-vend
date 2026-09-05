@@ -80,12 +80,12 @@ export default function CloudflareR2AdminPage() {
         <div className="max-w-2xl">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Cloud className="w-7 h-7 text-orange-500" />
+                    <Cloud className="w-7 h-7 text-warning" />
                     {t("title")}
                 </h1>
                 <p className="text-muted-foreground">{t("subtitle")}</p>
                 {isActive && (
-                    <div className="mt-2 inline-flex items-center gap-1.5 text-sm text-green-600 bg-green-50 dark:bg-green-950/30 px-2 py-1 rounded">
+                    <div className="mt-2 inline-flex items-center gap-1.5 text-sm text-success bg-success/10 px-2 py-1 rounded">
                         <Check className="w-3.5 h-3.5" />
                         {t("currentlyActive")}
                     </div>

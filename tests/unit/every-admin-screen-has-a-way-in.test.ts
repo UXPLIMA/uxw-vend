@@ -7,19 +7,19 @@ import { CORE_NAV_GROUPS } from "@/core/lib/admin-nav-groups";
  * A screen nobody can navigate to, and a screen a module cannot get past.
  *
  * Core carries forty-one admin pages. The sidebar lists thirty-four of them,
- * the `/admin/settings` card grid lists a partly different set, and the
- * spotlight search carries a hardcoded list of twelve. Nothing compared the
- * three against the pages on disk, so a page could be shipped, guarded,
+ * and the spotlight search carries a hardcoded list of twelve. Nothing
+ * compared the two against the pages on disk, so a page could be shipped,
+ * guarded,
  * translated and wired to a working API while being reachable only by typing
  * its URL.
  *
  * Four were. `/admin/settings/moderation` is the only writer of the
  * `moderation` setting, which `forum` reads to decide whether a new topic is
  * PENDING or APPROVED: the Moderation Queue was in the sidebar and the switch
- * that fills it was not. `/admin/setup` is a second onboarding wizard that
- * installs modules and writes site settings. `/admin/dev` inspects the hook
- * and registry tables. `/admin/seo` was the fourth, and was worse than
- * unreachable - see below.
+ * that fills it was not. `/admin/setup` was a second onboarding wizard, a
+ * leftover beside the real one at `/setup`, and has since been deleted.
+ * `/admin/dev` inspects the hook and registry tables. `/admin/seo` was the
+ * fourth, and was worse than unreachable - see below.
  *
  * The second half of this file is the shadowing rule. Module pages are served
  * by three catch-alls, and a catch-all is the App Router's lowest-priority

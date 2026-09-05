@@ -2,7 +2,7 @@
   "id": "servers",
   "name": "Game Servers",
   "description": "Game server management, RCON, and status monitoring",
-  "version": "1.1.7",
+  "version": "1.1.9",
   "coreVersion": "^1.3.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Game Servers",
       "path": "/servers",
-      "icon": "Server"
+      "icon": "Server",
+      "group": "gaming"
     }
   ],
   "adminRoutes": [
@@ -120,7 +121,10 @@
         "menu_servers": "Servers",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "menu_servers_game_servers": "Game Servers"
+        "menu_servers_game_servers": "Game Servers",
+        "navGroup_gaming": "Gaming",
+        "module_servers_name": "Game Servers",
+        "module_servers_description": "Game server management, RCON, and status monitoring"
       }
     },
     "tr": {
@@ -187,7 +191,10 @@
         "menu_servers": "Sunucular",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "menu_servers_game_servers": "Oyun Sunucuları"
+        "menu_servers_game_servers": "Oyun Sunucuları",
+        "navGroup_gaming": "Oyun",
+        "module_servers_name": "Oyun Sunucuları",
+        "module_servers_description": "Oyun sunucusu yönetimi, RCON ve durum izleme"
       }
     }
   },
@@ -196,6 +203,14 @@
       "hook": "server.command",
       "type": "filter",
       "handler": "hooks/run-command.ts"
+    }
+  ],
+  "navGroups": [
+    {
+      "id": "gaming",
+      "label": "Gaming",
+      "icon": "Gamepad2",
+      "order": 30
     }
   ]
 }

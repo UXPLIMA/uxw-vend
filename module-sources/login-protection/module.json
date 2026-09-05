@@ -2,7 +2,7 @@
   "id": "login-protection",
   "name": "Login Protection",
   "description": "Login throttling: how many failed attempts lock an account",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -11,7 +11,8 @@
     {
       "label": "Security",
       "path": "/security",
-      "icon": "Shield"
+      "icon": "Shield",
+      "group": "advanced"
     }
   ],
   "adminRoutes": [
@@ -36,7 +37,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_login-protection": "Login Protection",
-        "menu_login-protection_security": "Security"
+        "menu_login-protection_security": "Security",
+        "module_login-protection_name": "Login Protection",
+        "module_login-protection_description": "Login throttling: how many failed attempts lock an account"
       },
       "loginProtection": {
         "title": "Security Settings",
@@ -94,7 +97,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_login-protection": "Giriş Koruması",
-        "menu_login-protection_security": "Güvenlik"
+        "menu_login-protection_security": "Güvenlik",
+        "module_login-protection_name": "Giriş Koruması",
+        "module_login-protection_description": "Giriş sınırlaması: kaç başarısız denemenin hesabı kilitleyeceği"
       },
       "loginProtection": {
         "title": "Güvenlik Ayarları",

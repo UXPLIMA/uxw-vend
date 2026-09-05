@@ -113,7 +113,7 @@ export default function DiscordSettingsPage() {
     return (
         <>
             <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings">
+                <Link href="/admin/settings/general">
                     <Button aria-label={commonT("back")} variant="ghost" size="icon">
                         <ArrowLeft className="w-4 h-4" />
                     </Button>

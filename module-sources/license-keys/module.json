@@ -2,7 +2,7 @@
   "id": "license-keys",
   "name": "License Keys",
   "description": "Generate, deliver and activate license keys for digital products, with a machine limit per key",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "coreVersion": "^1.2.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -144,6 +144,10 @@
         "prd_validDays": "Valid for (days)",
         "prd_validDaysPlaceholder": "Leave empty for no expiry",
         "prd_prefix": "Key prefix"
+      },
+      "admin": {
+        "module_license-keys_name": "License Keys",
+        "module_license-keys_description": "Generate, deliver and activate license keys for digital products, with a machine limit per key"
       }
     },
     "tr": {
@@ -207,6 +211,10 @@
         "prd_validDays": "Geçerlilik (gün)",
         "prd_validDaysPlaceholder": "Süresiz için boş bırak",
         "prd_prefix": "Anahtar ön eki"
+      },
+      "admin": {
+        "module_license-keys_name": "Lisans Anahtarları",
+        "module_license-keys_description": "Dijital ürünler için lisans anahtarı üretin, teslim edin ve etkinleştirin; anahtar başına makine sınırı ile"
       }
     }
   }

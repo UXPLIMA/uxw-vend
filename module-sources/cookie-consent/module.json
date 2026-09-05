@@ -2,7 +2,7 @@
   "id": "cookie-consent",
   "name": "Cookie Consent",
   "description": "GDPR cookie consent banner",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -22,6 +22,10 @@
         "message": "We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies.",
         "accept": "Accept",
         "reject": "Reject"
+      },
+      "admin": {
+        "module_cookie-consent_name": "Cookie Consent",
+        "module_cookie-consent_description": "GDPR cookie consent banner"
       }
     },
     "tr": {
@@ -29,6 +33,10 @@
         "message": "Deneyiminizi iyileştirmek için çerezler kullanıyoruz. Bu siteyi kullanmaya devam ederek çerez kullanımını kabul etmiş olursunuz.",
         "accept": "Kabul Et",
         "reject": "Reddet"
+      },
+      "admin": {
+        "module_cookie-consent_name": "Çerez Onayı",
+        "module_cookie-consent_description": "KVKK ve GDPR uyumlu çerez onay bandı"
       }
     }
   }

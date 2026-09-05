@@ -10,12 +10,12 @@ export function SuggestedModulesBanner({ themeName, suggestions }: { themeName: 
     const t = useTranslations("admin");
     if (!suggestions?.length) return null;
     return (
-        <div className="rounded-md border border-amber-300 bg-amber-50 p-4 mb-4 text-sm">
-            <div className="flex items-center gap-2 font-medium text-amber-900">
+        <div className="rounded-md border border-warning/30 bg-warning/10 p-4 mb-4 text-sm">
+            <div className="flex items-center gap-2 font-medium text-warning">
                 <AlertTriangle className="w-4 h-4" />
                 {t("theme_suggests", { name: themeName })}
             </div>
-            <ul className="mt-2 space-y-1 text-amber-900">
+            <ul className="mt-2 space-y-1 text-warning">
                 {suggestions.map(s => (
                     <li key={s.id}>
                         <Link href={`/admin/modules?install=${s.id}`} className="underline">{s.id}</Link>

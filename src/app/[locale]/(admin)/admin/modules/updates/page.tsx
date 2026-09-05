@@ -9,6 +9,9 @@ import { ArrowLeft, Loader2, Download, Check, AlertCircle, RefreshCw } from "luc
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/lib/utils";
 
+import { moduleDescription, moduleName } from "../module-name";
+import { Badge } from "@/core/components/ui/badge";
+
 interface UpdateInfo {
     moduleId: string;
     name: string;
@@ -118,7 +121,7 @@ export default function ModuleUpdatesPage() {
             {updates.length === 0 && !error ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <Check className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                        <Check className="w-12 h-12 text-success mx-auto mb-3" />
                         <p className="text-muted-foreground">{t("moduleUpdates_allUpToDate")}</p>
                     </CardContent>
                 </Card>
@@ -131,7 +134,7 @@ export default function ModuleUpdatesPage() {
                             <Card key={u.moduleId}>
                                 <CardHeader className="pb-3">
                                     <CardTitle className="flex items-center justify-between text-base">
-                                        <span>{u.name}</span>
+                                        <span>{moduleName({ id: u.moduleId, name: u.name, description: u.description ?? "" }, __locale, t)}</span>
                                         <code className="text-xs font-mono text-muted-foreground">{u.moduleId}</code>
                                     </CardTitle>
                                 </CardHeader>
@@ -141,10 +144,10 @@ export default function ModuleUpdatesPage() {
                                             <div className="flex items-center gap-2 text-sm mb-2">
                                                 <span className="px-2 py-0.5 bg-muted rounded text-xs font-mono">{u.installedVersion}</span>
                                                 <span className="text-muted-foreground">→</span>
-                                                <span className="px-2 py-0.5 bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 rounded text-xs font-mono font-bold">{u.latestVersion}</span>
+                                                <Badge tone="success" className="font-mono font-bold">{u.latestVersion}</Badge>
                                             </div>
                                             {u.description && (
-                                                <p className="text-xs text-muted-foreground">{u.description}</p>
+                                                <p className="text-xs text-muted-foreground">{moduleDescription({ id: u.moduleId, name: u.name, description: u.description ?? "" }, __locale, t)}</p>
                                             )}
                                         </div>
                                         <Button

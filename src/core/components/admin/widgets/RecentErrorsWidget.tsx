@@ -25,9 +25,9 @@ export default async function RecentErrorsWidget() {
                         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             {t("widget_recentErrors")}
                         </span>
-                        <AlertTriangle className={`w-4 h-4 ${hasErrors ? "text-amber-500" : "text-muted-foreground"}`} />
+                        <AlertTriangle className={`w-4 h-4 ${hasErrors ? "text-warning" : "text-muted-foreground"}`} />
                     </div>
-                    <div className={`text-2xl font-bold ${hasErrors ? "text-amber-500" : ""}`}>{count}</div>
+                    <div className={`text-2xl font-bold ${hasErrors ? "text-warning" : ""}`}>{count}</div>
                     {!hasErrors && (
                         <div className="text-xs text-muted-foreground mt-1">{t("widget_noRecentErrors")}</div>
                     )}

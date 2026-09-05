@@ -30,7 +30,7 @@ const STATIC_ADMIN_PAGES: { title: string; href: string; keywords: string[] }[] 
     { title: "System Health", href: "/admin/system", keywords: ["health", "monitoring"] },
     { title: "API Keys", href: "/admin/api-keys", keywords: ["api", "tokens"] },
     { title: "Media Library", href: "/admin/media", keywords: ["files", "uploads", "images"] },
-    { title: "Settings", href: "/admin/settings", keywords: ["config"] },
+    { title: "Settings", href: "/admin/settings/general", keywords: ["config"] },
     { title: "Appearance", href: "/admin/settings/theme", keywords: ["theme", "library", "modes"] },
     { title: "Navbar Editor", href: "/admin/settings/navbar", keywords: ["menu", "navigation"] },
 ];

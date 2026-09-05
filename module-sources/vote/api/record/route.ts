@@ -3,13 +3,24 @@ import { prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { voteClaimSchema } from "../../lib/validations";
 
-// POST /api/v1/vote/claim - Claim vote reward
+/**
+ * POST /api/v1/vote/record - record that this user voted on a site.
+ *
+ * This used to be `/claim`, and it moved credits: each site carried a reward
+ * and voting paid it out. The module sends people to a server listing to
+ * vote and nothing more now, so the payout, the credit transaction and the
+ * dependency on the credits module are gone.
+ *
+ * The log itself stays. It is what the 24-hour cooldown is derived from, what
+ * the leaderboard counts to rank voters, and what the trophy engine counts
+ * for the "Voter" badge - none of which was ever about the reward.
+ */
 export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const allowed = await rateLimitForRoleAsync(
-        `vote-claim:${session.user.id}`,
+        `vote-record:${session.user.id}`,
         { maxRequests: 10, windowMs: 3_600_000 },
         session.user.role
     );
@@ -26,16 +37,15 @@ export async function POST(request: NextRequest) {
     const site = await prisma.voteSite.findUnique({ where: { id: voteSiteId } });
     if (!site) return NextResponse.json({ error: "Vote site not found" }, { status: 404 });
 
-    // A transaction on its own does not prevent a double claim: under read
-    // committed, two claims submitted together both read no recent vote log
-    // and both go on to write one and award the credits. The invariant here is
-    // "no row newer than the cutoff", which no conditional write can express,
-    // so the isolation level has to carry it. Postgres aborts one of two
-    // serializable transactions whose reads and writes conflict this way; that
-    // abort is answered below as a retry, not a 500.
+    // A transaction on its own does not prevent a double record: under read
+    // committed, two submitted together both read no recent vote log and both
+    // go on to write one. The invariant here is "no row newer than the
+    // cutoff", which no conditional write can express, so the isolation level
+    // has to carry it. Postgres aborts one of two serializable transactions
+    // whose reads and writes conflict this way; that abort is answered below
+    // as a retry, not a 500.
     try {
-        const reward = await prisma.$transaction(async (tx) => {
-            // Check cooldown (24 hours per site)
+        await prisma.$transaction(async (tx) => {
             const lastVote = await tx.voteLog.findFirst({
                 where: { userId: session.user.id, voteSiteId },
                 orderBy: { createdAt: "desc" },
@@ -49,65 +59,40 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // Log vote
             await tx.voteLog.create({
                 data: { userId: session.user.id, voteSiteId },
             });
-
-            // Award credits
-            if (site.reward > 0) {
-                await tx.user.update({
-                    where: { id: session.user.id },
-                    data: { creditBalance: { increment: site.reward } },
-                });
-
-                await tx.creditTransaction.create({
-                    data: {
-                        userId: session.user.id,
-                        amount: site.reward,
-                        type: "vote_reward",
-                        description: `Vote reward from ${site.name}`,
-                    },
-                });
-            }
-
-            return site.reward;
         }, { isolationLevel: "Serializable" });
 
-        // Fire hook + activity feed entry
         const { doActionAsync } = await import("@/core/sdk");
         await doActionAsync("vote.vote.cast", {
             userId: session.user.id,
             voteSiteId,
             siteName: site.name,
-            reward,
         });
         await prisma.activityFeedItem.create({
             data: {
                 type: "vote.vote.cast",
                 actorId: session.user.id,
-                title: `Voted on ${site.name}${reward > 0 ? ` and earned ${reward} credits` : ""}`,
+                title: `Voted on ${site.name}`,
                 icon: "ThumbsUp",
                 isPublic: true,
             },
         }).catch(() => {});
 
-        return NextResponse.json({
-            message: `Vote recorded! You earned ${reward} credits.`,
-            reward,
-        });
+        return NextResponse.json({ message: `Vote recorded for ${site.name}.` });
     } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
         if (message.startsWith("COOLDOWN:")) {
             return NextResponse.json({ error: message.slice(9) }, { status: 429 });
         }
         // P2034: the transaction was aborted for conflicting with another one.
-        // Two claims arrived together and Postgres kept exactly one, which is
+        // Two records arrived together and Postgres kept exactly one, which is
         // the point. The caller is told to try again rather than shown a 500.
         const code = (err as { code?: string }).code;
         if (code === "P2034") {
             return NextResponse.json(
-                { error: "Another claim is in flight. Try again in a moment." },
+                { error: "Another vote is in flight. Try again in a moment." },
                 { status: 409 },
             );
         }

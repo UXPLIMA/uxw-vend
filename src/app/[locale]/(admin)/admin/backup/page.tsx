@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { downloadFromUrl } from "@/core/lib/download";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { Badge } from "@/core/components/ui/badge";
 import {
     Database,
     Download,
@@ -52,13 +53,10 @@ function formatDate(value: string | null, tag: string): string {
 }
 
 function TypeBadge({ type, label }: { type: "manual" | "scheduled"; label: string }) {
-    const cls = type === "manual"
-        ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-        : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
     return (
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-mono ${cls}`}>
+        <Badge tone={type === "manual" ? "info" : "success"} className="uppercase font-mono">
             {label}
-        </span>
+        </Badge>
     );
 }
 
@@ -345,8 +343,8 @@ export default function BackupAdminPage() {
                         className="relative bg-card border border-[var(--uxw-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
                     >
                         <div className="flex items-start gap-4 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 dark:bg-red-950">
-                                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" aria-hidden="true" />
+                            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                                <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
                             </div>
                             <div className="flex-1">
                                 <h2 id="restore-title" className="font-semibold text-foreground mb-1">{t("backup_restoreTitle")}</h2>

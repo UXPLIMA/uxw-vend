@@ -317,7 +317,7 @@ export default function LicensesPage() {
                                             <span
                                                 className={
                                                     license.status === "active"
-                                                        ? "text-emerald-500"
+                                                        ? "text-success"
                                                         : "text-muted-foreground"
                                                 }
                                             >

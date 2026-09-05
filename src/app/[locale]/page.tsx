@@ -93,7 +93,7 @@ export default function HomePage() {
                         {commonT('welcomeBrowseModules')}
                       </Button>
                     </Link>
-                    <Link href="/admin/settings">
+                    <Link href="/admin/settings/general">
                       <Button variant="outline">
                         <Settings className="w-4 h-4 mr-2" />
                         {commonT('welcomeOpenSettings')}

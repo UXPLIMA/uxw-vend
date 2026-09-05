@@ -12,13 +12,14 @@ const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 /**
  * A tint per status, expressed as an alpha over the theme's own colour rather
  * than a light-mode swatch. `bg-yellow-50` is a near-white that a dark panel
- * turns into a glowing rectangle; `bg-yellow-500/10` reads as a tint on both.
+ * turns into a glowing rectangle; a tint of the theme's own warning colour
+ * reads correctly on both, and follows a theme that recolours the panel.
  */
 const statusColors: Record<string, string> = {
-    PENDING: "border-yellow-500/40 bg-yellow-500/10",
-    PROCESSING: "border-blue-500/40 bg-blue-500/10",
-    COMPLETED: "border-green-500/40 bg-green-500/10",
-    CANCELLED: "border-red-500/40 bg-red-500/10",
+    PENDING: "border-warning/40 bg-warning/10",
+    PROCESSING: "border-primary/40 bg-primary/10",
+    COMPLETED: "border-success/40 bg-success/10",
+    CANCELLED: "border-destructive/40 bg-destructive/10",
     REFUNDED: "border-border bg-muted",
 };
 
@@ -72,7 +73,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: OrderStatusSelectP
                 ))}
             </NativeSelect>
             {saving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
-            {saved && <Check className="w-3 h-3 text-green-500" />}
+            {saved && <Check className="w-3 h-3 text-success" />}
         </div>
     );
 }

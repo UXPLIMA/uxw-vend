@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { FileUpload } from "@/core/components/ui/file-upload";
 import { IconPicker } from "@/core/components/ui/icon-picker";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
 
@@ -33,7 +32,6 @@ interface SettingsFormProps {
 
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
     const t = useTranslations("admin");
-    const commonT = useTranslations("common");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -84,14 +82,9 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
-                    <p className="text-muted-foreground">{subtitle}</p>
-                </div>
+            <div className="mb-8">
+                <h1 className="text-xl font-semibold">{title}</h1>
+                <p className="text-sm text-muted-foreground">{subtitle}</p>
             </div>
 
             {error && <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>}

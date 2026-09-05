@@ -2,7 +2,7 @@
   "id": "reddit-auth",
   "name": "Reddit Login",
   "description": "Allow users to sign in with their Reddit account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -44,6 +44,10 @@
         "adm_title": "Reddit Login Settings",
         "adm_subtitle": "Set up Reddit OAuth sign-in for your site.",
         "signInWith": "Sign in with Reddit"
+      },
+      "admin": {
+        "module_reddit-auth_name": "Reddit Login",
+        "module_reddit-auth_description": "Allow users to sign in with their Reddit account"
       }
     },
     "tr": {
@@ -51,6 +55,10 @@
         "adm_title": "Reddit ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Reddit ile OAuth girişini yapılandırın.",
         "signInWith": "Reddit ile giriş yap"
+      },
+      "admin": {
+        "module_reddit-auth_name": "Reddit ile Giriş",
+        "module_reddit-auth_description": "Kullanıcıların Reddit hesabıyla giriş yapmasına izin verin"
       }
     }
   }

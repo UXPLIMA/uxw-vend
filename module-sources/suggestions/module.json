@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -27,7 +27,8 @@
     {
       "label": "Suggestions",
       "path": "/suggestions",
-      "icon": "MessageSquare"
+      "icon": "MessageSquare",
+      "group": "community"
     }
   ],
   "api": [
@@ -77,7 +78,9 @@
     "en": {
       "admin": {
         "menu_suggestions": "Suggestions",
-        "menu_suggestions_suggestions": "All Suggestions"
+        "menu_suggestions_suggestions": "All Suggestions",
+        "module_suggestions_name": "Suggestions",
+        "module_suggestions_description": "Community feature suggestions with voting"
       },
       "suggestions": {
         "adm_title": "Suggestion Moderation",
@@ -147,7 +150,9 @@
     "tr": {
       "admin": {
         "menu_suggestions": "Öneriler",
-        "menu_suggestions_suggestions": "Tüm Öneriler"
+        "menu_suggestions_suggestions": "Tüm Öneriler",
+        "module_suggestions_name": "Öneriler",
+        "module_suggestions_description": "Oylamalı topluluk özellik önerileri"
       },
       "suggestions": {
         "adm_title": "Öneri Moderasyonu",

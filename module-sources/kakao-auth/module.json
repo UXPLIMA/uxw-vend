@@ -2,7 +2,7 @@
   "id": "kakao-auth",
   "name": "Kakao Login",
   "description": "Allow users to sign in with their Kakao account",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -45,6 +45,10 @@
         "adm_subtitle": "Set up Kakao OAuth sign-in for your site.",
         "signInWith": "Sign in with Kakao",
         "adm_emailNote": "The email address is an optional consent item that Kakao has to approve for your app. Until it is, accounts arrive without one and get a placeholder address that can never receive mail."
+      },
+      "admin": {
+        "module_kakao-auth_name": "Kakao Login",
+        "module_kakao-auth_description": "Allow users to sign in with their Kakao account"
       }
     },
     "tr": {
@@ -53,6 +57,10 @@
         "adm_subtitle": "Siteniz için Kakao ile OAuth girişini yapılandırın.",
         "signInWith": "Kakao ile giriş yap",
         "adm_emailNote": "E-posta adresi, Kakao'nun uygulamanız için onaylaması gereken isteğe bağlı bir izin kalemidir. Onaylanana kadar hesaplar e-postasız gelir ve posta alamayan geçici bir adres alır."
+      },
+      "admin": {
+        "module_kakao-auth_name": "Kakao ile Giriş",
+        "module_kakao-auth_description": "Kullanıcıların Kakao hesabıyla giriş yapmasına izin verin"
       }
     }
   }

@@ -56,7 +56,7 @@ export default function CssSettingsPage() {
                         placeholder={`/* Your custom CSS here */\n.my-class {\n  color: red;\n}`}
                         aria-label={t("css_editor")}
                         rows={20}
-                        className="w-full font-mono text-sm bg-gray-900 text-green-400 p-4 rounded-lg border-0 resize-y"
+                        className="w-full font-mono text-sm bg-card text-foreground border border-border p-4 rounded-lg resize-y"
                         spellCheck={false}
                     />
                 </CardContent>

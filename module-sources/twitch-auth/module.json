@@ -2,7 +2,7 @@
   "id": "twitch-auth",
   "name": "Twitch Login",
   "description": "Allow users to sign in with their Twitch account",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -67,7 +67,9 @@
       },
       "admin": {
         "title": "Admin Panel",
-        "subtitle": "Manage your platform settings and content"
+        "subtitle": "Manage your platform settings and content",
+        "module_twitch-auth_name": "Twitch Login",
+        "module_twitch-auth_description": "Allow users to sign in with their Twitch account"
       }
     },
     "tr": {
@@ -98,7 +100,9 @@
       },
       "admin": {
         "title": "Yönetim Paneli",
-        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin"
+        "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
+        "module_twitch-auth_name": "Twitch ile Giriş",
+        "module_twitch-auth_description": "Kullanıcıların Twitch hesabıyla giriş yapmasına izin verin"
       }
     }
   }

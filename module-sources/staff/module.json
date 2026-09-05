@@ -2,7 +2,7 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -14,12 +14,14 @@
     {
       "label": "Staff Applications",
       "path": "/staff-applications",
-      "icon": "FileText"
+      "icon": "FileText",
+      "group": "community"
     },
     {
       "label": "Staff Members",
       "path": "/staff-members",
-      "icon": "Users"
+      "icon": "Users",
+      "group": "community"
     }
   ],
   "routes": [
@@ -160,7 +162,9 @@
         "reject": "Reject",
         "adminNote": "Admin note",
         "menu_staff_staff_applications": "Staff Applications",
-        "menu_staff_staff_members": "Staff Members"
+        "menu_staff_staff_members": "Staff Members",
+        "module_staff_name": "Staff",
+        "module_staff_description": "Staff member listing and applications"
       },
       "pageTitles": {
         "staff": "Staff"
@@ -254,7 +258,9 @@
         "reject": "Reddet",
         "adminNote": "Yönetici notu",
         "menu_staff_staff_applications": "Personel Başvuruları",
-        "menu_staff_staff_members": "Personel Üyeleri"
+        "menu_staff_staff_members": "Personel Üyeleri",
+        "module_staff_name": "Ekip",
+        "module_staff_description": "Ekip üyesi listesi ve başvurular"
       },
       "pageTitles": {
         "staff": "Ekip"

@@ -375,7 +375,7 @@ export default function AdminCouponsPage() {
                                                 <button
                                                     onClick={() => toggleActive(coupon)}
                                                     className={`text-xs px-2 py-1 rounded cursor-pointer ${coupon.isActive
-                                                        ? "bg-green-100 text-green-700"
+                                                        ? "bg-success/10 text-success"
                                                         : "bg-muted text-muted-foreground"
                                                     }`}
                                                 >

@@ -29,7 +29,7 @@ export default async function UsersCountWidget() {
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("widget_users")}</span>
-                        <Users className="w-4 h-4 text-orange-600" />
+                        <Users className="w-4 h-4 text-warning" />
                     </div>
                     <div className="text-2xl font-bold">{total.toLocaleString(numberTag)}</div>
                     {last7d > 0 && (

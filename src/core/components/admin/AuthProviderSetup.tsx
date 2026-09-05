@@ -13,9 +13,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { ArrowLeft, Check, Loader2, TriangleAlert } from "lucide-react";
+import { Check, Loader2, TriangleAlert } from "lucide-react";
 
 interface ProviderStatus {
     id: string;
@@ -76,14 +75,6 @@ export function AuthProviderSetup({
 
     return (
         <div className="space-y-6">
-            <Link
-                href="/admin/settings"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-                <ArrowLeft className="h-4 w-4" />
-                {t("back")}
-            </Link>
-
             <div>
                 <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
                 {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
@@ -103,12 +94,12 @@ export function AuthProviderSetup({
                     {!loading && !error && status && (
                         <>
                             {status.configured ? (
-                                <p className="flex items-center gap-2 text-green-500">
+                                <p className="flex items-center gap-2 text-success">
                                     <Check className="h-4 w-4" />
                                     {t("active")}
                                 </p>
                             ) : (
-                                <p className="flex items-center gap-2 text-amber-500">
+                                <p className="flex items-center gap-2 text-warning">
                                     <TriangleAlert className="h-4 w-4" />
                                     {t("inactive")}
                                 </p>
@@ -123,8 +114,8 @@ export function AuthProviderSetup({
                                             <span
                                                 className={
                                                     status.missing.includes(name)
-                                                        ? "text-amber-500"
-                                                        : "text-green-500"
+                                                        ? "text-warning"
+                                                        : "text-success"
                                                 }
                                             >
                                                 {status.missing.includes(name) ? t("notSet") : t("set")}

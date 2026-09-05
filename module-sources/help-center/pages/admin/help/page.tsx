@@ -358,13 +358,13 @@ export default function AdminHelpCenterPage() {
                                                     </td>
                                                     <td className="py-3 px-4 text-sm">{article.views}</td>
                                                     <td className="py-3 px-4 text-sm">
-                                                        <span className="text-green-600">👍 {article.helpful}</span>
+                                                        <span className="text-success">👍 {article.helpful}</span>
                                                         {" / "}
-                                                        <span className="text-red-600">👎 {article.notHelpful}</span>
+                                                        <span className="text-destructive">👎 {article.notHelpful}</span>
                                                     </td>
                                                     <td className="py-3 px-4">
                                                         <span className={`text-xs px-2 py-1 rounded ${
-                                                            article.isActive ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                                                            article.isActive ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
                                                         }`}>
                                                             {article.isActive ? t("adm_active") : t("adm_inactive")}
                                                         </span>
@@ -406,7 +406,7 @@ export default function AdminHelpCenterPage() {
                                                 {cat.name}
                                             </span>
                                             <span className={`text-xs px-2 py-1 rounded ${
-                                                cat.isActive ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                                                cat.isActive ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
                                             }`}>
                                                 {cat.isActive ? t("adm_active") : t("adm_inactive")}
                                             </span>

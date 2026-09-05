@@ -1,0 +1,130 @@
+"use client";
+
+import { use, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { Button } from "@/core/components/ui/button";
+import { Card, CardContent } from "@/core/components/ui/card";
+import { Link } from "@/core/lib/i18n/navigation";
+import { ModuleIcon } from "../ModuleIcon";
+import { ModuleSettingsPanel } from "../ModuleSettingsPanel";
+import { moduleDescription, moduleName } from "../module-name";
+import type { Module, ModuleSettingValues } from "../types";
+
+/**
+ * One module's settings, on its own screen.
+ *
+ * The form used to be folded into the module's card on /admin/modules, which
+ * is the marketplace: a screen for finding, installing and enabling things.
+ * Configuring a module there made every card a different height, buried the
+ * install controls under a form, and left the settings of eleven modules
+ * competing for the same page. A module's configuration is a place, so it
+ * gets an address.
+ */
+export default function ModuleSettingsPage({
+    params,
+}: {
+    params: Promise<{ moduleId: string }>;
+}) {
+    const { moduleId } = use(params);
+    const t = useTranslations("admin");
+    const commonT = useTranslations("common");
+    const locale = useLocale();
+
+    const [mod, setMod] = useState<Module | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // The reader can be on another module's settings before this answers.
+        let cancelled = false;
+        fetch("/api/v1/modules")
+            .then((r) => r.json())
+            .then((data) => {
+                if (cancelled) return;
+                setMod((data.modules || []).find((m: Module) => m.id === moduleId) ?? null);
+            })
+            .catch(() => {
+                if (!cancelled) toast.error(t("modules_networkError"));
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => { cancelled = true; };
+    }, [moduleId, t]);
+
+    const save = async (id: string, config: ModuleSettingValues) => {
+        try {
+            const res = await fetch("/api/v1/modules", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ moduleId: id, enabled: mod?.enabled ?? true, config }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.error(data.error || t("modules_settingsFailed"));
+                return false;
+            }
+            setMod((current) => (current ? { ...current, config } : current));
+            toast.success(t("modules_settingsSaved"));
+            return true;
+        } catch {
+            toast.error(t("modules_networkError"));
+            return false;
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center py-16">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    if (!mod) {
+        return (
+            <Card>
+                <CardContent className="py-12 text-center space-y-3">
+                    <p className="text-muted-foreground">{t("modules_notInstalled")}</p>
+                    <Link href="/admin/modules" className="inline-flex">
+                        <Button variant="outline" size="sm">
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            {commonT("back")}
+                        </Button>
+                    </Link>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+                <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
+                    <div className="min-w-0">
+                        <h1 className="text-xl font-semibold">{moduleName(mod, locale, t)}</h1>
+                        <p className="text-sm text-muted-foreground">{moduleDescription(mod, locale, t)}</p>
+                    </div>
+                </div>
+                <Link href="/admin/modules" className="inline-flex">
+                    <Button variant="outline" size="sm">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        {commonT("back")}
+                    </Button>
+                </Link>
+            </div>
+
+            <Card>
+                <CardContent className="p-6">
+                    {(mod.settings ?? []).length === 0 ? (
+                        <p className="text-sm text-muted-foreground">{t("modules_noSettings")}</p>
+                    ) : (
+                        <ModuleSettingsPanel module={mod} onSave={save} />
+                    )}
+                </CardContent>
+            </Card>
+        </>
+    );
+}

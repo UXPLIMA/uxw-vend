@@ -2,7 +2,7 @@
   "id": "param-gateway",
   "name": "Param Payment Gateway",
   "description": "Take Turkish card and instalment payments through Param (TurkPos)",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -23,7 +23,8 @@
     {
       "label": "Param Settings",
       "path": "/settings/param",
-      "icon": "CreditCard"
+      "icon": "CreditCard",
+      "group": "settings"
     }
   ],
   "adminRoutes": [
@@ -81,7 +82,9 @@
       },
       "admin": {
         "menu_param-gateway": "Param Gateway",
-        "menu_param-gateway_param_settings": "Param Settings"
+        "menu_param-gateway_param_settings": "Param Settings",
+        "module_param-gateway_name": "Param Payment Gateway",
+        "module_param-gateway_description": "Take Turkish card and instalment payments through Param (TurkPos)"
       }
     },
     "tr": {
@@ -101,7 +104,9 @@
       },
       "admin": {
         "menu_param-gateway": "Param Ödeme",
-        "menu_param-gateway_param_settings": "Param Ayarları"
+        "menu_param-gateway_param_settings": "Param Ayarları",
+        "module_param-gateway_name": "Param Ödeme Altyapısı",
+        "module_param-gateway_description": "Param (TurkPos) üzerinden Türk kartı ve taksitli ödemeleri alın"
       }
     }
   }

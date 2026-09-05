@@ -2,7 +2,7 @@
   "id": "webhook-logs",
   "name": "Webhook Logs",
   "description": "View and manage webhook delivery logs",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Webhook Logs",
       "path": "/webhook-logs",
-      "icon": "Webhook"
+      "icon": "Webhook",
+      "group": "advanced"
     }
   ],
   "adminRoutes": [
@@ -86,7 +87,9 @@
         "status": "Status",
         "event": "Event",
         "date": "Date",
-        "menu_webhook-logs_webhook_logs": "Webhook Logs"
+        "menu_webhook-logs_webhook_logs": "Webhook Logs",
+        "module_webhook-logs_name": "Webhook Logs",
+        "module_webhook-logs_description": "View and manage webhook delivery logs"
       }
     },
     "tr": {
@@ -137,7 +140,9 @@
         "status": "Durum",
         "event": "Olay",
         "date": "Tarih",
-        "menu_webhook-logs_webhook_logs": "Webhook Günlükleri"
+        "menu_webhook-logs_webhook_logs": "Webhook Günlükleri",
+        "module_webhook-logs_name": "Webhook Kayıtları",
+        "module_webhook-logs_description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
       }
     }
   }

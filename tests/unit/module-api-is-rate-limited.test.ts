@@ -167,8 +167,11 @@ describe("what the modules in this repository declare", () => {
         expect(over).toEqual([]);
     });
 
-    it("tightens the two endpoints that mint a reward", () => {
+    it("tightens the two endpoints a player can hammer for gain", () => {
+        // Voting no longer pays anything, so `vote/record` mints nothing; it
+        // stays tightened because the vote count it writes is what the
+        // leaderboard ranks on.
         const tightened = endpoints.filter((e) => e.rateLimit).map((e) => `${e.module}${e.path}`);
-        expect(tightened.sort()).toEqual(["vote/vote/claim", "wheel/wheel/spin"]);
+        expect(tightened.sort()).toEqual(["vote/vote/record", "wheel/wheel/spin"]);
     });
 });

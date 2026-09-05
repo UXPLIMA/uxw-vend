@@ -222,10 +222,10 @@ export default function ThemeSettingsPage() {
             />
 
             {uploadMessage && (
-                <div className={`p-4 rounded-lg text-sm ${
+                <div className={`p-4 rounded-lg border text-sm ${
                     uploadMessage.type === "success"
-                        ? "bg-green-50 text-green-700 border border-green-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
+                        ? "bg-success/10 text-success border-success/25"
+                        : "bg-destructive/10 text-destructive border-destructive/25"
                 }`}>
                     {uploadMessage.type === "error" && <AlertTriangle className="w-4 h-4 inline mr-2" />}
                     {uploadMessage.text}
@@ -299,7 +299,7 @@ export default function ThemeSettingsPage() {
                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                                     <span>v{theme.version || '1.0.0'}</span>
                                     <div className="flex items-center gap-2">
-                                        {!isBuiltIn && <span className="text-blue-500">{t("theme_custom")}</span>}
+                                        {!isBuiltIn && <span className="text-primary">{t("theme_custom")}</span>}
                                         <span>{theme.modes?.default ?? "-"}</span>
                                     </div>
                                 </div>
@@ -316,7 +316,7 @@ export default function ThemeSettingsPage() {
                 return (
                     <div>
                         <h2 className="text-lg font-medium flex items-center gap-2 mb-4">
-                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                            <CheckCircle className="w-5 h-5 text-primary" />
                             {t("theme_verified")}
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -330,7 +330,7 @@ export default function ThemeSettingsPage() {
                                             <div>
                                                 <h3 className="font-semibold text-sm flex items-center gap-1.5">
                                                     {theme.name}
-                                                    {theme.verified && <CheckCircle className="w-3.5 h-3.5 text-blue-500" />}
+                                                    {theme.verified && <CheckCircle className="w-3.5 h-3.5 text-primary" />}
                                                 </h3>
                                                 <p className="text-xs text-muted-foreground">v{theme.version} - {theme.type}</p>
                                             </div>
@@ -354,7 +354,7 @@ export default function ThemeSettingsPage() {
                 );
             })()}
 
-            <div className="rounded-md border border-blue-300 bg-blue-50 p-4 text-sm text-blue-900">
+            <div className="rounded-md border border-primary/25 bg-primary/10 p-4 text-sm text-foreground">
                 <strong>{t("theme_libraryNoticeTitle")}</strong>{" "}
                 {t.rich("theme_libraryNoticeBody", {
                     path: () => <code className="font-mono text-xs">/admin/theme/appearance</code>,

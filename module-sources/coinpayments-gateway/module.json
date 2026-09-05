@@ -2,7 +2,7 @@
   "id": "coinpayments-gateway",
   "name": "CoinPayments Gateway",
   "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -23,7 +23,8 @@
     {
       "label": "CoinPayments Settings",
       "path": "/settings/coinpayments",
-      "icon": "Bitcoin"
+      "icon": "Bitcoin",
+      "group": "settings"
     }
   ],
   "adminRoutes": [
@@ -75,7 +76,9 @@
       },
       "admin": {
         "menu_coinpayments-gateway": "CoinPayments Gateway",
-        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Settings"
+        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Settings",
+        "module_coinpayments-gateway_name": "CoinPayments Gateway",
+        "module_coinpayments-gateway_description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments"
       }
     },
     "tr": {
@@ -89,7 +92,9 @@
       },
       "admin": {
         "menu_coinpayments-gateway": "CoinPayments Ödeme",
-        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Ayarları"
+        "menu_coinpayments-gateway_coinpayments_settings": "CoinPayments Ayarları",
+        "module_coinpayments-gateway_name": "CoinPayments Altyapısı",
+        "module_coinpayments-gateway_description": "CoinPayments üzerinden Bitcoin, Litecoin, USDT ve diğer kripto ödemelerini alın"
       }
     }
   }

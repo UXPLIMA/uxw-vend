@@ -2,7 +2,7 @@
   "id": "two-factor-auth",
   "name": "Two-Factor Authentication",
   "description": "TOTP-based 2FA with backup codes for enhanced account security",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -123,6 +123,10 @@
         "or": "or",
         "cancel": "Cancel",
         "done": "Done"
+      },
+      "admin": {
+        "module_two-factor-auth_name": "Two-Factor Authentication",
+        "module_two-factor-auth_description": "TOTP-based 2FA with backup codes for enhanced account security"
       }
     },
     "tr": {
@@ -173,6 +177,10 @@
         "or": "veya",
         "cancel": "İptal",
         "done": "Tamam"
+      },
+      "admin": {
+        "module_two-factor-auth_name": "İki Adımlı Doğrulama",
+        "module_two-factor-auth_description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
       }
     }
   }

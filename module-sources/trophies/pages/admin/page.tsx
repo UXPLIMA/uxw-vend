@@ -469,7 +469,7 @@ export default function AdminTrophiesPage() {
                                                     onClick={() => toggleActive(row)}
                                                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${
                                                         row.isActive
-                                                            ? "bg-green-500/10 text-green-600"
+                                                            ? "bg-success/10 text-success"
                                                             : "bg-muted text-muted-foreground"
                                                     }`}
                                                 >

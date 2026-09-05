@@ -10,6 +10,7 @@ import { formatDate } from "@/core/lib/utils";
 import { Pagination } from "@/core/components/ui/pagination";
 import { UserRoleSelect } from "./role-select";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { Badge } from "@/core/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
@@ -97,7 +98,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                                                     </div>
                                                     <Link href={`/admin/users/${user.id}`} className="font-medium hover:text-primary transition-colors">
                                                         {user.username}
-                                                        {user.isBanned && <span className="ml-2 text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">{t("users_banned")}</span>}
+                                                        {user.isBanned && <Badge tone="danger" className="ml-2">{t("users_banned")}</Badge>}
                                                     </Link>
                                                 </div>
                                             </td>

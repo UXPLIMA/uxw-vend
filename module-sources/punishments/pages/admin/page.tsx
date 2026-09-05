@@ -233,7 +233,7 @@ export default function AdminPunishmentsPage() {
                                     <td className="px-4 py-2 text-muted-foreground">{new Date(p.createdAt).toLocaleString(__dateTag)}</td>
                                     <td className="px-4 py-2">
                                         {p.active ? (
-                                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">{t("active")}</span>
+                                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">{t("active")}</span>
                                         ) : (
                                             <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">{t("revoked")}</span>
                                         )}

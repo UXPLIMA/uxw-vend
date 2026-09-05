@@ -2,7 +2,7 @@
   "id": "trophies",
   "name": "Trophies",
   "description": "Achievement badges with rule-based auto-award engine",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -14,7 +14,8 @@
     {
       "label": "Trophies",
       "path": "/trophies",
-      "icon": "Trophy"
+      "icon": "Trophy",
+      "group": "gaming"
     }
   ],
   "routes": [
@@ -173,6 +174,11 @@
       },
       "pageTitles": {
         "trophies": "Trophies"
+      },
+      "admin": {
+        "menu_trophies_trophies": "Trophies",
+        "module_trophies_name": "Trophies",
+        "module_trophies_description": "Achievement badges with rule-based auto-award engine"
       }
     },
     "tr": {
@@ -233,6 +239,11 @@
       },
       "pageTitles": {
         "trophies": "Kupalar"
+      },
+      "admin": {
+        "menu_trophies_trophies": "Kupalar",
+        "module_trophies_name": "Kupalar",
+        "module_trophies_description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
       }
     }
   }
