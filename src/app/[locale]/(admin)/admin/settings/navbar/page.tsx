@@ -210,7 +210,7 @@ export default function NavbarSettingsPage() {
             </Card>
 
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("seo_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("navbar_save")}</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("common_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("navbar_save")}</>}
             </Button>
 
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">
