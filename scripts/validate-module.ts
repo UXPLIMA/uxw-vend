@@ -1479,6 +1479,68 @@ function checkSecretChecksLimited(modulePath: string): CheckResult {
     return { name, passed: true, message: "Every secret check has a ceiling" };
 }
 
+/**
+ * Aliases of one handler have to agree about their limit.
+ *
+ * A manifest may declare the same handler at more than one path, and the
+ * dispatcher now counts a caller's requests against the handler rather than
+ * the URL so the aliases share one budget. That only stays honest while the
+ * declarations agree: if one spelling asks for a tighter `rateLimit` and
+ * another leaves it off, a caller who picks the loose spelling gets the loose
+ * ceiling on a bucket the tight one was meant to guard. Same for
+ * `providerCallback`, which buys a far higher ceiling.
+ */
+function checkApiAliasesAgree(modulePath: string): CheckResult {
+    const name = "API aliases agree on their limit";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: { api?: Array<{ path: string; handler: string; method?: string; providerCallback?: boolean; rateLimit?: { maxRequests: number; windowMs: number } }> };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const api = manifest.api ?? [];
+    if (api.length === 0) return { name, passed: true, message: "Declares no API routes" };
+
+    const byHandler = new Map<string, typeof api>();
+    for (const route of api) {
+        const handler = (route.handler ?? "").replace(/^\.?\//, "");
+        if (!handler) continue;
+        const list = byHandler.get(handler) ?? [];
+        list.push(route);
+        byHandler.set(handler, list);
+    }
+
+    const shape = (r: (typeof api)[number]) =>
+        JSON.stringify({
+            method: r.method ?? "ALL",
+            providerCallback: r.providerCallback ?? false,
+            rateLimit: r.rateLimit ?? null,
+        });
+
+    const problems: string[] = [];
+    for (const [handler, routes] of byHandler) {
+        if (routes.length < 2) continue;
+        const shapes = new Set(routes.map(shape));
+        if (shapes.size === 1) continue;
+        problems.push(`${handler} is declared at ${routes.map((r) => r.path).join(" and ")} with different method/rateLimit/providerCallback`);
+    }
+
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} disagreeing alias(es):\n      ${problems.join("\n      ")}`,
+            suggestion: "Give every path that names the same handler the same method, rateLimit and providerCallback, or point them at separate handlers.",
+        };
+    }
+    const aliased = [...byHandler.values()].filter((r) => r.length > 1).length;
+    return { name, passed: true, message: aliased === 0 ? "No handler is aliased" : `${aliased} aliased handler(s) agree` };
+}
+
 function checkModuleFetchPaths(modulePath: string): CheckResult {
     const name = "Fetched API paths exist";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1738,6 +1800,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkTranslationKeys(modulePath),
         checkAdminKeyPrefix(modulePath),
         checkModuleFetchPaths(modulePath),
+        checkApiAliasesAgree(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),

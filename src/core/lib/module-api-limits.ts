@@ -21,6 +21,36 @@ export interface EndpointLimit {
     rateLimit?: { maxRequests: number; windowMs: number };
 }
 
+/** Enough of a matched route to say which endpoint a request spent budget on. */
+export interface BucketIdentity {
+    module: string;
+    handler?: string;
+    key: string;
+}
+
+/**
+ * Which endpoint a request counts against.
+ *
+ * Not the URL. A manifest declares `{ path, handler }` pairs and nothing stops
+ * it declaring one handler at two paths, which fifteen of them do: the store
+ * lists thirteen of its routes both bare and under `/store/`, and `servers`
+ * and `player-profiles` each list one twice. The registry key is built from
+ * the path, so each spelling opened its own budget and the ceiling on those
+ * endpoints was quietly twice what it read as - measured on the demo, 120
+ * requests to `/api/v1/store/widget-stats` exhausted that path and 30 more to
+ * `/api/v1/widget-stats` from the same caller were all served.
+ *
+ * Two of them dispense value on request, `gift-codes/redeem` and `chest/[id]`,
+ * and the dispatcher's whole reason for existing is that an endpoint may not
+ * opt out of its limit. Keying on the handler makes an alias free: declare a
+ * route under as many paths as you like, they share one budget.
+ *
+ * Falls back to the key for a route table generated before `handler` existed.
+ */
+export function bucketKeyFor(route: BucketIdentity): string {
+    return route.handler ? `${route.module}:${route.handler}` : route.key;
+}
+
 export function defaultBucket(providerCallback?: boolean): RateLimitConfig {
     return providerCallback ? RATE_LIMIT_PROVIDER_CALLBACK : RATE_LIMIT_API;
 }

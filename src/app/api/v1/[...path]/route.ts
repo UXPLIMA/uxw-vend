@@ -5,7 +5,7 @@ import { logRequest } from "@/core/lib/logger";
 import { recordMetric } from "@/core/lib/metrics";
 import { auth } from "@/core/lib/auth";
 import { getClientIP, rateLimitForRoleAsync } from "@/core/lib/rate-limit";
-import { bucketFor } from "@/core/lib/module-api-limits";
+import { bucketFor, bucketKeyFor } from "@/core/lib/module-api-limits";
 import { prismaErrorResponse } from "@/core/lib/prisma-errors";
 
 /**
@@ -17,7 +17,9 @@ import { prismaErrorResponse } from "@/core/lib/prisma-errors";
  *
  * The bucket is per endpoint and per caller, so one busy endpoint does not
  * spend another's budget, and a signed-in user is counted by their id rather
- * than by an address they may be sharing with a whole campus.
+ * than by an address they may be sharing with a whole campus. Per endpoint
+ * means per handler file, not per URL: a manifest may declare one handler at
+ * several paths, and keying on the path gave each spelling its own budget.
  */
 
 /** Whether this request even carries a session, so an anonymous one costs no decode. */
@@ -61,7 +63,7 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
 
     const caller = await callerFor(req, match);
     const allowed = await rateLimitForRoleAsync(
-        `module-api:${match.key}:${caller.id}`,
+        `module-api:${bucketKeyFor(match)}:${caller.id}`,
         bucketFor(match),
         caller.role,
     );
