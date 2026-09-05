@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useCurrency } from "../lib/currency-context";
+import { useSiteCurrency } from "@/core/sdk/ui";
 
 export function TopCustomerWidget() {
     const sidebarT = useTranslations('sidebar');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const [topCustomer, setTopCustomer] = useState<{ username: string; avatar: string | null; total: number } | null>(null);
 
     useEffect(() => {

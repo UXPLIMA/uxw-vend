@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button } from "@/core/sdk/ui";
+import { Button, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Check, X, Crown, Loader2 } from "lucide-react";
-import { useCurrency } from "../../../lib/currency-context";
 
 interface Product {
     id: string;
@@ -37,7 +36,7 @@ export default function VipTablePage() {
     const t = useTranslations("store");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
 
     useEffect(() => {
         // Fetch featured products to use as VIP ranks

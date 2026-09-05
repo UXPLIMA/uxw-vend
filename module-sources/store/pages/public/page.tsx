@@ -8,7 +8,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
-import { useCurrency } from "../../lib/currency-context";
+import { useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
     id: string;
     name: string;
@@ -48,7 +48,7 @@ export default function StorePage() {
 
     const t = useTranslations('store');
     const commonT = useTranslations('common');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
 
     // Fetch Categories
     useEffect(() => {

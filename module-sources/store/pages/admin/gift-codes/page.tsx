@@ -3,8 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { formatCurrency } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Gift, Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,6 +19,7 @@ interface GiftCode {
 }
 
 export default function GiftCodesPage() {
+    const { format: money } = useSiteCurrency();
     const t = useTranslations("store");
     const commonT = useTranslations("common");
     const { confirm } = useConfirm();
@@ -162,7 +162,7 @@ export default function GiftCodesPage() {
                                             <td className="py-3 px-4">
                                                 <code className="font-mono text-sm bg-muted px-2 py-0.5 rounded">{code.code}</code>
                                             </td>
-                                            <td className="py-3 px-4 font-medium">{formatCurrency(Number(code.value))}</td>
+                                            <td className="py-3 px-4 font-medium">{money(Number(code.value))}</td>
                                             <td className="py-3 px-4">
                                                 <span className={`text-xs px-2 py-1 rounded ${code.isRedeemed ? "bg-muted text-muted-foreground" : "bg-green-100 text-green-700"}`}>
                                                     {code.isRedeemed ? t("adm_redeemed") : t("adm_available")}

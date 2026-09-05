@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, PartyPopper } from "lucide-react";
@@ -19,6 +19,7 @@ interface Prize {
 
 export default function WheelPage() {
     const t = useTranslations('wheel');
+    const { format: money } = useSiteCurrency();
     const { data: session } = useSession();
     const [prizes, setPrizes] = useState<Prize[]>([]);
     const [loading, setLoading] = useState(true);
@@ -210,7 +211,7 @@ export default function WheelPage() {
                                     <div key={p.id} className="flex items-center gap-2 text-sm">
                                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
                                         <span className="text-foreground">{p.name}</span>
-                                        {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? t('valueCredits', { value: p.value }) : `$${p.value}`})</span>}
+                                        {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? t('valueCredits', { value: p.value }) : money(p.value)})</span>}
                                     </div>
                                 ))}
                             </div>

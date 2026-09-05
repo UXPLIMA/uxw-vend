@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.8.0 - `useSiteCurrency` joins `@/core/sdk/ui`, and core mounts the
+ * provider behind it. A module that shows a price no longer has to guess the
+ * currency: the base is the setting the payment gateways charge in, the
+ * formatting follows the reader's locale, and a module that knows exchange
+ * rates can put every price on the site into another currency with
+ * `setDisplay({ code, rate })`.
+ *
  * 1.7.0 - `writeError` and the `Translator` type join `@/core/sdk`. A handler
  * that sends a POST and then shows a green toast without reading the response
  * reports success for a 403, a 429 and a 500 alike; the helper is the check,
@@ -50,4 +57,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.7.0";
+export const CORE_API_VERSION = "1.8.0";

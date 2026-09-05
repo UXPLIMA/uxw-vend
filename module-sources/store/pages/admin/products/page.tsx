@@ -5,8 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { formatCurrency } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, Package } from "lucide-react";
 
 interface Product {
@@ -23,6 +22,7 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
+    const { format: money } = useSiteCurrency();
     const t = useTranslations("store");
     const commonT = useTranslations("common");
     const [products, setProducts] = useState<Product[]>([]);
@@ -120,7 +120,7 @@ export default function AdminProductsPage() {
                                                     {product.category?.name || "-"}
                                                 </td>
                                                 <td className="py-3 px-4 font-medium">
-                                                    {formatCurrency(Number(product.price))}
+                                                    {money(Number(product.price))}
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     {product.stock === null ? "∞" : product.stock}

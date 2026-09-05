@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/sdk";
-import { useCurrency } from "../lib/currency-context";
 import { Target } from "lucide-react";
+import { useSiteCurrency } from "@/core/sdk/ui";
 
 interface GoalData {
     target: number;
@@ -16,7 +16,7 @@ interface GoalData {
 export function PaymentGoalWidget() {
     const __dateTag = dateLocaleTag(useLocale());
     const sidebarT = useTranslations('sidebar');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const [goal, setGoal] = useState<GoalData | null>(null);
 
     useEffect(() => {

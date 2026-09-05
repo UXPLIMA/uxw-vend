@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { formatCurrency, formatDate } from "@/core/sdk";
+import { formatDate } from "@/core/sdk";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { ORDER_STATUS_KEYS, orderStatusLabel } from "../lib/order-status";
@@ -38,6 +38,7 @@ const statusColor = (status: string) => {
 };
 
 export function ProfileOrdersTab() {
+    const { format: money } = useSiteCurrency();
     const t = useTranslations("store");
     const dateTag = dateLocaleTag(useLocale());
     const [orders, setOrders] = useState<Order[]>([]);
@@ -92,7 +93,7 @@ export function ProfileOrdersTab() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="text-right">
-                                            <p className="font-bold">{formatCurrency(Number(order.total))}</p>
+                                            <p className="font-bold">{money(Number(order.total))}</p>
                                             <span className={`text-xs px-2 py-0.5 rounded ${statusColor(order.status)}`}>
                                                 {statusLabel(order.status)}
                                             </span>
@@ -118,11 +119,11 @@ export function ProfileOrdersTab() {
                                                     <div className="flex-1">
                                                         <p className="text-sm font-medium">{item.product?.name || item.name}</p>
                                                         <p className="text-xs text-muted-foreground">
-                                                            {formatCurrency(Number(item.price))} × {item.quantity}
+                                                            {money(Number(item.price))} × {item.quantity}
                                                         </p>
                                                     </div>
                                                     <p className="text-sm font-medium">
-                                                        {formatCurrency(Number(item.price) * item.quantity)}
+                                                        {money(Number(item.price) * item.quantity)}
                                                     </p>
                                                 </div>
                                             ))}
@@ -130,12 +131,12 @@ export function ProfileOrdersTab() {
                                         {Number(order.discount) > 0 && (
                                             <div className="flex justify-between mt-3 pt-3 border-t text-sm text-green-600">
                                                 <span>{t("tab_orders_discount")}</span>
-                                                <span>-{formatCurrency(Number(order.discount))}</span>
+                                                <span>-{money(Number(order.discount))}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between mt-2 pt-2 border-t text-sm font-bold">
                                             <span>{t("tab_orders_total")}</span>
-                                            <span>{formatCurrency(Number(order.total))}</span>
+                                            <span>{money(Number(order.total))}</span>
                                         </div>
                                     </div>
                                 )}

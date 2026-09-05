@@ -9,6 +9,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 import { useAllModules } from "@/core/providers/module-provider";
 import dynamic from "next/dynamic";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { useSiteCurrency } from "@/core/components/currency/site-currency";
 
 const DashboardCharts = dynamic(() => import("./dashboard-charts").then(m => ({ default: m.DashboardCharts })), {
     loading: () => <div className="h-[300px] bg-muted animate-pulse rounded-lg" />,
@@ -133,9 +134,15 @@ function useModuleDashboardData() {
     return { cards, stats, sections, loading };
 }
 
-function formatValue(key: string, value: string | number | undefined): string | number {
+function formatValue(
+    key: string,
+    value: string | number | undefined,
+    money: (amount: number | string | null | undefined) => string,
+): string | number {
     if (value === undefined) return 0;
-    if (key === "revenue") return `$${Number(value || 0).toFixed(2)}`;
+    // A module's revenue card is denominated in whatever the gateways charge
+    // in. This used to write it with a dollar sign whatever that was.
+    if (key === "revenue") return money(value);
     return value || 0;
 }
 
@@ -146,6 +153,7 @@ function formatValue(key: string, value: string | number | undefined): string | 
 export function ModuleStatCards() {
     const { cards, stats, loading } = useModuleDashboardData();
     const t = useTranslations("admin");
+    const { format: money } = useSiteCurrency();
 
     const translateLabel = (raw: string, key?: string): string => {
         if (!key) return raw;
@@ -185,7 +193,7 @@ export function ModuleStatCards() {
                                     </span>
                                     <CardIcon name={card.icon} className={`w-4 h-4 ${card.color}`} />
                                 </div>
-                                <div className="text-2xl font-bold">{formatValue(card.statKey, stats[card.statKey])}</div>
+                                <div className="text-2xl font-bold">{formatValue(card.statKey, stats[card.statKey], money)}</div>
                             </CardContent>
                         </Card>
                     </Link>

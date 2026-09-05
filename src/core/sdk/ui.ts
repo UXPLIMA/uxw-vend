@@ -23,6 +23,15 @@ export {
 } from "@/core/components/ui/select";
 export { Skeleton } from "@/core/components/ui/skeleton";
 export { useConfirm } from "@/core/components/ui/confirm-dialog";
+
+/**
+ * The site's currency and a formatter for it. A module that shows a price
+ * must use this rather than its own `$`: the base comes from the setting the
+ * payment gateways charge in, and the formatting follows the reader's locale.
+ * A module that knows exchange rates calls `setDisplay({ code, rate })`.
+ */
+export { useSiteCurrency } from "@/core/components/currency/site-currency";
+export type { SiteCurrency, DisplayCurrency } from "@/core/components/currency/site-currency";
 export { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 export { FileUpload } from "@/core/components/ui/file-upload";
 export { FooterDropdown } from "@/core/components/ui/footer-dropdown";

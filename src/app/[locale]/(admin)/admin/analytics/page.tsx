@@ -19,6 +19,7 @@ import {
 import { Line } from "react-chartjs-2";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { useSiteCurrency } from "@/core/components/currency/site-currency";
 
 ChartJS.register(
     CategoryScale,
@@ -64,8 +65,13 @@ function sum(data: number[]): number {
     return data.reduce((a, b) => a + b, 0);
 }
 
-function formatTotal(total: number, fmt: string | undefined, localeTag: string): string {
-    if (fmt === "currency") return `$${total.toFixed(2)}`;
+function formatTotal(
+    total: number,
+    fmt: string | undefined,
+    localeTag: string,
+    money: (amount: number | string | null | undefined) => string,
+): string {
+    if (fmt === "currency") return money(total);
     if (Number.isInteger(total)) return total.toLocaleString(localeTag);
     return total.toFixed(2);
 }
@@ -73,6 +79,7 @@ function formatTotal(total: number, fmt: string | undefined, localeTag: string):
 export default function AnalyticsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
+    const { format: money } = useSiteCurrency();
     const t = useTranslations("admin");
     const moduleStates = useAllModules();
     const [period, setPeriod] = useState<string>("30");
@@ -203,7 +210,7 @@ export default function AnalyticsPage() {
                                                 {t("analytics_total")}
                                             </div>
                                             <div className="text-lg font-bold" style={{ color }}>
-                                                {formatTotal(total, chart.format, __dateTag)}
+                                                {formatTotal(total, chart.format, __dateTag, money)}
                                             </div>
                                         </div>
                                     </div>
@@ -236,7 +243,7 @@ export default function AnalyticsPage() {
                                                         callbacks: {
                                                             label: (ctx) => {
                                                                 const v = ctx.parsed.y;
-                                                                if (chart.format === "currency") return `$${Number(v).toFixed(2)}`;
+                                                                if (chart.format === "currency") return money(Number(v));
                                                                 return String(v);
                                                             },
                                                         },

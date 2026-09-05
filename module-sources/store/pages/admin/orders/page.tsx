@@ -4,8 +4,8 @@
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { formatCurrency, formatDate } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { formatDate } from "@/core/sdk";
+import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminOrderStatusKeys, orderStatusLabel } from "../../../lib/order-status";
@@ -34,6 +34,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminOrdersPage() {
+    const { format: money } = useSiteCurrency();
     const t = useTranslations("store");
     const commonT = useTranslations("common");
     const dateTag = dateLocaleTag(useLocale());
@@ -148,7 +149,7 @@ export default function AdminOrdersPage() {
                                                 {t("adm_itemsCount", { count: order.items.length })}
                                             </td>
                                             <td className="py-3 px-4 font-medium">
-                                                {formatCurrency(Number(order.total))}
+                                                {money(Number(order.total))}
                                             </td>
                                             <td className="py-3 px-4">
                                                 <span className={`text-xs px-2 py-1 rounded ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>

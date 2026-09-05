@@ -119,3 +119,10 @@ export { log } from "@/core/lib/logger";
 // rather than a NEXT_PUBLIC_* var, which `next build` freezes into the
 // prebuilt image for every installation on earth.
 export { resolveAppUrl, resolveAppName } from "@/core/lib/app-url";
+
+/**
+ * The currency the payment gateways charge in, and a formatter for it. The
+ * client half is `useSiteCurrency` in `@/core/sdk/ui`; a server component
+ * cannot call a hook, so it awaits these instead.
+ */
+export { siteCurrency, formatSiteCurrency } from "@/core/lib/site-currency";

@@ -24,8 +24,12 @@ const PUBLIC_KEYS = [
     "theme_color_primary",
     "theme_color_secondary",
     "theme_color_accent",
-    "currency",
-    "currency_symbol",
+    // What the payment gateways charge in. Every price on the site is
+    // written in it, so a client that draws one needs it; checkout has
+    // published the same value to the buyer for as long as there was a
+    // checkout. The old "currency" and "currency_symbol" keys were on this
+    // list with nothing writing them and nothing reading them.
+    "default_currency",
     // Theme customizer overrides
     "theme_overrides",
     // Admin > Settings > Widgets writes both of these, and the homepage is
