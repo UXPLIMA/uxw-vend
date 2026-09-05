@@ -16,7 +16,7 @@ interface HealthData {
     checks: {
         database: { ok: boolean; latencyMs?: number; error?: string };
         redis: { ok: boolean; enabled: boolean; error?: string };
-        emailQueue: { ok: boolean; pending: number; failed: number; error?: string };
+        emailQueue: { ok: boolean; configured: boolean; pending: number; failed: number; error?: string };
         scheduler: { ok: boolean; staleJobs: number; error?: string };
     };
     version: string;
@@ -187,18 +187,29 @@ export default function ObservabilityPage() {
                         <CardTitle className="text-sm flex items-center gap-2">
                             <Mail className="w-4 h-4 text-rose-500" />
                             {t("observability_emailQueue")}
-                            <StatusDot ok={health?.checks.emailQueue.ok ?? false} />
+                            <StatusDot
+                                ok={health?.checks.emailQueue.ok ?? false}
+                                disabled={health?.checks.emailQueue.configured === false}
+                            />
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm space-y-1">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground text-xs">pending</span>
-                            <span className="font-mono">{health?.checks.emailQueue.pending ?? 0}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground text-xs">failed</span>
-                            <span className="font-mono text-rose-500">{health?.checks.emailQueue.failed ?? 0}</span>
-                        </div>
+                        {health?.checks.emailQueue.configured === false ? (
+                            <p className="text-xs text-muted-foreground">
+                                {t("observability_notConfigured")}
+                            </p>
+                        ) : (
+                            <>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground text-xs">pending</span>
+                                    <span className="font-mono">{health?.checks.emailQueue.pending ?? 0}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground text-xs">failed</span>
+                                    <span className="font-mono text-rose-500">{health?.checks.emailQueue.failed ?? 0}</span>
+                                </div>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
 

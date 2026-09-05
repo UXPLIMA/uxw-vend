@@ -140,6 +140,7 @@ function generateRegistry() {
     const allNavLinks: ({ label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string })[] = [];
     const allFooterLinks: ManifestItem[] = [];
     const allDashboardCards: ManifestItem[] = [];
+    const allDashboardSections: ManifestItem[] = [];
     const allHomepageSections: ({ id: string; type: 'content' | 'widget'; component: string; order: number; module: string })[] = [];
     const allLayoutComponents: ({ id: string; component: string; include?: string[]; exclude?: string[]; module: string })[] = [];
     const allNavbarComponents: ({ id: string; component: string; order: number; module: string })[] = [];
@@ -172,6 +173,7 @@ function generateRegistry() {
         manifest.navLinks?.forEach((l) => allNavLinks.push({ ...l, module: moduleName }));
         manifest.footerLinks?.forEach((l) => allFooterLinks.push({ ...l, module: moduleName }));
         manifest.dashboardCards?.forEach((c) => allDashboardCards.push({ ...c, module: moduleName }));
+        manifest.dashboardSections?.forEach((sec) => allDashboardSections.push({ ...sec, module: moduleName }));
         manifest.layoutComponents?.forEach((lc) => allLayoutComponents.push({ ...lc, module: moduleName }));
         manifest.profileTabs?.forEach((pt) => allProfileTabs.push({ ...pt, module: moduleName }));
         manifest.oauthButtons?.forEach((btn) => allOauthButtons.push({ ...btn, module: moduleName }));
@@ -249,6 +251,7 @@ function generateRegistry() {
     widgetRegistry += `export const ModuleNavLinks: { label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; labelKey?: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;
+    widgetRegistry += `export const ModuleDashboardSections: { id: string; label: string; labelKey?: string; module: string }[] = ${JSON.stringify(allDashboardSections, null, 2)};\n\n`;
     widgetRegistry += `// Activity-feed title localization entries contributed by modules.\n`;
     widgetRegistry += `export const ModuleActivityTitles: { type: string; prefix: string; key: string; module: string }[] = ${JSON.stringify(allActivityTitles, null, 2)};\n\n`;
     widgetRegistry += `// RBAC resource strings modules own - surfaced in the admin permission matrix (flattened + deduped).\n`;

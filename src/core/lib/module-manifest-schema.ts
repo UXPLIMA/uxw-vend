@@ -537,6 +537,19 @@ const dashboardCard = z.object({
     statKey: z.string().min(1).max(64).regex(SAFE_SLUG),
 });
 
+/**
+ * A dashboard section panel. The panel's contents arrive at runtime from the
+ * module's `statsApi`, but the dashboard customizer is rendered before any of
+ * those endpoints are called, so a panel nobody declared could never appear in
+ * the list of things an admin is allowed to hide. The id here must match the
+ * `sections[].id` the stats endpoint returns.
+ */
+const dashboardSection = z.object({
+    id: z.string().min(1).max(64).regex(SAFE_SLUG),
+    label: z.string().min(1).max(100),
+    labelKey: z.string().max(128).optional(),
+});
+
 const userDataExportEntry = z.object({
     model: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/, "model must be a Prisma delegate identifier"),
     key: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
@@ -734,6 +747,7 @@ export const moduleManifestSchema = z.object({
     settingsCards: z.array(settingsCard).max(50).optional(),
     homepageSections: z.array(homepageSection).max(50).optional(),
     dashboardCards: z.array(dashboardCard).max(50).optional(),
+    dashboardSections: z.array(dashboardSection).max(20).optional(),
     statsApi: routePath.optional(),
     seoRoutes: z.object({ handler: relativePath("handler") }).optional(),
     userDataExport: z.array(userDataExportEntry).max(50).optional(),

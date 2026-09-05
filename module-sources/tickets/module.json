@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -100,6 +100,13 @@
       "color": "text-red-600",
       "statKey": "tickets",
       "labelKey": "dashboard_tickets"
+    }
+  ],
+  "dashboardSections": [
+    {
+      "id": "open-tickets",
+      "label": "Open Tickets",
+      "labelKey": "dashboard_openTickets"
     }
   ],
   "statsApi": "/support/stats",

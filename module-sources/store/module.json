@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.16",
+  "version": "2.2.17",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -436,6 +436,13 @@
       "color": "text-purple-600",
       "statKey": "products",
       "labelKey": "dashboard_products"
+    }
+  ],
+  "dashboardSections": [
+    {
+      "id": "recent-orders",
+      "label": "Recent Orders",
+      "labelKey": "dashboard_recentOrders"
     }
   ],
   "statsApi": "/store/stats",

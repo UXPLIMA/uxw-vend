@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T15:59:26Z",
+  "updatedAt": "2026-09-05T16:12:53Z",
   "modules": [
     {
       "id": "announcements",
@@ -727,13 +727,13 @@
       "id": "forum",
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
-      "version": "1.1.12",
+      "version": "1.1.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T15:59:26Z",
+      "updatedAt": "2026-09-05T16:12:53Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2039,13 +2039,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.16",
+      "version": "2.2.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T15:59:26Z",
+      "updatedAt": "2026-09-05T16:12:53Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2159,13 +2159,13 @@
       "id": "tickets",
       "name": "Support Tickets",
       "description": "Customer support ticket system with departments and priority levels",
-      "version": "1.0.30",
+      "version": "1.0.31",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T15:59:26Z",
+      "updatedAt": "2026-09-05T16:12:53Z",
       "screenshots": [],
       "tags": [
         "management"

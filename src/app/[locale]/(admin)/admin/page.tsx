@@ -3,7 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { getLocale, getTranslations } from "next-intl/server";
 import {
-    ModuleStatCards,
+    DashboardKpiRow,
     ModuleSections,
 } from "./components/dashboard-client";
 import { DashboardCustomizer } from "@/core/components/admin/DashboardCustomizer";
@@ -40,12 +40,6 @@ export const dynamic = "force-dynamic";
  *  - Panels: activity-feed (1x1 but larger cards)
  */
 
-const KPI_WIDGET_IDS = new Set([
-    "users-count",
-    "health-snapshot",
-    "email-queue-status",
-    "recent-errors",
-]);
 const PANEL_WIDGET_IDS = new Set(["activity-feed"]);
 
 const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
@@ -78,8 +72,29 @@ export default async function AdminDashboard() {
         return render ? render() : null;
     };
 
-    const visibleKpiWidgets = visible.filter((w) => KPI_WIDGET_IDS.has(w.id));
     const visiblePanelWidgets = visible.filter((w) => PANEL_WIDGET_IDS.has(w.id));
+
+    // The KPI row mixes core widgets with module stat cards, and the customizer
+    // lets an admin order and hide either. The core widgets are rendered here,
+    // on the server, and handed to the row as nodes; the row fetches the module
+    // cards itself and places both in the saved order.
+    const kpiOrder = visible
+        .filter((w) => {
+            const info = availableById.get(w.id);
+            return Boolean(info) && info!.kind === "card" && !PANEL_WIDGET_IDS.has(w.id);
+        })
+        .map((w) => w.id);
+    const coreSlots: Record<string, React.ReactNode> = {};
+    for (const id of kpiOrder) {
+        const node = renderWidget(id);
+        if (node) coreSlots[id] = node;
+    }
+
+    // Section panels are hidden by plain id; the row ids carry the module.
+    const hiddenSections = layout
+        .filter((w) => !w.visible && availableById.get(w.id)?.kind === "section")
+        .map((w) => w.id.split(":section:")[1])
+        .filter(Boolean);
 
     return (
         <div className="space-y-6">
@@ -93,10 +108,9 @@ export default async function AdminDashboard() {
             </div>
 
             {/* KPI row - core KPIs + module stat cards, uniform 1x1 grid */}
-            {(visibleKpiWidgets.length > 0 || true) && (
+            {kpiOrder.length > 0 && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    {visibleKpiWidgets.map((w) => renderWidget(w.id))}
-                    <ModuleStatCards />
+                    <DashboardKpiRow order={kpiOrder} coreSlots={coreSlots} />
                 </div>
             )}
 
@@ -108,7 +122,7 @@ export default async function AdminDashboard() {
             )}
 
             {/* Module sections - 2-col panels contributed by modules */}
-            <ModuleSections />
+            <ModuleSections hidden={hiddenSections} />
         </div>
     );
 }

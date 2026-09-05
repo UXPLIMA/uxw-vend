@@ -146,11 +146,36 @@ function formatValue(
     return value || 0;
 }
 
+/** The layout id a module card or panel is stored under. Mirrors core. */
+function widgetId(kind: "card" | "section", moduleId: string, id: string): string {
+    return kind === "section" ? `mod:${moduleId}:section:${id}` : `mod:${moduleId}:${id}`;
+}
+
+function StatCardSkeleton() {
+    return (
+        <Card className="animate-pulse">
+            <CardContent className="p-4">
+                <div className="h-4 bg-muted rounded w-20 mb-2" />
+                <div className="h-8 bg-muted rounded w-16" />
+            </CardContent>
+        </Card>
+    );
+}
+
 /**
- * Flat list of module-contributed stat cards. Designed to sit inside a
- * uniform 4-col grid alongside core KPI widgets.
+ * The KPI row.
+ *
+ * `order` is the admin's saved layout, already filtered to the visible ids and
+ * sorted. `coreSlots` carries the core widgets, rendered on the server and
+ * handed down as nodes, so the row can interleave a module's card between two
+ * core ones - which is what the customizer's up and down arrows promise. The
+ * previous version rendered the core widgets in layout order and then dumped
+ * every module card after them, visible or not.
  */
-export function ModuleStatCards() {
+export function DashboardKpiRow({ order, coreSlots }: {
+    order: string[];
+    coreSlots: Record<string, React.ReactNode>;
+}) {
     const { cards, stats, loading } = useModuleDashboardData();
     const t = useTranslations("admin");
     const { format: money } = useSiteCurrency();
@@ -165,26 +190,17 @@ export function ModuleStatCards() {
         }
     };
 
-    if (loading) {
-        return (
-            <>
-                {[1, 2, 3].map(i => (
-                    <Card key={`skel-${i}`} className="animate-pulse">
-                        <CardContent className="p-4">
-                            <div className="h-4 bg-muted rounded w-20 mb-2" />
-                            <div className="h-8 bg-muted rounded w-16" />
-                        </CardContent>
-                    </Card>
-                ))}
-            </>
-        );
-    }
+    const byId = new Map(cards.map((card) => [widgetId("card", card.module, card.id), card]));
 
     return (
         <>
-            {cards.map((card) => {
+            {order.map((id) => {
+                if (coreSlots[id]) return <div key={id}>{coreSlots[id]}</div>;
+                if (!id.startsWith("mod:")) return null;
+                const card = byId.get(id);
+                if (!card) return loading ? <StatCardSkeleton key={id} /> : null;
                 return (
-                    <Link key={card.id} href={card.href} className="block">
+                    <Link key={id} href={card.href} className="block">
                         <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                             <CardContent className="p-4">
                                 <div className="flex items-center justify-between mb-2">
@@ -204,10 +220,25 @@ export function ModuleStatCards() {
 }
 
 /**
+ * Flat list of module-contributed stat cards, every one of them. Kept for the
+ * legacy `DashboardClient` wrapper below; the dashboard itself uses
+ * `DashboardKpiRow`, which obeys the saved layout.
+ */
+export function ModuleStatCards() {
+    const { cards } = useModuleDashboardData();
+    return (
+        <DashboardKpiRow
+            order={cards.map((card) => widgetId("card", card.module, card.id))}
+            coreSlots={{}}
+        />
+    );
+}
+
+/**
  * Module-contributed section panels (e.g. open tickets, latest orders,
  * recent forum topics). Rendered as a 2-col grid of larger Cards.
  */
-export function ModuleSections() {
+export function ModuleSections({ hidden }: { hidden?: string[] } = {}) {
     const { sections, loading } = useModuleDashboardData();
     const t = useTranslations("admin");
 
@@ -221,11 +252,18 @@ export function ModuleSections() {
         }
     };
 
-    if (loading || sections.length === 0) return null;
+    // `hidden` is the set of section ids the admin switched off in the
+    // customizer. A section the module returns but its manifest never declared
+    // cannot be in that set, so it stays visible: the customizer never offered
+    // it, and hiding something nobody was asked about is the worse failure.
+    const hiddenIds = new Set(hidden ?? []);
+    const visible = sections.filter((section) => !hiddenIds.has(section.id));
+
+    if (loading || visible.length === 0) return null;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {sections.map((section) => (
+            {visible.map((section) => (
                 <Card key={section.id}>
                     <CardHeader>
                         <div className="flex justify-between items-center">

@@ -62,6 +62,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **"Customize dashboard" now changes the dashboard.** The modal listed core
+  widgets and module cards, saved the answer and reloaded - and the page then
+  consulted that answer for its own five widgets only. Every module stat card
+  and every module panel rendered regardless, so unchecking Revenue, Orders or
+  Products did nothing. The KPI row was also wrapped in
+  `{(visibleKpiWidgets.length > 0 || true) && ...}`, which is `true`. Core
+  widgets are now handed to the row as rendered nodes so a module card can sit
+  between two of them, which is what the up and down arrows promise.
+- **A module declares its dashboard panels.** `dashboardSections` in the
+  manifest, collected into the registry beside `dashboardCards`. The panel's
+  contents still arrive at runtime from `statsApi`, but the customizer is drawn
+  before any of those endpoints are called, so a panel nobody declared could
+  never be offered to an admin. A gate checks that every section a module's
+  stats route returns is declared.
+- **The widget names in the customizer are translated.** They were English
+  string literals in a core array, printed unchanged on a Turkish panel.
+- **The email row on /admin/observability no longer shows a green tick when no
+  mail can be sent.** It reported `failed < 10`, and a site with no transport
+  configured has nothing to fail. It now says "not configured", the same thing
+  the Redis row says in the same situation, read from the one place that
+  decides whether mail goes out at all.
+
 - **Every dropdown in the panel now looks like the panel.** Forty-five bare
   `<select>` elements across thirty-one files became `NativeSelect`, so the
   roles picker on the users screen, the "Yetkili Tipi" filter on resource

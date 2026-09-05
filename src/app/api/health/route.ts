@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
 import { isRedisReady, rateLimitForRoleAsync, getClientIP } from "@/core/lib/rate-limit";
 import { isRedisConfigured } from "@/core/lib/redis";
+import { getEmailConfig } from "@/core/lib/email-config";
 import pkg from "../../../../package.json";
 
 /**
@@ -24,7 +25,7 @@ interface HealthResponse {
     checks: {
         database: { ok: boolean; latencyMs?: number; error?: string };
         redis: { ok: boolean; enabled: boolean; error?: string };
-        emailQueue: { ok: boolean; pending: number; failed: number; error?: string };
+        emailQueue: { ok: boolean; configured: boolean; pending: number; failed: number; error?: string };
         scheduler: { ok: boolean; staleJobs: number; error?: string };
     };
     version: string;
@@ -66,15 +67,24 @@ async function checkRedis(): Promise<{ ok: boolean; enabled: boolean; error?: st
     }
 }
 
-async function checkEmailQueue(): Promise<{ ok: boolean; pending: number; failed: number; error?: string }> {
+/**
+ * An empty queue is not a working mailer. With no transport configured there
+ * is nothing to fail, so `failed < 10` was reporting a green tick on a site
+ * that could not send a password reset. Redis says "not configured" in exactly
+ * this situation and email now says the same thing, out of the one place that
+ * decides whether mail can go out at all.
+ */
+async function checkEmailQueue(): Promise<{ ok: boolean; configured: boolean; pending: number; failed: number; error?: string }> {
     try {
-        const [pending, failed] = await Promise.all([
+        const [config, pending, failed] = await Promise.all([
+            getEmailConfig(),
             prisma.emailJob.count({ where: { status: "pending" } }),
             prisma.emailJob.count({ where: { status: "failed" } }),
         ]);
-        return { ok: failed < 10, pending, failed };
+        const configured = Boolean(config.apiKey);
+        return { ok: configured ? failed < 10 : true, configured, pending, failed };
     } catch (err) {
-        return { ok: false, pending: 0, failed: 0, error: safeErrorMessage(err) };
+        return { ok: false, configured: false, pending: 0, failed: 0, error: safeErrorMessage(err) };
     }
 }
 

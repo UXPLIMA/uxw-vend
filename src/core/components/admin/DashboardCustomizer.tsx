@@ -17,8 +17,11 @@ interface DashboardWidget {
 interface AvailableWidget {
     id: string;
     label: string;
+    labelKey?: string;
     description?: string;
+    descriptionKey?: string;
     source: "core" | "module";
+    kind: "card" | "section";
     moduleId?: string;
 }
 
@@ -108,6 +111,22 @@ export function DashboardCustomizer() {
 
     const infoFor = (id: string) => available.find((a) => a.id === id);
 
+    /**
+     * The widget names were English string literals in a core array, printed
+     * unchanged on a Turkish panel. They are keys now; `label` stays as the
+     * fallback for a module that shipped no key, and a key the catalogue does
+     * not carry falls back the same way rather than rendering the key itself.
+     */
+    const translate = (raw: string, key?: string): string => {
+        if (!key) return raw;
+        try {
+            const translated = t(key);
+            return translated && translated !== key ? translated : raw;
+        } catch {
+            return raw;
+        }
+    };
+
     return (
         <>
             <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -145,7 +164,7 @@ export function DashboardCustomizer() {
                                                     onClick={() => move(i, -1)}
                                                     disabled={i === 0}
                                                     className="p-0.5 disabled:opacity-30 hover:bg-muted rounded"
-                                                    aria-label={t("customizer_moveUp", { label: info.label })}
+                                                    aria-label={t("customizer_moveUp", { label: translate(info.label, info.labelKey) })}
                                                 >
                                                     <ChevronUp className="w-3.5 h-3.5" />
                                                 </button>
@@ -154,7 +173,7 @@ export function DashboardCustomizer() {
                                                     onClick={() => move(i, 1)}
                                                     disabled={i === layout.length - 1}
                                                     className="p-0.5 disabled:opacity-30 hover:bg-muted rounded"
-                                                    aria-label={t("customizer_moveDown", { label: info.label })}
+                                                    aria-label={t("customizer_moveDown", { label: translate(info.label, info.labelKey) })}
                                                 >
                                                     <ChevronDown className="w-3.5 h-3.5" />
                                                 </button>
@@ -167,9 +186,11 @@ export function DashboardCustomizer() {
                                                 className="rounded"
                                             />
                                             <label htmlFor={`widget-${w.id}`} className="flex-1 text-sm cursor-pointer">
-                                                <div className="font-medium">{info.label}</div>
+                                                <div className="font-medium">{translate(info.label, info.labelKey)}</div>
                                                 {info.description && (
-                                                    <div className="text-xs text-muted-foreground">{info.description}</div>
+                                                    <div className="text-xs text-muted-foreground">
+                                                        {translate(info.description, info.descriptionKey)}
+                                                    </div>
                                                 )}
                                             </label>
                                             <span className={`text-[10px] px-1.5 py-0.5 rounded ${info.source === "core" ? "bg-blue-500/10 text-blue-600" : "bg-purple-500/10 text-purple-600"}`}>
