@@ -63,9 +63,14 @@ describe('rateLimit', () => {
 });
 
 describe('getClientIP', () => {
+    // The rightmost entry, not the leftmost: a proxy appends the peer it saw,
+    // so anything to the left of that is text the caller wrote. This case used
+    // to assert '1.2.3.4' and so held the bug in place. Resolution across a
+    // declared TRUSTED_PROXY_IPS chain is covered in
+    // tests/unit/forwarded-ip-is-resolved.test.ts.
     it('extracts IP from x-forwarded-for', () => {
         const headers = new Headers({ 'x-forwarded-for': '1.2.3.4, 5.6.7.8' });
-        expect(getClientIP(headers)).toBe('1.2.3.4');
+        expect(getClientIP(headers)).toBe('5.6.7.8');
     });
 
     it('falls back to x-real-ip', () => {

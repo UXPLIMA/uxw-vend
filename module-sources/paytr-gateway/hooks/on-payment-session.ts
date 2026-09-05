@@ -6,7 +6,7 @@
  * inside.
  */
 import type { HookHandlerFor } from "@/core/sdk";
-import { log } from "@/core/sdk/server";
+import { getClientIP, log } from "@/core/sdk/server";
 import { headers } from "next/headers";
 import {
     getPaytrConfig,
@@ -17,12 +17,15 @@ import {
     PAYTR_TOKEN_URL,
 } from "../lib/paytr";
 
-/** PayTR rejects a request with no plausible client IP. */
+/**
+ * PayTR rejects a request with no plausible client IP, and scores the one it
+ * gets for fraud. Resolving it through the core helper rather than reading
+ * the leftmost forwarded entry means the address sent is the one a declared
+ * proxy vouched for, not one the buyer chose.
+ */
 async function clientIp(): Promise<string> {
-    const list = await headers();
-    const forwarded = list.get("x-forwarded-for");
-    if (forwarded) return forwarded.split(",")[0].trim();
-    return list.get("x-real-ip") ?? "127.0.0.1";
+    const resolved = getClientIP(await headers());
+    return resolved === "unknown" ? "127.0.0.1" : resolved;
 }
 
 const onPaymentSession: HookHandlerFor<"payment.session", "filter"> = async (result, request) => {

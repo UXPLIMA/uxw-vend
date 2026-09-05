@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The forwarded address a proxy vouched for was the one entry never read.**
+  `x-forwarded-for` is a list, and a proxy appends to its right: nginx's
+  `$proxy_add_x_forwarded_for` and Caddy both add the peer they saw to the end,
+  so everything left of it is text the caller wrote. Three places read the
+  leftmost entry instead. `getClientIP` fed it to every rate limit and to the
+  `/admin/ip-blocks` blocklist, `auth.ts` recorded it against the `user.login`
+  hook, and the PayTR gateway sent it on as the buyer's address for fraud
+  scoring. It also left `TRUSTED_PROXY_IPS` meaning less than its name says:
+  with a real chain the entry it vouched for was not the entry that got used.
+
+  `resolveClientIp` now walks the chain from the right, stepping over hops that
+  are themselves declared proxies, which yields the first address no trusted
+  hop vouched for. `auth.ts` and the PayTR hook route through `getClientIP`
+  rather than re-reading headers - the same file already did so correctly in
+  two other places, with a comment saying the handling lives in one place.
+
+  Unchanged on purpose: with `TRUSTED_PROXY_IPS` unset, forwarded headers are
+  still believed as sent. Without a proxy the application has no other way to
+  tell two anonymous callers apart, and the tradeoff is documented. What was
+  missing is that an operator who put a proxy in front and did not declare it
+  had no way to notice, so the server now says so once at boot.
+  `docs/DEPLOYMENT.md` said to set `TRUSTED_PROXY_IPS=127.0.0.1` "so the app
+  trusts `X-Forwarded-For` only when it arrives from nginx", which describes
+  neither header: nginx sets `X-Real-IP` to the visitor's address, not its own.
+  Rewritten to say what each header carries and what leaving the setting unset
+  costs.
+
+  `tests/unit/forwarded-ip-is-resolved.test.ts` covers the resolution itself
+  and refuses any new raw read of either header outside the one helper.
 - **Every page had an unbounded supply of URLs that answered 200.**
   next-intl's middleware strips a trailing path segment that is nothing but a
   control character, so `/en/%00` served the homepage and `/en/store/%00`

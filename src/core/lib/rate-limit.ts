@@ -5,6 +5,7 @@ import {
 } from "./constants";
 import { getRedisClient, isRedisConfigured } from "./redis";
 import { prisma } from "./db";
+import { log } from "./logger";
 
 /**
  * Pluggable rate limiter. Uses Redis when REDIS_URL is set so counts are
@@ -238,25 +239,96 @@ const TRUSTED_PROXY_IPS: Set<string> | null = process.env.TRUSTED_PROXY_IPS
     : null;
 
 /**
+ * Say so at boot when nothing about the caller's address can be verified.
+ *
+ * With no trusted proxy declared, `x-forwarded-for` and `x-real-ip` arrive
+ * exactly as the caller wrote them, so every rate limit and every IP block is
+ * keyed on an address the caller picks: rotating one header buys a fresh
+ * budget, and a blocked address is evaded by typing a different one. That is
+ * the documented default, because without a proxy the application has no
+ * other way to tell two anonymous callers apart, but an operator who has put
+ * a proxy in front and not declared it has no way to notice on their own.
+ *
+ * Called once per server instance from `instrumentation.ts`.
+ */
+export function warnIfProxyTrustUnconfigured(): void {
+    if (TRUSTED_PROXY_IPS) return;
+    log.warn(
+        "TRUSTED_PROXY_IPS is not set: forwarded headers arrive unverified, " +
+        "so rate limits and IP blocks are keyed on an address the caller can choose. " +
+        "Set it to your reverse proxy's address - see docs/DEPLOYMENT.md.",
+    );
+}
+
+/**
+ * Which address in a forwarded chain is the caller.
+ *
+ * `x-forwarded-for` is a list, and a proxy appends to its right: nginx's
+ * `$proxy_add_x_forwarded_for` and Caddy both add the peer they saw to the
+ * end. Everything to the left of that is whatever the client chose to send.
+ * Reading the leftmost entry therefore reads the attacker's own text, which
+ * is the classic way a forwarded header gets trusted by mistake.
+ *
+ * Walking from the right and stepping over addresses that are themselves
+ * trusted proxies gives the first address no trusted hop vouched for, which
+ * is the caller. It also makes `TRUSTED_PROXY_IPS` mean what its name says
+ * for a chain of more than one hop, a CDN in front of nginx for instance.
+ *
+ * Exported for the tests: the env-derived set is read once at module load, so
+ * the decision has to be reachable without it.
+ */
+export function resolveClientIp(
+    realIp: string | null,
+    forwardedFor: string | null,
+    trusted: Set<string> | null,
+): string {
+    const chain = (forwardedFor ?? "")
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+    if (trusted) {
+        // Without a proxy in front, `x-real-ip` is whatever the caller typed.
+        // Behind one, every configuration this project ships overwrites it
+        // with the peer, so it is the only address here worth starting from.
+        const peer = realIp || "unknown";
+        if (!trusted.has(peer)) return peer;
+        for (let i = chain.length - 1; i >= 0; i--) {
+            if (!trusted.has(chain[i])) return chain[i];
+        }
+        return peer;
+    }
+
+    // Nothing is verifiable without a trusted list, and this is the documented
+    // default: see TRUSTED_PROXY_IPS in .env.example and the deployment guide.
+    // The rightmost entry is still the better guess, because an operator who
+    // has a proxy but has not declared it gets the address it appended rather
+    // than the one the caller prepended.
+    return realIp || chain[chain.length - 1] || "unknown";
+}
+
+/**
+ * The part of `Headers` this needs. Widened from `Headers` so that
+ * `next/headers`, whose `ReadonlyHeaders` is a separate type, can be handed
+ * here directly rather than each caller re-reading the raw headers itself.
+ */
+export interface HeaderReader {
+    get(name: string): string | null;
+}
+
+/**
  * Resolve the real client IP from request headers.
  *
  * When TRUSTED_PROXY_IPS is set, `x-forwarded-for` is only honored if the
  * direct peer (x-real-ip) is in the trusted list - this blocks header
  * injection spoofing from unauthorised origins.
  */
-export function getClientIP(headers: Headers): string {
-    const realIp = headers.get("x-real-ip")?.trim() || null;
-    const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
-
-    if (TRUSTED_PROXY_IPS) {
-        const directIp = realIp || "unknown";
-        if (TRUSTED_PROXY_IPS.has(directIp)) {
-            return forwardedFor || directIp;
-        }
-        return directIp;
-    }
-
-    return realIp || forwardedFor || "unknown";
+export function getClientIP(headers: HeaderReader): string {
+    return resolveClientIp(
+        headers.get("x-real-ip")?.trim() || null,
+        headers.get("x-forwarded-for") || null,
+        TRUSTED_PROXY_IPS,
+    );
 }
 
 export const rateLimits = {

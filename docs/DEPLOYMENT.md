@@ -302,7 +302,27 @@ server {
 }
 ```
 
-With this config, set `TRUSTED_PROXY_IPS=127.0.0.1` in `.env` so the app trusts the `X-Forwarded-For` header only when it arrives from nginx.
+With this config, set `TRUSTED_PROXY_IPS` in `.env` to the address nginx
+connects from as the app sees it, so a forwarded header is only believed when
+a declared proxy vouched for it.
+
+Two details are worth knowing, because getting either wrong is how a forwarded
+header ends up trusted by mistake:
+
+- `X-Real-IP` is set to `$remote_addr` above, which is the visitor, not nginx.
+  The app reads that as the caller and never has to consult the chain, which
+  is why this configuration is safe even before you set anything.
+- `$proxy_add_x_forwarded_for` **appends** the peer to whatever the visitor
+  sent, so the leftmost entry of `X-Forwarded-For` is the visitor's own text
+  and the rightmost is the one nginx added. The app walks the chain from the
+  right, stepping over addresses listed in `TRUSTED_PROXY_IPS`, so a chain
+  like Cloudflare in front of nginx resolves correctly once every hop is
+  listed.
+
+With no reverse proxy at all, leave `TRUSTED_PROXY_IPS` unset and understand
+what it costs: forwarded headers arrive as the caller wrote them, so rate
+limits and IP blocks are keyed on an address the caller chooses. The app logs
+this at startup. Publish the app port only behind a proxy you control.
 
 ### SSL with Certbot
 
