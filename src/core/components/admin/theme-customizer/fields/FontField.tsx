@@ -1,7 +1,9 @@
 "use client";
 
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { Input } from "@/core/components/ui/input";
 
 export function FontField({ def, value, onChange, isDefault }: FieldProps<string>) {
     if (def.type !== "font") return null;
@@ -25,19 +27,16 @@ export function FontField({ def, value, onChange, isDefault }: FieldProps<string
                     ))}
                 </NativeSelect>
             ) : (
-                <input
+                <Input
                     type="text"
                     value={current}
                     onChange={(e) => onChange(e.target.value)}
-                    placeholder={def.default ?? "Font stack"}
-                    className="h-8 rounded border border-input bg-background px-2 text-sm"
+                    placeholder={def.default ?? "Inter, system-ui, sans-serif"}
+                    aria-label={def.label}
+                    className="font-mono text-xs"
                 />
             )}
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </label>
     );
 }

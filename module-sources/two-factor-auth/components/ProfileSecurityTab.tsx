@@ -336,7 +336,7 @@ export function ProfileSecurityTab() {
                                     {backupCodes.map((code, i) => (
                                         <code
                                             key={i}
-                                            className="text-sm bg-card px-3 py-1 rounded border font-mono text-center"
+                                            className="text-sm bg-card px-3 py-1 rounded border border-border font-mono text-center"
                                         >
                                             {code}
                                         </code>

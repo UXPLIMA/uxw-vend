@@ -1,5 +1,7 @@
 "use client";
 
+import { Input } from "@/core/components/ui/input";
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 
 export function TextField({ def, value, onChange, isDefault }: FieldProps<string>) {
@@ -8,18 +10,14 @@ export function TextField({ def, value, onChange, isDefault }: FieldProps<string
 
     return (
         <label className="flex items-center gap-2 text-sm">
-            <input
+            <Input
                 type="text"
                 value={current}
                 maxLength={def.max ?? 10000}
                 onChange={(e) => onChange(e.target.value)}
-                className="h-8 flex-1 rounded border border-input bg-background px-2 text-sm"
+                aria-label={def.label}
             />
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </label>
     );
 }

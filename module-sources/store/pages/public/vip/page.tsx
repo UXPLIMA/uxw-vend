@@ -91,13 +91,13 @@ export default function VipTablePage() {
                 {failed ? (
                     <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : products.length === 0 ? (
-                    <div className="text-center py-12 bg-card rounded-xl border">
+                    <div className="text-center py-12 bg-card rounded-xl border border-border">
                         <Crown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                         <p className="text-muted-foreground">{t("vip_empty")}</p>
                     </div>
                 ) : allFeatures.length > 0 ? (
                     /* Full comparison table when features are available */
-                    <div className="bg-card rounded-xl border overflow-x-auto">
+                    <div className="bg-card rounded-xl border border-border overflow-x-auto">
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b">

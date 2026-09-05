@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
 import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
@@ -153,13 +153,12 @@ export default function SeoSettingsPage() {
 
                         <div>
                             <Label className="text-foreground">{t("adm_defaultDescription")}</Label>
-                            <textarea
+                            <Textarea
                                 aria-label={t("adm_defaultDescription")}
                                 value={settings.seo_default_description}
                                 onChange={(e) => updateSetting("seo_default_description", e.target.value)}
                                 placeholder={t("adm_defaultDescriptionPlaceholder")}
                                 rows={3}
-                                className="flex min-h-[80px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
                             />
                         </div>
 

@@ -244,7 +244,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
             <button
                 onClick={() => setMobileOpen(true)}
                 aria-label={t("sidebar_openMenu")}
-                className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border shadow-sm flex items-center justify-center"
+                className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border border-border shadow-sm flex items-center justify-center"
             >
                 <Menu size={20} />
             </button>

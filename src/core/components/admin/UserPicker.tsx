@@ -87,7 +87,7 @@ export function UserPicker({
                 </p>
             )}
             {hits.length > 0 && !value && (
-                <div className="absolute z-10 left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-md max-h-56 overflow-y-auto">
+                <div className="absolute z-10 left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-md max-h-56 overflow-y-auto">
                     {hits.map((user) => (
                         <button
                             type="button"

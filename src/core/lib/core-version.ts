@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.19.0 - `Radio` and `RadioField` join `@/core/sdk/ui`. The one-of-several
+ * to `Checkbox`'s any-of-several, and bare for the same reason the
+ * checkboxes were. Additions.
+ *
+ * 1.18.0 - `Slider` joins `@/core/sdk/ui`. The two range inputs in the panel
+ * were bare, so both were drawn in the operating system's blue beside
+ * controls painted in the theme's own primary. An addition.
+ *
  * 1.17.0 - `AdminPageHeader` joins `@/core/sdk/admin`. Eighty admin screens
  * had written their own title row, between them using twelve heading sizes
  * and six different layouts, so moving from one screen to the next changed
@@ -118,4 +126,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.17.0";
+export const CORE_API_VERSION = "1.19.0";

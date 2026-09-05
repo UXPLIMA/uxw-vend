@@ -1,6 +1,7 @@
 "use client";
 
 import { FileUpload } from "@/core/components/ui/file-upload";
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 
 export function ImageField({ def, value, onChange, isDefault }: FieldProps<string>) {
@@ -14,11 +15,7 @@ export function ImageField({ def, value, onChange, isDefault }: FieldProps<strin
                 onChange={(url) => onChange(url ?? undefined)}
                 accept="image/*"
             />
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </div>
     );
 }

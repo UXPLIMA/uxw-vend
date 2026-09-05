@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CheckboxField } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { Textarea } from "@/core/components/ui/textarea";
 
 interface MaintenanceConfig {
     enabled: boolean;
@@ -147,12 +148,11 @@ export default function MaintenanceSettingsPage() {
                     <CardTitle className="text-base">{t("maintenance_message")}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <textarea
+                    <Textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         rows={4}
                         placeholder={t("maintenance_defaultMessage")} aria-label={t("maintenance_defaultMessage")}
-                        className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm text-foreground"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                         {t("maintenance_messageHelp")}

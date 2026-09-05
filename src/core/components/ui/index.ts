@@ -11,5 +11,7 @@ export * from "./label";
 export * from "./textarea";
 export * from "./native-select";
 export * from "./pagination";
+export * from "./radio";
 export * from "./select";
 export * from "./skeleton";
+export * from "./slider";

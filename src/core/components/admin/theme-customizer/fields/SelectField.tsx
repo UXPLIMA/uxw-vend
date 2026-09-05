@@ -1,5 +1,6 @@
 "use client";
 
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 import { NativeSelect } from "@/core/components/ui/native-select";
 
@@ -19,11 +20,7 @@ export function SelectField({ def, value, onChange, isDefault }: FieldProps<stri
                     </option>
                 ))}
             </NativeSelect>
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </label>
     );
 }

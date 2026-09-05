@@ -16,9 +16,26 @@ const currencySchema = z.object({
 const configSchema = z.object({
     base: z.string().min(2).max(8),
     currencies: z.array(currencySchema).min(1),
-}).refine((c) => c.currencies.some((cur) => cur.code === c.base), {
-    message: "Base currency must exist in currencies list",
-});
+})
+    .refine((c) => c.currencies.some((cur) => cur.code === c.base), {
+        message: "Base currency must exist in currencies list",
+    })
+    // Two rows with the same code make every lookup ambiguous: whichever one
+    // `find` reaches first wins, and which that is depends on the order they
+    // happen to be stored in.
+    .refine((c) => new Set(c.currencies.map((cur) => cur.code)).size === c.currencies.length, {
+        message: "Two currencies cannot share a code",
+    })
+    // The base is the unit the others are quoted in. A base with a rate of
+    // 32.5 says one of itself is worth 32.5 of itself, and every conversion
+    // through it is off by that factor - so it is normalised rather than
+    // rejected, and a disabled base is enabled again for the same reason.
+    .transform((c) => ({
+        ...c,
+        currencies: c.currencies.map((cur) =>
+            cur.code === c.base ? { ...cur, rate: 1, enabled: true } : cur,
+        ),
+    }));
 
 const DEFAULT_CONFIG = {
     base: "USD",

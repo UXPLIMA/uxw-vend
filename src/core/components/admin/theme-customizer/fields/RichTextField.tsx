@@ -1,6 +1,7 @@
 "use client";
 
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 
 export function RichTextField({ def, value, onChange, isDefault }: FieldProps<string>) {
@@ -10,11 +11,7 @@ export function RichTextField({ def, value, onChange, isDefault }: FieldProps<st
     return (
         <div className="space-y-2">
             <RichTextEditor value={current} onChange={(v) => onChange(v)} />
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </div>
     );
 }

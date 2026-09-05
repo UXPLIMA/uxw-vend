@@ -111,7 +111,7 @@ export function ProfileOrdersTab() {
                                     </div>
                                 </button>
                                 {expandedOrder === order.id && order.items && (
-                                    <div className="mt-1 p-4 bg-background border rounded-lg">
+                                    <div className="mt-1 p-4 bg-background border border-border rounded-lg">
                                         <div className="space-y-2">
                                             {order.items.map((item) => (
                                                 <div key={item.id} className="flex items-center gap-3">

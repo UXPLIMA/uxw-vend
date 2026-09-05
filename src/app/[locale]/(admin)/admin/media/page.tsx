@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useModalDialog } from "@/core/hooks/useModalDialog";
-import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucide-react";
@@ -13,6 +12,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { copyText } from "@/core/lib/copy-text";
+import { cn } from "@/core/lib/utils";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface MediaItem {
@@ -37,6 +37,7 @@ export default function MediaLibraryPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
     const [search, setSearch] = useState("");
     const [type, setType] = useState<"" | "image" | "document">("");
     const [selected, setSelected] = useState<MediaItem | null>(null);
@@ -59,6 +60,7 @@ export default function MediaLibraryPage() {
             const data = await res.json();
             setItems(data.items || []);
             setTotalPages(data.totalPages || 1);
+            setTotal(data.total || 0);
         } catch {
             toast.error(t("media_loadFailed"));
         } finally {
@@ -147,40 +149,47 @@ export default function MediaLibraryPage() {
             <AdminPageHeader
                 title={t("media_title")}
                 description={t("media_subtitle")}
-                actions={<>
-                    <label className="cursor-pointer">
-                        <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} />
-                        <span className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4">
-                            {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin text-primary-foreground" /> <span className="text-primary-foreground">{t("media_uploading")}</span></> : <><Upload className="w-4 h-4 mr-2 text-primary-foreground" /> <span className="text-primary-foreground">{t("media_upload")}</span></>}
-                        </span>
+                actions={
+                    /* A file input cannot be a <Button>: the picker only opens
+                       from the input itself or a <label> pointing at it. So the
+                       label wears the button's own classes rather than a
+                       hand-rolled imitation of them, which is how this one came
+                       to be a different height and a different radius from every
+                       other button on the panel. */
+                    <label className={cn(buttonClassName("default"), uploading && "pointer-events-none opacity-50")}>
+                        <input type="file" className="sr-only" onChange={handleUpload} disabled={uploading} />
+                        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {uploading ? t("media_uploading") : t("media_upload")}
                     </label>
-                </>}
+                }
             />
 
-            {/* Filters */}
-            <div className="flex gap-2 mb-4">
-                <form onSubmit={handleSearch} className="flex gap-2 flex-1">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
-                        <Input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder={t("media_searchPlaceholder")} aria-label={t("media_searchPlaceholder")}
-                            className="pl-8 bg-background"
-                        />
-                    </div>
-                    <Button type="submit" variant="outline">{t("media_search")}</Button>
-                </form>
-                <NativeSelect
-                    value={type}
-                    onChange={(e) => { setType(e.target.value as "" | "image" | "document"); setPage(1); }}
-                    aria-label={t("media_type")}
-                >
-                    <option value="">{t("media_allTypes")}</option>
-                    <option value="image">{t("media_images")}</option>
-                    <option value="document">{t("media_documents")}</option>
-                </NativeSelect>
-            </div>
+            <Card className="mb-4">
+                <CardContent className="p-4 flex flex-wrap gap-3">
+                    <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[16rem]">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder={t("media_searchPlaceholder")} aria-label={t("media_searchPlaceholder")}
+                                className="pl-9"
+                            />
+                        </div>
+                        <Button type="submit" variant="outline">{t("media_search")}</Button>
+                    </form>
+                    <NativeSelect
+                        value={type}
+                        onChange={(e) => { setType(e.target.value as "" | "image" | "document"); setPage(1); }}
+                        aria-label={t("media_type")}
+                        className="sm:w-52"
+                    >
+                        <option value="">{t("media_allTypes")}</option>
+                        <option value="image">{t("media_images")}</option>
+                        <option value="document">{t("media_documents")}</option>
+                    </NativeSelect>
+                </CardContent>
+            </Card>
 
             {loading ? (
                 <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
@@ -189,32 +198,43 @@ export default function MediaLibraryPage() {
                     {t("media_noItems")}
                 </CardContent></Card>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
                     {items.map((item) => (
                         <button
                             key={item.id}
                             type="button"
                             onClick={() => setSelected(item)}
-                            className="group relative aspect-square rounded-lg border border-border bg-muted overflow-hidden hover:border-primary transition-colors"
+                            title={item.filename}
+                            className="group text-left rounded-lg border border-border bg-card overflow-hidden transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                         >
-                            {isImage(item.mimeType) ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img src={item.url} alt={item.alt || ""} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                                    <FileText className="w-8 h-8 text-muted-foreground mb-1" />
-                                    <span className="text-[10px] text-muted-foreground truncate w-full text-center">{item.filename}</span>
-                                </div>
-                            )}
-                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate opacity-0 group-hover:opacity-100 transition-opacity">
-                                {item.filename}
+                            <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
+                                {isImage(item.mimeType) ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img
+                                        src={item.url}
+                                        alt={item.alt || ""}
+                                        // `contain` rather than `cover`: this is a
+                                        // library, and a cropped thumbnail of a
+                                        // wide banner is not the banner.
+                                        className="w-full h-full object-contain"
+                                    />
+                                ) : (
+                                    <FileText className="w-10 h-10 text-muted-foreground" />
+                                )}
+                            </div>
+                            {/* The name used to appear only on hover, over a
+                                fixed black strip, which a touch screen never
+                                shows and a dark theme never matched. */}
+                            <div className="px-2.5 py-2 border-t border-border">
+                                <p className="text-xs truncate">{item.filename}</p>
+                                <p className="text-[11px] text-muted-foreground">{formatBytes(item.size)}</p>
                             </div>
                         </button>
                     ))}
                 </div>
             )}
 
-            <Pagination page={page} pages={totalPages} onPageChange={setPage} className="mt-6" />
+            <Pagination page={page} pages={totalPages} total={total} onPageChange={setPage} className="mt-6" />
 
             {/* Detail panel */}
             {selected && (
@@ -225,7 +245,7 @@ export default function MediaLibraryPage() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="media-detail-title"
-                        className="relative bg-card rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        className="relative bg-card border border-border rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between p-4 border-b border-border">
                             <h2 id="media-detail-title" className="font-bold truncate">{selected.filename}</h2>
@@ -279,9 +299,6 @@ export default function MediaLibraryPage() {
                     </div>
                 </div>
             )}
-
-            {/* Hidden link for ESLint - admin sidebar will link here */}
-            <Link href="/admin/media" className="hidden">media</Link>
         </>
     );
 }

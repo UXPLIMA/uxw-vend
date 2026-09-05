@@ -11,6 +11,7 @@ import { Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { Textarea } from "@/core/components/ui/textarea";
 
 export interface SettingsField {
     key: string;
@@ -94,13 +95,12 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                             <div key={field.key}>
                                 <Label>{field.label}</Label>
                                 {field.type === "textarea" ? (
-                                    <textarea
+                                    <Textarea
                                         aria-label={field.label}
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
                                         placeholder={field.placeholder}
                                         rows={3}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                     />
                                 ) : field.type === "image" ? (
                                     <FileUpload

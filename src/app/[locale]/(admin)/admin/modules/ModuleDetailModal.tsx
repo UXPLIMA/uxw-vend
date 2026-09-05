@@ -30,7 +30,7 @@ export function ModuleDetailModal({ module: mod, onClose }: DetailProps) {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="module-detail-title"
-                className="relative bg-card border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+                className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
             >
                 <div className="flex items-start justify-between p-5 border-b">
                     <div className="min-w-0">

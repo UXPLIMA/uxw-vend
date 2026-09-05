@@ -6,7 +6,8 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
+import { Slider } from "@/core/components/ui/slider";
+import { Badge } from "@/core/components/ui/badge";
 import { Loader2, Check, Infinity as InfinityIcon } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
@@ -89,100 +90,94 @@ export default function RateLimitsSettingsPage() {
         );
     }
 
-    const titleText = t("rateLimits_title");
-    const subtitleText = t("rateLimits_subtitle");
-    const descriptionText = t("rateLimits_description");
-    const roleLabel = t("rateLimits_role");
-    const multiplierLabel = t("rateLimits_multiplier");
-    const unlimitedLabel = t("rateLimits_unlimited");
-    const priorityLabel = t("rateLimits_priority");
-    const savingLabel = t("rateLimits_saving");
-    const saveLabel = t("rateLimits_save");
-
     return (
-        <>
+        <form onSubmit={handleSave}>
             <AdminPageHeader
-                title={titleText}
-                description={subtitleText}
+                title={t("rateLimits_title")}
+                description={t("rateLimits_description")}
+                actions={
+                    <Button type="submit" disabled={saving}>
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                        {saving ? t("rateLimits_saving") : t("rateLimits_save")}
+                    </Button>
+                }
             />
 
-            <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
+            {roles.length === 0 ? (
                 <Card>
-                    <CardHeader>
-                        <CardTitle>{titleText}</CardTitle>
-                        <CardDescription>{descriptionText}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-5">
-                        {roles.length === 0 && (
-                            <p className="text-sm text-muted-foreground">
-                                {t("rateLimits_noRoles")}
-                            </p>
-                        )}
+                    <CardContent className="py-12 text-center text-sm text-muted-foreground">
+                        {t("rateLimits_noRoles")}
+                    </CardContent>
+                </Card>
+            ) : (
+                <>
+                    <p className="mb-4 text-sm text-muted-foreground">{t("rateLimits_multiplierHelp")}</p>
+
+                    {/* One card per role, filling the width. The screen used to
+                        be a single `max-w-3xl` column with one row per role in
+                        it, which left the right half of a desktop panel empty
+                        while the rows themselves were cramped. */}
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {roles.map((role) => {
                             const current = values[role.name] ?? 1;
                             const isUnlimited = current === 0;
+                            const sliderId = `rate-limit-${role.id}`;
                             return (
-                                <div
-                                    key={role.id}
-                                    className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center border rounded-md p-4"
-                                >
-                                    <div className="space-y-1">
-                                        <Label className="text-sm font-semibold flex items-center gap-2">
+                                <Card key={role.id}>
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-base">
                                             {role.displayName || role.name}
-                                            <span className="text-xs font-normal text-muted-foreground">
-                                                ({roleLabel}: {role.name}, {priorityLabel}: {role.priority})
-                                            </span>
-                                        </Label>
-                                        <input
-                                            type="range"
+                                        </CardTitle>
+                                        <CardDescription className="flex flex-wrap items-center gap-1.5">
+                                            <Badge>
+                                                <span className="font-mono">{role.name}</span>
+                                            </Badge>
+                                            <Badge>
+                                                {t("rateLimits_priority")} {role.priority}
+                                            </Badge>
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <Input
+                                                id={`${sliderId}-value`}
+                                                type="number"
+                                                min={0}
+                                                max={100}
+                                                step={1}
+                                                value={current}
+                                                onChange={(e) => setValue(role.name, Number(e.target.value))}
+                                                className="w-20 text-center"
+                                                aria-label={`${role.displayName || role.name} ${t("rateLimits_multiplier")}`}
+                                            />
+                                            {isUnlimited ? (
+                                                <Badge tone="success">
+                                                    <InfinityIcon className="w-3 h-3" />
+                                                    {t("rateLimits_unlimited")}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-sm text-muted-foreground">
+                                                    {t("rateLimits_timesBase", { count: current })}
+                                                    {current === 1 && ` (${t("rateLimits_default")})`}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <Slider
+                                            id={sliderId}
                                             min={0}
                                             max={100}
                                             step={1}
                                             value={current}
                                             onChange={(e) => setValue(role.name, Number(e.target.value))}
-                                            className="w-full accent-indigo-500"
-                                            aria-label={`${role.displayName} ${multiplierLabel}`}
+                                            aria-label={`${role.displayName || role.name} ${t("rateLimits_multiplier")}`}
                                         />
-                                    </div>
-                                    <div className="flex items-center gap-2 md:w-40">
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            max={100}
-                                            step={1}
-                                            value={current}
-                                            onChange={(e) => setValue(role.name, Number(e.target.value))}
-                                            className="w-24"
-                                            aria-label={`${role.displayName} ${multiplierLabel} input`}
-                                        />
-                                        {isUnlimited ? (
-                                            <span className="text-xs font-medium text-success flex items-center gap-1">
-                                                <InfinityIcon className="w-3 h-3" /> {unlimitedLabel}
-                                            </span>
-                                        ) : (
-                                            <span className="text-xs text-muted-foreground">×</span>
-                                        )}
-                                    </div>
-                                </div>
+                                    </CardContent>
+                                </Card>
                             );
                         })}
-                    </CardContent>
-                </Card>
-
-                <div>
-                    <Button type="submit" disabled={saving}>
-                        {saving ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" /> {savingLabel}
-                            </>
-                        ) : (
-                            <>
-                                <Check className="w-4 h-4" /> {saveLabel}
-                            </>
-                        )}
-                    </Button>
-                </div>
-            </form>
-        </>
+                    </div>
+                </>
+            )}
+        </form>
     );
 }

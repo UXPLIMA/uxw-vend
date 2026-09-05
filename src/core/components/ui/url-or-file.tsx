@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link as LinkIcon, Upload } from "lucide-react";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { FileUpload } from "@/core/components/ui/file-upload";
+import { Radio } from "@/core/components/ui/radio";
 
 export interface UrlOrFileProps {
     value: string;
@@ -28,6 +30,7 @@ export function UrlOrFile({
     accept,
     placeholder = "https://...",
 }: UrlOrFileProps) {
+    const t = useTranslations("common");
     const [mode, setMode] = useState<Mode>(() => detectMode(value));
 
     const handleModeChange = (next: Mode) => {
@@ -40,26 +43,22 @@ export function UrlOrFile({
 
             <div className="flex gap-2">
                 <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted">
-                    <input
-                        type="radio"
+                    <Radio
                         name={`url-or-file-${label || "field"}`}
                         checked={mode === "link"}
                         onChange={() => handleModeChange("link")}
-                        className="cursor-pointer"
                     />
                     <LinkIcon className="h-3.5 w-3.5" />
-                    <span>Link</span>
+                    <span>{t("linkUrl")}</span>
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted">
-                    <input
-                        type="radio"
+                    <Radio
                         name={`url-or-file-${label || "field"}`}
                         checked={mode === "upload"}
                         onChange={() => handleModeChange("upload")}
-                        className="cursor-pointer"
                     />
                     <Upload className="h-3.5 w-3.5" />
-                    <span>Upload</span>
+                    <span>{t("uploadFile")}</span>
                 </label>
             </div>
 

@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import type { ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { Button } from "@/core/components/ui/button";
+import { Card, CardContent } from "@/core/components/ui/card";
+import { Check, Loader2 } from "lucide-react";
 
 interface Props {
     themeId: string;
@@ -16,6 +18,7 @@ interface Props {
 
 export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const [values, setValues] = useState<Record<string, unknown>>(() => ({ ...initialValues }));
     const [saving, setSaving] = useState(false);
 
@@ -34,12 +37,26 @@ export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
     };
 
     return (
-        <div className="space-y-6 max-w-xl">
-            {Object.entries(fields).map(([key, def]) => (
-                <FieldRow key={key} fieldKey={key} def={def} value={values[key]} onChange={(v) => set(key, v)} />
-            ))}
-            <Button onClick={onSubmit} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
-        </div>
+        <>
+            {/* A theme group is a form, and a form on a wide panel is not a
+                narrow column with a button under it. The fields sit two or
+                three across, and the save button sits where every other
+                screen's does. */}
+            <div className="mb-6 flex justify-end">
+                <Button onClick={onSubmit} disabled={saving}>
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    {saving ? t("theme_saving") : commonT("save")}
+                </Button>
+            </div>
+
+            <Card>
+                <CardContent className="grid gap-6 p-6 md:grid-cols-2 xl:grid-cols-3">
+                    {Object.entries(fields).map(([key, def]) => (
+                        <FieldRow key={key} fieldKey={key} def={def} value={values[key]} onChange={(v) => set(key, v)} />
+                    ))}
+                </CardContent>
+            </Card>
+        </>
     );
 }
 
@@ -50,9 +67,12 @@ function FieldRow({ fieldKey, def, value, onChange }: { fieldKey: string; def: T
     // stack a label header above.
     const label = def.label ?? fieldKey;
     const inner = renderField(def, value, onChange, isDefault);
+    // Some fields are too big for a column: an editor or an image picker
+    // squeezed into a third of the row is unusable.
+    const wide = def.type === "richtext" || def.type === "image";
     if (def.type === "color") return inner;
     return (
-        <div className="space-y-1.5">
+        <div className={`space-y-1.5${wide ? " md:col-span-2 xl:col-span-3" : ""}`}>
             <div className="text-sm font-medium">{label}</div>
             {inner}
         </div>

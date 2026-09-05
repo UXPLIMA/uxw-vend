@@ -19,9 +19,17 @@ export default async function ThemeSettingsPage({ params }: { params: Promise<{ 
     const initialValues = Object.fromEntries(rows.map(r => [r.key, r.value]));
 
     return (
-        <div className="p-6">
-            <AdminPageHeader title={groupDef.label} />
+        <>
+            {/* No `p-6` here: the admin layout already pads its own content,
+                and a second one made every theme group start further in than
+                every other screen. */}
+            <AdminPageHeader
+                title={groupDef.label}
+                description={manifest.name}
+                backHref="/admin/theme/appearance"
+                backLabel={manifest.name}
+            />
             <SchemaForm themeId={themeId} group={group} fields={groupDef.fields} initialValues={initialValues} />
-        </div>
+        </>
     );
 }

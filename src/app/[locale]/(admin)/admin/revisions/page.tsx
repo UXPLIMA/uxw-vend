@@ -99,7 +99,7 @@ export default function RevisionsPage() {
             />
 
             <Card className="mb-4">
-                <CardContent className="p-4 grid md:grid-cols-3 gap-3">
+                <CardContent className="p-4 grid gap-3 md:grid-cols-2">
                     <div>
                         <Label>{t("revisions_filterResource")}</Label>
                         <NativeSelect
@@ -129,9 +129,6 @@ export default function RevisionsPage() {
                             }}
                             placeholder={t("revisions_resourceIdPlaceholder")}
                         />
-                    </div>
-                    <div className="flex items-end text-sm text-muted-foreground">
-                        {total} {t("revisions_totalSuffix")}
                     </div>
                 </CardContent>
             </Card>
@@ -185,7 +182,7 @@ export default function RevisionsPage() {
                                         </button>
                                         {isOpen && (
                                             <div className="px-10 pb-4">
-                                                <pre className="font-mono text-xs bg-muted/50 border rounded p-3 overflow-x-auto max-h-96">
+                                                <pre className="font-mono text-xs bg-muted/50 border border-border rounded p-3 overflow-x-auto max-h-96">
                                                     {JSON.stringify(rev.data, null, 2)}
                                                 </pre>
                                             </div>
@@ -195,7 +192,7 @@ export default function RevisionsPage() {
                             })}
                         </div>
                     )}
-                    <Pagination page={page} pages={pages} onPageChange={setPage} />
+                    <Pagination page={page} pages={pages} total={total} onPageChange={setPage} />
                 </CardContent>
             </Card>
         </>

@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { Loader2, Send } from "lucide-react";
+import { Check, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { CheckboxField } from "@/core/components/ui/checkbox";
+import { RadioField } from "@/core/components/ui/radio";
+import { Badge } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 type HealthStatus = "ok" | "degraded" | "down";
@@ -126,114 +128,117 @@ export default function AlertingSettingsPage() {
     }
 
     return (
-        <>
+        <form onSubmit={save}>
             <AdminPageHeader
                 title={t("alerting_title")}
                 description={t("alerting_subtitle")}
+                actions={<>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={testing || !webhookUrl}
+                        onClick={sendTest}
+                    >
+                        {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        {testing ? t("alerting_testing") : t("alerting_test")}
+                    </Button>
+                    <Button type="submit" disabled={saving}>
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                        {saving ? t("alerting_saving") : t("alerting_save")}
+                    </Button>
+                </>}
             />
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t("alerting_webhookTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={save} className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-3 items-start">
+                {/* The switch is its own card and comes first, because
+                    everything below it is inert while it is off. */}
+                <Card className="lg:col-span-3">
+                    <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
                         <CheckboxField
                             id="enabled"
                             checked={enabled}
                             onChange={(e) => setEnabled(e.target.checked)}
-                            label={t("alerting_enabled")}
+                            label={<span className="font-medium">{t("alerting_enabled")}</span>}
+                            description={t("alerting_subtitle")}
                         />
+                        <Badge tone={enabled ? "success" : "neutral"}>
+                            {enabled ? t("alerting_on") : t("alerting_off")}
+                        </Badge>
+                    </CardContent>
+                </Card>
 
-                        <div>
-                            <Label>{t("alerting_channel")}</Label>
-                            <div className="flex flex-wrap gap-4 mt-2">
-                                {channels.map((c) => (
-                                    <label key={c.id} className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
+                <Card className="lg:col-span-2">
+                    <CardHeader>
+                        <CardTitle>{t("alerting_webhookTitle")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-5">
+                        <fieldset disabled={!enabled} className="space-y-5 disabled:opacity-60">
+                            <div>
+                                <Label>{t("alerting_channel")}</Label>
+                                <div className="flex flex-wrap gap-4 mt-2">
+                                    {channels.map((c) => (
+                                        <RadioField
+                                            key={c.id}
                                             name="channel"
                                             value={c.id}
                                             checked={channelId === c.id}
                                             onChange={() => setChannelId(c.id)}
+                                            label={c.label}
                                         />
-                                        <span>{c.label}</span>
-                                    </label>
-                                ))}
+                                    ))}
+                                </div>
+                                {channels.length === 1 && (
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                        {t("alerting_channelHint")}
+                                    </p>
+                                )}
                             </div>
-                            {channels.length === 1 && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    {t("alerting_channelHint")}
+
+                            <div>
+                                <Label htmlFor="alerting-webhook-url">{t("alerting_webhookUrl")}</Label>
+                                <Input
+                                    id="alerting-webhook-url"
+                                    type="url"
+                                    value={webhookUrl}
+                                    onChange={(e) => setWebhookUrl(e.target.value)}
+                                    placeholder={activeChannel?.urlPlaceholder ?? "https://"}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1.5">
+                                    {activeChannel?.hosts?.length
+                                        ? `${t("alerting_hostHint")} ${activeChannel.hosts.join(", ")}`
+                                        : t("alerting_publicHint")}
                                 </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <Label>{t("alerting_webhookUrl")}</Label>
-                            <Input
-                                aria-label={t("alerting_webhookUrl")}
-                                type="url"
-                                value={webhookUrl}
-                                onChange={(e) => setWebhookUrl(e.target.value)}
-                                placeholder={activeChannel?.urlPlaceholder ?? "https://"}
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">
-                                {activeChannel?.hosts?.length
-                                    ? t("alerting_hostHint") + " " + activeChannel.hosts.join(", ")
-                                    : t("alerting_publicHint")}
-                            </p>
-                        </div>
-
-                        <div>
-                            <Label>{t("alerting_alertOn")}</Label>
-                            <div className="flex gap-4 mt-2">
-                                {STATUSES.map((status) => (
-                                    <CheckboxField
-                                        key={status}
-                                        checked={alertOn.includes(status)}
-                                        onChange={() => toggleAlertOn(status)}
-                                        label={<span className="capitalize">{status}</span>}
-                                    />
-                                ))}
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
+                        </fieldset>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t("alerting_alertOn")}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <fieldset disabled={!enabled} className="space-y-3 disabled:opacity-60">
+                            {STATUSES.map((status) => (
+                                <CheckboxField
+                                    key={status}
+                                    checked={alertOn.includes(status)}
+                                    onChange={() => toggleAlertOn(status)}
+                                    // The two states were rendered as the raw
+                                    // English words the API uses, with
+                                    // `capitalize` on top, so a Turkish panel
+                                    // offered "Degraded" and "Down".
+                                    label={t(`health_${status}`)}
+                                    description={t(`alerting_${status}Hint`)}
+                                />
+                            ))}
+                            <p className="text-xs text-muted-foreground pt-1">
                                 {t("alerting_alertOnHint")}
                             </p>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        {t("alerting_saving")}
-                                    </>
-                                ) : (
-                                    t("alerting_save")
-                                )}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                disabled={testing || !webhookUrl}
-                                onClick={sendTest}
-                            >
-                                {testing ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        {t("alerting_testing")}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Send className="w-4 h-4" />
-                                        {t("alerting_test")}
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </>
+                        </fieldset>
+                    </CardContent>
+                </Card>
+            </div>
+        </form>
     );
 }

@@ -139,7 +139,7 @@ export function AdminSpotlight() {
                         onKeyDown={onKeyDown}
                         placeholder={at("spotlight_placeholder")}
                         aria-label={at("spotlight_placeholder")}
-                        className="flex-1 bg-transparent rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-ring text-foreground placeholder:text-muted-foreground"
+                        className="flex-1 bg-transparent rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-primary/50 text-foreground placeholder:text-muted-foreground"
                     />
                     <kbd className="hidden sm:inline px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground bg-muted rounded">ESC</kbd>
                     <button onClick={() => setOpen(false)} aria-label={t("close")} className="text-muted-foreground hover:text-foreground">

@@ -124,7 +124,7 @@ export default function ModerationSettingsPage() {
                         fields.map((field) => (
                             <label
                                 key={field.settingKey}
-                                className="flex items-start gap-3 cursor-pointer border rounded-md p-3 hover:bg-accent/40"
+                                className="flex items-start gap-3 cursor-pointer border border-border rounded-md p-3 hover:bg-accent/40"
                             >
                                 <Checkbox
                                     checked={config[field.settingKey] === "manual"}

@@ -71,7 +71,7 @@ export default function AdminModulesPage() {
             {(installProgress || bulkProgress) && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center">
                     <div className="fixed inset-0 bg-black/50" />
-                    <div className="relative bg-card border rounded-xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center">
+                    <div className="relative bg-card border border-border rounded-xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center">
                         <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
                         {bulkProgress ? (
                             <>

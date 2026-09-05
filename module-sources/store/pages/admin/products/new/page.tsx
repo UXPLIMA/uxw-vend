@@ -142,7 +142,7 @@ export default function NewProductPage() {
                                         <div className="flex flex-wrap gap-2 mb-2">
                                             {form.images.map((url, i) => (
                                                 <div key={i} className="relative group">
-                                                    <Image src={url} alt="" width={64} height={64} className="w-16 h-16 rounded-lg object-cover border" />
+                                                    <Image src={url} alt="" width={64} height={64} className="w-16 h-16 rounded-lg object-cover border border-border" />
                                                     <button
                                                         type="button"
                                                         onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })}

@@ -27,9 +27,13 @@ export {
 } from "@/core/components/ui/select";
 export { NativeSelect } from "@/core/components/ui/native-select";
 export { Pagination, usePagedRows } from "@/core/components/ui/pagination";
+export { Radio, RadioField } from "@/core/components/ui/radio";
+export type { RadioProps, RadioFieldProps } from "@/core/components/ui/radio";
 export type { NativeSelectProps } from "@/core/components/ui/native-select";
 export type { PaginationProps } from "@/core/components/ui/pagination";
 export { Skeleton } from "@/core/components/ui/skeleton";
+export { Slider } from "@/core/components/ui/slider";
+export type { SliderProps } from "@/core/components/ui/slider";
 export { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 /**

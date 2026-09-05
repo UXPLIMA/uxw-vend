@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { writeError } from "@/core/lib/write-result";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { Textarea } from "@/core/components/ui/textarea";
 
 export default function CssSettingsPage() {
     const t = useTranslations("admin");
@@ -51,13 +52,13 @@ export default function CssSettingsPage() {
             <Card className="mb-6">
                 <CardHeader><CardTitle>{t("css_editor")}</CardTitle></CardHeader>
                 <CardContent>
-                    <textarea
+                    <Textarea
                         value={css}
                         onChange={(e) => setCss(e.target.value)}
                         placeholder={`/* Your custom CSS here */\n.my-class {\n  color: red;\n}`}
                         aria-label={t("css_editor")}
                         rows={20}
-                        className="w-full font-mono text-sm bg-card text-foreground border border-border p-4 rounded-lg resize-y"
+                        className="font-mono resize-y"
                         spellCheck={false}
                     />
                 </CardContent>

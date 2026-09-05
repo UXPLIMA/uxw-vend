@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, CheckboxField } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, CheckboxField, Textarea } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
@@ -234,13 +234,13 @@ export default function SeoPageOverridesPage() {
                                     </div>
                                     <div>
                                         <Label className="text-foreground">{t("adm_metaDescription")}</Label>
-                                        <textarea
+                                        <Textarea
                                             aria-label={t("adm_metaDescription")}
                                             value={form.metaDescription}
                                             onChange={(e) => updateField("metaDescription", e.target.value)}
                                             placeholder={t("adm_metaDescriptionPlaceholder")}
                                             rows={2}
-                                            className="flex min-h-[60px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
+                                            className="min-h-[60px]"
                                         />
                                         <p className="text-xs text-muted-foreground mt-1">
                                             {form.metaDescription.length}/160 characters (recommended max)
@@ -284,13 +284,13 @@ export default function SeoPageOverridesPage() {
                                     </div>
                                     <div>
                                         <Label className="text-foreground">{t("adm_ogDescription")}</Label>
-                                        <textarea
+                                        <Textarea
                                             aria-label={t("adm_ogDescription")}
                                             value={form.ogDescription}
                                             onChange={(e) => updateField("ogDescription", e.target.value)}
                                             placeholder={t("adm_ogDescriptionPlaceholder")}
                                             rows={2}
-                                            className="flex min-h-[60px] w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors duration-200"
+                                            className="min-h-[60px]"
                                         />
                                     </div>
                                     <div>

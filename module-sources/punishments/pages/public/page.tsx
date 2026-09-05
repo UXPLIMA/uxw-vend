@@ -107,7 +107,7 @@ export default function PunishmentsPage() {
                 ) : (
                     <>
                         <div className="overflow-x-auto">
-                            <table className="w-full bg-card rounded-xl border">
+                            <table className="w-full bg-card rounded-xl border border-border">
                                 <thead>
                                     <tr className="border-b">
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">{t("player")}</th>

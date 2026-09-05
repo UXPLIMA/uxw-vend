@@ -1,5 +1,6 @@
 "use client";
 
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 
 export function ColorField({ def, value, onChange, isDefault }: FieldProps<string>) {
@@ -11,17 +12,13 @@ export function ColorField({ def, value, onChange, isDefault }: FieldProps<strin
                 type="color"
                 value={effective}
                 onChange={(e) => onChange(e.target.value)}
-                className="h-8 w-12 cursor-pointer rounded border flex-shrink-0"
+                className="h-8 w-12 cursor-pointer rounded border border-border flex-shrink-0"
             />
             <span className="flex flex-col min-w-0">
                 {def.label && <span className="font-medium">{def.label}</span>}
                 <span className="font-mono text-xs text-muted-foreground">{effective}</span>
             </span>
-            {!isDefault && (
-                <button type="button" className="text-xs underline ml-auto" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </label>
     );
 }

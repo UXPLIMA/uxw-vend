@@ -155,7 +155,7 @@ export default function SearchPage() {
                                                 <a
                                                     key={`${group.id}-${i}`}
                                                     href={r.href}
-                                                    className="block p-3 -mx-3 rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                    className="block p-3 -mx-3 rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                                                 >
                                                     <div className="flex items-start gap-3">
                                                         {r.image && (

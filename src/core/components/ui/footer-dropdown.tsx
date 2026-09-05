@@ -49,7 +49,7 @@ export function FooterDropdown({ options, value, onChange, formatLabel }: Footer
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-popover border border-border rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                    <div className="absolute bottom-full left-0 mb-1 w-full bg-card border border-border rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {options.map((option) => (
                             <button
                                 key={option}

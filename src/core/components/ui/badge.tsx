@@ -37,7 +37,10 @@ const TONES: Record<BadgeTone, string> = {
 
 export function badgeClassName(tone: BadgeTone = "neutral", className?: string): string {
     return cn(
-        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        // `border-border` is the base rather than a per-tone class so a tone that
+        // forgets one still gets a themed hairline instead of the CSS default,
+        // which since Tailwind 4 is `currentColor` - a black stroke.
+        "inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
         TONES[tone],
         className,
     );

@@ -1,5 +1,7 @@
 "use client";
 
+import { Slider } from "@/core/components/ui/slider";
+import { ResetToDefault } from "./ResetToDefault";
 import type { FieldProps } from "./types";
 
 export function SliderField({ def, value, onChange, isDefault }: FieldProps<number>) {
@@ -8,21 +10,15 @@ export function SliderField({ def, value, onChange, isDefault }: FieldProps<numb
 
     return (
         <label className="flex items-center gap-2 text-sm">
-            <input
-                type="range"
+            <Slider
                 min={def.min}
                 max={def.max}
                 step={def.step ?? 1}
                 value={current}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className="h-8 cursor-pointer"
             />
             <span className="font-mono text-xs text-muted-foreground w-12 text-right">{current}</span>
-            {!isDefault && (
-                <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
-                    reset
-                </button>
-            )}
+            {!isDefault && <ResetToDefault onReset={() => onChange(undefined)} />}
         </label>
     );
 }
