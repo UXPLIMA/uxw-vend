@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useAllModules } from "@/core/providers/module-provider";
+import { Link } from "@/core/lib/i18n/navigation";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -16,7 +17,7 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { useSiteCurrency } from "@/core/components/currency/site-currency";
@@ -32,12 +33,50 @@ ChartJS.register(
     Legend,
 );
 
+/**
+ * What a module may ask this screen to draw.
+ *
+ * Core owns the chart types; a module picks one. That is the same bargain as
+ * the rest of the platform - the module declares, core renders - and it is the
+ * reason a module cannot ship a chart that looks nothing like the panel.
+ *
+ *   `area`  (default) a filled trend line. Volume over time.
+ *   `line`  the same trend without the fill. Better when two series would
+ *           otherwise stack into mud, and for rates rather than volumes.
+ *   `bar`   discrete counts. A comparison between days rather than a curve
+ *           through them, which is what a count of orders per day really is.
+ *
+ * A ranking is not a chart. "Which five products earned the most" has no time
+ * axis, and drawing it as one is how a leaderboard ends up as a sawtooth
+ * nobody can read, so it gets its own panel type.
+ */
+type ChartKind = "line" | "area" | "bar";
+
 interface ChartSeries {
     id: string;
     label: string;
     labelKey?: string;
     labels: string[];
     data: number[];
+    color?: string;
+    type?: ChartKind;
+    format?: "currency" | "number";
+    source?: string;
+}
+
+interface RankingItem {
+    id: string;
+    label: string;
+    value: number;
+    secondary?: string;
+    href?: string;
+}
+
+interface RankingSeries {
+    id: string;
+    label: string;
+    labelKey?: string;
+    items: RankingItem[];
     color?: string;
     format?: "currency" | "number";
     source?: string;
@@ -84,11 +123,13 @@ export default function AnalyticsPage() {
     const moduleStates = useAllModules();
     const [period, setPeriod] = useState<string>("30");
     const [charts, setCharts] = useState<ChartSeries[]>([]);
+    const [rankings, setRankings] = useState<RankingSeries[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchAll = useCallback(async () => {
         setLoading(true);
         const collected: ChartSeries[] = [];
+        const collectedRankings: RankingSeries[] = [];
 
         // Core users chart
         try {
@@ -128,6 +169,13 @@ export default function AnalyticsPage() {
                                 collected.push({ ...c, source: m.id });
                             }
                         }
+                        if (Array.isArray(body.rankings)) {
+                            for (const r of body.rankings) {
+                                if (Array.isArray(r?.items)) {
+                                    collectedRankings.push({ ...r, source: m.id });
+                                }
+                            }
+                        }
                     } catch { /* skip */ }
                 });
                 await Promise.all(fetches);
@@ -135,6 +183,7 @@ export default function AnalyticsPage() {
         } catch { /* skip */ }
 
         setCharts(collected);
+        setRankings(collectedRankings);
         setLoading(false);
     }, [period, moduleStates]);
 
@@ -162,13 +211,23 @@ export default function AnalyticsPage() {
                     </h1>
                     <p className="text-sm text-muted-foreground">{t("analytics_description")}</p>
                 </div>
-                <div className="flex gap-1 rounded-lg border border-border p-1 bg-card">
+                {/*
+                  * A filter chip group, not a toolbar of boxes. `rounded` on a
+                  * button inside a `rounded-lg` strip left four square corners
+                  * on the selected period and four more on hover.
+                  */}
+                <div
+                    role="group"
+                    aria-label={t("analytics_periodLabel")}
+                    className="flex gap-1 rounded-full border border-border p-1 bg-card"
+                >
                     {PERIODS.map((p) => (
                         <button
                             key={p.key}
                             type="button"
                             onClick={() => setPeriod(p.key)}
-                            className={`px-3 py-1.5 rounded text-xs font-medium transition ${
+                            aria-pressed={period === p.key}
+                            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                                 period === p.key
                                     ? "bg-primary text-primary-foreground"
                                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -187,7 +246,7 @@ export default function AnalyticsPage() {
                         {t("analytics_loading")}
                     </div>
                 </div>
-            ) : charts.length === 0 ? (
+            ) : charts.length === 0 && rankings.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground text-sm">
                         {t("analytics_noCharts")}
@@ -198,13 +257,73 @@ export default function AnalyticsPage() {
                     {charts.map((chart) => {
                         const color = chart.color ?? "#6366f1";
                         const total = sum(chart.data);
+                        const kind: ChartKind = chart.type ?? "area";
+                        const title = translateLabel(chart.label, chart.labelKey);
+                        const dataset = {
+                            label: title,
+                            data: chart.data,
+                            borderColor: color,
+                            backgroundColor: kind === "bar" ? color + "cc" : color + "22",
+                            fill: kind === "area",
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            borderWidth: kind === "bar" ? 0 : 2,
+                            borderRadius: kind === "bar" ? 4 : undefined,
+                            hoverBackgroundColor: kind === "bar" ? color : undefined,
+                            maxBarThickness: 28,
+                        };
+                        // `pointRadius: 0` with Chart.js's default `intersect`
+                        // means the pointer has to land on an invisible point,
+                        // so hovering the chart showed nothing at all. Index
+                        // mode reads the nearest column instead, which is what
+                        // "what was it on this day" asks for.
+                        const options = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: "index" as const, intersect: false },
+                            hover: { mode: "index" as const, intersect: false },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    displayColors: false,
+                                    padding: 10,
+                                    callbacks: {
+                                        label: (ctx: { parsed: { y: number | null } }) => {
+                                            const v = ctx.parsed.y ?? 0;
+                                            if (chart.format === "currency") return money(v);
+                                            return `${title}: ${v.toLocaleString(__dateTag)}`;
+                                        },
+                                    },
+                                },
+                            },
+                            scales: {
+                                x: {
+                                    display: true,
+                                    ticks: {
+                                        maxTicksLimit: 6,
+                                        color: "rgb(var(--muted-foreground-rgb, 120 120 120) / 1)",
+                                        font: { size: 10 },
+                                    },
+                                    grid: { display: false },
+                                },
+                                y: {
+                                    display: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        maxTicksLimit: 5,
+                                        color: "rgb(var(--muted-foreground-rgb, 120 120 120) / 1)",
+                                        font: { size: 10 },
+                                    },
+                                    grid: { color: "rgba(150, 150, 150, 0.1)" },
+                                },
+                            },
+                        };
                         return (
                             <Card key={chart.id}>
                                 <CardHeader className="pb-2">
                                     <div className="flex items-start justify-between gap-3">
-                                        <CardTitle className="text-sm">
-                                            {translateLabel(chart.label, chart.labelKey)}
-                                        </CardTitle>
+                                        <CardTitle className="text-sm">{title}</CardTitle>
                                         <div className="text-right">
                                             <div className="text-[10px] uppercase text-muted-foreground tracking-wide">
                                                 {t("analytics_total")}
@@ -217,62 +336,80 @@ export default function AnalyticsPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="h-48">
-                                        <Line
-                                            data={{
-                                                labels: chart.labels,
-                                                datasets: [
-                                                    {
-                                                        label: translateLabel(chart.label, chart.labelKey),
-                                                        data: chart.data,
-                                                        borderColor: color,
-                                                        backgroundColor: color + "22",
-                                                        fill: true,
-                                                        tension: 0.35,
-                                                        pointRadius: 0,
-                                                        pointHoverRadius: 4,
-                                                        borderWidth: 2,
-                                                    },
-                                                ],
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                plugins: {
-                                                    legend: { display: false },
-                                                    tooltip: {
-                                                        callbacks: {
-                                                            label: (ctx) => {
-                                                                const v = ctx.parsed.y;
-                                                                if (chart.format === "currency") return money(Number(v));
-                                                                return String(v);
-                                                            },
-                                                        },
-                                                    },
-                                                },
-                                                scales: {
-                                                    x: {
-                                                        display: true,
-                                                        ticks: {
-                                                            maxTicksLimit: 6,
-                                                            color: "rgb(var(--muted-foreground-rgb, 120 120 120) / 1)",
-                                                            font: { size: 10 },
-                                                        },
-                                                        grid: { display: false },
-                                                    },
-                                                    y: {
-                                                        display: true,
-                                                        beginAtZero: true,
-                                                        ticks: {
-                                                            maxTicksLimit: 5,
-                                                            color: "rgb(var(--muted-foreground-rgb, 120 120 120) / 1)",
-                                                            font: { size: 10 },
-                                                        },
-                                                        grid: { color: "rgba(150, 150, 150, 0.1)" },
-                                                    },
-                                                },
-                                            }}
-                                        />
+                                        {kind === "bar" ? (
+                                            <Bar data={{ labels: chart.labels, datasets: [dataset] }} options={options} />
+                                        ) : (
+                                            <Line data={{ labels: chart.labels, datasets: [dataset] }} options={options} />
+                                        )}
                                     </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+
+                    {rankings.map((ranking) => {
+                        const color = ranking.color ?? "#6366f1";
+                        const top = ranking.items.slice(0, 8);
+                        const peak = Math.max(...top.map((item) => item.value), 0);
+                        return (
+                            <Card key={ranking.id}>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm">
+                                        {translateLabel(ranking.label, ranking.labelKey)}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {top.length === 0 ? (
+                                        <p className="py-12 text-center text-sm text-muted-foreground">
+                                            {t("analytics_noData")}
+                                        </p>
+                                    ) : (
+                                        <ol className="space-y-2">
+                                            {top.map((item, index) => {
+                                                const row = (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="w-5 shrink-0 text-xs font-mono text-muted-foreground">
+                                                            {index + 1}
+                                                        </span>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-baseline justify-between gap-2">
+                                                                <span className="truncate text-sm">{item.label}</span>
+                                                                <span className="shrink-0 text-sm font-semibold tabular-nums">
+                                                                    {formatTotal(item.value, ranking.format, __dateTag, money)}
+                                                                </span>
+                                                            </div>
+                                                            {/* The bar carries the comparison the number alone does not. */}
+                                                            <div className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                                                                <div
+                                                                    className="h-full rounded-full"
+                                                                    style={{
+                                                                        width: peak > 0 ? `${Math.max(2, (item.value / peak) * 100)}%` : "0%",
+                                                                        backgroundColor: color,
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            {item.secondary && (
+                                                                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                                                                    {item.secondary}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                                return (
+                                                    <li key={item.id}>
+                                                        {item.href ? (
+                                                            <Link href={item.href} className="block rounded-lg p-1 -m-1 hover:bg-muted/60 transition-colors">
+                                                                {row}
+                                                            </Link>
+                                                        ) : (
+                                                            row
+                                                        )}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ol>
+                                    )}
                                 </CardContent>
                             </Card>
                         );

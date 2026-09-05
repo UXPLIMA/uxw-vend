@@ -42,6 +42,7 @@ const EXEMPT: Record<string, string> = {
     "BlogComment.isApproved": "always paired with articleId, which is indexed and selective",
     "ApiKey.isActive": "paired with keyPrefix, which is indexed",
     "ActivityLog.metadata": "a JSON path filter, which a plain btree index does not serve",
+    "OrderItem.order": "a relation filter, which this scan cannot see through: the join uses OrderItem.orderId and the conditions are Order.status and Order.createdAt, all three indexed",
 };
 
 /** Models whose row count grows with what users do. */

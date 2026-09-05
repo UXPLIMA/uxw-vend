@@ -311,7 +311,68 @@ Components rendered on every matching page when the module is enabled (toasts, b
 "statsApi": "/my-module/stats"
 ```
 
-The dashboard issues `GET /api/v1/my-module/stats` and expects `{ cards: { [statKey: string]: number | string }, sections?: [...] }`. Permission gating is the handler's responsibility.
+The dashboard and the analytics screen both call `GET /api/v1/my-module/stats`.
+The analytics screen appends `?period=7|30|90|365`. Permission gating is the
+handler's responsibility - these numbers are not public.
+
+```jsonc
+{
+  // Scalar values for the dashboard cards. The key is the card's `statKey`.
+  "stats": { "orders": 128, "revenue": 4210.5 },
+
+  // Time series for the analytics page.
+  "charts": [{
+    "id": "store-orders",
+    "label": "Orders per day",          // fallback text
+    "labelKey": "analytics_storeOrders", // admin-namespace key, preferred
+    "labels": ["2026-09-01", "..."],
+    "data": [3, 7, 0],
+    "color": "#3b82f6",
+    "type": "bar",                       // "area" (default) | "line" | "bar"
+    "format": "currency"                 // optional; formats the total
+  }],
+
+  // Leaderboards. No time axis, so core draws them as a ranked list with a
+  // proportional bar rather than as a chart.
+  "rankings": [{
+    "id": "store-top-products",
+    "label": "Top products by revenue",
+    "labelKey": "analytics_storeTopProducts",
+    "color": "#10b981",
+    "format": "currency",
+    "items": [{ "id": "p1", "label": "Rank", "value": 320, "secondary": "12x", "href": "/admin/store/products/p1/edit" }]
+  }],
+
+  // Dashboard panels. Every `id` here must also appear in the manifest's
+  // `dashboardSections`, or the dashboard customizer cannot offer it.
+  "sections": [{
+    "id": "recent-orders",
+    "title": "Recent Orders",
+    "titleKey": "dashboard_recentOrders",
+    "viewAllHref": "/admin/store/orders",
+    "items": [{ "id": "o1", "primary": "#1042", "secondary": "alice", "value": "$12.00", "badge": "COMPLETED", "badgeColor": "green" }]
+  }]
+}
+```
+
+Core owns the chart types; a module picks one. `area` is a filled trend line
+and the default. `line` drops the fill, which reads better for a rate than for
+a volume. `bar` is for discrete counts - a number of orders on a day is a
+comparison between days, not a curve through them. A module cannot contribute a
+renderer, which is what keeps every panel on the screen looking like the panel.
+
+### `dashboardSections` - Declaring the panels your stats endpoint returns
+
+```json
+"dashboardSections": [
+    { "id": "recent-orders", "label": "Recent Orders", "labelKey": "dashboard_recentOrders" }
+]
+```
+
+The panel's contents arrive at runtime from `statsApi`, but the dashboard
+customizer is rendered before any of those endpoints are called. A panel that
+is not declared here can never be offered to an admin as something to hide.
+The `id` must match the `sections[].id` your endpoint returns.
 
 ### `settingsCards` - Admin settings page cards
 
@@ -1112,6 +1173,7 @@ Carry `request.reference` through the provider and back: it is how the store rec
     "profileTabs":       [{ "id": "MyTab", "label": "My Tab", "component": "components/MyTab", "order": 30 }],
     "dashboardCards":    [{ "id": "my-stat", "label": "My Stat", "labelKey": "dashboard_my_stat", "icon": "Star", "href": "/admin/my-feature", "color": "text-blue-500", "statKey": "myCount" }],
     "statsApi":          "/my-api/stats",
+    "dashboardSections": [{ "id": "my-panel", "label": "My Panel", "labelKey": "dashboard_my_panel" }],
     "settingsCards":     [{ "title": "My Settings", "description": "...", "href": "/my-settings", "icon": "Settings", "color": "text-gray-500" }],
     "navGroups":         [{ "id": "my-group", "label": "My Group", "icon": "Package", "order": 10 }],
     "authProviders":     [{ "id": "my-provider", "envIdVar": "AUTH_MY_ID", "envSecretVar": "AUTH_MY_SECRET" }],

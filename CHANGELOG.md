@@ -62,6 +62,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Hovering an analytics chart tells you the number.** Every dataset sets
+  `pointRadius: 0` and Chart.js defaults to `intersect: true`, so a tooltip
+  only fired when the pointer landed on a point that is not drawn - which is to
+  say, never. The charts read the nearest column now.
+- **Analytics supports more than one shape.** A module's chart may declare
+  `type` - `area` (the default filled trend), `line`, or `bar` for discrete
+  counts - and a `rankings` panel for a leaderboard, which has no time axis and
+  was never a chart. Core owns the renderers; the module picks one. The store
+  draws its orders per day as bars and contributes a top-products-by-revenue
+  ranking.
+- **The analytics period filter is a chip group, not four squares.** `rounded`
+  buttons inside a `rounded-lg` strip left square corners on the selected
+  period and on every hover.
+- **`docs/PLUGIN_SDK.md` described a `statsApi` response no module returns.**
+  It documented `{ cards: {...} }`; the actual contract is
+  `{ stats, charts, rankings, sections }`, now written out in full.
+
 - **"Customize dashboard" now changes the dashboard.** The modal listed core
   widgets and module cards, saved the answer and reloaded - and the page then
   consulted that answer for its own five widgets only. Every module stat card

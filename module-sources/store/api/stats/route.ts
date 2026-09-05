@@ -10,8 +10,11 @@ import { auth } from "@/core/sdk/auth";
  *  - stats: scalar KPIs (products / orders / revenue)
  *  - sections: recent orders panel
  *  - charts: daily time series for the Analytics page
- *      * orders-per-day (COMPLETED only)
- *      * revenue-per-day (COMPLETED only)
+ *      * orders-per-day (COMPLETED only, drawn as bars - a count of orders
+ *        on a day is a discrete comparison, not a curve through the days)
+ *      * revenue-per-day (COMPLETED only, drawn as a filled trend)
+ *  - rankings: top products by revenue in the window. A leaderboard has no
+ *    time axis, so core gives it its own panel rather than a chart.
  *
  * Accepts ?period=7|30|90|365 to match the analytics date range picker.
  * Defaults to 30 days.
@@ -74,8 +77,45 @@ export async function GET(request: NextRequest) {
         revenueByDay[row.day] = row.sum;
     }
 
+    // Top sellers in the window. Grouped in the database; the product names
+    // are fetched in one follow-up query rather than one per row.
+    const topRows = await prisma.orderItem.groupBy({
+        by: ["productId"],
+        _sum: { price: true, quantity: true },
+        where: {
+            productId: { not: null },
+            order: { status: "COMPLETED", createdAt: { gte: startDate } },
+        },
+        orderBy: { _sum: { price: "desc" } },
+        take: 8,
+    });
+    const topProducts = await prisma.product.findMany({
+        where: { id: { in: topRows.map((r) => r.productId!).filter(Boolean) } },
+        select: { id: true, name: true, slug: true },
+    });
+    const productById = new Map(topProducts.map((p) => [p.id, p]));
+
     return NextResponse.json({
         stats: { products, orders, revenue },
+        rankings: [
+            {
+                id: "store-top-products",
+                label: "Top products by revenue",
+                labelKey: "analytics_storeTopProducts",
+                color: "#10b981",
+                format: "currency",
+                items: topRows.map((row) => {
+                    const product = productById.get(row.productId!);
+                    return {
+                        id: row.productId!,
+                        label: product?.name ?? row.productId!,
+                        value: Number(row._sum.price || 0),
+                        secondary: `${row._sum.quantity ?? 0}x`,
+                        href: product ? `/admin/store/products/${product.id}/edit` : undefined,
+                    };
+                }),
+            },
+        ],
         charts: [
             {
                 id: "store-orders",
@@ -84,6 +124,7 @@ export async function GET(request: NextRequest) {
                 labels,
                 data: labels.map((k) => ordersByDay[k]),
                 color: "#3b82f6",
+                type: "bar",
             },
             {
                 id: "store-revenue",
