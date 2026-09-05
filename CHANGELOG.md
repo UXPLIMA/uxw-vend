@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Two finished widgets that no page could reach.**
+  `widgets/` is not an ordinary source folder: core renders what the manifest
+  names there and nothing else, resolving the export by the id it was given.
+  The store shipped six widget files and declared four. The payment goal bar
+  and the top credit loaders list were complete, translated into both locales,
+  and reading endpoints that answer, and the homepage sidebar they were written
+  for never knew about them. Both are declared now.
+
+  `validate-module` gained "Capability components are declared", and
+  `tests/unit/module-capability-components.test.ts` runs the same rule over
+  every module in `npm test`. A file another file in the module imports is a
+  helper and passes; only something nothing names at all is dead.
 - **Three API responses handed back columns the schema keeps secret.**
   Prisma returns every column when a query names no `select`, so a handler that
   writes a row and answers with what it got back ships the whole row.

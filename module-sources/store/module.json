@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1701,6 +1701,18 @@
       "id": "TopBuyersWidget",
       "component": "widgets/top-buyers-widget",
       "defaultOrder": 30,
+      "defaultVisible": true
+    },
+    {
+      "id": "PaymentGoalWidget",
+      "component": "widgets/payment-goal-widget",
+      "defaultOrder": 40,
+      "defaultVisible": true
+    },
+    {
+      "id": "TopCreditLoadersWidget",
+      "component": "widgets/top-credit-loaders-widget",
+      "defaultOrder": 50,
       "defaultVisible": true
     }
   ],
