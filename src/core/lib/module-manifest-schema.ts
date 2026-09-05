@@ -189,8 +189,20 @@ const apiEntry = z.object({
         .optional(),
 });
 
+// A widget carried no name at all. The screen that switches widgets on and
+// off derived one by splitting the component id on its capitals, so an admin
+// read "Featured Product Widget" in every locale, and a widget whose id was
+// not written in English read as nonsense. `label` is the fallback and
+// `labelKey` is what the screen renders, resolved in the `admin` namespace -
+// the same contract dashboard cards and sections already use.
+//
+// Both are optional here and required by the gate, because a manifest already
+// installed on a live site does not have them: rejecting it would take a
+// working homepage's widgets away on the upgrade that introduced the field.
 const widgetEntry = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
+    label: z.string().min(1).max(100).optional(),
+    labelKey: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/).optional(),
     component: relativePath("component"),
     defaultOrder: z.number().int(),
     defaultVisible: z.boolean(),

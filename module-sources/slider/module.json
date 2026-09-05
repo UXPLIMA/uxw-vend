@@ -2,7 +2,7 @@
   "id": "slider",
   "name": "Slider",
   "description": "Homepage image carousel and banners",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -39,6 +39,8 @@
   "widgets": [
     {
       "id": "SliderWidget",
+      "label": "Homepage Slider",
+      "labelKey": "widget_homepageSlider",
       "component": "widgets/slider-widget",
       "defaultOrder": -10,
       "defaultVisible": true
@@ -94,7 +96,8 @@
         "subtitle": "Manage your platform settings and content",
         "menu_slider_slider": "Slider",
         "module_slider_name": "Slider",
-        "module_slider_description": "Homepage image carousel and banners"
+        "module_slider_description": "Homepage image carousel and banners",
+        "widget_homepageSlider": "Homepage Slider"
       }
     },
     "tr": {
@@ -146,7 +149,8 @@
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_slider_slider": "Slayt",
         "module_slider_name": "Slayt Gösterisi",
-        "module_slider_description": "Ana sayfa görsel galerisi ve bantları"
+        "module_slider_description": "Ana sayfa görsel galerisi ve bantları",
+        "widget_homepageSlider": "Ana Sayfa Slaytı"
       }
     }
   },

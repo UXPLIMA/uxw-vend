@@ -4,13 +4,14 @@ import { useState, useEffect, useMemo } from "react";
 
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { Loader2, Check, Eye, EyeOff } from "lucide-react";
+import { Loader2, Check, Eye, EyeOff, ChevronUp, ChevronDown, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { useTranslations } from "next-intl";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { isWidgetVisible } from "@/core/lib/homepage-widgets";
+import { widgetLabel } from "@/core/lib/widget-label";
 import { writeError } from "@/core/lib/write-result";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
@@ -25,7 +26,7 @@ export default function WidgetSettingsPage() {
             .filter((w) => isEnabledIn(modules, w.module))
             .map((w) => ({
                 id: w.id,
-                name: w.id.replace(/([A-Z])/g, " $1").trim(),
+                name: widgetLabel(w, (key) => t.has(key), (key) => t(key)),
                 description: t("widgets_fromModule", { module: w.module }),
                 module: w.module,
                 defaultVisible: w.defaultVisible,
@@ -143,13 +144,29 @@ export default function WidgetSettingsPage() {
     const sortedWidgets = widgetOrder
         .map((id) => availableWidgets.find((w) => w.id === id))
         .filter(Boolean) as typeof availableWidgets;
+    const allHidden = sortedWidgets.length > 0 && sortedWidgets.every((w) => !widgetConfig[w.id]);
 
     return (
         <>
             <AdminPageHeader
                 title={t("widgets_title")}
                 description={t("widgets_subtitle")}
+                actions={sortedWidgets.length > 0 && !loadFailed ? (
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4" /> {t("widgets_save")}</>}
+                    </Button>
+                ) : undefined}
             />
+
+            {/* Every widget switched off is a legitimate choice and an easy
+                accident, and the homepage cannot tell you which it was: it
+                just renders nothing where the sidebar used to be. */}
+            {allHidden && (
+                <div className="mb-6 flex items-start gap-3 rounded-lg border border-warning/40 bg-warning/10 p-4 text-sm">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+                    <p className="text-foreground">{t("widgets_allHidden")}</p>
+                </div>
+            )}
 
             {loadFailed ? (
                 <Card className="mb-6">
@@ -179,8 +196,8 @@ export default function WidgetSettingsPage() {
                                 className={`flex items-center gap-4 p-4 transition-all ${draggedIdx === idx ? "opacity-40" : ""} ${dragOverIdx === idx && draggedIdx !== idx ? "bg-primary/10 border-l-2 border-l-primary" : ""}`}
                             >
                                 <div className="flex flex-col gap-0.5 cursor-grab active:cursor-grabbing">
-                                    <button aria-label={t("common_moveUp", { label: widget.name })} onClick={() => move(widget.id, -1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▲</span></button>
-                                    <button aria-label={t("common_moveDown", { label: widget.name })} onClick={() => move(widget.id, 1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▼</span></button>
+                                    <button type="button" aria-label={t("common_moveUp", { label: widget.name })} onClick={() => move(widget.id, -1)} disabled={idx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"><ChevronUp className="h-4 w-4" /></button>
+                                    <button type="button" aria-label={t("common_moveDown", { label: widget.name })} onClick={() => move(widget.id, 1)} disabled={idx === sortedWidgets.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground"><ChevronDown className="h-4 w-4" /></button>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium">{widget.name}</p>
@@ -198,12 +215,6 @@ export default function WidgetSettingsPage() {
                     </div>
                 </CardContent>
             </Card>
-            )}
-
-            {sortedWidgets.length > 0 && !loadFailed && (
-            <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4" /> {t("widgets_save")}</>}
-            </Button>
             )}
         </>
     );

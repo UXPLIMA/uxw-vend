@@ -247,7 +247,7 @@ function generateRegistry() {
     let homepageSectionImports = emitDynamicRegistry('Homepage section component registry', 'HomepageSectionRegistry', allHomepageSections);
     homepageSectionImports += `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
 
-    let widgetRegistry = `export const ModuleWidgets: { id: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
+    let widgetRegistry = `export const ModuleWidgets: { id: string; label?: string; labelKey?: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleFooterLinks: { label: string; labelKey?: string; href: string; section?: string; module: string }[] = ${JSON.stringify(allFooterLinks, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleDashboardCards: { id: string; label: string; labelKey?: string; icon: string; href: string; color: string; statKey: string; module: string }[] = ${JSON.stringify(allDashboardCards, null, 2)};\n\n`;

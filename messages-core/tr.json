@@ -1154,6 +1154,7 @@
     "widget_usersDescription": "Toplam kayıtlı kullanıcı ve 7 günlük değişim",
     "widget_usersInLast7Days": "son 7 günde +{n}",
     "widget_viewAll": "Tümünü gör",
+    "widgets_allHidden": "Tüm widget'lar kapalı, bu yüzden ana sayfanın kenar çubuğunda hiçbir şey görünmüyor. İstediğin bu değilse en az birini aç.",
     "widgets_fromModule": "{module} modülünden gelen bileşen",
     "widgets_hidden": "Gizli",
     "widgets_none": "Henüz bileşen yok. Bileşen sağlayan bir modül kurun.",

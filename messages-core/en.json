@@ -1154,6 +1154,7 @@
     "widget_usersDescription": "Total registered users with a 7-day delta",
     "widget_usersInLast7Days": "+{n} in 7 days",
     "widget_viewAll": "View all",
+    "widgets_allHidden": "Every widget is switched off, so the homepage sidebar renders nothing. Switch at least one on if that is not what you meant.",
     "widgets_fromModule": "Widget from the {module} module",
     "widgets_hidden": "Hidden",
     "widgets_none": "No widgets yet. Install a module that contributes one.",

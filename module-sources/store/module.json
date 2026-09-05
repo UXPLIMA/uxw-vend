@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.24",
+  "version": "2.2.25",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1083,7 +1083,13 @@
         "cc_secondarySuffix": "{discount}% off / {commission}% commission",
         "navGroup_commerce": "Commerce",
         "module_store_name": "Store Module",
-        "module_store_description": "Complete e-commerce functionality with products, categories, cart and orders"
+        "module_store_description": "Complete e-commerce functionality with products, categories, cart and orders",
+        "widget_featuredProduct": "Featured Product",
+        "widget_recentPurchases": "Recent Store Purchases",
+        "widget_topCustomer": "Top Customer",
+        "widget_topBuyers": "Top Buyers",
+        "widget_paymentGoal": "Payment Goal",
+        "widget_topCreditLoaders": "Top Credit Loaders"
       },
       "activity": {
         "storeOrderCompleted": "purchased:"
@@ -1673,7 +1679,13 @@
         "cc_secondarySuffix": "%{discount} indirim / %{commission} komisyon",
         "navGroup_commerce": "Ticaret",
         "module_store_name": "Mağaza Modülü",
-        "module_store_description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
+        "module_store_description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret",
+        "widget_featuredProduct": "Öne Çıkan Ürün",
+        "widget_recentPurchases": "Son Satın Almalar",
+        "widget_topCustomer": "En İyi Müşteri",
+        "widget_topBuyers": "En Çok Satın Alanlar",
+        "widget_paymentGoal": "Ödeme Hedefi",
+        "widget_topCreditLoaders": "En Çok Kredi Yükleyenler"
       },
       "activity": {
         "storeOrderCompleted": "satın aldı:"
@@ -1768,36 +1780,48 @@
   "widgets": [
     {
       "id": "FeaturedProductWidget",
+      "label": "Featured Product",
+      "labelKey": "widget_featuredProduct",
       "component": "widgets/featured-product-widget",
       "defaultOrder": 0,
       "defaultVisible": true
     },
     {
       "id": "RecentPurchasesWidget",
+      "label": "Recent Store Purchases",
+      "labelKey": "widget_recentPurchases",
       "component": "widgets/recent-purchases-widget",
       "defaultOrder": 10,
       "defaultVisible": true
     },
     {
       "id": "TopCustomerWidget",
+      "label": "Top Customer",
+      "labelKey": "widget_topCustomer",
       "component": "widgets/top-customer-widget",
       "defaultOrder": 20,
       "defaultVisible": true
     },
     {
       "id": "TopBuyersWidget",
+      "label": "Top Buyers",
+      "labelKey": "widget_topBuyers",
       "component": "widgets/top-buyers-widget",
       "defaultOrder": 30,
       "defaultVisible": true
     },
     {
       "id": "PaymentGoalWidget",
+      "label": "Payment Goal",
+      "labelKey": "widget_paymentGoal",
       "component": "widgets/payment-goal-widget",
       "defaultOrder": 40,
       "defaultVisible": true
     },
     {
       "id": "TopCreditLoadersWidget",
+      "label": "Top Credit Loaders",
+      "labelKey": "widget_topCreditLoaders",
       "component": "widgets/top-credit-loaders-widget",
       "defaultOrder": 50,
       "defaultVisible": true
