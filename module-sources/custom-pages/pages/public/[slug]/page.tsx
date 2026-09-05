@@ -30,13 +30,23 @@ export default function CustomPageView({ params }: PageProps) {
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/custom-pages/${slug}`)
             .then((r) => {
+                if (cancelled) return;
                 if (!r.ok) { setNotFound(true); setLoading(false); return null; }
                 return r.json();
             })
-            .then((d) => { if (d) { setPage(d.page); setLoading(false); } })
-            .catch(() => { setNotFound(true); setLoading(false); });
+            .then((d) => {
+                if (cancelled) return;
+                if (d) { setPage(d.page); setLoading(false); }
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setNotFound(true);
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [slug]);
 
     return (

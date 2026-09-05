@@ -41,9 +41,11 @@ export default function NavbarSettingsPage() {
     const [expandedDropdown, setExpandedDropdown] = useState<number | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/settings")
             .then((r) => r.json())
             .then((data) => {
+                if (cancelled) return;
                 const navLinks = data.settings?.navbar_links;
                 if (Array.isArray(navLinks)) {
                     setLinks(navLinks);
@@ -58,7 +60,11 @@ export default function NavbarSettingsPage() {
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [moduleStatus]);
 
     const addLink = () => setLinks([...links, { label: "", href: "/", icon: "" }]);

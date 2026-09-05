@@ -71,28 +71,37 @@ export default function ProductDetailPage() {
     const [variableValues, setVariableValues] = useState<Record<string, string>>({});
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/store/products/${lookupId}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Not found");
                 return res.json();
             })
             .then((data) => {
+                if (cancelled) return;
                 setProduct(data.product);
                 setLoading(false);
             })
             .catch(() => {
+                if (cancelled) return;
                 setError(true);
                 setLoading(false);
             });
+        return () => { cancelled = true; };
     }, [lookupId]);
 
     // Fetch product variables
     useEffect(() => {
+        let cancelled = false;
         if (!product) return;
         fetch(`/api/v1/product-variables?productId=${product.id}`)
             .then((r) => r.json())
-            .then((d) => setVariables(d.variables || []))
+            .then((d) => {
+                if (cancelled) return;
+                setVariables(d.variables || []);
+            })
             .catch(() => {});
+        return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id]);
 

@@ -29,15 +29,21 @@ export default function CloudflareR2AdminPage() {
     });
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/storage/cloudflare-r2/settings")
             .then((r) => r.json())
             .then((d) => {
+                if (cancelled) return;
                 if (d.config) setConfig(d.config);
                 setIsActive(!!d.isActive);
                 setSetActive(!!d.isActive);
             })
             .catch(() => toast.error(t("saveError")))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [t]);
 
     const save = async () => {

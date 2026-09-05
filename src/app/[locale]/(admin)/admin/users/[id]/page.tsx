@@ -183,10 +183,12 @@ export default function AdminUserDetailPage() {
     });
 
     useEffect(() => {
+        let cancelled = false;
         Promise.all([
             fetch(`/api/v1/users/${userId}`).then((r) => r.json()),
             fetch("/api/v1/roles").then((r) => r.json()),
         ]).then(([userData, rolesData]) => {
+            if (cancelled) return;
             if (userData.user) {
                 setUser(userData.user);
                 setForm({
@@ -197,7 +199,11 @@ export default function AdminUserDetailPage() {
             }
             setRoles(rolesData.roles || []);
             setLoading(false);
-        }).catch(() => setLoading(false));
+        }).catch(() => {
+            if (cancelled) return;
+            setLoading(false);
+        });
+        return () => { cancelled = true; };
     }, [userId]);
 
     const handleSave = async (e: React.FormEvent) => {

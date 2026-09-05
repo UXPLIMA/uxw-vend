@@ -37,10 +37,19 @@ export default function PlayerProfilePage({ params }: PageProps) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/players/${username}`)
             .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-            .then((d) => { setPlayer(d.player); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((d) => {
+                if (cancelled) return;
+                setPlayer(d.player);
+                setLoading(false);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [username]);
 
     return (

@@ -40,16 +40,22 @@ export default function LeaderboardPage() {
     const tabs = allTabs.filter((tab) => sources.includes(tab.id));
 
     useEffect(() => {
+        let cancelled = false;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/api/v1/leaderboard?type=${activeTab}&limit=20`)
             .then((r) => r.json())
             .then((d) => {
+                if (cancelled) return;
                 setEntries(d.leaderboard || []);
                 if (Array.isArray(d.sources)) setSources(d.sources);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [activeTab]);
 
     return (

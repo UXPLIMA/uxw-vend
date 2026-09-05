@@ -25,11 +25,13 @@ export default function ModerationSettingsPage() {
     const [config, setConfig] = useState<Record<string, ModerationMode>>({});
 
     useEffect(() => {
+        let cancelled = false;
         Promise.all([
             fetch("/api/v1/admin/moderation").then((r) => (r.ok ? r.json() : null)),
             fetch("/api/v1/settings").then((r) => (r.ok ? r.json() : null)),
         ])
             .then(([modPayload, settingsPayload]) => {
+                if (cancelled) return;
                 const types = (modPayload?.types ?? {}) as Record<
                     string,
                     { label: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string }
@@ -56,7 +58,11 @@ export default function ModerationSettingsPage() {
             .catch(() => {
                 toast.error(t("moderationSettings_loadFailed"));
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [t]);
 
     const toggleField = (key: string) => {

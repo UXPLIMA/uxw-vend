@@ -30,16 +30,21 @@ export default function PublicTrophiesPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         const tasks: Promise<unknown>[] = [
             fetch("/api/v1/trophies")
                 .then((r) => (r.ok ? r.json() : { trophies: [] }))
-                .then((d) => setTrophies(Array.isArray(d.trophies) ? d.trophies : [])),
+                .then((d) => {
+                    if (cancelled) return;
+                    setTrophies(Array.isArray(d.trophies) ? d.trophies : []);
+                }),
         ];
         if (session?.user) {
             tasks.push(
                 fetch("/api/v1/me/trophies")
                     .then((r) => (r.ok ? r.json() : { earned: [] }))
                     .then((d) => {
+                        if (cancelled) return;
                         const arr: EarnedRow[] = Array.isArray(d.earned) ? d.earned : [];
                         setEarnedIds(new Set(arr.map((row) => row.trophy.id)));
                     }),
@@ -47,7 +52,11 @@ export default function PublicTrophiesPage() {
         }
         Promise.all(tasks)
             .catch(() => { })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [session]);
 
     return (

@@ -8,6 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A slow answer overwrote a fresh one on 37 screens.** The pattern is
+  everywhere: an effect fetches on a changing dependency and writes the answer
+  straight into state, with nothing recording which request it belongs to.
+
+      useEffect(() => {
+          setLoading(true);
+          fetch(`/api/v1/leaderboard?type=${activeTab}&limit=20`)
+              .then((r) => r.json())
+              .then((d) => { setEntries(d.leaderboard || []); setLoading(false); });
+      }, [activeTab]);
+
+  Click a tab, click another before the first comes back, and the first tab's
+  rows land under the second tab's heading and stay there. The stale
+  `setLoading(false)` clears the spinner while the request the reader is
+  actually waiting for is still in flight, so the wrong rows do not even look
+  provisional. The store index raced on `[activeCategory, activeMode, sortBy]`,
+  the forum index on `[selectedCategory, page, searchQuery]`, the leaderboard
+  on `[activeTab]`, and 34 more did the same on a slug, an id or a session.
+
+  Every one of them now keeps a flag the cleanup flips and checks it before
+  each state write. The two admin search boxes had only a debounce timer, which
+  stops a keystroke landing before the request goes out and does nothing about
+  one landing after it; they keep the timer and gained the flag. The forum's
+  topic view fetches from an effect and from its own action handlers through
+  one function, so that function took an optional staleness predicate: the
+  effect passes one, the handlers do not, since their answer is always the one
+  wanted.
+
+  `tests/unit/a-late-response-does-not-win.test.ts` reads every effect in
+  `src/` and `module-sources/`, and fails on one that fetches on a dependency
+  and writes state without a cleanup that aborts the request or flips a flag
+  the body reads. Matching the word alone was not enough: the first pass at
+  this fix skipped the verify-email page because a `/* ignore */` comment sat
+  inside it.
+
 - **Every module endpoint claimed to accept every verb.** All of them are
   served by one dispatcher, `/api/v1/[...path]`, which has to export all five
   verbs to be reachable by any of them, and Next builds the `Allow` header

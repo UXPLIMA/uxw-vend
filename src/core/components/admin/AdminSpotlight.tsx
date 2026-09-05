@@ -77,19 +77,27 @@ export function AdminSpotlight() {
             return;
         }
         setLoading(true);
+        // The timer covers a keystroke landing before the request goes out;
+        // `cancelled` covers one landing after it, whose answer would otherwise
+        // arrive late and put the previous query's results under the new one.
+        let cancelled = false;
         const timer = setTimeout(async () => {
             try {
                 const res = await fetch(`/api/v1/admin/search?q=${encodeURIComponent(query)}`);
                 if (res.ok) {
                     const data = await res.json();
+                    if (cancelled) return;
                     setResults(data.results || []);
                     setSelectedIdx(0);
                 }
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         }, 200);
-        return () => clearTimeout(timer);
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
     }, [query]);
 
     // Arrow navigation

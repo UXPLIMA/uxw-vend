@@ -34,16 +34,22 @@ export default function HelpArticlePage({ params }: PageProps) {
     const [feedbackGiven, setFeedbackGiven] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/help/articles/${slug}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Not found");
                 return res.json();
             })
             .then((data) => {
+                if (cancelled) return;
                 setArticle(data);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [slug]);
 
     const submitFeedback = async (helpful: boolean) => {

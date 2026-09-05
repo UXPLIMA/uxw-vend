@@ -33,6 +33,7 @@ export default function PageBuilderPage(props: PageProps) {
     });
 
     useEffect(() => {
+        let cancelled = false;
         if (pageId === "new") {
             // Empty starter
             setData({ root: { props: {} }, content: [] } as unknown as Data);
@@ -44,6 +45,7 @@ export default function PageBuilderPage(props: PageProps) {
         fetch(`/api/v1/custom-pages/${pageId}`)
             .then((r) => r.json())
             .then((d) => {
+                if (cancelled) return;
                 if (!d.page) {
                     toast.error(t("pageBuilder_notFound"));
                     return;
@@ -63,7 +65,11 @@ export default function PageBuilderPage(props: PageProps) {
                     setData({ root: { props: {} }, content: [] } as unknown as Data);
                 }
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [pageId, t]);
 
     const save = async (puckData: Data) => {

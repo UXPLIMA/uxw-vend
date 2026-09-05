@@ -47,9 +47,11 @@ export default function MaintenanceSettingsPage() {
     }, []);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/admin/maintenance")
             .then((r) => (r.ok ? r.json() : null))
             .then((payload: { data?: MaintenanceConfig } | null) => {
+                if (cancelled) return;
                 const cfg = payload?.data;
                 if (cfg) {
                     setEnabled(Boolean(cfg.enabled));
@@ -64,7 +66,11 @@ export default function MaintenanceSettingsPage() {
             .catch(() => {
                 toast.error(t("maintenance_loadFailed"));
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [t]);
 
     const toggleRole = (role: string) => {

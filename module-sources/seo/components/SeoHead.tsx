@@ -7,11 +7,16 @@ export default function SeoHead() {
     const [seo, setSeo] = useState<Record<string, string | boolean | null> | null>(null);
 
     useEffect(() => {
+        let cancelled = false;
         const cleanPath = pathname.replace(/^\/[a-z]{2}(\/|$)/, "/") || "/";
         fetch(`/api/v1/seo/lookup?path=${encodeURIComponent(cleanPath)}`)
             .then(r => r.ok ? r.json() : null)
-            .then(d => setSeo(d))
+            .then(d => {
+                if (cancelled) return;
+                setSeo(d);
+            })
             .catch(() => {});
+        return () => { cancelled = true; };
     }, [pathname]);
 
     useEffect(() => {

@@ -33,9 +33,11 @@ export default function HelpCategoryPage({ params }: PageProps) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/help/categories")
             .then((res) => res.json())
             .then((categories) => {
+                if (cancelled) return;
                 const cat = categories.find((c: Category) => c.slug === slug);
                 if (cat) {
                     setCategory(cat);
@@ -43,12 +45,19 @@ export default function HelpCategoryPage({ params }: PageProps) {
                 }
                 throw new Error("Category not found");
             })
-            .then((res) => res.json())
+            // `res` is undefined when the step above bailed out on a cancelled
+            // effect; there is nothing left to read in that case.
+            .then((res) => (res ? res.json() : null))
             .then((data) => {
+                if (cancelled) return;
                 setArticles(data || []);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [slug]);
 
     return (

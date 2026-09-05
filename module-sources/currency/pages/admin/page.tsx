@@ -28,11 +28,19 @@ export default function CurrencyAdminPage() {
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/currency")
             .then((r) => r.json())
-            .then((d) => setConfig(d))
+            .then((d) => {
+                if (cancelled) return;
+                setConfig(d);
+            })
             .catch(() => toast.error(t("saveError")))
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [t]);
 
     const updateCurrency = (idx: number, patch: Partial<Currency>) => {

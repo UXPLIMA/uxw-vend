@@ -50,10 +50,12 @@ export default function EditProductPage(props: PageProps) {
     });
 
     useEffect(() => {
+        let cancelled = false;
         Promise.all([
             fetch(`/api/v1/store/products/${productId}`).then((r) => r.json()),
             fetch("/api/v1/store/categories").then((r) => r.json()),
         ]).then(([productData, catData]) => {
+            if (cancelled) return;
             const p = productData.product;
             if (p) {
                 setForm({
@@ -74,7 +76,11 @@ export default function EditProductPage(props: PageProps) {
             }
             setCategories(catData.categories || []);
             setLoading(false);
-        }).catch(() => setLoading(false));
+        }).catch(() => {
+            if (cancelled) return;
+            setLoading(false);
+        });
+        return () => { cancelled = true; };
     }, [productId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -423,15 +429,23 @@ function ProductCommandsEditor({ productId }: { productId: string }) {
     const [newServerId, setNewServerId] = useState("");
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/product-commands?productId=${productId}`)
             .then((r) => r.json())
-            .then((d) => setCommands(d.commands || []))
+            .then((d) => {
+                if (cancelled) return;
+                setCommands(d.commands || []);
+            })
             .catch(() => {});
         // Fetch available game servers
         fetch("/api/v1/servers")
             .then((r) => r.ok ? r.json() : { servers: [] })
-            .then((d) => setServers(d.servers || []))
+            .then((d) => {
+                if (cancelled) return;
+                setServers(d.servers || []);
+            })
             .catch(() => {});
+        return () => { cancelled = true; };
     }, [productId]);
 
     const addCmd = async () => {
@@ -492,10 +506,15 @@ function ProductVariablesEditor({ productId }: { productId: string }) {
     const [newLabel, setNewLabel] = useState("");
 
     useEffect(() => {
+        let cancelled = false;
         fetch(`/api/v1/product-variables?productId=${productId}`)
             .then((r) => r.json())
-            .then((d) => setVars(d.variables || []))
+            .then((d) => {
+                if (cancelled) return;
+                setVars(d.variables || []);
+            })
             .catch(() => {});
+        return () => { cancelled = true; };
     }, [productId]);
 
     const addVar = async () => {

@@ -142,6 +142,7 @@ export default function ProfilePage() {
     });
 
     useEffect(() => {
+        let cancelled = false;
         if (authStatus === "unauthenticated") {
             router.push("/auth/login");
             return;
@@ -151,6 +152,7 @@ export default function ProfilePage() {
         fetch("/api/v1/auth/profile")
             .then(r => r.json())
             .then((profileData) => {
+                if (cancelled) return;
                 if (profileData.user) {
                     setProfile(profileData.user);
                     setUsername(profileData.user.username);
@@ -158,7 +160,11 @@ export default function ProfilePage() {
                 }
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                if (cancelled) return;
+                setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, [authStatus, router]);
 
     const saveProfile = async (e: React.FormEvent) => {

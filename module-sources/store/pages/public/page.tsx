@@ -63,19 +63,25 @@ export default function StorePage() {
 
     // Fetch Products when category changes
     useEffect(() => {
+        let cancelled = false;
         const categorySlug = activeCategory || activeMode;
         if (categorySlug) {
             setLoadingProducts(true);
             fetch(`/api/v1/store/products?category=${categorySlug}&limit=12&sort=${sortBy}`)
                 .then((res) => res.json())
                 .then((data) => {
+                    if (cancelled) return;
                     setProducts(data.products || []);
                     setLoadingProducts(false);
                 })
-                .catch(() => setLoadingProducts(false));
+                .catch(() => {
+                    if (cancelled) return;
+                    setLoadingProducts(false);
+                });
         } else {
             setProducts([]);
         }
+        return () => { cancelled = true; };
     }, [activeCategory, activeMode, sortBy]);
 
     // Derived state
