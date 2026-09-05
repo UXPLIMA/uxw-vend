@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Sparkles, Settings, Puzzle } from "lucide-react";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { visibleWidgets } from "@/core/lib/homepage-widgets";
 import { STAFF_ROLE_PRIORITY } from "@/core/lib/constants";
 
 export default function HomePage() {
@@ -23,11 +24,15 @@ export default function HomePage() {
   const { settings } = useSiteSettings();
   const isStaff = (session?.user?.rolePriority ?? 0) >= STAFF_ROLE_PRIORITY;
 
-  const widgetVisibility = (settings.widget_visibility || {}) as Record<string, boolean>;
-  const enabledWidgets = ModuleWidgets
-    .filter(w => isEnabledIn(modules, w.module))
-    .filter(w => widgetVisibility[w.id] !== false)
-    .filter(w => WidgetComponentRegistry[w.id]);
+  // Visibility and order are the admin's, from Settings > Widgets; see
+  // homepage-widgets.ts for what each saved key means and what an unsaved
+  // widget falls back to.
+  const enabledWidgets = visibleWidgets(
+    ModuleWidgets
+      .filter(w => isEnabledIn(modules, w.module))
+      .filter(w => WidgetComponentRegistry[w.id]),
+    settings,
+  );
 
   const enabledSections = ModuleHomepageSections
     .filter(s => isEnabledIn(modules, s.module))

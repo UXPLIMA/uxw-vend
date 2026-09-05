@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The homepage widget customiser configured nothing.**
+  Admin > Settings > Widgets writes two keys: `widget_visibility` and
+  `widget_order`. The homepage honoured neither. `widget_order` was read by no
+  file in the repository, so dragging a widget into place changed nothing.
+  `widget_visibility` was read, but through `useSiteSettings`, which fetches
+  `/api/v1/public-settings`, and that endpoint publishes a fixed allowlist that
+  did not name it - so the key never left the database and hiding a widget did
+  nothing either. Both screens said "saved" and the page they configure stayed
+  exactly as it was.
+
+  A manifest's `defaultVisible` was ignored for a third reason: the default was
+  hardcoded to visible rather than read from the declaration, so a module that
+  shipped a widget switched off would have had it switched on.
+
+  Both keys are on the allowlist now, `hero_discord_url` with them (the footer
+  documents it as the back-compat alias for migrated installs, and it could
+  never resolve), and the homepage and the customiser share
+  `src/core/lib/homepage-widgets.ts` so they cannot disagree about what an
+  untouched widget does. A widget installed after the admin last saved keeps
+  its declared position and follows the ones the saved order named.
+
+  `tests/unit/site-settings-reach-their-readers.test.ts` asserts that every key
+  read through `useSiteSettings` anywhere in the tree is one the public
+  settings endpoint will answer with. On the tree before this change it reports
+  five such reads.
+- **A blog setting that nothing could set.** The homepage news section sized
+  its pages from `per_page_home_news`, a key no manifest declares and no screen
+  writes, so the fallback of four was the only value it ever had. It reads the
+  constant now and no longer subscribes to site settings for it.
 - **Two finished widgets that no page could reach.**
   `widgets/` is not an ordinary source folder: core renders what the manifest
   names there and nothing else, resolving the export by the id it was given.

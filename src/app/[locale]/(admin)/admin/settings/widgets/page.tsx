@@ -10,6 +10,7 @@ import { ModuleWidgets } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { useTranslations } from "next-intl";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { isWidgetVisible } from "@/core/lib/homepage-widgets";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
@@ -24,6 +25,7 @@ export default function WidgetSettingsPage() {
                 name: w.id.replace(/([A-Z])/g, " $1").trim(),
                 description: t("widgets_fromModule", { module: w.module }),
                 module: w.module,
+                defaultVisible: w.defaultVisible,
             })),
         [modules, t]
     );
@@ -45,7 +47,9 @@ export default function WidgetSettingsPage() {
                 const order = s.widget_order || widgetIds;
 
                 const vis: Record<string, boolean> = {};
-                availableWidgets.forEach((w) => { vis[w.id] = config[w.id] !== false; });
+                // Same rule the homepage applies, so an untouched widget
+                // reads here exactly as it renders there.
+                availableWidgets.forEach((w) => { vis[w.id] = isWidgetVisible(w, config); });
                 setWidgetConfig(vis);
                 setWidgetOrder(Array.isArray(order) ? order.filter((id: string) => widgetIds.includes(id)) : widgetIds);
                 // Add any new widgets not in saved order
