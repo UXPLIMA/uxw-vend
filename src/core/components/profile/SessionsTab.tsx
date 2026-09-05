@@ -92,7 +92,7 @@ export function SessionsTab() {
             // server component and client store built while the user was
             // authenticated, rather than carrying them into a logged-out session.
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-            window.location.href = "/auth/login";
+            window.location.href = `/${__locale}/auth/login`;
         }
     };
 

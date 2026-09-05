@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";

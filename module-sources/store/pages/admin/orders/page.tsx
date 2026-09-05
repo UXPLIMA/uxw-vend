@@ -3,7 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";

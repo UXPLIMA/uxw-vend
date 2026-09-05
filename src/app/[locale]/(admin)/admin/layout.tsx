@@ -1,7 +1,7 @@
 
-import { redirect } from "next/navigation";
+import { redirect } from "@/core/lib/i18n/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
@@ -16,14 +16,15 @@ import { getActiveTheme } from "@/core/lib/theme-state";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await auth();
+    const locale = await getLocale();
 
     if (!session?.user) {
-        redirect("/auth/login");
+        redirect({ href: "/auth/login", locale });
     }
 
     const admin = await isAdmin(session.user.id);
     if (!admin) {
-        redirect("/");
+        redirect({ href: "/", locale });
     }
 
     // Initialize module states from DB so isEnabled() works correctly

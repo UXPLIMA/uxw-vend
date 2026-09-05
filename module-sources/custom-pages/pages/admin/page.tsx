@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, ExternalLink, Pencil, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";

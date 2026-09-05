@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/core/components/ui/button";
 import { AlertTriangle, RotateCcw, Home } from "lucide-react";
 
@@ -35,6 +35,7 @@ export default function Error({
     reset: () => void;
 }) {
     const labels = useErrorTranslations();
+    const locale = useLocale();
 
     useEffect(() => {
         console.error(error);
@@ -62,7 +63,7 @@ export default function Error({
                   * "go home" reliably recover.
                   */}
                 {/* eslint-disable-next-line @next/next/no-location-assign-relative-destination */}
-                <Button variant="outline" onClick={() => window.location.href = "/"}>
+                <Button variant="outline" onClick={() => window.location.href = `/${locale}`}>
                     <Home className="w-4 h-4 mr-2" /> {labels.goHome}
                 </Button>
             </div>

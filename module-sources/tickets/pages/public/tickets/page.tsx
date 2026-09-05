@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { Button, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";

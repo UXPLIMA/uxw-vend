@@ -52,6 +52,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **A Turkish visitor was sent to the English page.** `localePrefix` is
+  `always`, so a navigation written without a prefix is not a broken link - the
+  proxy rewrites it to the default locale - which is why seventy-three of them
+  survived across thirty-one files. The visitor reached the page they asked
+  for, in a language they may not read. The worst was the admin gate:
+  `redirect("/auth/login")` in the admin layout meant every signed-out visitor
+  of `/tr/admin` landed on the English login form, reproducible on the demo.
+  `next/link` and `next/navigation` know nothing about locales; the wrappers in
+  `@/core/lib/i18n/navigation`, published to modules as `@/core/sdk/navigation`,
+  carry the active prefix, and that SDK file had said so in a comment since it
+  was written with nothing enforcing it. Four deliberate hard reloads - after
+  starting or stopping impersonation, after revoking every session, and the
+  error screen's way home - now write the locale into the path themselves.
+  `usePathname` stays where each caller had it: next-intl's strips the prefix,
+  `next/navigation`'s keeps it, and a callbackUrl built to come back here needs
+  the one that keeps it.
+
 - **A Turkish admin was told what went wrong in English.** Every screen in the
   panel is translated, so the English that survived hid where nobody rereads:
   in what a failed write says, what a field suggests before it is filled, and

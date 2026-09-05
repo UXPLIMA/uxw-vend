@@ -1,6 +1,6 @@
 import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
-import { redirect } from "next/navigation";
+import { redirect } from "@/core/lib/i18n/navigation";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
@@ -43,17 +43,17 @@ interface PageProps {
 
 export default async function AdminUsersPage({ searchParams }: PageProps) {
     const session = await auth();
-    if (!session?.user) redirect("/auth/login");
+    const locale = await getLocale();
+    if (!session?.user) redirect({ href: "/auth/login", locale });
 
     const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) redirect("/");
+    if (!adminCheck) redirect({ href: "/", locale });
 
     const sp = await searchParams;
     const requestedPage = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
 
     const [{ users, total }, roles] = await Promise.all([getUsers(requestedPage, PAGE_SIZE), getRoles()]);
     const t = await getTranslations("admin");
-    const locale = await getLocale();
     const dateTag = dateLocaleTag(locale);
 
     const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));

@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useModalDialog } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, X, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 
 interface SeoPage {
     id: string;

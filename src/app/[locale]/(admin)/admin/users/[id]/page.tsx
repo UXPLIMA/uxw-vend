@@ -114,7 +114,7 @@ export default function AdminUserDetailPage() {
             // cached tree and show the admin their own permissions while acting
             // as someone else.
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-            window.location.href = "/";
+            window.location.href = `/${locale}`;
         } catch {
             toast.error(t("users_impersonateFailed"));
         } finally {

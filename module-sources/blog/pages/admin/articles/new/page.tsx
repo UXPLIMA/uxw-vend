@@ -3,8 +3,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter } from "@/core/sdk/navigation";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@/core/sdk/ui";
 import { writeError } from "@/core/sdk";
 

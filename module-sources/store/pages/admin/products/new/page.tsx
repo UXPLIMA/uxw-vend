@@ -4,8 +4,8 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter } from "@/core/sdk/navigation";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 import { writeError } from "@/core/sdk";

@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/core/lib/i18n/navigation";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
     ModuleStatCards,
     ModuleSections,
@@ -58,8 +58,9 @@ const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
 
 export default async function AdminDashboard() {
     const session = await auth();
-    if (!session?.user) redirect("/auth/login");
-    if (!(await isAdmin(session.user.id))) redirect("/");
+    const locale = await getLocale();
+    if (!session?.user) redirect({ href: "/auth/login", locale });
+    if (!(await isAdmin(session.user.id))) redirect({ href: "/", locale });
 
     const t = await getTranslations("admin");
     const [layout, available] = await Promise.all([

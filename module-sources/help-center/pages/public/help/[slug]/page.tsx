@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { UserCog, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 export function ImpersonationBanner() {
     const { data: session, update } = useSession();
     const t = useTranslations("common");
+    const locale = useLocale();
     const [stopping, setStopping] = useState(false);
 
     if (!session?.user?.originalUserId) return null;
@@ -39,7 +40,7 @@ export function ImpersonationBanner() {
             // would leave the impersonated user's server-rendered tree in place
             // after the real session has already been restored.
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-            window.location.href = "/admin/users";
+            window.location.href = `/${locale}/admin/users`;
         } catch {
             toast.error(t("impersonationStopFailed"));
         } finally {
