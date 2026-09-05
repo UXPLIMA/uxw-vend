@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { ModuleUserDataTables } from "@/core/generated/module-registry";
+import { dashboardLayoutKey } from "./principal-rows";
 
 /**
  * GDPR-compliant user data export.
@@ -33,6 +34,12 @@ interface CoreTable {
     column: string;
     /** The columns handed out, in schema order. */
     select: Record<string, true>;
+    /**
+     * Extra `where` clauses, for a table that holds more than this user's
+     * rows under the same column. Only `ResourcePermission` needs it: its
+     * `principalId` names a role just as often as a person.
+     */
+    where?: Record<string, unknown>;
 }
 
 export const CORE_TABLES: CoreTable[] = [
@@ -126,6 +133,15 @@ export const CORE_TABLES: CoreTable[] = [
         column: "userId",
         select: { id: true, action: true, entity: true, entityId: true, ipAddress: true, createdAt: true },
     },
+    {
+        // principalType and principalId withheld: both are constant for
+        // these rows - "user", and the id already at the top of the bundle.
+        key: "resourcePermissions",
+        model: "resourcePermission",
+        column: "principalId",
+        where: { principalType: "user" },
+        select: { id: true, resource: true, resourceId: true, action: true, allow: true, createdAt: true },
+    },
 ];
 
 /**
@@ -162,6 +178,10 @@ interface FindManyDelegate {
     findMany(args: { where: Record<string, unknown>; select?: Record<string, true> }): Promise<unknown[]>;
 }
 
+interface FindUniqueDelegate {
+    findUnique(args: { where: Record<string, unknown>; select?: Record<string, true> }): Promise<unknown>;
+}
+
 function getDelegate(modelName: string): FindManyDelegate | null {
     const client = prisma as unknown as Record<string, unknown>;
     const delegate = client[modelName];
@@ -189,6 +209,27 @@ async function safeFindMany(
     }
 }
 
+async function safeFindUnique(
+    modelName: string,
+    where: Record<string, unknown>,
+    select: Record<string, true>
+): Promise<unknown> {
+    try {
+        const client = prisma as unknown as Record<string, unknown>;
+        const delegate = client[modelName];
+        if (
+            !delegate ||
+            typeof delegate !== "object" ||
+            typeof (delegate as { findUnique?: unknown }).findUnique !== "function"
+        ) {
+            return null;
+        }
+        return await (delegate as FindUniqueDelegate).findUnique({ where, select });
+    } catch {
+        return null;
+    }
+}
+
 export async function exportUserData(userId: string): Promise<UserDataExport> {
     // Core user row - strip secret fields.
     const userRow = await prisma.user.findUnique({
@@ -213,10 +254,21 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
     });
 
     const rows = await Promise.all(
-        CORE_TABLES.map((table) => safeFindMany(table.model, { [table.column]: userId }, table.select))
+        CORE_TABLES.map((table) =>
+            safeFindMany(table.model, { [table.column]: userId, ...table.where }, table.select),
+        ),
     );
 
-    const bundle: UserDataExport = { user: userRow, modules: {} };
+    // The dashboard arrangement is one Setting row keyed by the user's id
+    // rather than a table with a user column, so it is fetched on its own -
+    // through the same delegate probe the tables use, because a client
+    // without the model must yield nothing rather than throw.
+    const layout = await safeFindUnique("setting", { key: dashboardLayoutKey(userId) }, {
+        value: true,
+        updatedAt: true,
+    });
+
+    const bundle: UserDataExport = { user: userRow, modules: {}, dashboardLayout: layout };
     CORE_TABLES.forEach((table, i) => {
         bundle[table.key] = rows[i];
     });
@@ -267,6 +319,11 @@ Contents
   conversations    Direct-message threads you are a member of.
   messages         Direct messages you wrote. Replies from the other
                    side belong to their author and are not included.
+  resourcePermissions
+                   Per-account permission grants an admin recorded
+                   against you, beyond what your role already allows.
+  dashboardLayout  How you arranged the admin dashboard, if you are
+                   an admin and ever changed it.
   auditLog         Security-relevant actions recorded against your
                    account, with the IP they came from. Details that
                    name another account are omitted.
