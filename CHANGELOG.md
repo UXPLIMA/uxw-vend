@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Correction to the entry below: the served 404 body is still empty.**
+  Removing the nested document from `app/[locale]/not-found.tsx` was right and
+  is what the prerendered `_not-found.html` needed - that file now carries the
+  heading and the link where it used to carry a document inside a document.
+  It did not fix the response a visitor gets. A 404 on the running site is
+  rendered dynamically, and Next answers it with the `__next_error__` shell:
+  the status is 404, the markup is in the flight payload, and the body is empty
+  until JavaScript runs.
+
+  The cause is one Next names: this app's root layout is
+  `app/[locale]/layout.tsx`, a top-level dynamic segment, and
+  `createNotFoundLoaderTree` builds the 404 route with a page and no layout, so
+  there is nothing to render the document. The remedy Next documents for it is
+  `experimental.globalNotFound` with an `app/global-not-found.tsx`. That was
+  tried here and built without complaint, and the served 404 did not change, so
+  it has been reverted rather than left in as decoration. What is left is the
+  boundary rule and the gate that holds it: nothing that a layout composes
+  renders a document, and everything nothing composes does.
 - **The 404 page rendered nothing on the server.**
   `app/[locale]/not-found.tsx` carried its own `<html>` and `<body>`, on the
   belief that a root layout living on a top-level dynamic segment leaves a

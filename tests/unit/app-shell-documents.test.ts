@@ -3,22 +3,24 @@ import fs from "node:fs";
 import path from "node:path";
 
 /**
- * A boundary file renders a document exactly when nothing above it does.
+ * No boundary file renders a document of its own.
  *
  * `not-found.tsx` and `error.tsx` are composed inside the layouts above them,
- * so one that carries its own `<html>` puts a document inside a document.
- * React fails that on the server and streams an empty `__next_error__` shell
- * with the right status and no content: the markup only appears once the
- * client has run, so a crawler, a text browser and a reader with scripting off
- * see a blank page. `app/[locale]/not-found.tsx` shipped that way.
+ * so one that carries its own `<html>` puts a document inside a document. The
+ * served body then comes out empty: the right status, the markup only in the
+ * flight payload, and nothing at all for a crawler, a text browser or a reader
+ * with scripting off. Every mistyped URL on the demo was a blank page.
  *
- * The inverse is the same bug from the other side. This app's root layout is
- * `app/[locale]/layout.tsx`, a top-level dynamic segment, so a boundary that
- * sits above `[locale]` has no layout to compose with and has to supply the
- * document itself.
+ * Above `[locale]` there is no layout of ours, because this app's root layout
+ * is `app/[locale]/layout.tsx`, a top-level dynamic segment. Next supplies the
+ * document there itself - `.next/server/app/_not-found.html` shows the wrapper
+ * it renders - so a boundary at that level nests a second document inside the
+ * implicit one and produces the same empty body.
  *
- * `global-error.tsx` is the documented exception: it replaces the root layout
- * rather than rendering inside it, so it always carries a document.
+ * `global-error.tsx` and `global-not-found.tsx` are the documented exceptions:
+ * they are returned at the routing level rather than rendered inside a layout,
+ * so each carries a document of its own. `globalNotFound` in next.config.ts is
+ * what makes the 404 take that path.
  * See node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions.
  */
 
@@ -83,7 +85,7 @@ describe("app shell documents", () => {
         expect(files.length).toBeGreaterThanOrEqual(4);
     });
 
-    it("no boundary renders a document inside a layout that already does", () => {
+    it("no boundary a layout composes renders a document of its own", () => {
         const nested = files.filter((file) => {
             const wrapper = documentAncestor(path.dirname(file), APP, readOrNull);
             return wrapper !== null && rendersDocument(fs.readFileSync(file, "utf8"));
@@ -91,7 +93,7 @@ describe("app shell documents", () => {
         expect(nested.map((f) => path.relative(APP, f))).toEqual([]);
     });
 
-    it("every boundary with no document above it supplies one", () => {
+    it("every boundary nothing composes carries one", () => {
         const bare = files.filter((file) => {
             const wrapper = documentAncestor(path.dirname(file), APP, readOrNull);
             return wrapper === null && !rendersDocument(fs.readFileSync(file, "utf8"));
@@ -105,9 +107,9 @@ describe("app shell documents", () => {
         expect(rendersDocument(fs.readFileSync(globalError, "utf8"))).toBe(true);
     });
 
-    it("the locale not-found renders content, and the root one renders a document", () => {
+    it("the locale not-found renders content, since the layout composes it", () => {
         expect(rendersDocument(fs.readFileSync(path.join(APP, "[locale]/not-found.tsx"), "utf8"))).toBe(false);
-        expect(rendersDocument(fs.readFileSync(path.join(APP, "not-found.tsx"), "utf8"))).toBe(true);
+        expect(documentAncestor(path.join(APP, "[locale]"), APP, readOrNull)).toBe(path.join(APP, "[locale]/layout.tsx"));
     });
 
     // Self-tests: the checks above are only worth their runtime if they fail

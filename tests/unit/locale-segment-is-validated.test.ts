@@ -20,10 +20,11 @@ import path from "node:path";
  * of them sit on opposite sides of that refusal: a `notFound()` thrown under a
  * locale renders `app/[locale]/not-found.tsx` inside the layout, which names
  * the language and loads the stylesheet, while a segment the layout itself
- * rejects takes the layout down with it and leaves `app/not-found.tsx` to
- * supply its own document. Which file may carry an `<html>` is the subject of
+ * rejects takes the layout down with it and leaves `app/not-found.tsx` with
+ * neither. Which file may carry an `<html>` is the subject of
  * tests/unit/app-shell-documents.test.ts; what is checked here is that a 404
- * still names a language and reads its strings without the provider.
+ * still names a language where one is known, and reads its strings without the
+ * provider.
  */
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -114,10 +115,14 @@ describe("the layout", () => {
 });
 
 describe("the not-found pages", () => {
-    it("give the root one its own document, since no layout composes it", () => {
+    it("keep the root one readable without a stylesheet of ours", () => {
+        // Nothing composes it, so it brings its own document and nothing has
+        // loaded globals.css: its styles are inline, and its text is English
+        // because no locale is resolved that far out.
         const src = read("src/app/not-found.tsx");
         expect(src).toMatch(/<html\b[^>]*lang=/);
-        expect(src).toContain("<body");
+        expect(src).toContain("style={{");
+        expect(src).not.toContain("className=");
     });
 
     it("read their strings without the provider the layout mounts", () => {
@@ -134,7 +139,6 @@ describe("the not-found pages", () => {
         // not-found resolves nothing that far out and says so in its markup;
         // the locale one is composed inside the layout, which sets the tag
         // from the segment it has already checked.
-        expect(read("src/app/not-found.tsx")).toMatch(/<html lang="[a-z]{2}"/);
         expect(read("src/app/[locale]/layout.tsx")).toContain("lang={locale}");
     });
 });
