@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -29,17 +29,20 @@
     {
       "path": "/support",
       "component": "pages/public/tickets/page.tsx",
-      "noindex": true
+      "noindex": true,
+      "titleKey": "pageTitles.support"
     },
     {
       "path": "/support/new",
-      "component": "pages/public/tickets/new/page.tsx"
+      "component": "pages/public/tickets/new/page.tsx",
+      "titleKey": "pageTitles.newTicket"
     },
     {
       "path": "/support/[id]",
       "component": "pages/public/tickets/[id]/page.tsx",
       "resolver": "lib/route-exists.ts",
-      "noindex": true
+      "noindex": true,
+      "titleKey": "pageTitles.ticket"
     }
   ],
   "adminRoutes": [
@@ -271,6 +274,11 @@
       },
       "nav": {
         "tickets": "Support"
+      },
+      "pageTitles": {
+        "support": "Support",
+        "newTicket": "New Ticket",
+        "ticket": "Ticket"
       }
     },
     "tr": {
@@ -425,6 +433,11 @@
       },
       "nav": {
         "tickets": "Destek"
+      },
+      "pageTitles": {
+        "support": "Destek",
+        "newTicket": "Yeni Talep",
+        "ticket": "Talep"
       }
     }
   },

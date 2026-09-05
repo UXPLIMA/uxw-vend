@@ -8,6 +8,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every module page had an English browser tab, whatever language it was
+  in.** A module page is a component in a registry rather than a route segment
+  file, so it cannot export `generateMetadata` and core's catch-all titles it.
+  Core built that title by humanizing the last literal segment of the route
+  pattern, and a route pattern is a URL: written once, in English, by the
+  module author. Measured on the demo, in Turkish:
+
+      /tr/store        h1 "Magaza"             title "Store | uxwVend"
+      /tr/store/cart   h1 "Alisveris Sepeti"   title "Cart | uxwVend"
+      /tr/punishments  h1 "Cezalar"            title "Punishments | uxwVend"
+      /tr/leaderboard  h1 "Siralama"           title "Leaderboard | uxwVend"
+      /tr/vote         h1 "Oy Ver, Odul Kazan" title "Vote | uxwVend"
+
+  The tab is what a visitor reads with twenty of them open and the title is
+  the line a search engine prints, so the one string most likely to be seen
+  out of context was the only one still untranslated. `/store/vip` was titled
+  "Vip", which is a word in neither language.
+
+  A route now declares `titleKey`, a `namespace.key` into the translations the
+  module already ships, resolved against the merged catalogue in the visitor's
+  locale. Thirty routes across twenty modules declare one, in both locales.
+  The humanized segment stays as the fallback, so a module that declares
+  nothing behaves exactly as before, and a key that does not resolve falls
+  back rather than shipping the key itself as a title. `titleFromPath` still
+  wins where a route declared it, because there the URL names the resource in
+  its own words. The catalogue is loaded only for a route that declared a key,
+  since every unmatched URL on the site reaches this code and most of them are
+  about to 404.
+
+  `validate-module` fails a route with no `titleKey` and no `titleFromPath`,
+  and one whose key is missing from any locale the module ships.
+
 - **Ten of the seventeen hooks core advertised were fired by nothing.**
   `HookNames` is the list a module author reads to find out what they can
   listen to. A module could declare `{ "hook": "user.deleted", "type":

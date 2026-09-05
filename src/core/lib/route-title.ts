@@ -21,6 +21,13 @@
  * `titleFromPath`, which `validate-module` grants only to a server page that
  * calls `notFound()`. Everywhere else the title comes from the route pattern
  * the module itself declared, which no visitor can influence.
+ *
+ * That pattern is a URL, and a URL is written once, in English. A Turkish
+ * visitor reading "Mağaza" under an <h1> had "Store | uxwVend" in the browser
+ * tab and in the search result, and `/store/vip` was titled "Vip", which is
+ * not a word in either language. So a route may also declare `titleKey`, a
+ * key into the translations the module already ships, and the humanized
+ * segment becomes the fallback for a module that declares none.
  */
 
 const DYNAMIC_SEGMENT = /^\[.*\]$/;
@@ -64,4 +71,58 @@ export function moduleRouteTitle(
     }
 
     return "Page";
+}
+
+/**
+ * Look a dotted `namespace.key` up in a message catalogue.
+ *
+ * Returns null rather than the key itself for anything missing or not a
+ * string: the caller has a fallback, and a title reading `store.pageTitle`
+ * is worse than one reading "Store".
+ */
+export function titleFromMessages(
+    messages: Record<string, unknown> | null | undefined,
+    titleKey: string | undefined,
+): string | null {
+    if (!messages || !titleKey) return null;
+    let node: unknown = messages;
+    for (const segment of titleKey.split(".")) {
+        if (!node || typeof node !== "object") return null;
+        node = (node as Record<string, unknown>)[segment];
+    }
+    if (typeof node !== "string") return null;
+    const title = node.trim();
+    if (!title || title.length > MAX_TITLE_LENGTH) return null;
+    return title;
+}
+
+export interface RouteTitleInput {
+    /** The requested path, split into segments. */
+    slug?: string[];
+    /** The matched route's declared path, e.g. `/store/product/[...params]`. */
+    routePattern?: string;
+    /** Whether that route declared the URL trustworthy. */
+    titleFromPath?: boolean;
+    /** The route's declared translation key, if it has one. */
+    titleKey?: string;
+    /** The visitor's message catalogue, core and modules merged. */
+    messages?: Record<string, unknown> | null;
+}
+
+/**
+ * The title for a module page, in the visitor's language where the module
+ * said what it is called.
+ *
+ * `titleFromPath` still wins: a route that declared it names a resource the
+ * URL identifies (a product, an article), which is more specific than any
+ * static page name and is already the resource's own words.
+ */
+export function resolveRouteTitle(input: RouteTitleInput): string {
+    if (input.titleFromPath && input.slug && input.slug.length > 0) {
+        return moduleRouteTitle(input.slug, input.routePattern, true);
+    }
+    return (
+        titleFromMessages(input.messages, input.titleKey) ??
+        moduleRouteTitle(input.slug, input.routePattern, false)
+    );
 }

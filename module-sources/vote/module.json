@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote System",
   "description": "Vote-for-rewards system with configurable sites and cooldowns",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -20,7 +20,8 @@
   "routes": [
     {
       "path": "/vote",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.vote"
     }
   ],
   "adminRoutes": [
@@ -109,6 +110,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_vote_vote_sites": "Vote Sites"
+      },
+      "pageTitles": {
+        "vote": "Vote"
       }
     },
     "tr": {
@@ -160,6 +164,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_vote_vote_sites": "Oylama Siteleri"
+      },
+      "pageTitles": {
+        "vote": "Oy Ver"
       }
     }
   },

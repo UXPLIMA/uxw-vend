@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -44,17 +44,20 @@
   "routes": [
     {
       "path": "/help",
-      "component": "pages/public/help/page.tsx"
+      "component": "pages/public/help/page.tsx",
+      "titleKey": "pageTitles.help"
     },
     {
       "path": "/help/[slug]",
       "component": "pages/public/help/[slug]/page.tsx",
-      "resolver": "lib/article-exists.ts"
+      "resolver": "lib/article-exists.ts",
+      "titleKey": "pageTitles.article"
     },
     {
       "path": "/help/category/[slug]",
       "component": "pages/public/help/category/[slug]/page.tsx",
-      "resolver": "lib/category-exists.ts"
+      "resolver": "lib/category-exists.ts",
+      "titleKey": "pageTitles.category"
     }
   ],
   "adminRoutes": [
@@ -194,6 +197,11 @@
       },
       "activity": {
         "helpArticleCreated": "added a help article:"
+      },
+      "pageTitles": {
+        "help": "Help Center",
+        "article": "Help Article",
+        "category": "Help Category"
       }
     },
     "tr": {
@@ -298,6 +306,11 @@
       },
       "activity": {
         "helpArticleCreated": "yardım makalesi ekledi:"
+      },
+      "pageTitles": {
+        "help": "Yardım Merkezi",
+        "article": "Yardım Makalesi",
+        "category": "Yardım Kategorisi"
       }
     }
   },

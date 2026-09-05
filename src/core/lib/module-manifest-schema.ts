@@ -89,6 +89,17 @@ const routeEntry = z.object({
      */
     noindex: z.boolean().optional(),
     /**
+     * The page's name, as a key into the translations this module ships.
+     *
+     * A route pattern is a URL and a URL is written once, in English, so a
+     * title built from it read "Store" to a visitor whose page said "Mağaza",
+     * and `/store/vip` was titled "Vip". Format is `namespace.key`, resolved
+     * against the merged catalogue in the visitor's locale; a key that does
+     * not resolve falls back to the humanized route segment rather than
+     * shipping the key itself as a title.
+     */
+    titleKey: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9_-]+)+$/, "titleKey must be namespace.key").optional(),
+    /**
      * Lets core title the page from the last URL segment.
      *
      * Only true where the page resolves the resource on the server and calls

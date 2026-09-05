@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -37,7 +37,8 @@
   "routes": [
     {
       "path": "/blog",
-      "component": "pages/page.tsx"
+      "component": "pages/page.tsx",
+      "titleKey": "pageTitles.blog"
     },
     {
       "path": "/blog/[...params]",
@@ -261,6 +262,9 @@
       },
       "activity": {
         "blogArticlePublished": "published:"
+      },
+      "pageTitles": {
+        "blog": "Blog"
       }
     },
     "tr": {
@@ -383,6 +387,9 @@
       },
       "activity": {
         "blogArticlePublished": "yayınladı:"
+      },
+      "pageTitles": {
+        "blog": "Blog"
       }
     }
   },
