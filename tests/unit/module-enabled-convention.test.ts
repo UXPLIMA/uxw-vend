@@ -46,6 +46,14 @@ const SRC_FILES = walk(join(ROOT, "src")).filter(
 /**
  * Consumers that read a registry without consulting the enabled flag, each
  * for a reason. Anything not on this list must gate.
+ *
+ * `blocks-merger.ts` used to sit here, on the grounds that one Puck config
+ * serves both the editor and the public renderer so dropping a block would
+ * blank a page that already used it. What it actually did was mount the block
+ * anyway, against a module API the proxy answers 404 for, and render a silent
+ * empty region - while still offering the block in the palette. It takes a
+ * mode now: the editor keeps a disabled module's block loadable and out of
+ * the palette, the renderer drops it, and the exemption is gone.
  */
 const UNGATED_BY_DESIGN: Record<string, string> = {
     "src/core/lib/auth.ts":
@@ -56,8 +64,6 @@ const UNGATED_BY_DESIGN: Record<string, string> = {
         "Registry introspection for developers. Its whole purpose is to report what is installed, enabled or not.",
     "src/core/lib/activity-title.ts":
         "Titles rows already written to the activity log. History must keep rendering after a module is turned off, or it degrades to raw keys.",
-    "src/core/lib/blocks-merger.ts":
-        "The same Puck config drives the editor and the public renderer. Dropping a disabled module's block would blank it on pages that already use it.",
     "src/core/lib/storage.ts":
         "The active storage provider is chosen by an explicit setting. Silently redirecting new uploads to local disk would split a site's media across two backends.",
     "src/app/[locale]/(admin)/admin/permissions/page.tsx":

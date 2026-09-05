@@ -3,8 +3,8 @@
 import { useEffect, useState, use } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
 import { Button } from "@/core/sdk/ui";
-import { buildMergedBlockConfig } from "@/core/sdk/blocks";
-import { Puck, type Data, type Config } from "@measured/puck";
+import { useMergedBlockConfig } from "@/core/sdk/blocks";
+import { Puck, type Data } from "@measured/puck";
 import "@measured/puck/puck.css";
 import { ArrowLeft, Loader2, Save, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
@@ -26,14 +26,11 @@ export default function PageBuilderPage(props: PageProps) {
     const [data, setData] = useState<Data | null>(null);
     const [pageTitle, setPageTitle] = useState("");
     const [pageSlug, setPageSlug] = useState("");
-    const [blockConfig, setBlockConfig] = useState<Config | null>(null);
-
-    // Load merged block config (core + module blocks) once on mount
-    useEffect(() => {
-        buildMergedBlockConfig().then(setBlockConfig).catch(() => {
-            toast.error(t("pageBuilder_loadFailed"));
-        });
-    }, [t]);
+    // Core blocks plus every installed module's, minus the palette entries of
+    // modules the admin has switched off.
+    const blockConfig = useMergedBlockConfig("edit", () => {
+        toast.error(t("pageBuilder_loadFailed"));
+    });
 
     useEffect(() => {
         if (pageId === "new") {
