@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import {
     Plus,
     X,
@@ -422,14 +422,13 @@ export default function AdminTrophiesPage() {
                                 </div>
                                 <div>
                                     <Label>{t("ruleType")}</Label>
-                                    <select
+                                    <NativeSelect
                                         aria-label={t("ruleType")}
                                         value={form.ruleType}
-                                        onChange={(e) => setForm({ ...form, ruleType: e.target.value })}
-                                        className="flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                                        onChange={(e) => setForm({ ...form, ruleType: e.target.value })} className="w-full" inputSize="sm"
                                     >
                                         <option value="event-count">event-count</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                             </div>
                             <div>

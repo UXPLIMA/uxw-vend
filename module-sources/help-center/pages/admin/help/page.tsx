@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Plus, X } from "lucide-react";
 import { writeError } from "@/core/sdk";
 
@@ -192,18 +192,17 @@ export default function AdminHelpCenterPage() {
                                         {categories.length === 0 ? (
                                             <p className="text-sm text-destructive mt-1">{t("adm_noCategoriesYet")}</p>
                                         ) : (
-                                            <select
+                                            <NativeSelect
                                                 aria-label={t("adm_category")}
                                                 value={articleForm.categoryId}
-                                                onChange={(e) => setArticleForm({ ...articleForm, categoryId: e.target.value })}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                onChange={(e) => setArticleForm({ ...articleForm, categoryId: e.target.value })} className="w-full"
                                                 required
                                             >
                                                 <option value="">{t("adm_selectCategory")}</option>
                                                 {categories.map((cat) => (
                                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                                 ))}
-                                            </select>
+                                            </NativeSelect>
                                         )}
                                     </div>
                                     <div>

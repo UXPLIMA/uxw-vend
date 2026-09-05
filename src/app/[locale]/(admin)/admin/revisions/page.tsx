@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface Revision {
     id: string;
@@ -110,14 +111,13 @@ export default function RevisionsPage() {
                 <CardContent className="p-4 grid md:grid-cols-3 gap-3">
                     <div>
                         <Label>{t("revisions_filterResource")}</Label>
-                        <select
+                        <NativeSelect
                             aria-label={t("revisions_filterResource")}
                             value={resourceFilter}
                             onChange={(e) => {
                                 setPage(1);
                                 setResourceFilter(e.target.value);
-                            }}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            }} className="w-full"
                         >
                             <option value="">{t("revisions_allResources")}</option>
                             {resources.map((r) => (
@@ -125,7 +125,7 @@ export default function RevisionsPage() {
                                     {r}
                                 </option>
                             ))}
-                        </select>
+                        </NativeSelect>
                     </div>
                     <div>
                         <Label>{t("revisions_filterResourceId")}</Label>

@@ -829,6 +829,7 @@
     "rp_created": "İzin verildi.",
     "rp_deny": "ret",
     "rp_denyOpt": "Reddet",
+    "rp_effect": "Etki",
     "rp_filterPrincipal": "Yetkili Tipi",
     "rp_filterResource": "Kaynak",
     "rp_grant": "İzin Ver",

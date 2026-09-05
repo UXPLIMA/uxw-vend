@@ -12,6 +12,11 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.11.0 - `NativeSelect` joins `@/core/sdk/ui`. The panel had a themed
+ * `Input` and no themed dropdown, so every "pick one of these strings"
+ * control was a bare `<select>` wearing the browser's own chrome next to it.
+ * This is the same element with the appearance taken off. An addition.
+ *
  * 1.10.0 - `usePrompt` joins `@/core/sdk/ui`. It opens the same dialog
  * `useConfirm` does, with a field in it, so a module can ask for a line of
  * text without falling back to the browser's `prompt()`. An addition.
@@ -66,4 +71,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.10.0";
+export const CORE_API_VERSION = "1.11.0";

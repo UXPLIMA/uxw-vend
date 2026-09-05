@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
@@ -152,8 +152,7 @@ export default function AdminSuggestionsPage() {
                                     </div>
                                 </div>
                                 <div className="flex md:flex-col gap-2 items-end">
-                                    <select
-                                        className="border border-input bg-background rounded-md h-9 px-2 text-sm"
+                                    <NativeSelect inputSize="sm"
                                         value={s.status}
                                         onChange={e => changeStatus(s.id, e.target.value)}
                                         aria-label={t("adm_setStatus")}
@@ -161,7 +160,7 @@ export default function AdminSuggestionsPage() {
                                         {STATUS_OPTIONS.map(o => (
                                             <option key={o} value={o}>{t(o)}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(s.id)}>
                                         <Trash2 className="w-4 h-4 mr-1" /> {t("adm_delete")}
                                     </Button>

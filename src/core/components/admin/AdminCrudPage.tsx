@@ -15,6 +15,7 @@ import { UrlOrFile } from "@/core/components/ui/url-or-file";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 import { IconPicker } from "@/core/components/ui/icon-picker";
 import { writeError } from "@/core/lib/write-result";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 export interface CrudField {
     key: string;
@@ -168,10 +169,10 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} rows={3} />;
             case "select":
                 return (
-                    <select value={val} onChange={(e) => onChange(e.target.value)} aria-label={field.label} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required={field.required}>
+                    <NativeSelect value={val} onChange={(e) => onChange(e.target.value)} aria-label={field.label} className="w-full" required={field.required}>
                         <option value="">{ct("crud_selectPlaceholder")}</option>
                         {field.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    </select>
+                    </NativeSelect>
                 );
             case "toggle":
                 return (

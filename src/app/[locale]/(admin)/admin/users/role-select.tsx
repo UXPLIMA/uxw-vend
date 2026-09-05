@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface Role {
     id: string;
@@ -60,12 +61,12 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
 
     return (
         <div className="flex items-center gap-2">
-            <select
+            <NativeSelect
                 value={roleId}
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={saving}
                 aria-label={t("users_role")}
-                className={`text-xs px-2 py-1 rounded border cursor-pointer ${accent ? "" : "border-border bg-card"}`}
+                inputSize="sm"
                 style={swatch}
             >
                 {roles.map((role) => (
@@ -73,7 +74,7 @@ export function UserRoleSelect({ userId, currentRoleId, roles }: UserRoleSelectP
                         {role.displayName}
                     </option>
                 ))}
-            </select>
+            </NativeSelect>
             {saving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
             {saved && <Check className="w-3 h-3 text-green-500" />}
         </div>

@@ -21,6 +21,8 @@ export {
     SelectContent,
     SelectItem,
 } from "@/core/components/ui/select";
+export { NativeSelect } from "@/core/components/ui/native-select";
+export type { NativeSelectProps } from "@/core/components/ui/native-select";
 export { Skeleton } from "@/core/components/ui/skeleton";
 export { useConfirm } from "@/core/components/ui/confirm-dialog";
 

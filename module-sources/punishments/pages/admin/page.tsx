@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
@@ -150,16 +150,15 @@ export default function AdminPunishmentsPage() {
                             </div>
                             <div>
                                 <Label>{t("adm_type")}</Label>
-                                <select
-                                    aria-label={t("adm_type")}
-                                    className="w-full border border-input bg-background rounded-md h-9 px-3 text-sm"
+                                <NativeSelect
+                                    aria-label={t("adm_type")} className="w-full" inputSize="sm"
                                     value={form.type}
                                     onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
                                 >
                                     {TYPE_OPTIONS.map(o => (
                                         <option key={o} value={o}>{t(o)}</option>
                                     ))}
-                                </select>
+                                </NativeSelect>
                             </div>
                             <div>
                                 <Label>{t("adm_reason")}</Label>

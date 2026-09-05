@@ -17,6 +17,7 @@ import { useConfirm, usePrompt } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface UserDetail {
     id: string;
@@ -309,17 +310,16 @@ export default function AdminUserDetailPage() {
                                 </div>
                                 <div>
                                     <Label htmlFor={roleFieldId}>{t("users_role")}</Label>
-                                    <select
+                                    <NativeSelect
                                         id={roleFieldId}
                                         value={form.roleId}
-                                        onChange={(e) => setForm({ ...form, roleId: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/70 focus:ring-offset-2"
+                                        onChange={(e) => setForm({ ...form, roleId: e.target.value })} className="w-full"
                                     >
                                         <option value="">{t("users_noRole")}</option>
                                         {roles.map((role) => (
                                             <option key={role.id} value={role.id}>{role.displayName}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <Button type="submit" disabled={saving}>
                                     {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("users_saving")}</> :

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useParams, usePathname } from "next/navigation";
@@ -374,18 +374,17 @@ export default function ProductDetailPage() {
                                                 {v.label} {v.required && <span className="text-red-500">*</span>}
                                             </label>
                                             {v.type === "select" && v.options ? (
-                                                <select
+                                                <NativeSelect
                                                     aria-label={v.label}
                                                     value={variableValues[v.name] || ""}
-                                                    onChange={(e) => setVariableValues({ ...variableValues, [v.name]: e.target.value })}
-                                                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                                                    onChange={(e) => setVariableValues({ ...variableValues, [v.name]: e.target.value })} className="w-full"
                                                     required={v.required}
                                                 >
                                                     <option value="">{t("product_selectOption")}</option>
                                                     {v.options.split(",").map((opt) => (
                                                         <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
                                                     ))}
-                                                </select>
+                                                </NativeSelect>
                                             ) : (
                                                 <input
                                                     aria-label={v.label}

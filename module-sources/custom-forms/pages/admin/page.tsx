@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
@@ -163,14 +163,14 @@ export default function FormsPage() {
                                     {fields.map((field, i) => (
                                         <div key={i} className="flex items-center gap-2 p-2 bg-muted/50 rounded">
                                             <Input value={field.label} onChange={(e) => updateField(i, { label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") })} placeholder={t("adm_fieldLabel")} aria-label={t("adm_fieldLabel")} className="flex-1" />
-                                            <select value={field.type} onChange={(e) => updateField(i, { type: e.target.value })} aria-label={t("fieldType")} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
+                                            <NativeSelect value={field.type} onChange={(e) => updateField(i, { type: e.target.value })} aria-label={t("fieldType")} inputSize="sm">
                                                 <option value="text">{t("typeText")}</option>
                                                 <option value="email">{t("typeEmail")}</option>
                                                 <option value="number">{t("typeNumber")}</option>
                                                 <option value="textarea">{t("typeTextarea")}</option>
                                                 <option value="select">{t("typeSelect")}</option>
                                                 <option value="checkbox">{t("typeCheckbox")}</option>
-                                            </select>
+                                            </NativeSelect>
                                             <label className="flex items-center gap-1 text-xs">
                                                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(i, { required: e.target.checked })} />
                                                 {t("adm_required")}

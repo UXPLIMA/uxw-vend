@@ -1,6 +1,7 @@
 "use client";
 
 import type { FieldProps } from "./types";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 export function SelectField({ def, value, onChange, isDefault }: FieldProps<string>) {
     if (def.type !== "select") return null;
@@ -8,17 +9,16 @@ export function SelectField({ def, value, onChange, isDefault }: FieldProps<stri
 
     return (
         <label className="flex items-center gap-2 text-sm">
-            <select
+            <NativeSelect
                 value={current}
-                onChange={(e) => onChange(e.target.value)}
-                className="h-8 rounded border border-input bg-background px-2 text-sm"
+                onChange={(e) => onChange(e.target.value)} inputSize="sm"
             >
                 {def.options.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                         {opt.label}
                     </option>
                 ))}
-            </select>
+            </NativeSelect>
             {!isDefault && (
                 <button type="button" className="text-xs underline" onClick={() => onChange(undefined)}>
                     reset

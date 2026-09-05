@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface IpBlock {
     id: string;
@@ -164,16 +165,15 @@ export default function IpBlocksPage() {
                             </div>
                             <div>
                                 <Label>{t("ipBlocks_scope")}</Label>
-                                <select
+                                <NativeSelect
                                     aria-label={t("ipBlocks_scope")}
                                     value={scope}
-                                    onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")}
-                                    className="w-full h-9 px-3 rounded-md border bg-background text-sm"
+                                    onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")} className="w-full" inputSize="sm"
                                 >
                                     <option value="all">{t("ipBlocks_scopeAll")}</option>
                                     <option value="admin">{t("ipBlocks_scopeAdmin")}</option>
                                     <option value="api">{t("ipBlocks_scopeApi")}</option>
-                                </select>
+                                </NativeSelect>
                             </div>
                             <div>
                                 <Label>{t("ipBlocks_reason")}</Label>

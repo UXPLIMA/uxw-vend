@@ -10,6 +10,7 @@ import { FileUpload } from "@/core/components/ui/file-upload";
 import { IconPicker } from "@/core/components/ui/icon-picker";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 export interface SettingsField {
     key: string;
@@ -123,11 +124,10 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         placeholder={field.placeholder}
                                     />
                                 ) : field.type === "select" ? (
-                                    <select
+                                    <NativeSelect
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
-                                        aria-label={field.label}
-                                        className="w-full rounded-md border border-input bg-background px-3 h-9 text-sm"
+                                        aria-label={field.label} className="w-full" inputSize="sm"
                                     >
                                         {field.placeholder && !values[field.key] && (
                                             <option value="">{field.placeholder}</option>
@@ -135,7 +135,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         {(field.options || []).map((opt) => (
                                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 ) : (
                                     <Input
                                         type={field.type || "text"}

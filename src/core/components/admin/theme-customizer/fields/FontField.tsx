@@ -1,6 +1,7 @@
 "use client";
 
 import type { FieldProps } from "./types";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 export function FontField({ def, value, onChange, isDefault }: FieldProps<string>) {
     if (def.type !== "font") return null;
@@ -10,10 +11,9 @@ export function FontField({ def, value, onChange, isDefault }: FieldProps<string
     return (
         <label className="flex items-center gap-2 text-sm">
             {hasOptions ? (
-                <select
+                <NativeSelect
                     value={current}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="h-8 rounded border border-input bg-background px-2 text-sm"
+                    onChange={(e) => onChange(e.target.value)} inputSize="sm"
                 >
                     {def.default && !def.options!.includes(def.default) && (
                         <option value={def.default}>{def.default}</option>
@@ -23,7 +23,7 @@ export function FontField({ def, value, onChange, isDefault }: FieldProps<string
                             {opt}
                         </option>
                     ))}
-                </select>
+                </NativeSelect>
             ) : (
                 <input
                     type="text"

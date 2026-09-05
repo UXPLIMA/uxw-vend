@@ -4,7 +4,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, use } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
@@ -226,31 +226,29 @@ export default function AdminTicketDetailPage(props: PageProps) {
                         <CardContent className="space-y-4">
                             <div>
                                 <label className="text-sm text-muted-foreground block mb-1">{t("adm_status")}</label>
-                                <select
+                                <NativeSelect
                                     aria-label={t("adm_status")}
                                     value={ticket.status}
                                     onChange={(e) => updateTicket("status", e.target.value)}
-                                    disabled={updating}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    disabled={updating} className="w-full"
                                 >
                                     {statusOptions.map((s) => (
                                         <option key={s} value={s}>{s.replace("_", " ")}</option>
                                     ))}
-                                </select>
+                                </NativeSelect>
                             </div>
                             <div>
                                 <label className="text-sm text-muted-foreground block mb-1">{t("adm_priority")}</label>
-                                <select
+                                <NativeSelect
                                     aria-label={t("adm_priority")}
                                     value={ticket.priority}
                                     onChange={(e) => updateTicket("priority", e.target.value)}
-                                    disabled={updating}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    disabled={updating} className="w-full"
                                 >
                                     {priorityOptions.map((p) => (
                                         <option key={p} value={p}>{p}</option>
                                     ))}
-                                </select>
+                                </NativeSelect>
                             </div>
                         </CardContent>
                     </Card>

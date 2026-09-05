@@ -7,5 +7,6 @@ export * from "./icon-picker";
 export * from "./card";
 export * from "./label";
 export * from "./textarea";
+export * from "./native-select";
 export * from "./select";
 export * from "./skeleton";

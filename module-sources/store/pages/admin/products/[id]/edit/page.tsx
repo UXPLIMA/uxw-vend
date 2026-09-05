@@ -6,7 +6,7 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Trash2, X } from "lucide-react";
 import { writeError } from "@/core/sdk";
 
@@ -297,45 +297,42 @@ export default function EditProductPage(props: PageProps) {
                             <CardContent className="space-y-4">
                                 <div>
                                     <Label htmlFor="category">{t("adm_category")}</Label>
-                                    <select
+                                    <NativeSelect
                                         id="category"
                                         value={form.categoryId}
-                                        onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full"
                                     >
                                         <option value="">{t("adm_noCategory")}</option>
                                         {categories.map((cat) => (
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <div>
                                     <Label htmlFor="type">{t("adm_type")}</Label>
-                                    <select
+                                    <NativeSelect
                                         id="type"
                                         value={form.type}
-                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full"
                                     >
                                         <option value="DIGITAL">{t("adm_digital")}</option>
                                         <option value="PHYSICAL">{t("adm_physical")}</option>
                                         <option value="GAME_ITEM">{t("adm_gameItem")}</option>
                                         <option value="SUBSCRIPTION">{t("adm_subscription")}</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 {form.type === "SUBSCRIPTION" && (
                                     <>
                                         <div>
                                             <Label htmlFor="subscriptionInterval">{t("adm_subscriptionInterval")}</Label>
-                                            <select
+                                            <NativeSelect
                                                 id="subscriptionInterval"
                                                 value={form.subscriptionInterval}
-                                                onChange={(e) => setForm({ ...form, subscriptionInterval: e.target.value })}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                onChange={(e) => setForm({ ...form, subscriptionInterval: e.target.value })} className="w-full"
                                             >
                                                 <option value="month">{t("adm_monthly")}</option>
                                                 <option value="year">{t("adm_yearly")}</option>
-                                            </select>
+                                            </NativeSelect>
                                         </div>
                                         <div>
                                             <Label htmlFor="subscriptionIntervalCount">{t("adm_intervalCount")}</Label>
@@ -496,17 +493,16 @@ function ProductCommandsEditor({ productId }: { productId: string }) {
             ))}
             <div className="flex gap-2">
                 {servers.length > 0 && (
-                    <select
+                    <NativeSelect
                         value={newServerId}
                         onChange={(e) => setNewServerId(e.target.value)}
-                        aria-label={t("adm_defaultServer")}
-                        className="rounded-md border border-border bg-background px-2 py-1 text-xs w-32"
+                        aria-label={t("adm_defaultServer")} className="w-32" inputSize="sm"
                     >
                         <option value="">{t("adm_defaultServer")}</option>
                         {servers.map((s) => (
                             <option key={s.id} value={s.id}>{s.name}</option>
                         ))}
-                    </select>
+                    </NativeSelect>
                 )}
                 <Input value={newCmd} onChange={(e) => setNewCmd(e.target.value)} placeholder='give {player} diamond 64' aria-label={t("adm_deliveryCommands")} className="font-mono text-xs flex-1" />
                 <Button type="button" variant="outline" size="sm" onClick={addCmd}>{t("adm_add")}</Button>

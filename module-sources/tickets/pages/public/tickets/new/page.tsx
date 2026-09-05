@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Label, Textarea } from "@/core/sdk/ui";
+import { Button, Label, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useSession } from "next-auth/react";
@@ -117,11 +117,10 @@ export default function NewTicketPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <Label htmlFor="department">{t('department')} *</Label>
-                            <select
+                            <NativeSelect
                                 id="department"
                                 value={formData.departmentId}
-                                onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
-                                className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })} className="w-full mt-1"
                                 required
                             >
                                 <option value="">{t('selectDepartment')}</option>
@@ -130,22 +129,21 @@ export default function NewTicketPage() {
                                         {dept.name}
                                     </option>
                                 ))}
-                            </select>
+                            </NativeSelect>
                         </div>
 
                         <div>
                             <Label htmlFor="priority">{t('priority')}</Label>
-                            <select
+                            <NativeSelect
                                 id="priority"
                                 value={formData.priority}
-                                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                                className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onChange={(e) => setFormData({ ...formData, priority: e.target.value })} className="w-full mt-1"
                             >
                                 <option value="LOW">{t('low')}</option>
                                 <option value="MEDIUM">{t('medium')}</option>
                                 <option value="HIGH">{t('high')}</option>
                                 <option value="URGENT">{t('urgent')}</option>
-                            </select>
+                            </NativeSelect>
                         </div>
 
                         <div>

@@ -11,7 +11,11 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
             <label
                 ref={ref}
                 className={cn(
-                    "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                    // A label sat flush against its control everywhere in the
+                    // panel, because every caller wrapped the pair in a bare
+                    // `<div>` and none of them added a gap. The margin belongs
+                    // here, once, where `cn` still lets a caller drop it.
+                    "mb-1.5 block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                     className
                 )}
                 {...props}

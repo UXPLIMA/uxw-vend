@@ -13,6 +13,7 @@ import { useAdminModules } from "./useAdminModules";
 import { ModuleIcon } from "./ModuleIcon";
 import { ModuleDetailModal } from "./ModuleDetailModal";
 import { ModuleSettingsPanel } from "./ModuleSettingsPanel";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
@@ -291,15 +292,14 @@ export default function AdminModulesPage() {
                                 </Button>
                             )}
                             <label className="text-xs text-muted-foreground">{t("modules_sort")}</label>
-                            <select
+                            <NativeSelect
                                 aria-label={t("modules_sort")}
                                 value={sortKey}
-                                onChange={(e) => setSortKey(e.target.value as SortKey)}
-                                className="text-xs border rounded-md px-2 py-1.5 bg-background"
+                                onChange={(e) => setSortKey(e.target.value as SortKey)} inputSize="sm"
                             >
                                 <option value="newest">{t("modules_newest")}</option>
                                 <option value="alphabetical">{t("modules_alphabetical")}</option>
-                            </select>
+                            </NativeSelect>
                         </div>
                     </div>
 

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Input } from "@/core/components/ui/input";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 /** Locales the wizard offers. Must stay a subset of `src/core/lib/i18n/config`. */
 const LOCALE_OPTIONS = [
@@ -44,15 +45,14 @@ export function SiteStep({
                 </label>
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("locale")}</span>
-                    <select
+                    <NativeSelect
                         value={defaultLocaleCode}
-                        onChange={(e) => setDefaultLocaleCode(e.target.value)}
-                        className="w-full mt-1 px-3 py-2 rounded-md border border-border bg-background text-foreground text-sm"
+                        onChange={(e) => setDefaultLocaleCode(e.target.value)} className="w-full mt-1"
                     >
                         {LOCALE_OPTIONS.map((l) => (
                             <option key={l.code} value={l.code}>{l.label}</option>
                         ))}
-                    </select>
+                    </NativeSelect>
                 </label>
             </div>
         </div>

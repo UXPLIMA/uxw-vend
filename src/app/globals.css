@@ -164,7 +164,7 @@ body {
 [data-mode="dark"] .border-b { border-color: var(--uxw-color-border) !important; }
 [data-mode="dark"] .border-t { border-color: var(--uxw-color-border) !important; }
 /* Native form elements */
-[data-mode="dark"] input, [data-mode="dark"] textarea, [data-mode="dark"] select {
+[data-mode="dark"] input, [data-mode="dark"] textarea, [data-mode="dark"] select:not(.appearance-none) {
   background-color: var(--uxw-color-background) !important;
   border-color: var(--uxw-color-border) !important;
   color: var(--uxw-color-foreground) !important;

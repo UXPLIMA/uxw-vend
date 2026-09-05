@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { stripHtmlTags } from "@/core/sdk";
@@ -151,15 +151,14 @@ export default function SuggestionsPage() {
                                 <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("suggestionTitlePlaceholder")} aria-label={t("suggestionTitlePlaceholder")} required minLength={3} maxLength={200} />
                                 <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder={t("suggestionDescriptionPlaceholder")} aria-label={t("suggestionDescriptionPlaceholder")} rows={4} required minLength={10} maxLength={5000} />
                                 <div className="flex items-center justify-between gap-3 pt-1">
-                                    <select
+                                    <NativeSelect
                                         value={visibility}
                                         onChange={(e) => setVisibility(e.target.value)}
                                         aria-label={t("visibility")}
-                                        className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                                     >
                                         <option value="public">{t("open")}</option>
                                         <option value="private">{t("other")}</option>
-                                    </select>
+                                    </NativeSelect>
                                     <Button type="submit" disabled={saving}>
                                         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                                         {t("submitSuggestion")}

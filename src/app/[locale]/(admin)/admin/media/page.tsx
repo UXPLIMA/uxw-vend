@@ -10,6 +10,7 @@ import { Input } from "@/core/components/ui/input";
 import { Loader2, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface MediaItem {
     id: string;
@@ -169,16 +170,15 @@ export default function MediaLibraryPage() {
                     </div>
                     <Button type="submit" variant="outline">{t("media_search")}</Button>
                 </form>
-                <select
+                <NativeSelect
                     value={type}
                     onChange={(e) => { setType(e.target.value as "" | "image" | "document"); setPage(1); }}
                     aria-label={t("media_type")}
-                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                     <option value="">{t("media_allTypes")}</option>
                     <option value="image">{t("media_images")}</option>
                     <option value="document">{t("media_documents")}</option>
-                </select>
+                </NativeSelect>
             </div>
 
             {loading ? (

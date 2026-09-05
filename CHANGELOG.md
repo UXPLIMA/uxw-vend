@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `NativeSelect` joins `@/core/sdk/ui` (CORE_API_VERSION 1.11.0). The panel had
+  a themed `Input` and no themed dropdown, so all forty-odd "pick one of these
+  strings" controls were a bare `<select>` wearing the browser's own chrome:
+  square corners, a hairline border, a system font, and on the roles screen
+  Firefox's red invalid outline sitting next to a rounded themed input. This is
+  the same native element with `appearance-none` and the panel's border, radius,
+  height and focus ring, plus a drawn chevron and themed `<option>` colours so a
+  dark theme does not get a white dropdown list. `inputSize="sm"` is the compact
+  height used in toolbars and table rows.
+
 - `usePrompt` joins `@/core/sdk/ui` (CORE_API_VERSION 1.10.0). The in-page
   equivalent of `window.prompt()`: `const reason = await ask({ message,
   placeholder })` resolves to the text, or `null` when the reader backed out.
@@ -52,6 +62,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Every dropdown in the panel now looks like the panel.** Forty-five bare
+  `<select>` elements across thirty-one files became `NativeSelect`, so the
+  roles picker on the users screen, the "Yetkili Tipi" filter on resource
+  permissions and the day filter on analytics stop rendering as square,
+  hairline-bordered native controls beside rounded themed inputs.
+- **A form label no longer sits flush against its control.** `Label` carried no
+  bottom margin and all two hundred callers wrapped the pair in a bare `<div>`,
+  so every label in the admin touched the input under it.
+- **The resource permissions list has column headers.** Five columns of
+  monospaced text - resource, id, action, principal, effect - were rendered with
+  nothing saying which was which, and the grant count sat loose in the filter
+  grid as a third, empty-looking cell. The count moved to the list footer, where
+  it now shows on a single page too.
+
 - **Nine admin settings fields saved a value nothing read.** A settings field
   is a promise: type a value, press Save, something behaves differently.
   `SettingsForm` keeps that promise only as far as the `Setting` row - it

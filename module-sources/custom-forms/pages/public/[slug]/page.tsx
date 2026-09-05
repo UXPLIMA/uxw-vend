@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, CheckCircle } from "lucide-react";
@@ -82,10 +82,10 @@ export default function FormPage({ params }: PageProps) {
                 return <Textarea value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} rows={4} />;
             case "select":
                 return (
-                    <select value={val} onChange={(e) => onChange(e.target.value)} required={field.required} aria-label={field.label} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    <NativeSelect value={val} onChange={(e) => onChange(e.target.value)} required={field.required} aria-label={field.label} className="w-full">
                         <option value="">{t("selectOption")}</option>
                         {field.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
+                    </NativeSelect>
                 );
             case "checkbox":
                 return (

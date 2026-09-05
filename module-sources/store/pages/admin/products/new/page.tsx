@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, NativeSelect } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 import { writeError } from "@/core/sdk";
 
@@ -215,45 +215,42 @@ export default function NewProductPage() {
                             <CardContent className="space-y-4">
                                 <div>
                                     <Label htmlFor="category">{t("adm_category")}</Label>
-                                    <select
+                                    <NativeSelect
                                         id="category"
                                         value={form.categoryId}
-                                        onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full"
                                     >
                                         <option value="">{t("adm_noCategory")}</option>
                                         {categories.map((cat) => (
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <div>
                                     <Label htmlFor="type">{t("adm_type")}</Label>
-                                    <select
+                                    <NativeSelect
                                         id="type"
                                         value={form.type}
-                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full"
                                     >
                                         <option value="DIGITAL">{t("adm_digital")}</option>
                                         <option value="PHYSICAL">{t("adm_physical")}</option>
                                         <option value="GAME_ITEM">{t("adm_gameItem")}</option>
                                         <option value="SUBSCRIPTION">{t("adm_subscription")}</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 {form.type === "SUBSCRIPTION" && (
                                     <>
                                         <div>
                                             <Label htmlFor="subscriptionInterval">{t("adm_subscriptionInterval")}</Label>
-                                            <select
+                                            <NativeSelect
                                                 id="subscriptionInterval"
                                                 value={form.subscriptionInterval}
-                                                onChange={(e) => setForm({ ...form, subscriptionInterval: e.target.value })}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                onChange={(e) => setForm({ ...form, subscriptionInterval: e.target.value })} className="w-full"
                                             >
                                                 <option value="month">{t("adm_monthly")}</option>
                                                 <option value="year">{t("adm_yearly")}</option>
-                                            </select>
+                                            </NativeSelect>
                                         </div>
                                         <div>
                                             <Label htmlFor="subscriptionIntervalCount">{t("adm_intervalCount")}</Label>

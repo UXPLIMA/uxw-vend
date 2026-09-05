@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
@@ -158,17 +158,16 @@ export default function AdminStoreCategoriesPage() {
                                 </div>
                                 <div>
                                     <Label>{t("adm_parentCategory")}</Label>
-                                    <select
+                                    <NativeSelect
                                         aria-label={t("adm_parentCategory")}
                                         value={form.parentId}
-                                        onChange={(e) => setForm({ ...form, parentId: e.target.value })}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setForm({ ...form, parentId: e.target.value })} className="w-full"
                                     >
                                         <option value="">{t("adm_rootCategory")}</option>
                                         {rootCategories.map((cat) => (
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                             </div>
                             <div>

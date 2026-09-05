@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea, NativeSelect } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
@@ -103,18 +103,17 @@ export default function NewTopicPage() {
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div>
                                         <Label>{t('categoryLabel')}</Label>
-                                        <select
+                                        <NativeSelect
                                             aria-label={t('categoryLabel')}
                                             value={form.categoryId}
-                                            onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                            onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full"
                                             required
                                         >
                                             <option value="">{t('selectCategory')}</option>
                                             {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.id}>{cat.name}</option>
                                             ))}
-                                        </select>
+                                        </NativeSelect>
                                     </div>
 
                                     <div>

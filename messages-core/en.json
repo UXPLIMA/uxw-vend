@@ -829,6 +829,7 @@
     "rp_created": "Permission granted.",
     "rp_deny": "deny",
     "rp_denyOpt": "Deny",
+    "rp_effect": "Effect",
     "rp_filterPrincipal": "Principal Type",
     "rp_filterResource": "Resource",
     "rp_grant": "Grant Permission",

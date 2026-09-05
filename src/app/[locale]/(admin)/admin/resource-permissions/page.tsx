@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
 import { writeError } from "@/core/lib/write-result";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface Role {
     id: string;
@@ -249,54 +250,50 @@ export default function ResourcePermissionsPage() {
                                 </div>
                                 <div>
                                     <Label>{t("rp_action")}</Label>
-                                    <select
+                                    <NativeSelect
                                         aria-label={t("rp_action")}
                                         value={formAction}
-                                        onChange={(e) => setFormAction(e.target.value)}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setFormAction(e.target.value)} className="w-full"
                                     >
                                         {ACTIONS.map((a) => (
                                             <option key={a} value={a}>
                                                 {a}
                                             </option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <div>
                                     <Label>{t("rp_allow")}</Label>
-                                    <select
+                                    <NativeSelect
                                         aria-label={t("rp_allow")}
                                         value={formAllow}
-                                        onChange={(e) => setFormAllow(e.target.value)}
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        onChange={(e) => setFormAllow(e.target.value)} className="w-full"
                                     >
                                         <option value="true">{t("rp_allowOpt")}</option>
                                         <option value="false">{t("rp_denyOpt")}</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <div>
                                     <Label>{t("rp_principalType")}</Label>
-                                    <select
+                                    <NativeSelect
                                         aria-label={t("rp_principalType")}
                                         value={formPrincipalType}
                                         onChange={(e) =>
                                             setFormPrincipalType(e.target.value as "role" | "user")
-                                        }
-                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        } className="w-full"
                                     >
                                         <option value="role">{t("rp_role")}</option>
                                         <option value="user">{t("rp_user")}</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                                 <div className="relative">
                                     {formPrincipalType === "role" ? (
                                         <>
                                             <Label>{t("rp_selectRole")}</Label>
-                                            <select
+                                            <NativeSelect
                                                 aria-label={t("rp_selectRole")}
                                                 value={formRoleId}
-                                                onChange={(e) => setFormRoleId(e.target.value)}
-                                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                onChange={(e) => setFormRoleId(e.target.value)} className="w-full"
                                                 required
                                             >
                                                 <option value="">
@@ -307,7 +304,7 @@ export default function ResourcePermissionsPage() {
                                                         {r.displayName || r.name}
                                                     </option>
                                                 ))}
-                                            </select>
+                                            </NativeSelect>
                                         </>
                                     ) : (
                                         <>
@@ -365,7 +362,7 @@ export default function ResourcePermissionsPage() {
             )}
 
             <Card className="mb-4">
-                <CardContent className="p-4 grid md:grid-cols-3 gap-3">
+                <CardContent className="p-4 grid md:grid-cols-2 gap-3">
                     <div>
                         <Label>{t("rp_filterResource")}</Label>
                         <Input
@@ -380,22 +377,18 @@ export default function ResourcePermissionsPage() {
                     </div>
                     <div>
                         <Label>{t("rp_filterPrincipal")}</Label>
-                        <select
+                        <NativeSelect
                             aria-label={t("rp_filterPrincipal")}
                             value={principalFilter}
                             onChange={(e) => {
                                 setPage(1);
                                 setPrincipalFilter(e.target.value);
-                            }}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            }} className="w-full"
                         >
                             <option value="">{t("rp_all")}</option>
                             <option value="role">{t("rp_role")}</option>
                             <option value="user">{t("rp_user")}</option>
-                        </select>
-                    </div>
-                    <div className="flex items-end text-sm text-muted-foreground">
-                        {total} {t("rp_totalSuffix")}
+                        </NativeSelect>
                     </div>
                 </CardContent>
             </Card>
@@ -412,6 +405,19 @@ export default function ResourcePermissionsPage() {
                         </p>
                     ) : (
                         <div className="divide-y">
+                            <div className="px-4 py-2 flex items-center gap-3 border-b bg-muted/40">
+                                <div className="flex-1 min-w-0 hidden md:grid grid-cols-5 gap-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                                    <span>{t("rp_resource")}</span>
+                                    <span>{t("rp_resourceId")}</span>
+                                    <span>{t("rp_action")}</span>
+                                    <span>{t("rp_principalType")}</span>
+                                    <span>{t("rp_effect")}</span>
+                                </div>
+                                <span className="md:hidden text-xs text-muted-foreground">
+                                    {total} {t("rp_totalSuffix")}
+                                </span>
+                                <span className="w-9 shrink-0" aria-hidden="true" />
+                            </div>
                             {grants.map((g) => (
                                 <div key={g.id} className="p-4 flex items-center gap-3">
                                     <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-5 gap-2 items-center">
@@ -450,7 +456,7 @@ export default function ResourcePermissionsPage() {
                                         aria-label={commonT("delete")}
                                         variant="ghost"
                                         size="sm"
-                                        className="text-destructive"
+                                        className="text-destructive w-9 shrink-0 px-0"
                                         onClick={() => revokeGrant(g)}
                                     >
                                         <Trash2 className="w-3 h-3" />
@@ -459,10 +465,11 @@ export default function ResourcePermissionsPage() {
                             ))}
                         </div>
                     )}
-                    {pages > 1 && (
+                    {!loading && grants.length > 0 && (
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">
-                                {t("revisions_page")} {page} / {pages}
+                                {total} {t("rp_totalSuffix")}
+                                {pages > 1 && ` \u00b7 ${t("revisions_page")} ${page} / ${pages}`}
                             </span>
                             <div className="flex gap-1">
                                 <Button

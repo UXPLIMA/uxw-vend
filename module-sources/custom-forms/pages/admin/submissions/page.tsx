@@ -3,7 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -73,17 +73,16 @@ export default function SubmissionsPage() {
 
             {/* Filter by form */}
             <div className="flex gap-2 mb-4">
-                <select
+                <NativeSelect
                     value={filterForm}
                     onChange={(e) => { setFilterForm(e.target.value); setPage(1); }}
                     aria-label={t("adm_filterByForm")}
-                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                     <option value="">{t("adm_allForms")}</option>
                     {forms.map((f) => (
                         <option key={f.id} value={f.id}>{f.title}</option>
                     ))}
-                </select>
+                </NativeSelect>
             </div>
 
             {loading ? (

@@ -8,7 +8,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
-import { LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
+import { LoadFailed, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
 interface Category {
     id: string;
     name: string;
@@ -332,17 +332,16 @@ export default function StorePage() {
                     <section>
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-foreground">{t('products')}</h2>
-                            <select
+                            <NativeSelect
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                aria-label={t('sortBy')}
-                                className="text-sm border border-border rounded-lg px-3 py-1.5 bg-card"
+                                aria-label={t('sortBy')} inputSize="sm"
                             >
                                 <option value="newest">{t('newest')}</option>
                                 <option value="price_asc">{t('priceLowHigh')}</option>
                                 <option value="price_desc">{t('priceHighLow')}</option>
                                 <option value="popular">{t('mostPopular')}</option>
-                            </select>
+                            </NativeSelect>
                         </div>
                         {loadingProducts ? (
                             <SkeletonProductGrid count={4} />

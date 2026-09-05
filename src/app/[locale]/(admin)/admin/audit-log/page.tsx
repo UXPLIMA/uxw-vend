@@ -20,6 +20,7 @@ import {
 import { userProfilePath } from "@/core/lib/user-profile-link";
 import { useAllModules } from "@/core/providers/module-provider";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface AuditLogEntry {
     id: string;
@@ -229,13 +230,12 @@ export default function AuditLogPage() {
                                 <FilterIcon className="w-3 h-3" />
                                 {t("auditLog_action")}
                             </label>
-                            <select
+                            <NativeSelect
                                 aria-label={t("auditLog_action")}
                                 value={actionFilter}
                                 onChange={(e) =>
                                     resetPageAndSet(setActionFilter)(e.target.value)
-                                }
-                                className="h-9 rounded-md border bg-background px-3 text-sm min-w-48"
+                                } className="min-w-48" inputSize="sm"
                             >
                                 <option value="">
                                     {t("auditLog_allActions")}
@@ -245,7 +245,7 @@ export default function AuditLogPage() {
                                         {a}
                                     </option>
                                 ))}
-                            </select>
+                            </NativeSelect>
                         </div>
 
                         <div className="flex flex-col gap-1">
