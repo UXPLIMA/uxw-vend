@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -444,22 +444,26 @@
     {
       "model": "forumTopic",
       "key": "forum.topics",
-      "column": "authorId"
+      "column": "authorId",
+      "erasure": "retain"
     },
     {
       "model": "forumPost",
       "key": "forum.posts",
-      "column": "authorId"
+      "column": "authorId",
+      "erasure": "retain"
     },
     {
       "model": "forumTopicLike",
       "key": "forum.topicLikes",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     },
     {
       "model": "forumPostLike",
       "key": "forum.postLikes",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     }
   ],
   "moderationProviders": [

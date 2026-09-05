@@ -515,6 +515,15 @@ const userDataExportEntry = z.object({
     model: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/, "model must be a Prisma delegate identifier"),
     key: z.string().min(1).max(128).regex(/^[a-zA-Z0-9._-]+$/),
     column: z.string().min(1).max(128).regex(/^[a-zA-Z][a-zA-Z0-9]*$/),
+    /**
+     * What happens to this table when the user asks to be forgotten.
+     *
+     * "purge" deletes the rows; "retain" keeps them joined to the anonymised
+     * user row, which is right for anything with public-record or moderation
+     * value (a forum topic, an order, a ticket). Omitted means "retain",
+     * because that is what every table did before core could be told.
+     */
+    erasure: z.enum(["purge", "retain"]).optional(),
 });
 
 const moderationProvider = z.object({

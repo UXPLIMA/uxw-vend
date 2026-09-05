@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A module could not have its private data erased.** `user-deletion.ts`
+  carried a doc comment saying "this file knows nothing about any specific
+  module" directly above a list that named `linkedAccount`, `notification`,
+  `cartItem`, `forumTopicLike`, `forumPostLike` and `suggestionVote` - six
+  tables belonging to five modules. Everything else was walked past:
+  `wheel` records every spin, `vote` every vote, `trophies` every award,
+  `custom-forms` every submission, and none of them was touched by a right
+  to be forgotten. There was no way for a module to say otherwise, no
+  manifest field and no hook, so the only way to erase a module's data was
+  to edit core. The six that did work only worked because somebody had.
+
+  A module already declares its user tables for the data export. Each entry
+  now carries `"erasure": "purge" | "retain"`, and core reads that out of
+  the generated registry instead of naming tables it should never have known
+  about. Omitting the field means retain, which is what an undeclared table
+  always did, so a third-party manifest keeps the behaviour it had. The six
+  dispositions above are unchanged; the other eighteen tables in this
+  repository are marked retain, which is also what they did before, and the
+  choice is now the module author's to revisit.
+
+  `validate-module` fails a module whose user tables state nothing, and
+  fails a purge naming a model or column its own schema does not have,
+  because `deleteMany` against a name that is not there deletes nothing and
+  reports success. The erasure path is recorded as ungated by the module
+  enabled flag for the same reason the export is: disabling a module deletes
+  no rows, so skipping its tables would leave behind exactly the data an
+  erasure exists to remove.
+
 - **A ban, a deletion, a demotion and a revoked device never reached a
   session that was already open.** Under the JWT strategy nothing about a
   session lives server-side, so the `jwt` callback is the only place that can

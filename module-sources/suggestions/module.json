@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -210,12 +210,14 @@
     {
       "model": "suggestion",
       "key": "suggestions.suggestions",
-      "column": "authorId"
+      "column": "authorId",
+      "erasure": "retain"
     },
     {
       "model": "suggestionVote",
       "key": "suggestions.votes",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "purge"
     }
   ],
   "moderationProviders": [

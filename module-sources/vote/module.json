@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote System",
   "description": "Vote-for-rewards system with configurable sites and cooldowns",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -167,7 +167,8 @@
     {
       "model": "voteLog",
       "key": "vote.logs",
-      "column": "userId"
+      "column": "userId",
+      "erasure": "retain"
     }
   ]
 }
