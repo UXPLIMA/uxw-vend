@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Fifteen module endpoints had twice the rate limit they read as.** A
+  manifest declares `{ path, handler }` pairs and nothing stopped it naming one
+  handler at two paths: the store lists thirteen of its routes both bare and
+  under `/store/`, `servers` lists `rcon` and `status` twice, `player-profiles`
+  lists `linked-accounts` twice. The dispatcher keyed its rate-limit bucket on
+  a registry key built from the path, so each spelling opened its own budget.
+
+  Measured on the demo: 140 requests to `/api/v1/store/widget-stats` gave 120
+  served and 20 refused, 30 more to that path were all refused, and 30 to
+  `/api/v1/widget-stats` from the same caller were all served. Two of the
+  aliased routes hand out value on request, `gift-codes/redeem` and
+  `chest/[id]`, and the dispatcher exists precisely so that a module endpoint
+  cannot forget its limit and cannot opt out of it.
+
+  The generated route table now carries the handler each path resolves to, and
+  `bucketKeyFor` spends a caller's budget against that rather than the URL.
+  Aliasing stays free: declare a route under as many paths as you like and they
+  share one budget. No URL changed.
+
+  Two follow-on holes are closed with it. `validate-module` gained "API aliases
+  agree on their limit", because a loose spelling of a route another spelling
+  asked to tighten would hand back the ceiling it removed. And nothing checked
+  that two modules had not claimed the same path, where `matchApiRoute` takes
+  the first and the second is silently unreachable;
+  `tests/unit/aliased-endpoints-share-a-budget.test.ts` now refuses both.
 - **The forwarded address a proxy vouched for was the one entry never read.**
   `x-forwarded-for` is a list, and a proxy appends to its right: nginx's
   `$proxy_add_x_forwarded_for` and Caddy both add the peer they saw to the end,

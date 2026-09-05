@@ -43,8 +43,12 @@ describe("the module API dispatcher", () => {
         expect(dispatcher).toContain("rate_limited");
     });
 
+    // Per endpoint means per handler file. This asserted `match.key`, which is
+    // built from the URL, and a manifest may declare one handler at several
+    // paths - fifteen do, and each spelling opened its own budget. See
+    // tests/unit/aliased-endpoints-share-a-budget.test.ts.
     it("keys the bucket per endpoint and per caller", () => {
-        expect(dispatcher).toMatch(/`module-api:\$\{match\.key\}:\$\{caller\.id\}`/);
+        expect(dispatcher).toMatch(/`module-api:\$\{bucketKeyFor\(match\)\}:\$\{caller\.id\}`/);
     });
 
     it("counts a signed-in caller by id and everyone else by address", () => {
