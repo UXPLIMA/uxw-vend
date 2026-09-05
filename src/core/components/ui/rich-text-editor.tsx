@@ -9,6 +9,14 @@ interface RichTextEditorProps {
     onChange: (value: string) => void;
     placeholder?: string;
     className?: string;
+    /**
+     * The id of the element naming this editor, usually the `<Label>` above
+     * it. Quill owns the contenteditable and gives it `role="textbox"`, so a
+     * `<Label htmlFor>` has nothing to point at - four screens wrote one
+     * anyway and it named nothing. Naming the toolbar-plus-editor group is
+     * what is actually available, and it is announced.
+     */
+    labelledBy?: string;
 }
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -26,6 +34,7 @@ export function RichTextEditor({
     onChange,
     placeholder = "Write your content here...",
     className = "",
+    labelledBy,
 }: RichTextEditorProps) {
     // Quill modules configuration
     const modules = useMemo(
@@ -69,7 +78,11 @@ export function RichTextEditor({
     ];
 
     return (
-        <div className={`rich-text-editor ${className}`}>
+        <div
+            className={`rich-text-editor ${className}`}
+            role={labelledBy ? "group" : undefined}
+            aria-labelledby={labelledBy}
+        >
             <ReactQuill
                 theme="snow"
                 value={value}

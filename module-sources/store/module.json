@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.9",
+  "version": "2.2.10",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -807,7 +807,10 @@
         "vip_title": "VIP Ranks",
         "sortBy": "Sort by",
         "adm_writeFailed": "That did not go through. Please try again.",
-        "cartUpdateFailed": "The cart could not be updated. Please try again."
+        "cartUpdateFailed": "The cart could not be updated. Please try again.",
+        "cart_decreaseQuantity": "Decrease quantity of {name}",
+        "cart_increaseQuantity": "Increase quantity of {name}",
+        "product_goToImage": "Go to image {n}"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1380,7 +1383,10 @@
         "vip_title": "VIP Rütbeleri",
         "sortBy": "Sırala",
         "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin.",
-        "cartUpdateFailed": "Sepet güncellenemedi. Lütfen tekrar deneyin."
+        "cartUpdateFailed": "Sepet güncellenemedi. Lütfen tekrar deneyin.",
+        "cart_decreaseQuantity": "{name} adedini azalt",
+        "cart_increaseQuantity": "{name} adedini artır",
+        "product_goToImage": "{n}. görsele git"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

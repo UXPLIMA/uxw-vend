@@ -314,17 +314,19 @@ export default function CartPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
+                                                    aria-label={t("cart_decreaseQuantity", { name: item.product.name })}
                                                     onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
                                                 >
-                                                    -
+                                                    <span aria-hidden="true">-</span>
                                                 </Button>
                                                 <span className="w-8 text-center">{item.quantity}</span>
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
+                                                    aria-label={t("cart_increaseQuantity", { name: item.product.name })}
                                                     onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                                                 >
-                                                    +
+                                                    <span aria-hidden="true">+</span>
                                                 </Button>
                                             </div>
 
