@@ -117,8 +117,9 @@ export default function NewBlogArticlePage() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="content">{`${t("adm_content")} *`}</Label>
+                                    <Label id="content-label">{`${t("adm_content")} *`}</Label>
                                     <RichTextEditor
+                                        labelledBy="content-label"
                                         value={formData.content}
                                         onChange={(value: string) => setFormData({ ...formData, content: value })}
                                         placeholder={t("adm_contentPlaceholder")}
@@ -141,7 +142,7 @@ export default function NewBlogArticlePage() {
                                         value={formData.status}
                                         onValueChange={(value: string) => setFormData({ ...formData, status: value })}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger id="status">
                                             <SelectValue placeholder={t("adm_selectStatus")} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -159,7 +160,7 @@ export default function NewBlogArticlePage() {
                                         value={formData.categoryId}
                                         onValueChange={(value: string) => setFormData({ ...formData, categoryId: value })}
                                     >
-                                        <SelectTrigger>
+                                        <SelectTrigger id="category">
                                             <SelectValue placeholder={t("adm_selectCategory")} />
                                         </SelectTrigger>
                                         <SelectContent>

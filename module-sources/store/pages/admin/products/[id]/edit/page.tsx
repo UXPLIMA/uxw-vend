@@ -195,15 +195,17 @@ export default function EditProductPage(props: PageProps) {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="description">{t("adm_description")}</Label>
+                                    <Label id="description-label">{t("adm_description")}</Label>
                                     <RichTextEditor
+                                        labelledBy="description-label"
                                         value={form.description}
                                         onChange={(value: string) => setForm({ ...form, description: value })}
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="image">{t("adm_mainImageUrl")}</Label>
                                     <FileUpload
+                                        id="image"
+                                        label={t("adm_mainImageUrl")}
                                         value={form.image || null}
                                         onChange={(v) => setForm({ ...form, image: v || "" })}
                                         accept="image/*"

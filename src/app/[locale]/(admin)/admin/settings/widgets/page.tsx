@@ -163,8 +163,8 @@ export default function WidgetSettingsPage() {
                                 className={`flex items-center gap-4 p-4 transition-all ${draggedIdx === idx ? "opacity-40" : ""} ${dragOverIdx === idx && draggedIdx !== idx ? "bg-primary/10 border-l-2 border-l-primary" : ""}`}
                             >
                                 <div className="flex flex-col gap-0.5 cursor-grab active:cursor-grabbing">
-                                    <button onClick={() => move(widget.id, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
-                                    <button onClick={() => move(widget.id, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
+                                    <button aria-label={t("common_moveUp", { label: widget.name })} onClick={() => move(widget.id, -1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▲</span></button>
+                                    <button aria-label={t("common_moveDown", { label: widget.name })} onClick={() => move(widget.id, 1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▼</span></button>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-medium">{widget.name}</p>

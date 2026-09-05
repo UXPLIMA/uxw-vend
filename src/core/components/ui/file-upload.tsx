@@ -12,6 +12,13 @@ export interface FileUploadProps {
     onChange: (url: string | null) => void;
     accept?: string;
     label?: string;
+    /**
+     * Names the picker for a caller that draws its own label. The id lands on
+     * the visible button rather than the file input, which is hidden and so
+     * reaches no one; a `<button>` is labelable, so clicking the label opens
+     * the picker.
+     */
+    id?: string;
 }
 
 /**
@@ -23,7 +30,7 @@ function looksLikeImage(value: string | null, accept?: string): boolean {
     return /\.(png|jpe?g|gif|webp|svg|avif|bmp|ico)(\?.*)?$/i.test(value);
 }
 
-export function FileUpload({ value, onChange, accept, label }: FileUploadProps) {
+export function FileUpload({ value, onChange, accept, label, id }: FileUploadProps) {
     const t = useTranslations("common");
     const inputRef = useRef<HTMLInputElement>(null);
     const [uploading, setUploading] = useState(false);
@@ -70,7 +77,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
 
     return (
         <div className="space-y-2">
-            {label && <Label>{label}</Label>}
+            {label && <Label htmlFor={id}>{label}</Label>}
 
             {value && (
                 <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3">
@@ -79,7 +86,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={value}
-                            alt="Preview"
+                            alt={t("preview")}
                             className="h-20 w-20 rounded object-contain border border-border bg-muted p-1"
                         />
                     ) : (
@@ -93,6 +100,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
                         </p>
                         <div className="mt-2 flex gap-2">
                             <Button
+                                id={id}
                                 type="button"
                                 variant="outline"
                                 size="sm"
@@ -123,6 +131,7 @@ export function FileUpload({ value, onChange, accept, label }: FileUploadProps) 
 
             {!value && (
                 <Button
+                    id={id}
                     type="button"
                     variant="outline"
                     onClick={handlePick}

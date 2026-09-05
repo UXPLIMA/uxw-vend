@@ -14,6 +14,7 @@ interface SlideItem {
 
 export function SliderWidget() {
     const t = useTranslations("common");
+    const sliderT = useTranslations("slider");
     const [slides, setSlides] = useState<SlideItem[]>([]);
     const [current, setCurrent] = useState(0);
 
@@ -68,7 +69,13 @@ export function SliderWidget() {
                     </button>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
                         {slides.map((_, i) => (
-                            <button key={i} onClick={() => setCurrent(i)} className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"}`} />
+                            <button
+                                key={i}
+                                aria-label={sliderT("goToSlide", { n: i + 1 })}
+                                aria-current={i === current ? "true" : undefined}
+                                onClick={() => setCurrent(i)}
+                                className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"}`}
+                            />
                         ))}
                     </div>
                 </>

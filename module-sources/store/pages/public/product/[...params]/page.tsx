@@ -268,6 +268,8 @@ export default function ProductDetailPage() {
                                     {images.map((_, index) => (
                                         <button
                                             key={index}
+                                            aria-label={t("product_goToImage", { n: index + 1 })}
+                                            aria-current={index === currentImageIndex ? "true" : undefined}
                                             onClick={() => setCurrentImageIndex(index)}
                                             className={`w-2 h-2 rounded-full transition-colors ${index === currentImageIndex ? 'bg-card' : 'bg-card/50'}`}
                                         />

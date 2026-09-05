@@ -159,8 +159,8 @@ export default function NavbarSettingsPage() {
                                     {/* Main row */}
                                     <div className="flex items-center gap-2 p-3 bg-muted">
                                         <div className="flex flex-col gap-0.5">
-                                            <button onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs">▲</button>
-                                            <button onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs">▼</button>
+                                            <button aria-label={t("common_moveUp", { label: link.label })} onClick={() => moveLink(i, -1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▲</span></button>
+                                            <button aria-label={t("common_moveDown", { label: link.label })} onClick={() => moveLink(i, 1)} className="text-muted-foreground hover:text-foreground text-xs"><span aria-hidden="true">▼</span></button>
                                         </div>
                                         <Input value={link.label} onChange={(e) => updateLink(i, "label", e.target.value)} placeholder={t("navbar_labelPlaceholder")} aria-label={t("navbar_labelPlaceholder")} className="flex-1 min-w-0" />
                                         {!isDropdown && (

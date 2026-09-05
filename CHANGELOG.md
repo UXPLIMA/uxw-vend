@@ -32,6 +32,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Eighteen controls that a screen reader could not name.** Eight buttons
+  hold nothing but an icon, an arrow glyph or nothing at all, and were
+  announced as "button" and no more: the reorder arrows on the navbar and
+  homepage-widget settings, the cart's quantity steppers, and the carousel
+  dots on the slider widget and the product page. Ten `<Label htmlFor="x">`
+  named an `id` no element on the screen carried, so they named nothing and
+  focused nothing when clicked - each one sat beside a control that does not
+  take an `htmlFor` the naive way, and each is now reached properly: a Radix
+  `<Select>` through `<SelectTrigger id>`, a Quill editor through
+  `labelledBy` on a named group (Quill owns the contenteditable, so there is
+  no field for a label to point at), and `<FileUpload>` through an `id` on its
+  visible button rather than its hidden file input. The picker's preview image
+  was also described as "Preview" in every language. A gate now checks both
+  halves: a control with no words in it must carry a name, and a label must
+  name exactly one thing on its screen.
+
 - **Nine links pointed at pages this product does not serve.** Nothing checked
   them, and the App Router hides the mistake: the catch-all route answers 404
   for anything it cannot resolve, so a wrong href fails no build and no
