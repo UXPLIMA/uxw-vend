@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { badgeClassName } from "@/core/components/ui/badge";
 import { Checkbox } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 type ModerationMode = "auto" | "manual";
 
@@ -26,12 +27,19 @@ export default function ModerationSettingsPage() {
     const [saving, setSaving] = useState(false);
     const [fields, setFields] = useState<ModerationField[]>([]);
     const [config, setConfig] = useState<Record<string, ModerationMode>>({});
+    // Both reads already returned null on a failure, and both nulls then
+    // became `{}`: every type read as "auto" and saving wrote that over
+    // whatever the site actually had. A failure is a failure now.
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [attempt, setAttempt] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
+        setLoading(true);
+        setLoadFailed(false);
         Promise.all([
-            fetch("/api/v1/admin/moderation").then((r) => (r.ok ? r.json() : null)),
-            fetch("/api/v1/settings").then((r) => (r.ok ? r.json() : null)),
+            fetch("/api/v1/admin/moderation").then((r) => (r.ok ? r.json() : Promise.reject(new Error("moderation")))),
+            fetch("/api/v1/settings").then((r) => (r.ok ? r.json() : Promise.reject(new Error("settings")))),
         ])
             .then(([modPayload, settingsPayload]) => {
                 if (cancelled) return;
@@ -59,6 +67,8 @@ export default function ModerationSettingsPage() {
                 setConfig(next);
             })
             .catch(() => {
+                if (cancelled) return;
+                setLoadFailed(true);
                 toast.error(t("moderationSettings_loadFailed"));
             })
             .finally(() => {
@@ -66,7 +76,7 @@ export default function ModerationSettingsPage() {
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [t]);
+    }, [t, attempt]);
 
     const toggleField = (key: string) => {
         setConfig((prev) => ({
@@ -100,6 +110,20 @@ export default function ModerationSettingsPage() {
         return (
             <div className="flex items-center justify-center h-64">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    if (loadFailed) {
+        return (
+            <div className="space-y-6">
+                <AdminPageHeader
+                    title={t("moderationSettings_title")}
+                    description={t("moderationSettings_subtitle")}
+                />
+                <Card>
+                    <CardContent><LoadFailed onRetry={() => setAttempt((a) => a + 1)} /></CardContent>
+                </Card>
             </div>
         );
     }

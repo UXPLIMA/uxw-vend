@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -10,22 +10,18 @@ import { useTranslations } from "next-intl";
 import { writeError } from "@/core/lib/write-result";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { Textarea } from "@/core/components/ui/textarea";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 
 export default function CssSettingsPage() {
     const t = useTranslations("admin");
     const [css, setCss] = useState("");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                setCss((data.settings?.custom_css as string) || "");
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
+    // An empty editor over a failed read, with a save button under it, is how
+    // a site loses its stylesheet.
+    const { loading, failed, retry } = useSettingsLoad((settings) => {
+        setCss((settings.custom_css as string) || "");
+    });
 
     const save = async () => {
         setSaving(true);
@@ -34,9 +30,9 @@ export default function CssSettingsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ custom_css: css }),
         });
-        const failed = await writeError(res, t("common_writeFailed"), t);
+        const writeFailed = await writeError(res, t("common_writeFailed"), t);
         setSaving(false);
-        if (failed) { toast.error(failed); return; }
+        if (writeFailed) { toast.error(writeFailed); return; }
         toast.success(t("css_saved"));
     };
 
@@ -48,6 +44,13 @@ export default function CssSettingsPage() {
                 title={t("css_title")}
                 description={t("css_subtitle")}
             />
+
+            {failed ? (
+                <Card>
+                    <CardContent><LoadFailed onRetry={retry} /></CardContent>
+                </Card>
+            ) : (
+            <>
 
             <Card className="mb-6">
                 <CardHeader><CardTitle>{t("css_editor")}</CardTitle></CardHeader>
@@ -67,6 +70,8 @@ export default function CssSettingsPage() {
             <Button onClick={save} disabled={saving}>
                 {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("css_saving")}</> : <><Check className="w-4 h-4" /> {t("css_saveCss")}</>}
             </Button>
+            </>
+            )}
         </>
     );
 }

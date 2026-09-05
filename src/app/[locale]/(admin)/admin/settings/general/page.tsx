@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -10,6 +10,8 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 
 interface FieldDef {
     key: string;
@@ -45,26 +47,20 @@ const allFields = sections.flatMap((s) => s.fields);
 
 export default function GeneralSettingsPage() {
     const t = useTranslations("admin");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [values, setValues] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                const s = data.settings || {};
-                const v: Record<string, string> = {};
-                for (const field of allFields) {
-                    v[field.key] = s[field.key] !== undefined && s[field.key] !== null
-                        ? String(s[field.key])
-                        : String(field.defaultValue);
-                }
-                setValues(v);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
+    // Every field falls back to its default, so a failed read renders a form
+    // full of defaults that saving would write over the real settings.
+    const { loading, failed, retry } = useSettingsLoad((s) => {
+        const v: Record<string, string> = {};
+        for (const field of allFields) {
+            v[field.key] = s[field.key] !== undefined && s[field.key] !== null
+                ? String(s[field.key])
+                : String(field.defaultValue);
+        }
+        setValues(v);
+    });
 
     const setValue = (key: string, val: string) => {
         setValues((prev) => ({ ...prev, [key]: val }));
@@ -99,6 +95,15 @@ export default function GeneralSettingsPage() {
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
+        );
+    }
+
+    if (failed) {
+        return (
+            <>
+                <AdminPageHeader title={t("generalSettings_title")} description={t("generalSettings_subtitle")} />
+                <Card><CardContent><LoadFailed onRetry={retry} /></CardContent></Card>
+            </>
         );
     }
 

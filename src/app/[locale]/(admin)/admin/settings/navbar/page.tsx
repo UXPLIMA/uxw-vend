@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -15,6 +15,8 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { IconPicker } from "@/core/components/ui/icon-picker";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 
 interface NavChild {
     label: string;
@@ -37,35 +39,25 @@ export default function NavbarSettingsPage() {
     const commonT = useTranslations("common");
     const moduleStatus = useAllModules();
     const [links, setLinks] = useState<NavLink[]>([]);
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [expandedDropdown, setExpandedDropdown] = useState<number | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                if (cancelled) return;
-                const navLinks = data.settings?.navbar_links;
-                if (Array.isArray(navLinks)) {
-                    setLinks(navLinks);
-                } else {
-                    // No override yet - seed the editor with what the navbar is
-                    // currently rendering from the module registry, so the
-                    // admin sees real state and can edit from there.
-                    const registry = ModuleNavLinks
-                        .filter(nl => isEnabledIn(moduleStatus, nl.module))
-                        .map(nl => ({ label: nl.label, labelKey: nl.labelKey, href: nl.href, icon: nl.icon || "" }));
-                    setLinks([{ label: "Home", labelKey: "home", href: "/", icon: "Home" }, ...registry]);
-                }
-                setLoading(false);
-            })
-            .catch(() => {
-                if (cancelled) return;
-                setLoading(false);
-            });
-        return () => { cancelled = true; };
+    // Without an override this editor seeds itself from the registry, which
+    // means a failed read looks exactly like "no override yet" - and saving
+    // it replaces the admin's own navbar with the module defaults.
+    const { loading, failed, retry } = useSettingsLoad((settings) => {
+        const navLinks = settings.navbar_links;
+        if (Array.isArray(navLinks)) {
+            setLinks(navLinks);
+            return;
+        }
+        // No override yet - seed the editor with what the navbar is currently
+        // rendering from the module registry, so the admin sees real state
+        // and can edit from there.
+        const registry = ModuleNavLinks
+            .filter(nl => isEnabledIn(moduleStatus, nl.module))
+            .map(nl => ({ label: nl.label, labelKey: nl.labelKey, href: nl.href, icon: nl.icon || "" }));
+        setLinks([{ label: "Home", labelKey: "home", href: "/", icon: "Home" }, ...registry]);
     }, [moduleStatus]);
 
     const addLink = () => setLinks([...links, { label: "", href: "/", icon: "" }]);
@@ -131,6 +123,15 @@ export default function NavbarSettingsPage() {
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+
+    if (failed) {
+        return (
+            <>
+                <AdminPageHeader title={t("navbar_title")} description={t("navbar_subtitle")} />
+                <Card><CardContent><LoadFailed onRetry={retry} /></CardContent></Card>
+            </>
+        );
+    }
 
     return (
         <>

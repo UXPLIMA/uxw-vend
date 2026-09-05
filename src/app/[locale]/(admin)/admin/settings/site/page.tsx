@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
@@ -10,10 +10,11 @@ import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Check } from "lucide-react";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 
 export default function SiteSettingsPage() {
     const t = useTranslations("admin");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,26 +31,21 @@ export default function SiteSettingsPage() {
         socialDiscord: "",
     });
 
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                const s = data.settings || {};
-                setForm({
-                    siteName: s.siteName || "uxwVend",
-                    siteDescription: s.siteDescription || "",
-                    serverIp: s.serverIp || "",
-                    contactEmail: s.contactEmail || "",
-                    socialFacebook: s.socialFacebook || "",
-                    socialInstagram: s.socialInstagram || "",
-                    socialTwitter: s.socialTwitter || "",
-                    socialYoutube: s.socialYoutube || "",
-                    socialDiscord: s.socialDiscord || "",
-                });
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
+    // A read that failed would otherwise offer this form at its defaults, and
+    // saving it renames the site to "uxwVend" and empties every social link.
+    const { loading, failed, retry } = useSettingsLoad((s) => {
+        setForm({
+            siteName: (s.siteName as string) || "uxwVend",
+            siteDescription: (s.siteDescription as string) || "",
+            serverIp: (s.serverIp as string) || "",
+            contactEmail: (s.contactEmail as string) || "",
+            socialFacebook: (s.socialFacebook as string) || "",
+            socialInstagram: (s.socialInstagram as string) || "",
+            socialTwitter: (s.socialTwitter as string) || "",
+            socialYoutube: (s.socialYoutube as string) || "",
+            socialDiscord: (s.socialDiscord as string) || "",
+        });
+    });
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,6 +79,15 @@ export default function SiteSettingsPage() {
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
+        );
+    }
+
+    if (failed) {
+        return (
+            <>
+                <AdminPageHeader title={t("siteSettings_title")} description={t("siteSettings_subtitle")} />
+                <Card><CardContent><LoadFailed onRetry={retry} /></CardContent></Card>
+            </>
         );
     }
 

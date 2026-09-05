@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -10,6 +10,8 @@ import { IconPicker } from "@/core/components/ui/icon-picker";
 import { Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { Textarea } from "@/core/components/ui/textarea";
 
@@ -34,27 +36,21 @@ interface SettingsFormProps {
 
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
     const t = useTranslations("admin");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [values, setValues] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                const s = data.settings || {};
-                const v: Record<string, string> = {};
-                for (const field of fields) {
-                    v[field.key] = (s[field.key] as string) || field.defaultValue || "";
-                }
-                setValues(v);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // Shared by every screen built out of this form, so the hole was shared
+    // too: a failed read rendered the defaults and the save button under them
+    // wrote the defaults back.
+    const { loading, failed, retry } = useSettingsLoad((s) => {
+        const v: Record<string, string> = {};
+        for (const field of fields) {
+            v[field.key] = (s[field.key] as string) || field.defaultValue || "";
+        }
+        setValues(v);
+    });
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -80,6 +76,15 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
     if (loading) {
         return <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+    }
+
+    if (failed) {
+        return (
+            <>
+                <AdminPageHeader title={title} description={subtitle} />
+                <Card><CardContent><LoadFailed onRetry={retry} /></CardContent></Card>
+            </>
+        );
     }
 
     return (
