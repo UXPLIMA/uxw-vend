@@ -3,7 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, use } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";

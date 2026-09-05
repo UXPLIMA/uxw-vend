@@ -1,5 +1,6 @@
-import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import { redirect } from "@/core/sdk/navigation";
+import { Link } from "@/core/sdk/navigation";
 import Image from "next/image";
 import { formatCurrency, formatDate, dateLocaleTag } from "@/core/sdk";
 import { isAdmin, prisma, siteCurrency } from "@/core/sdk/server";
@@ -30,10 +31,10 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
     const currency = await siteCurrency();
     const money = (amount: number) => formatCurrency(amount, currency, dateTag);
     const session = await auth();
-    if (!session?.user) redirect("/auth/login");
+    if (!session?.user) redirect({ href: "/auth/login", locale });
 
     const adminCheck = await isAdmin(session.user.id);
-    if (!adminCheck) redirect("/");
+    if (!adminCheck) redirect({ href: "/", locale });
 
     const { id } = await params;
 

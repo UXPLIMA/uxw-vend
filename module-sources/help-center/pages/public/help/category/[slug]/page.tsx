@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { useTranslations } from "next-intl";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { LoadFailed } from "@/core/sdk/ui";

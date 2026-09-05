@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
 import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 
 interface SeoSettings {
     seo_default_title: string;

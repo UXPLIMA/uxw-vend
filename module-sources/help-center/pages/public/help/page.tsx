@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
 import { LoadFailed } from "@/core/sdk/ui";
 import { ThemeComponentSlot } from "@/core/sdk/theme";

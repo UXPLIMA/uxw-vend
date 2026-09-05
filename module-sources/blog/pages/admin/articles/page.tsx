@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { Link } from "@/core/sdk/navigation";
+import { redirect } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
@@ -54,16 +54,17 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
         return key && t.has(key) ? t(key) : status;
     };
     const commonT = await getTranslations("common");
-    const dateTag = dateLocaleTag(await getLocale());
+    const locale = await getLocale();
+    const dateTag = dateLocaleTag(locale);
     const session = await auth();
 
     if (!session?.user) {
-        redirect("/auth/login");
+        redirect({ href: "/auth/login", locale });
     }
 
     const adminCheck = await isAdmin(session.user.id);
     if (!adminCheck) {
-        redirect("/");
+        redirect({ href: "/", locale });
     }
 
     const raw = (await searchParams)?.page;

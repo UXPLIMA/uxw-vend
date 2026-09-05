@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, Package } from "lucide-react";
 

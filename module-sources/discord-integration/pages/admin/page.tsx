@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, Input, Label } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Check, Send } from "lucide-react";
 

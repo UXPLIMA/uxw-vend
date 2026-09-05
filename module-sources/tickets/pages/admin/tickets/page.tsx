@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";

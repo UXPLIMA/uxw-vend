@@ -10,7 +10,8 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/core/sdk/navigation";
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 

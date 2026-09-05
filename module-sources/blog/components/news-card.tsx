@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/core/sdk/navigation";
 import Image from "next/image";
 import { useLocalDate } from "@/core/sdk/ui";
 

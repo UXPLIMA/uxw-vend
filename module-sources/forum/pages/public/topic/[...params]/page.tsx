@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
