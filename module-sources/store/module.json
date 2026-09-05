@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1736,7 +1736,7 @@
   "activityTitles": [
     {
       "type": "store.order.completed",
-      "prefix": "Purchased: ",
+      "prefix": "Completed order ",
       "key": "storeOrderCompleted"
     }
   ],

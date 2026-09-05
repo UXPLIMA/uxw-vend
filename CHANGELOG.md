@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every module that localised its activity feed entries got it wrong, and
+  nothing checked.** The feed stores an English sentence per row and a module
+  translates it by declaring `{ type, prefix, key }`: core strips `prefix` off
+  the stored title and puts `t(key)` in its place. It is the only translated
+  string on the site matched by content rather than resolved by identifier, so
+  a declaration that is slightly wrong fails silently and reads as a missing
+  translation. Five modules used it; three of them were broken.
+
+  `blog` declared `blog.article.published` and writes `blog.article.created`.
+  `tickets` declared `tickets.ticket.created` and `tickets.reply.created` and
+  writes `tickets.ticket.opened` and `tickets.ticket.replied`. Three
+  translations, present and correct in both locales, that no row could match.
+
+  `store` was worse: it declared the prefix `"Purchased: "` for rows written as
+  `Completed order #1412`, so the match failed - and the fallback substituted
+  the label anyway and returned it alone. Every completed order rendered as a
+  bare `purchased:` in every locale, with the order number dropped. Measured
+  before the fix, `("store.order.completed", "Completed order #1234")` returned
+  `"satın aldı:"`.
+
+  A declared prefix that does not match now leaves the whole sentence alone,
+  and the four declarations are corrected.
+  `tests/unit/activity-titles-match-what-is-written.test.ts` requires a
+  declared type to be one some code writes, a declared prefix to be the literal
+  head of the title written with it, and the key to ship in every locale the
+  module ships. The thirteen types that still render in English are listed
+  there with the reason each one cannot be expressed as a prefix, so a new
+  activity type has to be declared or added on purpose.
 - **Fifteen module endpoints had twice the rate limit they read as.** A
   manifest declares `{ path, handler }` pairs and nothing stopped it naming one
   handler at two paths: the store lists thirteen of its routes both bare and
