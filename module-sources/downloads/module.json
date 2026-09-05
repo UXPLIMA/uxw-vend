@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -106,6 +106,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_downloads_downloads": "Downloads"
+      },
+      "activity": {
+        "fileDownloaded": "downloaded"
       }
     },
     "tr": {
@@ -166,7 +169,17 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_downloads_downloads": "İndirmeler"
+      },
+      "activity": {
+        "fileDownloaded": "indirdi:"
       }
     }
-  }
+  },
+  "activityTitles": [
+    {
+      "type": "downloads.file.downloaded",
+      "prefix": "Downloaded ",
+      "key": "fileDownloaded"
+    }
+  ]
 }

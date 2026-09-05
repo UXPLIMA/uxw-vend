@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Eight more activity feed events now read in the reader's language.** The
+  previous round fixed the declarations that were wrong and recorded the
+  thirteen types that had none, so they rendered in English whatever the
+  locale. Seven of those thirteen fit the existing `{ prefix, key }` model
+  exactly and simply had no declaration: `announcements`, `custom-forms`,
+  `downloads`, `help-center`, `referral` and `changelog` each gained one, with
+  the key shipped in both locales they ship. Core's own `user.2fa.enabled` and
+  `user.2fa.disabled` are whole English sentences with no entity in them, so
+  they join `user.registered` in `CORE_PREFIXES` and are replaced outright.
+
+  Six remain in English, each for a reason recorded in the test: the entity is
+  not at the end of the sentence, so no prefix describes where it starts.
+  Translating those needs the row to store parameters rather than prose.
+
+  The gate now reads core's declarations off the source rather than naming one
+  of them, and requires core to ship every key it declares in both locales, the
+  same rule modules already had.
 - **A published module archive was not a function of the module.** The build
   shelled to `zip -r`, which writes each file's mtime and atime into the entry,
   so an archive's bytes depended on when someone last opened the file rather

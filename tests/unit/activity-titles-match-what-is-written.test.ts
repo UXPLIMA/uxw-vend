@@ -117,20 +117,17 @@ const ENGLISH_BY_LIMITATION = new Set([
     "vote.vote.cast",
     // "Won ${prize} on the wheel" - trailing English after the entity.
     "wheel.prize.won",
-    // "Changelog ${version}: ${title}" - two interpolations.
-    "changelog.entry.published",
-    // "Announcement: ${title}", "Submitted form: ${title}", "Downloaded
-    // ${title}", "New help article: ${title}", "Joined via referral from
-    // ${user}" all fit the model and simply have no declaration yet.
-    "announcements.announcement.created",
-    "customforms.submission.created",
-    "downloads.file.downloaded",
-    "helpcenter.article.created",
-    "referral.referral.used",
-    // Written by core, and CORE_PREFIXES carries only user.registered.
-    "user.2fa.enabled",
-    "user.2fa.disabled",
 ]);
+
+/** The types and keys core declares for its own events, read off the source. */
+function coreDeclarations(): { types: string[]; keys: string[] } {
+    const source = fs.readFileSync(path.join(ROOT, "src/core/lib/activity-title.ts"), "utf8");
+    const block = source.slice(source.indexOf("const CORE_PREFIXES"), source.indexOf("const PREFIXES"));
+    return {
+        types: [...block.matchAll(/"([a-z][\w.]*)":\s*\{/g)].map((m) => m[1]),
+        keys: [...block.matchAll(/key:\s*"([^"]+)"/g)].map((m) => m[1]),
+    };
+}
 
 describe("what the feed writes", () => {
     const written = writtenTypes();
@@ -142,7 +139,7 @@ describe("what the feed writes", () => {
 
     it("has a declaration for every type, or a reason recorded here", () => {
         const declared = new Set(manifests().flatMap((m) => m.titles.map((t) => t.type)));
-        declared.add("user.registered"); // CORE_PREFIXES, in activity-title.ts
+        for (const type of coreDeclarations().types) declared.add(type);
         const undeclared = [...written.keys()].filter((t) => !declared.has(t)).sort();
         expect(undeclared).toEqual([...ENGLISH_BY_LIMITATION].sort());
     });
@@ -185,6 +182,27 @@ describe("what a module declares", () => {
                         missing.push(`${id}: activity.${t.key} missing for ${locale}`);
                     }
                 }
+            }
+        }
+        expect(missing).toEqual([]);
+    });
+});
+
+describe("what core declares", () => {
+    const { types, keys } = coreDeclarations();
+
+    it("declares the core-written types", () => {
+        expect(keys.length).toBeGreaterThanOrEqual(3);
+        expect(types).toHaveLength(keys.length);
+    });
+
+    it("ships every key it names, in both locales", () => {
+        const missing: string[] = [];
+        for (const locale of ["en", "tr"]) {
+            const messages = JSON.parse(fs.readFileSync(path.join(ROOT, `messages-core/${locale}.json`), "utf8"));
+            for (const key of keys) {
+                const value = messages?.activity?.[key];
+                if (typeof value !== "string" || !value.trim()) missing.push(`${locale}: activity.${key}`);
             }
         }
         expect(missing).toEqual([]);

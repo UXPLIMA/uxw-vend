@@ -2,7 +2,7 @@
   "id": "referral",
   "name": "Referral System",
   "description": "Earn credits by referring new users",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -138,6 +138,9 @@
         "rewardDescription": "Credits awarded to the referrer when someone uses their code",
         "saveSettings": "Save Settings",
         "menu_referral_referrals": "Referrals"
+      },
+      "activity": {
+        "referralUsed": "referred by:"
       }
     },
     "tr": {
@@ -219,6 +222,9 @@
         "rewardDescription": "Birisi kodunu kullandığında referans verene verilen krediler",
         "saveSettings": "Ayarları Kaydet",
         "menu_referral_referrals": "Referanslar"
+      },
+      "activity": {
+        "referralUsed": "davet eden:"
       }
     }
   },
@@ -227,6 +233,13 @@
       "model": "referral",
       "key": "referral.records",
       "column": "referrerId"
+    }
+  ],
+  "activityTitles": [
+    {
+      "type": "referral.referral.used",
+      "prefix": "Joined via referral from ",
+      "key": "referralUsed"
     }
   ]
 }

@@ -1,19 +1,19 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T03:45:03Z",
+  "updatedAt": "2026-09-05T03:57:42Z",
   "modules": [
     {
       "id": "announcements",
       "name": "Announcements",
       "description": "Site-wide announcement banners",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -136,13 +136,13 @@
       "id": "changelog",
       "name": "Changelog",
       "description": "Release notes and update history",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -421,13 +421,13 @@
       "id": "custom-forms",
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
-      "version": "1.0.16",
+      "version": "1.0.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -580,13 +580,13 @@
       "id": "downloads",
       "name": "Downloads",
       "description": "File download center for resources and mods",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -850,13 +850,13 @@
       "id": "help-center",
       "name": "Help Center",
       "description": "Knowledge base with categories and searchable articles",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1770,13 +1770,13 @@
       "id": "referral",
       "name": "Referral System",
       "description": "Earn credits by referring new users",
-      "version": "1.0.10",
+      "version": "1.0.11",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T03:57:42Z",
       "screenshots": [],
       "tags": [
         "community"

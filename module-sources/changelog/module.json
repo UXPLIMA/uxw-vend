@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -108,6 +108,9 @@
       },
       "nav": {
         "changelog": "Changelog"
+      },
+      "activity": {
+        "changelogEntryPublished": "changelog"
       }
     },
     "tr": {
@@ -162,6 +165,9 @@
       },
       "nav": {
         "changelog": "Değişiklikler"
+      },
+      "activity": {
+        "changelogEntryPublished": "değişiklik günlüğü"
       }
     }
   },
@@ -194,6 +200,13 @@
       "labelKey": "changelog",
       "href": "/changelog",
       "section": "quick"
+    }
+  ],
+  "activityTitles": [
+    {
+      "type": "changelog.entry.published",
+      "prefix": "Changelog ",
+      "key": "changelogEntryPublished"
     }
   ]
 }
