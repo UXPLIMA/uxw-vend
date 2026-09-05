@@ -14,6 +14,12 @@ export interface ApiRouteMatch {
     handler: string;
     params: Record<string, string>;
     method?: string;
+    /**
+     * The verbs the handler file exports, collected by generate-registry.
+     * The dispatcher answers OPTIONS and puts an `Allow` on its 405 from
+     * this, so neither has to import a handler to know what it accepts.
+     */
+    methods?: string[];
     /** An endpoint an external service posts to, with no browser behind it. */
     providerCallback?: boolean;
     /** A stricter limit the manifest asked for, if it asked for one. */
@@ -33,6 +39,7 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
             handler: exactMatch.handler,
             params: {},
             method: exactMatch.method,
+            methods: exactMatch.methods,
             providerCallback: exactMatch.providerCallback,
             rateLimit: exactMatch.rateLimit,
         };
@@ -49,6 +56,7 @@ export function matchApiRoute(pathSegments: string[]): ApiRouteMatch | null {
                 handler: route.handler,
                 params: match.params,
                 method: route.method,
+                methods: route.methods,
                 providerCallback: route.providerCallback,
                 rateLimit: route.rateLimit,
             };

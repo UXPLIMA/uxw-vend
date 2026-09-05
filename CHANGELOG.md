@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every module endpoint claimed to accept every verb.** All of them are
+  served by one dispatcher, `/api/v1/[...path]`, which has to export all five
+  verbs to be reachable by any of them, and Next builds the `Allow` header
+  from a route file's exports. Measured on the demo:
+
+      OPTIONS /api/v1/leaderboard        Allow: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+      OPTIONS /api/v1/announcements/xyz  Allow: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+      GET     /api/v1/announcements/xyz  405, no Allow header at all
+
+  `/api/v1/leaderboard` exports GET. `/api/v1/announcements/[id]` exports
+  PATCH and DELETE, so the two verbs its header led with are the two it
+  rejects. RFC 9110 requires a 405 to carry `Allow`, and the dispatcher's
+  carried none, so a client that got one had nowhere to look.
+
+  `generate-registry` records the verbs each handler file exports into the
+  route table, the matcher carries them, and the dispatcher answers OPTIONS
+  itself and puts `Allow` on both of its 405s. A manifest `method` narrows
+  that set and cannot widen it, since a manifest cannot make a handler export
+  something. The 405 raised after the handler is imported reads the module's
+  own exports, which is the last word if the two ever disagree, and an
+  endpoint whose verbs are unknown gets no `Allow` rather than a guessed one.
+
+  This is the same defect as the previous entry, one layer down: the reference
+  described the API and the API described itself, and both were describing
+  rather than reading. `exportedHttpMethods` is now one function that both the
+  spec generator and the route table read with.
+
 - **The API Reference described endpoints that do not exist, and left out a
   hundred that do.** `/admin/api-docs` renders a generated OpenAPI document,
   and it is the only description of this platform's HTTP surface anyone gets.
