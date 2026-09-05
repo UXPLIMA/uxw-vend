@@ -173,7 +173,6 @@ describe("dialogs and popovers", () => {
     const CLOSABLE = [
         "src/app/[locale]/(admin)/admin/media/page.tsx",
         "src/app/[locale]/(admin)/admin/modules/ModuleDetailModal.tsx",
-        "src/core/components/admin/DashboardCustomizer.tsx",
         "src/core/components/admin/AdminSpotlight.tsx",
         "src/core/components/ui/footer-dropdown.tsx",
         "src/core/components/ui/confirm-dialog.tsx",

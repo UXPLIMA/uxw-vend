@@ -123,7 +123,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                         page={page}
                         pages={pageCount}
                         total={total}
-                        hrefFor={(n) => `/admin/users?page=${n}`}
+                        pageParam="page"
                     />
                 </CardContent>
             </Card>

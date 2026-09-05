@@ -268,8 +268,6 @@ Customization overrides are mode-scoped via `ThemeCustomization` (`@@unique([the
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | `/stats?period=30d` | Admin | Core dashboard counters (users + roles) |
-| GET | `/admin/dashboard-layout` | Admin | Read the admin's dashboard layout + available widgets |
-| PUT | `/admin/dashboard-layout` | Admin | Save the dashboard layout |
 
 Module-contributed counters are fetched directly from each module's declared `statsApi` endpoint by the dashboard UI.
 

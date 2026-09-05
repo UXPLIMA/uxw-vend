@@ -48,8 +48,11 @@ describe("the schema still has no key to sweep by", () => {
         expect(model).not.toContain("@relation");
     });
 
-    it("the dashboard layout is still a Setting key, not a table", () => {
-        expect(read("src/core/lib/dashboard-layout.ts")).toContain('SETTING_KEY_PREFIX = "dashboard_layout:"');
+    it("still sweeps the dashboard layout rows the customizer left behind", () => {
+        // The per-admin dashboard customizer is gone, but the Setting rows it
+        // wrote are still in every database that ran a release with it, and an
+        // erasure still has to take them.
+        expect(read("src/core/lib/principal-rows.ts")).toContain('`dashboard_layout:${userId}`');
     });
 });
 

@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- The per-admin dashboard customizer. It was a dialog of checkboxes and up/down
+  arrows writing an order into the `Setting` table, it took two rounds of bug
+  fixes, and it still did not convince. The dashboard now shows what core and
+  the enabled modules contribute, in the order the manifests declare, the same
+  for every admin - a module adds a card or a panel by declaring it, which is
+  the knob that composes. `src/core/lib/dashboard-layout.ts`, the customizer
+  component and `/api/v1/admin/dashboard-layout` are gone; the erasure sweep
+  for the `dashboard_layout:<userId>` rows it wrote stays, because every
+  database that ran a release with it still holds them.
+
+### Fixed
+- The admin users screen threw on every request. It is a Server Component and
+  it handed the pager a function - `hrefFor={(n) => ...}` - which cannot be
+  serialised across the RSC boundary, so React refused the render at request
+  time rather than at build time. The failure then took the whole admin shell
+  down with it and filled the console with `MISSING_MESSAGE: admin`, from a
+  tree re-rendering outside the provider that had carried those messages.
+
+  `Pagination`'s URL form now takes `pageParam="page"` - the name of the query
+  parameter - and builds the links itself from the live path and search string,
+  which is serialisable and also keeps whatever else is in the query. The
+  hand-written `?page=N` was dropping it. A gate scans every server component
+  for a prop holding a function.
+
 ### Added
 - `useFormRoute` joins `@/core/sdk/ui` (CORE_API_VERSION 1.13.0). A create or
   edit form is a place, so it gets an address. The hook reads `?form=new` or

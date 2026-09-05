@@ -165,12 +165,9 @@ function StatCardSkeleton() {
 /**
  * The KPI row.
  *
- * `order` is the admin's saved layout, already filtered to the visible ids and
- * sorted. `coreSlots` carries the core widgets, rendered on the server and
- * handed down as nodes, so the row can interleave a module's card between two
- * core ones - which is what the customizer's up and down arrows promise. The
- * previous version rendered the core widgets in layout order and then dumped
- * every module card after them, visible or not.
+ * `order` names the core cards in the order the page wants them; `coreSlots`
+ * carries those cards, rendered on the server and handed down as nodes,
+ * because the row itself fetches the module cards and appends them after.
  */
 export function DashboardKpiRow({ order, coreSlots }: {
     order: string[];
@@ -221,8 +218,7 @@ export function DashboardKpiRow({ order, coreSlots }: {
 
 /**
  * Flat list of module-contributed stat cards, every one of them. Kept for the
- * legacy `DashboardClient` wrapper below; the dashboard itself uses
- * `DashboardKpiRow`, which obeys the saved layout.
+ * legacy `DashboardClient` wrapper below.
  */
 export function ModuleStatCards() {
     const { cards } = useModuleDashboardData();
@@ -238,7 +234,7 @@ export function ModuleStatCards() {
  * Module-contributed section panels (e.g. open tickets, latest orders,
  * recent forum topics). Rendered as a 2-col grid of larger Cards.
  */
-export function ModuleSections({ hidden }: { hidden?: string[] } = {}) {
+export function ModuleSections() {
     const { sections, loading } = useModuleDashboardData();
     const t = useTranslations("admin");
 
@@ -252,18 +248,11 @@ export function ModuleSections({ hidden }: { hidden?: string[] } = {}) {
         }
     };
 
-    // `hidden` is the set of section ids the admin switched off in the
-    // customizer. A section the module returns but its manifest never declared
-    // cannot be in that set, so it stays visible: the customizer never offered
-    // it, and hiding something nobody was asked about is the worse failure.
-    const hiddenIds = new Set(hidden ?? []);
-    const visible = sections.filter((section) => !hiddenIds.has(section.id));
-
-    if (loading || visible.length === 0) return null;
+    if (loading || sections.length === 0) return null;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {visible.map((section) => (
+            {sections.map((section) => (
                 <Card key={section.id}>
                     <CardHeader>
                         <div className="flex justify-between items-center">

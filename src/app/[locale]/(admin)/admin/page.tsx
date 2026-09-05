@@ -6,8 +6,6 @@ import {
     DashboardKpiRow,
     ModuleSections,
 } from "./components/dashboard-client";
-import { DashboardCustomizer } from "@/core/components/admin/DashboardCustomizer";
-import { getLayout, getAvailableWidgets } from "@/core/lib/dashboard-layout";
 import UsersCountWidget from "@/core/components/admin/widgets/UsersCountWidget";
 import ActivityFeedWidget from "@/core/components/admin/widgets/ActivityFeedWidget";
 import HealthSnapshotWidget from "@/core/components/admin/widgets/HealthSnapshotWidget";
@@ -21,7 +19,7 @@ export const dynamic = "force-dynamic";
  * stays uniform and nothing orphans on its own row.
  *
  *   ┌─ Header ────────────────────────────────────────┐
- *   │ Title + Customize                               │
+ *   │ Title                                           │
  *   ├─ KPI row ───────────────────────────────────────┤
  *   │ [ Users ] [ Health ] [ Email ] [ Errors ]       │ <- core 1x1 cards
  *   │ + module-contributed stat cards (same row)      │
@@ -30,25 +28,23 @@ export const dynamic = "force-dynamic";
  *   ├─ Module sections ───────────────────────────────┤
  *   │ [ Open tickets       ] [ Latest orders ]        │ <- module-contributed
  *   │ [ Recent forum topics ... ]                     │
- *   ├─ Analytics ─────────────────────────────────────┤
- *   │ [         Users chart, full width        ]      │
  *   └─────────────────────────────────────────────────┘
  *
- * Widgets are grouped by shape:
- *  - KPI:    users-count, health-snapshot, email-queue-status,
- *            recent-errors  (1x1)
- *  - Panels: activity-feed (1x1 but larger cards)
+ * There was a per-admin customizer here: a dialog of checkboxes and up/down
+ * arrows writing an order into the Setting table. It was two rounds of bug
+ * fixes deep and still did not convince, so it is gone. The dashboard shows
+ * what core and the enabled modules contribute, in the order the manifests
+ * declare, the same for every admin. A module adds a card or a panel by
+ * declaring it; that is the knob, and it is the one that composes.
  */
 
-const PANEL_WIDGET_IDS = new Set(["activity-feed"]);
-
-const WIDGET_COMPONENTS: Record<string, () => React.ReactNode> = {
-    "users-count": () => <UsersCountWidget key="users-count" />,
-    "activity-feed": () => <ActivityFeedWidget key="activity-feed" />,
-    "health-snapshot": () => <HealthSnapshotWidget key="health-snapshot" />,
-    "recent-errors": () => <RecentErrorsWidget key="recent-errors" />,
-    "email-queue-status": () => <EmailQueueStatusWidget key="email-queue-status" />,
-};
+/** Core KPI cards, in the order the row shows them. */
+const KPI_WIDGETS: [string, () => React.ReactNode][] = [
+    ["users-count", () => <UsersCountWidget key="users-count" />],
+    ["health-snapshot", () => <HealthSnapshotWidget key="health-snapshot" />],
+    ["email-queue-status", () => <EmailQueueStatusWidget key="email-queue-status" />],
+    ["recent-errors", () => <RecentErrorsWidget key="recent-errors" />],
+];
 
 export default async function AdminDashboard() {
     const session = await auth();
@@ -57,44 +53,12 @@ export default async function AdminDashboard() {
     if (!(await isAdmin(session.user.id))) redirect({ href: "/", locale });
 
     const t = await getTranslations("admin");
-    const [layout, available] = await Promise.all([
-        getLayout(session.user.id),
-        getAvailableWidgets(),
-    ]);
 
-    const visible = layout.filter((w) => w.visible);
-    const availableById = new Map(available.map((a) => [a.id, a]));
-
-    const renderWidget = (id: string) => {
-        const info = availableById.get(id);
-        if (!info || info.source !== "core") return null;
-        const render = WIDGET_COMPONENTS[id];
-        return render ? render() : null;
-    };
-
-    const visiblePanelWidgets = visible.filter((w) => PANEL_WIDGET_IDS.has(w.id));
-
-    // The KPI row mixes core widgets with module stat cards, and the customizer
-    // lets an admin order and hide either. The core widgets are rendered here,
-    // on the server, and handed to the row as nodes; the row fetches the module
-    // cards itself and places both in the saved order.
-    const kpiOrder = visible
-        .filter((w) => {
-            const info = availableById.get(w.id);
-            return Boolean(info) && info!.kind === "card" && !PANEL_WIDGET_IDS.has(w.id);
-        })
-        .map((w) => w.id);
+    // The core cards are rendered here, on the server, and handed to the row
+    // as nodes; the row fetches the module cards itself and appends them.
+    const kpiOrder = KPI_WIDGETS.map(([id]) => id);
     const coreSlots: Record<string, React.ReactNode> = {};
-    for (const id of kpiOrder) {
-        const node = renderWidget(id);
-        if (node) coreSlots[id] = node;
-    }
-
-    // Section panels are hidden by plain id; the row ids carry the module.
-    const hiddenSections = layout
-        .filter((w) => !w.visible && availableById.get(w.id)?.kind === "section")
-        .map((w) => w.id.split(":section:")[1])
-        .filter(Boolean);
+    for (const [id, render] of KPI_WIDGETS) coreSlots[id] = render();
 
     return (
         <div className="space-y-6">
@@ -104,25 +68,20 @@ export default async function AdminDashboard() {
                     <h1 className="text-xl font-semibold text-foreground">{t("dashboard_title")}</h1>
                     <p className="text-xs text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
                 </div>
-                <DashboardCustomizer />
             </div>
 
             {/* KPI row - core KPIs + module stat cards, uniform 1x1 grid */}
-            {kpiOrder.length > 0 && (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <DashboardKpiRow order={kpiOrder} coreSlots={coreSlots} />
-                </div>
-            )}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <DashboardKpiRow order={kpiOrder} coreSlots={coreSlots} />
+            </div>
 
             {/* Panel row - larger activity/engagement cards */}
-            {visiblePanelWidgets.length > 0 && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {visiblePanelWidgets.map((w) => renderWidget(w.id))}
-                </div>
-            )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <ActivityFeedWidget />
+            </div>
 
             {/* Module sections - 2-col panels contributed by modules */}
-            <ModuleSections hidden={hiddenSections} />
+            <ModuleSections />
         </div>
     );
 }

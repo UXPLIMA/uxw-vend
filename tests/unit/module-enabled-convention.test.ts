@@ -167,7 +167,6 @@ describe("module enabled flag - every registry consumer", () => {
         for (const rel of [
             "src/app/api/v1/admin/search/route.ts",
             "src/app/api/v1/notification-preferences/route.ts",
-            "src/core/lib/dashboard-layout.ts",
         ]) {
             expect(code(join(ROOT, rel))).toContain("isEnabledIn(");
         }

@@ -10,7 +10,8 @@ import {
 import { useTranslations } from "next-intl";
 import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
-import { Link } from "@/core/lib/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/core/lib/utils";
 import { pageWindow } from "@/core/lib/page-window";
 
@@ -25,9 +26,17 @@ import { pageWindow } from "@/core/lib/page-window";
  *
  * So: numbered pages with an ellipsis where the middle is elided, first and
  * last, and a box to type a page number into when there are more pages than
- * fit. The `hrefFor` form renders links, for a server component that pages
- * through the URL; the `onPageChange` form renders buttons, for a client
- * component holding the page in state. One of the two is required.
+ * fit.
+ *
+ * Two forms, because the callers come in two kinds. `onPageChange` renders
+ * buttons, for a client component holding the page in state. `pageParam`
+ * renders links, for a server component that reads the page out of the URL:
+ * it names the query parameter, and the links are built here from the live
+ * path and search string. It used to be an `hrefFor` callback instead, which
+ * a Server Component cannot pass - a function does not survive the boundary,
+ * and the users screen threw on every request because of it. Building the
+ * href here also keeps whatever else is in the query, which the callback's
+ * hand-written `?page=N` was dropping.
  */
 
 interface PaginationBase {
@@ -42,11 +51,12 @@ interface PaginationBase {
 
 interface PaginationWithHandler extends PaginationBase {
     onPageChange: (page: number) => void;
-    hrefFor?: never;
+    pageParam?: never;
 }
 
 interface PaginationWithHref extends PaginationBase {
-    hrefFor: (page: number) => string;
+    /** Query parameter carrying the page number, e.g. "page". */
+    pageParam: string;
     onPageChange?: never;
 }
 
@@ -72,8 +82,51 @@ export function usePagedRows<T>(rows: T[], pageSize = 10) {
     };
 }
 
-export function Pagination({ page, pages, total, className, onPageChange, hrefFor }: PaginationProps) {
+export function Pagination(props: PaginationProps) {
+    // `useSearchParams` is only reached by the URL form, and only inside its
+    // own Suspense boundary: a page that pages through state must not be
+    // pushed into client-side rendering by a hook it never uses.
+    if (props.pageParam) {
+        return (
+            <React.Suspense fallback={null}>
+                <UrlPagination {...props} />
+            </React.Suspense>
+        );
+    }
+    return <PaginationBar {...props} hrefFor={null} />;
+}
+
+function UrlPagination({ pageParam, ...rest }: PaginationWithHref) {
+    const pathname = usePathname();
+    const search = useSearchParams();
+
+    // Page 1 is the bare address: `?page=1` and no parameter are the same
+    // screen, and only one of them should be linkable. Every other parameter
+    // - a filter, a search term - rides along.
+    const hrefFor = (n: number) => {
+        const params = new URLSearchParams(search?.toString() ?? "");
+        if (n <= 1) params.delete(pageParam);
+        else params.set(pageParam, String(n));
+        const query = params.toString();
+        return query ? `${pathname}?${query}` : pathname;
+    };
+
+    return <PaginationBar {...rest} hrefFor={hrefFor} />;
+}
+
+function PaginationBar({
+    page,
+    pages,
+    total,
+    className,
+    onPageChange,
+    hrefFor,
+}: PaginationBase & {
+    onPageChange?: (page: number) => void;
+    hrefFor: ((page: number) => string) | null;
+}) {
     const t = useTranslations("common");
+    const router = useRouter();
     const [jump, setJump] = React.useState("");
 
     const clamp = (n: number) => Math.min(Math.max(1, n), pages);
@@ -85,7 +138,7 @@ export function Pagination({ page, pages, total, className, onPageChange, hrefFo
         if (!Number.isFinite(parsed)) return;
         const target = clamp(parsed);
         setJump("");
-        if (hrefFor) window.location.href = hrefFor(target);
+        if (hrefFor) router.push(hrefFor(target));
         else go(target);
     };
 

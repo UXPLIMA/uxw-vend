@@ -18,7 +18,11 @@ import { prisma } from "./db";
  *   Setting            `dashboard_layout:<userId>` is one row per admin,
  *                       keyed by embedding the id in a string. The user's
  *                       notification preferences next to it are a real table
- *                       and were purged on erasure; this one was not.
+ *                       and were purged on erasure; this one was not. The
+ *                       dashboard customizer that wrote these rows is gone,
+ *                       but the rows are not: every database that ran a
+ *                       release with it still holds them, so the sweep and
+ *                       the export both stay.
  *
  * Both sweeps live here so the delete paths and the export read one list
  * rather than each remembering. A grant against a deleted principal is inert
@@ -26,7 +30,7 @@ import { prisma } from "./db";
  * is why this is a hygiene and retention fix rather than a privilege one.
  */
 
-/** The `Setting.key` holding one admin's dashboard arrangement. */
+/** The `Setting.key` holding one admin's dashboard arrangement, from the releases that had a customizer. */
 export function dashboardLayoutKey(userId: string): string {
     return `dashboard_layout:${userId}`;
 }
