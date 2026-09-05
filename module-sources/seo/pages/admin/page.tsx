@@ -145,9 +145,9 @@ export default function SeoSettingsPage() {
                                 aria-label={t("adm_titleTemplate")}
                                 value={settings.seo_title_template}
                                 onChange={(e) => updateSetting("seo_title_template", e.target.value)}
-                                placeholder="%s | My Site"
+                                placeholder={t("adm_titleTemplateExample")}
                             />
-                            <p className="text-xs text-muted-foreground mt-1">Use %s as placeholder for the page title (e.g. &quot;%s | My Site&quot;)</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t("adm_titleTemplateHint")}</p>
                         </div>
 
                         <div>

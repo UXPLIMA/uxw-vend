@@ -40,7 +40,6 @@ const LITERAL_EXAMPLES = new Set([
     "auto-generated-from-title", // what an empty slug becomes
     "HelpCircle, BookOpen, Lightbulb...", // Lucide icon identifiers
     "7d",                   // a punishment duration
-    "%s | My Site",         // the title template's own syntax
     "google-site-verification=...",
     "msvalidate.01=...",
     "/about",               // a URL path

@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, useLocalDate } from "@/core/sdk/ui";
 import { Loader2, KeyRound, Copy, Check, Eye, EyeOff, Monitor } from "lucide-react";
 
 interface Activation {
@@ -33,6 +33,7 @@ interface License {
 
 export function ProfileLicensesTab() {
     const t = useTranslations("licenseKeys");
+    const formatLocalDate = useLocalDate();
     const [licenses, setLicenses] = useState<License[]>([]);
     const [loading, setLoading] = useState(true);
     const [shown, setShown] = useState<Set<string>>(new Set());
@@ -137,7 +138,7 @@ export function ProfileLicensesTab() {
                                     max: license.maxActivations,
                                 })}
                                 {license.expiresAt
-                                    ? ` - ${t("expiresOn", { date: new Date(license.expiresAt).toLocaleDateString() })}`
+                                    ? ` - ${t("expiresOn", { date: formatLocalDate(license.expiresAt) })}`
                                     : ""}
                             </p>
 
@@ -148,7 +149,7 @@ export function ProfileLicensesTab() {
                                             <Monitor className="h-3.5 w-3.5" />
                                             <span>{activation.label || t("unnamedMachine")}</span>
                                             <span className="text-xs">
-                                                {new Date(activation.lastSeenAt).toLocaleDateString()}
+                                                {formatLocalDate(activation.lastSeenAt)}
                                             </span>
                                         </li>
                                     ))}

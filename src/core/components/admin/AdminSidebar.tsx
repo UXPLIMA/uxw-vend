@@ -160,7 +160,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
                     className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition"
-                    aria-label="uxwVend admin"
+                    aria-label={t("sidebar_adminHome")}
                 >
                     <span className="text-xs font-bold">UV</span>
                 </Link>

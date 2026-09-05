@@ -2,13 +2,15 @@ import { Card, CardContent } from "@/core/components/ui/card";
 import { Users } from "lucide-react";
 import { prisma } from "@/core/lib/db";
 import { Link } from "@/core/lib/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { dateLocaleTag } from "@/core/lib/utils";
 
 /**
  * Users widget - total count + 7-day delta.
  */
 export default async function UsersCountWidget() {
     const t = await getTranslations("admin");
+    const numberTag = dateLocaleTag(await getLocale());
     let total = 0;
     let last7d = 0;
     try {
@@ -29,7 +31,7 @@ export default async function UsersCountWidget() {
                         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("widget_users")}</span>
                         <Users className="w-4 h-4 text-orange-600" />
                     </div>
-                    <div className="text-2xl font-bold">{total.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{total.toLocaleString(numberTag)}</div>
                     {last7d > 0 && (
                         <div className="text-xs text-muted-foreground mt-1">{t("widget_usersInLast7Days", { n: last7d })}</div>
                     )}

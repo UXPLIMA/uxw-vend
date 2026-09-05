@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -165,6 +165,8 @@
         "forum": "Forum"
       },
       "forum": {
+        "adm_createCategoryFailed": "That category could not be created.",
+        "createTopicFailed": "That topic could not be created.",
         "title": "Forum",
         "community": "Community discussions",
         "newTopic": "New Topic",
@@ -297,6 +299,8 @@
         "forum": "Forum"
       },
       "forum": {
+        "adm_createCategoryFailed": "Bu kategori oluşturulamadı.",
+        "createTopicFailed": "Bu konu oluşturulamadı.",
         "title": "Forum",
         "community": "Topluluk tartışmaları",
         "newTopic": "Yeni Konu",

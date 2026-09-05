@@ -7,7 +7,7 @@ import { Button, Card, CardContent, Input, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 import { useTranslations } from "next-intl";
 
 interface Category {

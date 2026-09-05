@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { CORE_PERMISSIONS } from "@/core/lib/permission-names";
+import { writeError } from "@/core/lib/write-result";
 
 interface Permission {
     id: string;
@@ -127,16 +128,16 @@ export default function AdminRolesPage() {
                 body: JSON.stringify(form),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to save role");
+            const failed = await writeError(res, commonT("somethingWentWrong"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             resetForm();
             fetchRoles();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }
@@ -148,9 +149,9 @@ export default function AdminRolesPage() {
 
         try {
             const res = await fetch(`/api/v1/roles/${roleId}`, { method: "DELETE" });
-            if (!res.ok) {
-                const data = await res.json();
-                toast.error(data.error || "Failed to delete role");
+            const failed = await writeError(res, commonT("somethingWentWrong"), t);
+            if (failed) {
+                toast.error(failed);
                 return;
             }
             fetchRoles();

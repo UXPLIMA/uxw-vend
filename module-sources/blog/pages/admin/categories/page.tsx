@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -17,6 +18,7 @@ interface Category {
 
 export default function AdminBlogCategoriesPage() {
     const t = useTranslations("blog");
+    const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -73,16 +75,16 @@ export default function AdminBlogCategoriesPage() {
                 body: JSON.stringify(form),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to save category");
+            const failed = await writeError(res, t("adm_saveCategoryFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             resetForm();
             fetchCategories();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

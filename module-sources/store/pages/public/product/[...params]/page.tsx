@@ -150,12 +150,11 @@ export default function ProductDetailPage() {
             } else if (res.status === 401) {
                 requireLogin();
             } else {
-                const body = await res.json().catch(() => ({}));
-                toast.error(body.error || "Failed to add to cart");
+                toast.error(t('cartAddFailed'));
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);
-            toast.error("Failed to add to cart");
+            toast.error(t("cartAddFailed"));
         } finally {
             setAddingToCart(false);
         }

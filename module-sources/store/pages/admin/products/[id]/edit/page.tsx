@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Trash2, X } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -120,22 +121,22 @@ export default function EditProductPage(props: PageProps) {
                 body: JSON.stringify(payload),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to update product");
+            const failed = await writeError(res, t("adm_updateProductFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             router.push("/admin/store/products");
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDelete = async () => {
-        const ok = await confirm({ title: "Delete Product", message: "Are you sure you want to delete this product?", variant: "danger", confirmText: "Delete" });
+        const ok = await confirm({ title: t("adm_deleteProduct"), message: t("adm_deleteProductConfirm"), variant: "danger", confirmText: t("adm_delete") });
         if (!ok) return;
 
         setDeleting(true);
@@ -147,7 +148,7 @@ export default function EditProductPage(props: PageProps) {
                 router.push("/admin/store/products");
             }
         } catch {
-            setError("Failed to delete product");
+            setError(t("adm_deleteProductFailed"));
         } finally {
             setDeleting(false);
         }

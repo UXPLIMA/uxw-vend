@@ -62,7 +62,7 @@ export default function FormsPage() {
         try {
             const res = await fetch(`/api/v1/forms/${form.slug}`);
             if (!res.ok) {
-                toast.error("Failed to load form");
+                toast.error(t("adm_loadFormFailed"));
                 return;
             }
             const data = await res.json();
@@ -73,7 +73,7 @@ export default function FormsPage() {
             setFields(Array.isArray(f.fields) && f.fields.length > 0 ? f.fields : [{ name: "name", type: "text", label: "Name", required: true }]);
             setShowCreate(true);
         } catch {
-            toast.error("Failed to load form");
+            toast.error(t("adm_loadFormFailed"));
         }
     };
 
@@ -104,7 +104,7 @@ export default function FormsPage() {
             resetForm();
             fetchForms();
         } else {
-            toast.error("Failed");
+            toast.error(t("adm_writeFailed"));
         }
         setSaving(false);
     };

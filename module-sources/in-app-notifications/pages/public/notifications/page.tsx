@@ -9,7 +9,7 @@ import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 
 interface NotificationItem {
     id: string;

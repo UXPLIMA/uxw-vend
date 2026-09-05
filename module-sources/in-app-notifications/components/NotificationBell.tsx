@@ -5,7 +5,7 @@ import { Bell, Check, CheckCheck, ExternalLink } from "lucide-react";
 import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 import { useModalDialog } from "@/core/sdk/ui";
 
 interface NotificationItem {

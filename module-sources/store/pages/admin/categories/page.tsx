@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -73,9 +74,9 @@ export default function AdminStoreCategoriesPage() {
                 }),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create category");
+            const failed = await writeError(res, t("adm_createCategoryFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
@@ -83,7 +84,7 @@ export default function AdminStoreCategoriesPage() {
             setForm({ name: "", description: "", image: "", parentId: "", order: 0, isActive: true });
             fetchCategories();
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

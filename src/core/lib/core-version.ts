@@ -12,6 +12,10 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.10.0 - `usePrompt` joins `@/core/sdk/ui`. It opens the same dialog
+ * `useConfirm` does, with a field in it, so a module can ask for a line of
+ * text without falling back to the browser's `prompt()`. An addition.
+ *
  * 1.9.0 - `LoadFailed` joins `@/core/sdk/ui`. A module that fetches its own
  * content has the same two ways of being empty core does, and had the same
  * one way of saying so; this is the panel for the other one. An addition, so
@@ -62,4 +66,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.9.0";
+export const CORE_API_VERSION = "1.10.0";

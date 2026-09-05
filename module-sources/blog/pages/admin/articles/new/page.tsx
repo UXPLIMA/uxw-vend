@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@/core/sdk/ui";
+import { writeError } from "@/core/sdk";
 
 
 interface Category {
@@ -16,6 +17,7 @@ interface Category {
 
 export default function NewBlogArticlePage() {
     const t = useTranslations("blog");
+    const commonT = useTranslations("common");
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -55,15 +57,15 @@ export default function NewBlogArticlePage() {
                 }),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to create article");
+            const failed = await writeError(res, t("adm_createArticleFailed"), t);
+            if (failed) {
+                throw new Error(failed);
             }
 
             router.push("/admin/blog/articles");
             router.refresh();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError(err instanceof Error ? err.message : commonT("somethingWentWrong"));
         } finally {
             setLoading(false);
         }

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 import { writeError } from "@/core/sdk";
 
 interface Topic {

@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `usePrompt` joins `@/core/sdk/ui` (CORE_API_VERSION 1.10.0). The in-page
+  equivalent of `window.prompt()`: `const reason = await ask({ message,
+  placeholder })` resolves to the text, or `null` when the reader backed out.
+  It shares the confirm dialog's markup, so what it asks is translated,
+  focusable and dismissible like the rest of the panel. `required: true`
+  refuses an empty answer; it is off by default because most of these reasons
+  are optional.
+
+- `useLocalDate` and `useRelativeTime` join `@/core/sdk/ui` (CORE_API_VERSION
+  1.10.0). Both already existed under `@/core/hooks/` and thirteen module files
+  were reaching straight past the SDK to get at them, which is a fair reading
+  of a boundary that was holding back two date formatters and offering no
+  replacement.
+
 - `LoadFailed` joins `@/core/sdk/ui` (CORE_API_VERSION 1.9.0). The panel a
   screen shows when the request behind it did not come back, with a retry,
   because these screens load once on mount and a reload was otherwise the only
@@ -38,6 +52,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **A Turkish admin was told what went wrong in English.** Every screen in the
+  panel is translated, so the English that survived hid where nobody rereads:
+  in what a failed write says, what a field suggests before it is filled, and
+  what a browser dialog asks. `data.error || t("saveFailed")` reads as a
+  translated fallback and is the opposite - `error` is the endpoint's own
+  English sentence, so the translation is reached only when the server says
+  nothing - and twenty-one of those carried an English literal in the fallback
+  slot as well. They now go through `writeError`, which returns the caller's
+  wording and translates `err.<code>` when the response carries one. Two
+  screens collected a ban reason and a staff rejection reason through
+  `window.prompt()`, which cannot be translated at all; they use `usePrompt`.
+  Alongside them: the rich text editor's placeholder, the footer and SEO
+  settings examples, the setup wizard's logo preview, the user page's deletion
+  reason hint, the admin sidebar's home link, four bare `toLocaleDateString()`
+  calls that read the server's locale during SSR and the browser's afterwards,
+  and the confirm dialog's own Cancel and Confirm buttons. A gate covers all
+  of it, with the six-entry allowlist naming what stays in English and why.
+
+- **The SDK boundary named two directories and let a third through.** The
+  check that keeps a module inside `@/core/sdk` matched `@/core/lib/*` and
+  `@/core/components/*` by name, so `@/core/hooks/*` walked past both the
+  validator and the manifest test. Both regexes now take anything under
+  `@/core/` that is not the published SDK, with `@/core/generated/*` as the
+  one exception - that is where a module reads the shape of a contribution it
+  declares.
+
 - **Forty screens reported a failed load as an empty result.** A list has two
   ways to be empty - nothing was created yet, or the request never came back -
   and every one of them had a single sentence for both. A server error, an

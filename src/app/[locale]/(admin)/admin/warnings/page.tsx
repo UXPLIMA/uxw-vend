@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { writeError } from "@/core/lib/write-result";
 
 interface Warning {
     id: string;
@@ -138,13 +139,13 @@ export default function WarningsPage() {
                     expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
                 }),
             });
-            if (res.ok) {
+            const failed = await writeError(res, commonT("somethingWentWrong"), t);
+            if (failed) {
+                toast.error(failed);
+            } else {
                 toast.success(fallback("warnings_issued", "Warning issued."));
                 resetForm();
                 fetchWarnings();
-            } else {
-                const data = await res.json().catch(() => ({}));
-                toast.error(data.error || "Failed");
             }
         } finally {
             setSaving(false);

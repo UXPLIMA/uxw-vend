@@ -57,13 +57,13 @@ export default function DiscordSettingsPage() {
             });
 
             if (!res.ok) {
-                setError("Failed to save");
+                setError(commonT("somethingWentWrong"));
                 return;
             }
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

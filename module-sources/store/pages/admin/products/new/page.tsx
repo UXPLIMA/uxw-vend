@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -74,15 +75,15 @@ export default function NewProductPage() {
                 body: JSON.stringify(payload),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                setError(data.error || "Failed to create product");
+            const failed = await writeError(res, t("adm_createProductFailed"), t);
+            if (failed) {
+                setError(failed);
                 return;
             }
 
             router.push("/admin/store/products");
         } catch {
-            setError("Something went wrong");
+            setError(commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }

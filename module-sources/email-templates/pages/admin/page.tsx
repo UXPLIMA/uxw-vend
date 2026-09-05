@@ -16,7 +16,7 @@ export default function EmailSettingsPage() {
                 { key: "email_welcome_subject", label: t("adm_field4Label"), placeholder: "Welcome to {appName}!", description: t("adm_field2Desc") },
                 { key: "email_welcome_body", label: t("adm_field5Label"), type: "textarea", description: t("adm_field3Desc") },
                 { key: "email_order_subject", label: t("adm_field6Label"), placeholder: "Order #{orderNumber}", description: t("adm_field4Desc") },
-                { key: "email_reset_subject", label: t("adm_field7Label"), placeholder: "Reset your password" },
+                { key: "email_reset_subject", label: t("adm_field7Label"), placeholder: t("adm_resetSubjectPlaceholder") },
             ]}
         />
     );

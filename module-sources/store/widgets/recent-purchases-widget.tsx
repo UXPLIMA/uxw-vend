@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 
 interface RecentPurchase {
     username: string;

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { Button, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { useRelativeTime } from "@/core/sdk/ui";
 import { labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
 import { useTranslations } from "next-intl";
 

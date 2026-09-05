@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Trash2 } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface Category {
     id: string;
@@ -20,6 +21,8 @@ interface PageProps {
 
 export default function EditBlogArticlePage(props: PageProps) {
     const t = useTranslations("blog");
+    const commonT = useTranslations("common");
+    const { confirm } = useConfirm();
     const params = use(props.params);
     const router = useRouter();
     const articleId = params.id;
@@ -85,30 +88,39 @@ export default function EditBlogArticlePage(props: PageProps) {
                 }),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || "Failed to update article");
+            const failed = await writeError(res, t("adm_updateArticleFailed"), t);
+            if (failed) {
+                throw new Error(failed);
             }
 
             router.push("/admin/blog/articles");
             router.refresh();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError(err instanceof Error ? err.message : commonT("somethingWentWrong"));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this article?")) return;
+        const ok = await confirm({
+            title: t("adm_deleteArticle"),
+            message: t("adm_deleteArticleConfirm"),
+            variant: "danger",
+            confirmText: commonT("delete"),
+        });
+        if (!ok) return;
         setDeleting(true);
         try {
             const res = await fetch(`/api/v1/blog/articles/${articleId}`, { method: "DELETE" });
-            if (res.ok) {
-                router.push("/admin/blog/articles");
-            }
+            // The answer used to be dropped: a refused delete left the page
+            // where it was with nothing said, which reads as "nothing
+            // happened" rather than "that did not work".
+            const failed = await writeError(res, t("adm_deleteFailed"), t);
+            if (failed) { setError(failed); return; }
+            router.push("/admin/blog/articles");
         } catch {
-            setError("Failed to delete article");
+            setError(t("adm_deleteFailed"));
         } finally {
             setDeleting(false);
         }

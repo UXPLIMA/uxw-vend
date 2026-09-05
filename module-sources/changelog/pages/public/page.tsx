@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { useLocalDate } from "@/core/hooks/useLocalDate";
+import { useLocalDate } from "@/core/sdk/ui";
 import { Loader2 } from "lucide-react";
 
 interface Entry {
