@@ -1,28 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
-import { AdminPageHeader } from "@/core/sdk/admin";
+import { AdminPageHeader, useSettingsLoad } from "@/core/sdk/admin";
 
 export default function DiscordWidgetAdminPage() {
     const t = useTranslations("discordWidget");
     const [serverId, setServerId] = useState("");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then(r => r.json())
-            .then(d => {
-                const value = d?.settings?.widget_discord_server_id;
-                setServerId(typeof value === "string" ? value : "");
-            })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+    // The old read swallowed every failure and left the field empty, and the
+    // save button below it then wrote that empty string over the configured
+    // server id.
+    const { loading, failed, retry } = useSettingsLoad((settings) => {
+        const value = settings.widget_discord_server_id;
+        setServerId(typeof value === "string" ? value : "");
+    });
 
     const save = async () => {
         setSaving(true);
@@ -57,6 +53,8 @@ export default function DiscordWidgetAdminPage() {
                         <div className="flex justify-center py-6">
                             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                         </div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={retry} />
                     ) : (
                         <>
                             <div>

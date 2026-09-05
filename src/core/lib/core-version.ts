@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.20.0 - `useSettingsLoad` and `readJson` join `@/core/sdk/admin`. A module
+ * settings screen that read `/api/v1/settings` with a bare `.then((r) =>
+ * r.json())` could not tell a 500 from an empty answer, so it rendered its
+ * defaults and its save button wrote them back over the site's real
+ * settings. Core had the same hole in six screens; the fix has to be
+ * reachable from a module or the gate that enforces it is a rule a module
+ * cannot follow. Additions.
+ *
  * 1.19.0 - `Radio` and `RadioField` join `@/core/sdk/ui`. The one-of-several
  * to `Checkbox`'s any-of-several, and bare for the same reason the
  * checkboxes were. Additions.
@@ -126,4 +134,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.19.0";
+export const CORE_API_VERSION = "1.20.0";

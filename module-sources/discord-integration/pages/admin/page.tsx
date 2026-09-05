@@ -3,11 +3,11 @@
 
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, Label } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, LoadFailed } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Check, Send } from "lucide-react";
-import { AdminPageHeader } from "@/core/sdk/admin";
+import { AdminPageHeader, useSettingsLoad } from "@/core/sdk/admin";
 
 const webhookEvents = [
     { key: "discord_webhook_general", labelKey: "adm_evt_general", descKey: "adm_evt_general_desc" },
@@ -21,7 +21,6 @@ const webhookEvents = [
 export default function DiscordSettingsPage() {
     const t = useTranslations("discordIntegration");
     const commonT = useTranslations("common");
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [testing, setTesting] = useState<string | null>(null);
@@ -29,20 +28,15 @@ export default function DiscordSettingsPage() {
 
     const [webhooks, setWebhooks] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        fetch("/api/v1/settings")
-            .then((r) => r.json())
-            .then((data) => {
-                const s = data.settings || {};
-                const wh: Record<string, string> = {};
-                for (const event of webhookEvents) {
-                    wh[event.key] = (s[event.key] as string) || "";
-                }
-                setWebhooks(wh);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    }, []);
+    // Every webhook falls back to the empty string, so a failed read showed
+    // a form of empty fields and saving it deleted every configured webhook.
+    const { loading, failed, retry } = useSettingsLoad((s) => {
+        const wh: Record<string, string> = {};
+        for (const event of webhookEvents) {
+            wh[event.key] = (s[event.key] as string) || "";
+        }
+        setWebhooks(wh);
+    });
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -108,6 +102,20 @@ export default function DiscordSettingsPage() {
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
+        );
+    }
+
+    if (failed) {
+        return (
+            <>
+                <AdminPageHeader
+                    title={t("adm_discordWebhooks")}
+                    description={t("adm_webhooksSubtitle")}
+                    backHref="/admin/settings/general"
+                    backLabel={commonT("back")}
+                />
+                <Card><CardContent><LoadFailed onRetry={retry} /></CardContent></Card>
+            </>
         );
     }
 

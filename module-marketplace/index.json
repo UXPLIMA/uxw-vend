@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T22:31:01Z",
+  "updatedAt": "2026-09-05T22:49:41Z",
   "modules": [
     {
       "id": "announcements",
@@ -615,13 +615,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.0.10",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.11",
+      "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:50:26Z",
+      "updatedAt": "2026-09-05T22:49:41Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -657,13 +657,13 @@
           "description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
         }
       },
-      "version": "1.0.7",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.8",
+      "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T22:05:22Z",
+      "updatedAt": "2026-09-05T22:49:41Z",
       "screenshots": [],
       "tags": [
         "integration"

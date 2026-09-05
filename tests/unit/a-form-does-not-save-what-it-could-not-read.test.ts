@@ -28,7 +28,20 @@ const ROOT = path.resolve(__dirname, "../..");
 const SEARCH = [
     "src/app/[locale]/(admin)",
     "src/core/components/admin",
+    // A module's settings screen writes to the same endpoint and had the same
+    // hole, so the rule is the same one. `useSettingsLoad` is on the SDK for
+    // exactly this reason: a rule a module cannot follow is not a rule.
+    ...moduleAdminRoots(),
 ];
+
+function moduleAdminRoots(): string[] {
+    const sources = path.join(ROOT, "module-sources");
+    if (!fs.existsSync(sources)) return [];
+    return fs.readdirSync(sources, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .map((e) => path.join("module-sources", e.name, "pages/admin"))
+        .filter((p) => fs.existsSync(path.join(ROOT, p)));
+}
 
 function sources(dir: string, into: string[] = []): string[] {
     let entries: fs.Dirent[];
@@ -59,7 +72,7 @@ describe("a settings screen", () => {
     const files = SEARCH.flatMap((d) => sources(path.join(ROOT, d)));
 
     it("finds the screens", () => {
-        expect(files.length).toBeGreaterThan(50);
+        expect(files.length).toBeGreaterThan(100);
         expect(files.filter((f) => writesSettings(fs.readFileSync(f, "utf8"))).length).toBeGreaterThan(3);
     });
 
@@ -93,6 +106,11 @@ describe("a settings screen", () => {
 });
 
 describe("the hook", () => {
+    it("is reachable by a module", () => {
+        const sdk = fs.readFileSync(path.join(ROOT, "src/core/sdk/admin.ts"), "utf8");
+        expect(sdk).toContain("useSettingsLoad");
+    });
+
     const source = fs.readFileSync(path.join(ROOT, "src/core/hooks/useSettingsLoad.ts"), "utf8");
 
     it("goes through readJson rather than json()", () => {

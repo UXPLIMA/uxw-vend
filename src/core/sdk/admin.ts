@@ -25,3 +25,9 @@ export type { SettingsField } from "@/core/components/admin/SettingsForm";
 // URL to register - not a form that would appear to work and change nothing.
 export { AuthProviderSetup } from "@/core/components/admin/AuthProviderSetup";
 export type { AuthProviderSetupProps } from "@/core/components/admin/AuthProviderSetup";
+
+// Reading the site settings, and knowing whether the read worked. A settings
+// screen that cannot tell a 500 from an empty answer renders its defaults and
+// then writes them back over the settings it never read; see the hook.
+export { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
+export { readJson, ReadFailed } from "@/core/lib/read-json";
