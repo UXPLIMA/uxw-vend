@@ -8,6 +8,7 @@ import {
     sessionExpired,
     sessionExpiresAt,
 } from "./session-lifetime";
+import { shouldRecheckSession } from "./session-recheck";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { coreAuthAdapter } from "./auth-adapter";
 import bcrypt from "bcryptjs";
@@ -76,8 +77,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // a session the user did not ask to keep is cut short by the
         // absolute deadline the jwt callback enforces. See session-lifetime.ts.
         maxAge: REMEMBERED_MAX_AGE_SECONDS,
-        // Force a token refresh every hour so role/ban/permission changes
-        // propagate within an hour even on dormant sessions.
+        // Auth.js consults updateAge in the database-session branch only, so
+        // under the jwt strategy it throttles nothing. Role, ban and
+        // revocation freshness is the jwt callback's job; session-recheck.ts
+        // holds the interval that is actually enforced.
         updateAge: 60 * 60,
     },
     pages: {
@@ -337,6 +340,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.absoluteExpiry = sessionExpiresAt(
                     (user as { remember?: boolean }).remember === true,
                 );
+                // authorize() just read this user out of the database, so the
+                // first request after signing in has nothing to re-check.
+                token.checkedAt = Date.now();
             }
 
             // Enforced on every request, not only on refresh: the cookie now
@@ -370,6 +376,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = target.id;
                 token.role = target.role?.name || "member";
                 token.rolePriority = target.role?.priority ?? 0;
+                // The token now speaks for somebody else, so the stamp from
+                // the admin's own check does not vouch for it.
+                token.checkedAt = undefined;
                 return token;
             }
 
@@ -393,36 +402,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.role = admin.role?.name || "member";
                 token.rolePriority = admin.role?.priority ?? 0;
                 token.originalUserId = undefined;
+                token.checkedAt = undefined;
                 return token;
             }
 
-            // Refresh role + ban status from DB on every token refresh.
+            // Refresh role, ban and revocation state from the database, at
+            // most once per SESSION_RECHECK_INTERVAL_SECONDS. This used to
+            // run only when the client called update(), so a ban, a deletion,
+            // a demotion and a revoked device all waited for the next
+            // sign-in. See session-recheck.ts.
             //
             // When impersonating, we check the impersonated user (token.id) -
             // if they become banned/deleted the impersonation session ends
             // immediately, not at the next manual update(). When not
             // impersonating, this also refreshes the admin's own role so a
             // demotion takes effect on the next request.
-            if (trigger === "update" || !token.role || token.rolePriority === undefined) {
+            if (shouldRecheckSession(token, trigger)) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    include: { role: true },
+                    select: {
+                        isBanned: true,
+                        isDeleted: true,
+                        role: { select: { name: true, priority: true } },
+                    },
                 });
-                if (dbUser) {
-                    if (dbUser.isBanned || dbUser.isDeleted) {
+                // A token whose user row is gone is a token for nobody.
+                if (!dbUser) {
+                    return null as unknown as typeof token;
+                }
+                if (dbUser.isBanned || dbUser.isDeleted) {
+                    return null as unknown as typeof token;
+                }
+                if (token.tokenId) {
+                    const sess = await prisma.userSession.findUnique({
+                        where: { tokenId: token.tokenId as string },
+                        select: { isRevoked: true },
+                    });
+                    if (sess?.isRevoked) {
                         return null as unknown as typeof token;
                     }
-                    if (token.tokenId) {
-                        const sess = await prisma.userSession.findUnique({
-                            where: { tokenId: token.tokenId as string },
-                        });
-                        if (sess?.isRevoked) {
-                            return null as unknown as typeof token;
-                        }
-                    }
-                    token.role = dbUser.role?.name || "member";
-                    token.rolePriority = dbUser.role?.priority ?? 0;
                 }
+                token.role = dbUser.role?.name || "member";
+                token.rolePriority = dbUser.role?.priority ?? 0;
+                token.checkedAt = Date.now();
 
                 // Double-check the original admin identity during impersonation
                 // - if the admin has been banned / demoted since starting the
@@ -488,5 +510,7 @@ declare module "@auth/core/jwt" {
         absoluteExpiry?: number;
         /** Set while impersonating - holds the real admin's user id. */
         originalUserId?: string;
+        /** Epoch ms of the last database check. See session-recheck.ts. */
+        checkedAt?: number;
     }
 }
