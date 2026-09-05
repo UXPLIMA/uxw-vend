@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { writeError } from "@/core/lib/write-result";
 
 interface Broadcast {
     id: string;
@@ -101,7 +102,9 @@ export default function BroadcastsPage() {
             variant: "danger",
         });
         if (!ok) return;
-        await fetch(`/api/v1/broadcasts/${b.id}`, { method: "DELETE" });
+        const res = await fetch(`/api/v1/broadcasts/${b.id}`, { method: "DELETE" });
+        const failed = await writeError(res, t("common_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchBroadcasts();
     };
 
@@ -113,7 +116,9 @@ export default function BroadcastsPage() {
             confirmText: t("broadcasts_sendButton"),
         });
         if (!ok) return;
-        await fetch(`/api/v1/broadcasts/${b.id}`, { method: "POST" });
+        const res = await fetch(`/api/v1/broadcasts/${b.id}`, { method: "POST" });
+        const failed = await writeError(res, t("broadcasts_sendFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchBroadcasts();
     };
 

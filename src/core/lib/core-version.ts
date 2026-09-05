@@ -12,6 +12,11 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.7.0 - `writeError` and the `Translator` type join `@/core/sdk`. A handler
+ * that sends a POST and then shows a green toast without reading the response
+ * reports success for a 403, a 429 and a 500 alike; the helper is the check,
+ * in one line, in the reader's language.
+ *
  * 1.6.0 - `useModalDialog` and `ModalDialogOptions` join `@/core/sdk/ui`. A
  * module that draws its own `role="dialog"` gets Escape, a Tab trap and focus
  * returned to whatever opened it, instead of hand-rolling a keydown listener
@@ -45,4 +50,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.6.0";
+export const CORE_API_VERSION = "1.7.0";

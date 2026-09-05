@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { writeError } from "@/core/lib/write-result";
 
 interface ApiKeyItem {
     id: string;
@@ -68,7 +69,9 @@ export default function ApiKeysPage() {
     const deleteKey = async (id: string) => {
         const ok = await confirm({ title: t("apiKeys_deleteTitle"), message: t("apiKeys_deleteMessage"), variant: "danger", confirmText: t("common_delete") });
         if (!ok) return;
-        await fetch(`/api/v1/api-keys/${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/v1/api-keys/${id}`, { method: "DELETE" });
+        const failed = await writeError(res, t("common_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchKeys();
     };
 

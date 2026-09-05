@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T08:11:01Z",
+  "updatedAt": "2026-09-05T08:38:38Z",
   "modules": [
     {
       "id": "announcements",
@@ -421,13 +421,13 @@
       "id": "custom-forms",
       "name": "Custom Forms",
       "description": "Dynamic form builder with submissions",
-      "version": "1.0.20",
+      "version": "1.0.21",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -513,13 +513,13 @@
       "id": "discord-integration",
       "name": "Discord Integration",
       "description": "Discord webhook notifications and settings",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -727,13 +727,13 @@
       "id": "forum",
       "name": "Forum Module",
       "description": "Community discussion forum with categories, topics, and replies",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -850,13 +850,13 @@
       "id": "help-center",
       "name": "Help Center",
       "description": "Knowledge base with categories and searchable articles",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -881,13 +881,13 @@
       "id": "in-app-notifications",
       "name": "In-App Notifications",
       "description": "In-app notification system with bell icon",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T05:41:03Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1260,13 +1260,13 @@
       "id": "minecraft-link",
       "name": "Minecraft Link",
       "description": "Let players prove they own an in-game Minecraft account by reading a code whispered to them on the server",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2039,13 +2039,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.5",
+      "version": "2.2.6",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2159,13 +2159,13 @@
       "id": "tickets",
       "name": "Support Tickets",
       "description": "Customer support ticket system with departments and priority levels",
-      "version": "1.0.24",
+      "version": "1.0.25",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T08:38:38Z",
       "screenshots": [],
       "tags": [
         "management"

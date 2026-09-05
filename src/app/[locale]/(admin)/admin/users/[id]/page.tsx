@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { writeError } from "@/core/lib/write-result";
 
 interface UserDetail {
     id: string;
@@ -399,11 +400,13 @@ export default function AdminUserDetailPage() {
                                         variant="outline"
                                         size="sm"
                                         onClick={async () => {
-                                            await fetch(`/api/v1/users/${userId}`, {
+                                            const res = await fetch(`/api/v1/users/${userId}`, {
                                                 method: "PATCH",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ isBanned: false }),
                                             });
+                                            const failed = await writeError(res, t("common_writeFailed"), t);
+                                            if (failed) { toast.error(failed); return; }
                                             window.location.reload();
                                         }}
                                     >
@@ -417,11 +420,13 @@ export default function AdminUserDetailPage() {
                                     onClick={async () => {
                                         const reason = prompt("Ban reason (optional):");
                                         if (reason === null) return;
-                                        await fetch(`/api/v1/users/${userId}`, {
+                                        const res = await fetch(`/api/v1/users/${userId}`, {
                                             method: "PATCH",
                                             headers: { "Content-Type": "application/json" },
                                             body: JSON.stringify({ isBanned: true, banReason: reason || undefined }),
                                         });
+                                        const failed = await writeError(res, t("common_writeFailed"), t);
+                                        if (failed) { toast.error(failed); return; }
                                         window.location.reload();
                                     }}
                                 >

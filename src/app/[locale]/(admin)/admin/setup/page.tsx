@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { defaultThemeId } from "@/core/generated/theme-registry";
+import { writeError } from "@/core/lib/write-result";
 
 const steps = ["Welcome", "Site Info", "Modules", "Theme", "Done"];
 
@@ -69,6 +70,7 @@ const MAX_RECOMMENDED = 6;
 
 export default function SetupWizardPage() {
     const t = useTranslations("admin");
+    const commonT = useTranslations("common");
     const router = useRouter();
     const [step, setStep] = useState(0);
     const [saving, setSaving] = useState(false);
@@ -175,11 +177,17 @@ export default function SetupWizardPage() {
                 const formData = new FormData();
                 formData.append("file", logoFile);
                 formData.append("type", "logo");
-                await fetch("/api/v1/upload", { method: "POST", body: formData }).catch(() => {});
+                const upload = await fetch("/api/v1/upload", { method: "POST", body: formData }).catch(() => null);
+                // The rest of the wizard is worth finishing without a logo, so
+                // this warns rather than stops. It used to say nothing at all,
+                // and the admin found out by looking at the navbar.
+                if (!upload || (await writeError(upload, commonT("uploadFailed"), commonT))) {
+                    toast.error(commonT("uploadFailed"));
+                }
             }
 
             // Save settings
-            await fetch("/api/v1/settings", {
+            const res = await fetch("/api/v1/settings", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -188,6 +196,11 @@ export default function SetupWizardPage() {
                     setup_completed: "true",
                 }),
             });
+            // `setup_completed` is written by this call and nothing else. A
+            // wizard that congratulates the admin on a PATCH the server
+            // refused leaves the site in setup with no sign that it is.
+            const failed = await writeError(res, t("setup_saveFailed"), t);
+            if (failed) { toast.error(failed); return; }
             toast.success(t("setup_complete"));
             setStep(4);
         } catch {

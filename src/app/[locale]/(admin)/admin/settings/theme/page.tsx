@@ -11,6 +11,7 @@ import { useTranslations } from "next-intl";
 import { themeRegistry } from "@/core/generated/theme-registry";
 import { useTheme } from "@/core/providers/theme-provider";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
+import { writeError } from "@/core/lib/write-result";
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
@@ -81,11 +82,15 @@ export default function ThemeSettingsPage() {
     };
 
     const handleThemeSwitch = async (themeId: string) => {
-        await fetch("/api/v1/themes/state", {
+        const res = await fetch("/api/v1/themes/state", {
             method: "PUT",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ themeId, mode: currentMode }),
         });
+        const failed = await writeError(res, t("common_writeFailed"), t);
+        // Reloading on a failed switch would repaint the page in the theme it
+        // already had and look like the click did nothing.
+        if (failed) { toast.error(failed); return; }
         location.reload();
     };
 
@@ -234,13 +239,15 @@ export default function ThemeSettingsPage() {
                         <Button
                             key={m}
                             variant={m === currentMode ? "default" : "outline"}
-                            onClick={() => {
+                            onClick={async () => {
                                 setMode(m);
-                                fetch("/api/v1/themes/state", {
+                                const res = await fetch("/api/v1/themes/state", {
                                     method: "PUT",
                                     headers: { "content-type": "application/json" },
                                     body: JSON.stringify({ themeId: activeTheme?.id, mode: m }),
                                 });
+                                const failed = await writeError(res, t("common_writeFailed"), t);
+                                if (failed) toast.error(failed);
                             }}
                         >
                             {m}

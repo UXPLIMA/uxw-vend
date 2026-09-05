@@ -10,6 +10,8 @@ import { useCurrency } from "../../../lib/currency-context";
 import * as LucideIcons from "lucide-react";
 import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 interface CartItem {
     id: string;
@@ -117,11 +119,13 @@ export default function CartPage() {
 
     const updateQuantity = async (productId: string, quantity: number) => {
         try {
-            await fetch("/api/v1/store/cart", {
+            const res = await fetch("/api/v1/store/cart", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ productId, quantity }),
             });
+            const failed = await writeError(res, t("cartUpdateFailed"), t);
+            if (failed) { toast.error(failed); return; }
             fetchCart();
         } catch (error) {
             console.error("Failed to update cart:", error);
@@ -134,7 +138,9 @@ export default function CartPage() {
 
     const clearCart = async () => {
         try {
-            await fetch("/api/v1/store/cart", { method: "DELETE" });
+            const res = await fetch("/api/v1/store/cart", { method: "DELETE" });
+            const failed = await writeError(res, t("cartUpdateFailed"), t);
+            if (failed) { toast.error(failed); return; }
             fetchCart();
         } catch (error) {
             console.error("Failed to clear cart:", error);

@@ -7,6 +7,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { writeError } from "@/core/lib/write-result";
 
 export default function CssSettingsPage() {
     const t = useTranslations("admin");
@@ -26,13 +27,15 @@ export default function CssSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        await fetch("/api/v1/settings", {
+        const res = await fetch("/api/v1/settings", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ custom_css: css }),
         });
-        toast.success(t("css_saved"));
+        const failed = await writeError(res, t("common_writeFailed"), t);
         setSaving(false);
+        if (failed) { toast.error(failed); return; }
+        toast.success(t("css_saved"));
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

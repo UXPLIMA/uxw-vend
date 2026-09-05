@@ -11,6 +11,7 @@ import { useAllModules } from "@/core/providers/module-provider";
 import { useTranslations } from "next-intl";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { isWidgetVisible } from "@/core/lib/homepage-widgets";
+import { writeError } from "@/core/lib/write-result";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
@@ -116,13 +117,15 @@ export default function WidgetSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        await fetch("/api/v1/settings", {
+        const res = await fetch("/api/v1/settings", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ widget_visibility: widgetConfig, widget_order: widgetOrder }),
         });
-        toast.success(t("widgets_saved"));
+        const failed = await writeError(res, t("common_writeFailed"), t);
         setSaving(false);
+        if (failed) { toast.error(failed); return; }
+        toast.success(t("widgets_saved"));
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

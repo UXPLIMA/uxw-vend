@@ -8,6 +8,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConf
 import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
+import { writeError } from "@/core/sdk";
 
 interface Coupon {
     id: string;
@@ -130,11 +131,13 @@ export default function AdminCouponsPage() {
 
     const toggleActive = async (coupon: Coupon) => {
         try {
-            await fetch(`/api/v1/store/coupons/${coupon.id}`, {
+            const res = await fetch(`/api/v1/store/coupons/${coupon.id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ isActive: !coupon.isActive }),
             });
+            const failed = await writeError(res, t("adm_writeFailed"), t);
+            if (failed) { toast.error(failed); return; }
             fetchCoupons();
         } catch (err) {
             console.error(err);

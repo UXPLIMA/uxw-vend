@@ -8,6 +8,7 @@ import { Input } from "@/core/components/ui/input";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { ModulePermissionResources } from "@/core/generated/module-registry";
+import { writeError } from "@/core/lib/write-result";
 
 interface Role {
     id: string;
@@ -63,46 +64,29 @@ export default function PermissionsMatrixPage() {
 
     const toggleGrant = async (resource: string, action: string, roleId: string) => {
         const existing = findGrant(resource, action, roleId);
-        try {
-            if (!existing) {
-                // Create allow grant
-                await fetch("/api/v1/admin/resource-permissions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        resource,
-                        action,
-                        principalType: "role",
-                        principalId: roleId,
-                        allow: true,
-                    }),
-                });
-            } else if (existing.allow) {
-                // Toggle to deny
-                await fetch("/api/v1/admin/resource-permissions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        resource,
-                        action,
-                        principalType: "role",
-                        principalId: roleId,
-                        allow: false,
-                    }),
-                });
-            } else {
-                // Remove
-                await fetch("/api/v1/admin/resource-permissions", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        resource,
-                        action,
-                        principalType: "role",
-                        principalId: roleId,
-                    }),
-                });
+        // allow -> deny -> no grant at all, which is the third state the grid
+        // draws and the only one that is a DELETE rather than a POST.
+        const request: RequestInit = !existing || existing.allow
+            ? {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    resource,
+                    action,
+                    principalType: "role",
+                    principalId: roleId,
+                    allow: !existing,
+                }),
             }
+            : {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ resource, action, principalType: "role", principalId: roleId }),
+            };
+        try {
+            const res = await fetch("/api/v1/admin/resource-permissions", request);
+            const failed = await writeError(res, t("permissions_updateFailed"), t);
+            if (failed) { toast.error(failed); return; }
             fetchData();
         } catch {
             toast.error(t("permissions_updateFailed"));

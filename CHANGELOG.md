@@ -7,7 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `writeError` joins `@/core/sdk` (CORE_API_VERSION 1.7.0). One line to turn a
+  write's response into either nothing or the message to show, in the reader's
+  language: `const failed = await writeError(res, t("saveFailed"), t);`. Like
+  `authErrorMessage`, it returns the caller's wording rather than the server's
+  English, and translates `err.<code>` when the response carries a code the
+  caller's catalogue knows, so a rate-limited save says so.
+
 ### Fixed
+- **A screen reported a write it never checked.** `fetch` rejects only when the
+  request never reached a server, so a 400, a 403 on an expired session, a 429
+  and a 500 all resolve normally:
+
+      await fetch("/api/v1/settings", { method: "PATCH", body: ... });
+      toast.success(t("css_saved"));
+
+  32 mutating calls across 24 client screens were shaped like that. The worst
+  was the setup wizard: `setup_completed` is written by that one PATCH and
+  nothing else, so a refused call left the site in setup while the wizard
+  congratulated the admin and moved to the done step. Ban and unban reloaded
+  the page and left the admin to notice the row had not changed. Custom CSS,
+  the widget layout, the theme reset and the theme switch each said "saved".
+  The bulk delete in `AdminCrudPage`, which every module CRUD screen is built
+  on, fired one request per row, discarded all of them and said "Deleted"; it
+  now counts and says how many actually went.
+
+  The rest, each now reporting what happened: the API key and broadcast
+  deletes, queueing a broadcast, the permission grid's allow/deny/clear
+  toggle, the setup wizard's logo upload, forum pin and lock, the store's
+  coupon toggle and both cart writes, ticket status changes, the help centre's
+  article vote (it thanked the reader for a vote the server had dropped), the
+  Minecraft unlink, and the notification bell, which cleared the unread badge
+  whether or not the mark-read went through.
+
+  Three calls stay fire-and-forget on purpose, with the reason recorded in the
+  test: the error boundary reporting the error that just broke the page, the
+  setup wizard's theme pick (written again by the final step), and the trophy
+  engine reload.
+
+  The Discord webhook test button posted and reported nothing at all, in any
+  case. It now says whether Discord accepted the message, and says separately
+  when the browser blocked the cross-origin call, which tells the admin
+  nothing about the webhook itself.
+
+  `tests/unit/a-write-reports-what-happened.test.ts` fails on a new mutating
+  fetch in a client component whose response nothing looks at, and counts the
+  exempt calls per file so a second one cannot ride in on the first one's
+  reason.
+
 - **A slow answer overwrote a fresh one on 37 screens.** The pattern is
   everywhere: an effect fetches on a changing dependency and writes the answer
   straight into state, with nothing recording which request it belongs to.

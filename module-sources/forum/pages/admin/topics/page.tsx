@@ -7,6 +7,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, useConfirm } from "@/
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { useRelativeTime } from "@/core/hooks/useRelativeTime";
+import { writeError } from "@/core/sdk";
 
 interface Topic {
     id: string;
@@ -54,20 +55,24 @@ export default function AdminForumTopicsPage() {
     }, [page]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     const togglePin = async (topicId: string, isPinned: boolean) => {
-        await fetch(`/api/v1/forum/topics/${topicId}`, {
+        const res = await fetch(`/api/v1/forum/topics/${topicId}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ isPinned: !isPinned }),
         });
+        const failed = await writeError(res, t("adm_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchTopics();
     };
 
     const toggleLock = async (topicId: string, isLocked: boolean) => {
-        await fetch(`/api/v1/forum/topics/${topicId}`, {
+        const res = await fetch(`/api/v1/forum/topics/${topicId}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ isLocked: !isLocked }),
         });
+        const failed = await writeError(res, t("adm_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchTopics();
     };
 

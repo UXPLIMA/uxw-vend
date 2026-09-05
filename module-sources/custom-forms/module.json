@@ -2,7 +2,7 @@
   "id": "custom-forms",
   "name": "Custom Forms",
   "description": "Dynamic form builder with submissions",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -158,7 +158,8 @@
         "updateError": "Failed to update form",
         "updated": "Form updated successfully",
         "viewSubmissions": "View Submissions",
-        "adm_filterByForm": "Filter by form"
+        "adm_filterByForm": "Filter by form",
+        "adm_writeFailed": "That did not go through. Please try again."
       },
       "admin": {
         "menu_custom-forms": "Custom Forms",
@@ -270,7 +271,8 @@
         "updateError": "Form güncellenemedi",
         "updated": "Form başarıyla güncellendi",
         "viewSubmissions": "Gönderimleri Gör",
-        "adm_filterByForm": "Forma göre filtrele"
+        "adm_filterByForm": "Forma göre filtrele",
+        "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin."
       },
       "admin": {
         "menu_custom-forms": "Formlar",
