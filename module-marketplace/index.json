@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T14:26:50Z",
+  "updatedAt": "2026-09-05T14:59:09Z",
   "modules": [
     {
       "id": "announcements",
@@ -611,13 +611,13 @@
       "id": "email-templates",
       "name": "Email Templates",
       "description": "Email service configuration and templates",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T11:49:24Z",
+      "updatedAt": "2026-09-05T14:59:09Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1125,14 +1125,14 @@
     {
       "id": "login-protection",
       "name": "Login Protection",
-      "description": "CAPTCHA, login throttling, and account security",
-      "version": "1.0.1",
+      "description": "Login throttling: how many failed attempts lock an account",
+      "version": "1.0.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T14:59:09Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2039,13 +2039,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.14",
+      "version": "2.2.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T14:10:25Z",
+      "updatedAt": "2026-09-05T14:59:09Z",
       "screenshots": [],
       "tags": [
         "commerce"

@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { resolveAppName } from "./app-url";
+import { getEmailConfig } from "./email-config";
 import { log } from "./logger";
 
 /**
@@ -18,11 +19,12 @@ import { log } from "./logger";
  *      Internally this still logs an EmailJob row for audit purposes
  *      so every outbound message is recorded in one place.
  *
- * When no provider is configured (no RESEND_API_KEY) all functions
- * degrade gracefully to console.log - tests and dev don't need SMTP.
+ * When no provider is configured all functions degrade gracefully to
+ * console.log - tests and dev don't need SMTP. The transport, the return
+ * address and the sender name come from `email-config`, which reads the
+ * admin's rows before the environment.
  */
 
-const FROM_EMAIL = process.env.EMAIL_FROM || "noreply@uxwvend.com";
 // Runtime-resolved: NEXT_PUBLIC_* is inlined at build time and cannot
 // differ per installation in the prebuilt image. See app-url.ts.
 const APP_NAME = resolveAppName();
@@ -143,18 +145,22 @@ function validateEmailAddress(addr: string): boolean {
 // ---------------------------------------------------------------------------
 
 let _resend: unknown = null;
+/** The key `_resend` was built from, so an admin's edit rebuilds the client. */
+let _resendKey: string | null = null;
 
 async function getResend(): Promise<{ emails: { send: (opts: Record<string, unknown>) => Promise<unknown> } } | null> {
-    if (!process.env.RESEND_API_KEY) return null;
-    if (!_resend) {
+    const { apiKey } = await getEmailConfig();
+    if (!apiKey) return null;
+    if (!_resend || _resendKey !== apiKey) {
         const { Resend } = await import("resend");
-        _resend = new Resend(process.env.RESEND_API_KEY);
+        _resend = new Resend(apiKey);
+        _resendKey = apiKey;
     }
     return _resend as { emails: { send: (opts: Record<string, unknown>) => Promise<unknown> } };
 }
 
-function getEmailEnabled(): boolean {
-    return !!process.env.RESEND_API_KEY;
+async function getEmailEnabled(): Promise<boolean> {
+    return !!(await getEmailConfig()).apiKey;
 }
 
 /**
@@ -195,15 +201,16 @@ async function deliverViaProvider(opts: {
         return { ok: false, error: "Empty subject after sanitization" };
     }
 
-    if (!getEmailEnabled()) {
+    if (!(await getEmailEnabled())) {
         log.warn("email suppressed: no transport configured", { to: opts.to, subject: safeSubject });
         return { ok: true }; // Treat as delivered (dev/test mode)
     }
     const resend = await getResend();
     if (!resend) return { ok: false, error: "Resend client unavailable" };
     try {
+        const { fromEmail, fromName } = await getEmailConfig();
         await resend.emails.send({
-            from: `${stripHeaderInjection(APP_NAME)} <${stripHeaderInjection(FROM_EMAIL)}>`,
+            from: `${stripHeaderInjection(fromName ?? APP_NAME)} <${stripHeaderInjection(fromEmail)}>`,
             to: opts.to,
             subject: safeSubject,
             html,
@@ -406,7 +413,7 @@ export async function sendEmail(opts: {
 // ---------------------------------------------------------------------------
 
 export async function sendPasswordResetEmail(email: string, resetUrl: string, locale?: string) {
-    if (!getEmailEnabled()) {
+    if (!(await getEmailEnabled())) {
         // The URL is logged only outside production. A developer with no SMTP
         // needs it to finish the flow; in production it is a single-use
         // account-takeover token sitting in the log aggregator.
@@ -438,7 +445,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string, lo
 }
 
 export async function sendWelcomeEmail(email: string, username: string, locale?: string) {
-    if (!getEmailEnabled()) {
+    if (!(await getEmailEnabled())) {
         log.warn("email suppressed: no transport configured", { kind: "welcome", to: email, username });
         return;
     }
@@ -461,7 +468,7 @@ export async function sendWelcomeEmail(email: string, username: string, locale?:
 }
 
 export async function sendVerificationEmail(email: string, verifyUrl: string, locale?: string) {
-    if (!getEmailEnabled()) {
+    if (!(await getEmailEnabled())) {
         log.warn("email suppressed: no transport configured", {
             kind: "email-verification",
             to: email,

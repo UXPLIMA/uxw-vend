@@ -52,6 +52,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Nine admin settings fields saved a value nothing read.** A settings field
+  is a promise: type a value, press Save, something behaves differently.
+  `SettingsForm` keeps that promise only as far as the `Setting` row - it
+  writes whatever key the screen names and reports success, whether or not a
+  line of code ever reads the key back. Nine of the fifty-seven shipped
+  fields named a key nothing read.
+
+  `resend-provider` and `email-templates` both offered a Resend API key, a
+  from-address and a sender name while the mailer took all three from the
+  environment, so an operator pasted their key into the admin panel, saw
+  "Saved", and mail stayed off with the key now sitting in the database
+  earning nothing. `login-protection` offered a maximum-login-attempts field
+  while the lockout threshold came from `ACCOUNT_LOCKOUT_ATTEMPTS`, so an
+  operator who set 3 still got 10.
+
+  The four that name a real capability are wired up. `email-config.ts` reads
+  `resend_api_key`, `email_from` and `email_from_name` and falls back to the
+  environment, which is the order an operator expects: the image ships a
+  default, the running site overrides it. The Resend client is rebuilt when
+  the key changes and a settings write drops the cache, so a pasted key works
+  on the next send. `max_login_attempts` joins the clamped settings in
+  `security-settings.ts` with a floor of 3, because a control that locks an
+  account on the first typo is a denial of service aimed at any account whose
+  username is known.
+
+  The five that describe a capability that does not exist are gone from their
+  screens: `enable_email_verification`, and the four email subject and body
+  overrides. A single stored string cannot stand in for a message core
+  composes in the reader's own language, so wiring them would have shipped
+  English to every locale.
+
+  `login-protection` also carried a `verifyCaptcha` helper for Cloudflare
+  Turnstile that nothing called and that returned `true` when unconfigured;
+  it and the module's CAPTCHA claim are removed, and `cloudflare-turnstile`
+  remains the module that actually does this.
+
+- **The store kept a second mailer of its own.** Its order confirmation went
+  out through a private Resend client built straight from
+  `process.env.RESEND_API_KEY`, which skipped the `EmailJob` queue and its
+  retries, the `email.subject` / `email.body` filters, the header-injection
+  guard, and the admin's own settings. It also wrote the total as `$12.00`
+  whatever `default_currency` said, and wrote it in English to every buyer.
+  It now goes through `queueEmail`, formats with `formatSiteCurrency`, and
+  reads in the buyer's stored locale - the only thing that knows their
+  language, since a gateway webhook has no request locale to inherit.
+  `a-settings-field-changes-something` fails any module that builds a Resend
+  client of its own.
+
+
 - **Search and the sitemap read past the switch that hides a page.** A
   search result is a way into content, not a lesser view of it, and a sitemap
   is the most public read path there is - it hands a crawler the list of URLs

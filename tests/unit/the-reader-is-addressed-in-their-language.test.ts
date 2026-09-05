@@ -43,8 +43,6 @@ const DIRS = ["src/app", "src/core", "module-sources"];
 const STAYS_IN_ENGLISH: Record<string, string> = {
     "module-sources/discord-integration/pages/admin/page.tsx":
         "The body of the test webhook, which is posted to Discord rather than rendered on any page of this site.",
-    "module-sources/email-templates/pages/admin/page.tsx":
-        "An example subject line carrying the literal template variable {appName}. ICU would read those braces as its own placeholder, and escaping them hides the very syntax the example is there to show.",
 };
 
 /** Attributes and option fields whose value is read by a person. */
