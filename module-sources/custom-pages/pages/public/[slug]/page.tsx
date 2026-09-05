@@ -3,12 +3,12 @@
 import { useState, useEffect, use } from "react";
 import { useTranslations } from "next-intl";
 import DOMPurify from "dompurify";
-import { Render, type Data, type Config } from "@measured/puck";
+import { Render, type Data } from "@measured/puck";
 import "@measured/puck/puck.css";
 import { Card, CardContent } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { buildMergedBlockConfig } from "@/core/sdk/blocks";
+import { useMergedBlockConfig } from "@/core/sdk/blocks";
 import { Loader2 } from "lucide-react";
 
 interface PageProps {
@@ -64,7 +64,9 @@ export default function CustomPageView({ params }: PageProps) {
  * Puck data) or sanitized HTML (legacy/fallback).
  */
 function PageContent({ page }: { page: CustomPage }) {
-    const [blockConfig, setBlockConfig] = useState<Config | null>(null);
+    // A block whose module is off is not in this config, and Puck renders
+    // nothing for a component id it does not carry.
+    const blockConfig = useMergedBlockConfig("render");
 
     let puckData: Data | null = null;
     try {
@@ -75,13 +77,6 @@ function PageContent({ page }: { page: CustomPage }) {
     } catch {
         // Not JSON - fall through to HTML render
     }
-
-    useEffect(() => {
-        if (puckData) {
-            buildMergedBlockConfig().then(setBlockConfig).catch(() => {});
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page.content]);
 
     if (puckData) {
         if (!blockConfig) {

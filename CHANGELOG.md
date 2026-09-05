@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A disabled module's page blocks still rendered, and were still offered.**
+  Page blocks were the one module capability that ignored whether the module
+  was switched on. Slots, homepage widgets and sections, dashboard cards and
+  nav links all filter on `isEnabledIn`, and the proxy answers 404 for a
+  disabled module's pages and API routes - so a custom page carrying a block
+  from a module an admin had turned off still mounted the block, the fetch
+  inside it came back 404, and the visitor got a silent empty region. The page
+  builder went on listing the same block in its palette, so one could be added
+  to another page while the module was off.
+
+  `blocks-merger.ts` was on the enabled-flag gate's exemption list for this,
+  on the grounds that one Puck config serves both the editor and the public
+  renderer, so dropping a block would blank a page that already used it. It
+  takes a mode instead: `render` drops a disabled module's blocks, which is
+  what every other capability does, and `edit` keeps them loadable so a page
+  that already uses one still opens and saves intact, while leaving them out
+  of the palette. A category left with no members is dropped rather than
+  shown as an empty heading. The exemption is gone, so the gate covers it.
+
+  Modules reach this through `useMergedBlockConfig(mode)` from
+  `@/core/sdk/blocks`, which reads the enabled state from the module provider
+  itself. Passing the states was the thing a caller could forget, so there is
+  nothing left to pass. `custom-pages` 1.0.10 -> 1.0.11 uses it on both the
+  builder and the public page.
 - **The homepage widget customiser configured nothing.**
   Admin > Settings > Widgets writes two keys: `widget_visibility` and
   `widget_order`. The homepage honoured neither. `widget_order` was read by no
