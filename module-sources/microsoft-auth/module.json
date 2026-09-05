@@ -2,7 +2,7 @@
   "id": "microsoft-auth",
   "name": "Microsoft and Xbox Login",
   "description": "Allow users to sign in with their Microsoft or Xbox account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -43,7 +43,6 @@
       "microsoftAuth": {
         "adm_title": "Microsoft Login Settings",
         "adm_subtitle": "Set up Microsoft OAuth sign-in for your site.",
-        "signInWith": "Sign in with Microsoft",
         "adm_tenantNote": "A single-tenant application also needs AUTH_MICROSOFT_ENTRA_ID_ISSUER set to https://login.microsoftonline.com/<tenant-id>/v2.0. Left unset, sign-in runs against the shared /common/ endpoint, which accepts any Microsoft or Xbox account."
       },
       "admin": {
@@ -55,7 +54,6 @@
       "microsoftAuth": {
         "adm_title": "Microsoft ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Microsoft ile OAuth girişini yapılandırın.",
-        "signInWith": "Microsoft ile giriş yap",
         "adm_tenantNote": "Tek kiracılı (single-tenant) bir uygulama için ayrıca AUTH_MICROSOFT_ENTRA_ID_ISSUER değişkenini https://login.microsoftonline.com/<tenant-id>/v2.0 olarak ayarlayın. Boş bırakılırsa giriş, her Microsoft veya Xbox hesabını kabul eden ortak /common/ uç noktası üzerinden yapılır."
       },
       "admin": {

@@ -2,7 +2,7 @@
   "id": "tiktok-auth",
   "name": "TikTok Login",
   "description": "Allow users to sign in with their TikTok account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -42,8 +42,7 @@
     "en": {
       "tiktokAuth": {
         "adm_title": "TikTok Login Settings",
-        "adm_subtitle": "Set up TikTok OAuth sign-in for your site.",
-        "signInWith": "Sign in with TikTok"
+        "adm_subtitle": "Set up TikTok OAuth sign-in for your site."
       },
       "admin": {
         "module_tiktok-auth_name": "TikTok Login",
@@ -53,8 +52,7 @@
     "tr": {
       "tiktokAuth": {
         "adm_title": "TikTok ile Giriş Ayarları",
-        "adm_subtitle": "Siteniz için TikTok ile OAuth girişini yapılandırın.",
-        "signInWith": "TikTok ile giriş yap"
+        "adm_subtitle": "Siteniz için TikTok ile OAuth girişini yapılandırın."
       },
       "admin": {
         "module_tiktok-auth_name": "TikTok ile Giriş",

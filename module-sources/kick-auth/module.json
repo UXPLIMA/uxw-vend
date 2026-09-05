@@ -2,7 +2,7 @@
   "id": "kick-auth",
   "name": "Kick Login",
   "description": "Allow users to sign in with their Kick account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.4.0",
   "category": "integration",
   "author": "uxwVend",
@@ -47,7 +47,6 @@
       "kickAuth": {
         "adm_title": "Kick Login Settings",
         "adm_subtitle": "Set up Kick OAuth sign-in for your site.",
-        "signInWith": "Sign in with Kick",
         "adm_scopeNote": "The Kick application needs the user:read scope. Kick's OAuth requires PKCE, which this module turns on, so nothing extra has to be configured for it."
       },
       "admin": {
@@ -59,7 +58,6 @@
       "kickAuth": {
         "adm_title": "Kick ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Kick ile OAuth girişini yapılandırın.",
-        "signInWith": "Kick ile giriş yap",
         "adm_scopeNote": "Kick uygulamasında user:read izni gerekir. Kick'in OAuth akışı PKCE zorunlu kılar; bu modül onu kendisi açar, ayrıca bir ayar yapmanız gerekmez."
       },
       "admin": {

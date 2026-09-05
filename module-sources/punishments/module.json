@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -97,7 +97,6 @@
         "adm_error": "Operation failed",
         "title": "Punishments",
         "description": "View player punishments and ban history",
-        "searchPlayer": "Search by player name",
         "searchPlaceholder": "Enter player name...",
         "type": "Type",
         "ban": "Ban",
@@ -120,7 +119,6 @@
         "duration": "Duration",
         "noPunishments": "No punishments found",
         "details": "Punishment Details",
-        "evidence": "Evidence",
         "server": "Server"
       },
       "nav": {
@@ -164,7 +162,6 @@
         "adm_error": "İşlem başarısız",
         "title": "Cezalar",
         "description": "Oyuncu cezalarını ve yasaklama geçmişini görüntüle",
-        "searchPlayer": "Oyuncu adına göre ara",
         "searchPlaceholder": "Oyuncu adı girin...",
         "type": "Tür",
         "ban": "Yasaklama",
@@ -187,7 +184,6 @@
         "duration": "Süre",
         "noPunishments": "Ceza bulunamadı",
         "details": "Ceza Detayları",
-        "evidence": "Kanıt",
         "server": "Sunucu"
       },
       "nav": {

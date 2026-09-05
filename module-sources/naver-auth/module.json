@@ -2,7 +2,7 @@
   "id": "naver-auth",
   "name": "Naver Login",
   "description": "Allow users to sign in with their Naver account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -43,7 +43,6 @@
       "naverAuth": {
         "adm_title": "Naver Login Settings",
         "adm_subtitle": "Set up Naver OAuth sign-in for your site.",
-        "signInWith": "Sign in with Naver",
         "adm_reviewNote": "Naver reviews an application before it may serve users outside the developer's own account, so a new integration works for you immediately and for everyone else once it is approved."
       },
       "admin": {
@@ -55,7 +54,6 @@
       "naverAuth": {
         "adm_title": "Naver ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için Naver ile OAuth girişini yapılandırın.",
-        "signInWith": "Naver ile giriş yap",
         "adm_reviewNote": "Naver, bir uygulamanın geliştirici hesabı dışındaki kullanıcılara hizmet vermesini incelemeye tabi tutar; yeni bir entegrasyon sizde hemen, herkeste ise onaydan sonra çalışır."
       },
       "admin": {

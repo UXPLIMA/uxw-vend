@@ -2,7 +2,7 @@
   "id": "steam-auth",
   "name": "Steam Login",
   "description": "Allow users to sign in with their Steam account",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -72,7 +72,6 @@
     "en": {
       "steamAuth": {
         "title": "Steam Login",
-        "signInWith": "Sign in with Steam",
         "signingIn": "Signing you in with Steam...",
         "signInFailed": "Steam sign-in did not complete. The link may have expired.",
         "backToLogin": "Back to login",
@@ -95,7 +94,6 @@
     "tr": {
       "steamAuth": {
         "title": "Steam ile Giriş",
-        "signInWith": "Steam ile giriş yap",
         "signingIn": "Steam ile giriş yapılıyor...",
         "signInFailed": "Steam girişi tamamlanmadı. Bağlantının süresi dolmuş olabilir.",
         "backToLogin": "Girişe dön",

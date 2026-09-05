@@ -2,7 +2,7 @@
   "id": "discord-widget",
   "name": "Discord Widget",
   "description": "Discord server widget on homepage sidebar",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "coreVersion": "^1.20.0",
   "category": "integration",
   "author": "uxwVend",
@@ -61,14 +61,10 @@
         "adm_saved": "Discord widget settings saved",
         "adm_error": "Failed to save",
         "title": "Discord Server",
-        "membersOnline": "Members Online",
-        "totalMembers": "Total Members",
-        "joinServer": "Join Server",
         "online": "Online",
         "offline": "Offline",
         "loading": "Loading Discord widget...",
-        "error": "Failed to load Discord widget",
-        "noServer": "No Discord server configured"
+        "error": "Failed to load Discord widget"
       }
     },
     "tr": {
@@ -89,14 +85,10 @@
         "adm_saved": "Discord widget ayarları kaydedildi",
         "adm_error": "Kaydedilemedi",
         "title": "Discord Sunucusu",
-        "membersOnline": "Çevrimiçi Üyeler",
-        "totalMembers": "Toplam Üye",
-        "joinServer": "Sunucuya Katıl",
         "online": "Çevrimiçi",
         "offline": "Çevrimdışı",
         "loading": "Discord widget'ı yükleniyor...",
-        "error": "Discord widget'ı yüklenemedi",
-        "noServer": "Discord sunucusu yapılandırılmamış"
+        "error": "Discord widget'ı yüklenemedi"
       }
     }
   },

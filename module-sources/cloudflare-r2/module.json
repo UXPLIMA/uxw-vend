@@ -2,7 +2,7 @@
   "id": "cloudflare-r2",
   "name": "Cloudflare R2 Storage",
   "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -63,7 +63,6 @@
         "saveError": "Failed to save settings",
         "test": "Test Connection",
         "testSuccess": "Connection successful",
-        "testFailed": "Connection failed",
         "currentlyActive": "Currently active storage provider",
         "save": "Save",
         "saving": "Saving…"
@@ -90,7 +89,6 @@
         "saveError": "Ayarlar kaydedilemedi",
         "test": "Bağlantıyı Test Et",
         "testSuccess": "Bağlantı başarılı",
-        "testFailed": "Bağlantı başarısız",
         "currentlyActive": "Şu anki aktif depolama sağlayıcısı",
         "save": "Kaydet",
         "saving": "Kaydediliyor…"

@@ -2,7 +2,7 @@
   "id": "line-auth",
   "name": "LINE Login",
   "description": "Allow users to sign in with their LINE account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -43,7 +43,6 @@
       "lineAuth": {
         "adm_title": "LINE Login Settings",
         "adm_subtitle": "Set up LINE OAuth sign-in for your site.",
-        "signInWith": "Sign in with LINE",
         "adm_emailNote": "Reading the email address is a separate permission on the LINE channel and needs LINE's approval. Without it accounts get a placeholder address that can never receive mail."
       },
       "admin": {
@@ -55,7 +54,6 @@
       "lineAuth": {
         "adm_title": "LINE ile Giriş Ayarları",
         "adm_subtitle": "Siteniz için LINE ile OAuth girişini yapılandırın.",
-        "signInWith": "LINE ile giriş yap",
         "adm_emailNote": "E-posta adresini okumak LINE kanalında ayrı bir izindir ve LINE onayı gerektirir. Bu izin olmadan hesaplara posta alamayan geçici bir adres atanır."
       },
       "admin": {
