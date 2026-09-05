@@ -155,7 +155,7 @@ export default function BroadcastsPage() {
                         onClick={() => setComposing(!composing)}
                     >
                         {composing ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                        {composing ? t("customizer_cancel") : t("common_new")}
+                        {composing ? commonT("cancel") : t("common_new")}
                     </Button>
                 </>}
             />
