@@ -14,6 +14,14 @@ interface SearchResult {
  * Uses PostgreSQL full-text search via a GIN tsvector index for O(log n)
  * lookups. Falls back to ILIKE-based contains() queries if the FTS index
  * is not yet present.
+ *
+ * Both paths repeat the visibility rule the public endpoints apply, because
+ * a search result is a way into the content and not a lesser view of it.
+ * `/api/v1/forum/topics` hides anything but APPROVED from a non-admin, and
+ * the single-topic endpoint answers 404 for one - a search that skipped the
+ * same test handed an anonymous visitor the title and the first 140
+ * characters of a topic still waiting on a moderator, linking to a page that
+ * would then refuse to show it.
  */
 export default async function search(q: string): Promise<SearchResult[]> {
     if (!q || q.length < 2) return [];
@@ -23,7 +31,8 @@ export default async function search(q: string): Promise<SearchResult[]> {
         const rows = await prisma.$queryRaw<Array<{ title: string; slug: string; content: string }>>`
             SELECT title, slug, content
             FROM "ForumTopic"
-            WHERE to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
+            WHERE "moderationState" = 'APPROVED'
+              AND to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
                   @@ plainto_tsquery('english', ${q})
             ORDER BY ts_rank(
                 to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, '')),
@@ -45,9 +54,14 @@ export default async function search(q: string): Promise<SearchResult[]> {
         );
         const rows = await prisma.forumTopic.findMany({
             where: {
-                OR: [
-                    { title: { contains: q, mode: "insensitive" } },
-                    { content: { contains: q, mode: "insensitive" } },
+                AND: [
+                    { moderationState: "APPROVED" },
+                    {
+                        OR: [
+                            { title: { contains: q, mode: "insensitive" } },
+                            { content: { contains: q, mode: "insensitive" } },
+                        ],
+                    },
                 ],
             },
             select: { title: true, slug: true, content: true },

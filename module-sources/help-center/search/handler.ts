@@ -14,6 +14,12 @@ interface SearchResult {
  * Uses PostgreSQL full-text search via a GIN tsvector index for O(log n)
  * lookups. Falls back to ILIKE-based contains() queries if the FTS index
  * is not yet present.
+ *
+ * Both paths repeat the visibility rule the public endpoints apply. Clearing
+ * `isActive` is how an article is taken down - the list, the single-article
+ * endpoint and the category listing all honour it - so search has to honour
+ * it too, or taking an article down leaves it readable to anyone who
+ * searches for a phrase in it.
  */
 export default async function search(q: string): Promise<SearchResult[]> {
     if (!q || q.length < 2) return [];
@@ -29,7 +35,8 @@ export default async function search(q: string): Promise<SearchResult[]> {
         const rows = await prisma.$queryRaw<Array<{ title: string; slug: string; content: string }>>`
             SELECT title, slug, content
             FROM "HelpArticle"
-            WHERE to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
+            WHERE "isActive" = true
+              AND to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
                   @@ plainto_tsquery('english', ${q})
             ORDER BY ts_rank(
                 to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, '')),
@@ -51,9 +58,14 @@ export default async function search(q: string): Promise<SearchResult[]> {
         );
         const rows = await prisma.helpArticle.findMany({
             where: {
-                OR: [
-                    { title: { contains: q, mode: "insensitive" } },
-                    { content: { contains: q, mode: "insensitive" } },
+                AND: [
+                    { isActive: true },
+                    {
+                        OR: [
+                            { title: { contains: q, mode: "insensitive" } },
+                            { content: { contains: q, mode: "insensitive" } },
+                        ],
+                    },
                 ],
             },
             select: { title: true, slug: true, content: true },

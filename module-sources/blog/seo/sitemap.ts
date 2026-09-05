@@ -15,6 +15,11 @@ export default async function blogSitemap(): Promise<SitemapEntry[]> {
             where: {
                 status: "PUBLISHED",
                 publishedAt: { lte: new Date() },
+                // A `publishAt` left over from a schedule outlives a status
+                // change that does not mention it, so PUBLISHED plus a passed
+                // `publishedAt` is not yet the whole test the article's own
+                // page applies.
+                OR: [{ publishAt: null }, { publishAt: { lte: new Date() } }],
             },
             select: {
                 slug: true,
