@@ -3,8 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
-import { formatCurrency } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
@@ -26,6 +25,7 @@ interface Coupon {
 }
 
 export default function AdminCouponsPage() {
+    const { format: money } = useSiteCurrency();
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("store");
@@ -336,11 +336,11 @@ export default function AdminCouponsPage() {
                                                 <span className="font-medium">
                                                     {coupon.type === "PERCENTAGE"
                                                         ? `${coupon.value}%`
-                                                        : formatCurrency(Number(coupon.value))}
+                                                        : money(Number(coupon.value))}
                                                 </span>
                                                 {coupon.minPurchase && (
                                                     <p className="text-xs text-muted-foreground">
-                                                        {t("adm_minPurchase", { amount: formatCurrency(Number(coupon.minPurchase)) })}
+                                                        {t("adm_minPurchase", { amount: money(Number(coupon.minPurchase)) })}
                                                     </p>
                                                 )}
                                             </td>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useCurrency } from "../lib/currency-context";
+import { useSiteCurrency } from "@/core/sdk/ui";
 
 interface TopBuyer {
     username: string;
@@ -12,7 +12,7 @@ interface TopBuyer {
 
 export function TopBuyersWidget() {
     const sidebarT = useTranslations('sidebar');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const [buyers, setBuyers] = useState<TopBuyer[]>([]);
 
     useEffect(() => {

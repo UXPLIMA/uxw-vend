@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `useSiteCurrency` joins `@/core/sdk/ui` and `siteCurrency` / `formatSiteCurrency`
+  join `@/core/sdk/server` (CORE_API_VERSION 1.8.0). Core mounts the provider in
+  the root layout, outside the module providers, so a module that knows exchange
+  rates can put every price on the site into another currency with
+  `setDisplay({ code, rate })`. `default_currency` is published through
+  `/api/v1/public-settings` for it.
+
 - `writeError` joins `@/core/sdk` (CORE_API_VERSION 1.7.0). One line to turn a
   write's response into either nothing or the message to show, in the reader's
   language: `const failed = await writeError(res, t("saveFailed"), t);`. Like
@@ -16,6 +23,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Every price on the site was in dollars, whatever the site charged in.**
+  There were four answers to "what currency is this?" and none of them was the
+  setting the payment gateways read.
+
+  Checkout, credits and the payment-provider list all charge in
+  `default_currency`. The store's admin screens called `formatCurrency(x)` with
+  no arguments, which is `Intl.NumberFormat("en-US", { currency: "USD" })`, so a
+  shop charging in lira showed every order, product, coupon and gift code as
+  `$1,250.00` - and the buyer's own order history said the same. The figure was
+  not converted either: it was the lira number with a dollar sign on it. The
+  admin dashboard's revenue card and the analytics charts glued the `$` on by
+  hand.
+
+  Worse, the store and the leaderboard each shipped a `CurrencyProvider` that
+  nothing ever mounted, so every `useCurrency()` in those modules fell through
+  to a default context whose formatter was `` `$${amount.toFixed(2)}` ``. The
+  currency module mounted a fourth provider app-wide, with a hardcoded rate
+  table it never refreshed from its own admin page, that no other module could
+  import. That is why picking a currency in the footer changed nothing on any
+  page: the selector wrote to a context no price read, under a different
+  `localStorage` key than the two dead copies used.
+
+  Core owns the formatter now, because core owns the setting the gateways
+  charge in. The three dead providers are gone, the store, leaderboard, wheel
+  and both admin screens format through `useSiteCurrency`, the admin order
+  detail page (a server component) uses `siteCurrency()`, and the footer picker
+  hands core a code and a rate re-quoted against the site's own currency, so a
+  price cannot be converted twice. The picker hides itself when there is only
+  one currency to offer.
+
+  `/api/v1/public-settings` also stops publishing `currency` and
+  `currency_symbol`, two keys nothing wrote and nothing read.
+
+  `tests/unit/a-price-is-in-the-sites-currency.test.ts` fails on a currency
+  symbol glued to a number, on a `formatCurrency` call that does not say which
+  currency, and on a module screen that formats money without asking core what
+  the currency is.
+
 - **A screen reported a write it never checked.** `fetch` rejects only when the
   request never reached a server, so a 400, a 403 on an expired session, a 429
   and a 500 all resolve normally:

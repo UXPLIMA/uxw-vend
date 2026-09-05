@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button } from "@/core/sdk/ui";
+import { Button, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useParams, usePathname } from "next/navigation";
@@ -11,7 +11,6 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { useCurrency } from "../../../../lib/currency-context";
 import { useTranslations } from "next-intl";
 
 interface Product {
@@ -37,7 +36,7 @@ export default function ProductDetailPage() {
     const router = useRouter();
     const pathname = usePathname();
     const { status: authStatus } = useSession();
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const t = useTranslations('store');
     const commonT = useTranslations('common');
 

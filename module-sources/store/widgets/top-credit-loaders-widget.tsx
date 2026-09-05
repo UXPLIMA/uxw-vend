@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useCurrency } from "../lib/currency-context";
+import { useSiteCurrency } from "@/core/sdk/ui";
 
 interface TopLoader {
     username: string;
@@ -12,7 +12,7 @@ interface TopLoader {
 
 export function TopCreditLoadersWidget() {
     const sidebarT = useTranslations('sidebar');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const [loaders, setLoaders] = useState<TopLoader[]>([]);
 
     useEffect(() => {

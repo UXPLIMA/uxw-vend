@@ -16,6 +16,7 @@ import { CustomCssInjector } from "@/core/components/layout/CustomCssInjector";
 import { ModuleLayoutComponents } from "@/core/components/layout/ModuleLayoutComponents";
 import { ServerSlot } from "@/core/components/ServerSlot";
 import { ModuleContextProviders } from "@/core/components/layout/ModuleContextProviders";
+import { SiteCurrencyProvider } from "@/core/components/currency/site-currency";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
 import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
@@ -133,6 +134,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={publicMessages(messages)}>
               <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>
                 <ModuleProvider moduleStates={moduleStates}>
+                <SiteCurrencyProvider>
                 <ModuleContextProviders>
                 <ConfirmProvider>
                   <a
@@ -164,6 +166,7 @@ export default async function RootLayout({
                   />
                 </ConfirmProvider>
                 </ModuleContextProviders>
+                </SiteCurrencyProvider>
                 </ModuleProvider>
               </AppThemeProvider>
           </NextIntlClientProvider>

@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button } from "@/core/sdk/ui";
+import { Button, useSiteCurrency } from "@/core/sdk/ui";
 import { Crown } from "lucide-react";
-import { useCurrency } from "../lib/currency-context";
 
 interface Product {
     id: string;
@@ -18,7 +17,7 @@ interface Product {
 
 export function FeaturedProductWidget() {
     const sidebarT = useTranslations('sidebar');
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const [product, setProduct] = useState<Product | null>(null);
 
     useEffect(() => {

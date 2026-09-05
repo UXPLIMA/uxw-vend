@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T08:38:38Z",
+  "updatedAt": "2026-09-05T09:25:50Z",
   "modules": [
     {
       "id": "announcements",
@@ -392,13 +392,13 @@
       "id": "currency",
       "name": "Multi-Currency",
       "description": "Multi-currency support with automatic conversion",
-      "version": "1.0.7",
+      "version": "1.1.0",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T09:02:28Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1033,13 +1033,13 @@
       "id": "leaderboard",
       "name": "Leaderboard",
       "description": "Player rankings by purchases, votes, and activity",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T08:11:01Z",
+      "updatedAt": "2026-09-05T09:02:28Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2039,13 +2039,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.6",
+      "version": "2.2.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T08:38:38Z",
+      "updatedAt": "2026-09-05T09:25:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2407,13 +2407,13 @@
       "id": "wheel",
       "name": "Wheel of Fortune",
       "description": "Spin-to-win game with configurable prizes and cooldowns",
-      "version": "1.0.8",
+      "version": "1.0.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T05:41:03Z",
+      "updatedAt": "2026-09-05T09:02:28Z",
       "screenshots": [],
       "tags": [
         "commerce"

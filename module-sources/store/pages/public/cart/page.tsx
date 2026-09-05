@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { useCurrency } from "../../../lib/currency-context";
 import * as LucideIcons from "lucide-react";
 import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -57,7 +56,7 @@ function ProviderIcon({ name }: { name?: string }) {
 
 export default function CartPage() {
     const router = useRouter();
-    const { formatPrice } = useCurrency();
+    const { format: formatPrice } = useSiteCurrency();
     const t = useTranslations('store');
     const commonT = useTranslations('common');
     const [cart, setCart] = useState<CartData | null>(null);
