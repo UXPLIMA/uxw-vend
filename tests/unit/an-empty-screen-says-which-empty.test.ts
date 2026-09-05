@@ -191,6 +191,38 @@ describe("the two screens this cost the most", () => {
         expect(source).toMatch(guard);
     });
 
+    it("a user who could not be read is not reported as missing", () => {
+        // `if (!user)` renders "user not found", which tells the operator to
+        // stop looking. A 500 has to reach a different branch. A real 404
+        // still goes through, since that answer is the truth.
+        const source = fs.readFileSync(path.join(ROOT, "src/app/[locale]/(admin)/admin/users/[id]/page.tsx"), "utf8");
+        expect(source).toContain("r.status !== 404");
+        expect(source.indexOf("if (loadFailed)")).toBeLessThan(source.indexOf("users_notFound"));
+    });
+
+    it("a module that could not be read is not reported as uninstalled", () => {
+        const source = fs.readFileSync(path.join(ROOT, "src/app/[locale]/(admin)/admin/modules/[moduleId]/page.tsx"), "utf8");
+        expect(source.indexOf("if (loadFailed)")).toBeLessThan(source.indexOf("if (!mod)"));
+    });
+
+    it("a theme marketplace that did not load is not an empty marketplace", () => {
+        const source = fs.readFileSync(path.join(ROOT, "src/app/[locale]/(admin)/admin/settings/theme/page.tsx"), "utf8");
+        expect(source).toContain("marketplaceFailed");
+        expect(source).toContain("readJson");
+    });
+
+    it("a blog article edit form is not offered with blank fields", () => {
+        // `articleData.article || articleData` is truthy for an error body,
+        // so the form filled itself with empty strings and saving wrote them
+        // over the article.
+        const source = fs.readFileSync(
+            path.join(ROOT, "module-sources/blog/pages/admin/articles/[id]/edit/page.tsx"),
+            "utf8",
+        );
+        expect(source).toContain("if (!r.ok) throw new Error");
+        expect(source.indexOf("if (loadFailed)")).toBeLessThan(source.indexOf("adm_editArticle"));
+    });
+
     it("a product edit form is not offered with blank fields", () => {
         const source = fs.readFileSync(
             path.join(ROOT, "module-sources/store/pages/admin/products/[id]/edit/page.tsx"),

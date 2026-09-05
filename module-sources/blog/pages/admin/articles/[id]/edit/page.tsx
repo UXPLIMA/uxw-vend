@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect, use } from "react";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Trash2 } from "lucide-react";
 import { writeError } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -33,6 +33,11 @@ export default function EditBlogArticlePage(props: PageProps) {
     const [deleting, setDeleting] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [error, setError] = useState<string | null>(null);
+    // `articleData.article || articleData` is truthy for an error body too, so
+    // a failed read filled the form with empty strings and the save button
+    // under it wrote them over the article.
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -46,8 +51,12 @@ export default function EditBlogArticlePage(props: PageProps) {
 
     useEffect(() => {
         let cancelled = false;
+        setLoadFailed(false);
         Promise.all([
-            fetch(`/api/v1/blog/articles/${articleId}`).then((r) => r.json()),
+            fetch(`/api/v1/blog/articles/${articleId}`).then((r) => {
+                if (!r.ok) throw new Error("load failed");
+                return r.json();
+            }),
             fetch("/api/v1/blog/categories").then((r) => r.json()),
         ]).then(([articleData, catData]) => {
             if (cancelled) return;
@@ -67,10 +76,11 @@ export default function EditBlogArticlePage(props: PageProps) {
             setLoading(false);
         }).catch(() => {
             if (cancelled) return;
+            setLoadFailed(true);
             setLoading(false);
         });
         return () => { cancelled = true; };
-    }, [articleId]);
+    }, [articleId, reloadKey]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -133,6 +143,10 @@ export default function EditBlogArticlePage(props: PageProps) {
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
+    }
+
+    if (loadFailed) {
+        return <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />;
     }
 
     return (

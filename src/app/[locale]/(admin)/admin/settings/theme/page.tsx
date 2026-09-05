@@ -13,6 +13,8 @@ import { useTheme } from "@/core/providers/theme-provider";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 import { writeError } from "@/core/lib/write-result";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import { readJson } from "@/core/lib/read-json";
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
@@ -154,12 +156,29 @@ export default function ThemeSettingsPage() {
     const [loadingMarketplace, setLoadingMarketplace] = useState(true);
     const [installing, setInstalling] = useState<string | null>(null);
 
+    // A failed read used to render an empty marketplace, which reads as "there
+    // are no themes to install" rather than "the list did not load".
+    const [marketplaceFailed, setMarketplaceFailed] = useState(false);
+    const [marketplaceAttempt, setMarketplaceAttempt] = useState(0);
+
     useEffect(() => {
+        let cancelled = false;
+        setLoadingMarketplace(true);
+        setMarketplaceFailed(false);
         fetch("/api/v1/themes/marketplace")
-            .then(r => r.json())
-            .then(d => { setMarketplaceThemes(d.themes || []); setLoadingMarketplace(false); })
-            .catch(() => setLoadingMarketplace(false));
-    }, []);
+            .then(readJson<{ themes?: typeof marketplaceThemes }>)
+            .then(d => {
+                if (cancelled) return;
+                setMarketplaceThemes(d.themes || []);
+                setLoadingMarketplace(false);
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setMarketplaceFailed(true);
+                setLoadingMarketplace(false);
+            });
+        return () => { cancelled = true; };
+    }, [marketplaceAttempt]);
 
     const installedThemeIds = new Set(Object.keys(themeRegistry));
 
@@ -309,9 +328,17 @@ export default function ThemeSettingsPage() {
             </div>
 
             {/* Theme Marketplace */}
+            {marketplaceFailed && (
+                <Card>
+                    <CardContent>
+                        <LoadFailed onRetry={() => setMarketplaceAttempt((a) => a + 1)} />
+                    </CardContent>
+                </Card>
+            )}
+
             {(() => {
                 const available = marketplaceThemes.filter(th => !installedThemeIds.has(th.id));
-                if (loadingMarketplace || available.length === 0) return null;
+                if (loadingMarketplace || marketplaceFailed || available.length === 0) return null;
                 return (
                     <div>
                         <h2 className="text-lg font-medium flex items-center gap-2 mb-4">

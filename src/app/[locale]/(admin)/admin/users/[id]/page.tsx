@@ -19,6 +19,7 @@ import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 interface UserDetail {
     id: string;
@@ -54,6 +55,8 @@ export default function AdminUserDetailPage() {
     const [user, setUser] = useState<UserDetail | null>(null);
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -188,8 +191,15 @@ export default function AdminUserDetailPage() {
 
     useEffect(() => {
         let cancelled = false;
+        setLoadFailed(false);
         Promise.all([
-            fetch(`/api/v1/users/${userId}`).then((r) => r.json()),
+            // A 500 here used to resolve, leave `user` null, and put the
+            // screen on "user not found" - the one answer that tells the
+            // operator to stop looking.
+            fetch(`/api/v1/users/${userId}`).then((r) => {
+                if (!r.ok && r.status !== 404) throw new Error("load failed");
+                return r.json();
+            }),
             fetch("/api/v1/roles").then((r) => r.json()),
         ]).then(([userData, rolesData]) => {
             if (cancelled) return;
@@ -205,10 +215,11 @@ export default function AdminUserDetailPage() {
             setLoading(false);
         }).catch(() => {
             if (cancelled) return;
+            setLoadFailed(true);
             setLoading(false);
         });
         return () => { cancelled = true; };
-    }, [userId]);
+    }, [userId, reloadKey]);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -244,6 +255,10 @@ export default function AdminUserDetailPage() {
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
+    }
+
+    if (loadFailed) {
+        return <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />;
     }
 
     if (!user) {

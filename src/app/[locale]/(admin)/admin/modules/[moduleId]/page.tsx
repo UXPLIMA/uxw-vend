@@ -12,6 +12,7 @@ import { ModuleSettingsPanel } from "../ModuleSettingsPanel";
 import { moduleDescription, moduleName } from "../module-name";
 import type { Module, ModuleSettingValues } from "../types";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 /**
  * One module's settings, on its own screen.
@@ -35,24 +36,34 @@ export default function ModuleSettingsPage({
 
     const [mod, setMod] = useState<Module | null>(null);
     const [loading, setLoading] = useState(true);
+    // A failed read left `mod` null and put the screen on "this module is not
+    // installed", which is a different thing from "the list did not load".
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         // The reader can be on another module's settings before this answers.
         let cancelled = false;
+        setLoadFailed(false);
         fetch("/api/v1/modules")
-            .then((r) => r.json())
+            .then((r) => {
+                if (!r.ok) throw new Error("load failed");
+                return r.json();
+            })
             .then((data) => {
                 if (cancelled) return;
                 setMod((data.modules || []).find((m: Module) => m.id === moduleId) ?? null);
             })
             .catch(() => {
-                if (!cancelled) toast.error(t("modules_networkError"));
+                if (cancelled) return;
+                setLoadFailed(true);
+                toast.error(t("modules_networkError"));
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [moduleId, t]);
+    }, [moduleId, t, reloadKey]);
 
     const save = async (id: string, config: ModuleSettingValues) => {
         try {
@@ -80,6 +91,14 @@ export default function ModuleSettingsPage({
             <div className="flex justify-center py-16">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             </div>
+        );
+    }
+
+    if (loadFailed) {
+        return (
+            <Card>
+                <CardContent><LoadFailed onRetry={() => setReloadKey((k) => k + 1)} /></CardContent>
+            </Card>
         );
     }
 
