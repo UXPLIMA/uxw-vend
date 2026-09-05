@@ -1551,6 +1551,69 @@ function checkModuleFetchPaths(modulePath: string): CheckResult {
     return { name, passed: true, message: `${files.length} file(s) fetch only declared routes` };
 }
 
+/**
+ * A component under a capability directory is declared, or it is dead.
+ *
+ * `widgets/` and `slots/` are not ordinary source folders: core renders what
+ * the manifest names there and nothing else, resolving the export by the id it
+ * was given. Two finished widgets sat in `store/widgets/` for their whole life
+ * without an entry - a payment goal bar and a top credit loaders list, both
+ * translated into every locale the module ships, both reading endpoints that
+ * answer - and the homepage they were written for never knew about them.
+ *
+ * A file that another file in the module imports is a helper and passes; only
+ * something nothing names at all is dead.
+ */
+function checkCapabilityFilesDeclared(modulePath: string): CheckResult {
+    const name = "Capability components are declared";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+    const manifest = fs.readFileSync(manifestPath, "utf8");
+
+    const imported = new Set<string>();
+    const walk = (dir: string) => {
+        if (!fs.existsSync(dir)) return;
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                if (entry.name !== "node_modules") walk(full);
+            } else if (/\.tsx?$/.test(entry.name)) {
+                const source = fs.readFileSync(full, "utf8");
+                for (const match of source.matchAll(/(?:from|import\(\s*)\s*["'`](\.[^"'`]+)["'`]/g)) {
+                    imported.add(path.normalize(path.join(path.dirname(full), match[1])));
+                }
+            }
+        }
+    };
+    walk(modulePath);
+
+    const orphans: string[] = [];
+    for (const dir of ["widgets", "slots"]) {
+        const full = path.join(modulePath, dir);
+        if (!fs.existsSync(full)) continue;
+        for (const entry of fs.readdirSync(full)) {
+            if (!/\.tsx?$/.test(entry)) continue;
+            const stem = entry.replace(/\.tsx?$/, "");
+            if (manifest.includes(`${dir}/${stem}`)) continue;
+            if (imported.has(path.join(full, stem))) continue;
+            orphans.push(`${dir}/${entry}`);
+        }
+    }
+
+    if (orphans.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${orphans.length} component(s) under a capability directory that the manifest never names: ${orphans.join(", ")}`,
+            suggestion:
+                "Core renders only what the manifest declares, so these never reach a page. Add an entry " +
+                "naming the file and the exported component, or delete the file.",
+        };
+    }
+
+    return { name, passed: true, message: "Every widget and slot component is declared" };
+}
+
 function checkApiRoutesWired(modulePath: string): CheckResult {
     const name = "API routes wired";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1670,6 +1733,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkNoAnyTypes(modulePath),
         checkApiAuthChecks(modulePath),
         checkApiRoutesWired(modulePath),
+        checkCapabilityFilesDeclared(modulePath),
         checkStatsApiAuth(modulePath),
         checkTranslationKeys(modulePath),
         checkAdminKeyPrefix(modulePath),
