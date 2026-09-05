@@ -37,6 +37,20 @@ function shouldLog(level: LogLevel): boolean {
     return LOG_LEVEL_ORDER[level] >= LOG_LEVEL_ORDER[MIN_LEVEL];
 }
 
+/**
+ * One log record is one line.
+ *
+ * The production branch encodes with `JSON.stringify`, which escapes a
+ * newline, but the development branch interpolates into a template string, so
+ * a control character in a value it was handed - a request path, most of all -
+ * used to end the line and start another that reads like a genuine record.
+ * The proxy refuses such a path outright now; this keeps the guarantee for
+ * every other value that reaches here.
+ */
+export function oneLine(value: string): string {
+    return value.replace(/[\u0000-\u001f\u007f]/g, (c) => `\\x${c.charCodeAt(0).toString(16).padStart(2, "0")}`);
+}
+
 function emit(entry: LogEntry) {
     if (!shouldLog(entry.level)) return;
 
@@ -46,11 +60,11 @@ function emit(entry: LogEntry) {
         const prefix = `${color}[${entry.level.toUpperCase()}]${reset}`;
         const cid = entry.correlationId ? ` [${entry.correlationId.slice(0, 8)}]` : "";
         const duration = entry.durationMs !== undefined ? ` (${entry.durationMs}ms)` : "";
-        const method = entry.method ? ` ${entry.method}` : "";
-        const path = entry.path ? ` ${entry.path}` : "";
+        const method = entry.method ? ` ${oneLine(entry.method)}` : "";
+        const path = entry.path ? ` ${oneLine(entry.path)}` : "";
         const status = entry.statusCode ? ` → ${entry.statusCode}` : "";
 
-        console.log(`${prefix}${cid}${method}${path}${status}${duration} ${entry.message}`);
+        console.log(`${prefix}${cid}${method}${path}${status}${duration} ${oneLine(entry.message)}`);
         if (entry.stack) console.log(entry.stack);
     } else {
         // Production: JSON lines for log aggregators
