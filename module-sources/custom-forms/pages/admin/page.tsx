@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 interface FormField {
     name: string;
@@ -115,7 +116,9 @@ export default function FormsPage() {
             variant: "danger",
         });
         if (!ok) return;
-        await fetch(`/api/v1/forms/${slug}`, { method: "DELETE" });
+        const res = await fetch(`/api/v1/forms/${slug}`, { method: "DELETE" });
+        const failed = await writeError(res, t("adm_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         fetchForms();
     };
 

@@ -2,6 +2,7 @@
 
 
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Card, CardContent, Input, Label } from "@/core/sdk/ui";
@@ -74,7 +75,7 @@ export default function DiscordSettingsPage() {
 
         setTesting(key);
         try {
-            await fetch(url, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -87,8 +88,15 @@ export default function DiscordSettingsPage() {
                     }],
                 }),
             });
+            // A test that says nothing is not a test. Discord answers 204 on
+            // success and 401 on a URL that has been revoked, which is exactly
+            // what the admin pressed this button to find out.
+            if (res.ok) toast.success(t("testSuccess"));
+            else toast.error(t("testError"));
         } catch {
-            // CORS may block but webhook still works server-side
+            // The browser blocked the cross-origin call, which says nothing
+            // about the webhook: the server sends the real ones.
+            toast.info(t("testBlocked"));
         } finally {
             setTesting(null);
         }

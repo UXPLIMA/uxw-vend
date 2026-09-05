@@ -61,22 +61,30 @@ export function NotificationBell() {
         return () => document.removeEventListener("mousedown", onDown);
     }, [open]);
 
+    /**
+     * Both mark-read calls used to swallow the answer, so a rejected PATCH
+     * still cleared the badge - and the badge is the only thing telling the
+     * reader there is something to come back to. On a failure the count is
+     * left where it was.
+     */
     const markRead = async (id: string) => {
-        await fetch("/api/v1/notifications", {
+        const res = await fetch("/api/v1/notifications", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id }),
-        }).catch(() => {});
+        }).catch(() => null);
+        if (!res?.ok) return;
         setItems(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
         setUnread(n => Math.max(0, n - 1));
     };
 
     const markAllRead = async () => {
-        await fetch("/api/v1/notifications", {
+        const res = await fetch("/api/v1/notifications", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ markAllRead: true }),
-        }).catch(() => {});
+        }).catch(() => null);
+        if (!res?.ok) return;
         setItems(prev => prev.map(n => ({ ...n, isRead: true })));
         setUnread(0);
     };

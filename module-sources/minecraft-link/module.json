@@ -2,7 +2,7 @@
   "id": "minecraft-link",
   "name": "Minecraft Link",
   "description": "Let players prove they own an in-game Minecraft account by reading a code whispered to them on the server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "coreVersion": "^1.2.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -92,7 +92,8 @@
         "adm_title": "Minecraft Link",
         "adm_subtitle": "How the linking code is delivered to a player in game.",
         "adm_field1Label": "Whisper command",
-        "adm_field1Desc": "Run to send a player their code. {player} and {message} are substituted. Defaults to Minecraft's tell command; change it for a proxy or a plugin that handles private messages differently."
+        "adm_field1Desc": "Run to send a player their code. {player} and {message} are substituted. Defaults to Minecraft's tell command; change it for a proxy or a plugin that handles private messages differently.",
+        "unlinkFailed": "The account could not be unlinked. Please try again."
       }
     },
     "tr": {
@@ -126,7 +127,8 @@
         "adm_title": "Minecraft Bağlama",
         "adm_subtitle": "Bağlama kodunun oyuncuya oyun içinde nasıl ileteceği.",
         "adm_field1Label": "Fısıltı komutu",
-        "adm_field1Desc": "Oyuncuya kodunu göndermek için çalıştırılır. {player} ve {message} yerine geçer. Varsayılan Minecraft tell komutudur; proxy veya özel mesajları farklı işleyen bir eklenti kullanıyorsan değiştir."
+        "adm_field1Desc": "Oyuncuya kodunu göndermek için çalıştırılır. {player} ve {message} yerine geçer. Varsayılan Minecraft tell komutudur; proxy veya özel mesajları farklı işleyen bir eklenti kullanıyorsan değiştir.",
+        "unlinkFailed": "Hesap bağlantısı kaldırılamadı. Lütfen tekrar deneyin."
       }
     }
   }

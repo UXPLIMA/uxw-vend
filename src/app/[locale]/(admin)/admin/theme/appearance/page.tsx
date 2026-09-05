@@ -10,6 +10,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTheme } from "@/core/providers/theme-provider";
 import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
+import { writeError } from "@/core/lib/write-result";
 
 /**
  * Active theme's appearance editor - color tokens + mode toggle.
@@ -72,11 +73,13 @@ export default function ActiveThemeAppearancePage() {
             confirmText: t("theme_reset"),
         });
         if (!ok) return;
-        await fetch(`/api/v1/themes/${themeId}/customization`, {
+        const res = await fetch(`/api/v1/themes/${themeId}/customization`, {
             method: "PUT",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ mode: currentMode, overrides: {} }),
         });
+        const failed = await writeError(res, t("common_writeFailed"), t);
+        if (failed) { toast.error(failed); return; }
         setColorOverrides({});
         toast.success(t("theme_resetDone"));
     };
@@ -84,11 +87,15 @@ export default function ActiveThemeAppearancePage() {
     const switchMode = async (m: string) => {
         if (!themeId) return;
         setMode(m);
-        await fetch("/api/v1/themes/state", {
+        const res = await fetch("/api/v1/themes/state", {
             method: "PUT",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ themeId, mode: m }),
         });
+        // The mode is applied locally either way; what a failure costs is the
+        // memory of it, so the next visit opens on the old one.
+        const failed = await writeError(res, t("common_writeFailed"), t);
+        if (failed) toast.error(failed);
     };
 
     if (!activeTheme) {

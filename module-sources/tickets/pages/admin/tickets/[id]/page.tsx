@@ -8,6 +8,8 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Textarea } from "@/co
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
+import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 /** The admin catalogue's copy of the status labels. */
 const ADMIN_STATUS_KEYS = adminKeys(STATUS_KEYS);
@@ -115,11 +117,13 @@ export default function AdminTicketDetailPage(props: PageProps) {
     const updateTicket = async (field: string, value: string) => {
         setUpdating(true);
         try {
-            await fetch(`/api/v1/tickets/${ticketId}`, {
+            const res = await fetch(`/api/v1/tickets/${ticketId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ [field]: value }),
             });
+            const failed = await writeError(res, t("adm_writeFailed"), t);
+            if (failed) { toast.error(failed); return; }
             fetchTicket();
         } catch (err) {
             console.error("Failed to update ticket:", err);

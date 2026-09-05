@@ -2,7 +2,7 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -119,7 +119,8 @@
         "adm_evt_userRegistered": "User Registered",
         "adm_evt_userRegistered_desc": "When a new user signs up",
         "adm_evt_forumTopic": "Forum Topic",
-        "adm_evt_forumTopic_desc": "When a new forum topic is created"
+        "adm_evt_forumTopic_desc": "When a new forum topic is created",
+        "testBlocked": "Your browser blocked the test call. The server sends the real notifications, so this does not mean the webhook is broken."
       },
       "admin": {
         "menu_discord-integration": "Discord Integration",
@@ -177,7 +178,8 @@
         "adm_evt_userRegistered": "Kullanıcı Kaydoldu",
         "adm_evt_userRegistered_desc": "Yeni bir kullanıcı kaydolduğunda",
         "adm_evt_forumTopic": "Forum Konusu",
-        "adm_evt_forumTopic_desc": "Yeni bir forum konusu oluşturulduğunda"
+        "adm_evt_forumTopic_desc": "Yeni bir forum konusu oluşturulduğunda",
+        "testBlocked": "Tarayıcı test çağrısını engelledi. Gerçek bildirimleri sunucu gönderir, bu yüzden webhook bozuk demek değil."
       },
       "admin": {
         "menu_discord-integration": "Discord Entegrasyonu",

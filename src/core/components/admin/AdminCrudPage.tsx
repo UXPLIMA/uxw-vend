@@ -14,6 +14,7 @@ import { FileUpload } from "@/core/components/ui/file-upload";
 import { UrlOrFile } from "@/core/components/ui/url-or-file";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 import { IconPicker } from "@/core/components/ui/icon-picker";
+import { writeError } from "@/core/lib/write-result";
 
 export interface CrudField {
     key: string;
@@ -135,12 +136,19 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     const bulkDelete = async () => {
         const ok = await confirm({ title: ct("crud_deleteItems"), message: ct("crud_deleteItemsConfirm", { count: selected.size }), variant: "danger", confirmText: ct("crud_delete") });
         if (!ok) return;
+        // One request per row, and every answer used to be thrown away: five
+        // rows selected, four refused, and the panel still said "Deleted".
+        let deleted = 0;
         for (const id of selected) {
-            await fetch(`${apiPath}/${id}`, { method: "DELETE" });
+            const res = await fetch(`${apiPath}/${id}`, { method: "DELETE" });
+            if (!(await writeError(res, ct("crud_deleteFailed"), ct))) deleted++;
         }
-        toast.success(ct("crud_deleted"));
+        const total = selected.size;
         setSelected(new Set());
         fetchItems();
+        if (deleted === total) toast.success(ct("crud_deleted"));
+        else if (deleted === 0) toast.error(ct("crud_deleteFailed"));
+        else toast.error(ct("crud_deletedPartly", { deleted, total }));
     };
 
     const deleteItem = async (id: string) => {

@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -242,7 +242,8 @@
         "writeYourReply": "Write your reply…",
         "topicsCount": "{count, plural, one {# topic} other {# topics}}",
         "guestViewDisabled": "This forum is for members only.",
-        "signIn": "Sign in"
+        "signIn": "Sign in",
+        "adm_writeFailed": "That did not go through. Please try again."
       },
       "admin": {
         "menu_forum": "Forum",
@@ -373,7 +374,8 @@
         "writeYourReply": "Yanıtınızı yazın…",
         "topicsCount": "{count, plural, one {# konu} other {# konu}}",
         "guestViewDisabled": "Bu forum yalnizca uyelere aciktir.",
-        "signIn": "Giris yap"
+        "signIn": "Giris yap",
+        "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin."
       },
       "admin": {
         "menu_forum": "Forum",

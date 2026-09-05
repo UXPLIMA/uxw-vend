@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { toast } from "sonner";
+import { writeError } from "@/core/sdk";
 
 interface Article {
     id: string;
@@ -55,11 +57,16 @@ export default function HelpArticlePage({ params }: PageProps) {
     const submitFeedback = async (helpful: boolean) => {
         if (feedbackGiven) return;
 
-        await fetch(`/api/v1/help/articles/${slug}`, {
+        const res = await fetch(`/api/v1/help/articles/${slug}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ helpful }),
         });
+        // Thanking the reader for a vote the server dropped is worse than
+        // asking them to try again: the vote is gone either way, and only one
+        // of the two says so.
+        const failed = await writeError(res, t("feedbackFailed"), t);
+        if (failed) { toast.error(failed); return; }
         setFeedbackGiven(true);
     };
 

@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Link2, Link2Off } from "lucide-react";
+import { writeError } from "@/core/sdk";
 
 interface LinkState {
     account: { username: string; uuid: string | null; linkedAt: string } | null;
@@ -108,7 +109,9 @@ export function ProfileMinecraftTab() {
         if (!(await confirm({ title: t("unlinkTitle"), message: t("unlinkConfirm"), variant: "danger" }))) return;
         setBusy(true);
         try {
-            await fetch("/api/v1/minecraft-link", { method: "DELETE" });
+            const res = await fetch("/api/v1/minecraft-link", { method: "DELETE" });
+            const failed = await writeError(res, t("unlinkFailed"), t);
+            if (failed) { toast.error(failed); return; }
             toast.success(t("unlinked"));
             await load();
         } finally {

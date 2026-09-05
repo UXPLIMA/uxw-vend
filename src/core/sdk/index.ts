@@ -47,6 +47,18 @@ export {
     generateOrderNumber,
 } from "@/core/lib/utils";
 
+/**
+ * The one-line check that a write actually went through. `fetch` resolves for
+ * a 403, a 429 and a 500 alike, so a handler that does not read the response
+ * reports success for all three.
+ *
+ *     const failed = await writeError(res, t("saveFailed"));
+ *     if (failed) { toast.error(failed); return; }
+ */
+export { writeError } from "@/core/lib/write-result";
+export type { WriteErrorBody } from "@/core/lib/write-result";
+export type { Translator } from "@/core/lib/auth-error-message";
+
 // --- The hook bus: how modules talk to core and to each other ---
 export {
     addAction,

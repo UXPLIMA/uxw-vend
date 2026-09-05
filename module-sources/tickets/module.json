@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -230,7 +230,8 @@
         "unassigned": "Unassigned",
         "updatedAt": "Updated",
         "urgent": "Urgent",
-        "waitingReply": "Waiting for Reply"
+        "waitingReply": "Waiting for Reply",
+        "adm_writeFailed": "That did not go through. Please try again."
       },
       "admin": {
         "menu_tickets": "Tickets",
@@ -389,7 +390,8 @@
         "unassigned": "Atanmamış",
         "updatedAt": "Güncellendi",
         "urgent": "Acil",
-        "waitingReply": "Yanıt Bekleniyor"
+        "waitingReply": "Yanıt Bekleniyor",
+        "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin."
       },
       "admin": {
         "menu_tickets": "Destek Talepleri",
