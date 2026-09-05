@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Every page had an unbounded supply of URLs that answered 200.**
+  next-intl's middleware strips a trailing path segment that is nothing but a
+  control character, so `/en/%00` served the homepage and `/en/store/%00`
+  served the store page, both with a 200, while `/en/definitely-not-a-page`
+  correctly 404s. Same for `%01`, `%09`, `%0a`, `%0d`. That is a soft 404 to a
+  crawler and a false green to a link checker or an uptime monitor, at as many
+  URLs as an attacker cares to invent.
+
+  The shape matters more than the size. A layer that strips a character while
+  the gates match on the string that still carries it is how a gate gets
+  walked past, which is the same lesson as the matcher fix for an API id
+  containing a dot. The proxy now refuses a control character in the path,
+  both spellings, before any other gate runs: 400, JSON under `/api/`, plain
+  text elsewhere.
+
+- **The development logger could be made to forge a log line.** Production
+  encodes each record with `JSON.stringify`, which escapes a newline, but the
+  development branch interpolated the request path into a template string, so
+  a `%0a` in a path ended the line and started one that reads like a genuine
+  record. Every value that branch interpolates goes through `oneLine` now.
+
+  `tests/unit/control-characters-in-paths.test.ts` covers both, including that
+  the path check runs before the body ceiling, the demo gate, CSRF, the
+  module-enabled gate and the setup gate. It builds its control characters
+  with `String.fromCharCode` so the file itself stays printable.
 - **A row that was already gone answered 500.**
   Prisma throws `P2025` when an update or delete matches no row, `P2002` when
   a unique column already holds the value, `P2003` for a foreign key pointing

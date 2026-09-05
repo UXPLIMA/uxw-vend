@@ -11,6 +11,7 @@ import prisma from '@/core/lib/db';
 import { isIpBlocked, type IpBlockScope } from '@/core/lib/ip-blocks';
 import { getModuleStates } from '@/core/lib/module-cache';
 import { checkCsrf } from '@/core/lib/csrf';
+import { hasControlCharacter } from '@/core/lib/request-path';
 import { providerCallbackRoutes } from '@/core/generated/module-routes';
 import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
@@ -168,6 +169,27 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     requestHeaders.set('x-correlation-id', correlationId);
 
     const { pathname } = request.nextUrl;
+
+    // ===== Control characters in the path =====
+    // A control character has no meaning in a URL path, and letting one
+    // through cost two things. next-intl's middleware strips a trailing
+    // segment that is nothing but one, so `/en/store/%00` answered 200 with
+    // the store page and `/en/%00` with the homepage - every page on the site
+    // had an unbounded supply of URLs that reported 200 for content that is
+    // not there, which is a soft 404 to a crawler and a false green to a link
+    // checker or an uptime monitor. And a layer that strips a character while
+    // the gates below match on the string that still has it is exactly how a
+    // gate gets walked past; `%0a` in a path also forges a line in any log
+    // that formats rather than encodes.
+    //
+    // Both spellings are refused: the literal character, and the percent
+    // escape, because which one reaches here depends on the layer that
+    // normalised it.
+    if (hasControlCharacter(pathname)) {
+        return pathname.startsWith('/api/')
+            ? NextResponse.json({ error: 'Invalid path', code: 'invalid_path' }, { status: 400 })
+            : new NextResponse('Invalid path', { status: 400 });
+    }
 
     // ===== Absolute body ceiling =====
     // App Router route handlers have no body limit of their own, so the only
