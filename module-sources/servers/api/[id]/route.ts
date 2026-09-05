@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { encryptSecret, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { serverUpdateSchema } from "../../lib/validations";
+import { SERVER_PUBLIC_FIELDS } from "../../lib/server-fields";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -34,7 +35,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (fields.isDefault !== undefined) data.isDefault = fields.isDefault;
     if (fields.isActive !== undefined) data.isActive = fields.isActive;
     if (fields.order !== undefined) data.order = fields.order;
-    const server = await prisma.gameServer.update({ where: { id }, data });
+    const server = await prisma.gameServer.update({ where: { id }, data, select: SERVER_PUBLIC_FIELDS });
     return NextResponse.json({ server });
 }
 

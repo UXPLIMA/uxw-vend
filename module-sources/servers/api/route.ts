@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { encryptSecret, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { serverCreateSchema } from "../lib/validations";
+import { SERVER_PUBLIC_FIELDS } from "../lib/server-fields";
 
 export async function GET() {
     const servers = await prisma.gameServer.findMany({
         where: { isActive: true },
         orderBy: { order: "asc" },
-        select: { id: true, name: true, type: true, host: true, port: true, queryPort: true, isDefault: true, isActive: true, order: true, createdAt: true, updatedAt: true },
+        select: SERVER_PUBLIC_FIELDS,
     });
     return NextResponse.json({ servers });
 }
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
             isDefault: fields.isDefault || false,
             order: fields.order || 0,
         },
+        select: SERVER_PUBLIC_FIELDS,
     });
     return NextResponse.json({ server }, { status: 201 });
 }
