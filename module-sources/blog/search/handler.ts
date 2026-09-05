@@ -14,6 +14,12 @@ interface SearchResult {
  * Uses PostgreSQL full-text search via a GIN tsvector index for O(log n)
  * lookups. Falls back to ILIKE-based contains() queries if the FTS index
  * is not yet present (e.g. fresh install before ensureIndexes() has run).
+ *
+ * Both paths repeat the visibility rule the public endpoints apply. PUBLISHED
+ * on its own is not "visible": `publishedAt` can be stamped in the future by
+ * a caller who passes one, and a `publishAt` left over from a schedule
+ * survives a status change that does not mention it. The list endpoint and
+ * the single-article endpoint both test the dates, so search does as well.
  */
 export default async function search(q: string): Promise<SearchResult[]> {
     if (!q || q.length < 2) return [];
@@ -24,6 +30,8 @@ export default async function search(q: string): Promise<SearchResult[]> {
             SELECT title, slug, excerpt
             FROM "BlogArticle"
             WHERE status = 'PUBLISHED'
+              AND "publishedAt" <= NOW()
+              AND ("publishAt" IS NULL OR "publishAt" <= NOW())
               AND to_tsvector('english', coalesce(title, '') || ' ' || coalesce(excerpt, '') || ' ' || coalesce(content, ''))
                   @@ plainto_tsquery('english', ${q})
             ORDER BY ts_rank(
@@ -48,6 +56,8 @@ export default async function search(q: string): Promise<SearchResult[]> {
             where: {
                 AND: [
                     { status: "PUBLISHED" },
+                    { publishedAt: { lte: new Date() } },
+                    { OR: [{ publishAt: null }, { publishAt: { lte: new Date() } }] },
                     {
                         OR: [
                             { title: { contains: q, mode: "insensitive" } },

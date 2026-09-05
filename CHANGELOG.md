@@ -52,6 +52,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Search and the sitemap read past the switch that hides a page.** A
+  search result is a way into content, not a lesser view of it, and a sitemap
+  is the most public read path there is - it hands a crawler the list of URLs
+  worth fetching. Both had drifted from the endpoints they link to.
+
+  The forum searched and announced every topic whatever its
+  `moderationState`, while `/api/v1/forum/topics` shows a non-admin only
+  APPROVED rows and the single-topic endpoint answers 404 for the rest. An
+  anonymous visitor searching a phrase got the title and the first 140
+  characters of a topic still waiting on a moderator, linked to a page that
+  would then refuse to show it, and the same topic was listed in
+  `/sitemap.xml` for search engines to fetch. The help centre searched
+  inactive articles, so clearing `isActive` - the only way an article is
+  taken down - left it readable to anyone who searched a phrase from it. The
+  blog checked `status = 'PUBLISHED'` and nothing else in search, and
+  `publishedAt` but not `publishAt` in its sitemap; neither is the whole test
+  its own page applies, because a caller can stamp `publishedAt` in the
+  future and a `publishAt` left over from a schedule survives a status change
+  that does not mention it.
+
+  Every provider now repeats the rule its public endpoint applies, on both
+  the full-text path and the ILIKE fallback an install without its GIN index
+  falls back to - a rule applied to one path only holds until the index is
+  missing. `a-public-read-path-hides-what-the-page-hides` runs all four
+  search providers and all three row-reading sitemap contributors against a
+  mocked client and asserts the predicate reaches the database, and fails if
+  a module ships a new one without an entry. The store was already correct.
+
+
 - **246 English fallbacks that could never be read.** A screen that may be
   asked for a key it does not have has one supported escape hatch:
   `t.has(key) ? t(key) : "English"`. It is the right call when the key is
