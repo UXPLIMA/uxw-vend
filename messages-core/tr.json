@@ -1258,7 +1258,8 @@
     "profileTab_ProfileOrdersTab": "Siparişler",
     "profileTab_ProfileChestTab": "Envanter",
     "profileTab_ProfileSecurityTab": "Güvenlik",
-    "profileTab_referrals": "Referanslar"
+    "profileTab_referrals": "Referanslar",
+    "metaDescription": "Hesap ayarların, oturumların ve gizlilik denetimlerin."
   },
   "auth": {
     "accountLocked": "Çok fazla başarısız deneme. Hesabın geçici olarak kilitlendi. E-postanı kontrol et veya birkaç dakika sonra tekrar dene.",
@@ -1351,7 +1352,8 @@
     "verifyFailedBody": "Bu doğrulama bağlantısı geçersiz veya süresi dolmuş. Profilden yenisini iste.",
     "verifySuccess": "E-posta doğrulandı!",
     "verifySuccessBody": "E-postan doğrulandı. Artık hesabının tüm özelliklerini kullanabilirsin.",
-    "verifyTitle": "E-postayı Doğrula"
+    "verifyTitle": "E-postayı Doğrula",
+    "verifyMetaDescription": "Hesabını tamamlamak için e-posta adresini doğrula."
   },
   "search": {
     "title": "Arama",
@@ -1365,7 +1367,8 @@
     "result": "sonuç",
     "results": "sonuç",
     "source": "kaynak",
-    "sources": "kaynak"
+    "sources": "kaynak",
+    "metaDescription": "Bu sitenin yayımladığı her şeyi ara."
   },
   "setup": {
     "title": "uxwVend Kurulumu",

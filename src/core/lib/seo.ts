@@ -14,12 +14,23 @@ import type { Metadata } from "next";
 import { prisma } from "./db";
 import { resolveAppUrl } from "./app-url";
 import { serverConfig } from "@/core/config/server";
+import { localeAlternates, localizedPath } from "./sitemap-routes";
+import { locales } from "./i18n/config";
 
 export interface PageMetaInput {
     title: string;
     description?: string;
     image?: string;
+    /** Path below the locale segment, e.g. `/store/cart`. */
     url?: string;
+    /**
+     * Which language this render is in. Every route on this site lives under a
+     * locale segment, so a URL without one is a redirect rather than a page:
+     * pass the locale and the canonical tag names the page a visitor is on
+     * instead of the redirect that leads to it. Omit it and no canonical or
+     * hreflang is emitted, which is better than emitting a wrong one.
+     */
+    locale?: string;
     type?: "website" | "article" | "profile";
     publishedTime?: string;
     authorName?: string;
@@ -78,6 +89,24 @@ function getSeoSiteInfoSync(): SeoSiteInfo {
 }
 
 /**
+ * `canonical` plus the `hreflang` set for one page.
+ *
+ * The sitemap has published these alternates for a while; the pages said
+ * nothing, so a crawler comparing the two found the claim on one side only.
+ * A path already carrying a locale segment is left alone - the caller has
+ * given an absolute or already-localized URL and knows better than we do.
+ */
+function alternatesFor(siteUrl: string, path: string | undefined, locale: string | undefined) {
+    if (!path || !locale || !(locales as readonly string[]).includes(locale)) return undefined;
+    if (path.startsWith("http")) return undefined;
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    return {
+        canonical: `${siteUrl}${localizedPath(normalized, locale)}`,
+        languages: localeAlternates(siteUrl, normalized),
+    };
+}
+
+/**
  * Build a Next.js Metadata object for a page, populated with OpenGraph and
  * Twitter card data. Use from `generateMetadata()` or as a static `metadata`
  * export. Async to allow reading Settings - await the result.
@@ -96,9 +125,12 @@ export async function buildPageMeta(input: PageMetaInput): Promise<Metadata> {
 
     const twitterCard: "summary" | "summary_large_image" = absoluteImage ? "summary_large_image" : "summary";
 
+    const alternates = alternatesFor(siteUrl, input.url, input.locale);
+
     return {
         title: input.title,
         description,
+        ...(alternates ? { alternates } : {}),
         openGraph: {
             title: input.title,
             description,
@@ -136,9 +168,12 @@ export function buildPageMetaSync(input: PageMetaInput): Metadata {
         : undefined;
     const twitterCard: "summary" | "summary_large_image" = absoluteImage ? "summary_large_image" : "summary";
 
+    const alternates = alternatesFor(siteUrl, input.url, input.locale);
+
     return {
         title: input.title,
         description,
+        ...(alternates ? { alternates } : {}),
         openGraph: {
             title: input.title,
             description,

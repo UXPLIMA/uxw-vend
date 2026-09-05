@@ -2,8 +2,12 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { Wrench, LogIn } from "lucide-react";
 import { getMaintenanceConfig } from "@/core/lib/maintenance";
+import { coreScreenMetadata } from "@/core/lib/core-screens";
 
 export const dynamic = "force-dynamic";
+
+// A server component, so it names itself directly - no sibling layout needed.
+export const generateMetadata = coreScreenMetadata("/maintenance");
 
 export default async function MaintenancePage() {
     const config = await getMaintenanceConfig();
