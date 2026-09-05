@@ -197,7 +197,7 @@ export function ProfileSecurityTab() {
         setPasswordSaved(false);
 
         if (newPassword !== confirmPassword) {
-            setPasswordError(t.has("passwordMismatch") ? t("passwordMismatch") : "Passwords don't match");
+            setPasswordError(t("passwordMismatch"));
             setSavingPassword(false);
             return;
         }
@@ -490,7 +490,7 @@ export function ProfileSecurityTab() {
                             {savingPassword ? (
                                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
                             ) : (
-                                t.has("changePassword") ? t("changePassword") : "Change password"
+                                t("changePassword")
                             )}
                         </Button>
                     </form>

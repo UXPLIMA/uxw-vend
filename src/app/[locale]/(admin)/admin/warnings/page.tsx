@@ -42,7 +42,6 @@ export default function WarningsPage() {
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
-    const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [warnings, setWarnings] = useState<Warning[]>([]);
     const [loading, setLoading] = useState(true);
@@ -120,11 +119,11 @@ export default function WarningsPage() {
     const issueWarning = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedUser) {
-            toast.error(fallback("warnings_selectUser", "Please select a user."));
+            toast.error(t("warnings_selectUser"));
             return;
         }
         if (!reason.trim()) {
-            toast.error(fallback("warnings_reasonRequired", "Reason is required."));
+            toast.error(t("warnings_reasonRequired"));
             return;
         }
         setSaving(true);
@@ -143,7 +142,7 @@ export default function WarningsPage() {
             if (failed) {
                 toast.error(failed);
             } else {
-                toast.success(fallback("warnings_issued", "Warning issued."));
+                toast.success(t("warnings_issued"));
                 resetForm();
                 fetchWarnings();
             }
@@ -154,15 +153,15 @@ export default function WarningsPage() {
 
     const revoke = async (w: Warning) => {
         const ok = await confirm({
-            title: fallback("warnings_revokeTitle", "Revoke warning"),
-            message: fallback("warnings_revokeConfirm", "Mark this warning as inactive?"),
+            title: t("warnings_revokeTitle"),
+            message: t("warnings_revokeConfirm"),
             variant: "danger",
-            confirmText: fallback("warnings_revoke", "Revoke"),
+            confirmText: t("warnings_revoke"),
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/admin/warnings/${w.id}`, { method: "PATCH" });
         if (res.ok) {
-            toast.success(fallback("warnings_revoked", "Warning revoked."));
+            toast.success(t("warnings_revoked"));
             fetchWarnings();
         } else {
             toast.error(t("common_failed"));
@@ -171,14 +170,14 @@ export default function WarningsPage() {
 
     const deleteWarning = async (w: Warning) => {
         const ok = await confirm({
-            title: fallback("warnings_deleteTitle", "Delete warning"),
-            message: fallback("warnings_deleteConfirm", "Permanently delete this warning?"),
+            title: t("warnings_deleteTitle"),
+            message: t("warnings_deleteConfirm"),
             variant: "danger",
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/admin/warnings/${w.id}`, { method: "DELETE" });
         if (res.ok) {
-            toast.success(fallback("warnings_deleted", "Warning deleted."));
+            toast.success(t("warnings_deleted"));
             fetchWarnings();
         } else {
             toast.error(t("common_failed"));
@@ -190,24 +189,21 @@ export default function WarningsPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-xl font-semibold">
-                        {fallback("warnings_title", "User Warnings")}
+                        {t("warnings_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        {fallback(
-                            "warnings_subtitle",
-                            "Issue and review moderator warnings for users.",
-                        )}
+                        {t("warnings_subtitle")}
                     </p>
                 </div>
                 <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
                     {showForm ? (
                         <>
-                            <X className="w-4 h-4 mr-2" /> {fallback("warnings_cancel", "Cancel")}
+                            <X className="w-4 h-4 mr-2" /> {t("warnings_cancel")}
                         </>
                     ) : (
                         <>
                             <Plus className="w-4 h-4 mr-2" />{" "}
-                            {fallback("warnings_issueButton", "Issue Warning")}
+                            {t("warnings_issueButton")}
                         </>
                     )}
                 </Button>
@@ -216,25 +212,22 @@ export default function WarningsPage() {
             {showForm && (
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>{fallback("warnings_newTitle", "New Warning")}</CardTitle>
+                        <CardTitle>{t("warnings_newTitle")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={issueWarning} className="space-y-4">
                             <div className="relative">
-                                <Label>{fallback("warnings_user", "User")}</Label>
+                                <Label>{t("warnings_user")}</Label>
                                 <Input
-                                    aria-label={fallback("warnings_user", "User")}
+                                    aria-label={t("warnings_user")}
                                     value={userQuery}
                                     onChange={(e) => searchUsers(e.target.value)}
-                                    placeholder={fallback(
-                                        "warnings_userPlaceholder",
-                                        "Search by username or email",
-                                    )}
+                                    placeholder={t("warnings_userPlaceholder")}
                                     autoComplete="off"
                                 />
                                 {selectedUser && (
                                     <p className="text-xs text-muted-foreground mt-1">
-                                        {fallback("warnings_selected", "Selected")}:{" "}
+                                        {t("warnings_selected")}:{" "}
                                         <span className="font-medium">{selectedUser.username}</span>
                                     </p>
                                 )}
@@ -258,9 +251,9 @@ export default function WarningsPage() {
                                 )}
                             </div>
                             <div>
-                                <Label>{fallback("warnings_reason", "Reason")}</Label>
+                                <Label>{t("warnings_reason")}</Label>
                                 <Textarea
-                                    aria-label={fallback("warnings_reason", "Reason")}
+                                    aria-label={t("warnings_reason")}
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
                                     rows={3}
@@ -269,9 +262,9 @@ export default function WarningsPage() {
                             </div>
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label>{fallback("warnings_points", "Points")}</Label>
+                                    <Label>{t("warnings_points")}</Label>
                                     <Input
-                                        aria-label={fallback("warnings_points", "Points")}
+                                        aria-label={t("warnings_points")}
                                         type="number"
                                         min={1}
                                         max={100}
@@ -280,9 +273,9 @@ export default function WarningsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>{fallback("warnings_expiresAt", "Expires At")}</Label>
+                                    <Label>{t("warnings_expiresAt")}</Label>
                                     <Input
-                                        aria-label={fallback("warnings_expiresAt", "Expires At")}
+                                        aria-label={t("warnings_expiresAt")}
                                         type="datetime-local"
                                         value={expiresAt}
                                         onChange={(e) => setExpiresAt(e.target.value)}
@@ -293,10 +286,10 @@ export default function WarningsPage() {
                                 {saving ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                        {fallback("warnings_issuing", "Issuing...")}
+                                        {t("warnings_issuing")}
                                     </>
                                 ) : (
-                                    fallback("warnings_issue", "Issue Warning")
+                                    t("warnings_issue")
                                 )}
                             </Button>
                         </form>
@@ -312,7 +305,7 @@ export default function WarningsPage() {
                         </div>
                     ) : warnings.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">
-                            {fallback("warnings_none", "No warnings have been issued.")}
+                            {t("warnings_none")}
                         </p>
                     ) : (
                         <div className="divide-y">
@@ -331,24 +324,24 @@ export default function WarningsPage() {
                                                 }`}
                                             >
                                                 {w.isActive
-                                                    ? fallback("warnings_active", "active")
-                                                    : fallback("warnings_inactive", "revoked")}
+                                                    ? t("warnings_active")
+                                                    : t("warnings_inactive")}
                                             </span>
                                             <span className="text-xs text-muted-foreground">
-                                                {w.points} {fallback("warnings_pts", "pts")}
+                                                {w.points} {t("warnings_pts")}
                                             </span>
                                         </div>
                                         <p className="text-sm text-muted-foreground truncate">
                                             {w.reason}
                                         </p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                            {fallback("warnings_by", "by")}{" "}
-                                            {w.issuedBy?.username || fallback("warnings_system", "system")}{" "}
+                                            {t("warnings_by")}{" "}
+                                            {w.issuedBy?.username || t("warnings_system")}{" "}
                                             · {new Date(w.createdAt).toLocaleString(__dateTag)}
                                             {w.expiresAt && (
                                                 <>
                                                     {" "}
-                                                    · {fallback("warnings_expires", "expires")}{" "}
+                                                    · {t("warnings_expires")}{" "}
                                                     {new Date(w.expiresAt).toLocaleDateString(__dateTag)}
                                                 </>
                                             )}
@@ -360,7 +353,7 @@ export default function WarningsPage() {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => revoke(w)}
-                                                title={fallback("warnings_revoke", "Revoke")}
+                                                title={t("warnings_revoke")}
                                             >
                                                 <ShieldOff className="w-3 h-3" />
                                             </Button>
@@ -382,7 +375,7 @@ export default function WarningsPage() {
                     {pages > 1 && (
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">
-                                {total} · {fallback("revisions_page", "Page")} {page} / {pages}
+                                {total} · {t("revisions_page")} {page} / {pages}
                             </span>
                             <div className="flex gap-1">
                                 <Button

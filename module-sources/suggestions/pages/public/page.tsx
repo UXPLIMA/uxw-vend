@@ -54,9 +54,9 @@ export default function SuggestionsPage() {
     const formatLocalDate = useLocalDate();
 
     const requireLogin = () => {
-        toast.error(t.has("loginToVote") ? t("loginToVote") : "Log in to vote", {
+        toast.error(t("loginToVote"), {
             action: {
-                label: t.has("login") ? t("login") : "Log in",
+                label: t("login"),
                 onClick: () => router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/")}`),
             },
         });

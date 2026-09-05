@@ -73,22 +73,22 @@ export default function GiftCodesPage() {
 
     const deleteCode = async (id: string) => {
         const ok = await confirm({
-            title: t.has("gc_deleteTitle") ? t("gc_deleteTitle") : "Delete gift code?",
-            message: t.has("gc_deleteConfirm") ? t("gc_deleteConfirm") : "Delete this gift code? If the code has been distributed but not redeemed, the holder will not be able to use it.",
-            confirmText: t.has("gc_delete") ? t("gc_delete") : "Delete",
+            title: t("gc_deleteTitle"),
+            message: t("gc_deleteConfirm"),
+            confirmText: t("gc_delete"),
             variant: "danger",
         });
         if (!ok) return;
         try {
             const res = await fetch(`/api/v1/gift-codes/${id}`, { method: "DELETE" });
             if (!res.ok) {
-                toast.error(t.has("gc_deleteError") ? t("gc_deleteError") : "Failed to delete gift code");
+                toast.error(t("gc_deleteError"));
                 return;
             }
-            toast.success(t.has("gc_deletedToast") ? t("gc_deletedToast") : "Gift code deleted");
+            toast.success(t("gc_deletedToast"));
             fetchCodes();
         } catch {
-            toast.error(t.has("gc_deleteError") ? t("gc_deleteError") : "Failed to delete gift code");
+            toast.error(t("gc_deleteError"));
         }
     };
 

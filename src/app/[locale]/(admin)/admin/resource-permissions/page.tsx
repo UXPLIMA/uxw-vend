@@ -47,7 +47,6 @@ const ACTIONS = ["view", "create", "edit", "delete", "*"];
 export default function ResourcePermissionsPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
-    const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [grants, setGrants] = useState<Grant[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -140,13 +139,13 @@ export default function ResourcePermissionsPage() {
     const grantPermission = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formResource.trim()) {
-            toast.error(fallback("rp_resourceRequired", "Resource is required."));
+            toast.error(t("rp_resourceRequired"));
             return;
         }
         const principalId =
             formPrincipalType === "role" ? formRoleId : formSelectedUser?.id || "";
         if (!principalId) {
-            toast.error(fallback("rp_principalRequired", "Select a role or user."));
+            toast.error(t("rp_principalRequired"));
             return;
         }
         setSaving(true);
@@ -167,7 +166,7 @@ export default function ResourcePermissionsPage() {
             if (failed) {
                 toast.error(failed);
             } else {
-                toast.success(fallback("rp_created", "Permission granted."));
+                toast.success(t("rp_created"));
                 resetForm();
                 fetchGrants();
             }
@@ -178,17 +177,17 @@ export default function ResourcePermissionsPage() {
 
     const revokeGrant = async (g: Grant) => {
         const ok = await confirm({
-            title: fallback("rp_revokeTitle", "Revoke permission"),
-            message: fallback("rp_revokeConfirm", "Remove this permission grant?"),
+            title: t("rp_revokeTitle"),
+            message: t("rp_revokeConfirm"),
             variant: "danger",
-            confirmText: fallback("rp_revoke", "Revoke"),
+            confirmText: t("rp_revoke"),
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/admin/resource-permissions/${g.id}`, {
             method: "DELETE",
         });
         if (res.ok) {
-            toast.success(fallback("rp_revoked", "Permission revoked."));
+            toast.success(t("rp_revoked"));
             fetchGrants();
         } else {
             toast.error(t("common_failed"));
@@ -200,23 +199,20 @@ export default function ResourcePermissionsPage() {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-xl font-semibold">
-                        {fallback("rp_title", "Resource Permissions")}
+                        {t("rp_title")}
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        {fallback(
-                            "rp_subtitle",
-                            "Granular per-resource allow/deny grants on top of role defaults.",
-                        )}
+                        {t("rp_subtitle")}
                     </p>
                 </div>
                 <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
                     {showForm ? (
                         <>
-                            <X className="w-4 h-4 mr-2" /> {fallback("rp_cancel", "Cancel")}
+                            <X className="w-4 h-4 mr-2" /> {t("rp_cancel")}
                         </>
                     ) : (
                         <>
-                            <Plus className="w-4 h-4 mr-2" /> {fallback("rp_grant", "Grant Permission")}
+                            <Plus className="w-4 h-4 mr-2" /> {t("rp_grant")}
                         </>
                     )}
                 </Button>
@@ -225,15 +221,15 @@ export default function ResourcePermissionsPage() {
             {showForm && (
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>{fallback("rp_newTitle", "New Grant")}</CardTitle>
+                        <CardTitle>{t("rp_newTitle")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={grantPermission} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label>{fallback("rp_resource", "Resource")}</Label>
+                                    <Label>{t("rp_resource")}</Label>
                                     <Input
-                                        aria-label={fallback("rp_resource", "Resource")}
+                                        aria-label={t("rp_resource")}
                                         value={formResource}
                                         onChange={(e) => setFormResource(e.target.value)}
                                         placeholder="blog.article"
@@ -242,22 +238,19 @@ export default function ResourcePermissionsPage() {
                                 </div>
                                 <div>
                                     <Label>
-                                        {fallback("rp_resourceId", "Resource ID (optional)")}
+                                        {t("rp_resourceId")}
                                     </Label>
                                     <Input
-                                        aria-label={fallback("rp_resourceId", "Resource ID (optional)")}
+                                        aria-label={t("rp_resourceId")}
                                         value={formResourceId}
                                         onChange={(e) => setFormResourceId(e.target.value)}
-                                        placeholder={fallback(
-                                            "rp_resourceIdPlaceholder",
-                                            "Leave blank to apply to all",
-                                        )}
+                                        placeholder={t("rp_resourceIdPlaceholder")}
                                     />
                                 </div>
                                 <div>
-                                    <Label>{fallback("rp_action", "Action")}</Label>
+                                    <Label>{t("rp_action")}</Label>
                                     <select
-                                        aria-label={fallback("rp_action", "Action")}
+                                        aria-label={t("rp_action")}
                                         value={formAction}
                                         onChange={(e) => setFormAction(e.target.value)}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -270,44 +263,44 @@ export default function ResourcePermissionsPage() {
                                     </select>
                                 </div>
                                 <div>
-                                    <Label>{fallback("rp_allow", "Allow / Deny")}</Label>
+                                    <Label>{t("rp_allow")}</Label>
                                     <select
-                                        aria-label={fallback("rp_allow", "Allow / Deny")}
+                                        aria-label={t("rp_allow")}
                                         value={formAllow}
                                         onChange={(e) => setFormAllow(e.target.value)}
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                     >
-                                        <option value="true">{fallback("rp_allowOpt", "Allow")}</option>
-                                        <option value="false">{fallback("rp_denyOpt", "Deny")}</option>
+                                        <option value="true">{t("rp_allowOpt")}</option>
+                                        <option value="false">{t("rp_denyOpt")}</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <Label>{fallback("rp_principalType", "Principal")}</Label>
+                                    <Label>{t("rp_principalType")}</Label>
                                     <select
-                                        aria-label={fallback("rp_principalType", "Principal")}
+                                        aria-label={t("rp_principalType")}
                                         value={formPrincipalType}
                                         onChange={(e) =>
                                             setFormPrincipalType(e.target.value as "role" | "user")
                                         }
                                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                     >
-                                        <option value="role">{fallback("rp_role", "Role")}</option>
-                                        <option value="user">{fallback("rp_user", "User")}</option>
+                                        <option value="role">{t("rp_role")}</option>
+                                        <option value="user">{t("rp_user")}</option>
                                     </select>
                                 </div>
                                 <div className="relative">
                                     {formPrincipalType === "role" ? (
                                         <>
-                                            <Label>{fallback("rp_selectRole", "Select Role")}</Label>
+                                            <Label>{t("rp_selectRole")}</Label>
                                             <select
-                                                aria-label={fallback("rp_selectRole", "Select Role")}
+                                                aria-label={t("rp_selectRole")}
                                                 value={formRoleId}
                                                 onChange={(e) => setFormRoleId(e.target.value)}
                                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                                 required
                                             >
                                                 <option value="">
-                                                    {fallback("rp_selectRolePlaceholder", "Select a role...")}
+                                                    {t("rp_selectRolePlaceholder")}
                                                 </option>
                                                 {roles.map((r) => (
                                                     <option key={r.id} value={r.id}>
@@ -318,20 +311,17 @@ export default function ResourcePermissionsPage() {
                                         </>
                                     ) : (
                                         <>
-                                            <Label>{fallback("rp_searchUser", "Search User")}</Label>
+                                            <Label>{t("rp_searchUser")}</Label>
                                             <Input
-                                                aria-label={fallback("rp_searchUser", "Search User")}
+                                                aria-label={t("rp_searchUser")}
                                                 value={formUserQuery}
                                                 onChange={(e) => searchUsers(e.target.value)}
-                                                placeholder={fallback(
-                                                    "rp_searchUserPlaceholder",
-                                                    "Search by username",
-                                                )}
+                                                placeholder={t("rp_searchUserPlaceholder")}
                                                 autoComplete="off"
                                             />
                                             {formSelectedUser && (
                                                 <p className="text-xs text-muted-foreground mt-1">
-                                                    {fallback("rp_selected", "Selected")}:{" "}
+                                                    {t("rp_selected")}:{" "}
                                                     <span className="font-medium">
                                                         {formSelectedUser.username}
                                                     </span>
@@ -363,10 +353,10 @@ export default function ResourcePermissionsPage() {
                                 {saving ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                        {fallback("rp_saving", "Saving...")}
+                                        {t("rp_saving")}
                                     </>
                                 ) : (
-                                    fallback("rp_create", "Grant")
+                                    t("rp_create")
                                 )}
                             </Button>
                         </form>
@@ -377,9 +367,9 @@ export default function ResourcePermissionsPage() {
             <Card className="mb-4">
                 <CardContent className="p-4 grid md:grid-cols-3 gap-3">
                     <div>
-                        <Label>{fallback("rp_filterResource", "Resource")}</Label>
+                        <Label>{t("rp_filterResource")}</Label>
                         <Input
-                            aria-label={fallback("rp_filterResource", "Resource")}
+                            aria-label={t("rp_filterResource")}
                             value={resourceFilter}
                             onChange={(e) => {
                                 setPage(1);
@@ -389,9 +379,9 @@ export default function ResourcePermissionsPage() {
                         />
                     </div>
                     <div>
-                        <Label>{fallback("rp_filterPrincipal", "Principal Type")}</Label>
+                        <Label>{t("rp_filterPrincipal")}</Label>
                         <select
-                            aria-label={fallback("rp_filterPrincipal", "Principal Type")}
+                            aria-label={t("rp_filterPrincipal")}
                             value={principalFilter}
                             onChange={(e) => {
                                 setPage(1);
@@ -399,13 +389,13 @@ export default function ResourcePermissionsPage() {
                             }}
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         >
-                            <option value="">{fallback("rp_all", "All")}</option>
-                            <option value="role">{fallback("rp_role", "Role")}</option>
-                            <option value="user">{fallback("rp_user", "User")}</option>
+                            <option value="">{t("rp_all")}</option>
+                            <option value="role">{t("rp_role")}</option>
+                            <option value="user">{t("rp_user")}</option>
                         </select>
                     </div>
                     <div className="flex items-end text-sm text-muted-foreground">
-                        {total} {fallback("rp_totalSuffix", "grants")}
+                        {total} {t("rp_totalSuffix")}
                     </div>
                 </CardContent>
             </Card>
@@ -418,7 +408,7 @@ export default function ResourcePermissionsPage() {
                         </div>
                     ) : grants.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">
-                            {fallback("rp_none", "No resource permission grants.")}
+                            {t("rp_none")}
                         </p>
                     ) : (
                         <div className="divide-y">
@@ -435,7 +425,7 @@ export default function ResourcePermissionsPage() {
                                             className="font-mono text-xs text-muted-foreground truncate"
                                             title={g.resourceId || ""}
                                         >
-                                            {g.resourceId || fallback("rp_any", "(any)")}
+                                            {g.resourceId || t("rp_any")}
                                         </span>
                                         <span className="font-mono text-xs">{g.action}</span>
                                         <span className="text-xs">
@@ -452,8 +442,8 @@ export default function ResourcePermissionsPage() {
                                             }`}
                                         >
                                             {g.allow
-                                                ? fallback("rp_allow", "allow")
-                                                : fallback("rp_deny", "deny")}
+                                                ? t("rp_allow")
+                                                : t("rp_deny")}
                                         </span>
                                     </div>
                                     <Button
@@ -472,7 +462,7 @@ export default function ResourcePermissionsPage() {
                     {pages > 1 && (
                         <div className="flex items-center justify-between p-3 border-t">
                             <span className="text-xs text-muted-foreground">
-                                {fallback("revisions_page", "Page")} {page} / {pages}
+                                {t("revisions_page")} {page} / {pages}
                             </span>
                             <div className="flex gap-1">
                                 <Button

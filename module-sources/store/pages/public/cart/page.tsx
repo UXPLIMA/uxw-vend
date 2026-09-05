@@ -163,10 +163,10 @@ export default function CartPage() {
                 setCouponApplied(data.coupon.code);
                 setCouponDiscount(data.coupon.discount);
             } else {
-                setCouponError(data.error || (t.has("err_invalidCoupon") ? t("err_invalidCoupon") : "Invalid coupon"));
+                setCouponError(data.error || (t("err_invalidCoupon")));
             }
         } catch {
-            setCouponError(t.has("err_validateCoupon") ? t("err_validateCoupon") : "Failed to validate coupon");
+            setCouponError(t("err_validateCoupon"));
         }
     };
 
@@ -187,10 +187,10 @@ export default function CartPage() {
             if (data.valid) {
                 setCreatorApplied({ code: data.code, discountPercent: data.discountPercent, creator: data.creator });
             } else {
-                setCreatorError(t.has("err_invalidCreatorCode") ? t("err_invalidCreatorCode") : "Invalid creator code");
+                setCreatorError(t("err_invalidCreatorCode"));
             }
         } catch {
-            setCreatorError(t.has("err_validateCreatorCode") ? t("err_validateCreatorCode") : "Failed to validate creator code");
+            setCreatorError(t("err_validateCreatorCode"));
         }
     };
 
@@ -227,7 +227,7 @@ export default function CartPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setCheckoutError(data.error || (t.has("err_checkoutFailed") ? t("err_checkoutFailed") : "Checkout failed"));
+                setCheckoutError(data.error || (t("err_checkoutFailed")));
                 return;
             }
 
@@ -241,7 +241,7 @@ export default function CartPage() {
             // Free order or dev mode: redirect to success page
             router.push("/store/order-success");
         } catch {
-            setCheckoutError(t.has("err_generic") ? t("err_generic") : "Something went wrong. Please try again.");
+            setCheckoutError(t("err_generic"));
         } finally {
             setCheckingOut(false);
         }

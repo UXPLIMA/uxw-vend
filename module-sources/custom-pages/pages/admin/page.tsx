@@ -70,11 +70,11 @@ export default function CustomPagesAdminPage() {
                 body: JSON.stringify({ title, content, isActive, order }),
             });
             if (res.ok) {
-                toast.success(t.has("adm_pageUpdated") ? t("adm_pageUpdated") : "Page updated");
+                toast.success(t("adm_pageUpdated"));
                 resetForm();
                 fetchPages();
             } else {
-                toast.error(t.has("adm_updateFailed") ? t("adm_updateFailed") : "Failed to update page");
+                toast.error(t("adm_updateFailed"));
             }
         } else {
             const res = await fetch("/api/v1/custom-pages", {
@@ -83,11 +83,11 @@ export default function CustomPagesAdminPage() {
                 body: JSON.stringify({ title, slug: slug || undefined, content, isActive, order }),
             });
             if (res.ok) {
-                toast.success(t.has("adm_pageCreated") ? t("adm_pageCreated") : "Page created");
+                toast.success(t("adm_pageCreated"));
                 resetForm();
                 fetchPages();
             } else {
-                toast.error(t.has("adm_createFailed") ? t("adm_createFailed") : "Failed to create page");
+                toast.error(t("adm_createFailed"));
             }
         }
         setSaving(false);
@@ -95,18 +95,18 @@ export default function CustomPagesAdminPage() {
 
     const deletePage = async (page: CustomPage) => {
         const ok = await confirm({
-            title: t.has("adm_deleteTitle") ? t("adm_deleteTitle") : "Delete Page",
-            message: t.has("adm_deleteConfirm") ? t("adm_deleteConfirm", { title: page.title }) : `Are you sure you want to delete "${page.title}"?`,
+            title: t("adm_deleteTitle"),
+            message: t("adm_deleteConfirm", { title: page.title }),
             variant: "danger",
-            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+            confirmText: t("adm_delete"),
         });
         if (!ok) return;
         const res = await fetch(`/api/v1/custom-pages/${page.slug}`, { method: "DELETE" });
         if (res.ok) {
-            toast.success(t.has("adm_pageDeleted") ? t("adm_pageDeleted") : "Page deleted");
+            toast.success(t("adm_pageDeleted"));
             fetchPages();
         } else {
-            toast.error(t.has("adm_deleteFailed") ? t("adm_deleteFailed") : "Failed to delete page");
+            toast.error(t("adm_deleteFailed"));
         }
     };
 

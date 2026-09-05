@@ -167,14 +167,14 @@ export default function AdminTicketsPage() {
                     size="sm"
                     onClick={() => setStatusFilter("RESOLVED")}
                 >
-                    {t.has("adm_resolved") ? t("adm_resolved") : "Resolved"}
+                    {t("adm_resolved")}
                 </Button>
                 <Button
                     variant={statusFilter === "CLOSED" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setStatusFilter("CLOSED")}
                 >
-                    {t.has("adm_closed") ? t("adm_closed") : "Closed"}
+                    {t("adm_closed")}
                 </Button>
             </div>
 

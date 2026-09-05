@@ -146,9 +146,9 @@ export default function AdminCouponsPage() {
 
     const deleteCoupon = async (id: string) => {
         const ok = await confirm({
-            title: t.has("cou_deleteTitle") ? t("cou_deleteTitle") : "Delete coupon?",
-            message: t.has("cou_deleteConfirm") ? t("cou_deleteConfirm") : "Delete this coupon? This cannot be undone.",
-            confirmText: t.has("cou_delete") ? t("cou_delete") : "Delete",
+            title: t("cou_deleteTitle"),
+            message: t("cou_deleteConfirm"),
+            confirmText: t("cou_delete"),
             variant: "danger",
         });
         if (!ok) return;
@@ -156,13 +156,13 @@ export default function AdminCouponsPage() {
             const res = await fetch(`/api/v1/store/coupons/${id}`, { method: "DELETE" });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t.has("cou_deleteError") ? t("cou_deleteError") : "Failed to delete coupon"));
+                toast.error(data.error || (t("cou_deleteError")));
                 return;
             }
-            toast.success(t.has("cou_deletedToast") ? t("cou_deletedToast") : "Coupon deleted");
+            toast.success(t("cou_deletedToast"));
             fetchCoupons();
         } catch {
-            toast.error(t.has("cou_deleteError") ? t("cou_deleteError") : "Failed to delete coupon");
+            toast.error(t("cou_deleteError"));
         }
     };
 

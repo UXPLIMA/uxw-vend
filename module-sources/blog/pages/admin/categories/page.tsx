@@ -92,23 +92,23 @@ export default function AdminBlogCategoriesPage() {
 
     const deleteCategory = async (id: string) => {
         const ok = await confirm({
-            title: t.has("adm_deleteCatTitle") ? t("adm_deleteCatTitle") : "Delete category?",
-            message: t.has("adm_deleteCatConfirm") ? t("adm_deleteCatConfirm") : "Delete this category? Articles will be unlinked from it.",
-            confirmText: t.has("adm_delete") ? t("adm_delete") : "Delete",
+            title: t("adm_deleteCatTitle"),
+            message: t("adm_deleteCatConfirm"),
+            confirmText: t("adm_delete"),
             variant: "danger",
         });
         if (!ok) return;
         try {
             const res = await fetch(`/api/v1/blog/categories/${id}`, { method: "DELETE" });
             if (res.ok) {
-                toast.success(t.has("adm_catDeleted") ? t("adm_catDeleted") : "Category deleted");
+                toast.success(t("adm_catDeleted"));
                 fetchCategories();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t.has("adm_deleteCatError") ? t("adm_deleteCatError") : "Failed to delete category"));
+                toast.error(data.error || (t("adm_deleteCatError")));
             }
         } catch {
-            toast.error(t.has("adm_deleteCatError") ? t("adm_deleteCatError") : "Failed to delete category");
+            toast.error(t("adm_deleteCatError"));
         }
     };
 

@@ -114,7 +114,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                 {/* Related Articles */}
                                 {relatedArticles.length > 0 && (
                                     <div className="bg-card rounded-xl border border-border p-5">
-                                        <h2 className="font-bold text-foreground mb-4">{t.has("relatedArticles") ? t("relatedArticles") : "Related Articles"}</h2>
+                                        <h2 className="font-bold text-foreground mb-4">{t("relatedArticles")}</h2>
                                         <div className="space-y-4">
                                             {relatedArticles.map((related) => (
                                                 <Link
@@ -148,7 +148,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
                                 {/* Share */}
                                 <div className="bg-card rounded-xl border border-border p-5">
-                                    <h2 className="font-bold text-foreground mb-4">{t.has("share") ? t("share") : "Share"}</h2>
+                                    <h2 className="font-bold text-foreground mb-4">{t("share")}</h2>
                                     <div className="flex gap-2">
                                         <a
                                             href={shareTwitter}
@@ -176,7 +176,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                 <div className="text-sm text-muted-foreground mb-6">
                                     <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
                                     <span className="mx-2">/</span>
-                                    <Link href="/blog" className="hover:text-blue-600">{t.has("breadcrumb") ? t("breadcrumb") : "Blog"}</Link>
+                                    <Link href="/blog" className="hover:text-blue-600">{t("breadcrumb")}</Link>
                                     {article.category && (
                                         <>
                                             <span className="mx-2">/</span>
@@ -239,7 +239,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                 </div>
                                                 <div>
                                                     <p className="font-medium text-foreground">{article.author.username}</p>
-                                                    <p className="text-sm text-muted-foreground">{t.has("author") ? t("author") : "Author"}</p>
+                                                    <p className="text-sm text-muted-foreground">{t("author")}</p>
                                                 </div>
                                             </div>
                                         )}

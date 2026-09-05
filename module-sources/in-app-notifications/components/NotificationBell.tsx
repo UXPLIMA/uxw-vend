@@ -182,7 +182,7 @@ export function NotificationBell() {
                         onClick={() => setOpen(false)}
                         className="block px-3 py-2 text-xs text-center text-primary hover:bg-muted border-t border-border inline-flex items-center justify-center gap-1 w-full"
                     >
-                        {t.has("viewAll") ? t("viewAll") : "View all"} <ExternalLink className="w-3 h-3" />
+                        {t("viewAll")} <ExternalLink className="w-3 h-3" />
                     </Link>
                 </div>
             )}

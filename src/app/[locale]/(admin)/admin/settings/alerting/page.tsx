@@ -34,7 +34,6 @@ const STATUSES: HealthStatus[] = ["degraded", "down"];
 
 export default function AlertingSettingsPage() {
     const t = useTranslations("admin");
-    const fallback = (key: string, en: string) => (t.has(key) ? t(key) : en);
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -76,7 +75,7 @@ export default function AlertingSettingsPage() {
     const save = async (e: React.FormEvent) => {
         e.preventDefault();
         if (alertOn.length === 0) {
-            toast.error(fallback("alerting_selectAtLeastOne", "Select at least one status to alert on."));
+            toast.error(t("alerting_selectAtLeastOne"));
             return;
         }
         setSaving(true);
@@ -87,10 +86,10 @@ export default function AlertingSettingsPage() {
                 body: JSON.stringify({ enabled, channel: channelId, webhookUrl, alertOn }),
             });
             if (res.ok) {
-                toast.success(fallback("alerting_saved", "Alerting settings saved."));
+                toast.success(t("alerting_saved"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || fallback("alerting_saveFailed", "Failed to save."));
+                toast.error(data.error || t("alerting_saveFailed"));
             }
         } finally {
             setSaving(false);
@@ -99,17 +98,17 @@ export default function AlertingSettingsPage() {
 
     const sendTest = async () => {
         if (!webhookUrl) {
-            toast.error(fallback("alerting_saveFirst", "Save a webhook URL first."));
+            toast.error(t("alerting_saveFirst"));
             return;
         }
         setTesting(true);
         try {
             const res = await fetch("/api/v1/admin/alerting/test", { method: "POST" });
             if (res.ok) {
-                toast.success(fallback("alerting_testSent", "Test notification sent."));
+                toast.success(t("alerting_testSent"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || fallback("alerting_testFailed", "Test failed."));
+                toast.error(data.error || t("alerting_testFailed"));
             }
         } finally {
             setTesting(false);
@@ -128,19 +127,16 @@ export default function AlertingSettingsPage() {
         <>
             <div className="mb-6">
                 <h1 className="text-3xl font-bold">
-                    {fallback("alerting_title", "Health Alerting")}
+                    {t("alerting_title")}
                 </h1>
                 <p className="text-muted-foreground">
-                    {fallback(
-                        "alerting_subtitle",
-                        "Send a webhook notification when /api/health goes degraded or down.",
-                    )}
+                    {t("alerting_subtitle")}
                 </p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{fallback("alerting_webhookTitle", "Webhook configuration")}</CardTitle>
+                    <CardTitle>{t("alerting_webhookTitle")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={save} className="space-y-6">
@@ -153,12 +149,12 @@ export default function AlertingSettingsPage() {
                                 className="h-4 w-4"
                             />
                             <Label htmlFor="enabled" className="cursor-pointer">
-                                {fallback("alerting_enabled", "Enable health alerting")}
+                                {t("alerting_enabled")}
                             </Label>
                         </div>
 
                         <div>
-                            <Label>{fallback("alerting_channel", "Delivery channel")}</Label>
+                            <Label>{t("alerting_channel")}</Label>
                             <div className="flex flex-wrap gap-4 mt-2">
                                 {channels.map((c) => (
                                     <label key={c.id} className="flex items-center gap-2 cursor-pointer">
@@ -175,18 +171,15 @@ export default function AlertingSettingsPage() {
                             </div>
                             {channels.length === 1 && (
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    {fallback(
-                                        "alerting_channelHint",
-                                        "Install a module that provides a delivery channel to get richer formatting.",
-                                    )}
+                                    {t("alerting_channelHint")}
                                 </p>
                             )}
                         </div>
 
                         <div>
-                            <Label>{fallback("alerting_webhookUrl", "Webhook URL")}</Label>
+                            <Label>{t("alerting_webhookUrl")}</Label>
                             <Input
-                                aria-label={fallback("alerting_webhookUrl", "Webhook URL")}
+                                aria-label={t("alerting_webhookUrl")}
                                 type="url"
                                 value={webhookUrl}
                                 onChange={(e) => setWebhookUrl(e.target.value)}
@@ -194,13 +187,13 @@ export default function AlertingSettingsPage() {
                             />
                             <p className="text-xs text-muted-foreground mt-1">
                                 {activeChannel?.hosts?.length
-                                    ? fallback("alerting_hostHint", "Must be a webhook URL on:") + " " + activeChannel.hosts.join(", ")
-                                    : fallback("alerting_publicHint", "Must be an https URL on a public host.")}
+                                    ? t("alerting_hostHint") + " " + activeChannel.hosts.join(", ")
+                                    : t("alerting_publicHint")}
                             </p>
                         </div>
 
                         <div>
-                            <Label>{fallback("alerting_alertOn", "Alert on these statuses")}</Label>
+                            <Label>{t("alerting_alertOn")}</Label>
                             <div className="flex gap-4 mt-2">
                                 {STATUSES.map((status) => (
                                     <label key={status} className="flex items-center gap-2 cursor-pointer">
@@ -214,10 +207,7 @@ export default function AlertingSettingsPage() {
                                 ))}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {fallback(
-                                    "alerting_alertOnHint",
-                                    "Recovery ('ok' after a bad state) is always sent.",
-                                )}
+                                {t("alerting_alertOnHint")}
                             </p>
                         </div>
 
@@ -226,10 +216,10 @@ export default function AlertingSettingsPage() {
                                 {saving ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        {fallback("alerting_saving", "Saving...")}
+                                        {t("alerting_saving")}
                                     </>
                                 ) : (
-                                    fallback("alerting_save", "Save")
+                                    t("alerting_save")
                                 )}
                             </Button>
                             <Button
@@ -241,12 +231,12 @@ export default function AlertingSettingsPage() {
                                 {testing ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        {fallback("alerting_testing", "Sending...")}
+                                        {t("alerting_testing")}
                                     </>
                                 ) : (
                                     <>
                                         <Send className="w-4 h-4 mr-2" />
-                                        {fallback("alerting_test", "Test webhook")}
+                                        {t("alerting_test")}
                                     </>
                                 )}
                             </Button>

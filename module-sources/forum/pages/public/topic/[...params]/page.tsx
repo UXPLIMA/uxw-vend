@@ -102,7 +102,7 @@ export default function TopicDetailPage() {
     const toggleLike = async () => {
         if (!topic) return;
         if (!session?.user) {
-            toast.error(t.has("loginToLike") ? t("loginToLike") : "Please log in to like");
+            toast.error(t("loginToLike"));
             router.push("/auth/login");
             return;
         }
@@ -113,14 +113,14 @@ export default function TopicDetailPage() {
                 setLiked(data.liked);
                 setLikeCount(data.count);
             } else if (res.status === 401) {
-                toast.error(t.has("loginToLike") ? t("loginToLike") : "Please log in to like");
+                toast.error(t("loginToLike"));
                 router.push("/auth/login");
             } else {
-                toast.error(t.has("likeError") ? t("likeError") : "Failed to like");
+                toast.error(t("likeError"));
             }
         } catch (err) {
             console.error("Failed to toggle like:", err);
-            toast.error(t.has("likeError") ? t("likeError") : "Failed to like");
+            toast.error(t("likeError"));
         }
     };
 
