@@ -251,10 +251,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // Extract ip + userAgent from the incoming Request (best-effort).
                 try {
                     const headers = (request as Request | undefined)?.headers;
-                    const ip =
-                        headers?.get("x-forwarded-for")?.split(",")[0].trim() ||
-                        headers?.get("x-real-ip") ||
-                        "";
+                    // Through getClientIP, so the address recorded against a
+                    // login is the one the proxy vouched for rather than the
+                    // leftmost forwarded entry, which the caller writes.
+                    const ip = headers ? getClientIP(headers) : "";
                     const userAgent = headers?.get("user-agent") || "";
                     const { doActionAsync } = await import("./hooks");
                     await doActionAsync("user.login", {

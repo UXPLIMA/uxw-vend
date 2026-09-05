@@ -23,10 +23,16 @@ export async function register(): Promise<void> {
     const { bootstrapHooks } = await import("@/core/lib/hooks");
     const { bootstrapScheduler } = await import("@/core/lib/scheduler");
     const { installShutdownHandlers } = await import("@/core/lib/shutdown");
+    const { warnIfProxyTrustUnconfigured } = await import("@/core/lib/rate-limit");
 
     // Install first. If bootstrap below throws, a SIGTERM must still unwind
     // Prisma and any interval already registered.
     installShutdownHandlers();
+
+    // One line, once, if the caller's address cannot be verified. Rate limits
+    // and IP blocks both key on it, and an operator behind an undeclared proxy
+    // would otherwise have no way to find out.
+    warnIfProxyTrustUnconfigured();
 
     try {
         await bootstrapHooks();
