@@ -172,7 +172,25 @@ async function deliverViaProvider(opts: {
     if (!validateEmailAddress(opts.to)) {
         return { ok: false, error: "Invalid recipient address" };
     }
-    const safeSubject = stripHeaderInjection(opts.subject);
+
+    // The one place every outbound message passes through, so the one place
+    // the email filters can run. They run before sanitization, not after: a
+    // listener's output is no more trusted than a caller's, and the header
+    // injection guard below has to be the last word on what is sent.
+    let subject = opts.subject;
+    let html = opts.html;
+    try {
+        const { applyFiltersAsync } = await import("./hooks");
+        subject = await applyFiltersAsync("email.subject", opts.subject, { to: opts.to });
+        html = await applyFiltersAsync("email.body", opts.html, { to: opts.to, subject });
+    } catch {
+        // A broken listener must not stop the mail. Fall back to what the
+        // caller wrote.
+        subject = opts.subject;
+        html = opts.html;
+    }
+
+    const safeSubject = stripHeaderInjection(subject);
     if (!safeSubject) {
         return { ok: false, error: "Empty subject after sanitization" };
     }
@@ -188,7 +206,7 @@ async function deliverViaProvider(opts: {
             from: `${stripHeaderInjection(APP_NAME)} <${stripHeaderInjection(FROM_EMAIL)}>`,
             to: opts.to,
             subject: safeSubject,
-            html: opts.html,
+            html,
         });
         return { ok: true };
     } catch (err) {

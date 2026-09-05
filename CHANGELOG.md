@@ -8,6 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Ten of the seventeen hooks core advertised were fired by nothing.**
+  `HookNames` is the list a module author reads to find out what they can
+  listen to. A module could declare `{ "hook": "user.deleted", "type":
+  "action" }`, pass validation, ship, and never run: a listener registered
+  against a name nobody emits is indistinguishable from one whose event has
+  not happened yet, so there was no error anywhere to notice.
+
+  Three of them mattered. `user.deleted` was the only way a module could
+  clean up after a right to be forgotten, which is exactly what
+  `two-factor-auth` needs: it injects `twoFactorSecret`, `twoFactorEnabled`
+  and `backupCodes` into `User`, and core cannot know about a column a
+  module added to one of core's own models, so the TOTP seed and the hashed
+  backup codes of an erased account stayed in the database indefinitely.
+  `user.banned` and `user.updated` are how a module mirroring an account
+  elsewhere hears that an admin changed it. All three are now emitted, typed
+  in the payload registry, and `two-factor-auth` listens for the erasure and
+  clears its three columns.
+
+  `email.subject` and `email.body` had a real place to run and no call.
+  They now run in `deliverViaProvider`, the single point every outbound
+  message passes through whether it was queued or sent immediately, and they
+  run before `stripHeaderInjection` rather than after: a listener's output
+  is no more trusted than a caller's, so the injection guard stays the last
+  word on what is sent. A listener that throws leaves the message as its
+  caller wrote it rather than stopping the mail.
+
+  The remaining five - `page.title`, `page.meta`, `navbar.links`,
+  `footer.links` and `admin.sidebar` - are gone rather than wired. Each
+  describes a contribution the manifest already makes declaratively through
+  `navLinks`, `footerLinks`, `navGroups` and `seoRoutes`, which do work, and
+  two mechanisms for one thing is how the dead one gets built against.
+
+  The gate scans every source file for an emitter of every name `HookNames`
+  declares, by constant or by literal, and fails on any that has none.
+
 - **A module could not have its private data erased.** `user-deletion.ts`
   carried a doc comment saying "this file knows nothing about any specific
   module" directly above a list that named `linkedAccount`, `notification`,

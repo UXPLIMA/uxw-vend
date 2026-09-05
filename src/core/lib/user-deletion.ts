@@ -143,6 +143,15 @@ export async function softDeleteUser(
             },
         });
 
+        // Last, and only once the anonymisation has actually landed: a
+        // module that keeps user data core cannot reach - a column it added
+        // to `User`, a cache, a file - gets its chance here. A listener that
+        // throws or hangs must not turn a completed erasure into a failure.
+        try {
+            const { doActionAsync, HookNames } = await import("./hooks");
+            await doActionAsync(HookNames.USER_DELETED, { userId, reason: reason ?? null });
+        } catch { /* non-fatal: the erasure itself is done */ }
+
         return { success: true };
     } catch (err) {
         return {

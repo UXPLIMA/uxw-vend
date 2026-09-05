@@ -2,7 +2,7 @@
   "id": "two-factor-auth",
   "name": "Two-Factor Authentication",
   "description": "TOTP-based 2FA with backup codes for enhanced account security",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -65,6 +65,13 @@
     {
       "hook": "user.2fa.enabled",
       "type": "action"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "user.deleted",
+      "type": "action",
+      "handler": "hooks/on-user-deleted.ts"
     }
   ],
   "translations": {

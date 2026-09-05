@@ -447,11 +447,6 @@ export const HookNames = {
     USER_DELETED: "user.deleted",
     USER_BANNED: "user.banned",
 
-    PAGE_TITLE: "page.title",
-    PAGE_META: "page.meta",
-    NAVBAR_LINKS: "navbar.links",
-    FOOTER_LINKS: "footer.links",
-    ADMIN_SIDEBAR: "admin.sidebar",
     EMAIL_SUBJECT: "email.subject",
     EMAIL_BODY: "email.body",
 } as const;

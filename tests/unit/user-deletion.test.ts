@@ -39,6 +39,19 @@ function makeDelegate(model: string) {
     };
 }
 
+/** Actions fired through the hook system, in order. */
+let firedHooks: { name: string; payload: unknown }[];
+let hookThrows: boolean;
+
+vi.mock("@/core/lib/hooks", () => ({
+    HookNames: { USER_DELETED: "user.deleted" },
+    doActionAsync: async (name: string, payload: unknown) => {
+        if (hookThrows) throw new Error("a listener exploded");
+        opLog.push(`hook:${name}`);
+        firedHooks.push({ name, payload });
+    },
+}));
+
 vi.mock("@/core/generated/module-registry", () => ({
     get ModuleUserDataTables() { return moduleTables; },
 }));
@@ -116,6 +129,8 @@ beforeEach(() => {
     failingModels = new Set();
     bogusModels = new Set();
     opLog = [];
+    firedHooks = [];
+    hookThrows = false;
     moduleTables = [...MODULE_TABLES];
     installedModels = new Set([...ALL_PRIVATE_MODELS, ...PUBLIC_RECORD_MODELS]);
 });
@@ -263,8 +278,42 @@ describe("softDeleteUser", () => {
         // If anonymisation went first and then something threw, the account
         // would already be unreachable while its private data was still
         // there - the worst of both outcomes.
-        expect(opLog[opLog.length - 1]).toBe("update:user");
-        expect(opLog.slice(0, -1).every((op) => op.startsWith("delete:"))).toBe(true);
+        const writes = opLog.filter((op) => !op.startsWith("hook:"));
+        expect(writes[writes.length - 1]).toBe("update:user");
+        expect(writes.slice(0, -1).every((op) => op.startsWith("delete:"))).toBe(true);
+    });
+
+    it("tells the modules once the account is actually anonymised", async () => {
+        // A module keeps data core cannot reach - a column it added to User,
+        // a cache, a file. This action is its only notice, and it must come
+        // after the row has changed rather than before.
+        await softDeleteUser("usr_1", "spam");
+
+        expect(firedHooks).toEqual([{ name: "user.deleted", payload: { userId: "usr_1", reason: "spam" } }]);
+        expect(opLog[opLog.length - 1]).toBe("hook:user.deleted");
+        expect(opLog[opLog.length - 2]).toBe("update:user");
+    });
+
+    it("passes a null reason rather than undefined", async () => {
+        await softDeleteUser("usr_1");
+        expect(firedHooks[0].payload).toEqual({ userId: "usr_1", reason: null });
+    });
+
+    it("reports success even when a listener throws", async () => {
+        hookThrows = true;
+
+        // The erasure has already happened by then. Reporting it as failed
+        // would invite a retry, and the second run is refused as "already
+        // deleted" - so the caller would be told an erasure failed that did
+        // not, and could never be made to succeed.
+        expect(await softDeleteUser("usr_1")).toEqual({ success: true });
+        expect(updateArgs).not.toBeNull();
+    });
+
+    it("fires nothing when the erasure was refused", async () => {
+        userRow = { id: "usr_1", isDeleted: true };
+        await softDeleteUser("usr_1");
+        expect(firedHooks).toEqual([]);
     });
 
     it("refuses an unknown user without touching anything", async () => {
