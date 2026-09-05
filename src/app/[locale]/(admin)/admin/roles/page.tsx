@@ -4,38 +4,16 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { Loader2, Plus, X, Shield, Trash2 } from "lucide-react";
+import { Loader2, Plus, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
-import { CORE_PERMISSIONS } from "@/core/lib/permission-names";
+import { Link } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
+import { LoadFailed } from "@/core/components/ui/load-failed";
+import type { RoleRecord } from "./role-form";
 
-interface Permission {
-    id: string;
-    name: string;
-    module: string;
-}
-
-interface Role {
-    id: string;
-    name: string;
-    displayName: string;
-    color: string | null;
-    priority: number;
-    isDefault: boolean;
-    permissions: Permission[];
-    _count: { users: number };
-}
-
-// Core permissions always shown; module permissions added dynamically.
-// The names come from core so this screen and moduleSystem.getAllPermissions()
-// cannot drift apart.
-const corePermissions = [
-    { module: "admin", perms: [...CORE_PERMISSIONS] },
-];
+type Role = RoleRecord;
 
 export default function AdminRolesPage() {
     const t = useTranslations("admin");
@@ -43,30 +21,19 @@ export default function AdminRolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const paged = usePagedRows(roles);
     const [loading, setLoading] = useState(true);
-    const [availablePermissions, setAvailablePermissions] = useState(corePermissions);
+    const [failed, setFailed] = useState(false);
     const { confirm } = useConfirm();
-    const [editingRole, setEditingRole] = useState<Role | null>(null);
-    const [showCreateForm, setShowCreateForm] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const [form, setForm] = useState({
-        name: "",
-        displayName: "",
-        color: "#6366f1",
-        priority: 0,
-        permissions: [] as string[],
-    });
 
     const fetchRoles = async () => {
+        setLoading(true);
         try {
             const res = await fetch("/api/v1/roles");
-            if (res.ok) {
-                const data = await res.json();
-                setRoles(data.roles || []);
-            }
-        } catch (err) {
-            console.error("Failed to fetch roles:", err);
+            if (!res.ok) throw new Error("failed");
+            const data = await res.json();
+            setRoles(data.roles || []);
+            setFailed(false);
+        } catch {
+            setFailed(true);
         } finally {
             setLoading(false);
         }
@@ -74,76 +41,7 @@ export default function AdminRolesPage() {
 
     useEffect(() => {
         fetchRoles();
-        // Build permission groups dynamically from module manifests
-        fetch("/api/v1/modules")
-            .then((r) => r.json())
-            .then((data) => {
-                const modules = (data.modules || []).filter((m: { enabled: boolean }) => m.enabled);
-                const modulePerms = modules
-                    .filter((m: { permissions?: string[] }) => m.permissions && m.permissions.length > 0)
-                    .map((m: { id: string; permissions: string[] }) => ({ module: m.id, perms: m.permissions as string[] }));
-                setAvailablePermissions([...corePermissions, ...modulePerms]);
-            })
-            .catch(() => { /* keep core permissions only */ });
     }, []);
-
-    const resetForm = () => {
-        setForm({ name: "", displayName: "", color: "#6366f1", priority: 0, permissions: [] });
-        setEditingRole(null);
-        setShowCreateForm(false);
-        setError(null);
-    };
-
-    const startEdit = (role: Role) => {
-        setEditingRole(role);
-        setShowCreateForm(true);
-        setForm({
-            name: role.name,
-            displayName: role.displayName,
-            color: role.color || "#6366f1",
-            priority: role.priority,
-            permissions: role.permissions.map((p) => p.name),
-        });
-    };
-
-    const togglePermission = (perm: string) => {
-        setForm((prev) => ({
-            ...prev,
-            permissions: prev.permissions.includes(perm)
-                ? prev.permissions.filter((p) => p !== perm)
-                : [...prev.permissions, perm],
-        }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        setError(null);
-
-        try {
-            const url = editingRole ? `/api/v1/roles/${editingRole.id}` : "/api/v1/roles";
-            const method = editingRole ? "PATCH" : "POST";
-
-            const res = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
-
-            const failed = await writeError(res, commonT("somethingWentWrong"), t);
-            if (failed) {
-                setError(failed);
-                return;
-            }
-
-            resetForm();
-            fetchRoles();
-        } catch {
-            setError(commonT("somethingWentWrong"));
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const deleteRole = async (roleId: string) => {
         const ok = await confirm({ title: t("roles_deleteTitle"), message: t("roles_deleteMessage"), variant: "danger", confirmText: t("common_delete") });
@@ -151,9 +49,9 @@ export default function AdminRolesPage() {
 
         try {
             const res = await fetch(`/api/v1/roles/${roleId}`, { method: "DELETE" });
-            const failed = await writeError(res, commonT("somethingWentWrong"), t);
-            if (failed) {
-                toast.error(failed);
+            const failedMessage = await writeError(res, commonT("somethingWentWrong"), t);
+            if (failedMessage) {
+                toast.error(failedMessage);
                 return;
             }
             fetchRoles();
@@ -170,6 +68,8 @@ export default function AdminRolesPage() {
         );
     }
 
+    if (failed) return <LoadFailed onRetry={fetchRoles} />;
+
     return (
         <>
             <div className="flex justify-between items-center mb-8">
@@ -177,123 +77,12 @@ export default function AdminRolesPage() {
                     <h1 className="text-3xl font-bold">{t("roles_title")}</h1>
                     <p className="text-muted-foreground">{t("roles_subtitle")}</p>
                 </div>
-                <Button onClick={() => { resetForm(); setShowCreateForm(true); }}>
-                    <Plus className="w-4 h-4 mr-2" /> {t("roles_newRole")}
-                </Button>
+                <Link href="/admin/roles/new" className="inline-flex">
+                    <Button>
+                        <Plus className="w-4 h-4 mr-2" /> {t("roles_newRole")}
+                    </Button>
+                </Link>
             </div>
-
-            {error && (
-                <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
-            )}
-
-            {/* Create/Edit Form */}
-            {showCreateForm && (
-                <Card className="mb-8">
-                    <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                            <span>{editingRole ? t("roles_editRole", { name: editingRole.displayName }) : t("roles_newRole")}</span>
-                            <Button aria-label={commonT("close")} variant="ghost" size="icon" onClick={resetForm}>
-                                <X className="w-4 h-4" />
-                            </Button>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>{t("roles_internalName")} *</Label>
-                                    <Input
-                                        aria-label={t("roles_internalName")}
-                                        value={form.name}
-                                        onChange={(e) => setForm({ ...form, name: e.target.value.toLowerCase().replace(/[^a-z_]/g, "") })}
-                                        placeholder="moderator"
-                                        required
-                                        disabled={editingRole?.name === "admin"}
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-1">{t("roles_lowercaseHint")}</p>
-                                </div>
-                                <div>
-                                    <Label>{t("roles_displayName")} *</Label>
-                                    <Input
-                                        aria-label={t("roles_displayName")}
-                                        value={form.displayName}
-                                        onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-                                        placeholder={t("roles_namePlaceholder")}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label>{t("roles_color")}</Label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            aria-label={t("roles_color")}
-                                            type="color"
-                                            value={form.color}
-                                            onChange={(e) => setForm({ ...form, color: e.target.value })}
-                                            className="w-10 h-10 rounded cursor-pointer"
-                                        />
-                                        <Input
-                                            value={form.color}
-                                            onChange={(e) => setForm({ ...form, color: e.target.value })}
-                                            placeholder="#6366f1" aria-label={t("roles_color")}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label>{t("roles_priority")}</Label>
-                                    <Input
-                                        aria-label={t("roles_priority")}
-                                        type="number"
-                                        value={form.priority}
-                                        onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}
-                                        placeholder="0"
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-1">{t("roles_priorityHint")}</p>
-                                </div>
-                            </div>
-
-                            {/* Permissions */}
-                            <div>
-                                <Label className="mb-3 block">{t("roles_permissions")}</Label>
-                                {editingRole?.name === "admin" ? (
-                                    <p className="text-sm text-muted-foreground">{t("roles_adminAllPerms")}</p>
-                                ) : (
-                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {availablePermissions.map((group) => (
-                                            <div key={group.module} className="border rounded-lg p-3">
-                                                <p className="text-sm font-medium mb-2 capitalize">{group.module}</p>
-                                                <div className="space-y-1">
-                                                    {group.perms.map((perm) => (
-                                                        <label key={perm} className="flex items-center gap-2 text-sm cursor-pointer">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={form.permissions.includes(perm)}
-                                                                onChange={() => togglePermission(perm)}
-                                                                className="rounded"
-                                                            />
-                                                            <span className="text-muted-foreground">{perm}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("roles_saving")}</>
-                                ) : editingRole ? (
-                                    t("roles_saveChanges")
-                                ) : (
-                                    t("roles_createRole")
-                                )}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             {/* Roles List */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -309,9 +98,11 @@ export default function AdminRolesPage() {
                                     <span>{role.displayName}</span>
                                 </div>
                                 <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" onClick={() => startEdit(role)}>
-                                        {t("crud_edit")}
-                                    </Button>
+                                    <Link href={`/admin/roles/${role.id}/edit`} className="inline-flex">
+                                        <Button variant="ghost" size="sm">
+                                            {t("crud_edit")}
+                                        </Button>
+                                    </Link>
                                     {role.name !== "admin" && role.name !== "member" && (
                                         <Button
                                             aria-label={commonT("delete")}

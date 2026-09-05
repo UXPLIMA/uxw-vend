@@ -2,10 +2,10 @@
 
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, useConfirm } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, ExternalLink, Pencil, LayoutDashboard } from "lucide-react";
+import { Button, Card, CardContent, Input, Label, RichTextEditor, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { ArrowLeft, Loader2, Plus, Trash2, ExternalLink, Pencil, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 
 interface CustomPage {
@@ -22,10 +22,12 @@ export default function CustomPagesAdminPage() {
     const commonT = useTranslations("common");
     const [pages, setPages] = useState<CustomPage[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
     const { confirm } = useConfirm();
+
+    // The editor is a screen of its own at `?form=new` or `?form=<id>`, so it
+    // survives a reload and the back button closes it.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
 
     const [title, setTitle] = useState("");
     const [slug, setSlug] = useState("");
@@ -33,31 +35,43 @@ export default function CustomPagesAdminPage() {
     const [isActive, setIsActive] = useState(true);
     const [order, setOrder] = useState(0);
 
-    const fetchPages = async () => {
+    const fetchPages = useCallback(async () => {
         const res = await fetch("/api/v1/custom-pages");
         if (res.ok) { const data = await res.json(); setPages(data.pages || []); }
         setLoading(false);
-    };
+    }, []);
 
-    useEffect(() => { fetchPages(); }, []);
+    useEffect(() => { fetchPages(); }, [fetchPages]);
 
     const resetForm = () => {
         setTitle(""); setSlug(""); setContent(""); setIsActive(true); setOrder(0);
-        setEditingId(null); setShowForm(false);
     };
 
-    const startEdit = async (page: CustomPage) => {
-        const res = await fetch(`/api/v1/custom-pages/${page.slug}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setTitle(data.page.title);
-        setSlug(data.page.slug);
-        setContent(data.page.content || "");
-        setIsActive(data.page.isActive);
-        setOrder(data.page.order || 0);
-        setEditingId(page.id);
-        setShowForm(true);
-    };
+    // The page the URL names is loaded once the list arrives, so opening
+    // `?form=<id>` directly - or reloading it - lands on a filled editor. The
+    // body is not in the list response, hence the second request.
+    useEffect(() => {
+        if (!editingId) { resetForm(); return; }
+        const row = pages.find((page) => page.id === editingId);
+        if (!row) return;
+        let cancelled = false;
+        fetch(`/api/v1/custom-pages/${row.slug}`)
+            .then((res) => (res.ok ? res.json() : Promise.reject(new Error("load"))))
+            .then((data) => {
+                if (cancelled) return;
+                setTitle(data.page.title);
+                setSlug(data.page.slug);
+                setContent(data.page.content || "");
+                setIsActive(data.page.isActive);
+                setOrder(data.page.order || 0);
+            })
+            .catch(() => {
+                // An editor that silently stays blank looks like an empty
+                // page, and saving it would then wipe the real one.
+                if (!cancelled) toast.error(t("adm_loadFailed"));
+            });
+        return () => { cancelled = true; };
+    }, [editingId, pages, t]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,8 +85,8 @@ export default function CustomPagesAdminPage() {
             });
             if (res.ok) {
                 toast.success(t("adm_pageUpdated"));
-                resetForm();
-                fetchPages();
+                await fetchPages();
+                closeForm();
             } else {
                 toast.error(t("adm_updateFailed"));
             }
@@ -84,8 +98,8 @@ export default function CustomPagesAdminPage() {
             });
             if (res.ok) {
                 toast.success(t("adm_pageCreated"));
-                resetForm();
-                fetchPages();
+                await fetchPages();
+                closeForm();
             } else {
                 toast.error(t("adm_createFailed"));
             }
@@ -112,22 +126,21 @@ export default function CustomPagesAdminPage() {
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_customPages")}</h1>
-                    <p className="text-muted-foreground">{t("adm_customPagesSubtitle")}</p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{editingId ? t("adm_editPage") : t("adm_createPage")}</h1>
+                        <p className="text-muted-foreground">{t("adm_customPagesSubtitle")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newPage")}</>}
-                </Button>
-            </div>
 
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader><CardTitle>{editingId ? t("adm_editPage") : t("adm_createPage")}</CardTitle></CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
@@ -155,14 +168,33 @@ export default function CustomPagesAdminPage() {
                                     <Input aria-label={t("adm_order")} type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {editingId ? t("adm_updatePage") : t("adm_createPage")}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                    {editingId ? t("adm_updatePage") : t("adm_createPage")}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_customPages")}</h1>
+                    <p className="text-muted-foreground">{t("adm_customPagesSubtitle")}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newPage")}</Button>
+                </Link>
+            </div>
 
             {pages.length === 0 ? (
                 <Card><CardContent className="py-8 text-center text-muted-foreground">{t("adm_noPagesYet")}</CardContent></Card>
@@ -186,7 +218,7 @@ export default function CustomPagesAdminPage() {
                                             <LayoutDashboard className="w-3 h-3" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" onClick={() => startEdit(page)} title={t("adm_htmlEditor")}><Pencil className="w-3 h-3" /></Button>
+                                    <Button variant="ghost" size="sm" onClick={() => openForm(page.id)} title={t("adm_htmlEditor")}><Pencil className="w-3 h-3" /></Button>
                                     <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deletePage(page)}><Trash2 className="w-3 h-3" /></Button>
                                 </div>
                             </CardContent>

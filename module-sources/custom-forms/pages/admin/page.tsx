@@ -2,9 +2,10 @@
 
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, NativeSelect } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Button, Card, CardContent, Input, Label, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
 
@@ -31,9 +32,10 @@ export default function FormsPage() {
     const { confirm } = useConfirm();
     const [forms, setForms] = useState<Form[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showCreate, setShowCreate] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [editingSlug, setEditingSlug] = useState<string | null>(null);
+    // The builder is a screen at `?form=new` or `?form=<slug>`, not a card
+    // above the list of forms.
+    const { showForm: showCreate, editingId: editingSlug, formHref, openForm, closeForm } = useFormRoute();
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -41,41 +43,38 @@ export default function FormsPage() {
         { name: "name", type: "text", label: "Name", required: true },
     ]);
 
-    const fetchForms = async () => {
+    const fetchForms = useCallback(async () => {
         const res = await fetch("/api/v1/forms");
         if (res.ok) { const data = await res.json(); setForms(data.forms || []); }
         setLoading(false);
-    };
+    }, []);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    useEffect(() => { fetchForms(); }, []);
+    useEffect(() => { fetchForms(); }, [fetchForms]);
 
-    const resetForm = () => {
-        setTitle("");
-        setDescription("");
-        setFields([{ name: "name", type: "text", label: "Name", required: true }]);
-        setEditingSlug(null);
-        setShowCreate(false);
-    };
-
-    const startEdit = async (form: Form) => {
-        try {
-            const res = await fetch(`/api/v1/forms/${form.slug}`);
-            if (!res.ok) {
-                toast.error(t("adm_loadFormFailed"));
-                return;
-            }
-            const data = await res.json();
-            const f = data.form;
-            setEditingSlug(f.slug);
-            setTitle(f.title || "");
-            setDescription(f.description || "");
-            setFields(Array.isArray(f.fields) && f.fields.length > 0 ? f.fields : [{ name: "name", type: "text", label: "Name", required: true }]);
-            setShowCreate(true);
-        } catch {
-            toast.error(t("adm_loadFormFailed"));
+    // The builder loads the form the URL names, so `?form=<slug>` can be
+    // reloaded, linked or reopened and still land on the same fields. The
+    // field list is not in the index response, hence the second request.
+    useEffect(() => {
+        if (!editingSlug) {
+            setTitle("");
+            setDescription("");
+            setFields([{ name: "name", type: "text", label: "Name", required: true }]);
+            return;
         }
-    };
+        let cancelled = false;
+        fetch(`/api/v1/forms/${editingSlug}`)
+            .then((res) => (res.ok ? res.json() : Promise.reject(new Error("load"))))
+            .then((data) => {
+                if (cancelled) return;
+                const f = data.form;
+                setTitle(f.title || "");
+                setDescription(f.description || "");
+                setFields(Array.isArray(f.fields) && f.fields.length > 0 ? f.fields : [{ name: "name", type: "text", label: "Name", required: true }]);
+            })
+            .catch(() => { if (!cancelled) toast.error(t("adm_loadFormFailed")); });
+        return () => { cancelled = true; };
+    }, [editingSlug, t]);
 
     const addField = () => {
         setFields([...fields, { name: `field_${fields.length}`, type: "text", label: "", required: false }]);
@@ -100,9 +99,9 @@ export default function FormsPage() {
             body: JSON.stringify({ title, description, fields }),
         });
         if (res.ok) {
-            toast.success(editingSlug ? "Updated" : "Created");
-            resetForm();
-            fetchForms();
+            toast.success(editingSlug ? t("adm_formSaved") : t("adm_formCreated"));
+            await fetchForms();
+            closeForm();
         } else {
             toast.error(t("adm_writeFailed"));
         }
@@ -124,22 +123,21 @@ export default function FormsPage() {
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_customForms")}</h1>
-                    <p className="text-muted-foreground">{t("adm_customFormsSubtitle")}</p>
+    if (showCreate) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{editingSlug ? t("adm_editForm") : t("adm_createForm")}</h1>
+                        <p className="text-muted-foreground">{t("adm_customFormsSubtitle")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => showCreate ? resetForm() : setShowCreate(true)}>
-                    {showCreate ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newForm")}</>}
-                </Button>
-            </div>
 
-            {showCreate && (
-                <Card className="mb-6">
-                    <CardHeader><CardTitle>{editingSlug ? t("adm_editForm") : t("adm_createForm")}</CardTitle></CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={submitForm} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
@@ -181,14 +179,33 @@ export default function FormsPage() {
                                 </div>
                             </div>
 
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {editingSlug ? t("adm_saveChanges") : t("adm_createFormButton")}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                    {editingSlug ? t("adm_saveChanges") : t("adm_createFormButton")}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_customForms")}</h1>
+                    <p className="text-muted-foreground">{t("adm_customFormsSubtitle")}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newForm")}</Button>
+                </Link>
+            </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {forms.length === 0 ? (
@@ -203,7 +220,7 @@ export default function FormsPage() {
                                     {form.description && <p className="text-xs text-muted-foreground">{form.description}</p>}
                                 </div>
                                 <div className="flex gap-1">
-                                    <Button aria-label={commonT("edit")} variant="ghost" size="sm" onClick={() => startEdit(form)}><Pencil className="w-3 h-3" /></Button>
+                                    <Button aria-label={commonT("edit")} variant="ghost" size="sm" onClick={() => openForm(form.slug)}><Pencil className="w-3 h-3" /></Button>
                                     <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteForm(form.slug)}><Trash2 className="w-3 h-3" /></Button>
                                 </div>
                             </div>

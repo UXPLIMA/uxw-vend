@@ -132,8 +132,10 @@ describe("the screens that were fixed", () => {
     it("gives the gift code screen a way to reach the next page", () => {
         const page = reads("module-sources/store/pages/admin/gift-codes/page.tsx");
         expect(page).toContain("?page=${targetPage}");
-        expect(page).toContain("previousPage");
-        expect(page).toContain("nextPage");
+        // Its own two chevrons became the shared pager, which carries first,
+        // last, numbered pages and a box to type a page number into.
+        expect(page).toContain("<Pagination");
+        expect(page).toContain("pages={totalPages}");
     });
 
     it("pages the blog index and still shows the newest five in the sidebar", () => {

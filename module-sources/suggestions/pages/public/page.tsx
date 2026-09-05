@@ -51,6 +51,7 @@ export default function SuggestionsPage() {
     const router = useRouter();
     const pathname = usePathname();
     const t = useTranslations("suggestions");
+    const commonT = useTranslations("common");
     const formatLocalDate = useLocalDate();
 
     const requireLogin = () => {
@@ -139,7 +140,7 @@ export default function SuggestionsPage() {
                     </div>
                     {session?.user && (
                         <Button onClick={() => setShowForm(!showForm)}>
-                            {showForm ? <><X className="w-4 h-4 mr-2" /> </> : <><Plus className="w-4 h-4 mr-2" /> {t("newSuggestion")}</>}
+                            {showForm ? <><X className="w-4 h-4 mr-2" /> {commonT("cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("newSuggestion")}</>}
                         </Button>
                     )}
                 </div>

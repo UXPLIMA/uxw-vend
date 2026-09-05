@@ -53,7 +53,10 @@ const dialogFiles = SEARCH_DIRS.flatMap((d) => walk(path.join(ROOT, d)))
 
 describe("dialogs", () => {
     it("finds the components that draw one", () => {
-        expect(dialogFiles.length).toBeGreaterThanOrEqual(12);
+        // The floor drops as modals turn into screens: the SEO overrides and
+        // trophies editors were `role="dialog"` and are now routes of their
+        // own, since a modal is the same screen wearing one address.
+        expect(dialogFiles.length).toBeGreaterThanOrEqual(10);
     });
 
     it("gives every one of them the shared keyboard behaviour", () => {

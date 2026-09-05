@@ -22,7 +22,7 @@ export {
     SelectItem,
 } from "@/core/components/ui/select";
 export { NativeSelect } from "@/core/components/ui/native-select";
-export { Pagination } from "@/core/components/ui/pagination";
+export { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 export type { NativeSelectProps } from "@/core/components/ui/native-select";
 export type { PaginationProps } from "@/core/components/ui/pagination";
 export { Skeleton } from "@/core/components/ui/skeleton";
@@ -44,6 +44,11 @@ export { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 // whatever opened it. A module that draws its own `role="dialog"` needs this
 // as much as core does, and there is one implementation of it.
 export { useModalDialog, type ModalDialogOptions } from "@/core/hooks/useModalDialog";
+
+// A create or edit form belongs on an address of its own rather than
+// unfolding above the list it belongs to. Core's screens got route
+// segments; a module screen gets the same behaviour on the path it has.
+export { useFormRoute } from "@/core/hooks/useFormRoute";
 
 // A module that builds a public page needs the same breadcrumb core uses.
 // This sat in the tree unreachable from a module, so the store hand-rolled

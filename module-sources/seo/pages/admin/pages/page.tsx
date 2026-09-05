@@ -3,8 +3,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useModalDialog } from "@/core/sdk/ui";
-import { ArrowLeft, Plus, Pencil, Trash2, Loader2, X, Search, Globe, EyeOff } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { ArrowLeft, Plus, Pencil, Trash2, Loader2, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
 
@@ -56,13 +56,14 @@ export default function SeoPageOverridesPage() {
     const commonT = useTranslations("common");
     const [pages, setPages] = useState<SeoPage[]>([]);
     const [loading, setLoading] = useState(true);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    // The form dialog had no keyboard exit at all and left Tab free to walk
-    // into the table behind it.
-    const dialogRef = useModalDialog<HTMLDivElement>(dialogOpen, () => setDialogOpen(false));
-    const [editingId, setEditingId] = useState<string | null>(null);
+    // The override form used to be a modal over the table. A modal is still
+    // the same screen wearing one address: it cannot be linked, reloaded or
+    // closed with the back button. It is now a screen at `?form=new` or
+    // `?form=<id>`.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
     const [form, setForm] = useState<FormData>(EMPTY_FORM);
     const [submitting, setSubmitting] = useState(false);
+    const paged = usePagedRows(pages);
     const { confirm } = useConfirm();
 
     const fetchPages = useCallback(async () => {
@@ -81,14 +82,15 @@ export default function SeoPageOverridesPage() {
         fetchPages();
     }, [fetchPages]);
 
-    const openCreate = () => {
-        setEditingId(null);
-        setForm(EMPTY_FORM);
-        setDialogOpen(true);
-    };
-
-    const openEdit = (page: SeoPage) => {
-        setEditingId(page.id);
+    // The override the URL names fills the form once the rows arrive, so
+    // `?form=<id>` survives a reload and can be sent to someone.
+    useEffect(() => {
+        if (!editingId) {
+            setForm(EMPTY_FORM);
+            return;
+        }
+        const page = pages.find((row) => row.id === editingId);
+        if (!page) return;
         setForm({
             path: page.path,
             metaTitle: page.metaTitle || "",
@@ -101,8 +103,7 @@ export default function SeoPageOverridesPage() {
             noIndex: page.noIndex,
             noFollow: page.noFollow,
         });
-        setDialogOpen(true);
-    };
+    }, [editingId, pages]);
 
     const handleDelete = async (page: SeoPage) => {
         const ok = await confirm({
@@ -165,8 +166,8 @@ export default function SeoPageOverridesPage() {
             toast.success(editingId
                 ? t("adm_updatedToast")
                 : t("adm_createdToast"));
-            setDialogOpen(false);
-            fetchPages();
+            await fetchPages();
+            closeForm();
         } catch {
             toast.error(t("adm_genericError"));
         } finally {
@@ -186,117 +187,26 @@ export default function SeoPageOverridesPage() {
         );
     }
 
-    return (
-        <>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <Link href="/admin/seo">
-                        <Button aria-label={commonT("back")} variant="ghost" size="icon">
+    if (showForm) {
+        return (
+            <>
+                <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+                    <div className="flex items-center gap-4">
+                        <Button aria-label={commonT("back")} variant="ghost" size="icon" onClick={closeForm}>
                             <ArrowLeft className="w-4 h-4" />
                         </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground">{t("adm_pageSeoOverrides")}</h1>
-                        <p className="text-muted-foreground">{t("adm_configurePerPage")}</p>
+                        <div>
+                            <h1 className="text-3xl font-bold text-foreground">
+                                {editingId ? t("adm_editPageSeo") : t("adm_addPageSeo")}
+                            </h1>
+                            <p className="text-muted-foreground">{t("adm_configurePerPage")}</p>
+                        </div>
                     </div>
                 </div>
-                <Button onClick={openCreate}>
-                    <Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}
-                </Button>
-            </div>
 
-            {/* Pages Table */}
-            {pages.length === 0 ? (
                 <Card>
-                    <CardContent className="p-12 text-center">
-                        <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-lg font-medium text-foreground mb-1">{t("adm_noPageSeo")}</p>
-                        <p className="text-sm text-muted-foreground mb-6">{t("adm_noPageSeoDesc")}</p>
-                        <Button onClick={openCreate}>
-                            <Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}
-                        </Button>
-                    </CardContent>
-                </Card>
-            ) : (
-                <Card>
-                    <CardContent className="p-0">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-border">
-                                        <th className="text-left p-4 font-medium text-muted-foreground">{t("adm_path")}</th>
-                                        <th className="text-left p-4 font-medium text-muted-foreground">{t("adm_metaTitle")}</th>
-                                        <th className="text-left p-4 font-medium text-muted-foreground hidden md:table-cell">{t("adm_description")}</th>
-                                        <th className="text-center p-4 font-medium text-muted-foreground">{t("adm_index")}</th>
-                                        <th className="text-right p-4 font-medium text-muted-foreground">{t("adm_actions")}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pages.map((page) => (
-                                        <tr key={page.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-2">
-                                                    <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                                    <span className="font-mono text-foreground text-xs">{page.path}</span>
-                                                </div>
-                                            </td>
-                                            <td className="p-4 text-foreground max-w-[200px] truncate">
-                                                {page.metaTitle || <span className="text-muted-foreground">--</span>}
-                                            </td>
-                                            <td className="p-4 text-muted-foreground max-w-[250px] truncate hidden md:table-cell">
-                                                {page.metaDescription || "--"}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                {page.noIndex ? (
-                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
-                                                        <EyeOff className="w-3 h-3" /> noindex
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
-                                                        indexed
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Button aria-label={commonT("edit")} variant="ghost" size="icon" onClick={() => openEdit(page)}>
-                                                        <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button aria-label={commonT("delete")} variant="ghost" size="icon" onClick={() => handleDelete(page)}>
-                                                        <Trash2 className="w-4 h-4 text-destructive" />
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {/* Form Dialog */}
-            {dialogOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center" role="presentation">
-                    <div className="fixed inset-0 bg-black/50" onClick={() => setDialogOpen(false)} aria-hidden="true" />
-                    <div
-                        ref={dialogRef}
-                        role="dialog"
-                        aria-modal="true"
-                        className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
-                    >
-                        <div className="sticky top-0 bg-card border-b border-border p-4 flex items-center justify-between rounded-t-xl z-10">
-                            <h2 className="text-lg font-semibold text-foreground">
-                                {editingId ? t("adm_editPageSeo") : t("adm_addPageSeo")}
-                            </h2>
-                            <Button aria-label={commonT("close")} variant="ghost" size="icon" onClick={() => setDialogOpen(false)}>
-                                <X className="w-4 h-4" />
-                            </Button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    <CardContent className="p-6">
+                        <form onSubmit={handleSubmit} className="space-y-5">
                             {/* URL Path */}
                             <div>
                                 <Label className="text-foreground">{`${t("adm_urlPath")} *`}</Label>
@@ -437,7 +347,7 @@ export default function SeoPageOverridesPage() {
 
                             {/* Actions */}
                             <div className="flex justify-end gap-2 pt-2">
-                                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                                <Button type="button" variant="outline" onClick={closeForm}>
                                     {t("adm_cancel")}
                                 </Button>
                                 <Button type="submit" disabled={submitting}>
@@ -451,9 +361,104 @@ export default function SeoPageOverridesPage() {
                                 </Button>
                             </div>
                         </form>
+                    </CardContent>
+                </Card>
+            </>
+        );
+    }
+
+    return (
+        <>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+                <div className="flex items-center gap-4">
+                    <Link href="/admin/seo">
+                        <Button aria-label={commonT("back")} variant="ghost" size="icon">
+                            <ArrowLeft className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                    <div>
+                        <h1 className="text-3xl font-bold text-foreground">{t("adm_pageSeoOverrides")}</h1>
+                        <p className="text-muted-foreground">{t("adm_configurePerPage")}</p>
                     </div>
                 </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}</Button>
+                </Link>
+            </div>
+
+            {/* Pages Table */}
+            {pages.length === 0 ? (
+                <Card>
+                    <CardContent className="p-12 text-center">
+                        <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-lg font-medium text-foreground mb-1">{t("adm_noPageSeo")}</p>
+                        <p className="text-sm text-muted-foreground mb-6">{t("adm_noPageSeoDesc")}</p>
+                        <Link href={formHref()} className="inline-flex">
+                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Card>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-border">
+                                        <th className="text-left p-4 font-medium text-muted-foreground">{t("adm_path")}</th>
+                                        <th className="text-left p-4 font-medium text-muted-foreground">{t("adm_metaTitle")}</th>
+                                        <th className="text-left p-4 font-medium text-muted-foreground hidden md:table-cell">{t("adm_description")}</th>
+                                        <th className="text-center p-4 font-medium text-muted-foreground">{t("adm_index")}</th>
+                                        <th className="text-right p-4 font-medium text-muted-foreground">{t("adm_actions")}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paged.rows.map((page) => (
+                                        <tr key={page.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                                    <span className="font-mono text-foreground text-xs">{page.path}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-foreground max-w-[200px] truncate">
+                                                {page.metaTitle || <span className="text-muted-foreground">--</span>}
+                                            </td>
+                                            <td className="p-4 text-muted-foreground max-w-[250px] truncate hidden md:table-cell">
+                                                {page.metaDescription || "--"}
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                {page.noIndex ? (
+                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                                                        <EyeOff className="w-3 h-3" /> noindex
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">
+                                                        indexed
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Button aria-label={commonT("edit")} variant="ghost" size="icon" onClick={() => openForm(page.id)}>
+                                                        <Pencil className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button aria-label={commonT("delete")} variant="ghost" size="icon" onClick={() => handleDelete(page)}>
+                                                        <Trash2 className="w-4 h-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    </CardContent>
+                </Card>
             )}
+
         </>
     );
 }

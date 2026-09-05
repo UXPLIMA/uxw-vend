@@ -1,24 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { useCallback, useEffect, useState } from "react";
+import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Pagination } from "@/core/components/ui/pagination";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { Textarea } from "@/core/components/ui/textarea";
-import {
-    Plus,
-    X,
-    Loader2,
-    ShieldOff,
-    Trash2,
-} from "lucide-react";
+import { Plus, Loader2, ShieldOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
-import { writeError } from "@/core/lib/write-result";
 
 interface Warning {
     id: string;
@@ -29,11 +20,6 @@ interface Warning {
     createdAt: string;
     user: { id: string; username: string } | null;
     issuedBy: { id: string; username: string } | null;
-}
-
-interface UserHit {
-    id: string;
-    username: string;
 }
 
 export default function WarningsPage() {
@@ -48,17 +34,8 @@ export default function WarningsPage() {
     const [pages, setPages] = useState(1);
     const [total, setTotal] = useState(0);
 
-    const [showForm, setShowForm] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [userQuery, setUserQuery] = useState("");
-    const [userHits, setUserHits] = useState<UserHit[]>([]);
-    const [selectedUser, setSelectedUser] = useState<UserHit | null>(null);
-    const [reason, setReason] = useState("");
-    const [points, setPoints] = useState("1");
-    const [expiresAt, setExpiresAt] = useState("");
 
     const { confirm } = useConfirm();
-    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const fetchWarnings = useCallback(async () => {
         setLoading(true);
@@ -78,77 +55,6 @@ export default function WarningsPage() {
     useEffect(() => {
         fetchWarnings();
     }, [fetchWarnings]);
-
-    const searchUsers = (q: string) => {
-        setUserQuery(q);
-        setSelectedUser(null);
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-        if (!q.trim()) {
-            setUserHits([]);
-            return;
-        }
-        searchTimeoutRef.current = setTimeout(async () => {
-            try {
-                const res = await fetch(`/api/v1/users?search=${encodeURIComponent(q)}&limit=10`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setUserHits(
-                        (data.users || []).map((u: { id: string; username: string }) => ({
-                            id: u.id,
-                            username: u.username,
-                        })),
-                    );
-                }
-            } catch {
-                /* ignore */
-            }
-        }, 250);
-    };
-
-    const resetForm = () => {
-        setShowForm(false);
-        setUserQuery("");
-        setUserHits([]);
-        setSelectedUser(null);
-        setReason("");
-        setPoints("1");
-        setExpiresAt("");
-    };
-
-    const issueWarning = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedUser) {
-            toast.error(t("warnings_selectUser"));
-            return;
-        }
-        if (!reason.trim()) {
-            toast.error(t("warnings_reasonRequired"));
-            return;
-        }
-        setSaving(true);
-        try {
-            const res = await fetch("/api/v1/admin/warnings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId: selectedUser.id,
-                    reason: reason.trim(),
-                    points: Number(points) || 1,
-                    expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
-                }),
-            });
-            const failed = await writeError(res, commonT("somethingWentWrong"), t);
-            if (failed) {
-                toast.error(failed);
-            } else {
-                toast.success(t("warnings_issued"));
-                resetForm();
-                fetchWarnings();
-            }
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const revoke = async (w: Warning) => {
         const ok = await confirm({
@@ -194,107 +100,12 @@ export default function WarningsPage() {
                         {t("warnings_subtitle")}
                     </p>
                 </div>
-                <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
-                    {showForm ? (
-                        <>
-                            <X className="w-4 h-4 mr-2" /> {t("warnings_cancel")}
-                        </>
-                    ) : (
-                        <>
-                            <Plus className="w-4 h-4 mr-2" />{" "}
-                            {t("warnings_issueButton")}
-                        </>
-                    )}
-                </Button>
+                <Link href="/admin/warnings/new" className="inline-flex">
+                    <Button>
+                        <Plus className="w-4 h-4 mr-2" /> {t("warnings_issueButton")}
+                    </Button>
+                </Link>
             </div>
-
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{t("warnings_newTitle")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={issueWarning} className="space-y-4">
-                            <div className="relative">
-                                <Label>{t("warnings_user")}</Label>
-                                <Input
-                                    aria-label={t("warnings_user")}
-                                    value={userQuery}
-                                    onChange={(e) => searchUsers(e.target.value)}
-                                    placeholder={t("warnings_userPlaceholder")}
-                                    autoComplete="off"
-                                />
-                                {selectedUser && (
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        {t("warnings_selected")}:{" "}
-                                        <span className="font-medium">{selectedUser.username}</span>
-                                    </p>
-                                )}
-                                {userHits.length > 0 && !selectedUser && (
-                                    <div className="absolute z-10 left-0 right-0 mt-1 bg-popover border rounded-md shadow-md max-h-56 overflow-y-auto">
-                                        {userHits.map((u) => (
-                                            <button
-                                                type="button"
-                                                key={u.id}
-                                                onClick={() => {
-                                                    setSelectedUser(u);
-                                                    setUserQuery(u.username);
-                                                    setUserHits([]);
-                                                }}
-                                                className="w-full text-left px-3 py-2 hover:bg-accent text-sm"
-                                            >
-                                                {u.username}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div>
-                                <Label>{t("warnings_reason")}</Label>
-                                <Textarea
-                                    aria-label={t("warnings_reason")}
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                    rows={3}
-                                    required
-                                />
-                            </div>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>{t("warnings_points")}</Label>
-                                    <Input
-                                        aria-label={t("warnings_points")}
-                                        type="number"
-                                        min={1}
-                                        max={100}
-                                        value={points}
-                                        onChange={(e) => setPoints(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Label>{t("warnings_expiresAt")}</Label>
-                                    <Input
-                                        aria-label={t("warnings_expiresAt")}
-                                        type="datetime-local"
-                                        value={expiresAt}
-                                        onChange={(e) => setExpiresAt(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                        {t("warnings_issuing")}
-                                    </>
-                                ) : (
-                                    t("warnings_issue")
-                                )}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card>
                 <CardContent className="p-0">

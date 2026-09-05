@@ -3,8 +3,9 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, Gift, Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, useSiteCurrency } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2, Gift, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface GiftCode {
@@ -25,8 +26,9 @@ export default function GiftCodesPage() {
     const { confirm } = useConfirm();
     const [codes, setCodes] = useState<GiftCode[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
+    // The generator is a screen at `?form=new`, not a card above the table.
+    const { showForm, formHref, closeForm } = useFormRoute();
     const [value, setValue] = useState("10");
     const [count, setCount] = useState("1");
     const [expiresAt, setExpiresAt] = useState("");
@@ -63,10 +65,10 @@ export default function GiftCodesPage() {
         });
         if (res.ok) {
             const data = await res.json();
-            toast.success(`Generated ${data.count} gift codes`);
-            setShowForm(false);
+            toast.success(t("adm_giftCodesGenerated", { count: data.count }));
             setPage(1);
-            fetchCodes(1);
+            await fetchCodes(1);
+            closeForm();
         } else toast.error(t("adm_giftCodeFailed"));
         setSaving(false);
     };
@@ -100,22 +102,21 @@ export default function GiftCodesPage() {
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_giftCodes")}</h1>
-                    <p className="text-muted-foreground">{t("adm_codesTotal", { total: codes.length, available: codes.filter(c => !c.isRedeemed).length })}</p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_generateGiftCodes")}</h1>
+                        <p className="text-muted-foreground">{t("adm_giftCodes")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => setShowForm(!showForm)}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_generate")}</>}
-                </Button>
-            </div>
 
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader><CardTitle>{t("adm_generateGiftCodes")}</CardTitle></CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={generate} className="space-y-4">
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
@@ -131,14 +132,33 @@ export default function GiftCodesPage() {
                                     <Input aria-label={t("adm_expiresAt")} type="datetime-local" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
                                 </div>
                             </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
-                                {t("adm_generateCodes", { count: parseInt(count) || 1 })}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
+                                    {t("adm_generateCodes", { count: parseInt(count) || 1 })}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_giftCodes")}</h1>
+                    <p className="text-muted-foreground">{t("adm_codesTotal", { total: codes.length, available: codes.filter(c => !c.isRedeemed).length })}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_generate")}</Button>
+                </Link>
+            </div>
 
             <Card>
                 <CardContent className="p-0">
@@ -188,15 +208,7 @@ export default function GiftCodesPage() {
                         </div>
                     )}
 
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between p-4 border-t">
-                            <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
-                            <div className="flex gap-2">
-                                <Button aria-label={commonT("previousPage")} variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}><ChevronLeft className="w-4 h-4" /></Button>
-                                <Button aria-label={commonT("nextPage")} variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}><ChevronRight className="w-4 h-4" /></Button>
-                            </div>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                 </CardContent>
             </Card>
         </>

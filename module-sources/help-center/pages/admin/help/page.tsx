@@ -3,8 +3,9 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect } from "@/core/sdk/ui";
-import { Loader2, Plus, X } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect, useFormRoute } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
 
 interface HelpCategory {
@@ -37,13 +38,18 @@ export default function AdminHelpCenterPage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<"articles" | "categories">("articles");
 
+    // Both forms are screens of their own rather than cards above the tab
+    // they belong to. There are two of them here, so the parameter names
+    // which: `?form=article`, `?form=category`.
+    const { formParam, formHref, closeForm } = useFormRoute();
+    const showArticleForm = formParam === "article";
+    const showCategoryForm = formParam === "category";
+
     // Article form
-    const [showArticleForm, setShowArticleForm] = useState(false);
     const [articleForm, setArticleForm] = useState({ title: "", content: "", categoryId: "", isActive: true });
     const [savingArticle, setSavingArticle] = useState(false);
 
     // Category form
-    const [showCategoryForm, setShowCategoryForm] = useState(false);
     const [categoryForm, setCategoryForm] = useState({ name: "", description: "", icon: "", image: "", isActive: true });
     const [savingCategory, setSavingCategory] = useState(false);
     const [iconMode, setIconMode] = useState<"icon" | "image">("icon");
@@ -90,9 +96,9 @@ export default function AdminHelpCenterPage() {
                 setError(failed);
                 return;
             }
-            setShowArticleForm(false);
             setArticleForm({ title: "", content: "", categoryId: "", isActive: true });
-            fetchData();
+            await fetchData();
+            closeForm();
         } catch {
             setError(commonT("somethingWentWrong"));
         } finally {
@@ -115,9 +121,9 @@ export default function AdminHelpCenterPage() {
                 setError(failed);
                 return;
             }
-            setShowCategoryForm(false);
             setCategoryForm({ name: "", description: "", icon: "", image: "", isActive: true });
-            fetchData();
+            await fetchData();
+            closeForm();
         } catch {
             setError(commonT("somethingWentWrong"));
         } finally {
@@ -130,6 +136,159 @@ export default function AdminHelpCenterPage() {
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
+        );
+    }
+
+    if (showArticleForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_newHelpArticle")}</h1>
+                        <p className="text-muted-foreground">{t("adm_manageKnowledgeBase")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
+                </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                )}
+
+                <Card>
+                    <CardContent className="p-6">
+                        <form onSubmit={createArticle} className="space-y-4">
+                            <div>
+                                <Label>{`${t("adm_title")} *`}</Label>
+                                <Input
+                                    aria-label={t("adm_title")}
+                                    value={articleForm.title}
+                                    onChange={(e) => setArticleForm({ ...articleForm, title: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <Label>{`${t("adm_category")} *`}</Label>
+                                {categories.length === 0 ? (
+                                    <p className="text-sm text-destructive mt-1">{t("adm_noCategoriesYet")}</p>
+                                ) : (
+                                    <NativeSelect
+                                        aria-label={t("adm_category")}
+                                        value={articleForm.categoryId}
+                                        onChange={(e) => setArticleForm({ ...articleForm, categoryId: e.target.value })} className="w-full"
+                                        required
+                                    >
+                                        <option value="">{t("adm_selectCategory")}</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                    </NativeSelect>
+                                )}
+                            </div>
+                            <div>
+                                <Label>{`${t("adm_content")} *`}</Label>
+                                <RichTextEditor
+                                    value={articleForm.content}
+                                    onChange={(value: string) => setArticleForm({ ...articleForm, content: value })}
+                                />
+                            </div>
+                            <Button type="submit" disabled={savingArticle}>
+                                {savingArticle ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createArticle")}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+            </>
+        );
+    }
+
+    if (showCategoryForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_newHelpCategory")}</h1>
+                        <p className="text-muted-foreground">{t("adm_manageKnowledgeBase")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
+                </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                )}
+
+                <Card>
+                    <CardContent className="p-6">
+                        <form onSubmit={createCategory} className="space-y-4">
+                            <div>
+                                <Label>{`${t("adm_name")} *`}</Label>
+                                <Input
+                                    aria-label={t("adm_name")}
+                                    value={categoryForm.name}
+                                    onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <Label>{t("adm_description")}</Label>
+                                <Textarea
+                                    aria-label={t("adm_description")}
+                                    value={categoryForm.description}
+                                    onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                                    rows={3}
+                                />
+                            </div>
+                            <div>
+                                <Label>{t("adm_icon")}</Label>
+                                <div className="flex gap-2 mb-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIconMode("icon")}
+                                        className={`px-3 py-1.5 rounded-md text-xs border ${
+                                            iconMode === "icon"
+                                                ? "bg-primary text-primary-foreground border-primary"
+                                                : "bg-muted border-border text-muted-foreground hover:text-foreground"
+                                        }`}
+                                    >
+                                        {t("adm_lucideIcon")}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIconMode("image")}
+                                        className={`px-3 py-1.5 rounded-md text-xs border ${
+                                            iconMode === "image"
+                                                ? "bg-primary text-primary-foreground border-primary"
+                                                : "bg-muted border-border text-muted-foreground hover:text-foreground"
+                                        }`}
+                                    >
+                                        {t("adm_imageUpload")}
+                                    </button>
+                                </div>
+                                {iconMode === "icon" ? (
+                                    <Input
+                                        value={categoryForm.icon}
+                                        onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value, image: "" })}
+                                        placeholder="HelpCircle, BookOpen, Lightbulb..."
+                                        aria-label={t("adm_lucideIcon")}
+                                    />
+                                ) : (
+                                    <FileUpload
+                                        value={categoryForm.image || null}
+                                        onChange={(v) => setCategoryForm({ ...categoryForm, image: v || "", icon: "" })}
+                                        accept="image/*"
+                                    />
+                                )}
+                            </div>
+                            <Button type="submit" disabled={savingCategory}>
+                                {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+            </>
         );
     }
 
@@ -166,59 +325,10 @@ export default function AdminHelpCenterPage() {
             {activeTab === "articles" && (
                 <>
                     <div className="flex justify-end mb-4">
-                        <Button onClick={() => setShowArticleForm(!showArticleForm)}>
-                            {showArticleForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newArticle")}</>}
-                        </Button>
+                        <Link href={formHref("article")} className="inline-flex">
+                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newArticle")}</Button>
+                        </Link>
                     </div>
-
-                    {showArticleForm && (
-                        <Card className="mb-6">
-                            <CardHeader>
-                                <CardTitle>{t("adm_newHelpArticle")}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <form onSubmit={createArticle} className="space-y-4">
-                                    <div>
-                                        <Label>{`${t("adm_title")} *`}</Label>
-                                        <Input
-                                            aria-label={t("adm_title")}
-                                            value={articleForm.title}
-                                            onChange={(e) => setArticleForm({ ...articleForm, title: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>{`${t("adm_category")} *`}</Label>
-                                        {categories.length === 0 ? (
-                                            <p className="text-sm text-destructive mt-1">{t("adm_noCategoriesYet")}</p>
-                                        ) : (
-                                            <NativeSelect
-                                                aria-label={t("adm_category")}
-                                                value={articleForm.categoryId}
-                                                onChange={(e) => setArticleForm({ ...articleForm, categoryId: e.target.value })} className="w-full"
-                                                required
-                                            >
-                                                <option value="">{t("adm_selectCategory")}</option>
-                                                {categories.map((cat) => (
-                                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                                ))}
-                                            </NativeSelect>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <Label>{`${t("adm_content")} *`}</Label>
-                                        <RichTextEditor
-                                            value={articleForm.content}
-                                            onChange={(value: string) => setArticleForm({ ...articleForm, content: value })}
-                                        />
-                                    </div>
-                                    <Button type="submit" disabled={savingArticle}>
-                                        {savingArticle ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createArticle")}
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
-                    )}
 
                     <Card>
                         <CardContent className="p-0">
@@ -274,84 +384,10 @@ export default function AdminHelpCenterPage() {
             {activeTab === "categories" && (
                 <>
                     <div className="flex justify-end mb-4">
-                        <Button onClick={() => setShowCategoryForm(!showCategoryForm)}>
-                            {showCategoryForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</>}
-                        </Button>
+                        <Link href={formHref("category")} className="inline-flex">
+                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</Button>
+                        </Link>
                     </div>
-
-                    {showCategoryForm && (
-                        <Card className="mb-6">
-                            <CardHeader>
-                                <CardTitle>{t("adm_newHelpCategory")}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <form onSubmit={createCategory} className="space-y-4">
-                                    <div>
-                                        <Label>{`${t("adm_name")} *`}</Label>
-                                        <Input
-                                            aria-label={t("adm_name")}
-                                            value={categoryForm.name}
-                                            onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>{t("adm_description")}</Label>
-                                        <Textarea
-                                            aria-label={t("adm_description")}
-                                            value={categoryForm.description}
-                                            onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
-                                            rows={3}
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>{t("adm_icon")}</Label>
-                                        <div className="flex gap-2 mb-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setIconMode("icon")}
-                                                className={`px-3 py-1.5 rounded-md text-xs border ${
-                                                    iconMode === "icon"
-                                                        ? "bg-primary text-primary-foreground border-primary"
-                                                        : "bg-muted border-border text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                {t("adm_lucideIcon")}
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setIconMode("image")}
-                                                className={`px-3 py-1.5 rounded-md text-xs border ${
-                                                    iconMode === "image"
-                                                        ? "bg-primary text-primary-foreground border-primary"
-                                                        : "bg-muted border-border text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                {t("adm_imageUpload")}
-                                            </button>
-                                        </div>
-                                        {iconMode === "icon" ? (
-                                            <Input
-                                                value={categoryForm.icon}
-                                                onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value, image: "" })}
-                                                placeholder="HelpCircle, BookOpen, Lightbulb..."
-                                                aria-label={t("adm_lucideIcon")}
-                                            />
-                                        ) : (
-                                            <FileUpload
-                                                value={categoryForm.image || null}
-                                                onChange={(v) => setCategoryForm({ ...categoryForm, image: v || "", icon: "" })}
-                                                accept="image/*"
-                                            />
-                                        )}
-                                    </div>
-                                    <Button type="submit" disabled={savingCategory}>
-                                        {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
-                                    </Button>
-                                </form>
-                            </CardContent>
-                        </Card>
-                    )}
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {categories.length === 0 ? (

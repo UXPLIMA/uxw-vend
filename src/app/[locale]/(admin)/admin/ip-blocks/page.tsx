@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
-import { Input } from "@/core/components/ui/input";
-import { Label } from "@/core/components/ui/label";
-import { Loader2, Plus, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
-import { NativeSelect } from "@/core/components/ui/native-select";
 
 interface IpBlock {
     id: string;
@@ -32,13 +30,7 @@ export default function IpBlocksPage() {
     const [blocks, setBlocks] = useState<IpBlock[]>([]);
     const paged = usePagedRows(blocks);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [saving, setSaving] = useState(false);
 
-    const [ip, setIp] = useState("");
-    const [scope, setScope] = useState<"all" | "admin" | "api">("all");
-    const [reason, setReason] = useState("");
-    const [expiresAt, setExpiresAt] = useState("");
 
     const { confirm } = useConfirm();
 
@@ -58,45 +50,6 @@ export default function IpBlocksPage() {
     useEffect(() => {
         fetchBlocks();
     }, [fetchBlocks]);
-
-    const resetForm = () => {
-        setShowForm(false);
-        setIp("");
-        setScope("all");
-        setReason("");
-        setExpiresAt("");
-    };
-
-    const createBlock = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!ip.trim()) {
-            toast.error(t("ipBlocks_ipRequired"));
-            return;
-        }
-        setSaving(true);
-        try {
-            const res = await fetch("/api/v1/admin/ip-blocks", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ip: ip.trim(),
-                    scope,
-                    reason: reason.trim() || null,
-                    expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
-                }),
-            });
-            if (res.ok) {
-                toast.success(t("ipBlocks_created"));
-                resetForm();
-                fetchBlocks();
-            } else {
-                const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("ipBlocks_createFailed"));
-            }
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const deleteBlock = async (b: IpBlock) => {
         const ok = await confirm({
@@ -131,87 +84,12 @@ export default function IpBlocksPage() {
                         {t("ipBlocks_subtitle")}
                     </p>
                 </div>
-                <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
-                    {showForm ? (
-                        <>
-                            <X className="w-4 h-4 mr-2" /> {t("ipBlocks_cancel")}
-                        </>
-                    ) : (
-                        <>
-                            <Plus className="w-4 h-4 mr-2" /> {t("ipBlocks_add")}
-                        </>
-                    )}
-                </Button>
+                <Link href="/admin/ip-blocks/new" className="inline-flex">
+                    <Button>
+                        <Plus className="w-4 h-4 mr-2" /> {t("ipBlocks_add")}
+                    </Button>
+                </Link>
             </div>
-
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{t("ipBlocks_newTitle")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={createBlock} className="space-y-4">
-                            <div>
-                                <Label>{t("ipBlocks_ipLabel")}</Label>
-                                <Input
-                                    aria-label={t("ipBlocks_ipLabel")}
-                                    value={ip}
-                                    onChange={(e) => setIp(e.target.value)}
-                                    placeholder="1.2.3.4 or 192.168.0.0/24"
-                                    autoComplete="off"
-                                    required
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    {t("ipBlocks_ipHint")}
-                                </p>
-                            </div>
-                            <div>
-                                <Label>{t("ipBlocks_scope")}</Label>
-                                <NativeSelect
-                                    aria-label={t("ipBlocks_scope")}
-                                    value={scope}
-                                    onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")} className="w-full" inputSize="sm"
-                                >
-                                    <option value="all">{t("ipBlocks_scopeAll")}</option>
-                                    <option value="admin">{t("ipBlocks_scopeAdmin")}</option>
-                                    <option value="api">{t("ipBlocks_scopeApi")}</option>
-                                </NativeSelect>
-                            </div>
-                            <div>
-                                <Label>{t("ipBlocks_reason")}</Label>
-                                <Input
-                                    aria-label={t("ipBlocks_reason")}
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                    placeholder={t("ipBlocks_reasonPlaceholder")}
-                                />
-                            </div>
-                            <div>
-                                <Label>{t("ipBlocks_expiresAt")}</Label>
-                                <Input
-                                    aria-label={t("ipBlocks_expiresAt")}
-                                    type="datetime-local"
-                                    value={expiresAt}
-                                    onChange={(e) => setExpiresAt(e.target.value)}
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    {t("ipBlocks_expiresHint")}
-                                </p>
-                            </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        {t("ipBlocks_saving")}
-                                    </>
-                                ) : (
-                                    t("ipBlocks_save")
-                                )}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card>
                 <CardContent className="p-0">

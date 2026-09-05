@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, useConfirm, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, Textarea, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
 import {
+    ArrowLeft,
     Plus,
-    X,
     Loader2,
     Trash2,
     Pencil,
@@ -78,9 +79,13 @@ export default function AdminTrophiesPage() {
     const [trophies, setTrophies] = useState<AdminTrophy[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editing, setEditing] = useState<AdminTrophy | null>(null);
+    // The editor used to be a modal over the table. A modal is the same
+    // screen wearing one address: nothing about it is in the URL, so it cannot
+    // be linked, reloaded or closed with the back button. It is now a screen
+    // at `?form=new` or `?form=<id>`.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
     const [form, setForm] = useState<FormState>(BLANK_FORM);
+    const paged = usePagedRows(trophies);
 
     const fetchTrophies = useCallback(async () => {
         setLoading(true);
@@ -103,32 +108,27 @@ export default function AdminTrophiesPage() {
         fetchTrophies();
     }, [fetchTrophies]);
 
-    const openCreate = () => {
-        setEditing(null);
-        setForm(BLANK_FORM);
-        setModalOpen(true);
-    };
+    const editing = editingId ? trophies.find((row) => row.id === editingId) ?? null : null;
 
-    const openEdit = (row: AdminTrophy) => {
-        setEditing(row);
+    // The trophy the URL names fills the form once the rows arrive, so
+    // `?form=<id>` survives a reload rather than opening a blank editor.
+    useEffect(() => {
+        if (!editing) {
+            setForm(BLANK_FORM);
+            return;
+        }
         setForm({
-            name: row.name,
-            description: row.description || "",
-            icon: row.icon || "Award",
-            color: row.color || "#f59e0b",
-            points: String(row.points),
-            ruleType: row.ruleType || "event-count",
-            ruleEvent: row.ruleEvent || "",
-            ruleThreshold: String(row.ruleThreshold ?? 1),
-            isActive: row.isActive,
+            name: editing.name,
+            description: editing.description || "",
+            icon: editing.icon || "Award",
+            color: editing.color || "#f59e0b",
+            points: String(editing.points),
+            ruleType: editing.ruleType || "event-count",
+            ruleEvent: editing.ruleEvent || "",
+            ruleThreshold: String(editing.ruleThreshold ?? 1),
+            isActive: editing.isActive,
         });
-        setModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setModalOpen(false);
-        setEditing(null);
-    };
+    }, [editing]);
 
     const reloadEngine = async () => {
         try {
@@ -174,7 +174,7 @@ export default function AdminTrophiesPage() {
             if (payload.ruleEvent !== originalEvent) {
                 await reloadEngine();
             }
-            closeModal();
+            closeForm();
             fetchTrophies();
         } catch {
             toast.error(t("saveFailed"));
@@ -225,144 +225,26 @@ export default function AdminTrophiesPage() {
         }
     };
 
-    return (
-        <div>
-            <div className="mb-6 flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("adm_description")}
-                    </p>
-                </div>
-                <Button onClick={openCreate}>
-                    <Plus className="w-4 h-4 mr-1" /> {tc("common_add")}
-                </Button>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">
-                        {trophies.length} {trophies.length === 1 ? t("trophy") : t("title")}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <div className="flex items-center justify-center py-8">
-                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : trophies.length === 0 ? (
-                        <p className="text-sm text-muted-foreground py-4">
-                            {t("noTrophies")}
+    if (showForm) {
+        return (
+            <div>
+                <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-xl font-semibold">
+                            {editing ? t("editTrophy") : t("newTrophy")}
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            {t("adm_description")}
                         </p>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-border text-left text-muted-foreground">
-                                        <th className="py-2 pr-3">{t("trophy")}</th>
-                                        <th className="py-2 pr-3">{tc("common_description")}</th>
-                                        <th className="py-2 pr-3">{t("points")}</th>
-                                        <th className="py-2 pr-3">{t("rule")}</th>
-                                        <th className="py-2 pr-3">{t("earned")}</th>
-                                        <th className="py-2 pr-3">{t("active")}</th>
-                                        <th className="py-2 pr-3 text-right">{t("actions")}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {trophies.map((row) => (
-                                        <tr key={row.id} className="border-b border-border/50">
-                                            <td className="py-2 pr-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div
-                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                                                        style={{ backgroundColor: row.color || "#6366f1" }}
-                                                    >
-                                                        {(row.icon || row.name).slice(0, 2)}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-medium">{row.name}</div>
-                                                        <div className="text-xs text-muted-foreground">{row.id}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-2 pr-3 max-w-[240px] truncate text-muted-foreground">
-                                                {row.description || "-"}
-                                            </td>
-                                            <td className="py-2 pr-3 font-medium">{row.points}</td>
-                                            <td className="py-2 pr-3">
-                                                {row.ruleEvent ? (
-                                                    <div className="flex flex-col">
-                                                        <code className="text-xs">{row.ruleEvent}</code>
-                                                        <span className="text-xs text-muted-foreground">
-                                                            x{row.ruleThreshold ?? 1}
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-muted-foreground text-xs">{t("manualOnly")}</span>
-                                                )}
-                                            </td>
-                                            <td className="py-2 pr-3">
-                                                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                                                    <Users className="w-3 h-3" />
-                                                    {row._count?.users ?? 0}
-                                                </span>
-                                            </td>
-                                            <td className="py-2 pr-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleActive(row)}
-                                                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${
-                                                        row.isActive
-                                                            ? "bg-green-500/10 text-green-600"
-                                                            : "bg-muted text-muted-foreground"
-                                                    }`}
-                                                >
-                                                    <Power className="w-3 h-3" />
-                                                    {row.isActive ? t("activeLabel") : t("inactiveLabel")}
-                                                </button>
-                                            </td>
-                                            <td className="py-2 pr-3 text-right whitespace-nowrap">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => openEdit(row)}
-                                                    title={tc("common_edit")}
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="text-destructive"
-                                                    onClick={() => handleDelete(row)}
-                                                    title={tc("common_delete")}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-1" /> {commonT("back")}
+                    </Button>
+                </div>
 
-            {modalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-background border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                        <div className="flex items-center justify-between p-4 border-b border-border">
-                            <h2 className="text-lg font-semibold">
-                                {editing ? t("editTrophy") : t("newTrophy")}
-                            </h2>
-                            <Button aria-label={commonT("close")} variant="ghost" size="sm" onClick={closeModal}>
-                                <X className="w-4 h-4" />
-                            </Button>
-                        </div>
-                        <div className="p-4 space-y-4">
+                <Card>
+                    <CardContent className="p-6">
+                        <div className="space-y-4">
                             <div>
                                 <Label>{t("name")}</Label>
                                 <Input
@@ -475,8 +357,8 @@ export default function AdminTrophiesPage() {
                                 </Label>
                             </div>
                         </div>
-                        <div className="flex justify-end gap-2 p-4 border-t border-border">
-                            <Button variant="outline" onClick={closeModal} disabled={saving}>
+                        <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">
+                            <Button variant="outline" onClick={closeForm} disabled={saving}>
                                 {tc("common_cancel")}
                             </Button>
                             <Button onClick={handleSave} disabled={saving}>
@@ -491,9 +373,139 @@ export default function AdminTrophiesPage() {
                                 )}
                             </Button>
                         </div>
-                    </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-xl font-semibold">
+                        {t("title")}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        {t("adm_description")}
+                    </p>
                 </div>
-            )}
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-1" /> {tc("common_add")}</Button>
+                </Link>
+            </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-base">
+                        {trophies.length} {trophies.length === 1 ? t("trophy") : t("title")}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : trophies.length === 0 ? (
+                        <p className="text-sm text-muted-foreground py-4">
+                            {t("noTrophies")}
+                        </p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-border text-left text-muted-foreground">
+                                        <th className="py-2 pr-3">{t("trophy")}</th>
+                                        <th className="py-2 pr-3">{tc("common_description")}</th>
+                                        <th className="py-2 pr-3">{t("points")}</th>
+                                        <th className="py-2 pr-3">{t("rule")}</th>
+                                        <th className="py-2 pr-3">{t("earned")}</th>
+                                        <th className="py-2 pr-3">{t("active")}</th>
+                                        <th className="py-2 pr-3 text-right">{t("actions")}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paged.rows.map((row) => (
+                                        <tr key={row.id} className="border-b border-border/50">
+                                            <td className="py-2 pr-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div
+                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                                                        style={{ backgroundColor: row.color || "#6366f1" }}
+                                                    >
+                                                        {(row.icon || row.name).slice(0, 2)}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-medium">{row.name}</div>
+                                                        <div className="text-xs text-muted-foreground">{row.id}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-2 pr-3 max-w-[240px] truncate text-muted-foreground">
+                                                {row.description || "-"}
+                                            </td>
+                                            <td className="py-2 pr-3 font-medium">{row.points}</td>
+                                            <td className="py-2 pr-3">
+                                                {row.ruleEvent ? (
+                                                    <div className="flex flex-col">
+                                                        <code className="text-xs">{row.ruleEvent}</code>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            x{row.ruleThreshold ?? 1}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-xs">{t("manualOnly")}</span>
+                                                )}
+                                            </td>
+                                            <td className="py-2 pr-3">
+                                                <span className="inline-flex items-center gap-1 text-muted-foreground">
+                                                    <Users className="w-3 h-3" />
+                                                    {row._count?.users ?? 0}
+                                                </span>
+                                            </td>
+                                            <td className="py-2 pr-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleActive(row)}
+                                                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${
+                                                        row.isActive
+                                                            ? "bg-green-500/10 text-green-600"
+                                                            : "bg-muted text-muted-foreground"
+                                                    }`}
+                                                >
+                                                    <Power className="w-3 h-3" />
+                                                    {row.isActive ? t("activeLabel") : t("inactiveLabel")}
+                                                </button>
+                                            </td>
+                                            <td className="py-2 pr-3 text-right whitespace-nowrap">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => openForm(row.id)}
+                                                    title={tc("common_edit")}
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-destructive"
+                                                    onClick={() => handleDelete(row)}
+                                                    title={tc("common_delete")}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
         </div>
     );
 }

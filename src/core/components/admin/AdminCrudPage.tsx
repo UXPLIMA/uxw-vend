@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
-import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,9 @@ import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
 import { IconPicker } from "@/core/components/ui/icon-picker";
 import { writeError } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
+import { Link } from "@/core/lib/i18n/navigation";
+import { useFormRoute } from "@/core/hooks/useFormRoute";
 
 export interface CrudField {
     key: string;
@@ -46,27 +49,43 @@ interface AdminCrudPageProps {
     secondaryRender?: (item: Record<string, unknown>) => string; // overrides secondaryField when provided
 }
 
-export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
+/**
+ * A create or edit screen is a place, and a place has an address.
+ *
+ * This used to unfold a card above the list. On a screen with two hundred rows
+ * that pushes the row you came to edit off the bottom, the browser's back
+ * button does nothing, and a half-filled form cannot be linked to or reloaded.
+ *
+ * The form is now a screen of its own, reached at `?form=new` or
+ * `?form=<id>`, replacing the list rather than sitting on top of it. It is a
+ * query parameter rather than a `/new` path segment because the field
+ * definitions live in the module's own page file - thirteen modules render
+ * this component - and a child route would need those definitions copied into
+ * two more files per module. The address changes, the back button works and
+ * the form owns the screen, which is what the path segment was for.
+ */
+export function AdminCrudPage(props: AdminCrudPageProps) {
+    return (
+        <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>}>
+            <AdminCrudPageInner {...props} />
+        </Suspense>
+    );
+}
+
+function AdminCrudPageInner({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
     const ct = useTranslations("admin");
     const commonT = useTranslations("common");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<Record<string, string>>({});
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const { confirm } = useConfirm();
 
-    const resetForm = () => {
-        const defaults: Record<string, string> = {};
-        fields.forEach((f) => { defaults[f.key] = f.defaultValue || ""; });
-        setForm(defaults);
-        setEditingId(null);
-        setShowForm(false);
-    };
+    // `?form=new` creates, `?form=<id>` edits, absent shows the list.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
 
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
         try {
             const res = await fetch(apiPath);
             if (res.ok) {
@@ -75,13 +94,22 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             }
         } catch (e) { console.error(e); }
         finally { setLoading(false); }
-    };
+    }, [apiPath, listKey]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { fetchItems(); resetForm(); }, []);
+    useEffect(() => { fetchItems(); }, [fetchItems]);
 
-    const startEdit = (item: Record<string, unknown>) => {
-        setEditingId(item.id as string);
+    // The form is filled from the row the URL names, once the rows arrive -
+    // which is also what makes a reload of `?form=<id>` land on a filled form
+    // rather than an empty one.
+    useEffect(() => {
+        const defaults: Record<string, string> = {};
+        fields.forEach((f) => { defaults[f.key] = f.defaultValue || ""; });
+        if (!editingId) {
+            setForm(defaults);
+            return;
+        }
+        const item = items.find((row) => row.id === editingId);
+        if (!item) return;
         const vals: Record<string, string> = {};
         fields.forEach((f) => {
             const v = item[f.key];
@@ -92,8 +120,10 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             }
         });
         setForm(vals);
-        setShowForm(true);
-    };
+        // `fields` is a literal rebuilt on every render by every caller, so it
+        // cannot be a dependency without looping.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editingId, items]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -122,8 +152,8 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             toast.error(failed);
         } else {
             toast.success(ct(editingId ? "crud_updated" : "crud_created"));
-            resetForm();
-            fetchItems();
+            await fetchItems();
+            closeForm();
         }
         setSaving(false);
     };
@@ -203,12 +233,53 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         }
     };
 
-    const [page, setPage] = useState(1);
-    const perPage = 20;
-    const totalPages = Math.ceil(items.length / perPage);
-    const paginatedItems = items.slice((page - 1) * perPage, page * perPage);
+    const paged = usePagedRows(items);
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
+
+    if (showForm) {
+        return (
+            <>
+                <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-xl font-semibold break-words">
+                            {editingId ? ct("crud_edit") : ct("crud_createNew")}
+                        </h1>
+                        <p className="text-sm text-muted-foreground">{title}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
+                </div>
+
+                <Card>
+                    <CardContent className="p-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="grid md:grid-cols-2 gap-4">
+                                {fields.map((field) => {
+                                    const fullWidth = field.type === "textarea" || field.type === "richtext" || field.type === "urlOrFile" || field.type === "image";
+                                    return (
+                                        <div key={field.key} className={fullWidth ? "md:col-span-2" : ""}>
+                                            <Label>{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
+                                            {renderField(field)}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}
+                                </Button>
+                                <Button type="button" variant="outline" disabled={saving} onClick={closeForm}>
+                                    {commonT("cancel")}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </>
+        );
+    }
 
     return (
         <>
@@ -223,37 +294,13 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                             <Trash2 className="w-3 h-3 mr-1" /> {ct("crud_delete")} {selected.size}
                         </Button>
                     )}
-                    <Button onClick={() => showForm ? resetForm() : setShowForm(true)}>
-                        {showForm ? <><X className="w-4 h-4 mr-2" /> {ct("crud_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {ct("crud_addNew")}</>}
-                    </Button>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4 mr-2" /> {ct("crud_addNew")}
+                        </Button>
+                    </Link>
                 </div>
             </div>
-
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{editingId ? ct("crud_edit") : ct("crud_createNew")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid md:grid-cols-2 gap-4">
-                                {fields.map((field) => {
-                                    const fullWidth = field.type === "textarea" || field.type === "richtext" || field.type === "urlOrFile" || field.type === "image";
-                                    return (
-                                        <div key={field.key} className={fullWidth ? "md:col-span-2" : ""}>
-                                            <Label>{field.label} {field.required && <span className="text-red-500">*</span>}</Label>
-                                            {renderField(field)}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card>
                 <CardContent className="p-0">
@@ -261,7 +308,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <p className="text-muted-foreground text-center py-8">{ct("crud_noItems")}</p>
                     ) : (
                         <div className="divide-y">
-                            {paginatedItems.map((item) => (
+                            {paged.rows.map((item) => (
                                 <div key={item.id as string} className="flex items-center gap-3 p-4 hover:bg-muted/50">
                                     <input
                                         type="checkbox"
@@ -279,7 +326,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                         ) : null}
                                     </div>
                                     <div className="flex gap-1">
-                                        <Button aria-label={commonT("edit")} variant="ghost" size="sm" onClick={() => startEdit(item)}>
+                                        <Button
+                                            aria-label={commonT("edit")}
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => openForm(item.id as string)}
+                                        >
                                             <Pencil className="w-3 h-3" />
                                         </Button>
                                         <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteItem(item.id as string)}>
@@ -290,15 +342,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                             ))}
                         </div>
                     )}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between p-3 border-t">
-                            <span className="text-xs text-muted-foreground">{items.length} items · Page {page}/{totalPages}</span>
-                            <div className="flex gap-1">
-                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>{ct("common_prev")}</Button>
-                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>{ct("users_next")}</Button>
-                            </div>
-                        </div>
-                    )}
+                    <Pagination
+                        page={paged.page}
+                        pages={paged.pages}
+                        total={paged.total}
+                        onPageChange={paged.setPage}
+                    />
                 </CardContent>
             </Card>
         </>

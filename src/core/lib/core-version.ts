@@ -12,6 +12,16 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.13.0 - `useFormRoute` joins `@/core/sdk/ui`. A create or edit form used
+ * to unfold as a card above the list it belonged to, which on a screen with
+ * two hundred rows pushes the row you came to edit off the bottom, gives the
+ * back button nothing to close, and leaves a half-filled form that cannot be
+ * reloaded or linked because nothing about it is in the URL. The hook reads
+ * `?form=new` or `?form=<id>` off the current path; the screen renders the
+ * form and returns early. Core's own screens use route segments instead - a
+ * module's field definitions live in its one page file, and a child route
+ * would need them copied into two more files per module.
+ *
  * 1.12.0 - `Pagination` and `usePagedRows` join `@/core/sdk/ui`, and the
  * manifest gains `dashboardSections`. Eight admin screens had written the same
  * two chevrons and a "Page 2 / 9" caption, and nine lists that grow had no
@@ -80,4 +90,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.12.0";
+export const CORE_API_VERSION = "1.13.0";

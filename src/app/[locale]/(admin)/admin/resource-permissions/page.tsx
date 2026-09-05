@@ -1,29 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { useCallback, useEffect, useState } from "react";
+import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import {
-    Plus,
-    X,
-    Loader2,
-    Trash2,
-} from "lucide-react";
+import { Plus, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
+import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { writeError } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
-
-interface Role {
-    id: string;
-    name: string;
-    displayName: string | null;
-    color: string | null;
-}
 
 interface Grant {
     id: string;
@@ -37,19 +25,11 @@ interface Grant {
     createdAt: string;
 }
 
-interface UserHit {
-    id: string;
-    username: string;
-}
-
-const ACTIONS = ["view", "create", "edit", "delete", "*"];
-
 export default function ResourcePermissionsPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
 
     const [grants, setGrants] = useState<Grant[]>([]);
-    const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
@@ -57,20 +37,8 @@ export default function ResourcePermissionsPage() {
     const [resourceFilter, setResourceFilter] = useState("");
     const [principalFilter, setPrincipalFilter] = useState("");
 
-    const [showForm, setShowForm] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [formResource, setFormResource] = useState("");
-    const [formResourceId, setFormResourceId] = useState("");
-    const [formAction, setFormAction] = useState("view");
-    const [formPrincipalType, setFormPrincipalType] = useState<"role" | "user">("role");
-    const [formRoleId, setFormRoleId] = useState("");
-    const [formUserQuery, setFormUserQuery] = useState("");
-    const [formUserHits, setFormUserHits] = useState<UserHit[]>([]);
-    const [formSelectedUser, setFormSelectedUser] = useState<UserHit | null>(null);
-    const [formAllow, setFormAllow] = useState("true");
 
     const { confirm } = useConfirm();
-    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const fetchGrants = useCallback(async () => {
         setLoading(true);
@@ -86,7 +54,6 @@ export default function ResourcePermissionsPage() {
                 setGrants(data.grants || []);
                 setPages(data.pages || 1);
                 setTotal(data.total || 0);
-                setRoles(data.roles || []);
             }
         } finally {
             setLoading(false);
@@ -96,84 +63,6 @@ export default function ResourcePermissionsPage() {
     useEffect(() => {
         fetchGrants();
     }, [fetchGrants]);
-
-    const searchUsers = (q: string) => {
-        setFormUserQuery(q);
-        setFormSelectedUser(null);
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-        if (!q.trim()) {
-            setFormUserHits([]);
-            return;
-        }
-        searchTimeoutRef.current = setTimeout(async () => {
-            try {
-                const res = await fetch(`/api/v1/users?search=${encodeURIComponent(q)}&limit=10`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setFormUserHits(
-                        (data.users || []).map((u: { id: string; username: string }) => ({
-                            id: u.id,
-                            username: u.username,
-                        })),
-                    );
-                }
-            } catch {
-                /* ignore */
-            }
-        }, 250);
-    };
-
-    const resetForm = () => {
-        setShowForm(false);
-        setFormResource("");
-        setFormResourceId("");
-        setFormAction("view");
-        setFormPrincipalType("role");
-        setFormRoleId("");
-        setFormUserQuery("");
-        setFormUserHits([]);
-        setFormSelectedUser(null);
-        setFormAllow("true");
-    };
-
-    const grantPermission = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formResource.trim()) {
-            toast.error(t("rp_resourceRequired"));
-            return;
-        }
-        const principalId =
-            formPrincipalType === "role" ? formRoleId : formSelectedUser?.id || "";
-        if (!principalId) {
-            toast.error(t("rp_principalRequired"));
-            return;
-        }
-        setSaving(true);
-        try {
-            const res = await fetch("/api/v1/admin/resource-permissions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    resource: formResource.trim(),
-                    resourceId: formResourceId.trim() || null,
-                    action: formAction,
-                    principalType: formPrincipalType,
-                    principalId,
-                    allow: formAllow === "true",
-                }),
-            });
-            const failed = await writeError(res, commonT("somethingWentWrong"), t);
-            if (failed) {
-                toast.error(failed);
-            } else {
-                toast.success(t("rp_created"));
-                resetForm();
-                fetchGrants();
-            }
-        } finally {
-            setSaving(false);
-        }
-    };
 
     const revokeGrant = async (g: Grant) => {
         const ok = await confirm({
@@ -205,160 +94,12 @@ export default function ResourcePermissionsPage() {
                         {t("rp_subtitle")}
                     </p>
                 </div>
-                <Button onClick={() => (showForm ? resetForm() : setShowForm(true))}>
-                    {showForm ? (
-                        <>
-                            <X className="w-4 h-4 mr-2" /> {t("rp_cancel")}
-                        </>
-                    ) : (
-                        <>
-                            <Plus className="w-4 h-4 mr-2" /> {t("rp_grant")}
-                        </>
-                    )}
-                </Button>
+                <Link href="/admin/resource-permissions/new" className="inline-flex">
+                    <Button>
+                        <Plus className="w-4 h-4 mr-2" /> {t("rp_grant")}
+                    </Button>
+                </Link>
             </div>
-
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{t("rp_newTitle")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={grantPermission} className="space-y-4">
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>{t("rp_resource")}</Label>
-                                    <Input
-                                        aria-label={t("rp_resource")}
-                                        value={formResource}
-                                        onChange={(e) => setFormResource(e.target.value)}
-                                        placeholder="blog.article"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label>
-                                        {t("rp_resourceId")}
-                                    </Label>
-                                    <Input
-                                        aria-label={t("rp_resourceId")}
-                                        value={formResourceId}
-                                        onChange={(e) => setFormResourceId(e.target.value)}
-                                        placeholder={t("rp_resourceIdPlaceholder")}
-                                    />
-                                </div>
-                                <div>
-                                    <Label>{t("rp_action")}</Label>
-                                    <NativeSelect
-                                        aria-label={t("rp_action")}
-                                        value={formAction}
-                                        onChange={(e) => setFormAction(e.target.value)} className="w-full"
-                                    >
-                                        {ACTIONS.map((a) => (
-                                            <option key={a} value={a}>
-                                                {a}
-                                            </option>
-                                        ))}
-                                    </NativeSelect>
-                                </div>
-                                <div>
-                                    <Label>{t("rp_allow")}</Label>
-                                    <NativeSelect
-                                        aria-label={t("rp_allow")}
-                                        value={formAllow}
-                                        onChange={(e) => setFormAllow(e.target.value)} className="w-full"
-                                    >
-                                        <option value="true">{t("rp_allowOpt")}</option>
-                                        <option value="false">{t("rp_denyOpt")}</option>
-                                    </NativeSelect>
-                                </div>
-                                <div>
-                                    <Label>{t("rp_principalType")}</Label>
-                                    <NativeSelect
-                                        aria-label={t("rp_principalType")}
-                                        value={formPrincipalType}
-                                        onChange={(e) =>
-                                            setFormPrincipalType(e.target.value as "role" | "user")
-                                        } className="w-full"
-                                    >
-                                        <option value="role">{t("rp_role")}</option>
-                                        <option value="user">{t("rp_user")}</option>
-                                    </NativeSelect>
-                                </div>
-                                <div className="relative">
-                                    {formPrincipalType === "role" ? (
-                                        <>
-                                            <Label>{t("rp_selectRole")}</Label>
-                                            <NativeSelect
-                                                aria-label={t("rp_selectRole")}
-                                                value={formRoleId}
-                                                onChange={(e) => setFormRoleId(e.target.value)} className="w-full"
-                                                required
-                                            >
-                                                <option value="">
-                                                    {t("rp_selectRolePlaceholder")}
-                                                </option>
-                                                {roles.map((r) => (
-                                                    <option key={r.id} value={r.id}>
-                                                        {r.displayName || r.name}
-                                                    </option>
-                                                ))}
-                                            </NativeSelect>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Label>{t("rp_searchUser")}</Label>
-                                            <Input
-                                                aria-label={t("rp_searchUser")}
-                                                value={formUserQuery}
-                                                onChange={(e) => searchUsers(e.target.value)}
-                                                placeholder={t("rp_searchUserPlaceholder")}
-                                                autoComplete="off"
-                                            />
-                                            {formSelectedUser && (
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {t("rp_selected")}:{" "}
-                                                    <span className="font-medium">
-                                                        {formSelectedUser.username}
-                                                    </span>
-                                                </p>
-                                            )}
-                                            {formUserHits.length > 0 && !formSelectedUser && (
-                                                <div className="absolute z-10 left-0 right-0 mt-1 bg-popover border rounded-md shadow-md max-h-56 overflow-y-auto">
-                                                    {formUserHits.map((u) => (
-                                                        <button
-                                                            type="button"
-                                                            key={u.id}
-                                                            onClick={() => {
-                                                                setFormSelectedUser(u);
-                                                                setFormUserQuery(u.username);
-                                                                setFormUserHits([]);
-                                                            }}
-                                                            className="w-full text-left px-3 py-2 hover:bg-accent text-sm"
-                                                        >
-                                                            {u.username}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />{" "}
-                                        {t("rp_saving")}
-                                    </>
-                                ) : (
-                                    t("rp_create")
-                                )}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card className="mb-4">
                 <CardContent className="p-4 grid md:grid-cols-2 gap-3">

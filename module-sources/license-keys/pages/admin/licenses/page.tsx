@@ -13,8 +13,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useLocalDate } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, Ban, RotateCcw, Copy, Check, KeyRound } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useFormRoute, useLocalDate } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2, Ban, RotateCcw, Copy, Check, KeyRound } from "lucide-react";
 
 interface License {
     id: string;
@@ -33,12 +34,14 @@ interface License {
 
 export default function LicensesPage() {
     const t = useTranslations("licenseKeys");
+    const commonT = useTranslations("common");
     const formatLocalDate = useLocalDate();
     const { confirm } = useConfirm();
 
     const [licenses, setLicenses] = useState<License[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+    // Issuing keys is a screen at `?form=new`, not a card above the table.
+    const { showForm, formHref, closeForm } = useFormRoute();
     const [saving, setSaving] = useState(false);
     const [search, setSearch] = useState("");
     const [minted, setMinted] = useState<string[]>([]);
@@ -88,9 +91,9 @@ export default function LicensesPage() {
             }
             const data = await res.json();
             setMinted(data.keys || []);
-            setShowForm(false);
             toast.success(t("adm_issued", { count: (data.keys || []).length }));
-            fetchLicenses(search.trim());
+            await fetchLicenses(search.trim());
+            closeForm();
         } finally {
             setSaving(false);
         }
@@ -148,61 +151,21 @@ export default function LicensesPage() {
         );
     }
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                    <p className="text-muted-foreground">
-                        {t("adm_summary", {
-                            total: licenses.length,
-                            active: licenses.filter((l) => l.status === "active").length,
-                        })}
-                    </p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_issueKeys")}</h1>
+                        <p className="text-muted-foreground">{t("adm_mintedOnce")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => setShowForm(!showForm)}>
-                    {showForm ? (
-                        <>
-                            <X className="w-4 h-4 mr-2" /> {t("adm_cancel")}
-                        </>
-                    ) : (
-                        <>
-                            <Plus className="w-4 h-4 mr-2" /> {t("adm_issueKeys")}
-                        </>
-                    )}
-                </Button>
-            </div>
 
-            {minted.length > 0 && (
-                <Card className="mb-6 border-primary">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <KeyRound className="w-5 h-5" />
-                            {t("adm_mintedTitle")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        <p className="text-sm text-muted-foreground">{t("adm_mintedOnce")}</p>
-                        <pre className="rounded bg-muted p-3 font-mono text-sm overflow-x-auto">{minted.join("\n")}</pre>
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={copyMinted}>
-                                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                                {t("adm_copyAll")}
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setMinted([])}>
-                                {t("adm_dismiss")}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{t("adm_issueKeys")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={issue} className="space-y-4">
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
@@ -258,11 +221,59 @@ export default function LicensesPage() {
                                     <Input aria-label={t("adm_note")} value={note} onChange={(e) => setNote(e.target.value)} />
                                 </div>
                             </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                {t("adm_issue")}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                    {t("adm_issue")}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
+                    </CardContent>
+                </Card>
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
+                    <p className="text-muted-foreground">
+                        {t("adm_summary", {
+                            total: licenses.length,
+                            active: licenses.filter((l) => l.status === "active").length,
+                        })}
+                    </p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_issueKeys")}</Button>
+                </Link>
+            </div>
+
+            {minted.length > 0 && (
+                <Card className="mb-6 border-primary">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <KeyRound className="w-5 h-5" />
+                            {t("adm_mintedTitle")}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <p className="text-sm text-muted-foreground">{t("adm_mintedOnce")}</p>
+                        <pre className="rounded bg-muted p-3 font-mono text-sm overflow-x-auto">{minted.join("\n")}</pre>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={copyMinted}>
+                                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                                {t("adm_copyAll")}
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setMinted([])}>
+                                {t("adm_dismiss")}
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             )}

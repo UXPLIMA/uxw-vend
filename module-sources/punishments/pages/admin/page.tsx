@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, NativeSelect } from "@/core/sdk/ui";
-import { Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
+import { Button, Card, CardContent, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -24,14 +25,17 @@ const TYPE_OPTIONS = ["ban", "mute", "kick", "warning", "tempBan", "tempMute"];
 
 export default function AdminPunishmentsPage() {
     const t = useTranslations("punishments");
+    const commonT = useTranslations("common");
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const { confirm } = useConfirm();
     const [items, setItems] = useState<Punishment[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"all" | "active" | "revoked">("all");
-    const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
+    // The punishment form is a screen at `?form=new`, not a card wedged
+    // between the filters and the table.
+    const { showForm, formHref, closeForm } = useFormRoute();
     const [form, setForm] = useState({
         playerName: "",
         type: "ban",
@@ -58,6 +62,7 @@ export default function AdminPunishmentsPage() {
     const filtered = items.filter(p =>
         filter === "all" ? true : filter === "active" ? p.active : !p.active
     );
+    const paged = usePagedRows(filtered);
 
     const create = async () => {
         if (!form.playerName.trim()) return;
@@ -76,9 +81,9 @@ export default function AdminPunishmentsPage() {
             });
             if (!res.ok) throw new Error("create failed");
             toast.success(t("adm_createdToast"));
-            setShowForm(false);
             setForm({ playerName: "", type: "ban", reason: "", duration: "", expiresAt: "" });
             await load();
+            closeForm();
         } catch {
             toast.error(t("adm_error"));
         } finally {
@@ -114,35 +119,21 @@ export default function AdminPunishmentsPage() {
         }
     };
 
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                <p className="text-muted-foreground">{t("adm_subtitle")}</p>
-            </div>
+    if (showForm) {
+        return (
+            <div className="space-y-6">
+                <div className="flex justify-between items-center gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_newPunishment")}</h1>
+                        <p className="text-muted-foreground">{t("adm_subtitle")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
+                </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-                <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
-                    {t("adm_filterAll")}
-                </Button>
-                <Button variant={filter === "active" ? "default" : "outline"} size="sm" onClick={() => setFilter("active")}>
-                    {t("adm_filterActive")}
-                </Button>
-                <Button variant={filter === "revoked" ? "default" : "outline"} size="sm" onClick={() => setFilter("revoked")}>
-                    {t("adm_filterRevoked")}
-                </Button>
-                <div className="flex-1" />
-                <Button size="sm" onClick={() => setShowForm(s => !s)}>
-                    <Plus className="w-4 h-4 mr-1" /> {t("adm_newPunishment")}
-                </Button>
-            </div>
-
-            {showForm && (
                 <Card>
-                    <CardHeader>
-                        <CardTitle>{t("adm_newPunishment")}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="p-6 space-y-3">
                         <div className="grid md:grid-cols-2 gap-3">
                             <div>
                                 <Label>{t("adm_playerName")}</Label>
@@ -174,14 +165,41 @@ export default function AdminPunishmentsPage() {
                             </div>
                         </div>
                         <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowForm(false)}>{t("adm_filterAll")}</Button>
+                            <Button variant="outline" onClick={closeForm}>{commonT("cancel")}</Button>
                             <Button onClick={create} disabled={saving || !form.playerName.trim()}>
                                 {saving ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> {t("adm_creating")}</> : t("adm_create")}
                             </Button>
                         </div>
                     </CardContent>
                 </Card>
-            )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
+                <p className="text-muted-foreground">{t("adm_subtitle")}</p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+                <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
+                    {t("adm_filterAll")}
+                </Button>
+                <Button variant={filter === "active" ? "default" : "outline"} size="sm" onClick={() => setFilter("active")}>
+                    {t("adm_filterActive")}
+                </Button>
+                <Button variant={filter === "revoked" ? "default" : "outline"} size="sm" onClick={() => setFilter("revoked")}>
+                    {t("adm_filterRevoked")}
+                </Button>
+                <div className="flex-1" />
+                <Link href={formHref()} className="inline-flex">
+                    <Button size="sm">
+                        <Plus className="w-4 h-4 mr-1" /> {t("adm_newPunishment")}
+                    </Button>
+                </Link>
+            </div>
 
             {loading ? (
                 <div className="flex justify-center py-12">
@@ -207,7 +225,7 @@ export default function AdminPunishmentsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filtered.map(p => (
+                            {paged.rows.map(p => (
                                 <tr key={p.id} className="border-t">
                                     <td className="px-4 py-2 font-medium">{p.playerName}</td>
                                     <td className="px-4 py-2">{TYPE_OPTIONS.includes(p.type) ? t(p.type) : p.type}</td>
@@ -240,6 +258,7 @@ export default function AdminPunishmentsPage() {
                             ))}
                         </tbody>
                     </table>
+                    <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
                 </div>
             )}
         </div>

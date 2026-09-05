@@ -2,9 +2,10 @@
 
 
 import { useTranslations, useLocale } from "next-intl";
-import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, Tag } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Button, Card, CardContent, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { writeError } from "@/core/sdk";
@@ -33,10 +34,13 @@ export default function AdminCouponsPage() {
     const { confirm } = useConfirm();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
+    // The editor is a screen at `?form=new` or `?form=<id>`, not a card above
+    // the table of coupons.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
     const [error, setError] = useState<string | null>(null);
+
+    const paged = usePagedRows(coupons);
 
     const [form, setForm] = useState({
         code: "",
@@ -50,7 +54,7 @@ export default function AdminCouponsPage() {
         isActive: true,
     });
 
-    const fetchCoupons = async () => {
+    const fetchCoupons = useCallback(async () => {
         try {
             const res = await fetch("/api/v1/store/coupons");
             if (res.ok) {
@@ -62,14 +66,22 @@ export default function AdminCouponsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchCoupons();
-    }, []);
+    }, [fetchCoupons]);
 
-    const startEdit = (coupon: Coupon) => {
-        setEditingId(coupon.id);
+    // Filled from the coupon the URL names, once the rows arrive, so a reload
+    // of `?form=<id>` lands on the same edit rather than an empty form.
+    useEffect(() => {
+        setError(null);
+        if (!editingId) {
+            setForm({ code: "", description: "", type: "PERCENTAGE", value: "", minPurchase: "", maxDiscount: "", usageLimit: "", expiresAt: "", isActive: true });
+            return;
+        }
+        const coupon = coupons.find((row) => row.id === editingId);
+        if (!coupon) return;
         setForm({
             code: coupon.code,
             description: coupon.description || "",
@@ -81,15 +93,7 @@ export default function AdminCouponsPage() {
             expiresAt: coupon.expiresAt ? new Date(coupon.expiresAt).toISOString().slice(0, 16) : "",
             isActive: coupon.isActive,
         });
-        setShowForm(true);
-    };
-
-    const resetForm = () => {
-        setForm({ code: "", description: "", type: "PERCENTAGE", value: "", minPurchase: "", maxDiscount: "", usageLimit: "", expiresAt: "", isActive: true });
-        setEditingId(null);
-        setShowForm(false);
-        setError(null);
-    };
+    }, [editingId, coupons]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -120,8 +124,8 @@ export default function AdminCouponsPage() {
                 return;
             }
 
-            resetForm();
-            fetchCoupons();
+            await fetchCoupons();
+            closeForm();
         } catch {
             setError(commonT("somethingWentWrong"));
         } finally {
@@ -174,28 +178,25 @@ export default function AdminCouponsPage() {
         );
     }
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_coupons")}</h1>
-                    <p className="text-muted-foreground">{t("adm_manageDiscountCodes")}</p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{editingId ? t("adm_editCoupon") : t("adm_newCoupon")}</h1>
+                        <p className="text-muted-foreground">{t("adm_manageDiscountCodes")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => showForm ? resetForm() : setShowForm(true)}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCoupon")}</>}
-                </Button>
-            </div>
 
-            {error && (
-                <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
-            )}
+                {error && (
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                )}
 
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{editingId ? t("adm_editCoupon") : t("adm_newCoupon")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div>
@@ -293,13 +294,32 @@ export default function AdminCouponsPage() {
                                 />
                             </div>
 
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</> : editingId ? t("adm_saveChanges") : t("adm_createCoupon")}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</> : editingId ? t("adm_saveChanges") : t("adm_createCoupon")}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_coupons")}</h1>
+                    <p className="text-muted-foreground">{t("adm_manageDiscountCodes")}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCoupon")}</Button>
+                </Link>
+            </div>
 
             {/* Coupons List */}
             <Card>
@@ -320,7 +340,7 @@ export default function AdminCouponsPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {coupons.map((coupon) => (
+                                    {paged.rows.map((coupon) => (
                                         <tr key={coupon.id} className="hover:bg-muted/50 border-b last:border-0">
                                             <td className="py-3 px-4">
                                                 <div className="flex items-center gap-2">
@@ -366,7 +386,7 @@ export default function AdminCouponsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => startEdit(coupon)}
+                                                    onClick={() => openForm(coupon.id)}
                                                 >
                                                     {t("adm_edit")}
                                                 </Button>
@@ -386,6 +406,7 @@ export default function AdminCouponsPage() {
                             </table>
                         </div>
                     )}
+                    <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
                 </CardContent>
             </Card>
         </>

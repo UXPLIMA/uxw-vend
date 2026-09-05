@@ -2,9 +2,10 @@
 
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2, Pencil } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
 
@@ -22,14 +23,15 @@ export default function AdminBlogCategoriesPage() {
     const { confirm } = useConfirm();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
+    // The form is a screen at `?form=new` or `?form=<id>`, not a card above
+    // the list: the row you came to edit stays where it was.
+    const { showForm, editingId, formHref, openForm, closeForm } = useFormRoute();
     const [error, setError] = useState<string | null>(null);
 
     const [form, setForm] = useState({ name: "", description: "" });
 
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
             const res = await fetch("/api/v1/blog/categories");
             if (res.ok) {
@@ -41,24 +43,23 @@ export default function AdminBlogCategoriesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
-    const resetForm = () => {
-        setForm({ name: "", description: "" });
-        setShowForm(false);
-        setEditingId(null);
+    // Filled from the row the URL names, once the rows arrive, so reloading
+    // `?form=<id>` lands on the same half-finished edit rather than a blank.
+    useEffect(() => {
         setError(null);
-    };
-
-    const startEdit = (cat: Category) => {
-        setEditingId(cat.id);
-        setForm({ name: cat.name, description: cat.description || "" });
-        setShowForm(true);
-    };
+        if (!editingId) {
+            setForm({ name: "", description: "" });
+            return;
+        }
+        const row = categories.find((cat) => cat.id === editingId);
+        if (row) setForm({ name: row.name, description: row.description || "" });
+    }, [editingId, categories]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,8 +82,8 @@ export default function AdminBlogCategoriesPage() {
                 return;
             }
 
-            resetForm();
-            fetchCategories();
+            await fetchCategories();
+            closeForm();
         } catch {
             setError(commonT("somethingWentWrong"));
         } finally {
@@ -120,28 +121,25 @@ export default function AdminBlogCategoriesPage() {
         );
     }
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_blogCategories")}</h1>
-                    <p className="text-muted-foreground">{t("adm_organizeBlog")}</p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{editingId ? t("adm_editCategory") : t("adm_newCategory")}</h1>
+                        <p className="text-muted-foreground">{t("adm_organizeBlog")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => { resetForm(); setShowForm(true); }}>
-                    {showForm && !editingId ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</>}
-                </Button>
-            </div>
 
-            {error && (
-                <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
-            )}
+                {error && (
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                )}
 
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{editingId ? t("adm_editCategory") : t("adm_newCategory")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
@@ -168,14 +166,28 @@ export default function AdminBlogCategoriesPage() {
                                     {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</> :
                                      editingId ? t("adm_saveChanges") : t("adm_createCategory")}
                                 </Button>
-                                {editingId && (
-                                    <Button type="button" variant="outline" onClick={resetForm}>{t("adm_cancel")}</Button>
-                                )}
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
                             </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_blogCategories")}</h1>
+                    <p className="text-muted-foreground">{t("adm_organizeBlog")}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</Button>
+                </Link>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories.length === 0 ? (
@@ -201,7 +213,7 @@ export default function AdminBlogCategoriesPage() {
                                 </p>
                                 <p className="text-xs text-muted-foreground mb-3">/{category.slug}</p>
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => startEdit(category)}>
+                                    <Button variant="outline" size="sm" onClick={() => openForm(category.id)}>
                                         <Pencil className="w-3 h-3 mr-1" /> {t("adm_edit")}
                                     </Button>
                                     <Button

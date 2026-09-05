@@ -8,6 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `useFormRoute` joins `@/core/sdk/ui` (CORE_API_VERSION 1.13.0). A create or
+  edit form is a place, so it gets an address. The hook reads `?form=new` or
+  `?form=<id>` off the current path and hands back `showForm`, `editingId`,
+  `formHref`, `openForm` and `closeForm`; the screen renders the form and
+  returns early. Core's own screens got real route segments instead
+  (`/admin/roles/new`, `/admin/roles/<id>/edit`); a module screen gets a query
+  parameter on the path it already has, because its field definitions, submit
+  handler and validation live in that one page file and a child route would
+  need all of it copied into two more files per module.
+
+### Changed
+- Twenty-nine admin create and edit forms stopped unfolding on top of the list
+  they belong to. Roles, API keys, IP blocks, warnings and resource permissions
+  moved to routes of their own; `AdminCrudPage` - rendered by thirteen module
+  screens - and twelve hand-rolled module screens moved to `?form=`. On a
+  screen with two hundred roles the old shape pushed the row you came to edit
+  off the bottom of the page, the browser's back button did not close it, and a
+  half-filled form could not be reloaded, linked, or reopened where you left
+  it, because nothing about it was in the URL. The SEO overrides and trophies
+  screens were modals rather than cards, which is the same problem with a
+  backdrop.
+
+- Six more lists learned to page: punishments, coupons, SEO overrides,
+  trophies, and the gift-code table swapped its two-chevron pager for the
+  shared `Pagination`.
+
+### Fixed
+- The cancel button on the punishments form was labelled "All" (it reused the
+  filter's translation key), and the one on the public suggestions board had an
+  icon and no text at all.
+
+- Three toasts were hard-coded English: `Generated N gift codes`, and `Updated`
+  / `Created` on the custom-forms builder.
+
+### Added
 - `Pagination` and `usePagedRows` join `@/core/sdk/ui` (CORE_API_VERSION
   1.12.0). Numbered pages with an ellipsis where the middle is elided, first
   and last, and a box to type a page number into once there are more pages than

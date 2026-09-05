@@ -4,8 +4,9 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, useConfirm, NativeSelect } from "@/core/sdk/ui";
-import { Loader2, Plus, X, Trash2 } from "lucide-react";
+import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Link } from "@/core/sdk/navigation";
+import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
 
@@ -28,8 +29,9 @@ export default function AdminStoreCategoriesPage() {
     const { confirm } = useConfirm();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
+    // The form is a screen at `?form=new`, not a card above the tree.
+    const { showForm, formHref, closeForm } = useFormRoute();
     const [error, setError] = useState<string | null>(null);
 
     const [form, setForm] = useState({
@@ -80,9 +82,9 @@ export default function AdminStoreCategoriesPage() {
                 return;
             }
 
-            setShowForm(false);
             setForm({ name: "", description: "", image: "", parentId: "", order: 0, isActive: true });
-            fetchCategories();
+            await fetchCategories();
+            closeForm();
         } catch {
             setError(commonT("somethingWentWrong"));
         } finally {
@@ -123,28 +125,25 @@ export default function AdminStoreCategoriesPage() {
         );
     }
 
-    return (
-        <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_storeCategories")}</h1>
-                    <p className="text-muted-foreground">{t("adm_organizeProducts")}</p>
+    if (showForm) {
+        return (
+            <>
+                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("adm_newCategory")}</h1>
+                        <p className="text-muted-foreground">{t("adm_organizeProducts")}</p>
+                    </div>
+                    <Button variant="outline" onClick={closeForm}>
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
+                    </Button>
                 </div>
-                <Button onClick={() => setShowForm(!showForm)}>
-                    {showForm ? <><X className="w-4 h-4 mr-2" /> {t("adm_cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</>}
-                </Button>
-            </div>
 
-            {error && (
-                <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
-            )}
+                {error && (
+                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                )}
 
-            {showForm && (
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>{t("adm_newCategory")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <Card>
+                    <CardContent className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
@@ -196,13 +195,32 @@ export default function AdminStoreCategoriesPage() {
                                     />
                                 </div>
                             </div>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
+                                    {t("adm_cancel")}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
+                <div>
+                    <h1 className="text-3xl font-bold">{t("adm_storeCategories")}</h1>
+                    <p className="text-muted-foreground">{t("adm_organizeProducts")}</p>
+                </div>
+                <Link href={formHref()} className="inline-flex">
+                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</Button>
+                </Link>
+            </div>
 
             {/* Category Tree */}
             <div className="space-y-4">
