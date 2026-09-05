@@ -8,7 +8,6 @@ import { useLocalDate } from "@/core/hooks/useLocalDate";
 import { ChevronRight, ChevronLeft, Newspaper } from "lucide-react";
 import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";
-import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 
 interface BlogPost {
   id: string;
@@ -28,7 +27,6 @@ export function BlogNewsSection() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const t = useTranslations('news');
     const formatLocalDate = useLocalDate();
-  const { settings } = useSiteSettings();
 
   useEffect(() => {
     fetch('/api/v1/blog/articles?limit=8')
@@ -37,7 +35,10 @@ export function BlogNewsSection() {
       .catch(() => setIsLoading(false));
   }, []);
 
-  const newsPerPage = Number(settings.per_page_home_news) || 4;
+  // Two pages out of the eight articles fetched above. This read the
+  // `per_page_home_news` setting, which no manifest declares and no screen
+  // writes, so the fallback was the only value it ever had.
+  const newsPerPage = 4;
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
