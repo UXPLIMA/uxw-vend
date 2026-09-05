@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Loader2, Zap, Layers, Cpu } from "lucide-react";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface DevData {
     hooks: {
@@ -73,12 +74,10 @@ export default function DevToolsPage() {
 
     return (
         <>
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold">
-                    {t("dev_title")}
-                </h1>
-                <p className="text-muted-foreground">{t("dev_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("dev_title")}
+                description={t("dev_subtitle")}
+            />
 
             {/* Tabs */}
             <div className="flex gap-2 mb-6 border-b border-border">

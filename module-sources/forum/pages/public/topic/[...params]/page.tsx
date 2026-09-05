@@ -277,9 +277,9 @@ export default function TopicDetailPage() {
                                     />
                                     <Button onClick={submitReply} disabled={sending || !replyContent.trim()}>
                                         {sending ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('posting')}</>
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('posting')}</>
                                         ) : (
-                                            <><Send className="w-4 h-4 mr-2" /> {t('postReply')}</>
+                                            <><Send className="w-4 h-4" /> {t('postReply')}</>
                                         )}
                                     </Button>
                                 </CardContent>

@@ -9,6 +9,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
 import { Loader2, Check } from "lucide-react";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default function SiteSettingsPage() {
     const t = useTranslations("admin");
@@ -87,10 +88,10 @@ export default function SiteSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-xl font-semibold">{t("siteSettings_title")}</h1>
-                <p className="text-muted-foreground">{t("siteSettings_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("siteSettings_title")}
+                description={t("siteSettings_subtitle")}
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -198,8 +199,8 @@ export default function SiteSettingsPage() {
 
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("siteSettings_saving")}</> :
-                         saved ? <><Check className="w-4 h-4 mr-2" /> {t("siteSettings_saved")}</> : t("siteSettings_saveSettings")}
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("siteSettings_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("siteSettings_saved")}</> : t("siteSettings_saveSettings")}
                     </Button>
                 </div>
             </form>

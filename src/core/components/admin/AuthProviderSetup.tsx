@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Check, Loader2, TriangleAlert } from "lucide-react";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface ProviderStatus {
     id: string;
@@ -75,10 +76,7 @@ export function AuthProviderSetup({
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-                {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
-            </div>
+            <AdminPageHeader title={title} description={subtitle} className="mb-0" />
 
             <Card>
                 <CardContent className="space-y-5 p-6 text-sm">

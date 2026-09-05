@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T20:06:18Z",
+  "updatedAt": "2026-09-05T20:50:26Z",
   "modules": [
     {
       "id": "announcements",
@@ -122,13 +122,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.1.17",
+      "version": "1.1.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -205,13 +205,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.0.8",
+      "version": "1.0.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -240,13 +240,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.1.5",
+      "version": "1.1.6",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -435,13 +435,13 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.0.6",
+      "version": "1.0.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -470,13 +470,13 @@
           "description": "Otomatik dönüşümle çoklu para birimi desteği"
         }
       },
-      "version": "1.1.2",
+      "version": "1.1.3",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -505,13 +505,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.28",
+      "version": "1.0.29",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -545,13 +545,13 @@
           "description": "Yöneticinin oluşturduğu HTML içerik sayfaları"
         }
       },
-      "version": "1.0.20",
+      "version": "1.0.21",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -615,13 +615,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.0.9",
+      "version": "1.0.10",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -657,13 +657,13 @@
           "description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
         }
       },
-      "version": "1.0.5",
+      "version": "1.0.6",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -694,13 +694,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.0.11",
+      "version": "1.0.12",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -871,13 +871,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.1.17",
+      "version": "1.1.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1018,13 +1018,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.1.13",
+      "version": "1.1.14",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1055,13 +1055,13 @@
           "description": "Zil simgeli uygulama içi bildirim sistemi"
         }
       },
-      "version": "1.0.12",
+      "version": "1.0.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1237,13 +1237,13 @@
           "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
         }
       },
-      "version": "1.1.8",
+      "version": "1.1.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1274,13 +1274,13 @@
           "description": "Dijital ürünler için lisans anahtarı üretin, teslim edin ve etkinleştirin; anahtar başına makine sınırı ile"
         }
       },
-      "version": "1.0.12",
+      "version": "1.0.13",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1506,13 +1506,13 @@
           "description": "Oyuncuların sunucuda kendilerine fısıldanan bir kodu okuyarak Minecraft hesabının sahibi olduklarını kanıtlamasını sağlayın"
         }
       },
-      "version": "1.0.7",
+      "version": "1.0.8",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1989,13 +1989,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.0.15",
+      "version": "1.0.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2106,13 +2106,13 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.0.19",
+      "version": "1.0.20",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2217,13 +2217,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.0.16",
+      "version": "1.0.17",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2359,13 +2359,13 @@
           "description": "Ekip üyesi listesi ve başvurular"
         }
       },
-      "version": "1.0.15",
+      "version": "1.0.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2429,13 +2429,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.22",
+      "version": "2.2.23",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2525,13 +2525,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.0.17",
+      "version": "1.0.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2567,13 +2567,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.0.33",
+      "version": "1.0.34",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2642,13 +2642,13 @@
           "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
         }
       },
-      "version": "1.0.19",
+      "version": "1.0.20",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2714,13 +2714,13 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.0.11",
+      "version": "1.0.12",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2789,13 +2789,13 @@
           "description": "Oyuncuları sıralamada yer aldığınız sunucu listelerine yönlendirin ve kimin oy verdiğini sayın"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2826,13 +2826,13 @@
           "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
         }
       },
-      "version": "1.0.8",
+      "version": "1.0.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2861,13 +2861,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.0.13",
+      "version": "1.0.14",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-05T20:50:26Z",
       "screenshots": [],
       "tags": [
         "commerce"

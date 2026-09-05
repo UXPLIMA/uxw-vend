@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, CheckboxField } from "@/core/sdk/ui";
 import { Loader2, Plus, Trash2, Save, Star, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Currency {
     code: string;
@@ -107,19 +108,19 @@ export default function CurrencyAdminPage() {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <DollarSign className="w-7 h-7" />
-                        {t("title")}
-                    </h1>
-                    <p className="text-muted-foreground">{t("settings")}</p>
-                </div>
-                <Button onClick={save} disabled={saving}>
-                    {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                    {t("settings")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={<>
+                    <DollarSign className="w-7 h-7" />
+                    {t("title")}
+                </>}
+                description={t("settings")}
+                actions={<>
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {t("settings")}
+                    </Button>
+                </>}
+            />
 
             <Card>
                 <CardHeader>
@@ -171,14 +172,12 @@ export default function CurrencyAdminPage() {
                                     />
                                 </div>
                                 <div className="col-span-2 flex items-center gap-2">
-                                    <label className="flex items-center gap-1 text-xs cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={cur.enabled}
-                                            onChange={(e) => updateCurrency(idx, { enabled: e.target.checked })}
-                                        />
-                                        {t("enabled")}
-                                    </label>
+                                    <CheckboxField
+                                        checked={cur.enabled}
+                                        onChange={(e) => updateCurrency(idx, { enabled: e.target.checked })}
+                                        label={t("enabled")}
+                                        rowClassName="text-xs"
+                                    />
                                 </div>
                                 <div className="col-span-1 flex items-center justify-end gap-1">
                                     <Button
@@ -205,7 +204,7 @@ export default function CurrencyAdminPage() {
                         );
                     })}
                     <Button type="button" variant="outline" onClick={addCurrency}>
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="w-4 h-4" />
                         {t("addCurrency")}
                     </Button>
                 </CardContent>

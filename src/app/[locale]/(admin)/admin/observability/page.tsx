@@ -9,6 +9,7 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface HealthData {
     status: "ok" | "degraded" | "down";
@@ -114,25 +115,23 @@ export default function ObservabilityPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("observability_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("observability_subtitle")}
-                        {health?.version && <span className="ml-2 text-xs">v{health.version}</span>}
-                    </p>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    {refreshing && <Loader2 className="w-3 h-3 animate-spin" />}
-                    {lastRefresh && (
-                        <span>
-                            {t("observability_lastRefresh")}: {lastRefresh.toLocaleTimeString(__dateTag)}
-                        </span>
-                    )}
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("observability_title")}
+                description={<>
+                    {t("observability_subtitle")}
+                    {health?.version && <span className="ml-2 text-xs">v{health.version}</span>}
+                </>}
+                actions={<>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {refreshing && <Loader2 className="w-3 h-3 animate-spin" />}
+                        {lastRefresh && (
+                            <span>
+                                {t("observability_lastRefresh")}: {lastRefresh.toLocaleTimeString(__dateTag)}
+                            </span>
+                        )}
+                    </div>
+                </>}
+            />
 
             {/* Status cards row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

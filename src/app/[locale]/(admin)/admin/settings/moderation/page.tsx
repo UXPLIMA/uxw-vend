@@ -8,6 +8,8 @@ import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { Checkbox } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 type ModerationMode = "auto" | "manual";
 
@@ -104,14 +106,10 @@ export default function ModerationSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">
-                    {t("moderationSettings_title")}
-                </h1>
-                <p className="text-muted-foreground">
-                    {t("moderationSettings_subtitle")}
-                </p>
-            </div>
+            <AdminPageHeader
+                title={t("moderationSettings_title")}
+                description={t("moderationSettings_subtitle")}
+            />
 
             <Card>
                 <CardHeader>
@@ -128,11 +126,10 @@ export default function ModerationSettingsPage() {
                                 key={field.settingKey}
                                 className="flex items-start gap-3 cursor-pointer border rounded-md p-3 hover:bg-accent/40"
                             >
-                                <input
-                                    type="checkbox"
+                                <Checkbox
                                     checked={config[field.settingKey] === "manual"}
                                     onChange={() => toggleField(field.settingKey)}
-                                    className="w-4 h-4 mt-1"
+                                    className="mt-0.5"
                                 />
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-foreground">
@@ -163,11 +160,11 @@ export default function ModerationSettingsPage() {
                 <Button onClick={onSave} disabled={saving}>
                     {saving ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("moderationSettings_saving")}
+                            <Loader2 className="w-4 h-4 animate-spin" /> {t("moderationSettings_saving")}
                         </>
                     ) : (
                         <>
-                            <Save className="w-4 h-4 mr-2" /> {t("moderationSettings_saveChanges")}
+                            <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
                         </>
                     )}
                 </Button>

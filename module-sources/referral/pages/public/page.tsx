@@ -9,6 +9,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
+import { copyText } from "@/core/sdk";
 
 interface ReferralData {
     referralCode: string;
@@ -65,25 +66,13 @@ export default function ReferralPage() {
     const copyLink = async () => {
         if (!data) return;
         const link = `${typeof window !== "undefined" ? window.location.origin : ""}?ref=${data.referralCode}`;
-        try {
-            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-                await navigator.clipboard.writeText(link);
-            } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = link;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-9999px";
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-            }
-            setCopied(true);
-            toast.success(t("linkCopied"));
-            setTimeout(() => setCopied(false), 2000);
-        } catch {
+        if (!(await copyText(link))) {
             toast.error(t("copyFailed"));
+            return;
         }
+        setCopied(true);
+        toast.success(t("linkCopied"));
+        setTimeout(() => setCopied(false), 2000);
     };
 
     const applyCode = async () => {
@@ -174,9 +163,9 @@ export default function ReferralPage() {
                                     />
                                     <Button onClick={copyLink} variant="outline">
                                         {copied ? (
-                                            <><Check className="w-4 h-4 mr-1" /> {t("copied")}</>
+                                            <><Check className="w-4 h-4" /> {t("copied")}</>
                                         ) : (
-                                            <><Copy className="w-4 h-4 mr-1" /> {t("copyLink")}</>
+                                            <><Copy className="w-4 h-4" /> {t("copyLink")}</>
                                         )}
                                     </Button>
                                 </div>

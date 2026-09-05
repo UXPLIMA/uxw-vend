@@ -29,12 +29,12 @@ export default function OrderSuccessPage() {
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link href="/profile">
                                 <Button variant="outline">
-                                    <ShoppingBag className="w-4 h-4 mr-2" /> {t("orderSuccess_myOrders")}
+                                    <ShoppingBag className="w-4 h-4" /> {t("orderSuccess_myOrders")}
                                 </Button>
                             </Link>
                             <Link href="/store">
                                 <Button>
-                                    {t("orderSuccess_continue")} <ArrowRight className="w-4 h-4 ml-2" />
+                                    {t("orderSuccess_continue")} <ArrowRight className="w-4 h-4" />
                                 </Button>
                             </Link>
                         </div>

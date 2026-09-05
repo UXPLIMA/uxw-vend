@@ -8,6 +8,8 @@ import { Label } from "@/core/components/ui/label";
 import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { CheckboxField } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 type HealthStatus = "ok" | "degraded" | "down";
 
@@ -125,14 +127,10 @@ export default function AlertingSettingsPage() {
 
     return (
         <>
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold">
-                    {t("alerting_title")}
-                </h1>
-                <p className="text-muted-foreground">
-                    {t("alerting_subtitle")}
-                </p>
-            </div>
+            <AdminPageHeader
+                title={t("alerting_title")}
+                description={t("alerting_subtitle")}
+            />
 
             <Card>
                 <CardHeader>
@@ -140,18 +138,12 @@ export default function AlertingSettingsPage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={save} className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <input
-                                id="enabled"
-                                type="checkbox"
-                                checked={enabled}
-                                onChange={(e) => setEnabled(e.target.checked)}
-                                className="h-4 w-4"
-                            />
-                            <Label htmlFor="enabled" className="cursor-pointer">
-                                {t("alerting_enabled")}
-                            </Label>
-                        </div>
+                        <CheckboxField
+                            id="enabled"
+                            checked={enabled}
+                            onChange={(e) => setEnabled(e.target.checked)}
+                            label={t("alerting_enabled")}
+                        />
 
                         <div>
                             <Label>{t("alerting_channel")}</Label>
@@ -196,14 +188,12 @@ export default function AlertingSettingsPage() {
                             <Label>{t("alerting_alertOn")}</Label>
                             <div className="flex gap-4 mt-2">
                                 {STATUSES.map((status) => (
-                                    <label key={status} className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={alertOn.includes(status)}
-                                            onChange={() => toggleAlertOn(status)}
-                                        />
-                                        <span className="capitalize">{status}</span>
-                                    </label>
+                                    <CheckboxField
+                                        key={status}
+                                        checked={alertOn.includes(status)}
+                                        onChange={() => toggleAlertOn(status)}
+                                        label={<span className="capitalize">{status}</span>}
+                                    />
                                 ))}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -215,7 +205,7 @@ export default function AlertingSettingsPage() {
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         {t("alerting_saving")}
                                     </>
                                 ) : (
@@ -230,12 +220,12 @@ export default function AlertingSettingsPage() {
                             >
                                 {testing ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         {t("alerting_testing")}
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="w-4 h-4 mr-2" />
+                                        <Send className="w-4 h-4" />
                                         {t("alerting_test")}
                                     </>
                                 )}

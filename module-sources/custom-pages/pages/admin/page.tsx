@@ -4,9 +4,10 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, Label, RichTextEditor, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, RichTextEditor, useConfirm, useFormRoute, CheckboxField } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Plus, Trash2, ExternalLink, Pencil, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface CustomPage {
     id: string;
@@ -129,15 +130,12 @@ export default function CustomPagesAdminPage() {
     if (showForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{editingId ? t("adm_editPage") : t("adm_createPage")}</h1>
-                        <p className="text-muted-foreground">{t("adm_customPagesSubtitle")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={editingId ? t("adm_editPage") : t("adm_createPage")}
+                    description={t("adm_customPagesSubtitle")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -159,10 +157,11 @@ export default function CustomPagesAdminPage() {
                                 <RichTextEditor value={content} onChange={setContent} />
                             </div>
                             <div className="flex items-center gap-4">
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-                                    {t("adm_published")}
-                                </label>
+                                <CheckboxField
+                                    checked={isActive}
+                                    onChange={(e) => setIsActive(e.target.checked)}
+                                    label={t("adm_published")}
+                                />
                                 <div className="flex items-center gap-2">
                                     <Label className="text-sm">{t("adm_sortOrder")}</Label>
                                     <Input aria-label={t("adm_sortOrder")} type="number" className="w-20" value={order} onChange={(e) => setOrder(parseInt(e.target.value) || 0)} />
@@ -170,7 +169,7 @@ export default function CustomPagesAdminPage() {
                             </div>
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                                     {editingId ? t("adm_updatePage") : t("adm_createPage")}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
@@ -186,15 +185,15 @@ export default function CustomPagesAdminPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_customPages")}</h1>
-                    <p className="text-muted-foreground">{t("adm_customPagesSubtitle")}</p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newPage")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_customPages")}
+                description={t("adm_customPagesSubtitle")}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_newPage")}</Button>
+                    </Link>
+                </>}
+            />
 
             {pages.length === 0 ? (
                 <Card><CardContent className="py-8 text-center text-muted-foreground">{t("adm_noPagesYet")}</CardContent></Card>

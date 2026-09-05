@@ -75,7 +75,7 @@ export default function LeaderboardPage() {
                 <div className="flex flex-wrap justify-center gap-2 mb-6">
                     {tabs.map((tab) => (
                         <Button key={tab.id} variant={activeTab === tab.id ? "default" : "outline"} onClick={() => setActiveTab(tab.id)}>
-                            <tab.icon className="w-4 h-4 mr-2" /> {tab.label}
+                            <tab.icon className="w-4 h-4" /> {tab.label}
                         </Button>
                     ))}
                 </div>

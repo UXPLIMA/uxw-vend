@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { SystemMetrics } from "../components/system-metrics";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface SystemData {
     database: { size: string; totalUsers: number; newUsersWeek: number; totalModules: number; enabledModules: number };
@@ -52,15 +53,15 @@ export default function SystemPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("system_title")}</h1>
-                    <p className="text-muted-foreground">{system.system.hostname} - {system.system.platform}</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={fetchData}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> {t("system_refresh")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={t("system_title")}
+                description={`${system.system.hostname} - ${system.system.platform}`}
+                actions={<>
+                    <Button variant="outline" size="sm" onClick={fetchData}>
+                        <RefreshCw className="w-4 h-4" /> {t("system_refresh")}
+                    </Button>
+                </>}
+            />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

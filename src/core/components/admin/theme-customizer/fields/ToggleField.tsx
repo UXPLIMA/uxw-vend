@@ -1,6 +1,7 @@
 "use client";
 
 import type { FieldProps } from "./types";
+import { Checkbox } from "@/core/components/ui/checkbox";
 
 export function ToggleField({ def, value, onChange, isDefault }: FieldProps<boolean>) {
     if (def.type !== "toggle") return null;
@@ -8,11 +9,9 @@ export function ToggleField({ def, value, onChange, isDefault }: FieldProps<bool
 
     return (
         <label className="flex items-center gap-2 text-sm">
-            <input
-                type="checkbox"
+            <Checkbox
                 checked={current}
                 onChange={(e) => onChange(e.target.checked)}
-                className="h-4 w-4 cursor-pointer rounded border border-input"
             />
             <span className="text-xs text-muted-foreground">{current ? "On" : "Off"}</span>
             {!isDefault && (

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
 import { Download, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 export default function ExportImportPage() {
     const t = useTranslations("csvImportExport");
@@ -37,10 +38,10 @@ export default function ExportImportPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("adm_exportImport")}</h1>
-                <p className="text-muted-foreground">{t("adm_exportImportSubtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_exportImport")}
+                description={t("adm_exportImportSubtitle")}
+            />
 
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
@@ -51,13 +52,13 @@ export default function ExportImportPage() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <Button variant="outline" className="w-full justify-start" onClick={() => exportData("products")}>
-                            <Download className="w-4 h-4 mr-2" /> {t("adm_exportProducts")}
+                            <Download className="w-4 h-4" /> {t("adm_exportProducts")}
                         </Button>
                         <Button variant="outline" className="w-full justify-start" onClick={() => exportData("orders")}>
-                            <Download className="w-4 h-4 mr-2" /> {t("adm_exportOrders")}
+                            <Download className="w-4 h-4" /> {t("adm_exportOrders")}
                         </Button>
                         <Button variant="outline" className="w-full justify-start" onClick={() => exportData("users")}>
-                            <Download className="w-4 h-4 mr-2" /> {t("adm_exportUsers")}
+                            <Download className="w-4 h-4" /> {t("adm_exportUsers")}
                         </Button>
                     </CardContent>
                 </Card>

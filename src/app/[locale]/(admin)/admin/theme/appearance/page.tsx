@@ -11,6 +11,7 @@ import { useTheme } from "@/core/providers/theme-provider";
 import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 import { writeError } from "@/core/lib/write-result";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /**
  * Active theme's appearance editor - color tokens + mode toggle.
@@ -104,15 +105,13 @@ export default function ActiveThemeAppearancePage() {
 
     return (
         <div className="p-6 space-y-6 max-w-4xl">
-            <div>
-                <h1 className="text-2xl font-semibold flex items-center gap-2">
+            <AdminPageHeader
+                title={<>
                     <Palette className="w-5 h-5" />
                     {activeTheme.name} - {t("theme_appearanceTitle")}
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                    {t("theme_appearanceSubtitle")}
-                </p>
-            </div>
+                </>}
+                description={t("theme_appearanceSubtitle")}
+            />
 
             <SuggestedModulesBanner
                 themeName={activeTheme.name}
@@ -170,7 +169,7 @@ export default function ActiveThemeAppearancePage() {
                         </div>
                         <div className="flex gap-2 mt-6">
                             <Button size="sm" onClick={saveColors} disabled={saving}>
-                                <Check className="w-3 h-3 mr-1" />
+                                <Check className="w-3 h-3" />
                                 {saving ? t("theme_saving") : t("theme_saveColors")}
                             </Button>
                             <Button size="sm" variant="outline" onClick={resetColors}>

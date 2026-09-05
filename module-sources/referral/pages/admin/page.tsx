@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, Users, UserPlus, Coins, Clock, Save } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface AdminStats {
     totalReferrals: number;
@@ -89,10 +90,10 @@ export default function AdminReferralPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold">{t("adm_referralManagement")}</h1>
-                <p className="text-muted-foreground">{t("adm_referralOverview")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_referralManagement")}
+                description={t("adm_referralOverview")}
+            />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -209,9 +210,9 @@ export default function AdminReferralPage() {
                         </div>
                         <Button onClick={saveSettings} disabled={saving}>
                             {saving ? (
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                <Save className="w-4 h-4 mr-2" />
+                                <Save className="w-4 h-4" />
                             )}
                             {t("adm_saveSettings")}
                         </Button>

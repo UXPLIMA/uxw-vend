@@ -20,6 +20,7 @@ import { userProfilePath } from "@/core/lib/user-profile-link";
 import { useAllModules } from "@/core/providers/module-provider";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface AuditLogEntry {
     id: string;
@@ -209,16 +210,16 @@ export default function AuditLogPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">{title}</h1>
-                    <p className="text-sm text-muted-foreground">{subtitle}</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={exportCsv}>
-                    <Download className="w-4 h-4 mr-2" />
-                    {t("auditLog_exportCsv")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={title}
+                description={subtitle}
+                actions={<>
+                    <Button variant="outline" size="sm" onClick={exportCsv}>
+                        <Download className="w-4 h-4" />
+                        {t("auditLog_exportCsv")}
+                    </Button>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-4">

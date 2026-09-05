@@ -12,6 +12,8 @@ import { Loader2, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucid
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { copyText } from "@/core/lib/copy-text";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface MediaItem {
     id: string;
@@ -132,8 +134,8 @@ export default function MediaLibraryPage() {
         }
     };
 
-    const copyUrl = (item: MediaItem) => {
-        navigator.clipboard.writeText(item.url);
+    const copyUrl = async (item: MediaItem) => {
+        if (!(await copyText(item.url))) return;
         setCopiedId(item.id);
         setTimeout(() => setCopiedId(null), 2000);
     };
@@ -142,20 +144,18 @@ export default function MediaLibraryPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("media_title")}
-                    </h1>
-                    <p className="text-muted-foreground">{t("media_subtitle")}</p>
-                </div>
-                <label className="cursor-pointer">
-                    <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} />
-                    <span className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4">
-                        {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin text-primary-foreground" /> <span className="text-primary-foreground">{t("media_uploading")}</span></> : <><Upload className="w-4 h-4 mr-2 text-primary-foreground" /> <span className="text-primary-foreground">{t("media_upload")}</span></>}
-                    </span>
-                </label>
-            </div>
+            <AdminPageHeader
+                title={t("media_title")}
+                description={t("media_subtitle")}
+                actions={<>
+                    <label className="cursor-pointer">
+                        <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} />
+                        <span className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4">
+                            {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin text-primary-foreground" /> <span className="text-primary-foreground">{t("media_uploading")}</span></> : <><Upload className="w-4 h-4 mr-2 text-primary-foreground" /> <span className="text-primary-foreground">{t("media_upload")}</span></>}
+                        </span>
+                    </label>
+                </>}
+            />
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">
@@ -272,7 +272,7 @@ export default function MediaLibraryPage() {
                             </div>
                             <div className="flex justify-end">
                                 <Button variant="destructive" size="sm" onClick={() => deleteItem(selected)}>
-                                    <Trash2 className="w-4 h-4 mr-2" /> {t("common_delete")}
+                                    <Trash2 className="w-4 h-4" /> {t("common_delete")}
                                 </Button>
                             </div>
                         </div>

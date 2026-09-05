@@ -14,6 +14,7 @@ import { ModuleNavLinks } from "@/core/generated/module-registry";
 import { useAllModules } from "@/core/providers/module-provider";
 import { IconPicker } from "@/core/components/ui/icon-picker";
 import { isEnabledIn } from "@/core/lib/module-enabled";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface NavChild {
     label: string;
@@ -133,18 +134,18 @@ export default function NavbarSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("navbar_title")}</h1>
-                <p className="text-muted-foreground">{t("navbar_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("navbar_title")}
+                description={t("navbar_subtitle")}
+            />
 
             <Card className="mb-6">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle>{t("navbar_links")}</CardTitle>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={addLink}><Plus className="w-4 h-4 mr-1" /> {t("navbar_addLink")}</Button>
-                            <Button variant="outline" size="sm" onClick={addDropdown}><Plus className="w-4 h-4 mr-1" /> {t("navbar_addDropdown")}</Button>
+                            <Button variant="outline" size="sm" onClick={addLink}><Plus className="w-4 h-4" /> {t("navbar_addLink")}</Button>
+                            <Button variant="outline" size="sm" onClick={addDropdown}><Plus className="w-4 h-4" /> {t("navbar_addDropdown")}</Button>
                         </div>
                     </div>
                 </CardHeader>
@@ -174,7 +175,7 @@ export default function NavbarSettingsPage() {
                                         {isDropdown && (
                                             <Button variant="ghost" size="sm" onClick={() => setExpandedDropdown(isExpanded ? null : i)}>
                                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                                <span className="text-xs ml-1">{link.children!.length}</span>
+                                                <span className="text-xs">{link.children!.length}</span>
                                             </Button>
                                         )}
                                         {!isDropdown && (
@@ -204,7 +205,7 @@ export default function NavbarSettingsPage() {
                                                 </div>
                                             ))}
                                             <Button variant="ghost" size="sm" className="ml-6" onClick={() => addChild(i)}>
-                                                <Plus className="w-3 h-3 mr-1" /> {t("navbar_addSubItem")}
+                                                <Plus className="w-3 h-3" /> {t("navbar_addSubItem")}
                                             </Button>
                                         </div>
                                     )}
@@ -216,7 +217,7 @@ export default function NavbarSettingsPage() {
             </Card>
 
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("common_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("navbar_save")}</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}</> : <><Check className="w-4 h-4" /> {t("navbar_save")}</>}
             </Button>
 
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">

@@ -7,6 +7,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, La
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface HelpCategory {
     id: string;
@@ -142,15 +143,12 @@ export default function AdminHelpCenterPage() {
     if (showArticleForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_newHelpArticle")}</h1>
-                        <p className="text-muted-foreground">{t("adm_manageKnowledgeBase")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_newHelpArticle")}
+                    description={t("adm_manageKnowledgeBase")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 {error && (
                     <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -194,7 +192,7 @@ export default function AdminHelpCenterPage() {
                                 />
                             </div>
                             <Button type="submit" disabled={savingArticle}>
-                                {savingArticle ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createArticle")}
+                                {savingArticle ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</> : t("adm_createArticle")}
                             </Button>
                         </form>
                     </CardContent>
@@ -206,15 +204,12 @@ export default function AdminHelpCenterPage() {
     if (showCategoryForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_newHelpCategory")}</h1>
-                        <p className="text-muted-foreground">{t("adm_manageKnowledgeBase")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_newHelpCategory")}
+                    description={t("adm_manageKnowledgeBase")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 {error && (
                     <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -283,7 +278,7 @@ export default function AdminHelpCenterPage() {
                                 )}
                             </div>
                             <Button type="submit" disabled={savingCategory}>
-                                {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</> : t("adm_createCategory")}
+                                {savingCategory ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</> : t("adm_createCategory")}
                             </Button>
                         </form>
                     </CardContent>
@@ -294,12 +289,10 @@ export default function AdminHelpCenterPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_helpCenter")}</h1>
-                    <p className="text-muted-foreground">{t("adm_manageKnowledgeBase")}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("adm_helpCenter")}
+                description={t("adm_manageKnowledgeBase")}
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -326,7 +319,7 @@ export default function AdminHelpCenterPage() {
                 <>
                     <div className="flex justify-end mb-4">
                         <Link href={formHref("article")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newArticle")}</Button>
+                            <Button><Plus className="w-4 h-4" /> {t("adm_newArticle")}</Button>
                         </Link>
                     </div>
 
@@ -385,7 +378,7 @@ export default function AdminHelpCenterPage() {
                 <>
                     <div className="flex justify-end mb-4">
                         <Link href={formHref("category")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCategory")}</Button>
+                            <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
                         </Link>
                     </div>
 

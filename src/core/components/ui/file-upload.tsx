@@ -108,9 +108,9 @@ export function FileUpload({ value, onChange, accept, label, id }: FileUploadPro
                                 disabled={uploading}
                             >
                                 {uploading ? (
-                                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                    <Loader2 className="h-3 w-3 animate-spin" />
                                 ) : (
-                                    <Upload className="mr-1 h-3 w-3" />
+                                    <Upload className="h-3 w-3" />
                                 )}
                                 {t("replace")}
                             </Button>
@@ -121,7 +121,7 @@ export function FileUpload({ value, onChange, accept, label, id }: FileUploadPro
                                 onClick={handleRemove}
                                 disabled={uploading}
                             >
-                                <X className="mr-1 h-3 w-3" aria-hidden="true" />
+                                <X className="h-3 w-3" aria-hidden="true" />
                                 {t("remove")}
                             </Button>
                         </div>
@@ -139,12 +139,12 @@ export function FileUpload({ value, onChange, accept, label, id }: FileUploadPro
                 >
                     {uploading ? (
                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                             {t("uploading")}
                         </>
                     ) : (
                         <>
-                            <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+                            <Upload className="h-4 w-4" aria-hidden="true" />
                             {t("uploadFile")}
                         </>
                     )}

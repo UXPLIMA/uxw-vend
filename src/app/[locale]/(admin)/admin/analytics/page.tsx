@@ -21,6 +21,7 @@ import { Bar, Line } from "react-chartjs-2";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { useSiteCurrency } from "@/core/components/currency/site-currency";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 ChartJS.register(
     CategoryScale,
@@ -204,40 +205,38 @@ export default function AnalyticsPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("analytics_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("analytics_description")}</p>
-                </div>
-                {/*
-                  * A filter chip group, not a toolbar of boxes. `rounded` on a
-                  * button inside a `rounded-lg` strip left four square corners
-                  * on the selected period and four more on hover.
-                  */}
-                <div
-                    role="group"
-                    aria-label={t("analytics_periodLabel")}
-                    className="flex gap-1 rounded-full border border-border p-1 bg-card"
-                >
-                    {PERIODS.map((p) => (
-                        <button
-                            key={p.key}
-                            type="button"
-                            onClick={() => setPeriod(p.key)}
-                            aria-pressed={period === p.key}
-                            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                period === p.key
-                                    ? "bg-primary text-primary-foreground"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                            }`}
-                        >
-                            {t(p.labelKey as "analytics_period_30")}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("analytics_title")}
+                description={t("analytics_description")}
+                actions={<>
+                    {/*
+                      * A filter chip group, not a toolbar of boxes. `rounded` on a
+                      * button inside a `rounded-lg` strip left four square corners
+                      * on the selected period and four more on hover.
+                      */}
+                    <div
+                        role="group"
+                        aria-label={t("analytics_periodLabel")}
+                        className="flex gap-1 rounded-full border border-border p-1 bg-card"
+                    >
+                        {PERIODS.map((p) => (
+                            <button
+                                key={p.key}
+                                type="button"
+                                onClick={() => setPeriod(p.key)}
+                                aria-pressed={period === p.key}
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    period === p.key
+                                        ? "bg-primary text-primary-foreground"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                }`}
+                            >
+                                {t(p.labelKey as "analytics_period_30")}
+                            </button>
+                        ))}
+                    </div>
+                </>}
+            />
 
             {loading ? (
                 <div className="flex items-center justify-center py-24">

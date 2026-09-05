@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/c
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
-import { ArrowLeft, Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle, UserCog } from "lucide-react";
+import { Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle, UserCog } from "lucide-react";
 import { formatDate } from "@/core/lib/utils";
 import { toast } from "sonner";
 import { useConfirm, usePrompt } from "@/core/components/ui/confirm-dialog";
@@ -18,6 +18,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface UserDetail {
     id: string;
@@ -258,13 +259,12 @@ export default function AdminUserDetailPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/users" aria-label={t("users_backToList")}>
-                    <Button variant="ghost" size="icon" aria-label={t("users_backToList")}>
-                        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                    </Button>
-                </Link>
-                <div className="flex items-center gap-3">
+            <AdminPageHeader
+                backHref="/admin/users"
+                backLabel={t("users_backToList")}
+                title={user.username}
+                description={user.email}
+                actions={
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden">
                         {user.avatar ? (
                             <Image src={user.avatar} alt="" width={48} height={48} className="w-full h-full object-cover" unoptimized />
@@ -272,12 +272,8 @@ export default function AdminUserDetailPage() {
                             user.username[0].toUpperCase()
                         )}
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-bold">{user.username}</h1>
-                        <p className="text-muted-foreground text-sm">{user.email}</p>
-                    </div>
-                </div>
-            </div>
+                }
+            />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Edit Form */}
@@ -322,8 +318,8 @@ export default function AdminUserDetailPage() {
                                     </NativeSelect>
                                 </div>
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("users_saving")}</> :
-                                     saved ? <><Check className="w-4 h-4 mr-2" /> {t("users_saved")}</> : t("common_save")}
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("users_saving")}</> :
+                                     saved ? <><Check className="w-4 h-4" /> {t("users_saved")}</> : t("common_save")}
                                 </Button>
                             </form>
                         </CardContent>
@@ -411,7 +407,7 @@ export default function AdminUserDetailPage() {
                                             window.location.reload();
                                         }}
                                     >
-                                        <ShieldCheck className="w-3 h-3 mr-2" /> {t("users_unbanUser")}
+                                        <ShieldCheck className="w-3 h-3" /> {t("users_unbanUser")}
                                     </Button>
                                 </div>
                             ) : (
@@ -435,7 +431,7 @@ export default function AdminUserDetailPage() {
                                         window.location.reload();
                                     }}
                                 >
-                                    <Ban className="w-3 h-3 mr-2" /> {t("users_banUser")}
+                                    <Ban className="w-3 h-3" /> {t("users_banUser")}
                                 </Button>
                             )}
                         </CardContent>
@@ -462,12 +458,12 @@ export default function AdminUserDetailPage() {
                                 >
                                     {impersonating ? (
                                         <>
-                                            <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                            <Loader2 className="w-3 h-3 animate-spin" />
                                             {t("users_switching")}
                                         </>
                                     ) : (
                                         <>
-                                            <UserCog className="w-3 h-3 mr-2" />
+                                            <UserCog className="w-3 h-3" />
                                             {t("users_loginAsUser")}
                                         </>
                                     )}
@@ -493,12 +489,12 @@ export default function AdminUserDetailPage() {
                             >
                                 {exportingData ? (
                                     <>
-                                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                        <Loader2 className="w-3 h-3 animate-spin" />
                                         {t("users_preparing")}
                                     </>
                                 ) : (
                                     <>
-                                        <Download className="w-3 h-3 mr-2" />
+                                        <Download className="w-3 h-3" />
                                         {t("users_exportData")}
                                     </>
                                 )}
@@ -514,7 +510,7 @@ export default function AdminUserDetailPage() {
                                     setDeleteModalOpen(true);
                                 }}
                             >
-                                <Trash2 className="w-3 h-3 mr-2" />
+                                <Trash2 className="w-3 h-3" />
                                 {t("users_deleteAccount")}
                             </Button>
                         </CardContent>
@@ -612,7 +608,7 @@ export default function AdminUserDetailPage() {
                             >
                                 {deletingAccount ? (
                                     <>
-                                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                                        <Loader2 className="w-3 h-3 animate-spin" />
                                         {t("users_deleting")}
                                     </>
                                 ) : (

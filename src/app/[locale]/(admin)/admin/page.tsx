@@ -11,6 +11,7 @@ import ActivityFeedWidget from "@/core/components/admin/widgets/ActivityFeedWidg
 import HealthSnapshotWidget from "@/core/components/admin/widgets/HealthSnapshotWidget";
 import RecentErrorsWidget from "@/core/components/admin/widgets/RecentErrorsWidget";
 import EmailQueueStatusWidget from "@/core/components/admin/widgets/EmailQueueStatusWidget";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -63,12 +64,10 @@ export default async function AdminDashboard() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold text-foreground">{t("dashboard_title")}</h1>
-                    <p className="text-xs text-muted-foreground">{t("dashboard_welcomeBack", { name: session.user.name })}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("dashboard_title")}
+                description={t("dashboard_welcomeBack", { name: session.user.name })}
+            />
 
             {/* KPI row - core KPIs + module stat cards, uniform 1x1 grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

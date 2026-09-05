@@ -11,6 +11,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { downloadFromUrl } from "@/core/lib/download";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { Badge } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import {
     Database,
     Download,
@@ -207,24 +208,22 @@ export default function BackupAdminPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("sidebar_backup")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("backup_description")}</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => { void fetchBackups(); void fetchCronInfo(); }} disabled={loading}>
-                        <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                        {t("common_refresh")}
-                    </Button>
-                    <Button onClick={handleCreate} disabled={creating}>
-                        {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-                        {t("backup_createNow")}
-                    </Button>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("sidebar_backup")}
+                description={t("backup_description")}
+                actions={<>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => { void fetchBackups(); void fetchCronInfo(); }} disabled={loading}>
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                            {t("common_refresh")}
+                        </Button>
+                        <Button onClick={handleCreate} disabled={creating}>
+                            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                            {t("backup_createNow")}
+                        </Button>
+                    </div>
+                </>}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>

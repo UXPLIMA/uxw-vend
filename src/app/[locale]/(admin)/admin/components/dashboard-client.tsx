@@ -5,7 +5,8 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Package } from "lucide-react";
-import { DynamicIcon } from "lucide-react/dynamic";
+import { DynamicIcon, iconNames } from "lucide-react/dynamic";
+import { resolveIconName } from "@/core/lib/icon-names";
 import { useAllModules } from "@/core/providers/module-provider";
 import dynamic from "next/dynamic";
 import { isEnabledIn } from "@/core/lib/module-enabled";
@@ -22,15 +23,12 @@ interface ModuleManifest {
     dashboardCards?: DashboardCard[];
 }
 
-function toKebab(name: string): string {
-    return name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-}
-
 function CardIcon({ name, className }: { name: string; className?: string }) {
-    if (!name) return <Package className={className} />;
+    const resolved = name ? resolveIconName(name, iconNames) : null;
+    if (!resolved) return <Package className={className} />;
     return (
         <DynamicIcon
-            name={toKebab(name) as React.ComponentProps<typeof DynamicIcon>["name"]}
+            name={resolved as React.ComponentProps<typeof DynamicIcon>["name"]}
             className={className}
             fallback={() => <Package className={className} />}
         />

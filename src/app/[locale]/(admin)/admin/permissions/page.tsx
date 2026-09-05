@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { ModulePermissionResources } from "@/core/generated/module-registry";
 import { writeError } from "@/core/lib/write-result";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface Role {
     id: string;
@@ -116,12 +117,10 @@ export default function PermissionsMatrixPage() {
 
     return (
         <>
-            <div className="mb-6">
-                <h1 className="text-xl font-semibold">
-                    {t("permissions_title")}
-                </h1>
-                <p className="text-muted-foreground">{t("permissions_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("permissions_title")}
+                description={t("permissions_subtitle")}
+            />
 
             <Card className="mb-6">
                 <CardHeader>
@@ -136,7 +135,7 @@ export default function PermissionsMatrixPage() {
                             className="max-w-sm"
                         />
                         <Button variant="outline" onClick={addCustomResource}>
-                            <Plus className="w-4 h-4 mr-2" /> {t("common_add")}
+                            <Plus className="w-4 h-4" /> {t("common_add")}
                         </Button>
                     </div>
                     {customResources.length > 0 && (

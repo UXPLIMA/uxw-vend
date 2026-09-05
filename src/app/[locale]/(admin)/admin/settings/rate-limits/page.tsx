@@ -9,6 +9,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, Infinity as InfinityIcon } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface RoleRow {
     id: string;
@@ -100,10 +101,10 @@ export default function RateLimitsSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{titleText}</h1>
-                <p className="text-muted-foreground">{subtitleText}</p>
-            </div>
+            <AdminPageHeader
+                title={titleText}
+                description={subtitleText}
+            />
 
             <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
                 <Card>
@@ -172,11 +173,11 @@ export default function RateLimitsSettingsPage() {
                     <Button type="submit" disabled={saving}>
                         {saving ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" /> {savingLabel}
+                                <Loader2 className="w-4 h-4 animate-spin" /> {savingLabel}
                             </>
                         ) : (
                             <>
-                                <Check className="w-4 h-4 mr-2" /> {saveLabel}
+                                <Check className="w-4 h-4" /> {saveLabel}
                             </>
                         )}
                     </Button>

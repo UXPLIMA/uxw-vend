@@ -11,6 +11,7 @@ import { Pagination } from "@/core/components/ui/pagination";
 import { UserRoleSelect } from "./role-select";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { Badge } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -61,10 +62,10 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("users_title")}</h1>
-                <p className="text-muted-foreground">{t("users_total", { count: total })}</p>
-            </div>
+            <AdminPageHeader
+                title={t("users_title")}
+                description={t("users_total", { count: total })}
+            />
 
             <Card>
                 <CardHeader>

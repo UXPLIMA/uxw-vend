@@ -7,6 +7,7 @@ import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 /** The admin catalogue's copy of the status labels. */
 const ADMIN_STATUS_KEYS = adminKeys(STATUS_KEYS);
@@ -91,10 +92,10 @@ export default function AdminTicketsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("adm_supportTickets")}</h1>
-                <p className="text-muted-foreground">{t("adm_manageTickets")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_supportTickets")}
+                description={t("adm_manageTickets")}
+            />
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

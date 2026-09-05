@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useThemeConfig } from "@/core/lib/theme-config-client";
 import { Slot } from "@/core/components/Slot";
 import { Copy, Check, Gamepad2 } from "lucide-react";
+import { copyText } from "@/core/lib/copy-text";
 
 /**
  * PixelCraft hero - three-column gaming banner.
@@ -32,11 +33,9 @@ export default function Hero() {
     const [copied, setCopied] = useState(false);
     const copyIp = async () => {
         if (!serverIp) return;
-        try {
-            await navigator.clipboard.writeText(serverIp);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1600);
-        } catch { /* clipboard unavailable - ignore */ }
+        if (!(await copyText(serverIp))) return;
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
     };
 
     return (

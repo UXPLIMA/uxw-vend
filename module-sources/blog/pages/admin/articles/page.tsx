@@ -6,6 +6,7 @@ import { auth } from "@/core/sdk/auth";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 
 export const dynamic = "force-dynamic";
@@ -80,15 +81,15 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_blogArticles")}</h1>
-                    <p className="text-muted-foreground">{t("adm_manageBlogContent")}</p>
-                </div>
-                <Link href="/admin/blog/articles/new">
-                    <Button>{`+ ${t("adm_newArticle")}`}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_blogArticles")}
+                description={t("adm_manageBlogContent")}
+                actions={<>
+                    <Link href="/admin/blog/articles/new">
+                        <Button>{`+ ${t("adm_newArticle")}`}</Button>
+                    </Link>
+                </>}
+            />
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -58,7 +58,7 @@ export default function AdminError({
                         </p>
                     )}
                     <Button onClick={reset}>
-                        <RotateCcw className="mr-2 h-4 w-4" />
+                        <RotateCcw className="h-4 w-4" />
                         {t("retry")}
                     </Button>
                 </CardContent>

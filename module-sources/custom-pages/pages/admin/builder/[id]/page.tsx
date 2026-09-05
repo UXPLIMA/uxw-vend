@@ -127,7 +127,7 @@ export default function PageBuilderPage(props: PageProps) {
                     )}
                 </div>
                 <Button onClick={() => save(data)} disabled={saving}>
-                    {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("pageBuilder_saving")}</> : <><Save className="w-4 h-4 mr-2" /> {t("pageBuilder_save")}</>}
+                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("pageBuilder_saving")}</> : <><Save className="w-4 h-4" /> {t("pageBuilder_save")}</>}
                 </Button>
             </div>
 

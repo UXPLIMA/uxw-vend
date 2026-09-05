@@ -6,6 +6,7 @@ import { dateLocaleTag } from "@/core/sdk";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
 import { Loader2, UserPlus, Users, Coins, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { copyText } from "@/core/sdk";
 
 interface ReferralData {
     referralCode: string;
@@ -40,10 +41,10 @@ export function ReferralTab() {
             .finally(() => setLoading(false));
     }, []);
 
-    const copyLink = () => {
+    const copyLink = async () => {
         if (!data) return;
         const link = `${window.location.origin}?ref=${data.referralCode}`;
-        navigator.clipboard.writeText(link);
+        if (!(await copyText(link))) return;
         setCopied(true);
         toast.success(t("linkCopied"));
         setTimeout(() => setCopied(false), 2000);

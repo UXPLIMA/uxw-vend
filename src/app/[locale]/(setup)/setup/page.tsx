@@ -333,7 +333,7 @@ export default function SetupWizardPage() {
                             onClick={goBack}
                             disabled={step === 1 || submitting}
                         >
-                            <ChevronLeft className="w-4 h-4 mr-1" /> {t("back")}
+                            <ChevronLeft className="w-4 h-4" /> {t("back")}
                         </Button>
 
                         {step < LAST_INPUT_STEP && (
@@ -343,7 +343,7 @@ export default function SetupWizardPage() {
                                 disabled={!canAdvance()}
                                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
-                                {t("next")} <ChevronRight className="w-4 h-4 ml-1" />
+                                {t("next")} <ChevronRight className="w-4 h-4" />
                             </Button>
                         )}
 
@@ -356,11 +356,11 @@ export default function SetupWizardPage() {
                             >
                                 {submitting ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("finishing")}
+                                        <Loader2 className="w-4 h-4 animate-spin" /> {t("finishing")}
                                     </>
                                 ) : (
                                     <>
-                                        {t("finish")} <ArrowRight className="w-4 h-4 ml-1" />
+                                        {t("finish")} <ArrowRight className="w-4 h-4" />
                                     </>
                                 )}
                             </Button>

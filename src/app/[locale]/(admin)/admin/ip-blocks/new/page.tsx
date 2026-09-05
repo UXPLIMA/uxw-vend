@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -10,6 +10,7 @@ import { Label } from "@/core/components/ui/label";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /** Blocking an address, on its own route rather than folded above the list. */
 export default function NewIpBlockPage() {
@@ -56,18 +57,12 @@ export default function NewIpBlockPage() {
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">{t("ipBlocks_newTitle")}</h1>
-                    <p className="text-sm text-muted-foreground">{t("ipBlocks_subtitle")}</p>
-                </div>
-                <Link href="/admin/ip-blocks" className="inline-flex">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {commonT("back")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("ipBlocks_newTitle")}
+                description={t("ipBlocks_subtitle")}
+                backHref="/admin/ip-blocks"
+                backLabel={commonT("back")}
+            />
 
             <Card>
                 <CardContent className="p-6">
@@ -119,7 +114,7 @@ export default function NewIpBlockPage() {
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         {t("ipBlocks_saving")}
                                     </>
                                 ) : (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, NativeSelect, CheckboxField } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, CheckCircle } from "lucide-react";
@@ -89,10 +89,12 @@ export default function FormPage({ params }: PageProps) {
                 );
             case "checkbox":
                 return (
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={val === "true"} onChange={(e) => onChange(String(e.target.checked))} className="rounded" />
-                        <span className="text-sm">{field.placeholder || field.label}</span>
-                    </label>
+                    <CheckboxField
+                        checked={val === "true"}
+                        onChange={(e) => onChange(String(e.target.checked))}
+                        label={field.placeholder || field.label}
+                        required={field.required}
+                    />
                 );
             default:
                 return <Input type={field.type || "text"} value={val} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} aria-label={field.label} required={field.required} />;
@@ -132,7 +134,7 @@ export default function FormPage({ params }: PageProps) {
                                     </div>
                                 ))}
                                 <Button type="submit" disabled={submitting}>
-                                    {submitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("submitting")}</> : t("submit")}
+                                    {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</> : t("submit")}
                                 </Button>
                             </form>
                         </CardContent>

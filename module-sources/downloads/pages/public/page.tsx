@@ -83,7 +83,7 @@ export default function DownloadsPage() {
                                         </div>
                                     </div>
                                     <Button size="sm" onClick={() => handleDownload(dl.id)}>
-                                        <Download className="w-4 h-4 mr-2" /> {t('downloadAction')}
+                                        <Download className="w-4 h-4" /> {t('downloadAction')}
                                     </Button>
                                 </CardContent>
                             </Card>

@@ -13,6 +13,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface Grant {
     id: string;
@@ -86,21 +87,17 @@ export default function ResourcePermissionsPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("rp_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("rp_subtitle")}
-                    </p>
-                </div>
-                <Link href="/admin/resource-permissions/new" className="inline-flex">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> {t("rp_grant")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("rp_title")}
+                description={t("rp_subtitle")}
+                actions={<>
+                    <Link href="/admin/resource-permissions/new" className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("rp_grant")}
+                        </Button>
+                    </Link>
+                </>}
+            />
 
             <Card className="mb-4">
                 <CardContent className="p-4 grid md:grid-cols-2 gap-3">

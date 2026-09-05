@@ -8,6 +8,12 @@
  * Separate from `@/core/sdk/ui` so a public-facing module page never pulls the
  * admin scaffolds into its bundle.
  */
+// The top of an admin screen. Eighty of them had written the title, the
+// description and the action button by hand, in twelve heading sizes and
+// half a dozen row layouts; a module's screen should look like core's.
+export { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+export type { AdminPageHeaderProps } from "@/core/components/admin/AdminPageHeader";
+
 export { AdminCrudPage } from "@/core/components/admin/AdminCrudPage";
 export type { CrudField } from "@/core/components/admin/AdminCrudPage";
 export { SettingsForm } from "@/core/components/admin/SettingsForm";

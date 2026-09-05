@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, CheckboxField, Badge } from "@/core/sdk/ui";
 import { Cloud, Loader2, Save, Check } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface R2Config {
     accountId: string;
@@ -78,19 +79,13 @@ export default function CloudflareR2AdminPage() {
 
     return (
         <div className="max-w-2xl">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                    <Cloud className="w-7 h-7 text-warning" />
-                    {t("title")}
-                </h1>
-                <p className="text-muted-foreground">{t("subtitle")}</p>
-                {isActive && (
-                    <div className="mt-2 inline-flex items-center gap-1.5 text-sm text-success bg-success/10 px-2 py-1 rounded">
-                        <Check className="w-3.5 h-3.5" />
-                        {t("currentlyActive")}
-                    </div>
-                )}
-            </div>
+            <AdminPageHeader
+                title={<span className="inline-flex items-center gap-2"><Cloud className="w-6 h-6 text-warning" />{t("title")}</span>}
+                description={t("subtitle")}
+                actions={isActive ? (
+                    <Badge tone="success"><Check className="w-3.5 h-3.5" />{t("currentlyActive")}</Badge>
+                ) : undefined}
+            />
 
             <Card>
                 <CardHeader>
@@ -144,16 +139,13 @@ export default function CloudflareR2AdminPage() {
                         />
                         <p className="text-xs text-muted-foreground mt-1">{t("publicUrlHint")}</p>
                     </div>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={setActive}
-                            onChange={(e) => setSetActive(e.target.checked)}
-                        />
-                        <span className="text-sm">{t("active")}</span>
-                    </label>
+                    <CheckboxField
+                        checked={setActive}
+                        onChange={(e) => setSetActive(e.target.checked)}
+                        label={t("active")}
+                    />
                     <Button onClick={save} disabled={saving} className="w-full">
-                        {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {saving ? t("saving") : t("save")}
                     </Button>
                 </CardContent>

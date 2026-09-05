@@ -55,6 +55,16 @@ export {
  *     const failed = await writeError(res, t("saveFailed"));
  *     if (failed) { toast.error(failed); return; }
  */
+/**
+ * Copy to the clipboard on a plain-http origin too.
+ *
+ * `navigator.clipboard` only exists in a secure context, so on a self-hosted
+ * site reached by IP over http:// every "Copy" button threw and did nothing.
+ * `copyText` uses the real API where there is one and an offscreen textarea
+ * where there is not, and returns whether the text actually landed.
+ */
+export { copyText } from "@/core/lib/copy-text";
+
 export { writeError } from "@/core/lib/write-result";
 export type { WriteErrorBody } from "@/core/lib/write-result";
 export type { Translator } from "@/core/lib/auth-error-message";

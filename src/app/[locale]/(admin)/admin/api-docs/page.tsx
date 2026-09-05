@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { FileJson, ExternalLink } from "lucide-react";
 import "swagger-ui-react/swagger-ui.css";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 function SwaggerLoading() {
     const t = useTranslations("admin");
@@ -28,24 +29,22 @@ export default function ApiDocsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-                <div>
-                    <h1 className="text-xl font-semibold">{t("apiDocs_title")}</h1>
-                    <p className="text-muted-foreground">
-                        {t("apiDocs_subtitle")}
-                    </p>
-                </div>
-                <a
-                    href="/api/v1/openapi"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                    <FileJson className="w-4 h-4" />
-                    {t("apiDocs_rawSpec")}
-                    <ExternalLink className="w-3 h-3" />
-                </a>
-            </div>
+            <AdminPageHeader
+                title={t("apiDocs_title")}
+                description={t("apiDocs_subtitle")}
+                actions={<>
+                    <a
+                        href="/api/v1/openapi"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                    >
+                        <FileJson className="w-4 h-4" />
+                        {t("apiDocs_rawSpec")}
+                        <ExternalLink className="w-3 h-3" />
+                    </a>
+                </>}
+            />
 
             <Card>
                 <CardHeader>

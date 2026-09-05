@@ -7,13 +7,14 @@ import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
-import { Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
 import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface Broadcast {
     id: string;
@@ -145,17 +146,19 @@ export default function BroadcastsPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("sidebar_broadcasts")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("settings_broadcastsDesc")}</p>
-                </div>
-                <Button onClick={() => setComposing(!composing)}>
-                    {composing ? t("customizer_cancel") : (t("common_new"))}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={t("sidebar_broadcasts")}
+                description={t("settings_broadcastsDesc")}
+                actions={<>
+                    <Button
+                        variant={composing ? "outline" : "default"}
+                        onClick={() => setComposing(!composing)}
+                    >
+                        {composing ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                        {composing ? t("customizer_cancel") : t("common_new")}
+                    </Button>
+                </>}
+            />
 
             {composing && (
                 <Card className="mb-6">
@@ -175,7 +178,7 @@ export default function BroadcastsPage() {
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => send(false)} disabled={sending}>{t("broadcasts_saveDraft")}</Button>
                             <Button onClick={() => send(true)} disabled={sending}>
-                                {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                 {t("broadcasts_sendNow")}
                             </Button>
                         </div>
@@ -212,7 +215,7 @@ export default function BroadcastsPage() {
                                 <div className="flex gap-1">
                                     {b.status === "draft" && (
                                         <Button variant="outline" size="sm" onClick={() => queueDraft(b)}>
-                                            <Send className="w-3 h-3 mr-1" /> {t("broadcasts_sendButton")}
+                                            <Send className="w-3 h-3" /> {t("broadcasts_sendButton")}
                                         </Button>
                                     )}
                                     <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deleteBroadcast(b)}>

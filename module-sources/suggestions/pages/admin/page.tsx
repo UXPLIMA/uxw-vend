@@ -6,6 +6,7 @@ import { Button, Card, CardContent, useConfirm, NativeSelect } from "@/core/sdk/
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Suggestion {
     id: string;
@@ -101,10 +102,10 @@ export default function AdminSuggestionsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                <p className="text-muted-foreground">{t("adm_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_title")}
+                description={t("adm_subtitle")}
+            />
 
             <div className="flex flex-wrap gap-2">
                 {FILTERS.map(f => (
@@ -162,7 +163,7 @@ export default function AdminSuggestionsPage() {
                                         ))}
                                     </NativeSelect>
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(s.id)}>
-                                        <Trash2 className="w-4 h-4 mr-1" /> {t("adm_delete")}
+                                        <Trash2 className="w-4 h-4" /> {t("adm_delete")}
                                     </Button>
                                 </div>
                             </CardContent>

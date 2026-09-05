@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Form {
     id: string;
@@ -64,12 +65,10 @@ export default function SubmissionsPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_formSubmissions")}</h1>
-                    <p className="text-muted-foreground">{total} total submission{total !== 1 ? "s" : ""}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("adm_formSubmissions")}
+                description={t("adm_submissionsTotal", { count: total })}
+            />
 
             {/* Filter by form */}
             <div className="flex gap-2 mb-4">
@@ -106,10 +105,10 @@ export default function SubmissionsPage() {
                                     >
                                         <div>
                                             <span className="font-medium text-foreground">{sub.form.title}</span>
-                                            <span className="text-xs text-muted-foreground ml-3">
+                                            <span className="text-xs text-muted-foreground">
                                                 {new Date(sub.createdAt).toLocaleString(__dateTag)}
                                             </span>
-                                            <span className={`ml-2 text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                            <span className={`text-xs px-1.5 py-0.5 rounded ${sub.status === "new" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                                                 {sub.status === "new" ? t("adm_submissionNew") : sub.status}
                                             </span>
                                         </div>

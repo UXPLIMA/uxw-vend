@@ -65,7 +65,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                                 window.location.reload();
                             }}
                         >
-                            <RefreshCw className="w-4 h-4 mr-2" />
+                            <RefreshCw className="w-4 h-4" />
                             Reload Page
                         </Button>
                     </div>

@@ -425,7 +425,7 @@ export default function ProductDetailPage() {
                                     disabled={!inStock || addingToCart}
                                 >
                                     {addedToCart ? (
-                                        <><Check className="w-4 h-4 mr-1" /> {t('addedToCart')}</>
+                                        <><Check className="w-4 h-4" /> {t('addedToCart')}</>
                                     ) : (
                                         t('addToCart')
                                     )}

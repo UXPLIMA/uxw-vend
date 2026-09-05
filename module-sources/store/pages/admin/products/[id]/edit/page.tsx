@@ -6,9 +6,10 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm, NativeSelect } from "@/core/sdk/ui";
-import { ArrowLeft, Loader2, Trash2, X } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm, NativeSelect, CheckboxField } from "@/core/sdk/ui";
+import { ArrowLeft, Loader2, Trash2, X, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Category {
     id: string;
@@ -169,24 +170,19 @@ export default function EditProductPage(props: PageProps) {
     return (
         <>
             <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <Link href="/admin/store/products">
-                        <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                            <ArrowLeft className="w-4 h-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_editProduct")}</h1>
-                        <p className="text-muted-foreground">{form.name}</p>
-                    </div>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_editProduct")}
+                    description={form.name}
+                    backHref="/admin/store/products"
+                    backLabel={commonT("back")}
+                />
                 <Button
                     variant="ghost"
                     className="text-destructive hover:text-destructive"
                     onClick={handleDelete}
                     disabled={deleting}
                 >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash2 className="w-4 h-4" />
                     {deleting ? t("adm_deleting") : t("adm_delete")}
                 </Button>
             </div>
@@ -370,24 +366,16 @@ export default function EditProductPage(props: PageProps) {
                                 <CardTitle>{t("adm_status")}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={form.isActive}
-                                        onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                                        className="rounded"
-                                    />
-                                    <span className="text-sm">{t("adm_active")}</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={form.isFeatured}
-                                        onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
-                                        className="rounded"
-                                    />
-                                    <span className="text-sm">{t("adm_featured")}</span>
-                                </label>
+                                <CheckboxField
+                                    checked={form.isActive}
+                                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                                    label={t("adm_active")}
+                                />
+                                <CheckboxField
+                                    checked={form.isFeatured}
+                                    onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+                                    label={t("adm_featured")}
+                                />
                             </CardContent>
                         </Card>
 
@@ -421,7 +409,7 @@ export default function EditProductPage(props: PageProps) {
 
                         <Button type="submit" className="w-full" disabled={saving}>
                             {saving ? (
-                                <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</>
+                                <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
                             ) : (
                                 t("adm_saveChanges")
                             )}
@@ -505,7 +493,7 @@ function ProductCommandsEditor({ productId }: { productId: string }) {
                     </NativeSelect>
                 )}
                 <Input value={newCmd} onChange={(e) => setNewCmd(e.target.value)} placeholder='give {player} diamond 64' aria-label={t("adm_deliveryCommands")} className="font-mono text-xs flex-1" />
-                <Button type="button" variant="outline" size="sm" onClick={addCmd}>{t("adm_add")}</Button>
+                <Button type="button" variant="outline" size="sm" onClick={addCmd}><Plus className="w-3.5 h-3.5" /> {t("adm_add")}</Button>
             </div>
         </div>
     );
@@ -554,7 +542,7 @@ function ProductVariablesEditor({ productId }: { productId: string }) {
             ))}
             <div className="flex gap-2">
                 <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder={t("adm_variableLabelPlaceholder")} aria-label={t("adm_variableLabelPlaceholder")} className="text-xs" />
-                <Button type="button" variant="outline" size="sm" onClick={addVar}>{t("adm_add")}</Button>
+                <Button type="button" variant="outline" size="sm" onClick={addVar}><Plus className="w-3.5 h-3.5" /> {t("adm_add")}</Button>
             </div>
         </div>
     );

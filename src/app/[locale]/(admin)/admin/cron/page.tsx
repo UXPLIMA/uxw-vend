@@ -9,6 +9,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface CronJobRow {
     key: string;
@@ -94,18 +95,16 @@ export default function CronAdminPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("cron_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("cron_description")}</p>
-                </div>
-                <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
-                    <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                    {t("common_refresh")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={t("cron_title")}
+                description={t("cron_description")}
+                actions={<>
+                    <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
+                        <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                        {t("common_refresh")}
+                    </Button>
+                </>}
+            />
 
             {loading && jobs.length === 0 ? (
                 <div className="flex justify-center py-12">
@@ -176,7 +175,7 @@ export default function CronAdminPage() {
                                                             {runningKey === job.key ? (
                                                                 <Loader2 className="w-3 h-3 animate-spin" />
                                                             ) : (
-                                                                <Play className="w-3 h-3 mr-1" />
+                                                                <Play className="w-3 h-3" />
                                                             )}
                                                             {t("cron_runNow")}
                                                         </Button>

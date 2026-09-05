@@ -6,7 +6,8 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
-import { ArrowLeft, Loader2, Plus, Trash2, Pencil } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil } from "lucide-react";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,7 @@ import { NativeSelect } from "@/core/components/ui/native-select";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useFormRoute } from "@/core/hooks/useFormRoute";
+import { Checkbox, CheckboxField } from "@/core/components/ui/checkbox";
 
 export interface CrudField {
     key: string;
@@ -198,10 +200,11 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 );
             case "toggle":
                 return (
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={val === "true"} onChange={(e) => onChange(String(e.target.checked))} className="rounded" />
-                        <span className="text-sm">{ct("enabled")}</span>
-                    </label>
+                    <CheckboxField
+                        checked={val === "true"}
+                        onChange={(e) => onChange(String(e.target.checked))}
+                        label={ct("enabled")}
+                    />
                 );
             case "datetime":
                 return <Input type="datetime-local" value={val} onChange={(e) => onChange(e.target.value)} aria-label={field.label} />;
@@ -232,17 +235,12 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     if (showForm) {
         return (
             <>
-                <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
-                    <div className="min-w-0 flex-1">
-                        <h1 className="text-xl font-semibold break-words">
-                            {editingId ? ct("crud_edit") : ct("crud_createNew")}
-                        </h1>
-                        <p className="text-sm text-muted-foreground">{title}</p>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                    title={editingId ? ct("crud_edit") : ct("crud_createNew")}
+                    description={title}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -260,7 +258,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                             </div>
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {ct("crud_saving")}</> : editingId ? ct("crud_saveChanges") : ct("crud_create")}
                                 </Button>
                                 <Button type="button" variant="outline" disabled={saving} onClick={closeForm}>
                                     {commonT("cancel")}
@@ -275,24 +273,22 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
 
     return (
         <>
-            <div className="flex flex-wrap justify-between items-start sm:items-center gap-4 mb-8">
-                <div className="min-w-0 flex-1">
-                    <h1 className="text-2xl sm:text-3xl font-bold break-words">{title}</h1>
-                    <p className="text-muted-foreground text-sm sm:text-base">{subtitle}</p>
-                </div>
-                <div className="flex gap-2 flex-wrap">
+            <AdminPageHeader
+                title={title}
+                description={subtitle}
+                actions={<>
                     {selected.size > 0 && (
-                        <Button variant="destructive" size="sm" onClick={bulkDelete}>
-                            <Trash2 className="w-3 h-3 mr-1" /> {ct("crud_delete")} {selected.size}
+                        <Button variant="destructive" onClick={bulkDelete}>
+                            <Trash2 className="w-4 h-4" /> {ct("crud_delete")} {selected.size}
                         </Button>
                     )}
                     <Link href={formHref()} className="inline-flex">
                         <Button>
-                            <Plus className="w-4 h-4 mr-2" /> {ct("crud_addNew")}
+                            <Plus className="w-4 h-4" /> {ct("crud_addNew")}
                         </Button>
                     </Link>
-                </div>
-            </div>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-0">
@@ -302,12 +298,10 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <div className="divide-y">
                             {paged.rows.map((item) => (
                                 <div key={item.id as string} className="flex items-center gap-3 p-4 hover:bg-muted/50">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         checked={selected.has(item.id as string)}
                                         onChange={() => toggleSelect(item.id as string)}
                                         aria-label={ct("common_selectRow")}
-                                        className="rounded flex-shrink-0"
                                     />
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium">{String(item[displayField] || "")}</p>

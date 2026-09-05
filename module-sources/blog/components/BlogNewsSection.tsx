@@ -83,7 +83,7 @@ export function BlogNewsSection() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
           <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
-            <ChevronLeft className="w-4 h-4 mr-1" /> {t('previous')}
+            <ChevronLeft className="w-4 h-4" /> {t('previous')}
           </Button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)}>
@@ -91,7 +91,7 @@ export function BlogNewsSection() {
             </Button>
           ))}
           <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
-            {t('next')} <ChevronRight className="w-4 h-4 ml-1" />
+            {t('next')} <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       )}

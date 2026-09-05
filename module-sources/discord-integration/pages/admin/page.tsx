@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, Input, Label } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Check, Send } from "lucide-react";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 const webhookEvents = [
     { key: "discord_webhook_general", labelKey: "adm_evt_general", descKey: "adm_evt_general_desc" },
@@ -112,17 +113,12 @@ export default function DiscordSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/settings/general">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_discordWebhooks")}</h1>
-                    <p className="text-muted-foreground">{t("adm_webhooksSubtitle")}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("adm_discordWebhooks")}
+                description={t("adm_webhooksSubtitle")}
+                backHref="/admin/settings/general"
+                backLabel={commonT("back")}
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -165,8 +161,8 @@ export default function DiscordSettingsPage() {
 
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</> :
-                         saved ? <><Check className="w-4 h-4 mr-2" /> {t("adm_saved")}</> : t("adm_saveWebhooks")}
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("adm_saved")}</> : t("adm_saveWebhooks")}
                     </Button>
                 </div>
             </form>

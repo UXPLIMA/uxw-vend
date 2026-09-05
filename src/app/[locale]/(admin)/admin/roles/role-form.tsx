@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -11,6 +11,8 @@ import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { CORE_PERMISSIONS } from "@/core/lib/permission-names";
 import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
+import { CheckboxField } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /**
  * The role editor, on its own route.
@@ -119,18 +121,12 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {role ? t("roles_editRole", { name: role.displayName }) : t("roles_newRole")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("roles_subtitle")}</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => router.push("/admin/roles")}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    {commonT("back")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={role ? t("roles_editRole", { name: role.displayName }) : t("roles_newRole")}
+                description={t("roles_subtitle")}
+                onBack={() => router.push("/admin/roles")}
+                backLabel={commonT("back")}
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -207,15 +203,12 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
                                             <p className="text-sm font-medium mb-2 capitalize">{group.module}</p>
                                             <div className="space-y-1">
                                                 {group.perms.map((perm) => (
-                                                    <label key={perm} className="flex items-center gap-2 text-sm cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={form.permissions.includes(perm)}
-                                                            onChange={() => togglePermission(perm)}
-                                                            className="rounded"
-                                                        />
-                                                        <span className="text-muted-foreground">{perm}</span>
-                                                    </label>
+                                                    <CheckboxField
+                                                        key={perm}
+                                                        checked={form.permissions.includes(perm)}
+                                                        onChange={() => togglePermission(perm)}
+                                                        label={<span className="text-muted-foreground">{perm}</span>}
+                                                    />
                                                 ))}
                                             </div>
                                         </div>
@@ -228,7 +221,7 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("roles_saving")}
+                                        <Loader2 className="w-4 h-4 animate-spin" /> {t("roles_saving")}
                                     </>
                                 ) : role ? (
                                     t("roles_saveChanges")

@@ -12,6 +12,7 @@ import { themeRegistry } from "@/core/generated/theme-registry";
 import { useTheme } from "@/core/providers/theme-provider";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
 import { writeError } from "@/core/lib/write-result";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default function ThemeSettingsPage() {
     const t = useTranslations("admin");
@@ -185,35 +186,33 @@ export default function ThemeSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-lg font-medium">{t("settings_appearance")}</h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("theme_subtitle")}
-                    </p>
-                </div>
-                <div>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".zip"
-                        onChange={handleUpload}
-                        aria-label={t("theme_upload")}
-                        className="hidden"
-                    />
-                    <Button
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                    >
-                        {uploading ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("theme_uploading")}</>
-                        ) : (
-                            <><Upload className="w-4 h-4 mr-2" /> {t("theme_upload")}</>
-                        )}
-                    </Button>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("settings_appearance")}
+                description={t("theme_subtitle")}
+                actions={<>
+                    <div>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".zip"
+                            onChange={handleUpload}
+                            aria-label={t("theme_upload")}
+                            className="hidden"
+                        />
+                        <Button
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                        >
+                            {uploading ? (
+                                <><Loader2 className="w-4 h-4 animate-spin" /> {t("theme_uploading")}</>
+                            ) : (
+                                <><Upload className="w-4 h-4" /> {t("theme_upload")}</>
+                            )}
+                        </Button>
+                    </div>
+                </>}
+            />
 
             {/* Suggested modules banner */}
             <SuggestedModulesBanner
@@ -344,7 +343,7 @@ export default function ThemeSettingsPage() {
                                             </div>
                                         )}
                                         <Button size="sm" className="w-full" disabled={installing === theme.id} onClick={() => handleMarketplaceInstall(theme)}>
-                                            {installing === theme.id ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 mr-1.5" /> {t("modules_install")}</>}
+                                            {installing === theme.id ? <><Loader2 className="w-3 h-3 animate-spin .5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 .5" /> {t("modules_install")}</>}
                                         </Button>
                                     </CardContent>
                                 </Card>

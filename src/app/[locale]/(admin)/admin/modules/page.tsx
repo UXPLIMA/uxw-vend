@@ -16,6 +16,8 @@ import { useAdminModules } from "./useAdminModules";
 import { ModuleIcon } from "./ModuleIcon";
 import { ModuleDetailModal } from "./ModuleDetailModal";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { Checkbox } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default function AdminModulesPage() {
     const t = useTranslations("admin");
@@ -92,10 +94,10 @@ export default function AdminModulesPage() {
                 </div>
             )}
 
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("modules_title")}</h1>
-                <p className="text-muted-foreground">{t("modules_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("modules_title")}
+                description={t("modules_subtitle")}
+            />
 
             {updatesOnly && updatesAvailableCount > 0 && (
                 <Card className="mb-6 border-warning/40 bg-warning/10">
@@ -107,7 +109,7 @@ export default function AdminModulesPage() {
                             </span>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => setUpdatesOnly(false)}>
-                            <X className="w-3 h-3 mr-1" /> {t("modules_clearFilter")}
+                            <X className="w-3 h-3" /> {t("modules_clearFilter")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -123,7 +125,7 @@ export default function AdminModulesPage() {
                         <div>
                             <input type="file" accept=".zip" ref={fileInputRef} aria-label={t("modules_uploadZip")} className="hidden" onChange={handleUpload} />
                             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                                {uploading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("modules_installing")}</> : <><Upload className="w-4 h-4 mr-2" /> {t("modules_uploadZip")}</>}
+                                {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("modules_installing")}</> : <><Upload className="w-4 h-4" /> {t("modules_uploadZip")}</>}
                             </Button>
                         </div>
                     </div>
@@ -288,7 +290,7 @@ export default function AdminModulesPage() {
                         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                             {selectedModules.size > 0 && (
                                 <Button size="sm" onClick={handleBulkInstall} disabled={isBusy || bulkInstalling}>
-                                    {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 mr-1.5" /> {t("modules_installSelected", { count: selectedModules.size })}</>}
+                                    {bulkInstalling ? <><Loader2 className="w-3 h-3 animate-spin .5" /> {t("modules_installing")}</> : <><Download className="w-3 h-3 .5" /> {t("modules_installSelected", { count: selectedModules.size })}</>}
                                 </Button>
                             )}
                             {filteredMarketplace.length > 0 && (
@@ -375,12 +377,10 @@ export default function AdminModulesPage() {
                                 <CardContent className="p-4 flex flex-col flex-1">
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2.5">
-                                            <input
-                                                type="checkbox"
+                                            <Checkbox
                                                 checked={selectedModules.has(mod.id)}
                                                 onChange={() => toggleSelect(mod.id)}
                                                 aria-label={t("common_selectRow")}
-                                                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                                             />
                                             <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
                                             <div>
@@ -435,9 +435,9 @@ export default function AdminModulesPage() {
                                         onClick={() => handleMarketplaceInstall(mod)}
                                     >
                                         {installing === mod.id ? (
-                                            <><Loader2 className="w-3 h-3 animate-spin mr-1.5" /> {t("modules_installing")}</>
+                                            <><Loader2 className="w-3 h-3 animate-spin .5" /> {t("modules_installing")}</>
                                         ) : (
-                                            <><Download className="w-3 h-3 mr-1.5" /> {t("modules_install")}</>
+                                            <><Download className="w-3 h-3 .5" /> {t("modules_install")}</>
                                         )}
                                     </Button>
                                 </CardContent>

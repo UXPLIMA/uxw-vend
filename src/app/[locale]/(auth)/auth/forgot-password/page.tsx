@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                                 </p>
                                 <Link href="/auth/login">
                                     <Button variant="outline">
-                                        <ArrowLeft className="w-4 h-4 mr-2" /> {t('backToLogin')}
+                                        <ArrowLeft className="w-4 h-4" /> {t('backToLogin')}
                                     </Button>
                                 </Link>
                             </div>

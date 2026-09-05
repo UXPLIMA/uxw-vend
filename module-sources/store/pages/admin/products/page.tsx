@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
-import { Loader2, ChevronLeft, ChevronRight, Package } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Package, Plus } from "lucide-react";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Product {
     id: string;
@@ -56,15 +57,15 @@ export default function AdminProductsPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_products")}</h1>
-                    <p className="text-muted-foreground">{t("adm_productsTotal", { count: total })}</p>
-                </div>
-                <Link href="/admin/store/products/new">
-                    <Button>{`+ ${t("adm_addProduct")}`}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_products")}
+                description={t("adm_productsTotal", { count: total })}
+                actions={<>
+                    <Link href="/admin/store/products/new">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_addProduct")}</Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardHeader>

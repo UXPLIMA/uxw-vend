@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -12,6 +12,7 @@ import { UserPicker, type PickedUser } from "@/core/components/admin/UserPicker"
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 const ACTIONS = ["view", "create", "edit", "delete", "*"];
 
@@ -86,18 +87,12 @@ export default function NewResourcePermissionPage() {
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">{t("rp_newTitle")}</h1>
-                    <p className="text-sm text-muted-foreground">{t("rp_subtitle")}</p>
-                </div>
-                <Link href="/admin/resource-permissions" className="inline-flex">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {commonT("back")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("rp_newTitle")}
+                description={t("rp_subtitle")}
+                backHref="/admin/resource-permissions"
+                backLabel={commonT("back")}
+            />
 
             <Card>
                 <CardContent className="p-6">
@@ -188,7 +183,7 @@ export default function NewResourcePermissionPage() {
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("rp_saving")}
+                                        <Loader2 className="w-4 h-4 animate-spin" /> {t("rp_saving")}
                                     </>
                                 ) : (
                                     t("rp_create")

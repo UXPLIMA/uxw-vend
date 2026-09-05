@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useFormRoute, useLocalDate } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Ban, RotateCcw, Copy, Check, KeyRound } from "lucide-react";
+import { copyText } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface License {
     id: string;
@@ -137,8 +139,8 @@ export default function LicensesPage() {
         setLicenses((rows) => rows.filter((row) => row.id !== id));
     };
 
-    const copyMinted = () => {
-        navigator.clipboard.writeText(minted.join("\n"));
+    const copyMinted = async () => {
+        if (!(await copyText(minted.join("\n")))) return;
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -154,15 +156,12 @@ export default function LicensesPage() {
     if (showForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_issueKeys")}</h1>
-                        <p className="text-muted-foreground">{t("adm_mintedOnce")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_issueKeys")}
+                    description={t("adm_mintedOnce")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -223,7 +222,7 @@ export default function LicensesPage() {
                             </div>
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                    {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                                     {t("adm_issue")}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
@@ -239,20 +238,20 @@ export default function LicensesPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                    <p className="text-muted-foreground">
-                        {t("adm_summary", {
-                            total: licenses.length,
-                            active: licenses.filter((l) => l.status === "active").length,
-                        })}
-                    </p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_issueKeys")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_title")}
+                description={<>
+                    {t("adm_summary", {
+                        total: licenses.length,
+                        active: licenses.filter((l) => l.status === "active").length,
+                    })}
+                </>}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_issueKeys")}</Button>
+                    </Link>
+                </>}
+            />
 
             {minted.length > 0 && (
                 <Card className="mb-6 border-primary">
@@ -267,7 +266,7 @@ export default function LicensesPage() {
                         <pre className="rounded bg-muted p-3 font-mono text-sm overflow-x-auto">{minted.join("\n")}</pre>
                         <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={copyMinted}>
-                                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                 {t("adm_copyAll")}
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => setMinted([])}>

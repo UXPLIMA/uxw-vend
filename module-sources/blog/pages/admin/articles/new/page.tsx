@@ -7,6 +7,7 @@ import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@/core/sdk/ui";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 
 interface Category {
@@ -73,13 +74,12 @@ export default function NewBlogArticlePage() {
 
     return (
         <>
-            <div className="mb-8">
-                <Link href="/admin/blog/articles" className="text-sm text-muted-foreground hover:text-primary">
-                    ← Back to Articles
-                </Link>
-                <h1 className="text-3xl font-bold mt-2">{t("adm_newArticle")}</h1>
-                <p className="text-muted-foreground">{t("adm_createBlogArticle")}</p>
-            </div>
+            <AdminPageHeader
+                backHref="/admin/blog/articles"
+                backLabel={t("adm_backToArticles")}
+                title={t("adm_newArticle")}
+                description={t("adm_createBlogArticle")}
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 text-destructive rounded-lg">

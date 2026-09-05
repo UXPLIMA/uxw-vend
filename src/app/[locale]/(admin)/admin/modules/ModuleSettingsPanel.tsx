@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Loader2 } from "lucide-react";
 import type { Module, ModuleSettingValues } from "./types";
+import { CheckboxField } from "@/core/components/ui/checkbox";
 
 /**
  * The settings form for one installed module, built entirely from what that
@@ -58,23 +59,15 @@ export function ModuleSettingsPanel({
                 return (
                     <div key={setting.key} className="text-sm">
                         {setting.type === "boolean" ? (
-                            <label htmlFor={id} className="flex items-start gap-2 cursor-pointer">
-                                <input
-                                    id={id}
-                                    type="checkbox"
-                                    className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
-                                    checked={value === true}
-                                    onChange={(e) =>
-                                        setValues((v) => ({ ...v, [setting.key]: e.target.checked }))
-                                    }
-                                />
-                                <span>
-                                    <span className="font-medium">{setting.label}</span>
-                                    {setting.description && (
-                                        <span className="block text-muted-foreground">{setting.description}</span>
-                                    )}
-                                </span>
-                            </label>
+                            <CheckboxField
+                                id={id}
+                                checked={value === true}
+                                onChange={(e) =>
+                                    setValues((v) => ({ ...v, [setting.key]: e.target.checked }))
+                                }
+                                label={<span className="font-medium">{setting.label}</span>}
+                                description={setting.description}
+                            />
                         ) : (
                             <div className="space-y-1">
                                 <label htmlFor={id} className="font-medium block">{setting.label}</label>

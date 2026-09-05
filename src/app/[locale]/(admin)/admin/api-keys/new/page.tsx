@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Check, Copy, Loader2 } from "lucide-react";
+import { Check, Copy, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { toast } from "sonner";
+import { copyText } from "@/core/lib/copy-text";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /**
  * Creating an API key, on its own route.
@@ -50,27 +52,21 @@ export default function NewApiKeyPage() {
         }
     };
 
-    const copy = () => {
+    const copy = async () => {
         if (!created) return;
-        navigator.clipboard.writeText(created);
+        if (!(await copyText(created))) return;
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">{t("apiKeys_newKey")}</h1>
-                    <p className="text-sm text-muted-foreground">{t("apiKeys_subtitle")}</p>
-                </div>
-                <Link href="/admin/api-keys" className="inline-flex">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {commonT("back")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("apiKeys_newKey")}
+                description={t("apiKeys_subtitle")}
+                backHref="/admin/api-keys"
+                backLabel={commonT("back")}
+            />
 
             <Card>
                 <CardContent className="p-6">

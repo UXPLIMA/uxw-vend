@@ -9,6 +9,7 @@ import { ArrowLeft, Loader2, Plus, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Coupon {
     id: string;
@@ -181,15 +182,12 @@ export default function AdminCouponsPage() {
     if (showForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{editingId ? t("adm_editCoupon") : t("adm_newCoupon")}</h1>
-                        <p className="text-muted-foreground">{t("adm_manageDiscountCodes")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={editingId ? t("adm_editCoupon") : t("adm_newCoupon")}
+                    description={t("adm_manageDiscountCodes")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 {error && (
                     <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
@@ -296,7 +294,7 @@ export default function AdminCouponsPage() {
 
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</> : editingId ? t("adm_saveChanges") : t("adm_createCoupon")}
+                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</> : editingId ? t("adm_saveChanges") : t("adm_createCoupon")}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
                                     {t("adm_cancel")}
@@ -311,15 +309,15 @@ export default function AdminCouponsPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_coupons")}</h1>
-                    <p className="text-muted-foreground">{t("adm_manageDiscountCodes")}</p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newCoupon")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_coupons")}
+                description={t("adm_manageDiscountCodes")}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_newCoupon")}</Button>
+                    </Link>
+                </>}
+            />
 
             {/* Coupons List */}
             <Card>

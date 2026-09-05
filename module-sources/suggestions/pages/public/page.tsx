@@ -140,7 +140,7 @@ export default function SuggestionsPage() {
                     </div>
                     {session?.user && (
                         <Button onClick={() => setShowForm(!showForm)}>
-                            {showForm ? <><X className="w-4 h-4 mr-2" /> {commonT("cancel")}</> : <><Plus className="w-4 h-4 mr-2" /> {t("newSuggestion")}</>}
+                            {showForm ? <><X className="w-4 h-4" /> {commonT("cancel")}</> : <><Plus className="w-4 h-4" /> {t("newSuggestion")}</>}
                         </Button>
                     )}
                 </div>
@@ -161,7 +161,7 @@ export default function SuggestionsPage() {
                                         <option value="private">{t("other")}</option>
                                     </NativeSelect>
                                     <Button type="submit" disabled={saving}>
-                                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                                         {t("submitSuggestion")}
                                     </Button>
                                 </div>

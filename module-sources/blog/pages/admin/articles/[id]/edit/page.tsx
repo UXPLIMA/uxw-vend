@@ -8,6 +8,7 @@ import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Trash2 } from "lucide-react";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Category {
     id: string;
@@ -136,24 +137,23 @@ export default function EditBlogArticlePage(props: PageProps) {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <Link href="/admin/blog/articles" className="text-sm text-muted-foreground hover:text-primary">
-                        ← Back to Articles
-                    </Link>
-                    <h1 className="text-3xl font-bold mt-2">{t("adm_editArticle")}</h1>
-                    <p className="text-muted-foreground">{formData.title}</p>
-                </div>
-                <Button
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    onClick={handleDelete}
-                    disabled={deleting}
-                >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    {deleting ? t("adm_deleting") : t("adm_delete")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                backHref="/admin/blog/articles"
+                backLabel={t("adm_backToArticles")}
+                title={t("adm_editArticle")}
+                description={formData.title}
+                actions={
+                    <Button
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive"
+                        onClick={handleDelete}
+                        disabled={deleting}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        {deleting ? t("adm_deleting") : t("adm_delete")}
+                    </Button>
+                }
+            />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 text-destructive rounded-lg">
@@ -244,7 +244,7 @@ export default function EditBlogArticlePage(props: PageProps) {
                                 <div className="pt-4">
                                     <Button type="submit" className="w-full" disabled={saving}>
                                         {saving ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</>
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
                                         ) : (
                                             t("adm_saveChanges")
                                         )}

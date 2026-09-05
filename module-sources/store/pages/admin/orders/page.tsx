@@ -9,6 +9,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } fro
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminOrderStatusKeys, orderStatusLabel } from "../../../lib/order-status";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 /** The admin catalogue's copy of the order status labels. */
 const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
@@ -78,12 +79,10 @@ export default function AdminOrdersPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_orders")}</h1>
-                    <p className="text-muted-foreground">{t("adm_ordersTotal", { count: total })}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("adm_orders")}
+                description={t("adm_ordersTotal", { count: total })}
+            />
 
             {/* Status Filter Tabs */}
             <div className="flex gap-2 mb-6 flex-wrap">
@@ -96,7 +95,7 @@ export default function AdminOrdersPage() {
                     >
                         {status === "ALL" ? t("adm_all") : t(`adm_orderStatus_${status}`)}
                         {status !== "ALL" && statusCounts[status] ? (
-                            <span className="ml-1 text-xs opacity-70">({statusCounts[status]})</span>
+                            <span className="text-xs opacity-70">({statusCounts[status]})</span>
                         ) : null}
                     </Button>
                 ))}

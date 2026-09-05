@@ -136,9 +136,9 @@ export default function StaffPage() {
                                 <div className="flex justify-end">
                                     <Button onClick={submit} disabled={submitting || !position.trim() || !content.trim()}>
                                         {submitting ? (
-                                            <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> {t("submitting")}</>
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</>
                                         ) : (
-                                            <><Send className="w-4 h-4 mr-1" /> {t("submit")}</>
+                                            <><Send className="w-4 h-4" /> {t("submit")}</>
                                         )}
                                     </Button>
                                 </div>

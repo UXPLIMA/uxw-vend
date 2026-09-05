@@ -104,7 +104,7 @@ export default function VotePage() {
                                     <Button size="sm" onClick={() => vote(site)} disabled={voting === site.id}>
                                         {voting === site.id
                                             ? <Loader2 className="w-3 h-3 animate-spin" />
-                                            : <ExternalLink className="w-3 h-3 mr-1" />}
+                                            : <ExternalLink className="w-3 h-3" />}
                                         {t("voteNow")}
                                     </Button>
                                 </CardContent>

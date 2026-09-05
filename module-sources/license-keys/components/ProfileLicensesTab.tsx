@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, useLocalDate } from "@/core/sdk/ui";
 import { Loader2, KeyRound, Copy, Check, Eye, EyeOff, Monitor } from "lucide-react";
+import { copyText } from "@/core/sdk";
 
 interface Activation {
     id: string;
@@ -64,8 +65,8 @@ export function ProfileLicensesTab() {
         });
     };
 
-    const copy = (license: License) => {
-        navigator.clipboard.writeText(license.key);
+    const copy = async (license: License) => {
+        if (!(await copyText(license.key))) return;
         setCopiedId(license.id);
         setTimeout(() => setCopiedId(null), 2000);
     };
@@ -119,14 +120,14 @@ export function ProfileLicensesTab() {
                                     {visible ? license.key : t("hidden")}
                                 </code>
                                 <Button variant="outline" size="sm" onClick={() => toggle(license.id)}>
-                                    {visible ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                                    {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     {t(visible ? "hide" : "reveal")}
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={() => copy(license)}>
                                     {copiedId === license.id ? (
-                                        <Check className="mr-2 h-4 w-4" />
+                                        <Check className="h-4 w-4" />
                                     ) : (
-                                        <Copy className="mr-2 h-4 w-4" />
+                                        <Copy className="h-4 w-4" />
                                     )}
                                     {t("copy")}
                                 </Button>

@@ -7,6 +7,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "
 import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface SeoSettings {
     seo_default_title: string;
@@ -94,15 +95,15 @@ export default function SeoSettingsPage() {
     return (
         <>
             <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                        <Search className="w-5 h-5 text-success" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground">{t("adm_seoManager")}</h1>
-                        <p className="text-muted-foreground">{t("adm_seoManagerSubtitle")}</p>
-                    </div>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_seoManager")}
+                    description={t("adm_seoManagerSubtitle")}
+                    actions={<>
+                        <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                            <Search className="w-5 h-5 text-success" />
+                        </div>
+                    </>}
+                />
             </div>
 
             {/* Page SEO Overrides Link */}
@@ -204,9 +205,9 @@ export default function SeoSettingsPage() {
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
                         {saving ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</>
+                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
                         ) : saved ? (
-                            <><Check className="w-4 h-4 mr-2" /> {t("adm_saved")}</>
+                            <><Check className="w-4 h-4" /> {t("adm_saved")}</>
                         ) : (
                             t("adm_saveSettings")
                         )}

@@ -18,6 +18,36 @@ export function toIconSlug(name: string): string {
         .toLowerCase();
 }
 
+/**
+ * Resolves any accepted spelling of an icon name to the id lucide actually
+ * answers to, or null if there is no such icon.
+ *
+ * `toIconSlug` alone is not enough, because it splits on case and lucide
+ * splits on digits too: seven module manifests name `Gamepad2`, `Code2`,
+ * `Link2` or `Building2`, all of which slug to `gamepad2` and friends while
+ * lucide calls them `gamepad-2`. `DynamicIcon` answered each one with a
+ * console warning and rendered the fallback, so a payment gateway's row in
+ * the marketplace had no icon and the panel's console had a warning per
+ * module.
+ *
+ * The naive fix - always hyphenate before a digit - breaks the other
+ * direction: `Grid2x2` would become `grid-2x-2`, and lucide calls that
+ * `grid-2x2`. So instead of guessing where the hyphens go, compare with the
+ * hyphens taken out. Eighteen lucide names collide that way and all eighteen
+ * are alias pairs for the same glyph (`axis-3d` / `axis-3-d`), so whichever
+ * wins draws the same picture.
+ *
+ * The exact slug is still tried first, so a name that already matches keeps
+ * matching and nothing here can redirect it.
+ */
+export function resolveIconName(name: string, known: readonly string[]): string | null {
+    const slug = toIconSlug(name);
+    if (slug === "") return null;
+    if (known.includes(slug)) return slug;
+    const squashed = slug.replace(/-/g, "");
+    return known.find((candidate) => candidate.replace(/-/g, "") === squashed) ?? null;
+}
+
 /** Human-readable label for a picker tile: "shopping-bag" becomes "Shopping Bag". */
 export function iconLabel(name: string): string {
     return toIconSlug(name)

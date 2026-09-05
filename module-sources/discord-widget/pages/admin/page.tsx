@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 export default function DiscordWidgetAdminPage() {
     const t = useTranslations("discordWidget");
@@ -42,10 +43,10 @@ export default function DiscordWidgetAdminPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                <p className="text-muted-foreground">{t("adm_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_title")}
+                description={t("adm_subtitle")}
+            />
 
             <Card>
                 <CardHeader>
@@ -72,9 +73,9 @@ export default function DiscordWidgetAdminPage() {
                             <div className="flex justify-end">
                                 <Button onClick={save} disabled={saving}>
                                     {saving ? (
-                                        <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> {t("adm_saving")}</>
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
                                     ) : (
-                                        <><Save className="w-4 h-4 mr-1" /> {t("adm_save")}</>
+                                        <><Save className="w-4 h-4" /> {t("adm_save")}</>
                                     )}
                                 </Button>
                             </div>

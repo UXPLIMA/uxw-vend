@@ -13,6 +13,7 @@ import { isEnabledIn } from "@/core/lib/module-enabled";
 import { isWidgetVisible } from "@/core/lib/homepage-widgets";
 import { writeError } from "@/core/lib/write-result";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
@@ -145,10 +146,10 @@ export default function WidgetSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("widgets_title")}</h1>
-                <p className="text-muted-foreground">{t("widgets_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("widgets_title")}
+                description={t("widgets_subtitle")}
+            />
 
             {loadFailed ? (
                 <Card className="mb-6">
@@ -190,7 +191,7 @@ export default function WidgetSettingsPage() {
                                     size="sm"
                                     onClick={() => toggle(widget.id)}
                                 >
-                                    {widgetConfig[widget.id] ? <><Eye className="w-3 h-3 mr-1" /> {t("widgets_visible")}</> : <><EyeOff className="w-3 h-3 mr-1" /> {t("widgets_hidden")}</>}
+                                    {widgetConfig[widget.id] ? <><Eye className="w-3 h-3" /> {t("widgets_visible")}</> : <><EyeOff className="w-3 h-3" /> {t("widgets_hidden")}</>}
                                 </Button>
                             </div>
                         ))}
@@ -201,7 +202,7 @@ export default function WidgetSettingsPage() {
 
             {sortedWidgets.length > 0 && !loadFailed && (
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("widgets_save")}</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4" /> {t("widgets_save")}</>}
             </Button>
             )}
         </>

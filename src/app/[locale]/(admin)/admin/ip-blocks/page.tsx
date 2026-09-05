@@ -10,6 +10,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface IpBlock {
     id: string;
@@ -75,21 +76,17 @@ export default function IpBlocksPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("ipBlocks_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("ipBlocks_subtitle")}
-                    </p>
-                </div>
-                <Link href="/admin/ip-blocks/new" className="inline-flex">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> {t("ipBlocks_add")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("ipBlocks_title")}
+                description={t("ipBlocks_subtitle")}
+                actions={<>
+                    <Link href="/admin/ip-blocks/new" className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("ipBlocks_add")}
+                        </Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-0">

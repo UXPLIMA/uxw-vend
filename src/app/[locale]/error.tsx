@@ -54,7 +54,7 @@ export default function Error({
             </div>
             <div className="flex gap-3">
                 <Button onClick={() => reset()}>
-                    <RotateCcw className="w-4 h-4 mr-2" /> {labels.retry}
+                    <RotateCcw className="w-4 h-4" /> {labels.retry}
                 </Button>
                 {/*
                   * A hard navigation, deliberately. This is the error boundary:
@@ -64,7 +64,7 @@ export default function Error({
                   */}
                 {/* eslint-disable-next-line @next/next/no-location-assign-relative-destination */}
                 <Button variant="outline" onClick={() => window.location.href = `/${locale}`}>
-                    <Home className="w-4 h-4 mr-2" /> {labels.goHome}
+                    <Home className="w-4 h-4" /> {labels.goHome}
                 </Button>
             </div>
             {process.env.NODE_ENV === "development" && (

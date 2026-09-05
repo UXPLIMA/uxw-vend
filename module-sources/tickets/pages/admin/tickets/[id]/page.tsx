@@ -10,6 +10,7 @@ import { dateLocaleTag } from "@/core/sdk";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 /** The admin catalogue's copy of the status labels. */
 const ADMIN_STATUS_KEYS = adminKeys(STATUS_KEYS);
@@ -153,19 +154,14 @@ export default function AdminTicketDetailPage(props: PageProps) {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/tickets">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div className="flex-1">
-                    <h1 className="text-2xl font-bold">{ticket.subject}</h1>
-                    <p className="text-sm text-muted-foreground">
-                        by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString(__dateTag)}
-                    </p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={ticket.subject}
+                description={<>
+                    by {ticket.user.username} · {new Date(ticket.createdAt).toLocaleDateString(__dateTag)}
+                </>}
+                backHref="/admin/tickets"
+                backLabel={commonT("back")}
+            />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Messages */}
@@ -207,9 +203,9 @@ export default function AdminTicketDetailPage(props: PageProps) {
                                 />
                                 <Button onClick={sendReply} disabled={sending || !replyContent.trim()}>
                                     {sending ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_sending")}</>
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_sending")}</>
                                     ) : (
-                                        <><Send className="w-4 h-4 mr-2" /> {t("adm_sendReply")}</>
+                                        <><Send className="w-4 h-4" /> {t("adm_sendReply")}</>
                                     )}
                                 </Button>
                             </CardContent>

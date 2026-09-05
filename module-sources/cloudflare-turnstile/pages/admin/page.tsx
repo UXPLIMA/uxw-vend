@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, CheckboxField } from "@/core/sdk/ui";
 import { Shield, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface TurnstileConfig {
     siteKey: string;
@@ -76,13 +77,13 @@ export default function CloudflareTurnstileAdminPage() {
 
     return (
         <div className="max-w-2xl">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center gap-2">
+            <AdminPageHeader
+                title={<>
                     <Shield className="w-7 h-7 text-warning" />
                     {t("title")}
-                </h1>
-                <p className="text-muted-foreground">{t("subtitle")}</p>
-            </div>
+                </>}
+                description={t("subtitle")}
+            />
 
             <Card>
                 <CardHeader>
@@ -109,33 +110,21 @@ export default function CloudflareTurnstileAdminPage() {
                         />
                     </div>
                     <div className="space-y-3 pt-2 border-t border-border">
-                        <label className="flex items-start gap-3 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={config.enableOnLogin}
-                                onChange={(e) => setConfig({ ...config, enableOnLogin: e.target.checked })}
-                                className="mt-1"
-                            />
-                            <div>
-                                <div className="text-sm font-medium text-foreground">{t("enableOnLogin")}</div>
-                                <div className="text-xs text-muted-foreground">{t("enableOnLoginDesc")}</div>
-                            </div>
-                        </label>
-                        <label className="flex items-start gap-3 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={config.enableOnRegister}
-                                onChange={(e) => setConfig({ ...config, enableOnRegister: e.target.checked })}
-                                className="mt-1"
-                            />
-                            <div>
-                                <div className="text-sm font-medium text-foreground">{t("enableOnRegister")}</div>
-                                <div className="text-xs text-muted-foreground">{t("enableOnRegisterDesc")}</div>
-                            </div>
-                        </label>
+                        <CheckboxField
+                            checked={config.enableOnLogin}
+                            onChange={(e) => setConfig({ ...config, enableOnLogin: e.target.checked })}
+                            label={<span className="font-medium">{t("enableOnLogin")}</span>}
+                            description={t("enableOnLoginDesc")}
+                        />
+                        <CheckboxField
+                            checked={config.enableOnRegister}
+                            onChange={(e) => setConfig({ ...config, enableOnRegister: e.target.checked })}
+                            label={<span className="font-medium">{t("enableOnRegister")}</span>}
+                            description={t("enableOnRegisterDesc")}
+                        />
                     </div>
                     <Button onClick={save} disabled={saving} className="w-full">
-                        {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {t("save")}
                     </Button>
                 </CardContent>

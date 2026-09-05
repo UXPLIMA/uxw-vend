@@ -6,9 +6,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, NativeSelect, CheckboxField } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Category {
     id: string;
@@ -91,17 +92,12 @@ export default function NewProductPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/store/products">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_newProduct")}</h1>
-                    <p className="text-muted-foreground">{t("adm_createNewListing")}</p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("adm_newProduct")}
+                description={t("adm_createNewListing")}
+                backHref="/admin/store/products"
+                backLabel={commonT("back")}
+            />
 
             <form onSubmit={handleSubmit}>
                 <div className="grid lg:grid-cols-3 gap-8">
@@ -288,24 +284,16 @@ export default function NewProductPage() {
                                 <CardTitle>{t("adm_status")}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={form.isActive}
-                                        onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                                        className="rounded"
-                                    />
-                                    <span className="text-sm">{t("adm_active")}</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={form.isFeatured}
-                                        onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
-                                        className="rounded"
-                                    />
-                                    <span className="text-sm">{t("adm_featured")}</span>
-                                </label>
+                                <CheckboxField
+                                    checked={form.isActive}
+                                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                                    label={t("adm_active")}
+                                />
+                                <CheckboxField
+                                    checked={form.isFeatured}
+                                    onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+                                    label={t("adm_featured")}
+                                />
                             </CardContent>
                         </Card>
 
@@ -317,7 +305,7 @@ export default function NewProductPage() {
 
                         <Button type="submit" className="w-full" disabled={saving}>
                             {saving ? (
-                                <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_creating")}</>
+                                <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</>
                             ) : (
                                 t("adm_createProduct")
                             )}

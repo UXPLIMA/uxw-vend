@@ -6,6 +6,7 @@ export * from "./NavIcon";
 export * from "./icon-picker";
 export * from "./badge";
 export * from "./card";
+export * from "./checkbox";
 export * from "./label";
 export * from "./textarea";
 export * from "./native-select";

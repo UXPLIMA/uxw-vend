@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface LogEntry {
     id: string;
@@ -41,10 +42,10 @@ export default function ActivityLogPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("activityLog_title")}</h1>
-                <p className="text-muted-foreground">{t("activityLog_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("activityLog_title")}
+                description={t("activityLog_subtitle")}
+            />
 
             <Card>
                 <CardContent className="p-0">

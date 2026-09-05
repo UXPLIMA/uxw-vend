@@ -8,6 +8,7 @@ import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { writeError } from "@/core/lib/write-result";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default function CssSettingsPage() {
     const t = useTranslations("admin");
@@ -42,10 +43,10 @@ export default function CssSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("css_title")}</h1>
-                <p className="text-muted-foreground">{t("css_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("css_title")}
+                description={t("css_subtitle")}
+            />
 
             <Card className="mb-6">
                 <CardHeader><CardTitle>{t("css_editor")}</CardTitle></CardHeader>
@@ -63,7 +64,7 @@ export default function CssSettingsPage() {
             </Card>
 
             <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("css_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("css_saveCss")}</>}
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("css_saving")}</> : <><Check className="w-4 h-4" /> {t("css_saveCss")}</>}
             </Button>
         </>
     );

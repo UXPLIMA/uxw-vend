@@ -12,6 +12,27 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.17.0 - `AdminPageHeader` joins `@/core/sdk/admin`. Eighty admin screens
+ * had written their own title row, between them using twelve heading sizes
+ * and six different layouts, so moving from one screen to the next changed
+ * the size of the title and the height of the button beside it. One header,
+ * one set of choices. An addition.
+ *
+ * 1.16.0 - `Checkbox` and `CheckboxField` join `@/core/sdk/ui`. There were
+ * twenty-nine bare `<input type="checkbox">` between core and the modules,
+ * wearing ten different class strings, all of them painted by the operating
+ * system rather than by the theme - the system's blue on a light box, and a
+ * white box with a black hairline on a dark panel. Same treatment
+ * `NativeSelect` got: the real element, with its appearance taken off.
+ * Additions.
+ *
+ * 1.15.0 - `copyText` joins `@/core/sdk`. `navigator.clipboard` only exists
+ * in a secure context, so on a self-hosted site reached by IP over http://
+ * every "Copy" button on the site threw `TypeError` and did nothing. The
+ * helper uses the real API where there is one, falls back to an offscreen
+ * textarea where there is not, and returns whether the text landed. An
+ * addition.
+ *
  * 1.14.0 - `Badge` joins `@/core/sdk/ui`. Every screen had hand-rolled its
  * own status pill out of `bg-green-100 text-green-700` and friends, so a
  * badge was a fixed light chip whatever the theme said, unreadable on a dark
@@ -97,4 +118,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.14.0";
+export const CORE_API_VERSION = "1.17.0";

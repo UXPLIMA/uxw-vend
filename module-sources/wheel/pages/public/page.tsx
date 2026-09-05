@@ -176,7 +176,7 @@ export default function WheelPage() {
                             disabled={spinning || !session?.user}
                         >
                             {spinning ? (
-                                <><Loader2 className="w-5 h-5 animate-spin mr-2" /> {t('spinning')}</>
+                                <><Loader2 className="w-5 h-5 animate-spin" /> {t('spinning')}</>
                             ) : !session?.user ? (
                                 t('loginToSpin')
                             ) : freeSpinUsed && spinCost > 0 ? (

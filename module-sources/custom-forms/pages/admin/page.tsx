@@ -3,11 +3,12 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, Input, Label, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, useConfirm, useFormRoute, NativeSelect, CheckboxField } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface FormField {
     name: string;
@@ -126,15 +127,12 @@ export default function FormsPage() {
     if (showCreate) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{editingSlug ? t("adm_editForm") : t("adm_createForm")}</h1>
-                        <p className="text-muted-foreground">{t("adm_customFormsSubtitle")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={editingSlug ? t("adm_editForm") : t("adm_createForm")}
+                    description={t("adm_customFormsSubtitle")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -154,7 +152,7 @@ export default function FormsPage() {
                                 <div className="flex items-center justify-between mb-2">
                                     <Label>{t("adm_fields")}</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addField}>
-                                        <Plus className="w-3 h-3 mr-1" /> {t("adm_addField")}
+                                        <Plus className="w-3 h-3" /> {t("adm_addField")}
                                     </Button>
                                 </div>
                                 <div className="space-y-2">
@@ -169,10 +167,12 @@ export default function FormsPage() {
                                                 <option value="select">{t("typeSelect")}</option>
                                                 <option value="checkbox">{t("typeCheckbox")}</option>
                                             </NativeSelect>
-                                            <label className="flex items-center gap-1 text-xs">
-                                                <input type="checkbox" checked={field.required} onChange={(e) => updateField(i, { required: e.target.checked })} />
-                                                {t("adm_required")}
-                                            </label>
+                                            <CheckboxField
+                                                checked={field.required}
+                                                onChange={(e) => updateField(i, { required: e.target.checked })}
+                                                label={t("adm_required")}
+                                                rowClassName="text-xs whitespace-nowrap"
+                                            />
                                             <Button aria-label={commonT("remove")} type="button" variant="ghost" size="sm" onClick={() => removeField(i)}><X className="w-3 h-3" /></Button>
                                         </div>
                                     ))}
@@ -181,7 +181,7 @@ export default function FormsPage() {
 
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                                     {editingSlug ? t("adm_saveChanges") : t("adm_createFormButton")}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
@@ -197,15 +197,15 @@ export default function FormsPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_customForms")}</h1>
-                    <p className="text-muted-foreground">{t("adm_customFormsSubtitle")}</p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_newForm")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_customForms")}
+                description={t("adm_customFormsSubtitle")}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_newForm")}</Button>
+                    </Link>
+                </>}
+            />
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {forms.length === 0 ? (

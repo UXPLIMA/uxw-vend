@@ -15,6 +15,7 @@ import { isEnabledIn } from "@/core/lib/module-enabled";
 import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
 import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
+import { Checkbox } from "@/core/components/ui/checkbox";
 
 const DEMO_EMAIL = "admin@example.com";
 const DEMO_PASSWORD = "password123";
@@ -224,11 +225,9 @@ export default function LoginPage() {
 
                             <div className="flex items-center justify-between gap-3">
                                 <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         checked={remember}
                                         onChange={(e) => setRemember(e.target.checked)}
-                                        className="rounded border-border"
                                     />
                                     {t('rememberMe')}
                                 </label>
@@ -276,7 +275,7 @@ export default function LoginPage() {
                                                     }
                                                 }}
                                                 className="border-border text-foreground hover:bg-muted">
-                                                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill={btn.color}>
+                                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill={btn.color}>
                                                     {btn.svgIcon.includes("|")
                                                         ? btn.svgIcon.split("|").map((d: string, i: number) => <path key={i} d={d} />)
                                                         : <path d={btn.svgIcon} />

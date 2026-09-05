@@ -11,6 +11,7 @@ import { ModuleIcon } from "../ModuleIcon";
 import { ModuleSettingsPanel } from "../ModuleSettingsPanel";
 import { moduleDescription, moduleName } from "../module-name";
 import type { Module, ModuleSettingValues } from "../types";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /**
  * One module's settings, on its own screen.
@@ -89,7 +90,7 @@ export default function ModuleSettingsPage({
                     <p className="text-muted-foreground">{t("modules_notInstalled")}</p>
                     <Link href="/admin/modules" className="inline-flex">
                         <Button variant="outline" size="sm">
-                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            <ArrowLeft className="w-4 h-4" />
                             {commonT("back")}
                         </Button>
                     </Link>
@@ -100,21 +101,17 @@ export default function ModuleSettingsPage({
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
-                    <div className="min-w-0">
-                        <h1 className="text-xl font-semibold">{moduleName(mod, locale, t)}</h1>
-                        <p className="text-sm text-muted-foreground">{moduleDescription(mod, locale, t)}</p>
-                    </div>
-                </div>
-                <Link href="/admin/modules" className="inline-flex">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {commonT("back")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                backHref="/admin/modules"
+                backLabel={commonT("back")}
+                title={
+                    <span className="inline-flex items-center gap-2">
+                        <span className="text-primary"><ModuleIcon name={mod.icon} /></span>
+                        {moduleName(mod, locale, t)}
+                    </span>
+                }
+                description={moduleDescription(mod, locale, t)}
+            />
 
             <Card>
                 <CardContent className="p-6">

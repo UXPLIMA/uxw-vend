@@ -143,7 +143,7 @@ export default function NewTopicPage() {
 
                                     <Button type="submit" disabled={saving}>
                                         {saving ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('creating')}</>
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('creating')}</>
                                         ) : (
                                             t('createTopic')
                                         )}

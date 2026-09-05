@@ -7,6 +7,7 @@ import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Punishment {
     id: string;
@@ -122,15 +123,12 @@ export default function AdminPunishmentsPage() {
     if (showForm) {
         return (
             <div className="space-y-6">
-                <div className="flex justify-between items-center gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_newPunishment")}</h1>
-                        <p className="text-muted-foreground">{t("adm_subtitle")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_newPunishment")}
+                    description={t("adm_subtitle")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6 space-y-3">
@@ -167,7 +165,7 @@ export default function AdminPunishmentsPage() {
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" onClick={closeForm}>{commonT("cancel")}</Button>
                             <Button onClick={create} disabled={saving || !form.playerName.trim()}>
-                                {saving ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> {t("adm_creating")}</> : t("adm_create")}
+                                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</> : t("adm_create")}
                             </Button>
                         </div>
                     </CardContent>
@@ -178,10 +176,10 @@ export default function AdminPunishmentsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">{t("adm_title")}</h1>
-                <p className="text-muted-foreground">{t("adm_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_title")}
+                description={t("adm_subtitle")}
+            />
 
             <div className="flex flex-wrap items-center gap-2">
                 <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
@@ -196,7 +194,7 @@ export default function AdminPunishmentsPage() {
                 <div className="flex-1" />
                 <Link href={formHref()} className="inline-flex">
                     <Button size="sm">
-                        <Plus className="w-4 h-4 mr-1" /> {t("adm_newPunishment")}
+                        <Plus className="w-4 h-4" /> {t("adm_newPunishment")}
                     </Button>
                 </Link>
             </div>

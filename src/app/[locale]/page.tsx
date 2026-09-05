@@ -89,13 +89,13 @@ export default function HomePage() {
                   <div className="flex flex-wrap gap-3 justify-center">
                     <Link href="/admin/modules">
                       <Button>
-                        <Puzzle className="w-4 h-4 mr-2" />
+                        <Puzzle className="w-4 h-4" />
                         {commonT('welcomeBrowseModules')}
                       </Button>
                     </Link>
                     <Link href="/admin/settings/general">
                       <Button variant="outline">
-                        <Settings className="w-4 h-4 mr-2" />
+                        <Settings className="w-4 h-4" />
                         {commonT('welcomeOpenSettings')}
                       </Button>
                     </Link>

@@ -12,6 +12,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import type { RoleRecord } from "./role-form";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 type Role = RoleRecord;
 
@@ -72,17 +73,17 @@ export default function AdminRolesPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("roles_title")}</h1>
-                    <p className="text-muted-foreground">{t("roles_subtitle")}</p>
-                </div>
-                <Link href="/admin/roles/new" className="inline-flex">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> {t("roles_newRole")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("roles_title")}
+                description={t("roles_subtitle")}
+                actions={<>
+                    <Link href="/admin/roles/new" className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("roles_newRole")}
+                        </Button>
+                    </Link>
+                </>}
+            />
 
             {/* Roles List */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

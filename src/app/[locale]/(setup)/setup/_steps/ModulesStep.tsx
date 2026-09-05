@@ -7,6 +7,7 @@ import { AlertTriangle, Lock, Search } from "lucide-react";
 import type { ModuleOption } from "../types";
 import { CATEGORY_ORDER, categoryLabel } from "./categories";
 import { parseDependency, resolveInstallPlan, installPlanErrorMessage } from "@/core/lib/install-plan";
+import { Checkbox } from "@/core/components/ui/checkbox";
 
 interface ModulesStepProps {
     catalog: ModuleOption[];
@@ -138,15 +139,14 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                                                             : "border-border hover:bg-accent/30 cursor-pointer"
                                                     }`}
                                                 >
-                                                    <input
-                                                        type="checkbox"
+                                                    <Checkbox
                                                         checked={isPicked || isAuto}
                                                         // An auto-added module can't be unchecked here:
                                                         // it is only present because something selected
                                                         // needs it. Deselect that instead.
                                                         disabled={isAuto && !isPicked}
                                                         onChange={() => onToggle(m.id)}
-                                                        className="mt-1"
+                                                        className="mt-0.5"
                                                     />
                                                     <div className="min-w-0">
                                                         <div className="font-medium text-foreground flex items-center gap-1.5">

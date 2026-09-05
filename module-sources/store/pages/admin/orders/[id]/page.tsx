@@ -13,6 +13,7 @@ import { adminOrderStatusKeys, orderStatusLabel } from "../../../../lib/order-st
 /** The admin catalogue's copy of the order status labels. */
 const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 import { getTranslations, getLocale } from "next-intl/server";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -55,18 +56,15 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/admin/store/orders">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                        <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                </Link>
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold">{t("adm_orderNumber", { number: order.orderNumber })}</h1>
-                    <p className="text-muted-foreground">{formatDate(order.createdAt, undefined, dateTag)}</p>
-                </div>
-                <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
-            </div>
+            <AdminPageHeader
+                title={t("adm_orderNumber", { number: order.orderNumber })}
+                description={formatDate(order.createdAt, undefined, dateTag)}
+                backHref="/admin/store/orders"
+                backLabel={commonT("back")}
+                actions={<>
+                    <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                </>}
+            />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Order Items */}

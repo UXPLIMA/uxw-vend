@@ -4,6 +4,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
 import { SchemaForm } from "@/core/components/admin/theme-settings/SchemaForm";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default async function ThemeSettingsPage({ params }: { params: Promise<{ group: string }> }) {
     const session = await auth();
@@ -19,7 +20,7 @@ export default async function ThemeSettingsPage({ params }: { params: Promise<{ 
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4">{groupDef.label}</h1>
+            <AdminPageHeader title={groupDef.label} />
             <SchemaForm themeId={themeId} group={group} fields={groupDef.fields} initialValues={initialValues} />
         </div>
     );

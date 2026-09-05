@@ -502,7 +502,7 @@ export default function CartPage() {
                                                         <p className="text-xs text-muted-foreground">
                                                             {t('balance', { amount: formatPrice(creditBalance) })}
                                                             {cart && creditBalance < Math.max(0, cart.total - couponDiscount - (creatorApplied ? (cart.total - couponDiscount) * creatorApplied.discountPercent / 100 : 0)) && (
-                                                                <span className="text-destructive ml-1">({t('insufficient')})</span>
+                                                                <span className="text-destructive">({t('insufficient')})</span>
                                                             )}
                                                         </p>
                                                     </div>
@@ -530,7 +530,7 @@ export default function CartPage() {
                                         disabled={checkingOut || !playerName.trim() || !paymentMethod}
                                     >
                                         {checkingOut ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t('processing')}</>
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('processing')}</>
                                         ) : (
                                             t('proceedToCheckout')
                                         )}

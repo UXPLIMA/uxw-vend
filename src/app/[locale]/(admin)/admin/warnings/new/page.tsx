@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -12,6 +12,7 @@ import { UserPicker, type PickedUser } from "@/core/components/admin/UserPicker"
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 /** Issuing a warning, on its own route rather than folded above the list. */
 export default function NewWarningPage() {
@@ -62,18 +63,12 @@ export default function NewWarningPage() {
 
     return (
         <>
-            <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">{t("warnings_newTitle")}</h1>
-                    <p className="text-sm text-muted-foreground">{t("warnings_subtitle")}</p>
-                </div>
-                <Link href="/admin/warnings" className="inline-flex">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {commonT("back")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("warnings_newTitle")}
+                description={t("warnings_subtitle")}
+                backHref="/admin/warnings"
+                backLabel={commonT("back")}
+            />
 
             <Card>
                 <CardContent className="p-6">
@@ -122,7 +117,7 @@ export default function NewWarningPage() {
                             <Button type="submit" disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("warnings_issuing")}
+                                        <Loader2 className="w-4 h-4 animate-spin" /> {t("warnings_issuing")}
                                     </>
                                 ) : (
                                     t("warnings_issue")

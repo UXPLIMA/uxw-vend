@@ -10,6 +10,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 type EmailStatus = "pending" | "sending" | "sent" | "failed";
 type StatusFilter = "all" | EmailStatus;
@@ -191,24 +192,22 @@ export default function EmailQueueAdminPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("emailQueue_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">{t("emailQueue_description")}</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
-                        <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                        {t("common_refresh")}
-                    </Button>
-                    <Button onClick={handleProcess} disabled={processing}>
-                        {processing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
-                        {t("emailQueue_processNow")}
-                    </Button>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("emailQueue_title")}
+                description={t("emailQueue_description")}
+                actions={<>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => void fetchJobs()} disabled={loading}>
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                            {t("common_refresh")}
+                        </Button>
+                        <Button onClick={handleProcess} disabled={processing}>
+                            {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+                            {t("emailQueue_processNow")}
+                        </Button>
+                    </div>
+                </>}
+            />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {STATUS_CARD.map((s) => (
@@ -298,7 +297,7 @@ export default function EmailQueueAdminPage() {
                                                                 onClick={() => handleRetry(job)}
                                                                 disabled={busyId === job.id}
                                                             >
-                                                                <RotateCcw className="w-3 h-3 mr-1" />
+                                                                <RotateCcw className="w-3 h-3" />
                                                                 {t("emailQueue_retry")}
                                                             </Button>
                                                         )}

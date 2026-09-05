@@ -311,8 +311,8 @@ export default function ProfilePage() {
                                     <Input id={memberSinceId} value={profile ? formatDate(new Date(profile.createdAt), undefined, dateTag) : ""} disabled className="bg-muted" />
                                 </div>
                                 <Button type="submit" disabled={savingProfile}>
-                                    {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("saving")}</> :
-                                     profileSaved ? <><Check className="w-4 h-4 mr-2" /> {t("saved")}</> : t("saveChanges")}
+                                    {savingProfile ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}</> :
+                                     profileSaved ? <><Check className="w-4 h-4" /> {t("saved")}</> : t("saveChanges")}
                                 </Button>
                             </form>
                         </CardContent>
@@ -343,12 +343,12 @@ export default function ProfilePage() {
                                 >
                                     {exportingData ? (
                                         <>
-                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                             {t("preparing")}
                                         </>
                                     ) : (
                                         <>
-                                            <Download className="w-4 h-4 mr-2" />
+                                            <Download className="w-4 h-4" />
                                             {t("download")}
                                         </>
                                     )}
@@ -495,7 +495,7 @@ export default function ProfilePage() {
                             >
                                 {deletingAccount ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         {t("deleting")}
                                     </>
                                 ) : (

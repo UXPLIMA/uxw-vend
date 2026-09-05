@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, CheckCircle, XCircle } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Log {
     id: string;
@@ -51,10 +52,10 @@ export default function WebhookLogsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("adm_webhookLogs")}</h1>
-                <p className="text-muted-foreground">{t("adm_deliveryHistory")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_webhookLogs")}
+                description={t("adm_deliveryHistory")}
+            />
 
             <Card>
                 <CardContent className="p-0">

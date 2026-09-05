@@ -2,15 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/core/lib/i18n/navigation";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
-import { ArrowLeft, Loader2, Download, Check, AlertCircle, RefreshCw } from "lucide-react";
+import { Loader2, Download, Check, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/lib/utils";
 
 import { moduleDescription, moduleName } from "../module-name";
 import { Badge } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface UpdateInfo {
     moduleId: string;
@@ -87,27 +88,26 @@ export default function ModuleUpdatesPage() {
 
     return (
         <>
-            <div className="flex items-center gap-4 mb-6">
-                <Link href="/admin/modules"><Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button></Link>
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold">
-                        {t("moduleUpdates_title")}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        {updates.length === 0
-                            ? (t("moduleUpdates_allUpToDate"))
-                            : (t("moduleUpdates_count", { count: updates.length }))}
-                        {checkedAt && (
-                            <span className="ml-2 text-xs">
-                                · {t("moduleUpdates_checkedAt", { date: new Date(checkedAt).toLocaleString(__dateTag) })}
-                            </span>
-                        )}
-                    </p>
-                </div>
-                <Button variant="outline" onClick={fetchUpdates}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> {t("moduleUpdates_recheck")}
-                </Button>
-            </div>
+            <AdminPageHeader
+                title={t("moduleUpdates_title")}
+                description={<>
+                    {updates.length === 0
+                        ? (t("moduleUpdates_allUpToDate"))
+                        : (t("moduleUpdates_count", { count: updates.length }))}
+                    {checkedAt && (
+                        <span className="ml-2 text-xs">
+                            · {t("moduleUpdates_checkedAt", { date: new Date(checkedAt).toLocaleString(__dateTag) })}
+                        </span>
+                    )}
+                </>}
+                backHref="/admin/modules"
+                backLabel={commonT("back")}
+                actions={
+                    <Button variant="outline" onClick={fetchUpdates}>
+                        <RefreshCw className="w-4 h-4" /> {t("moduleUpdates_recheck")}
+                    </Button>
+                }
+            />
 
             {error && (
                 <Card className="mb-4 border-destructive">
@@ -156,11 +156,11 @@ export default function ModuleUpdatesPage() {
                                             size="sm"
                                         >
                                             {isUpdating ? (
-                                                <><Loader2 className="w-3 h-3 mr-2 animate-spin" /> {t("moduleUpdates_updating")}</>
+                                                <><Loader2 className="w-3 h-3 animate-spin" /> {t("moduleUpdates_updating")}</>
                                             ) : isDone ? (
-                                                <><Check className="w-3 h-3 mr-2" /> {t("moduleUpdates_done")}</>
+                                                <><Check className="w-3 h-3" /> {t("moduleUpdates_done")}</>
                                             ) : (
-                                                <><Download className="w-3 h-3 mr-2" /> {t("moduleUpdates_update")}</>
+                                                <><Download className="w-3 h-3" /> {t("moduleUpdates_update")}</>
                                             )}
                                         </Button>
                                     </div>

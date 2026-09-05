@@ -8,6 +8,8 @@ import { Input } from "@/core/components/ui/input";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { CheckboxField } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface MaintenanceConfig {
     enabled: boolean;
@@ -114,32 +116,24 @@ export default function MaintenanceSettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">
-                    {t("sidebar_maintenance")}
-                </h1>
-                <p className="text-muted-foreground">
+            <AdminPageHeader
+                title={t("sidebar_maintenance")}
+                description={<>
                     Temporarily take your site offline for visitors while allowing administrators to
                     continue browsing.
-                </p>
-            </div>
+                </>}
+            />
 
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">{t("common_status")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={enabled}
-                            onChange={(e) => setEnabled(e.target.checked)}
-                            className="w-4 h-4"
-                        />
-                        <span className="text-sm font-medium text-foreground">
-                            {t("maintenance_enable")}
-                        </span>
-                    </label>
+                    <CheckboxField
+                        checked={enabled}
+                        onChange={(e) => setEnabled(e.target.checked)}
+                        label={<span className="font-medium">{t("maintenance_enable")}</span>}
+                    />
                     <p className="text-xs text-muted-foreground">
                         When enabled, visitors whose role is not in the allowed list will see the
                         maintenance page. Authentication endpoints remain accessible so admins can
@@ -178,21 +172,14 @@ export default function MaintenanceSettingsPage() {
                         longer matches one - so an old entry stays visible and
                         removable rather than disappearing from the screen. */}
                     {[...new Set([...roleOptions, ...allowedRoles])].map((role) => (
-                        <label
+                        <CheckboxField
                             key={role}
-                            className="flex items-center gap-2 text-sm text-foreground cursor-pointer"
-                        >
-                            <input
-                                type="checkbox"
-                                checked={allowedRoles.includes(role)}
-                                onChange={() => toggleRole(role)}
-                                disabled={role === "admin"}
-                            />
-                            <span className="capitalize">{role}</span>
-                            {role === "admin" && (
-                                <span className="text-xs text-muted-foreground">(always allowed)</span>
-                            )}
-                        </label>
+                            checked={allowedRoles.includes(role)}
+                            onChange={() => toggleRole(role)}
+                            disabled={role === "admin"}
+                            label={<span className="capitalize">{role}</span>}
+                            description={role === "admin" ? t("maintenance_adminAlwaysAllowed") : undefined}
+                        />
                     ))}
                     <Input
                         type="text"
@@ -221,11 +208,11 @@ export default function MaintenanceSettingsPage() {
                 >
                     {saving ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("common_saving")}
+                            <Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}
                         </>
                     ) : (
                         <>
-                            <Save className="w-4 h-4 mr-2" /> {t("moderationSettings_saveChanges")}
+                            <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
                         </>
                     )}
                 </Button>

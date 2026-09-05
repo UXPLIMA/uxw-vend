@@ -144,7 +144,7 @@ export function ProfileMinecraftTab() {
                             <p className="text-lg font-medium text-foreground">{state.account.username}</p>
                         </div>
                         <Button variant="outline" onClick={unlink} disabled={busy}>
-                            <Link2Off className="mr-2 h-4 w-4" />
+                            <Link2Off className="h-4 w-4" />
                             {t("unlink")}
                         </Button>
                     </>
@@ -167,7 +167,7 @@ export function ProfileMinecraftTab() {
                         {error && <p className="text-sm text-destructive">{error}</p>}
                         <div className="flex gap-2">
                             <Button onClick={confirmCode} disabled={busy || code.trim().length < 6}>
-                                {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                                 {t("confirm")}
                             </Button>
                             <Button variant="ghost" onClick={() => setState({ ...state, pending: null })}>
@@ -190,7 +190,7 @@ export function ProfileMinecraftTab() {
                         </div>
                         {error && <p className="text-sm text-destructive">{error}</p>}
                         <Button onClick={request} disabled={busy || username.trim().length < 3}>
-                            {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                             {t("sendCode")}
                         </Button>
                     </>

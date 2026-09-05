@@ -7,6 +7,7 @@ import { Button, Card, CardContent, usePrompt } from "@/core/sdk/ui";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag, writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Application {
     id: string;
@@ -87,10 +88,10 @@ export default function StaffApplicationsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("adm_staffApplications")}</h1>
-                <p className="text-muted-foreground">{t("adm_pendingReview", { count: apps.filter(a => a.status === "pending").length })}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_staffApplications")}
+                description={t("adm_pendingReview", { count: apps.filter(a => a.status === "pending").length })}
+            />
 
             <div className="flex gap-2 mb-6">
                 {[
@@ -101,7 +102,7 @@ export default function StaffApplicationsPage() {
                 ].map((s) => (
                     <Button key={s.value} variant={filter === s.value ? "default" : "outline"} size="sm" onClick={() => setFilter(s.value)}>
                         {t(s.labelKey)}
-                        {s.value === "pending" && <span className="ml-1 text-xs">({apps.filter(a => a.status === "pending").length})</span>}
+                        {s.value === "pending" && <span className="text-xs">({apps.filter(a => a.status === "pending").length})</span>}
                     </Button>
                 ))}
             </div>
@@ -138,10 +139,10 @@ export default function StaffApplicationsPage() {
                                 {app.status === "pending" && (
                                     <div className="flex gap-2">
                                         <Button size="sm" onClick={() => updateStatus(app.id, "accepted")} className="bg-success text-success-foreground hover:bg-success/90">
-                                            <Check className="w-3 h-3 mr-1" /> {t("adm_accept")}
+                                            <Check className="w-3 h-3" /> {t("adm_accept")}
                                         </Button>
                                         <Button size="sm" variant="destructive" onClick={() => updateStatus(app.id, "rejected")}>
-                                            <X className="w-3 h-3 mr-1" /> {t("adm_reject")}
+                                            <X className="w-3 h-3" /> {t("adm_reject")}
                                         </Button>
                                     </div>
                                 )}

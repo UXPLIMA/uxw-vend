@@ -10,6 +10,7 @@ import { IconPicker } from "@/core/components/ui/icon-picker";
 import { Loader2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { NativeSelect } from "@/core/components/ui/native-select";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export interface SettingsField {
     key: string;
@@ -82,10 +83,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-xl font-semibold">{title}</h1>
-                <p className="text-sm text-muted-foreground">{subtitle}</p>
-            </div>
+            <AdminPageHeader title={title} description={subtitle} />
 
             {error && <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>}
 
@@ -149,8 +147,8 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("settingsForm_saving")}</> :
-                         saved ? <><Check className="w-4 h-4 mr-2" /> {t("settingsForm_saved")}</> : t("settingsForm_saveSettings")}
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("settingsForm_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("settingsForm_saved")}</> : t("settingsForm_saveSettings")}
                     </Button>
                 </div>
             </form>

@@ -11,6 +11,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface Warning {
     id: string;
@@ -92,21 +93,17 @@ export default function WarningsPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("warnings_title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("warnings_subtitle")}
-                    </p>
-                </div>
-                <Link href="/admin/warnings/new" className="inline-flex">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> {t("warnings_issueButton")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("warnings_title")}
+                description={t("warnings_subtitle")}
+                actions={<>
+                    <Link href="/admin/warnings/new" className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("warnings_issueButton")}
+                        </Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-0">

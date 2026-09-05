@@ -3,10 +3,11 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, CheckboxField } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface SeoPage {
     id: string;
@@ -190,19 +191,12 @@ export default function SeoPageOverridesPage() {
     if (showForm) {
         return (
             <>
-                <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-                    <div className="flex items-center gap-4">
-                        <Button aria-label={commonT("back")} variant="ghost" size="icon" onClick={closeForm}>
-                            <ArrowLeft className="w-4 h-4" />
-                        </Button>
-                        <div>
-                            <h1 className="text-3xl font-bold text-foreground">
-                                {editingId ? t("adm_editPageSeo") : t("adm_addPageSeo")}
-                            </h1>
-                            <p className="text-muted-foreground">{t("adm_configurePerPage")}</p>
-                        </div>
-                    </div>
-                </div>
+                <AdminPageHeader
+                    title={editingId ? t("adm_editPageSeo") : t("adm_addPageSeo")}
+                    description={t("adm_configurePerPage")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -318,30 +312,18 @@ export default function SeoPageOverridesPage() {
                                     <CardTitle className="text-sm text-foreground">{t("adm_searchEngineDirectives")}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    <label className="flex items-center gap-3 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={form.noIndex}
-                                            onChange={(e) => updateField("noIndex", e.target.checked)}
-                                            className="w-4 h-4 rounded border-border accent-primary"
-                                        />
-                                        <div>
-                                            <p className="text-sm font-medium text-foreground">{t("adm_noIndex")}</p>
-                                            <p className="text-xs text-muted-foreground">{t("adm_noIndexDesc")}</p>
-                                        </div>
-                                    </label>
-                                    <label className="flex items-center gap-3 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={form.noFollow}
-                                            onChange={(e) => updateField("noFollow", e.target.checked)}
-                                            className="w-4 h-4 rounded border-border accent-primary"
-                                        />
-                                        <div>
-                                            <p className="text-sm font-medium text-foreground">{t("adm_noFollow")}</p>
-                                            <p className="text-xs text-muted-foreground">{t("adm_noFollowDesc")}</p>
-                                        </div>
-                                    </label>
+                                    <CheckboxField
+                                        checked={form.noIndex}
+                                        onChange={(e) => updateField("noIndex", e.target.checked)}
+                                        label={<span className="font-medium">{t("adm_noIndex")}</span>}
+                                        description={t("adm_noIndexDesc")}
+                                    />
+                                    <CheckboxField
+                                        checked={form.noFollow}
+                                        onChange={(e) => updateField("noFollow", e.target.checked)}
+                                        label={<span className="font-medium">{t("adm_noFollow")}</span>}
+                                        description={t("adm_noFollowDesc")}
+                                    />
                                 </CardContent>
                             </Card>
 
@@ -352,7 +334,7 @@ export default function SeoPageOverridesPage() {
                                 </Button>
                                 <Button type="submit" disabled={submitting}>
                                     {submitting ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("adm_saving")}</>
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
                                     ) : editingId ? (
                                         t("adm_update")
                                     ) : (
@@ -369,23 +351,17 @@ export default function SeoPageOverridesPage() {
 
     return (
         <>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-                <div className="flex items-center gap-4">
-                    <Link href="/admin/seo">
-                        <Button aria-label={commonT("back")} variant="ghost" size="icon">
-                            <ArrowLeft className="w-4 h-4" />
-                        </Button>
+            <AdminPageHeader
+                title={t("adm_pageSeoOverrides")}
+                description={t("adm_configurePerPage")}
+                backHref="/admin/seo"
+                backLabel={commonT("back")}
+                actions={
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_addPage")}</Button>
                     </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground">{t("adm_pageSeoOverrides")}</h1>
-                        <p className="text-muted-foreground">{t("adm_configurePerPage")}</p>
-                    </div>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}</Button>
-                </Link>
-            </div>
+                }
+            />
 
             {/* Pages Table */}
             {pages.length === 0 ? (
@@ -395,7 +371,7 @@ export default function SeoPageOverridesPage() {
                         <p className="text-lg font-medium text-foreground mb-1">{t("adm_noPageSeo")}</p>
                         <p className="text-sm text-muted-foreground mb-6">{t("adm_noPageSeoDesc")}</p>
                         <Link href={formHref()} className="inline-flex">
-                            <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_addPage")}</Button>
+                            <Button><Plus className="w-4 h-4" /> {t("adm_addPage")}</Button>
                         </Link>
                     </CardContent>
                 </Card>

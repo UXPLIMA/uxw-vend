@@ -14,6 +14,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { badgeClassName } from "@/core/components/ui/badge";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface Revision {
     id: string;
@@ -92,14 +93,10 @@ export default function RevisionsPage() {
 
     return (
         <>
-            <div className="mb-6">
-                <h1 className="text-xl font-semibold">
-                    {t("revisions_title")}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    {t("revisions_subtitle")}
-                </p>
-            </div>
+            <AdminPageHeader
+                title={t("revisions_title")}
+                description={t("revisions_subtitle")}
+            />
 
             <Card className="mb-4">
                 <CardContent className="p-4 grid md:grid-cols-3 gap-3">

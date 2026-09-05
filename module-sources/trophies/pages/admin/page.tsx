@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, Textarea, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, Textarea, useConfirm, useFormRoute, NativeSelect, CheckboxField } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import {
     ArrowLeft,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface AdminTrophy {
     id: string;
@@ -228,19 +229,12 @@ export default function AdminTrophiesPage() {
     if (showForm) {
         return (
             <div>
-                <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-xl font-semibold">
-                            {editing ? t("editTrophy") : t("newTrophy")}
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            {t("adm_description")}
-                        </p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-1" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={editing ? t("editTrophy") : t("newTrophy")}
+                    description={t("adm_description")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -344,18 +338,12 @@ export default function AdminTrophiesPage() {
                                     {t("thresholdHint")}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="trophy-active"
-                                    type="checkbox"
-                                    checked={form.isActive}
-                                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                                    className="w-4 h-4"
-                                />
-                                <Label htmlFor="trophy-active" className="m-0 cursor-pointer">
-                                    {t("activeLabel")}
-                                </Label>
-                            </div>
+                            <CheckboxField
+                                id="trophy-active"
+                                checked={form.isActive}
+                                onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                                label={t("activeLabel")}
+                            />
                         </div>
                         <div className="flex justify-end gap-2 pt-4 border-t border-border mt-4">
                             <Button variant="outline" onClick={closeForm} disabled={saving}>
@@ -364,7 +352,7 @@ export default function AdminTrophiesPage() {
                             <Button onClick={handleSave} disabled={saving}>
                                 {saving ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin mr-1" /> {t("saving")}
+                                        <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                                     </>
                                 ) : editing ? (
                                     t("saveChanges")
@@ -381,19 +369,15 @@ export default function AdminTrophiesPage() {
 
     return (
         <div>
-            <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("adm_description")}
-                    </p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-1" /> {tc("common_add")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("title")}
+                description={t("adm_description")}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {tc("common_add")}</Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardHeader>

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, ShieldCheck, ShieldOff, KeyRound, RefreshCw } from "lucide-react";
+import { copyText } from "@/core/sdk";
 
 type Step = "idle" | "setup" | "verify" | "backup" | "regenerated";
 
@@ -182,12 +183,8 @@ export function ProfileSecurityTab() {
     };
 
     const copyCodes = async () => {
-        try {
-            await navigator.clipboard.writeText(backupCodes.join("\n"));
-            toast.success(t("codesCopied"));
-        } catch {
-            toast.error(t("setupError"));
-        }
+        if (await copyText(backupCodes.join("\n"))) toast.success(t("codesCopied"));
+        else toast.error(t("setupError"));
     };
 
     const changePassword = async (e: React.FormEvent) => {
@@ -275,7 +272,7 @@ export function ProfileSecurityTab() {
                             <p className="text-sm text-muted-foreground">{t("description")}</p>
                             <Button onClick={startSetup} disabled={actionLoading}>
                                 {actionLoading ? (
-                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : null}
                                 {t("enable")}
                             </Button>
@@ -308,7 +305,7 @@ export function ProfileSecurityTab() {
                             <div className="flex gap-2">
                                 <Button onClick={verifyAndEnable} disabled={actionLoading}>
                                     {actionLoading ? (
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : null}
                                     {t("verifyAndEnable")}
                                 </Button>
@@ -417,9 +414,9 @@ export function ProfileSecurityTab() {
                                         disabled={actionLoading || (!credentialToken && !credentialPassword)}
                                     >
                                         {actionLoading ? (
-                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                         ) : (
-                                            <RefreshCw className="w-4 h-4 mr-2" />
+                                            <RefreshCw className="w-4 h-4" />
                                         )}
                                         {t("regenerateCodes")}
                                     </Button>
@@ -488,7 +485,7 @@ export function ProfileSecurityTab() {
                         </div>
                         <Button type="submit" disabled={savingPassword}>
                             {savingPassword ? (
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 t("changePassword")
                             )}

@@ -11,6 +11,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { Link } from "@/core/lib/i18n/navigation";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface ApiKeyItem {
     id: string;
@@ -53,17 +54,17 @@ export default function ApiKeysPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("apiKeys_title")}</h1>
-                    <p className="text-muted-foreground">{t("apiKeys_subtitle")}</p>
-                </div>
-                <Link href="/admin/api-keys/new" className="inline-flex">
-                    <Button>
-                        <Plus className="w-4 h-4 mr-2" /> {t("apiKeys_newKey")}
-                    </Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("apiKeys_title")}
+                description={t("apiKeys_subtitle")}
+                actions={<>
+                    <Link href="/admin/api-keys/new" className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("apiKeys_newKey")}
+                        </Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-0">

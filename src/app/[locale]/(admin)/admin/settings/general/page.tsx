@@ -9,6 +9,7 @@ import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface FieldDef {
     key: string;
@@ -103,10 +104,10 @@ export default function GeneralSettingsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-xl font-semibold">{t("generalSettings_title")}</h1>
-                <p className="text-muted-foreground">{t("generalSettings_subtitle")}</p>
-            </div>
+            <AdminPageHeader
+                title={t("generalSettings_title")}
+                description={t("generalSettings_subtitle")}
+            />
 
             <form onSubmit={handleSave}>
                 <div className="grid lg:grid-cols-2 gap-6">
@@ -140,9 +141,9 @@ export default function GeneralSettingsPage() {
                 <div className="mt-6">
                     <Button type="submit" disabled={saving}>
                         {saving ? (
-                            <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generalSettings_saving")}</>
+                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("generalSettings_saving")}</>
                         ) : (
-                            <><Check className="w-4 h-4 mr-2" /> {t("generalSettings_saveSettings")}</>
+                            <><Check className="w-4 h-4" /> {t("generalSettings_saveSettings")}</>
                         )}
                     </Button>
                 </div>

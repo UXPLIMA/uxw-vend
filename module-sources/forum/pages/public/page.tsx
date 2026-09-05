@@ -104,7 +104,7 @@ export default function ForumPage() {
                     </div>
                     <Link href="/forum/new">
                         <Button>
-                            <Plus className="w-4 h-4 mr-2" /> {t('newTopic')}
+                            <Plus className="w-4 h-4" /> {t('newTopic')}
                         </Button>
                     </Link>
                 </div>

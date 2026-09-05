@@ -13,6 +13,8 @@ export { Button } from "@/core/components/ui/button";
 export { Badge, badgeClassName } from "@/core/components/ui/badge";
 export type { BadgeTone } from "@/core/components/ui/badge";
 export { Card, CardHeader, CardTitle, CardContent } from "@/core/components/ui/card";
+export { Checkbox, CheckboxField } from "@/core/components/ui/checkbox";
+export type { CheckboxProps, CheckboxFieldProps } from "@/core/components/ui/checkbox";
 export { Input } from "@/core/components/ui/input";
 export { Label } from "@/core/components/ui/label";
 export { Textarea } from "@/core/components/ui/textarea";

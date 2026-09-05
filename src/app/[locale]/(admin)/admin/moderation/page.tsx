@@ -16,6 +16,8 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { writeError } from "@/core/lib/write-result";
+import { Checkbox } from "@/core/components/ui/checkbox";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 interface ModerationItem {
     id: string;
@@ -241,16 +243,10 @@ export default function ModerationPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-xl font-semibold">
-                        {t("sidebar_moderationQueue")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t("moderation_description")}
-                    </p>
-                </div>
-            </div>
+            <AdminPageHeader
+                title={t("sidebar_moderationQueue")}
+                description={t("moderation_description")}
+            />
 
             <div className="flex flex-wrap gap-2 mb-4">
                 <button
@@ -267,7 +263,7 @@ export default function ModerationPage() {
                     {t("moderation_all")}
                     {totalAll > 0 && (
                         <span
-                            className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${activeTab === "all"
+                            className={`px-1.5 py-0.5 rounded text-[10px] ${activeTab === "all"
                                 ? "bg-primary-foreground/20"
                                 : "bg-background text-foreground"
                                 }`}
@@ -295,7 +291,7 @@ export default function ModerationPage() {
                             {typeLabel(id)}
                             {count > 0 && (
                                 <span
-                                    className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${isActive
+                                    className={`px-1.5 py-0.5 rounded text-[10px] ${isActive
                                         ? "bg-primary-foreground/20"
                                         : "bg-background text-foreground"
                                         }`}
@@ -312,12 +308,10 @@ export default function ModerationPage() {
                 <CardContent className="p-0">
                     {items.length > 0 && (
                         <div className="flex items-center gap-3 p-3 border-b bg-muted/40">
-                            <input
-                                type="checkbox"
+                            <Checkbox
                                 checked={selected.size === items.length && items.length > 0}
                                 onChange={toggleAll}
                                 aria-label={t("common_selectAll")}
-                                className="w-4 h-4"
                             />
                             <span className="text-xs text-muted-foreground flex-1">
                                 {selected.size > 0
@@ -331,7 +325,7 @@ export default function ModerationPage() {
                                         disabled={working}
                                         onClick={() => handleBulk("approve")}
                                     >
-                                        <Check className="w-3 h-3 mr-1" /> {t("moderation_approve")}
+                                        <Check className="w-3 h-3" /> {t("moderation_approve")}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -339,7 +333,7 @@ export default function ModerationPage() {
                                         disabled={working}
                                         onClick={() => handleBulk("reject")}
                                     >
-                                        <X className="w-3 h-3 mr-1" /> {t("moderation_reject")}
+                                        <X className="w-3 h-3" /> {t("moderation_reject")}
                                     </Button>
                                 </div>
                             )}
@@ -357,12 +351,11 @@ export default function ModerationPage() {
                         <div className="divide-y">
                             {items.map((item) => (
                                 <div key={`${item.type}:${item.id}`} className="p-4 flex items-start gap-3">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         checked={selected.has(item.id)}
                                         onChange={() => toggleOne(item.id)}
                                         aria-label={t("common_selectRow")}
-                                        className="w-4 h-4 mt-1"
+                                        className="mt-0.5"
                                     />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1 flex-wrap">

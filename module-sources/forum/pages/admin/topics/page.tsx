@@ -8,6 +8,7 @@ import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "
 import { toast } from "sonner";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { writeError } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Topic {
     id: string;
@@ -107,10 +108,10 @@ export default function AdminForumTopicsPage() {
 
     return (
         <>
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold">{t("adm_forumTopics")}</h1>
-                <p className="text-muted-foreground">{t("adm_topicsTotal", { count: total })}</p>
-            </div>
+            <AdminPageHeader
+                title={t("adm_forumTopics")}
+                description={t("adm_topicsTotal", { count: total })}
+            />
 
             <Card>
                 <CardHeader>

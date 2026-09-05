@@ -7,6 +7,8 @@ import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFor
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Gift, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import { copyText } from "@/core/sdk";
+import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface GiftCode {
     id: string;
@@ -94,8 +96,8 @@ export default function GiftCodesPage() {
         }
     };
 
-    const copyCode = (code: string, id: string) => {
-        navigator.clipboard.writeText(code);
+    const copyCode = async (code: string, id: string) => {
+        if (!(await copyText(code))) return;
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
     };
@@ -105,15 +107,12 @@ export default function GiftCodesPage() {
     if (showForm) {
         return (
             <>
-                <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                    <div>
-                        <h1 className="text-3xl font-bold">{t("adm_generateGiftCodes")}</h1>
-                        <p className="text-muted-foreground">{t("adm_giftCodes")}</p>
-                    </div>
-                    <Button variant="outline" onClick={closeForm}>
-                        <ArrowLeft className="w-4 h-4 mr-2" /> {commonT("back")}
-                    </Button>
-                </div>
+                <AdminPageHeader
+                    title={t("adm_generateGiftCodes")}
+                    description={t("adm_giftCodes")}
+                    onBack={closeForm}
+                    backLabel={commonT("back")}
+                />
 
                 <Card>
                     <CardContent className="p-6">
@@ -134,7 +133,7 @@ export default function GiftCodesPage() {
                             </div>
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Gift className="w-4 h-4 mr-2" />}
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />}
                                     {t("adm_generateCodes", { count: parseInt(count) || 1 })}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
@@ -150,15 +149,15 @@ export default function GiftCodesPage() {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-8 gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("adm_giftCodes")}</h1>
-                    <p className="text-muted-foreground">{t("adm_codesTotal", { total: codes.length, available: codes.filter(c => !c.isRedeemed).length })}</p>
-                </div>
-                <Link href={formHref()} className="inline-flex">
-                    <Button><Plus className="w-4 h-4 mr-2" /> {t("adm_generate")}</Button>
-                </Link>
-            </div>
+            <AdminPageHeader
+                title={t("adm_giftCodes")}
+                description={t("adm_codesTotal", { total: codes.length, available: codes.filter(c => !c.isRedeemed).length })}
+                actions={<>
+                    <Link href={formHref()} className="inline-flex">
+                        <Button><Plus className="w-4 h-4" /> {t("adm_generate")}</Button>
+                    </Link>
+                </>}
+            />
 
             <Card>
                 <CardContent className="p-0">
