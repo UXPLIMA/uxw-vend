@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -20,7 +20,8 @@
   "routes": [
     {
       "path": "/downloads",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.downloads"
     }
   ],
   "adminRoutes": [
@@ -109,6 +110,9 @@
       },
       "activity": {
         "fileDownloaded": "downloaded"
+      },
+      "pageTitles": {
+        "downloads": "Downloads"
       }
     },
     "tr": {
@@ -172,6 +176,9 @@
       },
       "activity": {
         "fileDownloaded": "indirdi:"
+      },
+      "pageTitles": {
+        "downloads": "İndirmeler"
       }
     }
   },

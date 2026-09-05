@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -13,7 +13,8 @@
   "routes": [
     {
       "path": "/punishments",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.punishments"
     }
   ],
   "adminRoutes": [
@@ -121,6 +122,9 @@
       },
       "nav": {
         "punishments": "Punishments"
+      },
+      "pageTitles": {
+        "punishments": "Punishments"
       }
     },
     "tr": {
@@ -182,6 +186,9 @@
         "server": "Sunucu"
       },
       "nav": {
+        "punishments": "Cezalar"
+      },
+      "pageTitles": {
         "punishments": "Cezalar"
       }
     }

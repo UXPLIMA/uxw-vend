@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -13,7 +13,8 @@
   "routes": [
     {
       "path": "/suggestions",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.suggestions"
     }
   ],
   "adminRoutes": [
@@ -137,6 +138,9 @@
       },
       "nav": {
         "suggestions": "Suggestions"
+      },
+      "pageTitles": {
+        "suggestions": "Suggestions"
       }
     },
     "tr": {
@@ -202,6 +206,9 @@
         "suggestionCreated": "öneri gönderdi:"
       },
       "nav": {
+        "suggestions": "Öneriler"
+      },
+      "pageTitles": {
         "suggestions": "Öneriler"
       }
     }

@@ -2,7 +2,7 @@
   "id": "steam-auth",
   "name": "Steam Login",
   "description": "Allow users to sign in with their Steam account",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -16,7 +16,8 @@
   "routes": [
     {
       "path": "/auth/steam",
-      "component": "pages/auth/steam/page.tsx"
+      "component": "pages/auth/steam/page.tsx",
+      "titleKey": "pageTitles.steam"
     }
   ],
   "api": [
@@ -82,6 +83,9 @@
         "adm_realmLabel": "Domain",
         "adm_realmHelp": "The site name Steam shows on its approval screen. This is the domain you register the API key against.",
         "adm_emailNote": "Steam never shares an email address, so an account created this way gets a placeholder one that can never receive mail. Ask these users to set a real address in their profile."
+      },
+      "pageTitles": {
+        "steam": "Steam Sign-in"
       }
     },
     "tr": {
@@ -98,6 +102,9 @@
         "adm_realmLabel": "Alan adı",
         "adm_realmHelp": "Steam'in onay ekranında gösterdiği site adı. API anahtarını bu alan adına kaydedersiniz.",
         "adm_emailNote": "Steam hiçbir zaman e-posta adresi paylaşmaz, bu yüzden bu yolla açılan hesaba posta alamayan geçici bir adres atanır. Bu kullanıcılardan profillerinde gerçek bir adres tanımlamalarını isteyin."
+      },
+      "pageTitles": {
+        "steam": "Steam ile Giriş"
       }
     }
   }

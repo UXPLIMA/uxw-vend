@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -20,7 +20,8 @@
   "routes": [
     {
       "path": "/wheel",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.wheel"
     }
   ],
   "adminRoutes": [
@@ -106,6 +107,9 @@
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
         "menu_wheel_wheel_prizes": "Wheel Prizes"
+      },
+      "pageTitles": {
+        "wheel": "Wheel"
       }
     },
     "tr": {
@@ -150,6 +154,9 @@
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_wheel_wheel_prizes": "Çark Ödülleri"
+      },
+      "pageTitles": {
+        "wheel": "Çark"
       }
     }
   },

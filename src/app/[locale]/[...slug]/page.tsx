@@ -7,7 +7,8 @@ import { ModuleRoutes } from "@/core/generated/module-registry";
 import { ModuleRouteResolvers } from "@/core/generated/module-route-resolvers";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
-import { moduleRouteTitle } from "@/core/lib/route-title";
+import { resolveRouteTitle } from "@/core/lib/route-title";
+import { getMessages } from "@/core/lib/i18n/translation-service";
 
 /**
  * Ask the module whether the URL names anything, when it declared a way to ask.
@@ -53,12 +54,21 @@ interface PageProps {
  * still get full data.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { slug } = await params;
+    const { slug, locale } = await params;
     const match = matchModuleRoute(slug);
     const route = match ? ModuleRoutes.find((r) => r.key === match.key) : undefined;
 
+    // Only for a route that declared a name; the fallback needs no catalogue.
+    const messages = route?.titleKey ? await getMessages(locale).catch(() => null) : null;
+
     const meta = await buildPageMeta({
-        title: moduleRouteTitle(slug, route?.path, route?.titleFromPath),
+        title: resolveRouteTitle({
+            slug,
+            routePattern: route?.path,
+            titleFromPath: route?.titleFromPath,
+            titleKey: route?.titleKey,
+            messages,
+        }),
         url: "/" + (slug?.join("/") || ""),
         type: "article",
     });

@@ -2,7 +2,7 @@
   "id": "in-app-notifications",
   "name": "In-App Notifications",
   "description": "In-app notification system with bell icon",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -17,7 +17,8 @@
   "routes": [
     {
       "path": "/notifications",
-      "component": "pages/public/notifications/page.tsx"
+      "component": "pages/public/notifications/page.tsx",
+      "titleKey": "pageTitles.notifications"
     }
   ],
   "api": [
@@ -56,6 +57,9 @@
         "soundEnabled": "Notification Sound",
         "saved": "Notification settings saved",
         "saveError": "Failed to save notification settings"
+      },
+      "pageTitles": {
+        "notifications": "Notifications"
       }
     },
     "tr": {
@@ -86,6 +90,9 @@
         "soundEnabled": "Bildirim Sesi",
         "saved": "Bildirim ayarları kaydedildi",
         "saveError": "Bildirim ayarları kaydedilemedi"
+      },
+      "pageTitles": {
+        "notifications": "Bildirimler"
       }
     }
   },

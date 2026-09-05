@@ -2,7 +2,7 @@
   "id": "custom-pages",
   "name": "Custom Pages",
   "description": "Admin-created HTML content pages",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "content",
   "author": "uxwVend",
@@ -11,7 +11,8 @@
     {
       "path": "/page/[slug]",
       "component": "pages/public/[slug]/page.tsx",
-      "resolver": "lib/route-exists.ts"
+      "resolver": "lib/route-exists.ts",
+      "titleKey": "pageTitles.page"
     }
   ],
   "adminRoutes": [
@@ -114,6 +115,9 @@
         "noPagesYet": "No pages yet",
         "draft": "Draft",
         "menu_custom-pages_custom_pages": "Custom Pages"
+      },
+      "pageTitles": {
+        "page": "Page"
       }
     },
     "tr": {
@@ -186,6 +190,9 @@
         "noPagesYet": "Henüz sayfa yok",
         "draft": "Taslak",
         "menu_custom-pages_custom_pages": "Özel Sayfalar"
+      },
+      "pageTitles": {
+        "page": "Sayfa"
       }
     }
   },

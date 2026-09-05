@@ -1603,6 +1603,66 @@ function checkErasureIsDeclared(modulePath: string): CheckResult {
     return { name, passed: true, message: `${tables.length} table(s), ${purged} purged on erasure` };
 }
 
+/**
+ * A page core renders for a module has to be named in the visitor's language.
+ *
+ * A module page is a component in a registry, not a route segment file, so it
+ * cannot export `generateMetadata` and core titles it. Core built that title
+ * from the route pattern, which is a URL and is therefore written once, in
+ * English: a Turkish visitor reading "Mağaza" under the heading had "Store"
+ * in the browser tab and in the search result, and `/store/vip` was titled
+ * "Vip", which is not a word in either language. A route now declares
+ * `titleKey`, and it has to resolve in every locale the module ships.
+ */
+function checkRouteTitlesAreTranslated(modulePath: string): CheckResult {
+    const name = "Route titles are translated";
+    const manifestPath = path.join(modulePath, "module.json");
+    if (!fs.existsSync(manifestPath)) return { name, passed: true, message: "No manifest" };
+
+    let manifest: {
+        routes?: Array<{ path: string; titleKey?: string; titleFromPath?: boolean }>;
+        translations?: Record<string, Record<string, Record<string, string>>>;
+    };
+    try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    } catch {
+        return { name, passed: true, message: "Manifest unparseable (reported above)" };
+    }
+
+    const routes = manifest.routes ?? [];
+    if (routes.length === 0) return { name, passed: true, message: "Renders no pages" };
+
+    const locales = Object.keys(manifest.translations ?? {});
+    const problems: string[] = [];
+    for (const route of routes) {
+        if (!route.titleKey) {
+            // `titleFromPath` names the page from the resource the URL
+            // identifies, which is the resource's own words already.
+            if (route.titleFromPath) continue;
+            problems.push(`${route.path} has no titleKey`);
+            continue;
+        }
+        const [namespace, ...rest] = route.titleKey.split(".");
+        const key = rest.join(".");
+        for (const locale of locales) {
+            const value = manifest.translations?.[locale]?.[namespace]?.[key];
+            if (typeof value !== "string" || !value.trim()) {
+                problems.push(`${route.path}: ${route.titleKey} missing for ${locale}`);
+            }
+        }
+    }
+
+    if (problems.length > 0) {
+        return {
+            name,
+            passed: false,
+            message: `${problems.length} problem(s):\n      ${problems.join("\n      ")}`,
+            suggestion: 'Give each route a "titleKey" of the form "namespace.key" and ship that key in every locale, or set "titleFromPath" where the URL names the resource itself.',
+        };
+    }
+    return { name, passed: true, message: `${routes.length} page(s) named in ${locales.length} locale(s)` };
+}
+
 function checkModuleFetchPaths(modulePath: string): CheckResult {
     const name = "Fetched API paths exist";
     const manifestPath = path.join(modulePath, "module.json");
@@ -1864,6 +1924,7 @@ function validateOne(modulePath: string, verbose: boolean, withTypeScript = true
         checkModuleFetchPaths(modulePath),
         checkApiAliasesAgree(modulePath),
         checkErasureIsDeclared(modulePath),
+        checkRouteTitlesAreTranslated(modulePath),
         checkSecretChecksLimited(modulePath),
         checkProviderCallbacksVerify(modulePath),
         checkTitleFromPathIsEarned(modulePath),

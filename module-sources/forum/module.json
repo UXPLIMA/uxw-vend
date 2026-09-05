@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -54,16 +54,19 @@
   "routes": [
     {
       "path": "/forum",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.forum"
     },
     {
       "path": "/forum/topic/[...params]",
       "component": "pages/public/topic/[...params]/page.tsx",
-      "resolver": "lib/route-exists.ts"
+      "resolver": "lib/route-exists.ts",
+      "titleKey": "pageTitles.topic"
     },
     {
       "path": "/forum/new",
-      "component": "pages/public/new/page.tsx"
+      "component": "pages/public/new/page.tsx",
+      "titleKey": "pageTitles.newTopic"
     }
   ],
   "adminRoutes": [
@@ -281,6 +284,11 @@
       "activity": {
         "forumTopicCreated": "started a new topic:",
         "forumPostCreated": "replied to:"
+      },
+      "pageTitles": {
+        "forum": "Forum",
+        "topic": "Topic",
+        "newTopic": "New Topic"
       }
     },
     "tr": {
@@ -407,6 +415,11 @@
       "activity": {
         "forumTopicCreated": "yeni konu açtı:",
         "forumPostCreated": "yanıt verdi:"
+      },
+      "pageTitles": {
+        "forum": "Forum",
+        "topic": "Konu",
+        "newTopic": "Yeni Konu"
       }
     }
   },

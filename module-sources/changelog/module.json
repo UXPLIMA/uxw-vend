@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -20,7 +20,8 @@
   "routes": [
     {
       "path": "/changelog",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.changelog"
     }
   ],
   "adminRoutes": [
@@ -111,6 +112,9 @@
       },
       "activity": {
         "changelogEntryPublished": "changelog"
+      },
+      "pageTitles": {
+        "changelog": "Changelog"
       }
     },
     "tr": {
@@ -168,6 +172,9 @@
       },
       "activity": {
         "changelogEntryPublished": "değişiklik günlüğü"
+      },
+      "pageTitles": {
+        "changelog": "Değişiklikler"
       }
     }
   },

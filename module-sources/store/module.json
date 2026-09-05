@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -129,26 +129,31 @@
   "routes": [
     {
       "path": "/store",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.store"
     },
     {
       "path": "/store/cart",
       "component": "pages/public/cart/page.tsx",
-      "noindex": true
+      "noindex": true,
+      "titleKey": "pageTitles.cart"
     },
     {
       "path": "/store/product/[...params]",
       "component": "pages/public/product/[...params]/page.tsx",
-      "resolver": "lib/route-exists.ts"
+      "resolver": "lib/route-exists.ts",
+      "titleKey": "pageTitles.product"
     },
     {
       "path": "/store/order-success",
       "component": "pages/public/order-success/page.tsx",
-      "noindex": true
+      "noindex": true,
+      "titleKey": "pageTitles.orderSuccess"
     },
     {
       "path": "/store/vip",
-      "component": "pages/public/vip/page.tsx"
+      "component": "pages/public/vip/page.tsx",
+      "titleKey": "pageTitles.vip"
     }
   ],
   "adminRoutes": [
@@ -1056,6 +1061,13 @@
       },
       "activity": {
         "storeOrderCompleted": "purchased:"
+      },
+      "pageTitles": {
+        "store": "Store",
+        "cart": "Cart",
+        "product": "Product",
+        "orderSuccess": "Order Complete",
+        "vip": "VIP"
       }
     },
     "tr": {
@@ -1620,6 +1632,13 @@
       },
       "activity": {
         "storeOrderCompleted": "satın aldı:"
+      },
+      "pageTitles": {
+        "store": "Mağaza",
+        "cart": "Sepet",
+        "product": "Ürün",
+        "orderSuccess": "Sipariş Tamamlandı",
+        "vip": "VIP"
       }
     }
   },

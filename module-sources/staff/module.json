@@ -2,7 +2,7 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend",
@@ -25,7 +25,8 @@
   "routes": [
     {
       "path": "/staff",
-      "component": "pages/public/page.tsx"
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.staff"
     }
   ],
   "adminRoutes": [
@@ -155,6 +156,9 @@
         "adminNote": "Admin note",
         "menu_staff_staff_applications": "Staff Applications",
         "menu_staff_staff_members": "Staff Members"
+      },
+      "pageTitles": {
+        "staff": "Staff"
       }
     },
     "tr": {
@@ -241,6 +245,9 @@
         "adminNote": "Yönetici notu",
         "menu_staff_staff_applications": "Personel Başvuruları",
         "menu_staff_staff_members": "Personel Üyeleri"
+      },
+      "pageTitles": {
+        "staff": "Ekip"
       }
     }
   },

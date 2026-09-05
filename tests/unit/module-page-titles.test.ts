@@ -144,8 +144,12 @@ describe("the catch-all that renders module pages", () => {
         "utf8",
     );
 
-    it("asks moduleRouteTitle rather than reaching into the slug itself", () => {
-        expect(page).toContain("moduleRouteTitle(slug, route?.path, route?.titleFromPath)");
+    it("asks the title resolver rather than reaching into the slug itself", () => {
+        // resolveRouteTitle wraps moduleRouteTitle: same rule about when a URL
+        // may name a page, plus the module's own translated name where it
+        // declared one. See a-page-title-speaks-the-visitors-language.test.ts.
+        expect(page).toContain("resolveRouteTitle({");
+        expect(page).toContain("titleFromPath: route?.titleFromPath");
         expect(page).not.toMatch(/slug\[slug\.length - 1\]/);
     });
 
