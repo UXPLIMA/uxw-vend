@@ -55,12 +55,12 @@ describe("hook payload registry", () => {
     });
 
     it("types declared filters and infers undeclared ones", () => {
-        addFilter("page.title", (title) => `${title} | Site`);
-        const titled = applyFilters("page.title", "Home");
-        expect(titled).toBe("Home | Site");
+        addFilter("email.subject", (subject) => `${subject} | Site`);
+        const titled = applyFilters("email.subject", "Welcome", { to: "a@b.c" });
+        expect(titled).toBe("Welcome | Site");
 
-        // @ts-expect-error - "page.title" is declared as string
-        applyFilters("page.title", 123);
+        // @ts-expect-error - "email.subject" is declared as string
+        applyFilters("email.subject", 123, { to: "a@b.c" });
 
         // Undeclared name: the value type comes from the argument.
         const n: number = applyFilters("ad.hoc.chain", 5);

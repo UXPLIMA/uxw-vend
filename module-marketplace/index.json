@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T04:49:39Z",
+  "updatedAt": "2026-09-05T05:22:54Z",
   "modules": [
     {
       "id": "announcements",
@@ -2282,13 +2282,13 @@
       "id": "two-factor-auth",
       "name": "Two-Factor Authentication",
       "description": "TOTP-based 2FA with backup codes for enhanced account security",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T05:22:54Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2301,7 +2301,9 @@
           "user.2fa.disabled",
           "user.2fa.enabled"
         ],
-        "listens": []
+        "listens": [
+          "user.deleted"
+        ]
       },
       "stats": {
         "publicRoutes": 0,

@@ -56,6 +56,17 @@ interface UxwVendHookPayloads {
     };
     "user.warning.threshold": { userId: string; points: number; threshold: number };
 
+    /** An admin changed somebody else's account from the users screen. */
+    "user.updated": { userId: string; changes: Record<string, unknown> };
+    "user.banned": { userId: string; banned: boolean; reason: string | null };
+    /**
+     * The account has been anonymised under the right to be forgotten. Fired
+     * after core has purged what it and the manifests know about, so a
+     * listener is the last chance to clear anything else the module keeps -
+     * a column it added to `User`, a cache, a file on disk.
+     */
+    "user.deleted": { userId: string; reason: string | null };
+
     "module.installed": { moduleId: string };
     "module.uninstalled": { moduleId: string };
     "module.enabled": { moduleId: string };
@@ -66,11 +77,6 @@ interface UxwVendHookPayloads {
  * The same registry for filters: the value that flows through the chain.
  */
 interface UxwVendFilterPayloads {
-    "page.title": string;
-    "page.meta": Record<string, string>;
-    "navbar.links": Array<{ href: string; label: string }>;
-    "footer.links": Array<{ href: string; label: string }>;
-    "admin.sidebar": Array<{ href: string; label: string; icon?: string }>;
     "email.subject": string;
     "email.body": string;
 
@@ -104,4 +110,9 @@ interface UxwVendFilterContexts {
         fields: Record<string, string>;
         ip: string | null;
     };
+
+    /** Who the message is going to, before it reaches the provider. */
+    "email.subject": { to: string };
+    /** The same, plus the subject as the subject filter left it. */
+    "email.body": { to: string; subject: string };
 }

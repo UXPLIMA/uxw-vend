@@ -147,6 +147,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             }).catch(() => {});
         }
 
+        // Modules that mirror an account elsewhere (a game server whitelist,
+        // a Discord role) need to hear about an admin editing it. Both are
+        // fire-and-forget: a listener must not be able to fail a write that
+        // has already happened.
+        import("@/core/lib/hooks")
+            .then(async ({ doActionAsync, HookNames }) => {
+                await doActionAsync(HookNames.USER_UPDATED, { userId: id, changes: { ...data } });
+                if (fields.isBanned !== undefined) {
+                    await doActionAsync(HookNames.USER_BANNED, {
+                        userId: id,
+                        banned: fields.isBanned,
+                        reason: fields.isBanned ? (fields.banReason || null) : null,
+                    });
+                }
+            })
+            .catch(() => {});
+
         return NextResponse.json({ user });
     } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
