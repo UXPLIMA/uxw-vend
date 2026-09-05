@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { RichTextEditor } from "@/core/components/ui/rich-text-editor";
@@ -31,6 +32,7 @@ export default function BroadcastsPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
     const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
+    const paged = usePagedRows(broadcasts);
     const [loading, setLoading] = useState(true);
     const [composing, setComposing] = useState(false);
     const [subject, setSubject] = useState("");
@@ -186,7 +188,7 @@ export default function BroadcastsPage() {
                 <Card><CardContent className="py-12 text-center text-muted-foreground">{t("broadcasts_noBroadcasts")}</CardContent></Card>
             ) : (
                 <div className="space-y-2">
-                    {broadcasts.map((b) => (
+                    {paged.rows.map((b) => (
                         <Card key={b.id}>
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="flex-1 min-w-0">
@@ -219,6 +221,13 @@ export default function BroadcastsPage() {
                             </CardContent>
                         </Card>
                     ))}
+                    <Pagination
+                        page={paged.page}
+                        pages={paged.pages}
+                        total={paged.total}
+                        onPageChange={paged.setPage}
+                        className="border-t-0"
+                    />
                 </div>
             )}
         </>

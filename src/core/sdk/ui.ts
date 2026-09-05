@@ -22,7 +22,9 @@ export {
     SelectItem,
 } from "@/core/components/ui/select";
 export { NativeSelect } from "@/core/components/ui/native-select";
+export { Pagination } from "@/core/components/ui/pagination";
 export type { NativeSelectProps } from "@/core/components/ui/native-select";
+export type { PaginationProps } from "@/core/components/ui/pagination";
 export { Skeleton } from "@/core/components/ui/skeleton";
 export { useConfirm } from "@/core/components/ui/confirm-dialog";
 

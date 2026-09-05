@@ -7,8 +7,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { formatDate } from "@/core/lib/utils";
-import { Button } from "@/core/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Pagination } from "@/core/components/ui/pagination";
 import { UserRoleSelect } from "./role-select";
 import { dateLocaleTag } from "@/core/lib/utils";
 
@@ -58,8 +57,6 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
     const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const page = Math.min(requestedPage, pageCount);
-    const prevPage = page > 1 ? page - 1 : null;
-    const nextPage = page < pageCount ? page + 1 : null;
 
     return (
         <>
@@ -122,41 +119,12 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
                         </div>
                     )}
 
-                    {pageCount > 1 && (
-                        <div className="flex items-center justify-between gap-4 pt-4 mt-4 border-t">
-                            <p className="text-sm text-muted-foreground">
-                                {t("users_pageOf", { page, total: pageCount })}
-                            </p>
-                            <div className="flex gap-2">
-                                {prevPage ? (
-                                    <Link href={`/admin/users?page=${prevPage}`}>
-                                        <Button variant="outline" size="sm">
-                                            <ChevronLeft className="w-4 h-4 mr-1" />
-                                            {t("users_prev")}
-                                        </Button>
-                                    </Link>
-                                ) : (
-                                    <Button variant="outline" size="sm" disabled>
-                                        <ChevronLeft className="w-4 h-4 mr-1" />
-                                        {t("users_prev")}
-                                    </Button>
-                                )}
-                                {nextPage ? (
-                                    <Link href={`/admin/users?page=${nextPage}`}>
-                                        <Button variant="outline" size="sm">
-                                            {t("users_next")}
-                                            <ChevronRight className="w-4 h-4 ml-1" />
-                                        </Button>
-                                    </Link>
-                                ) : (
-                                    <Button variant="outline" size="sm" disabled>
-                                        {t("users_next")}
-                                        <ChevronRight className="w-4 h-4 ml-1" />
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                    <Pagination
+                        page={page}
+                        pages={pageCount}
+                        total={total}
+                        hrefFor={(n) => `/admin/users?page=${n}`}
+                    />
                 </CardContent>
             </Card>
         </>

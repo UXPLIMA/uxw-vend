@@ -6,6 +6,7 @@ import { Link } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Loader2, FileText, Trash2, Upload, X, Search, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -213,13 +214,7 @@ export default function MediaLibraryPage() {
                 </div>
             )}
 
-            {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-6">
-                    <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>{t("common_prev")}</Button>
-                    <span className="text-sm text-muted-foreground">{t("media_page")} {page} / {totalPages}</span>
-                    <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>{t("common_next")}</Button>
-                </div>
-            )}
+            <Pagination page={page} pages={totalPages} onPageChange={setPage} className="mt-6" />
 
             {/* Detail panel */}
             {selected && (

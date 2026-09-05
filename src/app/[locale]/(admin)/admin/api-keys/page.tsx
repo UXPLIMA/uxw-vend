@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Trash2, Copy, Check, Key } from "lucide-react";
@@ -27,6 +28,7 @@ export default function ApiKeysPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
     const [keys, setKeys] = useState<ApiKeyItem[]>([]);
+    const paged = usePagedRows(keys);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [name, setName] = useState("");
@@ -127,7 +129,7 @@ export default function ApiKeysPage() {
                         <p className="text-muted-foreground text-center py-8">{t("apiKeys_noKeys")}</p>
                     ) : (
                         <div className="divide-y">
-                            {keys.map((k) => (
+                            {paged.rows.map((k) => (
                                 <div key={k.id} className="flex items-center justify-between p-4">
                                     <div className="flex items-center gap-3">
                                         <Key className="w-4 h-4 text-muted-foreground" />
@@ -146,6 +148,12 @@ export default function ApiKeysPage() {
                             ))}
                         </div>
                     )}
+                    <Pagination
+                        page={paged.page}
+                        pages={paged.pages}
+                        total={paged.total}
+                        onPageChange={paged.setPage}
+                    />
                 </CardContent>
             </Card>
         </>

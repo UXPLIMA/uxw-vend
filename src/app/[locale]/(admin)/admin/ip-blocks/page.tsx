@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
@@ -29,6 +30,7 @@ export default function IpBlocksPage() {
     const commonT = useTranslations("common");
 
     const [blocks, setBlocks] = useState<IpBlock[]>([]);
+    const paged = usePagedRows(blocks);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -235,7 +237,7 @@ export default function IpBlocksPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                    {blocks.map((b) => {
+                                    {paged.rows.map((b) => {
                                         const expired = b.expiresAt && new Date(b.expiresAt).getTime() < Date.now();
                                         return (
                                             <tr key={b.id}>
@@ -274,6 +276,12 @@ export default function IpBlocksPage() {
                             </table>
                         </div>
                     )}
+                    <Pagination
+                        page={paged.page}
+                        pages={paged.pages}
+                        total={paged.total}
+                        onPageChange={paged.setPage}
+                    />
                 </CardContent>
             </Card>
         </>

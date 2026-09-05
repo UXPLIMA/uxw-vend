@@ -4,12 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import {
     Check,
     X,
     Loader2,
-    ChevronLeft,
-    ChevronRight,
     ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -420,32 +419,8 @@ export default function ModerationPage() {
                             ))}
                         </div>
                     )}
-                    {pages > 1 && activeTab !== "all" && (
-                        <div className="flex items-center justify-between p-3 border-t">
-                            <span className="text-xs text-muted-foreground">
-                                {t("moderation_pageOf", { total, page, pages })}
-                            </span>
-                            <div className="flex gap-1">
-                                <Button
-                                    aria-label={commonT("previousPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    <ChevronLeft className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                    aria-label={commonT("nextPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page >= pages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    <ChevronRight className="w-3 h-3" />
-                                </Button>
-                            </div>
-                        </div>
+                    {activeTab !== "all" && (
+                        <Pagination page={page} pages={pages} total={total} onPageChange={setPage} />
                     )}
                 </CardContent>
             </Card>

@@ -5,12 +5,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { downloadFromUrl } from "@/core/lib/download";
 import { dateLocaleTag } from "@/core/lib/utils";
 import {
-    ChevronLeft,
-    ChevronRight,
     Download,
     Loader2,
     Filter as FilterIcon,
@@ -148,7 +147,6 @@ export default function AuditLogPage() {
     const t = useTranslations("admin");
     const modules = useAllModules();
     const [failed, setFailed] = useState(false);
-    const commonT = useTranslations("common");
 
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
     const [actions, setActions] = useState<string[]>([]);
@@ -409,32 +407,10 @@ export default function AuditLogPage() {
                     <div className="flex items-center justify-between p-4 border-t">
                         <span className="text-sm text-muted-foreground">
                             {total}{" "}
-                            {t("auditLog_entries")}{" "}
-                            · {t("auditLog_page")} {page}
-                            {" / "}
-                            {pages}
+                            {t("auditLog_entries")}
                         </span>
-                        <div className="flex gap-2">
-                            <Button
-                                aria-label={commonT("previousPage")}
-                                variant="outline"
-                                size="sm"
-                                disabled={page <= 1}
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                            </Button>
-                            <Button
-                                aria-label={commonT("nextPage")}
-                                variant="outline"
-                                size="sm"
-                                disabled={page >= pages}
-                                onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                            >
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
-                        </div>
                     </div>
+                    <Pagination page={page} pages={pages} onPageChange={setPage} />
                 </CardContent>
             </Card>
         </div>

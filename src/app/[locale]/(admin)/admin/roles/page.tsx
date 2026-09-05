@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Plus, X, Shield, Trash2 } from "lucide-react";
@@ -40,6 +41,7 @@ export default function AdminRolesPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
     const [roles, setRoles] = useState<Role[]>([]);
+    const paged = usePagedRows(roles);
     const [loading, setLoading] = useState(true);
     const [availablePermissions, setAvailablePermissions] = useState(corePermissions);
     const { confirm } = useConfirm();
@@ -295,7 +297,7 @@ export default function AdminRolesPage() {
 
             {/* Roles List */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {roles.map((role) => (
+                {paged.rows.map((role) => (
                     <Card key={role.id} className="relative">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
@@ -359,6 +361,13 @@ export default function AdminRolesPage() {
                     </Card>
                 ))}
             </div>
+            <Pagination
+                page={paged.page}
+                pages={paged.pages}
+                total={paged.total}
+                onPageChange={paged.setPage}
+                className="border-t-0"
+            />
         </>
     );
 }

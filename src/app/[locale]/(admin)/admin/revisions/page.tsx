@@ -2,13 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import {
     Loader2,
-    ChevronLeft,
-    ChevronRight,
     ChevronDown,
     ChevronRight as ChevronRightIcon,
 } from "lucide-react";
@@ -38,7 +36,6 @@ export default function RevisionsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("admin");
-    const commonT = useTranslations("common");
     const [revisions, setRevisions] = useState<Revision[]>([]);
     const [resources, setResources] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
@@ -204,33 +201,7 @@ export default function RevisionsPage() {
                             })}
                         </div>
                     )}
-                    {pages > 1 && (
-                        <div className="flex items-center justify-between p-3 border-t">
-                            <span className="text-xs text-muted-foreground">
-                                {t("revisions_page")} {page} / {pages}
-                            </span>
-                            <div className="flex gap-1">
-                                <Button
-                                    aria-label={commonT("previousPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    <ChevronLeft className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                    aria-label={commonT("nextPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page >= pages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    <ChevronRight className="w-3 h-3" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={pages} onPageChange={setPage} />
                 </CardContent>
             </Card>
         </>

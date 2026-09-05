@@ -3,6 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import { Loader2, Play, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
@@ -331,31 +332,7 @@ export default function EmailQueueAdminPage() {
                 </Card>
             )}
 
-            {total > pageSize && (
-                <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
-                    <span>
-                        {t("emailQueue_page")} {page} / {totalPages} · {total} total
-                    </span>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={page <= 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        >
-                            {t("emailQueue_previous")}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        >
-                            {t("emailQueue_next")}
-                        </Button>
-                    </div>
-                </div>
-            )}
+            <Pagination page={page} pages={totalPages} total={total} onPageChange={setPage} />
         </>
     );
 }

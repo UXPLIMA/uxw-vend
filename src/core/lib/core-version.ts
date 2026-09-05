@@ -12,6 +12,15 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.12.0 - `Pagination` and `usePagedRows` join `@/core/sdk/ui`, and the
+ * manifest gains `dashboardSections`. Eight admin screens had written the same
+ * two chevrons and a "Page 2 / 9" caption, and nine lists that grow had no
+ * pager at all; with only previous and next, reaching page forty takes
+ * thirty-nine clicks. Numbered pages, first and last, and a box to type a page
+ * number into. `dashboardSections` lets a module declare the panels its
+ * `statsApi` returns so the dashboard customizer can offer them. Both
+ * additions.
+ *
  * 1.11.0 - `NativeSelect` joins `@/core/sdk/ui`. The panel had a themed
  * `Input` and no themed dropdown, so every "pick one of these strings"
  * control was a bare `<select>` wearing the browser's own chrome next to it.
@@ -71,4 +80,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.11.0";
+export const CORE_API_VERSION = "1.12.0";

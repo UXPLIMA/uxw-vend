@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `Pagination` and `usePagedRows` join `@/core/sdk/ui` (CORE_API_VERSION
+  1.12.0). Numbered pages with an ellipsis where the middle is elided, first
+  and last, and a box to type a page number into once there are more pages than
+  fit. The `hrefFor` form renders links for a server component that pages
+  through the URL; the `onPageChange` form renders buttons for a client
+  component holding the page in state. `usePagedRows` pages a list the API
+  hands over whole.
+
 - `NativeSelect` joins `@/core/sdk/ui` (CORE_API_VERSION 1.11.0). The panel had
   a themed `Input` and no themed dropdown, so all forty-odd "pick one of these
   strings" controls were a bare `<select>` wearing the browser's own chrome:
@@ -62,6 +70,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Thirteen admin lists share one pager.** Nine screens had each written the
+  same two chevrons, a `disabled={page === 1}` and a "Page 2 / 9" caption, and
+  nothing else - so reaching page forty of an audit log took thirty-nine
+  clicks. Four more that grow without bound - roles, API keys, IP blocks,
+  broadcasts - fetched every row and rendered every row.
 - **Hovering an analytics chart tells you the number.** Every dataset sets
   `pointRadius: 0` and Chart.js defaults to `intersect: true`, so a tooltip
   only fired when the pointer landed on a point that is not drawn - which is to

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
+import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import {
@@ -10,8 +11,6 @@ import {
     X,
     Loader2,
     Trash2,
-    ChevronLeft,
-    ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
@@ -466,32 +465,7 @@ export default function ResourcePermissionsPage() {
                         </div>
                     )}
                     {!loading && grants.length > 0 && (
-                        <div className="flex items-center justify-between p-3 border-t">
-                            <span className="text-xs text-muted-foreground">
-                                {total} {t("rp_totalSuffix")}
-                                {pages > 1 && ` \u00b7 ${t("revisions_page")} ${page} / ${pages}`}
-                            </span>
-                            <div className="flex gap-1">
-                                <Button
-                                    aria-label={commonT("previousPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    <ChevronLeft className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                    aria-label={commonT("nextPage")}
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={page >= pages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    <ChevronRight className="w-3 h-3" />
-                                </Button>
-                            </div>
-                        </div>
+                        <Pagination page={page} pages={pages} total={total} onPageChange={setPage} />
                     )}
                 </CardContent>
             </Card>
