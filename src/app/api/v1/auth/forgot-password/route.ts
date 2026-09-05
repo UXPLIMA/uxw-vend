@@ -7,6 +7,7 @@ import { randomBytes, createHash } from "crypto";
 import { sendPasswordResetEmail } from "@/core/lib/email";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
+import { resolveAppUrl } from "@/core/lib/app-url";
 import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
 
 const GENERIC_OK = { message: "If an account exists, a reset link has been sent." };
@@ -87,8 +88,9 @@ export async function POST(request: NextRequest) {
                 },
             });
 
-            const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-            const resetUrl = `${baseUrl}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+            // See verify-email: one resolver, validated, same fallback as
+            // the rest of the app.
+            const resetUrl = `${resolveAppUrl()}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
             await sendPasswordResetEmail(email, resetUrl, user.locale ?? undefined).catch((err) => {
                 console.error("[forgot-password] email send failed:", err);

@@ -5,6 +5,7 @@ import { EMAIL_VERIFY_EXPIRY, getDurationMs } from "@/core/lib/security-settings
 import { randomBytes, createHash } from "crypto";
 import { sendVerificationEmail } from "@/core/lib/email";
 import { rateLimit } from "@/core/lib/rate-limit";
+import { resolveAppUrl } from "@/core/lib/app-url";
 
 function hashToken(token: string): string {
     return createHash("sha256").update(token).digest("hex");
@@ -46,8 +47,12 @@ export async function POST(_request: NextRequest) {
         },
     });
 
-    const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const verifyUrl = `${baseUrl}/auth/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
+    // Through `resolveAppUrl` rather than the raw variable: it rejects a
+    // value that is not an absolute http(s) URL, so a host written without a
+    // scheme becomes the localhost fallback instead of a link no mail client
+    // can follow, and it falls back to the same address the rest of the app
+    // does rather than a port nothing here listens on.
+    const verifyUrl = `${resolveAppUrl()}/auth/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
 
     await sendVerificationEmail(user.email, verifyUrl, user.locale ?? undefined);
 

@@ -1,5 +1,5 @@
 import { formatDate } from "@/core/sdk";
-import { buildArticleJsonLd, moduleSettings, prisma } from "@/core/sdk/server";
+import { buildArticleJsonLd, moduleSettings, prisma, resolveAppUrl } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar, Slot, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
@@ -84,8 +84,10 @@ export default async function BlogArticlePage({ params }: PageProps) {
     const t = await getTranslations("blog");
     const dateTag = dateLocaleTag(await getLocale());
 
-    const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL || "";
-    const articleUrl = baseUrl ? `${baseUrl}/blog/${article.number}/${article.slug}` : `/blog/${article.number}/${article.slug}`;
+    // A share link has to be absolute or it shares nothing: the old fallback
+    // was the empty string, which handed Twitter and Facebook a path with no
+    // host on any install that had not set AUTH_URL.
+    const articleUrl = `${resolveAppUrl()}/blog/${article.number}/${article.slug}`;
     const shareTwitter = `https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`;
     const shareFacebook = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
 
