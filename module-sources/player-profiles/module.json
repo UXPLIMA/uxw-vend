@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Player Profiles",
   "description": "Public player profile pages",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -110,5 +110,12 @@
         "oauthAutoLink": "Giriş yaptığınız hesaplar otomatik olarak bağlanır."
       }
     }
-  }
+  },
+  "userDataExport": [
+    {
+      "model": "linkedAccount",
+      "key": "playerProfiles.linkedAccounts",
+      "column": "userId"
+    }
+  ]
 }

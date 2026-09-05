@@ -4,34 +4,162 @@ import { ModuleUserDataTables } from "@/core/generated/module-registry";
 /**
  * GDPR-compliant user data export.
  *
- * Collects everything the platform stores about a user - core tables
- * (profile, sessions, warnings, notification prefs, revisions, activity
- * feed, linked accounts) plus a sweep of module-owned tables declared by
- * each module's `userDataExport` manifest entry.
+ * Collects everything the platform stores about a user - the core tables
+ * listed in CORE_TABLES below, plus a sweep of module-owned tables declared
+ * by each module's `userDataExport` manifest entry.
  *
  * Per the core motto, this file does NOT hardcode any module model names.
  * It reads the generated `ModuleUserDataTables` registry (aggregated from
  * every installed module's manifest at build time), then probes the
  * runtime Prisma client for each entry - uninstalled modules simply
  * contribute nothing to the export without raising errors.
+ *
+ * Every core table names the columns it hands out. Prisma returns every
+ * column when a query names no `select`, so an export written as a bare
+ * `findMany` ships whatever the schema keeps for itself: this one shipped
+ * `UserSession.tokenId`, the claim a JWT carries and the key a session is
+ * looked up by when it is checked for revocation. Listing the columns also
+ * means a column added to one of these tables later is withheld until
+ * someone puts it here on purpose.
  */
 
+/** A core table copied into the export. */
+interface CoreTable {
+    /** Top-level key in the bundle, and in the README. */
+    key: string;
+    /** Prisma delegate name. */
+    model: string;
+    /** Column joining a row to the user. */
+    column: string;
+    /** The columns handed out, in schema order. */
+    select: Record<string, true>;
+}
+
+export const CORE_TABLES: CoreTable[] = [
+    {
+        key: "activityFeed",
+        model: "activityFeedItem",
+        column: "actorId",
+        select: { id: true, type: true, title: true, body: true, href: true, icon: true, isPublic: true, createdAt: true },
+    },
+    {
+        // tokenId withheld: it is the live revocation key for the session.
+        key: "sessions",
+        model: "userSession",
+        column: "userId",
+        select: {
+            id: true, deviceInfo: true, ipAddress: true, userAgent: true,
+            lastActiveAt: true, createdAt: true, expiresAt: true, isRevoked: true,
+        },
+    },
+    {
+        // issuedById withheld: it names the moderator, who is a third party.
+        key: "warnings",
+        model: "userWarning",
+        column: "userId",
+        select: { id: true, reason: true, points: true, expiresAt: true, isActive: true, createdAt: true },
+    },
+    {
+        key: "notificationPrefs",
+        model: "notificationPreference",
+        column: "userId",
+        select: { id: true, eventType: true, channel: true, enabled: true, updatedAt: true },
+    },
+    {
+        key: "revisions",
+        model: "revision",
+        column: "authorId",
+        select: { id: true, resource: true, resourceId: true, data: true, action: true, createdAt: true },
+    },
+    {
+        // The OAuth links. refresh_token, access_token, id_token and
+        // session_state are live credentials for the provider account.
+        key: "accounts",
+        model: "account",
+        column: "userId",
+        select: {
+            id: true, type: true, provider: true, providerAccountId: true,
+            expires_at: true, token_type: true, scope: true,
+        },
+    },
+    {
+        // keyHash withheld: it is the verifier for the key itself.
+        key: "apiKeys",
+        model: "apiKey",
+        column: "userId",
+        select: {
+            id: true, name: true, keyPrefix: true, permissions: true,
+            lastUsedAt: true, expiresAt: true, isActive: true, createdAt: true,
+        },
+    },
+    {
+        // storagePath withheld: an internal bucket key, and `url` is the
+        // same file addressed the way the user can actually fetch it.
+        key: "media",
+        model: "mediaItem",
+        column: "uploadedById",
+        select: {
+            id: true, filename: true, url: true, mimeType: true, size: true,
+            width: true, height: true, alt: true, createdAt: true,
+        },
+    },
+    {
+        key: "conversations",
+        model: "conversationParticipant",
+        column: "userId",
+        select: { id: true, conversationId: true, joinedAt: true, lastReadAt: true },
+    },
+    {
+        // The user's own messages only. The other side of a thread is the
+        // other participant's data, not theirs to download.
+        key: "messages",
+        model: "message",
+        column: "authorId",
+        select: { id: true, conversationId: true, body: true, createdAt: true },
+    },
+    {
+        // metadata withheld: an admin action records the account it acted on
+        // (`targetUsername`, ban reasons), so the column carries other
+        // people's data. What the user did, and to which entity, does not.
+        key: "auditLog",
+        model: "activityLog",
+        column: "userId",
+        select: { id: true, action: true, entity: true, entityId: true, ipAddress: true, createdAt: true },
+    },
+];
+
+/**
+ * Core tables holding a User relation that the export leaves out, and why.
+ * A model added to the schema with a user column has to be exported or
+ * listed here; the gate test reads this map.
+ */
+export const CORE_TABLES_WITHHELD: Record<string, string> = {
+    // Auth.js runs the JWT strategy, so the adapter never writes this table,
+    // and `sessionToken` is a bearer credential. The session list a user can
+    // actually see is UserSession, which is exported above.
+    Session: "unused under the JWT strategy, and sessionToken is a credential",
+    // Site configuration an admin authored. `updatedById` records who last
+    // saved a global theme value; it is not data about that person.
+    ThemeCustomization: "site configuration, not personal data",
+    ThemeSetting: "site configuration, not personal data",
+};
+
+/**
+ * The bundle: the profile row, one key per entry in CORE_TABLES, and the
+ * module sweep. The core keys are indexed rather than named one by one so
+ * that CORE_TABLES stays the single place a table is declared.
+ */
 export interface UserDataExport {
     user: unknown;
-    activityFeed: unknown[];
-    sessions: unknown[];
-    warnings: unknown[];
-    notificationPrefs: unknown[];
-    revisions: unknown[];
-    linkedAccounts: unknown[];
     modules: Record<string, unknown>;
+    [table: string]: unknown;
 }
 
 // Narrow helper - the generated Prisma client isn't fully typed for us
 // because we look up models by string, so we use a minimal delegate shape
 // and cast once at the boundary. No `any` leaks out of this module.
 interface FindManyDelegate {
-    findMany(args: { where: Record<string, unknown> }): Promise<unknown[]>;
+    findMany(args: { where: Record<string, unknown>; select?: Record<string, true> }): Promise<unknown[]>;
 }
 
 function getDelegate(modelName: string): FindManyDelegate | null {
@@ -49,12 +177,13 @@ function getDelegate(modelName: string): FindManyDelegate | null {
 
 async function safeFindMany(
     modelName: string,
-    where: Record<string, unknown>
+    where: Record<string, unknown>,
+    select?: Record<string, true>
 ): Promise<unknown[]> {
     try {
         const delegate = getDelegate(modelName);
         if (!delegate) return [];
-        return await delegate.findMany({ where });
+        return await delegate.findMany(select ? { where, select } : { where });
     } catch {
         return [];
     }
@@ -83,40 +212,25 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
         },
     });
 
-    const [
-        activityFeed,
-        sessions,
-        warnings,
-        notificationPrefs,
-        revisions,
-        linkedAccounts,
-    ] = await Promise.all([
-        safeFindMany("activityFeedItem", { actorId: userId }),
-        safeFindMany("userSession", { userId }),
-        safeFindMany("userWarning", { userId }),
-        safeFindMany("notificationPreference", { userId }),
-        safeFindMany("revision", { authorId: userId }),
-        safeFindMany("linkedAccount", { userId }),
-    ]);
+    const rows = await Promise.all(
+        CORE_TABLES.map((table) => safeFindMany(table.model, { [table.column]: userId }, table.select))
+    );
+
+    const bundle: UserDataExport = { user: userRow, modules: {} };
+    CORE_TABLES.forEach((table, i) => {
+        bundle[table.key] = rows[i];
+    });
 
     const modules: Record<string, unknown> = {};
     for (const entry of ModuleUserDataTables) {
-        const rows = await safeFindMany(entry.model, { [entry.column]: userId });
-        if (rows.length > 0) {
-            modules[entry.key] = rows;
+        const moduleRows = await safeFindMany(entry.model, { [entry.column]: userId });
+        if (moduleRows.length > 0) {
+            modules[entry.key] = moduleRows;
         }
     }
+    bundle.modules = modules;
 
-    return {
-        user: userRow,
-        activityFeed,
-        sessions,
-        warnings,
-        notificationPrefs,
-        revisions,
-        linkedAccounts,
-        modules,
-    };
+    return bundle;
 }
 
 /**
@@ -143,12 +257,28 @@ Contents
   notificationPrefs
                    Your per-channel notification preferences.
   revisions        Content revisions you authored.
-  linkedAccounts   External accounts linked to your profile
-                   (OAuth providers, game account bindings, etc.).
+  accounts         Sign-in providers linked to your account (provider
+                   name and account id; the access tokens themselves
+                   are omitted).
+  apiKeys          API keys you created, by name and visible prefix.
+                   The key itself is stored hashed and cannot be
+                   handed back.
+  media            Files you uploaded, with their public URLs.
+  conversations    Direct-message threads you are a member of.
+  messages         Direct messages you wrote. Replies from the other
+                   side belong to their author and are not included.
+  auditLog         Security-relevant actions recorded against your
+                   account, with the IP they came from. Details that
+                   name another account are omitted.
   modules          Data owned by installed modules, grouped by module
                    (blog posts, forum topics, orders, tickets, votes,
-                   and so on). Only modules that are currently
-                   installed on this instance contribute data here.
+                   linked game accounts, and so on). Only modules that
+                   are currently installed on this instance contribute
+                   data here.
+
+Some rows are withheld on purpose: credentials that would still work
+if they left our database, and fields that name somebody other than
+you.
 
 Your rights
 -----------

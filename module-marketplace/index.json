@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-05",
-  "updatedAt": "2026-09-05T03:57:42Z",
+  "updatedAt": "2026-09-05T04:16:05Z",
   "modules": [
     {
       "id": "announcements",
@@ -332,13 +332,13 @@
       "id": "credits",
       "name": "Credit System",
       "description": "Virtual currency wallet for users",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T04:16:05Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1613,13 +1613,13 @@
       "id": "player-profiles",
       "name": "Player Profiles",
       "description": "Public player profile pages",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T04:16:05Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2039,13 +2039,13 @@
       "id": "store",
       "name": "Store Module",
       "description": "Complete e-commerce functionality with products, categories, cart and orders",
-      "version": "2.2.1",
+      "version": "2.2.2",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T03:43:16Z",
+      "updatedAt": "2026-09-05T04:16:05Z",
       "screenshots": [],
       "tags": [
         "commerce"

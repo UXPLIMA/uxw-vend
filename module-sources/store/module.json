@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1676,6 +1676,21 @@
       "model": "subscription",
       "key": "store.subscriptions",
       "column": "userId"
+    },
+    {
+      "model": "creditTransaction",
+      "key": "store.creditTransactions",
+      "column": "userId"
+    },
+    {
+      "model": "giftCode",
+      "key": "store.giftCodesRedeemed",
+      "column": "redeemedById"
+    },
+    {
+      "model": "creatorCode",
+      "key": "store.creatorCodes",
+      "column": "creatorId"
     }
   ],
   "widgets": [
