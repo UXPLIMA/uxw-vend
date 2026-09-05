@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { queueBroadcast } from "@/core/lib/broadcasts";
+import { prismaErrorOrThrow } from "@/core/lib/prisma-errors";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -43,6 +44,11 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
-    await prisma.emailBroadcast.delete({ where: { id } });
+    try {
+        await prisma.emailBroadcast.delete({ where: { id } });
+    } catch (err) {
+        // Deleting a broadcast that is already gone is a 404, not a 500.
+        return prismaErrorOrThrow(err);
+    }
     return NextResponse.json({ ok: true });
 }
