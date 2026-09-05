@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * is incomplete but looks fine.
  */
 
-interface FindCall { model: string; where: Record<string, unknown> }
+interface FindCall { model: string; where: Record<string, unknown>; select?: Record<string, true> }
 
 let findCalls: FindCall[];
 let userSelect: Record<string, unknown> | null;
@@ -39,9 +39,9 @@ vi.mock("@/core/lib/db", () => {
             if (bogusModels.has(prop)) return { count: () => 0 };
             if (!installedModels.has(prop)) return undefined;
             return {
-                findMany: async (args: { where: Record<string, unknown> }) => {
+                findMany: async (args: { where: Record<string, unknown>; select?: Record<string, true> }) => {
                     if (failingModels.has(prop)) throw new Error(`${prop} exploded`);
-                    findCalls.push({ model: prop, where: args.where });
+                    findCalls.push({ model: prop, where: args.where, select: args.select });
                     return rowsByModel[prop] ?? [];
                 },
             };
@@ -54,9 +54,16 @@ vi.mock("@/core/lib/db", () => {
     return { prisma };
 });
 
+/**
+ * Every core delegate the export reads. `linkedAccount` is not among them
+ * any more: it is `player-profiles`' table, and core hardcoding a module's
+ * model was the thing the registry exists to avoid. It now reaches the
+ * bundle through that module's own manifest, like every other module table.
+ */
 const CORE_MODELS = [
-    "activityFeedItem", "userSession", "userWarning",
-    "notificationPreference", "revision", "linkedAccount",
+    "activityFeedItem", "userSession", "userWarning", "notificationPreference",
+    "revision", "account", "apiKey", "mediaItem", "conversationParticipant",
+    "message", "activityLog",
 ];
 
 beforeEach(() => {
@@ -87,15 +94,43 @@ describe("exportUserData", () => {
         expect(userSelect).toMatchObject({ id: true, email: true, username: true });
     });
 
-    it("collects the six core tables on the right join columns", async () => {
+    it("collects every core table on the right join column", async () => {
         await exportUserData("usr_1");
 
         expect(findCalls.map((c) => c.model).sort()).toEqual([...CORE_MODELS].sort());
-        // activityFeedItem and revision join through the *author*, not the
-        // subject; the wrong column silently returns an empty export.
+        // activityFeedItem, revision and message join through the *author*,
+        // not the subject; the wrong column silently returns an empty export.
         expect(findCalls.find((c) => c.model === "activityFeedItem")!.where).toEqual({ actorId: "usr_1" });
         expect(findCalls.find((c) => c.model === "revision")!.where).toEqual({ authorId: "usr_1" });
+        expect(findCalls.find((c) => c.model === "message")!.where).toEqual({ authorId: "usr_1" });
+        expect(findCalls.find((c) => c.model === "mediaItem")!.where).toEqual({ uploadedById: "usr_1" });
         expect(findCalls.find((c) => c.model === "userWarning")!.where).toEqual({ userId: "usr_1" });
+    });
+
+    it("asks for named columns, so no core table answers with its secrets", async () => {
+        await exportUserData("usr_1");
+
+        // Prisma returns every column when a query names no select. The
+        // sessions table answered with `tokenId`, the key a session is
+        // looked up by when it is checked for revocation.
+        for (const call of findCalls) {
+            expect(call.select, `${call.model} was read with no select`).toBeTruthy();
+        }
+        const sessions = findCalls.find((c) => c.model === "userSession")!.select!;
+        expect(Object.keys(sessions)).not.toContain("tokenId");
+        expect(Object.keys(sessions)).toContain("ipAddress");
+    });
+
+    it("reads a module table whole, because a manifest cannot name columns", async () => {
+        moduleTables = [
+            { model: "blogArticle", key: "blog.articles", column: "authorId", module: "blog" },
+        ];
+        installedModels = new Set([...CORE_MODELS, "blogArticle"]);
+        rowsByModel = { blogArticle: [{ id: "a1" }] };
+
+        await exportUserData("usr_1");
+
+        expect(findCalls.find((c) => c.model === "blogArticle")!.select).toBeUndefined();
     });
 
     it("returns the user row it read", async () => {
@@ -180,8 +215,9 @@ describe("exportUserData", () => {
         // The README below promises these names; a missing key would make
         // the bundle contradict its own documentation.
         expect(Object.keys(result).sort()).toEqual([
-            "activityFeed", "linkedAccounts", "modules", "notificationPrefs",
-            "revisions", "sessions", "user", "warnings",
+            "accounts", "activityFeed", "apiKeys", "auditLog", "conversations",
+            "media", "messages", "modules", "notificationPrefs", "revisions",
+            "sessions", "user", "warnings",
         ]);
     });
 });
@@ -202,8 +238,9 @@ describe("buildExportReadme", () => {
         const readme = buildExportReadme("usr_1", new Date());
 
         for (const key of [
-            "user", "activityFeed", "sessions", "warnings",
-            "notificationPrefs", "revisions", "linkedAccounts", "modules",
+            "user", "activityFeed", "sessions", "warnings", "notificationPrefs",
+            "revisions", "accounts", "apiKeys", "media", "conversations",
+            "messages", "auditLog", "modules",
         ]) {
             expect(readme).toContain(key);
         }

@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The personal data export handed out a session credential and left six
+  tables out.** Every core table was read with a bare `findMany`, and Prisma
+  answers a query with no `select` by returning every column, so `sessions`
+  carried `UserSession.tokenId` - the claim a JWT carries, and the row a
+  session is looked up by when it is checked for revocation. The route that
+  lists sessions on screen had been fixed to withhold it; the export had not.
+
+  It was also incomplete. Fourteen core models hold a relation to `User` and
+  five were exported, while the README promised "every row in our database
+  that references your account" and named OAuth providers specifically. A
+  user's direct messages, OAuth sign-in links, API keys, uploaded files and
+  audit trail were all absent. All six are now included, each naming the
+  columns it hands out: no `refresh_token`, `access_token`, `id_token` or
+  `session_state` on the accounts, no `keyHash` on the API keys, no
+  `storagePath` on the media, and no `metadata` on the audit rows, because an
+  admin action records the account it acted on. `Session`, `ThemeCustomization`
+  and `ThemeSetting` are withheld with a reason recorded next to them.
+
+  On the module side, `player-profiles`' `linkedAccount` was hardcoded into
+  core by the one file whose own doc comment says it hardcodes no module model;
+  it now reaches the bundle through that module's manifest like everything
+  else. `store` declared none of `creditTransaction`, `giftCode` or
+  `creatorCode`, and `creditTransaction` was declared by `credits` for a model
+  that lives in `store`'s schema, so an instance running the store without the
+  credits module exported no transactions at all.
+
+  The gate requires every model in a schema that points at a user to be either
+  exported or withheld with a reason, requires a module to declare only models
+  out of its own schema, and fails on any secret column reaching the bundle.
+
 - **Eight more activity feed events now read in the reader's language.** The
   previous round fixed the declarations that were wrong and recorded the
   thirteen types that had none, so they rendered in English whatever the
