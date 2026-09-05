@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A ban, a deletion, a demotion and a revoked device never reached a
+  session that was already open.** Under the JWT strategy nothing about a
+  session lives server-side, so the `jwt` callback is the only place that can
+  consult the database, and it did so under `trigger === "update" ||
+  !token.role || token.rolePriority === undefined`. None of those is ever true
+  again after a sign-in: the credentials provider returns `role: ... ||
+  "member"` and `rolePriority ?? 0`, and Auth.js passes a trigger only when
+  the client calls `update()` itself. `session.updateAge` was set to an hour
+  with a comment saying it forced a refresh, but Auth.js reads updateAge in
+  the database-session branch only, so under `jwt` it throttled nothing.
+
+  The database was therefore consulted exactly once, at sign-in, and every
+  decision made from the token stayed frozen for the life of the cookie: up to
+  thirty days for a session that ticked "keep me signed in", twenty-four hours
+  otherwise. Banning an account did not sign it out. Anonymising it under the
+  right to be forgotten did not sign it out. An admin demoted to member kept
+  acting as an admin. And `UserSession.isRevoked`, the column behind "sign out
+  this device" and "sign out everywhere" on the sessions screen, was read in
+  exactly one place - the block that no longer ran - so both buttons wrote a
+  row and changed nothing.
+
+  The token now carries the time it was last checked and is checked again once
+  that stamp is older than `SESSION_RECHECK_INTERVAL_SECONDS` (60), so the
+  worst case is a minute rather than a month. The check reads three columns
+  instead of the whole user row, since it now runs on a schedule; a token
+  whose user row has disappeared entirely ends the session instead of falling
+  through; and an impersonation swap drops the stamp, so a check that vouched
+  for the admin does not vouch for the account they stepped into.
+
 - **The personal data export handed out a session credential and left six
   tables out.** Every core table was read with a bare `findMany`, and Prisma
   answers a query with no `select` by returning every column, so `sessions`
