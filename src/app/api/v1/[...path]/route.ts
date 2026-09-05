@@ -6,6 +6,7 @@ import { recordMetric } from "@/core/lib/metrics";
 import { auth } from "@/core/lib/auth";
 import { getClientIP, rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { bucketFor } from "@/core/lib/module-api-limits";
+import { prismaErrorResponse } from "@/core/lib/prisma-errors";
 
 /**
  * Every module endpoint is rate limited, and none of them was.
@@ -100,6 +101,15 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: st
         return response;
     } catch (error) {
         const errMsg = error instanceof Error ? error.message : "Unknown error";
+        // Prisma names the caller's mistakes. A handler that deletes by id
+        // without catching would otherwise report a row that is already gone
+        // as a server fault; the same for a unique column that is taken.
+        const known = prismaErrorResponse(error);
+        if (known) {
+            finish(known.status, { error: known.code, handler: match.key });
+            recordMetric(method, fullPath, known.status, Date.now() - requestStart);
+            return NextResponse.json({ error: known.error }, { status: known.status });
+        }
         finish(500, { error: errMsg, handler: match.key });
         recordMetric(method, fullPath, 500, Date.now() - requestStart);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

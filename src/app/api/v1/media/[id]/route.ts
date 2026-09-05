@@ -6,6 +6,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
+import { prismaErrorOrThrow } from "@/core/lib/prisma-errors";
 
 /** The two fields a media item's record may be renamed by. */
 const updateMediaSchema = z.object({
@@ -36,8 +37,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (parsed.data.alt !== undefined) data.alt = parsed.data.alt;
     if (parsed.data.filename !== undefined) data.filename = parsed.data.filename;
 
-    const item = await prisma.mediaItem.update({ where: { id }, data });
-    return NextResponse.json(item);
+    try {
+        const item = await prisma.mediaItem.update({ where: { id }, data });
+        return NextResponse.json(item);
+    } catch (err) {
+        // An item deleted between the list load and this save is a 404, not a
+        // server fault: two admins on the media library is enough to hit it.
+        return prismaErrorOrThrow(err);
+    }
 }
 
 /** DELETE /api/v1/media/[id] - delete record + file from disk (local only) */

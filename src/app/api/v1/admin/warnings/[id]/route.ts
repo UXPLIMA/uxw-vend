@@ -3,6 +3,7 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
+import { prismaErrorOrThrow } from "@/core/lib/prisma-errors";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -16,10 +17,16 @@ export async function PATCH(_request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const { id } = await params;
-    const warning = await prisma.userWarning.update({
-        where: { id },
-        data: { isActive: false },
-    });
+    let warning;
+    try {
+        warning = await prisma.userWarning.update({
+            where: { id },
+            data: { isActive: false },
+        });
+    } catch (err) {
+        // Revoking a warning another admin already deleted is a 404.
+        return prismaErrorOrThrow(err);
+    }
 
     logActivity({
         userId: session.user.id,

@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A row that was already gone answered 500.**
+  Prisma throws `P2025` when an update or delete matches no row, `P2002` when
+  a unique column already holds the value, `P2003` for a foreign key pointing
+  at nothing. Twenty-eight mutating handlers make such a call with no catch
+  and no prior existence check, and the module API dispatcher answered every
+  throw with a flat `Internal Server Error`. So deleting a server another
+  admin had just deleted, or saving a slug someone else had taken, both
+  reached the admin as "the server broke" rather than as what happened. Two
+  admins on the same screen is enough to hit it.
+
+  `src/core/lib/prisma-errors.ts` maps the codes Prisma documents as the
+  caller's mistake - 404, 409, 400 - and leaves everything else a 500 on
+  purpose, so a real fault still reaches the error log. The dispatcher applies
+  it before its 500 fallback, which covers every module route at once; core's
+  own three unguarded routes (media rename, warning revoke, broadcast delete)
+  use `prismaErrorOrThrow`, which rethrows anything unrecognised.
+
+  The mapper is duck-typed on the documented `P####` shape rather than
+  `instanceof PrismaClientKnownRequestError`, because a module handler's error
+  crosses a dynamic `import()` boundary before the dispatcher catches it.
+
+  `tests/unit/prisma-errors-are-mapped.test.ts` covers the mapping and asserts
+  that no core route writes by id without catching, checking first, or being
+  listed with its reason. On the tree before this change it names all three.
 - **A disabled module's page blocks still rendered, and were still offered.**
   Page blocks were the one module capability that ignored whether the module
   was switched on. Slots, homepage widgets and sections, dashboard cards and
