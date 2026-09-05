@@ -12,26 +12,69 @@ if [ ! -d "$SOURCES_DIR" ]; then
     exit 1
 fi
 
-count=0
-for mod in "$SOURCES_DIR"/*/; do
-    name=$(basename "$mod")
-    if [ ! -f "$mod/module.json" ]; then
-        echo "  Skip: $name (no module.json)"
-        continue
-    fi
-
-    (cd "$mod" && zip -r - . -x "*.DS_Store" -x "__MACOSX/*") > "$OUTPUT_DIR/${name}.zip" 2>/dev/null
-    count=$((count + 1))
-done
-
-# Regenerate index.json from module.json files, preserving runtime metadata.
+# ZIPs and index.json are both written by the pass below: an archive is a
+# published artifact, so it is written only after the catalog validates, and it
+# is written deterministically (see write_zip).
 UPDATED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 python3 - <<PYEOF
-import json, os, re, sys, datetime
+import json, os, re, sys, datetime, zipfile
 
 SOURCES_DIR = "$SOURCES_DIR"
 OUTPUT_DIR = "$OUTPUT_DIR"
 UPDATED_AT = "$UPDATED_AT"
+
+SKIP_FILES = {".DS_Store"}
+SKIP_DIRS = {"__MACOSX", "node_modules"}
+
+# The ZIP epoch. 'zip -r' stored each file's mtime and atime, so the bytes of a
+# published archive depended on when someone last read the file rather than on
+# what the file said: a rebuild after merely opening a module.json produced a
+# different artifact, git showed unrelated .zip files as modified in a commit,
+# and a fresh clone (where every mtime is checkout time) could not reproduce
+# any of them. Traversal order came from readdir, which is not stable either.
+ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
+ZIP_MODE = 0o644 << 16
+UNIX_CREATOR = 3
+
+
+def module_files(module_dir):
+    """Every packable file, as (absolute path, archive name), sorted by name."""
+    out = []
+    for root, dirs, files in os.walk(module_dir):
+        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
+        for fn in sorted(files):
+            if fn in SKIP_FILES:
+                continue
+            full = os.path.join(root, fn)
+            rel = os.path.relpath(full, module_dir).replace(os.sep, "/")
+            out.append((full, rel))
+    return sorted(out, key=lambda pair: pair[1])
+
+
+def write_zip(module_dir, zip_path):
+    """Same content, same bytes, on any machine and at any time."""
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        for full, rel in module_files(module_dir):
+            info = zipfile.ZipInfo(rel, date_time=ZIP_EPOCH)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = ZIP_MODE
+            info.create_system = UNIX_CREATOR
+            with open(full, "rb") as f:
+                archive.writestr(info, f.read())
+
+
+# Read once. Screenshots are curated content and updatedAt is history: both are
+# carried across rebuilds rather than regenerated.
+previous = {}
+previous_index = {}
+_existing_path = os.path.join(OUTPUT_DIR, "index.json")
+if os.path.isfile(_existing_path):
+    try:
+        with open(_existing_path, encoding="utf-8") as f:
+            previous_index = json.load(f)
+        previous = {em["id"]: em for em in previous_index.get("modules", [])}
+    except Exception:
+        previous = {}
 
 # Category and tags come from each module.json. There is deliberately no
 # category table here: a hardcoded module list in build tooling was the last
@@ -94,30 +137,28 @@ for name in sorted(os.listdir(SOURCES_DIR)):
     manifest_tags = m.get("tags")
     tags = [str(t) for t in manifest_tags] if isinstance(manifest_tags, list) and manifest_tags else [cat]
 
-    # Screenshots are curated content, not generated - carry them across rebuilds.
-    screenshots = []
-    existing_path = os.path.join(OUTPUT_DIR, "index.json")
-    if os.path.isfile(existing_path):
-        try:
-            with open(existing_path, encoding="utf-8") as f:
-                for em in json.load(f).get("modules", []):
-                    if em["id"] == m["id"]:
-                        screenshots = em.get("screenshots", []) or []
-                        break
-        except Exception:
-            pass
+    prior = previous.get(m["id"], {})
+    screenshots = prior.get("screenshots", []) or []
+    version = m.get("version", "1.0.0")
+
+    # updatedAt is shown on the admin modules screen and sorts it. Stamping
+    # every module with the build time said all seventy-eight were updated
+    # today, every build, and rewrote all seventy-eight lines of index.json
+    # whenever any one module changed. A module is updated when its published
+    # version changes; otherwise it keeps the date it already had.
+    updated_at = prior.get("updatedAt") if prior.get("version") == version else None
 
     modules.append({
         "id": m["id"],
         "name": m["name"],
         "description": m.get("description", ""),
-        "version": m.get("version", "1.0.0"),
+        "version": version,
         "coreVersion": m.get("coreVersion"),
         "author": m.get("author", "uxwVend"),
         "icon": m.get("icon", "Package"),
         "category": cat,
         "verified": True,
-        "updatedAt": UPDATED_AT,
+        "updatedAt": updated_at or UPDATED_AT,
         "screenshots": screenshots,
         "tags": tags,
         "zip": f"{name}.zip",
@@ -160,15 +201,23 @@ if violations:
         print(f"  ... and {len(violations) - 10} more", file=sys.stderr)
     sys.exit(1)
 
+# Only now, with the catalog validated: a module that breaks the SDK boundary
+# or listens to a hook nothing emits gets no published archive.
+for entry in modules:
+    write_zip(os.path.join(SOURCES_DIR, entry["id"]), os.path.join(OUTPUT_DIR, entry["zip"]))
+
+# The catalog was updated when its newest module was, not when the build ran.
+catalog_stamp = max((entry["updatedAt"] for entry in modules), default=UPDATED_AT)
+
 index = {
     "version": "1.0.0",
-    "updated": datetime.date.today().isoformat(),
-    "updatedAt": UPDATED_AT,
+    "updated": catalog_stamp[:10],
+    "updatedAt": catalog_stamp,
     "modules": modules,
 }
 with open(os.path.join(OUTPUT_DIR, "index.json"), "w", encoding="utf-8") as f:
     json.dump(index, f, indent=2, ensure_ascii=False)
 print(f"Index: {len(modules)} modules, {len(emitted_by)} hooks emitted, {len(listened_by)} listener(s)")
+print(f"Built {len(modules)} ZIPs")
 PYEOF
 
-echo "Built $count ZIPs"

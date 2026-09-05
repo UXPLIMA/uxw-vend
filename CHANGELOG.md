@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A published module archive was not a function of the module.** The build
+  shelled to `zip -r`, which writes each file's mtime and atime into the entry,
+  so an archive's bytes depended on when someone last opened the file rather
+  than on what it contained. Reading a `module.json` and rebuilding produced a
+  different artifact: the last two commits here carried `.zip` changes for
+  modules nobody had touched. A fresh clone, where git sets every mtime to
+  checkout time, could not reproduce any of the seventy-eight. Entry order came
+  from readdir, which is not stable across filesystems either.
+
+  Archives are now written directly, entries sorted, files only, every
+  timestamp at the ZIP epoch. Byte-identical for identical content, anywhere.
+  They are also written only after the catalog validates, so a module that
+  breaks the SDK boundary or listens to a hook nothing emits no longer gets a
+  published ZIP before the build fails. Dropping directory entries and
+  timestamp extras made them smaller as well, a third off the small ones.
+
+- **`index.json` claimed every module was updated today, after every build.**
+  Each module's `updatedAt` was stamped with the build clock, which rewrote all
+  seventy-eight lines whenever one module changed and told the admin modules
+  screen, which prints that date and sorts by it, that the whole catalogue had
+  just changed. A module now keeps the date it had unless its published version
+  moved, and the catalogue is dated by its newest module rather than by the
+  clock. Verified: bumping one module's version moved that one entry.
+
+  `tests/unit/marketplace-artifacts-are-reproducible.test.ts` covers both.
 - **Every module that localised its activity feed entries got it wrong, and
   nothing checked.** The feed stores an English sentence per row and a module
   translates it by declaring `{ type, prefix, key }`: core strips `prefix` off
