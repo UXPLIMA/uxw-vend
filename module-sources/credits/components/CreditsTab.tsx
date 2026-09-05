@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { Coins, Loader2, ArrowDownLeft, ArrowUpRight, ShoppingBag, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -31,17 +31,22 @@ export default function CreditsTab() {
     const [balance, setBalance] = useState<number>(0);
     const [history, setHistory] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/credits")
-            .then(r => r.json())
-            .then(d => {
+            .then(r => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then(d => { if (cancelled) return;
                 setBalance(Number(d.balance || 0));
                 setHistory(Array.isArray(d.history) ? d.history : []);
+                setFailed(false);
             })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const typeLabel = (type: string) => {
         const key = `type${type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}`;
@@ -74,6 +79,8 @@ export default function CreditsTab() {
                         <div className="flex justify-center py-6">
                             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                         </div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                     ) : history.length === 0 ? (
                         <p className="text-center text-muted-foreground py-8">{t("noTransactions")}</p>
                     ) : (

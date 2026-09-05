@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
-import { Card, CardContent } from "@/core/sdk/ui";
+import { Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useLocalDate } from "@/core/hooks/useLocalDate";
@@ -23,14 +23,18 @@ export default function ChangelogPage() {
     const t = useTranslations('changelog');
     const formatLocalDate = useLocalDate();
     const [entries, setEntries] = useState<Entry[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/changelog")
-            .then((r) => r.json())
-            .then((d) => { setEntries(d.entries || []); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setEntries(d.entries || []); setFailed(false); setLoading(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
@@ -43,6 +47,8 @@ export default function ChangelogPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : entries.length === 0 ? (
                     <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
                 ) : (

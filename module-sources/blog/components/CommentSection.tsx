@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Button } from "@/core/sdk/ui";
+import { Button, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 
 interface Comment {
@@ -30,24 +30,27 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [pending, setPending] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         if (!id) { setLoading(false); return; }
         fetch(`/api/v1/blog/comments?articleId=${encodeURIComponent(id)}`)
-            .then(r => r.ok ? r.json() : [])
+            .then(r => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then(data => {
                 if (cancelled) return;
                 setComments(Array.isArray(data) ? data : []);
+                setFailed(false);
             })
-            .catch(() => {})
+            .catch(() => { if (!cancelled) setFailed(true); })
             .finally(() => {
                 if (cancelled) return;
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [id]);
+    }, [id, reloadKey]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -110,9 +113,11 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
                         <p className="text-sm">{comment.content}</p>
                     </div>
                 ))}
-                {comments.length === 0 && (
+                {failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                ) : comments.length === 0 ? (
                     <p className="text-sm text-muted-foreground">{t("noComments")}</p>
-                )}
+                ) : null}
             </div>
         </div>
     );

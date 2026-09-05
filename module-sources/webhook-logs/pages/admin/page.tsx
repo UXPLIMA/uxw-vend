@@ -3,7 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, CheckCircle, XCircle } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 
@@ -22,6 +22,8 @@ export default function WebhookLogsPage() {
     const t = useTranslations("webhookLogs");
     const commonT = useTranslations("common");
     const [logs, setLogs] = useState<Log[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -31,19 +33,21 @@ export default function WebhookLogsPage() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/api/v1/webhook-logs?page=${page}`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 setLogs(d.logs || []);
                 setTotalPages(d.pages || 1);
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setFailed(true);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [page]);
+    }, [page, reloadKey]);
 
     return (
         <>
@@ -56,6 +60,8 @@ export default function WebhookLogsPage() {
                 <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                     ) : logs.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">{t("adm_noLogsYet")}</p>
                     ) : (

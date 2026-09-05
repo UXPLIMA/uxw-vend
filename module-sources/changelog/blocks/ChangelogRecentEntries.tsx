@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { dateLocaleTag } from "@/core/sdk";
 import type { ComponentConfig } from "@measured/puck";
+import { LoadFailed } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: ChangelogRecentEntries
@@ -31,24 +32,29 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
     const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("changelog");
     const [entries, setEntries] = useState<ChangelogEntry[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
         fetch(`/api/v1/changelog?limit=${count || 5}`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 const list: ChangelogEntry[] = Array.isArray(d) ? d : d.entries || d.data || [];
                 setEntries(list.slice(0, count || 5));
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
-                if (!cancelled) setLoading(false);
+                if (cancelled) return;
+                setFailed(true);
+                setLoading(false);
             });
 
         return () => { cancelled = true; };
-    }, [count]);
+    }, [count, reloadKey]);
 
     return (
         <section className="container mx-auto px-4 py-8 max-w-3xl">
@@ -61,6 +67,8 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
                         <div key={i} className="h-16 rounded-lg bg-muted animate-pulse" />
                     ))}
                 </div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : entries.length === 0 ? (
                 <div className="text-muted-foreground text-sm">{t("noEntries")}</div>
             ) : (

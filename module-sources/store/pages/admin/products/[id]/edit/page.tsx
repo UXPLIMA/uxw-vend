@@ -6,7 +6,7 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Trash2, X } from "lucide-react";
 
 interface Category {
@@ -48,11 +48,18 @@ export default function EditProductPage(props: PageProps) {
         subscriptionInterval: "month" as string,
         subscriptionIntervalCount: "1",
     });
+    // Without this the form rendered with every field blank after a failed
+    // load, and saving it would have written those blanks over the product.
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
         Promise.all([
-            fetch(`/api/v1/store/products/${productId}`).then((r) => r.json()),
+            fetch(`/api/v1/store/products/${productId}`).then((r) => {
+                if (!r.ok) throw new Error("load failed");
+                return r.json();
+            }),
             fetch("/api/v1/store/categories").then((r) => r.json()),
         ]).then(([productData, catData]) => {
             if (cancelled) return;
@@ -75,13 +82,15 @@ export default function EditProductPage(props: PageProps) {
                 });
             }
             setCategories(catData.categories || []);
+            setFailed(false);
             setLoading(false);
         }).catch(() => {
             if (cancelled) return;
+            setFailed(true);
             setLoading(false);
         });
         return () => { cancelled = true; };
-    }, [productId]);
+    }, [productId, reloadKey]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -150,6 +159,10 @@ export default function EditProductPage(props: PageProps) {
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
+    }
+
+    if (failed) {
+        return <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />;
     }
 
     return (

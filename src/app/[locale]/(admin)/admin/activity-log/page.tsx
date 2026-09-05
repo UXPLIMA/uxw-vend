@@ -6,6 +6,7 @@ import { Button } from "@/core/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 interface LogEntry {
     id: string;
@@ -26,13 +27,14 @@ export default function ActivityLogPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [failed, setFailed] = useState(false);
 
     const fetchLogs = useCallback(() => {
         setLoading(true);
         fetch(`/api/v1/activity-log?page=${page}`)
-            .then((r) => r.json())
-            .then((d) => { setLogs(d.logs || []); setTotalPages(d.pages || 1); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { setLogs(d.logs || []); setTotalPages(d.pages || 1); setFailed(false); setLoading(false); })
+            .catch(() => { setFailed(true); setLoading(false); });
     }, [page]);
 
      
@@ -49,6 +51,8 @@ export default function ActivityLogPage() {
                 <CardContent className="p-0">
                     {loading ? (
                         <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={fetchLogs} />
                     ) : logs.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">{t("activityLog_noLogs")}</p>
                     ) : (

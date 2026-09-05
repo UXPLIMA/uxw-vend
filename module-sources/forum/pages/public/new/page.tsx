@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
@@ -19,6 +19,8 @@ export default function NewTopicPage() {
     const t = useTranslations('forum');
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -29,12 +31,14 @@ export default function NewTopicPage() {
     });
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/forum/categories")
-            .then((r) => r.json())
-            .then((d) => setCategories(d.categories || []))
-            .catch(() => undefined)
-            .finally(() => setCategoriesLoaded(true));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setCategories(d.categories || []); setFailed(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setCategoriesLoaded(true); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +82,9 @@ export default function NewTopicPage() {
                         <CardTitle as="h1">{t('newTopic')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {categoriesLoaded && categories.length === 0 ? (
+                        {failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                        ) : categoriesLoaded && categories.length === 0 ? (
                             <div className="text-center py-10">
                                 <FolderPlus className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
                                 <p className="font-medium text-foreground">{t('noCategoriesTitle')}</p>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
+import { LoadFailed } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: BlogCategoryGrid
@@ -26,24 +27,29 @@ interface BlogCategory {
 function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): React.ReactElement {
     const t = useTranslations("blog");
     const [categories, setCategories] = useState<BlogCategory[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
         fetch(`/api/v1/blog/categories`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 const list: BlogCategory[] = Array.isArray(d) ? d : d.categories || d.data || [];
                 setCategories(list);
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
-                if (!cancelled) setLoading(false);
+                if (cancelled) return;
+                setFailed(true);
+                setLoading(false);
             });
 
         return () => { cancelled = true; };
-    }, []);
+    }, [reloadKey]);
 
     const colClass =
         columns === 2 ? "md:grid-cols-2" :
@@ -62,6 +68,8 @@ function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): Re
                         <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
                     ))}
                 </div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : categories.length === 0 ? (
                 <div className="text-muted-foreground text-sm">{t("noCategories")}</div>
             ) : (

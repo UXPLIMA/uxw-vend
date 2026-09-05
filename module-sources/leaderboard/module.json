@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",

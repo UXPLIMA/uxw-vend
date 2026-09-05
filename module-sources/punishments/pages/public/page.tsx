@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
@@ -47,6 +47,7 @@ export default function PunishmentsPage() {
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("punishments");
     const [punishments, setPunishments] = useState<PunishmentItem[]>([]);
+    const [failed, setFailed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
@@ -60,9 +61,9 @@ export default function PunishmentsPage() {
         if (typeFilter) params.set("type", typeFilter);
 
         fetch(`/api/v1/punishments?${params}`)
-            .then((r) => r.json())
-            .then((d) => { setPunishments(d.punishments || []); setTotalPages(d.pages || 1); setLoading(false); })
-            .catch(() => setLoading(false));
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { setPunishments(d.punishments || []); setTotalPages(d.pages || 1); setFailed(false); setLoading(false); })
+            .catch(() => { setFailed(true); setLoading(false); });
     };
 
     // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
@@ -99,6 +100,8 @@ export default function PunishmentsPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={fetchData} />
                 ) : punishments.length === 0 ? (
                     <Card><CardContent className="py-12 text-center text-muted-foreground">{t("noPunishments")}</CardContent></Card>
                 ) : (

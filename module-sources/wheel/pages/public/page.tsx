@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, PartyPopper } from "lucide-react";
@@ -22,6 +22,8 @@ export default function WheelPage() {
     const { format: money } = useSiteCurrency();
     const { data: session } = useSession();
     const [prizes, setPrizes] = useState<Prize[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
     const [spinning, setSpinning] = useState(false);
     const [rotation, setRotation] = useState(0);
@@ -31,11 +33,13 @@ export default function WheelPage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/wheel/prizes")
-            .then((r) => r.json())
-            .then((d) => { setPrizes(d.prizes || []); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setPrizes(d.prizes || []); setFailed(false); setLoading(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     // Draw wheel
     useEffect(() => {
@@ -143,6 +147,8 @@ export default function WheelPage() {
 
                 {loading ? (
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : prizes.length === 0 ? (
                     <Card><CardContent className="py-12 text-center text-muted-foreground">{t('noPrizes')}</CardContent></Card>
                 ) : (

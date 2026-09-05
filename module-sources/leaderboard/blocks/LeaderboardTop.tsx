@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 import { Crown, Medal, Trophy } from "lucide-react";
+import { LoadFailed } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: LeaderboardTop
@@ -35,24 +36,29 @@ function iconFor(type: LeaderboardTopProps["type"]) {
 function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): React.ReactElement {
     const t = useTranslations("leaderboard");
     const [entries, setEntries] = useState<LeaderEntry[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let cancelled = false;
         fetch(`/api/v1/leaderboard?type=${type}&limit=${limit || 5}`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 const list: LeaderEntry[] = Array.isArray(d) ? d : d.leaderboard || d.data || [];
                 setEntries(list.slice(0, limit || 5));
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
-                if (!cancelled) setLoading(false);
+                if (cancelled) return;
+                setFailed(true);
+                setLoading(false);
             });
 
         return () => { cancelled = true; };
-    }, [limit, type]);
+    }, [limit, type, reloadKey]);
 
     const Icon = iconFor(type);
 
@@ -71,6 +77,8 @@ function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): Re
                             <div key={i} className="h-14 bg-muted animate-pulse" />
                         ))}
                     </div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : entries.length === 0 ? (
                     <div className="p-6 text-sm text-muted-foreground text-center">
                         {t("noData")}

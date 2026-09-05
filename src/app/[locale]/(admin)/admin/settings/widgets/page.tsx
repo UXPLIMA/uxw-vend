@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { isWidgetVisible } from "@/core/lib/homepage-widgets";
 import { writeError } from "@/core/lib/write-result";
+import { LoadFailed } from "@/core/components/ui/load-failed";
 
 export default function WidgetSettingsPage() {
     const modules = useAllModules();
@@ -37,11 +38,17 @@ export default function WidgetSettingsPage() {
     const [saving, setSaving] = useState(false);
     const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
     const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+    // The list of widgets comes from the registry, so it renders either way -
+    // but the visibility it renders comes from this request. A failed load
+    // showed every widget at its default and let the admin save that back
+    // over the settings they actually had.
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
         fetch("/api/v1/settings")
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((data) => {
                 if (cancelled) return;
                 const s = data.settings || {};
@@ -61,14 +68,16 @@ export default function WidgetSettingsPage() {
                 if (missing.length > 0) {
                     setWidgetOrder((prev) => [...prev, ...missing]);
                 }
+                setLoadFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setLoadFailed(true);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [availableWidgets]);
+    }, [availableWidgets, reloadKey]);
 
     const toggle = (id: string) => {
         setWidgetConfig({ ...widgetConfig, [id]: !widgetConfig[id] });
@@ -141,7 +150,13 @@ export default function WidgetSettingsPage() {
                 <p className="text-muted-foreground">{t("widgets_subtitle")}</p>
             </div>
 
-            {sortedWidgets.length === 0 ? (
+            {loadFailed ? (
+                <Card className="mb-6">
+                    <CardContent>
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    </CardContent>
+                </Card>
+            ) : sortedWidgets.length === 0 ? (
                 <Card className="mb-6 border-dashed">
                     <CardContent className="py-12 text-center">
                         <p className="text-muted-foreground">{t("widgets_none")}</p>
@@ -184,7 +199,7 @@ export default function WidgetSettingsPage() {
             </Card>
             )}
 
-            {sortedWidgets.length > 0 && (
+            {sortedWidgets.length > 0 && !loadFailed && (
             <Button onClick={save} disabled={saving}>
                 {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("widgets_saving")}</> : <><Check className="w-4 h-4 mr-2" /> {t("widgets_save")}</>}
             </Button>

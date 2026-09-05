@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
+import { LoadFailed } from "@/core/sdk/ui";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useTranslations } from "next-intl";
 import { User, CreditCard, Package, Wrench, Info, BookOpen } from "lucide-react";
@@ -32,19 +33,28 @@ export default function HelpCenterPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const t = useTranslations('helpCenter');
     const commonT = useTranslations('common');
 
     useEffect(() => {
+        let cancelled = false;
+        const read = (url: string) => fetch(url).then(r => {
+            if (!r.ok) throw new Error("load failed");
+            return r.json();
+        });
         Promise.all([
-            fetch("/api/v1/help/categories").then(r => r.json()),
-            fetch("/api/v1/help/articles?limit=5").then(r => r.json()),
-        ]).then(([cats, articles]) => {
+            read("/api/v1/help/categories"),
+            read("/api/v1/help/articles?limit=5"),
+        ]).then(([cats, articles]) => { if (cancelled) return;
             setCategories(cats || []);
             setPopularArticles(articles || []);
+            setFailed(false);
             setLoading(false);
-        }).catch(() => setLoading(false));
-    }, []);
+        }).catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const handleSearch = async () => {
         if (!searchQuery.trim()) {
@@ -181,11 +191,13 @@ export default function HelpCenterPage() {
                                         ))}
                                     </div>
 
-                                    {categories.length === 0 && (
+                                    {failed ? (
+                                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                                    ) : categories.length === 0 ? (
                                         <div className="bg-card rounded-xl p-8 text-center">
                                             <p className="text-muted-foreground">{t('noCategories')}</p>
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             )}
                     </StandardSidebarLayout>

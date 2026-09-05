@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Send } from "lucide-react";
@@ -22,17 +22,21 @@ export default function StaffPage() {
     const t = useTranslations('staff');
     const { data: session } = useSession();
     const [members, setMembers] = useState<StaffMember[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
     const [position, setPosition] = useState("");
     const [content, setContent] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/staff")
-            .then((r) => r.json())
-            .then((d) => { setMembers(d.members || []); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setMembers(d.members || []); setFailed(false); setLoading(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const submit = async () => {
         if (!position.trim() || !content.trim()) return;
@@ -71,6 +75,8 @@ export default function StaffPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : members.length === 0 ? (
                     <Card className="max-w-4xl mx-auto"><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
                 ) : (

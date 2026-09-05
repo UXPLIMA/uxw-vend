@@ -5,6 +5,7 @@ import { Award, Check, Loader2, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Footer, Navbar } from "@/core/sdk/layout";
+import { LoadFailed } from "@/core/sdk/ui";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 
 interface TrophyRow {
@@ -28,12 +29,14 @@ export default function PublicTrophiesPage() {
     const [trophies, setTrophies] = useState<TrophyRow[]>([]);
     const [earnedIds, setEarnedIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
         const tasks: Promise<unknown>[] = [
             fetch("/api/v1/trophies")
-                .then((r) => (r.ok ? r.json() : { trophies: [] }))
+                .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
                 .then((d) => {
                     if (cancelled) return;
                     setTrophies(Array.isArray(d.trophies) ? d.trophies : []);
@@ -42,7 +45,7 @@ export default function PublicTrophiesPage() {
         if (session?.user) {
             tasks.push(
                 fetch("/api/v1/me/trophies")
-                    .then((r) => (r.ok ? r.json() : { earned: [] }))
+                    .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
                     .then((d) => {
                         if (cancelled) return;
                         const arr: EarnedRow[] = Array.isArray(d.earned) ? d.earned : [];
@@ -51,13 +54,14 @@ export default function PublicTrophiesPage() {
             );
         }
         Promise.all(tasks)
-            .catch(() => { })
+            .then(() => { if (!cancelled) setFailed(false); })
+            .catch(() => { if (!cancelled) setFailed(true); })
             .finally(() => {
                 if (cancelled) return;
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [session]);
+    }, [session, reloadKey]);
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
@@ -77,6 +81,8 @@ export default function PublicTrophiesPage() {
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                     </div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : trophies.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">
                         {t("noTrophiesAvailable")}

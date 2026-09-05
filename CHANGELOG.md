@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `LoadFailed` joins `@/core/sdk/ui` (CORE_API_VERSION 1.9.0). The panel a
+  screen shows when the request behind it did not come back, with a retry,
+  because these screens load once on mount and a reload was otherwise the only
+  way out. A module that fetches its own content has the same two ways of
+  being empty core does.
+
 - `userProfile: true` on a module manifest route. Core writes a username in a
   few places of its own and had no way to say where a person's profile lives,
   because that page belongs to a module that may not be installed. The module
@@ -32,6 +38,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   caller's catalogue knows, so a rate-limited save says so.
 
 ### Fixed
+- **Forty screens reported a failed load as an empty result.** A list has two
+  ways to be empty - nothing was created yet, or the request never came back -
+  and every one of them had a single sentence for both. A server error, an
+  expired session and an offline connection all read as "no orders yet", "no
+  categories", or, in the setup wizard, "all essential modules are installed"
+  under a green tick. Two shapes did it: `.catch(() => setLoading(false))`
+  turns a rejection into a finished load with no rows, and
+  `.then(r => r.ok ? r.json() : { items: [] })` substitutes an empty answer for
+  a refusal so the rejection never happens. Both read as deliberate, which is
+  why there were fifty-three of them.
+
+  Two cost more than a wrong sentence. The observability page said "no errors"
+  and "no failed emails" when it had not heard back, which is the worst thing
+  that page can get wrong. The widget settings screen showed every widget at
+  its default after a failed load, so saving wrote those defaults over the
+  admin's real settings; it now refuses to offer the save button at all. The
+  product edit form did the same with a blank form over a real product.
+
+  Retrying re-runs the effect, so fifteen loads that were previously
+  mount-only can now overlap; each of those gained the cancellation the
+  race gate requires. A gate checks every read that feeds a screen with an
+  empty state, and the nine files that may stay silent carry their reason.
+
 - **Eighteen controls that a screen reader could not name.** Eight buttons
   hold nothing but an icon, an arrow glyph or nothing at all, and were
   announced as "button" and no more: the reorder arrows on the navbar and

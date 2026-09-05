@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
@@ -22,6 +22,8 @@ const rankColors = ["text-yellow-500", "text-muted-foreground", "text-amber-600"
 export default function LeaderboardPage() {
     const t = useTranslations("leaderboard");
     const [activeTab, setActiveTab] = useState("buyers");
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [entries, setEntries] = useState<LeaderEntry[]>([]);
     const [loading, setLoading] = useState(true);
     // Which boards this site can fill. Votes and forum posts come from other
@@ -43,19 +45,21 @@ export default function LeaderboardPage() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`/api/v1/leaderboard?type=${activeTab}&limit=20`)
-            .then((r) => r.json())
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
             .then((d) => {
                 if (cancelled) return;
                 setEntries(d.leaderboard || []);
                 if (Array.isArray(d.sources)) setSources(d.sources);
+                setFailed(false);
                 setLoading(false);
             })
             .catch(() => {
                 if (cancelled) return;
+                setFailed(true);
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [activeTab]);
+    }, [activeTab, reloadKey]);
 
     return (
         <div className="min-h-screen flex flex-col bg-muted">
@@ -80,6 +84,8 @@ export default function LeaderboardPage() {
                     <CardContent className="p-0">
                         {loading ? (
                             <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                        ) : failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                         ) : entries.length === 0 ? (
                             <p className="text-muted-foreground text-center py-12">{t("noData")}</p>
                         ) : (

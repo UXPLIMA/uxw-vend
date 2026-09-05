@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, Users, UserPlus, Coins, Clock, Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,17 +27,22 @@ export default function AdminReferralPage() {
     const [loading, setLoading] = useState(true);
     const [rewardAmount, setRewardAmount] = useState("");
     const [saving, setSaving] = useState(false);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/referral/stats")
-            .then(r => r.json())
-            .then(d => {
+            .then(r => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then(d => { if (cancelled) return;
                 setStats(d);
                 setRewardAmount(String(d.rewardAmount));
+                setFailed(false);
             })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+            .catch(() => { if (cancelled) return; setFailed(true); })
+            .finally(() => { if (cancelled) return; setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const saveSettings = async () => {
         const amount = parseFloat(rewardAmount);
@@ -152,7 +157,9 @@ export default function AdminReferralPage() {
                         <CardTitle>{t("adm_topReferrers")}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {stats.topReferrers.length === 0 ? (
+                        {failed ? (
+                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                        ) : stats.topReferrers.length === 0 ? (
                             <p className="text-center text-muted-foreground py-4">{t("adm_noReferrals")}</p>
                         ) : (
                             <div className="space-y-3">

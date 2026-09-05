@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Download, FileText } from "lucide-react";
@@ -27,14 +27,18 @@ function formatFileSize(bytes: number | null, unknownLabel: string): string {
 export default function DownloadsPage() {
     const t = useTranslations('downloads');
     const [downloads, setDownloads] = useState<DownloadItem[]>([]);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         fetch("/api/v1/downloads")
-            .then((r) => r.json())
-            .then((d) => { setDownloads(d.downloads || []); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d) => { if (cancelled) return; setDownloads(d.downloads || []); setFailed(false); setLoading(false); })
+            .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
 
     const handleDownload = async (id: string) => {
         const res = await fetch(`/api/v1/downloads/${id}`);
@@ -57,6 +61,8 @@ export default function DownloadsPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : failed ? (
+                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : downloads.length === 0 ? (
                     <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
                 ) : (
