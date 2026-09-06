@@ -22,10 +22,17 @@ vi.mock("@/core/lib/db", () => ({
 
 vi.mock("@/core/lib/redis", () => ({ cacheGetJSON, cacheSetJSON, cacheDel }));
 
+// What a manifest declares and how a stored value is clamped is
+// module-settings' job and has its own tests. What matters here is which bag
+// this file hands over, so the resolver is a spy that reports its arguments.
+const { resolveSettings } = vi.hoisted(() => ({ resolveSettings: vi.fn() }));
+vi.mock("@/core/lib/module-settings", () => ({ resolveSettings }));
+
 import {
     getModuleStates,
     isModuleEnabled,
     invalidateModuleCache,
+    moduleSettings,
 } from "@/core/lib/module-cache";
 
 let consoleWarn: ReturnType<typeof vi.spyOn>;
@@ -35,6 +42,7 @@ beforeEach(() => {
     cacheGetJSON.mockReset().mockResolvedValue(null);
     cacheSetJSON.mockReset().mockResolvedValue(undefined);
     cacheDel.mockReset().mockResolvedValue(undefined);
+    resolveSettings.mockReset().mockImplementation((_id: string, stored: unknown) => ({ stored }));
     consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => { });
     vi.stubEnv("NODE_ENV", "test");
 });
@@ -154,5 +162,73 @@ describe("invalidateModuleCache", () => {
     it("drops the shared key so the next read re-queries", async () => {
         await invalidateModuleCache();
         expect(cacheDel).toHaveBeenCalledWith("uxw:modules:status");
+    });
+
+    it("drops the config key too", async () => {
+        // The two caches are written from the same table. Dropping only the
+        // states one left a module reading its old settings for another
+        // thirty seconds after an admin saved new ones.
+        await invalidateModuleCache();
+        expect(cacheDel).toHaveBeenCalledWith("uxw:modules:config");
+    });
+});
+
+/**
+ * A module's stored config travels the same road as its enabled state - own
+ * cache key, own soft failure - and none of it was covered: `moduleSettings`
+ * arrived with the settings feature and its half of this file was never run.
+ */
+describe("moduleSettings", () => {
+    it("serves a cache hit without touching the database", async () => {
+        cacheGetJSON.mockImplementation(async (key: string) =>
+            key === "uxw:modules:config" ? { shop: { currency: "TRY" } } : null);
+
+        await expect(moduleSettings("shop")).resolves.toEqual({ stored: { currency: "TRY" } });
+        expect(moduleConfig.findMany).not.toHaveBeenCalled();
+    });
+
+    it("reads its own cache key, not the states one", async () => {
+        await moduleSettings("shop");
+        expect(cacheGetJSON).toHaveBeenCalledWith("uxw:modules:config");
+    });
+
+    it("builds the bag from the config rows on a miss and caches it", async () => {
+        moduleConfig.findMany.mockResolvedValue([
+            { id: "shop", config: { currency: "TRY" } },
+            { id: "blog", config: { perPage: 10 } },
+        ]);
+
+        await expect(moduleSettings("blog")).resolves.toEqual({ stored: { perPage: 10 } });
+        expect(moduleConfig.findMany).toHaveBeenCalledWith({ select: { id: true, config: true } });
+        expect(cacheSetJSON).toHaveBeenCalledWith(
+            "uxw:modules:config",
+            { shop: { currency: "TRY" }, blog: { perPage: 10 } },
+            30,
+        );
+    });
+
+    it("hands the resolver nothing for a module that has never been saved", async () => {
+        await moduleSettings("shop");
+
+        // Not an error and not an empty object: `undefined` is what tells the
+        // resolver to answer with the manifest's own defaults.
+        expect(resolveSettings).toHaveBeenCalledWith("shop", undefined);
+    });
+
+    it("falls back to the manifest defaults during a database outage", async () => {
+        moduleConfig.findMany.mockRejectedValue(new Error("ECONNREFUSED"));
+
+        await expect(moduleSettings("shop")).resolves.toEqual({ stored: undefined });
+        expect(consoleWarn).toHaveBeenCalled();
+        // Nothing partial is cached, so the next read tries the database again.
+        expect(cacheSetJSON).not.toHaveBeenCalled();
+    });
+
+    it("says nothing about that outage in production", async () => {
+        vi.stubEnv("NODE_ENV", "production");
+        moduleConfig.findMany.mockRejectedValue(new Error("ECONNREFUSED"));
+
+        await expect(moduleSettings("shop")).resolves.toEqual({ stored: undefined });
+        expect(consoleWarn).not.toHaveBeenCalled();
     });
 });

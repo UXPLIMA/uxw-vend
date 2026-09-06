@@ -17,6 +17,9 @@ let rowsByModel: Record<string, unknown[]>;
 let failingModels: Set<string>;
 let installedModels: Set<string>;
 let bogusModels: Set<string>;
+let uniqueModels: Set<string>;
+let uniqueRow: unknown;
+let uniqueCall: { model: string; where: Record<string, unknown>; select?: Record<string, true> } | null;
 let moduleTables: { model: string; key: string; column: string; module: string }[];
 
 vi.mock("@/core/generated/module-registry", () => ({
@@ -44,6 +47,20 @@ vi.mock("@/core/lib/db", () => {
                     findCalls.push({ model: prop, where: args.where, select: args.select });
                     return rowsByModel[prop] ?? [];
                 },
+                // Only the models that say they have one. A Prisma client
+                // generated without a model answers `undefined` for it, and a
+                // delegate that is there but has no `findUnique` is the shape
+                // an older client leaves behind - the export has to survive
+                // both, so both stay reachable from here.
+                ...(uniqueModels.has(prop)
+                    ? {
+                        findUnique: async (args: { where: Record<string, unknown>; select?: Record<string, true> }) => {
+                            if (failingModels.has(prop)) throw new Error(`${prop} exploded`);
+                            uniqueCall = { model: prop, where: args.where, select: args.select };
+                            return uniqueRow;
+                        },
+                    }
+                    : {}),
             };
         },
         has(obj, prop: string) {
@@ -74,6 +91,9 @@ beforeEach(() => {
     failingModels = new Set();
     bogusModels = new Set();
     installedModels = new Set(CORE_MODELS);
+    uniqueModels = new Set();
+    uniqueRow = null;
+    uniqueCall = null;
     moduleTables = [];
 });
 
@@ -220,6 +240,43 @@ describe("exportUserData", () => {
             "notificationPrefs", "resourcePermissions", "revisions",
             "sessions", "user", "warnings",
         ]);
+    });
+
+    /**
+     * The dashboard arrangement is the one thing in the bundle that is a
+     * single row rather than a table, so it is the one thing fetched through
+     * `findUnique`. Every test above ran against a client with no `setting`
+     * model at all, which meant the only path ever exercised was the guard
+     * that gives up - the fetch itself, and its failure, were never run.
+     */
+    it("puts the user's dashboard layout in the bundle", async () => {
+        installedModels.add("setting");
+        uniqueModels.add("setting");
+        uniqueRow = { value: { widgets: ["credits"] }, updatedAt: new Date(0) };
+
+        const result = await exportUserData("usr_1");
+
+        // Keyed by the user, not joined on a column: the wrong key hands one
+        // user another user's layout.
+        expect(uniqueCall).toEqual({
+            model: "setting",
+            where: { key: "dashboard_layout:usr_1" },
+            select: { value: true, updatedAt: true },
+        });
+        expect(result.dashboardLayout).toEqual(uniqueRow);
+    });
+
+    it("still exports everything else when that one row cannot be read", async () => {
+        installedModels.add("setting");
+        uniqueModels.add("setting");
+        failingModels.add("setting");
+
+        const result = await exportUserData("usr_1");
+
+        // A layout is a convenience. Losing it must not cost the user the
+        // export they asked for.
+        expect(result.dashboardLayout).toBeNull();
+        expect(result.user).toEqual({ id: "usr_1", email: "a@b.c" });
     });
 });
 
