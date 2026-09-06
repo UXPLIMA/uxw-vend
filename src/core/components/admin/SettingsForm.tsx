@@ -110,7 +110,7 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                 }
             />
 
-            {error && <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>}
+            {error && <div role="alert" className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>}
 
             <form id={FORM_ID} onSubmit={handleSave}>
                 <Card>

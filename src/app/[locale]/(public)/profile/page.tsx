@@ -295,7 +295,7 @@ export default function ProfilePage() {
                         <CardContent>
                             <form onSubmit={saveProfile} className="space-y-4">
                                 {profileError && (
-                                    <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">{profileError}</div>
+                                    <div role="alert" className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">{profileError}</div>
                                 )}
                                 <div>
                                     <Label htmlFor={usernameId}>{t("username")}</Label>
@@ -446,7 +446,7 @@ export default function ProfilePage() {
                         </div>
 
                         {deleteError && (
-                            <div className="mb-3 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
+                            <div role="alert" className="mb-3 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                 {deleteError}
                             </div>
                         )}

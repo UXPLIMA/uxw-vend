@@ -170,7 +170,7 @@ export default function EditBlogArticlePage(props: PageProps) {
             />
 
             {error && (
-                <div className="mb-6 p-4 bg-destructive/10 border border-destructive/50 text-destructive rounded-lg">
+                <div role="alert" className="mb-6 p-4 bg-destructive/10 border border-destructive/50 text-destructive rounded-lg">
                     {error}
                 </div>
             )}

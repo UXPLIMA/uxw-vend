@@ -262,7 +262,7 @@ export function ProfileSecurityTab() {
                 </CardHeader>
                 <CardContent>
                     {twoFAError && (
-                        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg mb-4">
+                        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg mb-4">
                             {twoFAError}
                         </div>
                     )}
@@ -443,7 +443,7 @@ export function ProfileSecurityTab() {
                 <CardContent>
                     <form onSubmit={changePassword} className="space-y-4 max-w-md">
                         {passwordError && (
-                            <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
+                            <div role="alert" className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                 {passwordError}
                             </div>
                         )}

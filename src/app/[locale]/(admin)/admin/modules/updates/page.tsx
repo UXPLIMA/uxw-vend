@@ -111,7 +111,7 @@ export default function ModuleUpdatesPage() {
             />
 
             {error && (
-                <Card className="mb-4 border-destructive">
+                <Card role="alert" className="mb-4 border-destructive">
                     <CardContent className="py-3 flex items-center gap-2 text-sm text-destructive">
                         <AlertCircle className="w-4 h-4" />
                         {error}

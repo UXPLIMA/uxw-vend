@@ -151,7 +151,7 @@ export default function AdminHelpCenterPage() {
                 />
 
                 {error && (
-                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                    <div role="alert" className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
                 )}
 
                 <Card>
@@ -212,7 +212,7 @@ export default function AdminHelpCenterPage() {
                 />
 
                 {error && (
-                    <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                    <div role="alert" className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
                 )}
 
                 <Card>
@@ -311,7 +311,7 @@ export default function AdminHelpCenterPage() {
             />
 
             {error && (
-                <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
+                <div role="alert" className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
             )}
 
             {/* Tabs */}

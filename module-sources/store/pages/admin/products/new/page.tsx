@@ -298,7 +298,7 @@ export default function NewProductPage() {
                         </Card>
 
                         {error && (
-                            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+                            <div role="alert" className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
                                 {error}
                             </div>
                         )}

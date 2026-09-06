@@ -400,7 +400,7 @@ export default function CartPage() {
                                             </div>
                                         )}
                                         {couponError && (
-                                            <p className="text-sm text-destructive">{couponError}</p>
+                                            <p role="alert" className="text-sm text-destructive">{couponError}</p>
                                         )}
                                     </div>
 
@@ -428,7 +428,7 @@ export default function CartPage() {
                                                 <Button variant="outline" onClick={applyCreatorCode}>{t('apply')}</Button>
                                             </div>
                                         )}
-                                        {creatorError && <p className="text-sm text-destructive">{creatorError}</p>}
+                                        {creatorError && <p role="alert" className="text-sm text-destructive">{creatorError}</p>}
                                     </div>
 
                                     {/* Player Name */}
@@ -530,7 +530,7 @@ export default function CartPage() {
                                     </div>
 
                                     {checkoutError && (
-                                        <p className="text-sm text-destructive text-center">{checkoutError}</p>
+                                        <p role="alert" className="text-sm text-destructive text-center">{checkoutError}</p>
                                     )}
 
                                     <Button

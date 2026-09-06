@@ -95,7 +95,7 @@ export default function NewTopicPage() {
                         ) : (
                             <>
                                 {error && (
-                                    <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
+                                    <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                         {error}
                                     </div>
                                 )}

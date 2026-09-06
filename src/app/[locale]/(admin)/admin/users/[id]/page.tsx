@@ -299,7 +299,7 @@ export default function AdminUserDetailPage() {
                         </CardHeader>
                         <CardContent>
                             {error && (
-                                <div className="mb-4 p-3 bg-destructive/10 text-destructive text-sm rounded-lg">{error}</div>
+                                <div role="alert" className="mb-4 p-3 bg-destructive/10 text-destructive text-sm rounded-lg">{error}</div>
                             )}
                             <form onSubmit={handleSave} className="space-y-4">
                                 <div>
@@ -568,7 +568,7 @@ export default function AdminUserDetailPage() {
                         </div>
 
                         {deleteError && (
-                            <div className="mb-3 p-3 bg-destructive/10 border border-destructive/25 text-destructive text-sm rounded-lg">
+                            <div role="alert" className="mb-3 p-3 bg-destructive/10 border border-destructive/25 text-destructive text-sm rounded-lg">
                                 {deleteError}
                             </div>
                         )}

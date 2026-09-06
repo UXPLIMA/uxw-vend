@@ -109,7 +109,7 @@ export default function NewTicketPage() {
                         </div>
                     ) : (<>
                     {error && (
-                        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
+                        <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
                             {error}
                         </div>
                     )}

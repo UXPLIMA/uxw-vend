@@ -164,7 +164,7 @@ export function ProfileMinecraftTab() {
                                 className="font-mono tracking-widest"
                             />
                         </div>
-                        {error && <p className="text-sm text-destructive">{error}</p>}
+                        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
                         <div className="flex gap-2">
                             <Button onClick={confirmCode} disabled={busy || code.trim().length < 6}>
                                 {busy && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -188,7 +188,7 @@ export function ProfileMinecraftTab() {
                                 maxLength={16}
                             />
                         </div>
-                        {error && <p className="text-sm text-destructive">{error}</p>}
+                        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
                         <Button onClick={request} disabled={busy || username.trim().length < 3}>
                             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                             {t("sendCode")}
