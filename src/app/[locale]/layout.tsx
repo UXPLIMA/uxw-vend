@@ -8,6 +8,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { publicMessages } from "@/core/lib/i18n/message-scopes";
 import { SessionProvider } from "next-auth/react";
+import { getSession } from "@/core/lib/auth";
 import { AppThemeProvider } from "@/core/providers/theme-provider";
 import { ModuleProvider } from "@/core/providers/module-provider";
 import { getModuleStates } from "@/core/lib/module-cache";
@@ -99,6 +100,10 @@ export default async function RootLayout({
   // Resolve active theme + merged config on the server so the first paint
   // matches user customizations without a client round-trip.
   const active = await getActiveTheme();
+  // Handed to the provider below so the client does not fetch what the server
+  // already knows. Without it the first paint is anonymous and the header
+  // rewrites itself once the request lands.
+  const session = await getSession();
 
   // Build an override <style> block so admin-saved color customizations
   // actually take effect. The generated theme-tokens.css sets
@@ -130,7 +135,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
       >
-        <SessionProvider>
+        <SessionProvider session={session}>
           <NextIntlClientProvider messages={publicMessages(messages)}>
               <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>
                 <ModuleProvider moduleStates={moduleStates}>

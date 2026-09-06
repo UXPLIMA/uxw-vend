@@ -100,3 +100,21 @@ describe("the active theme", () => {
         expect(leaks, `These read the theme state directly:\n${leaks.join("\n")}`).toEqual([]);
     });
 });
+
+/**
+ * The same answer, handed across the server/client line.
+ *
+ * `SessionProvider` fetches `/api/auth/session` on mount when it is not given
+ * a session, which is a network round trip for something the server resolved
+ * while rendering the page that contains it. Passing it costs nothing: the
+ * lookup is already cached per render.
+ */
+describe("the client session provider", () => {
+    it("is handed the session the server already resolved", () => {
+        const layout = read(path.join(ROOT, "src/app/[locale]/layout.tsx"));
+        expect(layout, "SessionProvider must receive a session prop")
+            .toMatch(/<SessionProvider session=\{/);
+        expect(layout, "and it must come from the cached helper")
+            .toMatch(/getSession\(\)/);
+    });
+});
