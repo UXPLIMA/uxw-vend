@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, useConfirm, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Pagination, useConfirm, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
@@ -24,6 +24,8 @@ interface Suggestion {
 // no way to be filtered for afterwards.
 const FILTERS = ["all", ...SUGGESTION_STATUSES] as const;
 
+const PAGE_SIZE = 20;
+
 export default function AdminSuggestionsPage() {
     const t = useTranslations("suggestions");
     const __locale = useLocale();
@@ -32,21 +34,36 @@ export default function AdminSuggestionsPage() {
     const [items, setItems] = useState<Suggestion[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+    const [page, setPage] = useState(1);
+    const [pages, setPages] = useState(1);
+    const [total, setTotal] = useState(0);
 
+    // The board is the one screen where an old suggestion has to stay
+    // reachable. This asked for two hundred in one go, got the hundred the
+    // endpoint caps at, rendered every one of them, and offered no way to the
+    // ones behind: a board past its first hundred could not be moderated.
     const load = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/v1/suggestions?limit=200");
+            const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) });
+            if (filter !== "all") params.set("status", filter);
+            const res = await fetch(`/api/v1/suggestions?${params}`);
             const data = await res.json();
             setItems(data.suggestions || []);
+            setPages(data.pages || 1);
+            setTotal(data.total || 0);
         } catch {
             setItems([]);
+            setPages(1);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [page, filter]);
 
     useEffect(() => { load(); }, [load]);
+
+    const selectFilter = (next: (typeof FILTERS)[number]) => { setFilter(next); setPage(1); };
 
     const changeStatus = async (id: string, status: string) => {
         try {
@@ -93,8 +110,6 @@ export default function AdminSuggestionsPage() {
         return known ? STATUS_BADGE_CLASS[known] : "bg-muted text-muted-foreground";
     };
 
-    const filtered = items.filter(s => filter === "all" || canonicalStatus(s.status) === filter);
-
     return (
         <div className="space-y-6">
             <AdminPageHeader
@@ -108,7 +123,7 @@ export default function AdminSuggestionsPage() {
                         key={f}
                         variant={filter === f ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setFilter(f)}
+                        onClick={() => selectFilter(f)}
                     >
                         {f === "all" ? t("adm_filterAll") : t(f)}
                     </Button>
@@ -119,7 +134,7 @@ export default function AdminSuggestionsPage() {
                 <div className="flex justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </div>
-            ) : filtered.length === 0 ? (
+            ) : items.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
                         {t("adm_empty")}
@@ -127,7 +142,7 @@ export default function AdminSuggestionsPage() {
                 </Card>
             ) : (
                 <div className="space-y-3">
-                    {filtered.map(s => (
+                    {items.map(s => (
                         <Card key={s.id}>
                             <CardContent className="p-4 flex flex-col md:flex-row gap-4">
                                 <div className="flex flex-col items-center justify-center min-w-16 px-2 py-1 rounded bg-muted">
@@ -164,6 +179,7 @@ export default function AdminSuggestionsPage() {
                             </CardContent>
                         </Card>
                     ))}
+                    <Pagination page={page} pages={pages} total={total} onPageChange={setPage} />
                 </div>
             )}
         </div>

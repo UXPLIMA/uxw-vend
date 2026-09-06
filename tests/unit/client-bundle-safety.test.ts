@@ -191,7 +191,11 @@ describe("client bundle safety", () => {
         expect(CLIENT_ENTRIES.length).toBeGreaterThan(100);
     });
 
-    it("no client component reaches server-only code", () => {
+    // Walking every client entry's import graph is the slowest check in the
+    // suite, and vitest's five-second default made it fail on a loaded
+    // machine rather than on a real offender. A gate that goes red for the
+    // wrong reason is a gate people learn to ignore.
+    it("no client component reaches server-only code", { timeout: 60_000 }, () => {
         const offenders: string[] = [];
         for (const entry of CLIENT_ENTRIES) {
             for (const hit of serverOnlyReach(entry)) {

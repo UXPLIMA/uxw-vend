@@ -91,6 +91,14 @@ describe("both boards read the one list", () => {
         }
     });
 
+    it("filters and pages the admin board in the same query", () => {
+        expect(admin).toContain('params.set("status", filter)');
+        // Two hundred asked for, a hundred returned by the cap, all of them
+        // rendered, and no way to the ones behind them.
+        expect(admin).not.toContain("limit=200");
+        expect(admin).toContain("<Pagination");
+    });
+
     it("filters through the fold", () => {
         expect(api).toContain("canonicalStatus(status)");
         expect(api).toContain("spellingsOf(canonical)");
