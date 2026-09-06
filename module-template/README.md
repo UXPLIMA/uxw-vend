@@ -2,8 +2,6 @@
 
 Starter for new uxwVend modules. The `npm run create:module` script copies this directory into `module-sources/<id>/` and rewrites placeholders in every file.
 
-For the complete manifest reference, authoring patterns, and core import surface, see [../docs/PLUGIN_SDK.md](../docs/PLUGIN_SDK.md).
-
 ---
 
 ## Scaffold a module
@@ -116,8 +114,6 @@ The template manifest enumerates every common UI registration so you can see all
 | `notificationTypes` | Event types surfaced in user notification preferences |
 | `translations` | Inline `{ locale: { namespace: { key: value } } }` synced to the `Translation` DB table |
 
-Full schema and per-field shape: [../docs/PLUGIN_SDK.md](../docs/PLUGIN_SDK.md).
-
 ---
 
 ## Database models
@@ -157,7 +153,7 @@ npm run db:merge      # merge core + every module schema into prisma/schema.pris
 npm run db:push       # apply the diff to the database
 ```
 
-For schema changes against an already-deployed module, write a SQL migration in `migrations/NNN_description.sql`. See [../docs/MIGRATIONS.md](../docs/MIGRATIONS.md).
+For schema changes against an already-deployed module, write a SQL migration in `migrations/NNN_description.sql`.
 
 If your module has no database models, delete `schema.prisma` entirely.
 
@@ -233,12 +229,3 @@ npm run build:marketplace
 ```
 
 Commit the source tree under `module-sources/<id>/`, the generated `module-marketplace/<id>.zip`, and the updated `module-marketplace/index.json` together in the same commit. Never commit anything under `src/modules/` (gitignored runtime state) or `src/core/generated/` (codegen output).
-
----
-
-## See also
-
-- [../docs/PLUGIN_SDK.md](../docs/PLUGIN_SDK.md) - complete `module.json` reference and authoring patterns
-- [../docs/MIGRATIONS.md](../docs/MIGRATIONS.md) - per-module SQL migrations
-- [../docs/API.md](../docs/API.md) - REST API conventions for module handlers
-- [../docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md) - workflow and coding conventions

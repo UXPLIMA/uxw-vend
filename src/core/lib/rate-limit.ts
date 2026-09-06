@@ -256,7 +256,7 @@ export function warnIfProxyTrustUnconfigured(): void {
     log.warn(
         "TRUSTED_PROXY_IPS is not set: forwarded headers arrive unverified, " +
         "so rate limits and IP blocks are keyed on an address the caller can choose. " +
-        "Set it to your reverse proxy's address - see docs/DEPLOYMENT.md.",
+        "Set it to your reverse proxy's address.",
     );
 }
 

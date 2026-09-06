@@ -83,6 +83,13 @@ docs/superpowers/
 # claude code
 .claude/
 
+# Internal documentation lives in a separate private repository.
+# `next dev` rewrites AGENTS.md on every boot, so it is ignored rather
+# than committed.
+docs/
+CHANGELOG.md
+AGENTS.md
+
 # Test artifacts
 *.png
 !public/**/*.png

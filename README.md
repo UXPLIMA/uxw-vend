@@ -31,7 +31,7 @@ Three questions, each with a default. Give it a domain and it also obtains and
 renews an HTTPS certificate on its own.
 
 Afterwards the machine has a `uxwvend` command: `update`, `backup`, `restore`,
-`logs`, `status`, `restart`. Full reference in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+`logs`, `status`, `restart`.
 
 Then open the site, finish the setup wizard, and install modules from
 **Admin > Modules > Marketplace**.
@@ -95,8 +95,6 @@ stays reachable and the offending module can be removed. On every boot,
 `scripts/reconcile-build.ts` compares a fingerprint of `src/modules/` against
 the one recorded beside the build and rebuilds only when they disagree.
 
-Full detail in ["The Build Lifecycle"](docs/DEPLOYMENT.md#the-build-lifecycle).
-
 ---
 
 ## Modules
@@ -122,7 +120,7 @@ routes, API endpoints, sidebar menu, dashboard cards, widgets, navbar/footer/
 layout components, profile tabs, settings cards, OAuth buttons, dependencies,
 conflicts, RBAC permissions, cron jobs, webhook receivers, hook listeners, slot
 contributions, search providers, page-builder blocks, notification types and
-translations. The complete reference is [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md).
+translations.
 
 **Compatibility contract.** A manifest declares `coreVersion`, a semver range
 over `CORE_API_VERSION` (the module-facing contract version, deliberately
@@ -221,11 +219,10 @@ your own. Re-seeding never resets an existing admin's password.
 
 `db:push` is for a fresh local database only. The running app never pushes: it
 applies additive schema statements instead, because uninstall deliberately
-leaves module tables behind and a push would drop or refuse them. See
-[docs/MIGRATIONS.md](docs/MIGRATIONS.md).
+leaves module tables behind and a push would drop or refuse them.
 
-Production setup, environment variables, nginx, backups and hardening are in
-[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+`install.sh` covers production setup, environment variables, backups and
+hardening on a fresh machine.
 
 ---
 
@@ -274,7 +271,7 @@ npm run start            # Production server
 npm run db:merge         # Merge core + module schemas into prisma/schema.prisma
 npm run db:generate      # prisma generate
 npm run db:push          # Push the merged schema to a fresh database
-npm run db:migrate       # Apply per-module SQL migrations (docs/MIGRATIONS.md)
+npm run db:migrate       # Apply per-module SQL migrations
 npm run db:seed          # 3 roles + admin user
 npm run db:studio        # Prisma Studio
 npm run db:backup        # Gzipped SQL dump to ./backups/
@@ -334,37 +331,18 @@ For a faster local loop you can copy the source straight into
 `src/modules/<id>/` and run `npx tsx scripts/generate-registry.ts` to wire it up
 without packaging.
 
-The full manifest reference is [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md), and
 [module-template/README.md](module-template/README.md) is a walkthrough of the
 starter.
 
 ---
 
-## Documentation
-
-| Document | What it covers |
-|----------|----------------|
-| [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | Admin panel walkthrough: modules, themes, users, roles, settings |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment, environment variables, the build lifecycle, backups |
-| [docs/PLUGIN_SDK.md](docs/PLUGIN_SDK.md) | Module authoring reference and the complete `module.json` schema |
-| [docs/API.md](docs/API.md) | REST API, auth, rate limiting, module APIs, webhooks, cron |
-| [docs/MIGRATIONS.md](docs/MIGRATIONS.md) | Per-module SQL migrations, and why the install path never pushes |
-| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Contribution guide, coding conventions, CI checks |
-| [module-template/README.md](module-template/README.md) | Scaffolding a new module from the template |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
-| [SECURITY.md](SECURITY.md) | Reporting a vulnerability |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community expectations |
-
----
-
 ## Contributing
 
-Issues and pull requests are welcome. Read
-[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) first: it covers the coding
-conventions and the gates a PR has to pass. The short version is that
-`npm run typecheck && npm run lint && npm test` should be green before you open
-one, and that a change to core which mentions a module by name will be rejected
-by CI regardless of how well it works.
+Issues and pull requests are welcome. `npm run typecheck && npm run lint &&
+npm test` should be green before you open one, and a change to core which
+mentions a module by name will be rejected by CI regardless of how well it
+works. [SECURITY.md](SECURITY.md) covers reporting a vulnerability and
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) the community expectations.
 
 ---
 

@@ -78,12 +78,4 @@ describe("a chart answers when you point at it", () => {
         expect(src).toContain('rounded-full border border-border p-1 bg-card');
         expect(src).toContain("aria-pressed={period === p.key}");
     });
-
-    it("documents the stats contract it actually implements", () => {
-        const docs = readFileSync("docs/PLUGIN_SDK.md", "utf8");
-        expect(docs).not.toContain('{ cards: { [statKey: string]: number | string }');
-        expect(docs).toContain('"rankings"');
-        expect(docs).toContain('"type": "bar"');
-        expect(docs).toContain("dashboardSections");
-    });
 });

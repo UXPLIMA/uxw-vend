@@ -426,7 +426,7 @@ model CronRun {
 
 // Tracks which per-module SQL migrations have been applied to the DB.
 // Replaces the old `prisma db push` workflow with a forward-only
-// versioned migration system. See docs/MIGRATIONS.md.
+// versioned migration system.
 model ModuleMigration {
   id            String   @id @default(cuid())
   moduleId      String

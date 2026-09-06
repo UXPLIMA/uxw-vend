@@ -50,8 +50,8 @@ export async function GET() {
 /**
  * POST /api/v1/admin/cron - drive one scheduler tick from outside the process.
  *
- * This is the trigger `docs/DEPLOYMENT.md` tells an operator to point an
- * external cron at, for a host where the in-process ticker cannot be relied
+ * This is the trigger an operator points an external cron at, for a host
+ * where the in-process ticker cannot be relied
  * on. It used to call a parallel task list holding a single core cleanup and
  * nothing else, so an operator who wired it up ran none of core's registered
  * jobs and none of the modules', while the documentation said it ran both.

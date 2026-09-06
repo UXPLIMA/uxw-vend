@@ -1,8 +1,6 @@
 /**
  * Per-module SQL migration runner.
  *
- * See docs/MIGRATIONS.md for the design.
- *
  * Walks each installed module's migrations/ directory, applies any
  * migration not yet recorded in the ModuleMigration table, and records
  * the checksum + execution time.

@@ -26,7 +26,7 @@
  * `-- DropTable`, `-- AlterTable`, …), so the filter reads those annotations
  * instead of parsing SQL. Anything not provably additive is skipped and
  * named in the log - destructive and altering changes are what a module's
- * `migrations/` directory is for, and `docs/MIGRATIONS.md` says so.
+ * `migrations/` directory is for.
  *
  * Usage:
  *   npx tsx scripts/apply-schema-additions.ts             # apply

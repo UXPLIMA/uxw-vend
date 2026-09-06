@@ -8,8 +8,7 @@
 //                     permissions + admin user, so `install.sh` yields a
 //                     working login out of the box.
 //
-//   EXISTING database - run the upgrade sequence documented in
-//                     docs/DEPLOYMENT.md ("Upgrades") and docs/MIGRATIONS.md:
+//   EXISTING database - run the upgrade sequence:
 //                     merge-schemas -> apply-schema-additions -> db push ->
 //                     apply-migrations. It used to return early here, which
 //                     meant pulling a newer image left the database on the old
@@ -116,7 +115,7 @@ async function main(): Promise<void> {
         // Additive first, and unconditionally: this is the half that cannot
         // fail for a reason the operator should have to think about, and it
         // guarantees every new table and column exists before anything else
-        // runs. See docs/MIGRATIONS.md.
+        // runs.
         run("apply-schema-additions", "npx", ["tsx", "scripts/apply-schema-additions.ts"]);
         // Then the full reconciliation, for the removals and retypes the
         // additive pass deliberately will not do.

@@ -89,8 +89,7 @@ export {
  *     export default onOrderCreated;
  *
  * The payload itself is declared by whichever module FIRES the hook, in a
- * `declare global { interface UxwVendHookPayloads { … } }` block. See
- * docs/PLUGIN_SDK.md.
+ * `declare global { interface UxwVendHookPayloads { … } }` block.
  */
 export type {
     ActionPayload,

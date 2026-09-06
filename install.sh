@@ -399,7 +399,7 @@ HEALTH_URL="http://127.0.0.1:$APP_PORT/api/health"
 # A first install boots in well under a minute. Re-running the installer over
 # an existing install is an upgrade, though, and an upgrade on a site with
 # modules recompiles them before the app serves anything - minutes, not
-# seconds (see docs/DEPLOYMENT.md, "The Build Lifecycle"). The wait has to
+# seconds. The wait has to
 # cover the slow case or the installer reports a failure for a healthy boot.
 HEALTH_TIMEOUT=900
 DEADLINE=$(( $(date +%s) + HEALTH_TIMEOUT ))

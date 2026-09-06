@@ -39,7 +39,7 @@ jobs:
         run: npm ci
 
       # Fresh clones start with src/modules empty (runtime install state, see
-      # .gitignore + docs/CONTRIBUTING.md). For the type check to see module-
+      # .gitignore). For the type check to see module-
       # contributed Prisma models (WebhookLog, BlogComment, StoreProduct, …)
       # and module-registered routes, we seed src/modules/ from the tracked
       # module-sources/ directory - the same files the marketplace ZIPs are

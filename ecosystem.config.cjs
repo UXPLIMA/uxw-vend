@@ -38,7 +38,7 @@ module.exports = {
         // One process, deliberately. Module pages are compiled into the app,
         // so a module install rebuilds and replaces the process; two workers
         // would compile into the same .next and the loser would serve a
-        // half-written build. See docs/DEPLOYMENT.md, "The Build Lifecycle".
+        // half-written build.
         instances: 1,
         exec_mode: 'fork',
 

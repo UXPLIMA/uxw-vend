@@ -277,8 +277,8 @@ export async function POST(request: NextRequest) {
                 });
                 // Create the tables the merged schema declares. Only one of
                 // the twenty-six modules that ship a schema.prisma also ships
-                // a migrations/ directory - per docs/MIGRATIONS.md, migrations
-                // cover changes *after* a module's initial release, and the
+                // a migrations/ directory: migrations cover changes *after*
+                // a module's initial release, and the
                 // schema is what creates the tables the first time. Without
                 // this, every module the wizard installs comes up enabled and
                 // tableless: Prisma P2021 on its first request.

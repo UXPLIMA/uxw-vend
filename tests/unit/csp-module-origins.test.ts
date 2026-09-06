@@ -163,10 +163,4 @@ describe("the api documentation", () => {
             fs.existsSync(path.join(root, "src/app/[locale]/(admin)/admin/api-docs/page.tsx")),
         ).toBe(true);
     });
-
-    it("is documented at the address that works", () => {
-        const doc = fs.readFileSync(path.join(root, "docs/API.md"), "utf8");
-        expect(doc).toContain("/admin/api-docs");
-        expect(doc).not.toMatch(/lives at `\/api\/docs`/);
-    });
 });

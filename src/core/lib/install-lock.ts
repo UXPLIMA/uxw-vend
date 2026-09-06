@@ -16,9 +16,8 @@
  * The in-process flag is kept as a fast path so concurrent requests to this
  * process can early-reject without a round trip.
  *
- * Note that running two app processes permanently is not a supported topology
- * (see docs/DEPLOYMENT.md, "The Build Lifecycle"): they would compile into the
- * same .next. The lock narrows the window, it does not make that safe.
+ * Note that running two app processes permanently is not a supported
+ * topology: they would compile into the same .next. The lock narrows the window, it does not make that safe.
  */
 
 import { execFile } from "child_process";
@@ -189,8 +188,8 @@ export function scheduleBuild(): void {
             //
             //    Twenty-five of the twenty-six modules that ship a
             //    schema.prisma ship no migrations/ directory, because
-            //    docs/MIGRATIONS.md says migrations are for altering a
-            //    module's schema *after* it is deployed and that the schema
+            //    migrations are for altering a module's schema *after* it
+            //    is deployed, and the schema
             //    itself is what creates the tables on first install. This
             //    step used to be absent - the comment on step 3 read
             //    "replaces db push" - so installing any of those modules one

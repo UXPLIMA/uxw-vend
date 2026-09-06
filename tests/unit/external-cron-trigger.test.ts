@@ -10,8 +10,8 @@ const code = (source: string) =>
 /**
  * The documented external cron trigger did not drive the scheduler.
  *
- * `docs/DEPLOYMENT.md` tells an operator to point a system cron at
- * `POST /api/v1/admin/cron` with an API key, and says the endpoint "runs
+ * The deployment guide tells an operator to point a system cron at
+ * `POST /api/v1/admin/cron` with an API key, and said the endpoint "runs
  * maintenance tasks registered by installed modules (expiring coupons,
  * closing stale tickets, etc.)". It did nothing of the kind. It called
  * `runScheduledTasks()`, a parallel list that knew about one core cleanup and
@@ -71,21 +71,5 @@ describe("the scheduler", () => {
     it("registers the retention sweep that now owns the token prune", () => {
         expect(scheduler).toContain('key: "core:retention-prune"');
         expect(scheduler).toContain("verificationToken: r.verificationToken");
-    });
-});
-
-describe("the documentation", () => {
-    it("no longer promises the endpoint runs module jobs it never touched", () => {
-        const deployment = read("docs/DEPLOYMENT.md");
-        expect(deployment).not.toContain(
-            "The cron endpoint runs maintenance tasks registered by installed modules",
-        );
-        expect(deployment).toContain("/api/v1/admin/cron");
-    });
-
-    it("describes what the endpoint actually does", () => {
-        const api = read("docs/API.md");
-        expect(api).not.toContain("The endpoint runs the core scheduled tasks once");
-        expect(api).toContain("/api/v1/admin/cron");
     });
 });
