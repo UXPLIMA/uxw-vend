@@ -20,6 +20,8 @@ import { MODULES_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-pat
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 /** Which catalogue module to fetch. The regex checks below still apply. */
 const installModuleSchema = z.object({
@@ -239,9 +241,14 @@ export async function POST(request: NextRequest) {
         } catch (err) {
             await fs.rm(targetDir, { recursive: true, force: true });
             extractedPath = null;
-            const detail = err instanceof Error ? err.message : String(err);
+            log.error("[modules] registry generation failed, install rolled back", {
+                error: err instanceof Error ? err.message : String(err),
+            });
             return NextResponse.json(
-                { error: `Registry generation failed - install rolled back: ${detail}` },
+                {
+                    error: "Registry generation failed - install rolled back",
+                    details: devOnlyDetail(err),
+                },
                 { status: 500 },
             );
         }
@@ -306,10 +313,13 @@ export async function POST(request: NextRequest) {
         if (extractedPath) {
             await fs.rm(extractedPath, { recursive: true, force: true }).catch(() => { /* best-effort */ });
         }
-        const msg = process.env.NODE_ENV === 'production'
-            ? 'Operation failed'
-            : (err instanceof Error ? err.message : 'Unknown error');
-        return NextResponse.json({ error: msg }, { status: 500 });
+        log.error("[modules] installing from the marketplace failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
+        return NextResponse.json(
+            { error: "Operation failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     } finally {
         releaseLock();
     }

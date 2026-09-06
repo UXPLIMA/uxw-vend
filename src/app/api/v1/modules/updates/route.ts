@@ -5,6 +5,8 @@ import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 import { MODULES_DIR } from "@/core/lib/runtime-paths";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 
 interface MarketplaceModule {
@@ -63,9 +65,12 @@ export async function GET() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         marketplace = await res.json();
     } catch (err) {
+        log.error("[modules] reading the marketplace index failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
         return NextResponse.json({
             error: "Failed to fetch marketplace",
-            details: err instanceof Error ? err.message : "unknown",
+            details: devOnlyDetail(err),
             updates: [],
         }, { status: 502 });
     }

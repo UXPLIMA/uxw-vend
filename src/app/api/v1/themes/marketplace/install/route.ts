@@ -12,6 +12,8 @@ import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
 import { resolveWithin } from "@/core/lib/runtime-paths";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 /** Which catalogue theme to fetch. The regex checks below still apply. */
 const installThemeSchema = z.object({
@@ -109,7 +111,13 @@ export async function POST(request: NextRequest) {
             execFileSync("npx", ["tsx", "scripts/generate-theme-registry.ts"], { cwd: process.cwd(), timeout: 30000, stdio: "pipe" });
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
-            return NextResponse.json({ error: "Theme registry failed: " + (String((err as Error)?.message || err).slice(0, 200)) }, { status: 400 });
+            log.error("[themes] registry generation failed, install rolled back", {
+                error: String((err as Error)?.message || err),
+            });
+            return NextResponse.json(
+                { error: "Theme registry generation failed", details: devOnlyDetail(err) },
+                { status: 400 },
+            );
         }
 
         // Deferred, debounced rebuild + process replacement. Running the
@@ -128,9 +136,12 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ message: "Theme installed", theme: { id: themeId } });
     } catch (err: unknown) {
-        const msg = process.env.NODE_ENV === 'production'
-            ? 'Operation failed'
-            : (err instanceof Error ? err.message : 'Unknown error');
-        return NextResponse.json({ error: msg }, { status: 500 });
+        log.error("[themes] installing from the marketplace failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
+        return NextResponse.json(
+            { error: "Operation failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     }
 }

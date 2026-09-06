@@ -81,12 +81,18 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(result);
     } catch (err) {
+        // The three refusals below are storage's own vocabulary, matched
+        // here and answered in words chosen here, so what a reader sees is
+        // visible at the point it is sent rather than borrowed from a throw.
         const message = err instanceof Error ? err.message : "Upload failed";
         if (message === "File too large") {
-            return NextResponse.json({ error: message }, { status: 413 });
+            return NextResponse.json({ error: "File too large" }, { status: 413 });
         }
-        if (message === "Invalid file type" || message === "Invalid filename") {
-            return NextResponse.json({ error: message }, { status: 400 });
+        if (message === "Invalid file type") {
+            return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+        }
+        if (message === "Invalid filename") {
+            return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
         }
         return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }

@@ -24,6 +24,8 @@ import { MODULES_DIR, TMP_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/ru
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 /** Which catalogue module to fetch. The regex checks below still apply. */
 const updateModuleSchema = z.object({
@@ -253,9 +255,13 @@ export async function POST(request: NextRequest) {
                 try {
                     execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], { cwd: PROJECT_ROOT, timeout: 30000, stdio: "pipe" });
                 } catch { /* best effort */ }
-                return NextResponse.json({
-                    error: "Registry generation failed: " + String((regErr as Error)?.message || regErr).slice(0, 200),
-                }, { status: 400 });
+                log.error("[modules] registry generation failed after update, backup restored", {
+                    error: String((regErr as Error)?.message || regErr),
+                });
+                return NextResponse.json(
+                    { error: "Registry generation failed", details: devOnlyDetail(regErr) },
+                    { status: 400 },
+                );
             }
 
             // Deferred + debounced build and process replacement. Building
@@ -309,10 +315,13 @@ export async function POST(request: NextRequest) {
             await fs.rm(backupDir, { recursive: true, force: true }).catch(() => {});
         }
     } catch (err: unknown) {
-        const msg = process.env.NODE_ENV === 'production'
-            ? 'Operation failed'
-            : (err instanceof Error ? err.message : 'Unknown error');
-        return NextResponse.json({ error: msg }, { status: 500 });
+        log.error("[modules] updating a module failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
+        return NextResponse.json(
+            { error: "Operation failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     } finally {
         releaseLock();
     }

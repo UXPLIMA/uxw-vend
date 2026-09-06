@@ -5,6 +5,8 @@ import { isAdmin } from "@/core/lib/permissions";
 import { addBlock, isValidIpOrCidr, listBlocks } from "@/core/lib/ip-blocks";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 /**
  * Admin API for managing the IP allowlist / blocklist.
@@ -89,6 +91,10 @@ export async function POST(request: NextRequest) {
         if (message.includes("Unique constraint")) {
             return NextResponse.json({ error: "That IP is already blocked" }, { status: 409 });
         }
-        return NextResponse.json({ error: message }, { status: 500 });
+        log.error("[ip-blocks] creating a block failed", { error: message });
+        return NextResponse.json(
+            { error: "Could not create the block", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     }
 }

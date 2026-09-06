@@ -17,6 +17,8 @@ import { manifestHash } from "@/core/lib/module-install-audit";
 import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 const RESERVED_IDS = new Set([
     "auth", "admin", "core", "api", "users", "roles", "settings", "profile", "modules", "themes",
 ]);
@@ -191,8 +193,16 @@ export async function POST(request: NextRequest) {
         } catch (err: unknown) {
             await fs.rm(targetDir, { recursive: true, force: true });
             createdTargetDir = null;
-            const detail = process.env.NODE_ENV !== "production" ? ": " + (err instanceof Error ? err.message : "Unknown error") : "";
-            return NextResponse.json({ error: "Module has errors - registry generation failed" + detail }, { status: 400 });
+            log.error("[modules] registry generation failed for an uploaded module", {
+                error: err instanceof Error ? err.message : String(err),
+            });
+            return NextResponse.json(
+                {
+                    error: "Module has errors - registry generation failed",
+                    details: devOnlyDetail(err),
+                },
+                { status: 400 },
+            );
         }
 
         const installedAt = new Date();
@@ -242,10 +252,13 @@ export async function POST(request: NextRequest) {
         if (createdTargetDir) {
             await fs.rm(createdTargetDir, { recursive: true, force: true }).catch(() => {});
         }
-        const msg = process.env.NODE_ENV === "production"
-            ? "Operation failed"
-            : (err instanceof Error ? err.message : "Unknown error");
-        return NextResponse.json({ error: msg }, { status: 500 });
+        log.error("[modules] installing an uploaded module failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
+        return NextResponse.json(
+            { error: "Operation failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     } finally {
         if (extractDir) {
             await fs.rm(extractDir, { recursive: true, force: true }).catch(() => {});

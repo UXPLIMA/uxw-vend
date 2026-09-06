@@ -6,6 +6,8 @@ import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { themeRegistry } from "@/core/generated/theme-registry";
+import { devOnlyDetail } from "@/core/lib/api-utils";
+import { log } from "@/core/lib/logger";
 
 const THEMES_DIR = path.join(process.cwd(), "src/themes");
 // Themes shipped in-tree (every key in the generated registry) are the
@@ -55,7 +57,13 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     try {
         execFileSync("npx", ["tsx", "scripts/generate-theme-registry.ts"], { timeout: 30000, stdio: "pipe" });
     } catch (err) {
-        return NextResponse.json({ error: `Registry regen failed: ${(err as Error).message}` }, { status: 500 });
+        log.error("[themes] regenerating the registry failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
+        return NextResponse.json(
+            { error: "Regenerating the theme registry failed", details: devOnlyDetail(err) },
+            { status: 500 },
+        );
     }
 
     return NextResponse.json({ ok: true });

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/core/sdk/server";
+import { isAdmin, devOnlyDetail, log } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { registerTrophyListeners } from "../../../lib/trophy-engine";
 
@@ -26,9 +26,12 @@ export async function POST() {
         await registerTrophyListeners(true);
         return NextResponse.json({ ok: true });
     } catch (err) {
+        log.error("[trophies] reloading the listeners failed", {
+            error: err instanceof Error ? err.message : String(err),
+        });
         return NextResponse.json(
-            { error: (err as Error).message || "Reload failed" },
-            { status: 500 }
+            { error: "Reload failed", details: devOnlyDetail(err) },
+            { status: 500 },
         );
     }
 }

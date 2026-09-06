@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, readJsonBody, devOnlyDetail, log } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { sendRconCommand, isRconAvailable } from "../../lib/rcon";
 import { rconCommandSchema } from "../../lib/validations";
@@ -27,8 +27,15 @@ export async function POST(request: NextRequest) {
     try {
         return NextResponse.json({ response: await sendRconCommand(command, serverId) });
     } catch (err) {
+        // An RCON failure names the host and port it could not reach, which
+        // is the operator's own infrastructure. It goes to the log, where an
+        // operator can read it, rather than into an answer.
+        log.error("[servers] an RCON command failed", {
+            serverId,
+            error: err instanceof Error ? err.message : String(err),
+        });
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : "RCON command failed" },
+            { error: "RCON command failed", details: devOnlyDetail(err) },
             { status: 400 },
         );
     }
