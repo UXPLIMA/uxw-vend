@@ -16,6 +16,7 @@ import { isEnabledIn } from "@/core/lib/module-enabled";
 import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChallenge";
 import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
+import { readRefusal } from "@/core/lib/login-refusal";
 import { Checkbox } from "@/core/components/ui/checkbox";
 import { safeInternalPath } from "@/core/lib/safe-redirect";
 
@@ -79,23 +80,29 @@ export default function LoginPage() {
             });
 
             if (result?.error) {
-                if (result.error.includes("2FA_REQUIRED")) {
+                // Read the refusal Auth.js actually sends, which is a code and
+                // never the message the server threw. Anything this build does
+                // not recognise is a failure on our side, not a reader who
+                // mistyped, so it must not come back as a password problem.
+                const refusal = readRefusal(result);
+                if (refusal.kind === "two-factor-required") {
                     setNeeds2FA(true);
                     setError("");
-                } else if (result.error.includes("INVALID_2FA")) {
+                } else if (refusal.kind === "invalid-two-factor") {
                     setError(t('invalidTwoFactor'));
-                } else if (result.error.includes("BANNED")) {
+                } else if (refusal.kind === "banned") {
                     setError(t('accountSuspended'));
-                } else if (result.error.includes("ACCOUNT_LOCKED") || result.error.includes("LOCKED")) {
+                } else if (refusal.kind === "account-locked") {
                     setError(t('accountLocked'));
-                } else if (result.error.includes("CHALLENGE_FAILED")) {
+                } else if (refusal.kind === "challenge-failed") {
                     // The challenge module names its own code; core looks it
                     // up the same way it does every other auth error and
                     // falls back when the module ships no string for it.
-                    const code = result.error.split("CHALLENGE_FAILED:")[1]?.split(/[^a-z_]/)[0] ?? "";
-                    setError(authErrorMessage(t, { code }, t('challengeFailed')));
-                } else {
+                    setError(authErrorMessage(t, { code: refusal.code }, t('challengeFailed')));
+                } else if (refusal.kind === "bad-credentials") {
                     setError(t('invalidCredentials'));
+                } else {
+                    setError(t('genericError'));
                 }
             } else {
                 // If a non-TOTP (backup) code was used, warn about remaining codes.

@@ -3,6 +3,8 @@ import { cache } from "react";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { identifierLookup } from "./login-identifier";
+import { REFUSAL_CODE } from "./login-refusal";
+import { SignInRefusal } from "./sign-in-refusal";
 import {
     REMEMBERED_MAX_AGE_SECONDS,
     parseRemember,
@@ -66,6 +68,7 @@ const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
 // Gate on the actual URL scheme instead of NODE_ENV.
 const AUTH_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
 const IS_PROD_COOKIE = AUTH_URL.startsWith("https://");
+
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     // Core's `User` predates the shape Auth.js documents (`username` and
@@ -150,7 +153,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     ip: challengeHeaders ? getClientIP(challengeHeaders) : null,
                 });
                 if (!challenge.ok) {
-                    throw new Error(`CHALLENGE_FAILED:${challenge.code ?? "challenge_failed"}`);
+                    // The module names its own reason and the code rides in a
+                    // URL, so it is reduced to the alphabet a code may use
+                    // before it leaves here. A module is not trusted input.
+                    const named = (challenge.code ?? "").toLowerCase().replace(/[^a-z_]/g, "");
+                    throw new SignInRefusal(
+                        named ? `${REFUSAL_CODE.challengeFailed}:${named}` : REFUSAL_CODE.challengeFailed,
+                    );
                 }
 
                 const user = await prisma.user.findUnique({
@@ -163,7 +172,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 if (user.isBanned) {
-                    throw new Error("BANNED");
+                    throw new SignInRefusal(REFUSAL_CODE.banned);
                 }
 
                 // Account-level lockout check - short-circuits before bcrypt
@@ -171,7 +180,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // used to fingerprint valid emails via response-time delta.
                 const lockStatus = getLockoutStatus(user);
                 if (lockStatus.locked) {
-                    throw new Error("ACCOUNT_LOCKED");
+                    throw new SignInRefusal(REFUSAL_CODE.accountLocked);
                 }
 
                 const isPasswordValid = await bcrypt.compare(
@@ -201,7 +210,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const twoFactorCode = credentials.twoFactorCode as string;
 
                     if (!twoFactorCode) {
-                        throw new Error("2FA_REQUIRED");
+                        throw new SignInRefusal(REFUSAL_CODE.twoFactorRequired);
                     }
 
                     // Try TOTP first, then backup code. Replay-protected so
@@ -234,7 +243,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             // with a valid password could brute-force the
                             // 6-digit TOTP (~10^6 combos) unconstrained.
                             await registerFailedLogin(user.id, { ip });
-                            throw new Error("INVALID_2FA");
+                            throw new SignInRefusal(REFUSAL_CODE.invalidTwoFactor);
                         }
 
                         // Update remaining backup codes
