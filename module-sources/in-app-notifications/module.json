@@ -2,7 +2,7 @@
   "id": "in-app-notifications",
   "name": "In-App Notifications",
   "description": "In-app notification system with bell icon",
-  "version": "1.0.15",
+  "version": "1.1.0",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -46,7 +46,19 @@
         "markFailed": "Failed to update notification",
         "settings": "Notification Settings",
         "saved": "Notification settings saved",
-        "saveError": "Failed to save notification settings"
+        "saveError": "Failed to save notification settings",
+        "notif_orderCompleteTitle": "Order complete",
+        "notif_orderCompleteMessage": "Order {orderNumber} is complete.",
+        "notif_creditsAddedTitle": "Credits added",
+        "notif_creditsAddedMessage": "{amount} credits were added to your balance.",
+        "notif_punishmentTitle": "A punishment was issued",
+        "notif_punishmentMessage": "A {type} was issued against your account.",
+        "notif_punishmentWithReason": "{type}: {reason}",
+        "notif_prizeWonTitle": "You won a prize",
+        "notif_prizeWonMessage": "You won {prize} on the wheel.",
+        "notif_referralUsedTitle": "Your referral code was used",
+        "notif_referralUsedMessage": "Somebody joined with your referral code.",
+        "notif_referralUsedReward": "Somebody joined with your code. You earned {reward} credits."
       },
       "pageTitles": {
         "notifications": "Notifications"
@@ -73,7 +85,19 @@
         "markFailed": "Bildirim güncellenemedi",
         "settings": "Bildirim Ayarları",
         "saved": "Bildirim ayarları kaydedildi",
-        "saveError": "Bildirim ayarları kaydedilemedi"
+        "saveError": "Bildirim ayarları kaydedilemedi",
+        "notif_orderCompleteTitle": "Sipariş tamamlandı",
+        "notif_orderCompleteMessage": "{orderNumber} numaralı sipariş tamamlandı.",
+        "notif_creditsAddedTitle": "Kredi eklendi",
+        "notif_creditsAddedMessage": "Bakiyenize {amount} kredi eklendi.",
+        "notif_punishmentTitle": "Bir ceza verildi",
+        "notif_punishmentMessage": "Hesabınıza {type} cezası verildi.",
+        "notif_punishmentWithReason": "{type}: {reason}",
+        "notif_prizeWonTitle": "Bir ödül kazandınız",
+        "notif_prizeWonMessage": "Çarkta {prize} kazandınız.",
+        "notif_referralUsedTitle": "Davet kodunuz kullanıldı",
+        "notif_referralUsedMessage": "Biri davet kodunuzla katıldı.",
+        "notif_referralUsedReward": "Biri kodunuzla katıldı. {reward} kredi kazandınız."
       },
       "pageTitles": {
         "notifications": "Bildirimler"
@@ -90,6 +114,33 @@
       "key": "notifications.items",
       "column": "userId",
       "erasure": "purge"
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "store.order.completed",
+      "type": "action",
+      "handler": "listeners/order-completed.ts"
+    },
+    {
+      "hook": "credits.credit.added",
+      "type": "action",
+      "handler": "listeners/credit-added.ts"
+    },
+    {
+      "hook": "punishments.punishment.issued",
+      "type": "action",
+      "handler": "listeners/punishment-issued.ts"
+    },
+    {
+      "hook": "wheel.prize.won",
+      "type": "action",
+      "handler": "listeners/prize-won.ts"
+    },
+    {
+      "hook": "referral.referral.used",
+      "type": "action",
+      "handler": "listeners/referral-used.ts"
     }
   ]
 }

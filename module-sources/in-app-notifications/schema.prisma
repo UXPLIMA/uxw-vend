@@ -11,8 +11,17 @@ model Notification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation("Notifications", fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
+  // The English sentence, and the identifiers that let a reader see it in
+  // their own language. The activity feed localises by stripping a declared
+  // prefix off the stored sentence and substituting a translation, which is
+  // matched by string content rather than resolved by identifier - every
+  // module that tried it got it a little bit wrong and nothing said so. A key
+  // and its parameters cannot drift from the row they describe.
+  title      String
+  message    String
+  titleKey   String?
+  messageKey String?
+  params     Json?
   type      String   @default("info")
   href      String?
   isRead    Boolean  @default(false)

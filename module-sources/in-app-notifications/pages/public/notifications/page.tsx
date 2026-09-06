@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { notificationText } from "../../../lib/render";
 import { toast } from "sonner";
 import { Bell, Check, CheckCheck, Loader2 } from "lucide-react";
 import { Link } from "@/core/sdk/navigation";
@@ -15,6 +16,9 @@ interface NotificationItem {
     id: string;
     title: string;
     message: string;
+    titleKey?: string | null;
+    messageKey?: string | null;
+    params?: Record<string, string | number> | null;
     type: string;
     href: string | null;
     isRead: boolean;
@@ -139,14 +143,15 @@ export default function NotificationsPage() {
                     <Card>
                         <CardContent className="p-0 divide-y divide-border">
                             {filtered.map(n => {
+                                const said = notificationText(n, t);
                                 const body = (
                                     <div className="flex items-start gap-3 p-4">
                                         {!n.isRead && (
                                             <span className="mt-2 inline-block w-2 h-2 rounded-full bg-primary flex-shrink-0" aria-hidden="true" />
                                         )}
                                         <div className={`flex-1 min-w-0 ${n.isRead ? "pl-4" : ""}`}>
-                                            <p className="font-medium text-foreground">{n.title}</p>
-                                            <p className="text-sm text-muted-foreground mt-0.5">{n.message}</p>
+                                            <p className="font-medium text-foreground">{said.title}</p>
+                                            <p className="text-sm text-muted-foreground mt-0.5">{said.message}</p>
                                             <p className="text-xs text-muted-foreground mt-1">{relativeTime(n.createdAt)}</p>
                                         </div>
                                         {!n.isRead && (

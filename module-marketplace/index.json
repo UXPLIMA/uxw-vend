@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T02:01:45Z",
+  "updatedAt": "2026-09-06T02:11:02Z",
   "modules": [
     {
       "id": "announcements",
@@ -615,13 +615,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.0.12",
+      "version": "1.0.13",
       "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T02:11:02Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1055,13 +1055,13 @@
           "description": "Zil simgeli uygulama içi bildirim sistemi"
         }
       },
-      "version": "1.0.15",
+      "version": "1.1.0",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T02:11:02Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1071,7 +1071,13 @@
       "conflicts": [],
       "hooks": {
         "emits": [],
-        "listens": []
+        "listens": [
+          "store.order.completed",
+          "credits.credit.added",
+          "punishments.punishment.issued",
+          "wheel.prize.won",
+          "referral.referral.used"
+        ]
       },
       "stats": {
         "publicRoutes": 1,

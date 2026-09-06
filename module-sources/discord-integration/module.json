@@ -2,7 +2,7 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "coreVersion": "^1.20.0",
   "category": "integration",
   "author": "uxwVend",

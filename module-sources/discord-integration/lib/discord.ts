@@ -86,22 +86,3 @@ export async function sendDiscordWebhook(
         console.error("[Discord Webhook] Failed to send:", err);
     }
 }
-
-// ---- Core event: user registration (auth system, not module-specific) ----
-
-export async function notifyUserRegistered(user: {
-    username: string;
-    email: string;
-}) {
-    await sendDiscordWebhook("user_registered", {
-        embeds: [{
-            title: "New User Registered",
-            description: `**${user.username}** joined the platform`,
-            color: 0x8b5cf6, // purple
-            fields: [
-                { name: "Email", value: user.email, inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-        }],
-    });
-}

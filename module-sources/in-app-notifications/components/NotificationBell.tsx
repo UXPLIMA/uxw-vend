@@ -5,6 +5,7 @@ import { Bell, Check, CheckCheck, ExternalLink } from "lucide-react";
 import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { notificationText } from "../lib/render";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { useModalDialog } from "@/core/sdk/ui";
 
@@ -12,6 +13,9 @@ interface NotificationItem {
     id: string;
     title: string;
     message: string;
+    titleKey?: string | null;
+    messageKey?: string | null;
+    params?: Record<string, string | number> | null;
     type: string;
     href: string | null;
     isRead: boolean;
@@ -139,14 +143,15 @@ export function NotificationBell() {
                     ) : (
                         <ul className="max-h-80 overflow-y-auto divide-y divide-border">
                             {recent.map(n => {
+                                const said = notificationText(n, t);
                                 const body = (
                                     <div className="flex items-start gap-2 p-3 hover:bg-muted/50 transition-colors">
                                         {!n.isRead && (
                                             <span className="mt-1.5 inline-block w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                                         )}
                                         <div className={`flex-1 min-w-0 ${n.isRead ? "pl-4" : ""}`}>
-                                            <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
-                                            <p className="text-xs text-muted-foreground line-clamp-2">{n.message}</p>
+                                            <p className="text-sm font-medium text-foreground truncate">{said.title}</p>
+                                            <p className="text-xs text-muted-foreground line-clamp-2">{said.message}</p>
                                             <p className="text-[10px] text-muted-foreground mt-1">{relativeTime(n.createdAt)}</p>
                                         </div>
                                     </div>
@@ -166,7 +171,7 @@ export function NotificationBell() {
                                                 type="button"
                                                 onClick={() => { if (!n.isRead) markRead(n.id); }}
                                                 className="w-full text-left"
-                                                aria-label={n.isRead ? n.title : `${n.title} - ${t("markRead")}`}
+                                                aria-label={n.isRead ? said.title : `${said.title} - ${t("markRead")}`}
                                             >
                                                 {body}
                                             </button>
