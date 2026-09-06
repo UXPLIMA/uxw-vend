@@ -324,7 +324,11 @@ jobs:
           set -euo pipefail
           npx prisma db push --accept-data-loss
           npx tsx prisma/seed.ts
-          npx tsx scripts/seed-translations.ts
+          # --register-modules because this job seeds src/modules/ from the
+          # sources rather than installing them. Without the ModuleConfig row
+          # the app filters every module string out and the specs would drive
+          # a site rendering raw keys.
+          npx tsx scripts/seed-translations.ts --register-modules
 
       - name: Build
         run: npm run build

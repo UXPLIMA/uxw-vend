@@ -4,7 +4,18 @@
  *
  * Idempotent - safe to run multiple times. Upserts, never duplicates.
  *
- * Usage: npx tsx scripts/seed-translations.ts
+ * `getMessages()` only reads rows whose module is core or an *enabled* module,
+ * so seeding a module's strings does nothing on its own: a module that is on
+ * disk but has no `ModuleConfig` row still renders "store.title" where the
+ * title belongs. Copying `module-sources/` into `src/modules/` is the
+ * documented fast path for local work and it leaves exactly that gap.
+ *
+ * `--register-modules` closes it by writing the row the marketplace installer
+ * and the setup wizard write. It is opt-in because this script also runs on
+ * every container boot, where enabling whatever happens to be on disk would
+ * override what an operator turned off.
+ *
+ * Usage: npx tsx scripts/seed-translations.ts [--register-modules]
  */
 
 // Reads DATABASE_URL from .env - this script is run directly via tsx,
@@ -16,6 +27,10 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { locales } from "../src/core/lib/i18n/config";
+import { manifestHash } from "../src/core/lib/module-install-audit";
+
+/** Off by default: see the note above about container boots. */
+const REGISTER_MODULES = process.argv.includes("--register-modules");
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
@@ -135,12 +150,31 @@ async function main() {
         .filter((d) => d.isDirectory());
 
     let modTotal = 0;
+    let registered = 0;
     for (const mod of modules) {
         const manifestPath = path.join(MODULES_DIR, mod.name, "module.json");
         if (!fs.existsSync(manifestPath)) continue;
 
         const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
         const moduleId = manifest.id || mod.name;
+
+        if (REGISTER_MODULES) {
+            // `enabled` is set on create only. A row that already exists
+            // carries an operator's decision, and re-running a seed is not
+            // a reason to overturn it.
+            await prisma.moduleConfig.upsert({
+                where: { id: moduleId },
+                update: { name: manifest.name ?? moduleId, manifestHash: manifestHash(manifest) },
+                create: {
+                    id: moduleId,
+                    name: manifest.name ?? moduleId,
+                    enabled: true,
+                    manifestHash: manifestHash(manifest),
+                },
+            });
+            registered += 1;
+        }
+
         const translations = manifest.translations;
         if (!translations || typeof translations !== "object") continue;
 
@@ -159,7 +193,12 @@ async function main() {
     }
 
     console.log(`  Module total: ${modTotal} keys`);
+    if (REGISTER_MODULES) console.log(`  Registered ${registered} module(s) in ModuleConfig`);
     console.log(`\nDone. ${coreTotal + modTotal} total translation keys seeded.`);
+    if (!REGISTER_MODULES) {
+        console.log("Module strings stay invisible until each module has a ModuleConfig row.");
+        console.log("For a local tree seeded from module-sources/, re-run with --register-modules.");
+    }
 }
 
 main()
