@@ -7,6 +7,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { punishmentStatus, type PunishmentStatus } from "../../lib/status";
 
 interface PunishmentItem {
     id: string;
@@ -35,6 +36,17 @@ const typeColors: Record<string, string> = {
  * under it as "mute".
  */
 const typeKeys: Record<string, string> = { ban: "ban", mute: "mute", kick: "kick", warn: "warning" };
+
+/**
+ * A punishment's status was the one thing this table never said. It printed
+ * the duration an admin had typed ("7d") next to a date months old and left
+ * the reader to work out whether the ban was still running.
+ */
+const statusClass: Record<PunishmentStatus, string> = {
+    active: "bg-destructive/10 text-destructive",
+    expired: "bg-warning/10 text-warning",
+    revoked: "bg-muted text-muted-foreground",
+};
 
 /** The label for one type, falling back to the value when it is unmapped. */
 function typeLabel(t: { (key: string): string; has: (key: string) => boolean }, type: string): string {
@@ -116,11 +128,13 @@ export default function PunishmentsPage() {
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">{t("punishedBy")}</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">{t("duration")}</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">{t("date")}</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">{t("status")}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {punishments.map((p) => {
                                         const Icon = typeIcons[p.type] || Ban;
+                                        const status = punishmentStatus(p);
                                         return (
                                             <tr key={p.id} className="border-b last:border-0 hover:bg-muted">
                                                 <td className="py-3 px-4 font-medium">{p.playerName}</td>
@@ -133,6 +147,9 @@ export default function PunishmentsPage() {
                                                 <td className="py-3 px-4 text-sm text-muted-foreground">{p.punishedBy || t("console")}</td>
                                                 <td className="py-3 px-4 text-sm">{p.duration || t("permanent")}</td>
                                                 <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(p.createdAt).toLocaleDateString(__dateTag)}</td>
+                                                <td className="py-3 px-4">
+                                                    <span className={`text-xs px-2 py-1 rounded ${statusClass[status]}`}>{t(status)}</span>
+                                                </td>
                                             </tr>
                                         );
                                     })}

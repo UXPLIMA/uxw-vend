@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { punishmentStatus, type PunishmentStatus } from "../../lib/status";
 
 interface Punishment {
     id: string;
@@ -22,6 +23,25 @@ interface Punishment {
     expiresAt: string | null;
 }
 
+const STATUS_FILTERS = ["all", "active", "expired", "revoked"] as const;
+type StatusFilter = (typeof STATUS_FILTERS)[number];
+
+/** The filter button's label, and the badge's, come from the same three keys. */
+const FILTER_LABEL: Record<StatusFilter, string> = {
+    all: "adm_filterAll",
+    active: "adm_filterActive",
+    expired: "adm_filterExpired",
+    revoked: "adm_filterRevoked",
+};
+
+const BADGE_CLASS: Record<PunishmentStatus, string> = {
+    active: "bg-destructive/10 text-destructive",
+    expired: "bg-warning/10 text-warning",
+    revoked: "bg-muted text-muted-foreground",
+};
+
+const PAGE_SIZE = 20;
+
 const TYPE_OPTIONS = ["ban", "mute", "kick", "warning", "tempBan", "tempMute"];
 
 export default function AdminPunishmentsPage() {
@@ -32,7 +52,10 @@ export default function AdminPunishmentsPage() {
     const { confirm } = useConfirm();
     const [items, setItems] = useState<Punishment[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<"all" | "active" | "revoked">("all");
+    const [filter, setFilter] = useState<StatusFilter>("all");
+    const [page, setPage] = useState(1);
+    const [pages, setPages] = useState(1);
+    const [total, setTotal] = useState(0);
     const [saving, setSaving] = useState(false);
     // The punishment form is a screen at `?form=new`, not a card wedged
     // between the filters and the table.
@@ -45,25 +68,31 @@ export default function AdminPunishmentsPage() {
         expiresAt: "",
     });
 
+    // The filter and the paging both belong to the query. Filtering a fetched
+    // page in the browser hid every match that fell outside it and still
+    // printed the unfiltered total underneath.
     const load = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/v1/punishments?limit=100");
+            const params = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) });
+            if (filter !== "all") params.set("status", filter);
+            const res = await fetch(`/api/v1/punishments?${params}`);
             const data = await res.json();
             setItems(data.punishments || []);
+            setPages(data.pages || 1);
+            setTotal(data.total || 0);
         } catch {
             setItems([]);
+            setPages(1);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [page, filter]);
 
     useEffect(() => { load(); }, [load]);
 
-    const filtered = items.filter(p =>
-        filter === "all" ? true : filter === "active" ? p.active : !p.active
-    );
-    const paged = usePagedRows(filtered);
+    const selectFilter = (next: StatusFilter) => { setFilter(next); setPage(1); };
 
     const create = async () => {
         if (!form.playerName.trim()) return;
@@ -182,15 +211,11 @@ export default function AdminPunishmentsPage() {
             />
 
             <div className="flex flex-wrap items-center gap-2">
-                <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
-                    {t("adm_filterAll")}
-                </Button>
-                <Button variant={filter === "active" ? "default" : "outline"} size="sm" onClick={() => setFilter("active")}>
-                    {t("adm_filterActive")}
-                </Button>
-                <Button variant={filter === "revoked" ? "default" : "outline"} size="sm" onClick={() => setFilter("revoked")}>
-                    {t("adm_filterRevoked")}
-                </Button>
+                {STATUS_FILTERS.map(f => (
+                    <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => selectFilter(f)}>
+                        {t(FILTER_LABEL[f])}
+                    </Button>
+                ))}
                 <div className="flex-1" />
                 <Link href={formHref()} className="inline-flex">
                     <Button size="sm">
@@ -203,7 +228,7 @@ export default function AdminPunishmentsPage() {
                 <div className="flex justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
                 </div>
-            ) : filtered.length === 0 ? (
+            ) : items.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground">
                         {t("adm_empty")}
@@ -223,18 +248,18 @@ export default function AdminPunishmentsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {paged.rows.map(p => (
+                            {items.map(p => {
+                                const status = punishmentStatus(p);
+                                return (
                                 <tr key={p.id} className="border-t">
                                     <td className="px-4 py-2 font-medium">{p.playerName}</td>
                                     <td className="px-4 py-2">{TYPE_OPTIONS.includes(p.type) ? t(p.type) : p.type}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{p.reason || "-"}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{new Date(p.createdAt).toLocaleString(__dateTag)}</td>
                                     <td className="px-4 py-2">
-                                        {p.active ? (
-                                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">{t("active")}</span>
-                                        ) : (
-                                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">{t("revoked")}</span>
-                                        )}
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${BADGE_CLASS[status]}`}>
+                                            {t(status)}
+                                        </span>
                                     </td>
                                     <td className="px-4 py-2 text-right">
                                         <div className="inline-flex gap-1">
@@ -253,10 +278,11 @@ export default function AdminPunishmentsPage() {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
-                    <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    <Pagination page={page} pages={pages} total={total} onPageChange={setPage} />
                 </div>
             )}
         </div>

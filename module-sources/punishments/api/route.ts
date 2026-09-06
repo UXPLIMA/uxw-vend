@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { punishmentCreateSchema } from "../lib/validations";
+import { isPunishmentStatus, punishmentStatus, statusWhere } from "../lib/status";
 
 /**
  * Constant-time API key comparison. Guards against undefined values and
@@ -22,12 +23,17 @@ function apiKeyMatches(provided: string | null | undefined, expected: string | u
 export async function GET(request: NextRequest) {
     const type = request.nextUrl.searchParams.get("type");
     const search = request.nextUrl.searchParams.get("search");
+    const status = request.nextUrl.searchParams.get("status");
     const page = Math.max(1, parseInt(request.nextUrl.searchParams.get("page") || "1") || 1);
     const limit = Math.min(100, Math.max(1, parseInt(request.nextUrl.searchParams.get("limit") || "20") || 20));
 
+    const now = new Date();
     const where: Record<string, unknown> = {};
     if (type) where.type = type;
     if (search) where.playerName = { contains: search, mode: "insensitive" };
+    // Under AND rather than merged in, so the status clause keeps its own `OR`
+    // whatever else the caller filtered on.
+    if (isPunishmentStatus(status)) where.AND = [statusWhere(status, now)];
 
     const [punishments, total] = await Promise.all([
         prisma.punishment.findMany({
@@ -39,7 +45,11 @@ export async function GET(request: NextRequest) {
         prisma.punishment.count({ where }),
     ]);
 
-    return NextResponse.json({ punishments, total, pages: Math.ceil(total / limit) });
+    // `status` travels with every row: a caller reading `active` alone cannot
+    // tell a ban that is still running from one whose clock ran out.
+    const rows = punishments.map((p) => ({ ...p, status: punishmentStatus(p, now.getTime()) }));
+
+    return NextResponse.json({ punishments: rows, total, pages: Math.ceil(total / limit) });
 }
 
 // POST - Admin or external plugin webhook
