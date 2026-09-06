@@ -65,6 +65,15 @@ function devOriginHosts(): string[] {
 const nextConfig: NextConfig = {
   // output: "standalone", // Disabled: modules need full node_modules for runtime registry generation
   poweredByHeader: false,
+  // A production build and `next dev` write to the same `.next` by default,
+  // so building to measure a page costs whoever is using the dev server their
+  // session. Naming a different directory lets both stand at once, which is
+  // the only way to compare a dev page against the build it will ship as.
+  // Unset everywhere that matters, so the default is what CI and deploys get.
+  // Next adds whichever directory it built to `tsconfig.json`'s include on
+  // its way through, so a build under this variable leaves that one line to
+  // put back.
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
   ...(isDev ? { allowedDevOrigins: devOriginHosts() } : {}),
   serverExternalPackages: ["redis", "net", "fs", "dns", "tls", "pg", "@prisma/adapter-pg", "@aws-sdk/client-s3"],
   images: {

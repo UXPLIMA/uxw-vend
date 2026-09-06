@@ -13,6 +13,8 @@
 
 # next.js
 /.next/
+# Build output under a NEXT_DIST_DIR chosen to leave the dev server alone.
+/.next-*/
 /out/
 
 # production
