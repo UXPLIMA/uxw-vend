@@ -202,6 +202,20 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
             : new NextResponse('Invalid path', { status: 400 });
     }
 
+    // The same rule for the query, which had no rule at all. A `%00` in any
+    // value that reached a Prisma string filter answered 500 - Postgres text
+    // cannot hold a null byte, so the driver threw where a handler had
+    // nothing to say - and `/api/v1/punishments?search=%00` was one of many:
+    // every endpoint that passes a search term or a filter into a query was
+    // another. A control character is not something a person typed into a
+    // search box, so it is refused here rather than stripped at each of the
+    // dozens of places it can reach.
+    if (hasControlCharacter(request.nextUrl.search)) {
+        return pathname.startsWith('/api/')
+            ? NextResponse.json({ error: 'Invalid query', code: 'invalid_query' }, { status: 400 })
+            : new NextResponse('Invalid query', { status: 400 });
+    }
+
     // ===== Absolute body ceiling =====
     // App Router route handlers have no body limit of their own, so the only
     // bound on an inbound request used to be whatever a handler imposed after

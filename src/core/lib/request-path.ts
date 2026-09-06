@@ -1,5 +1,5 @@
 /**
- * What a request path is allowed to contain.
+ * What a request URL is allowed to contain.
  *
  * A control character has no meaning in a URL path, and letting one through
  * cost two things. next-intl's middleware strips a trailing segment that is
@@ -13,6 +13,15 @@
  * character while the gates match on the string that still carries it is how
  * a gate gets walked past, and `%0a` in a path forges a line in any log that
  * formats rather than encodes.
+ *
+ * The query string is held to the same rule, and was not. A `%00` in any
+ * query value that reached a Prisma string filter answered 500: Postgres text
+ * cannot hold a null byte, so the driver threw and the handler had nothing to
+ * say about it. `/api/v1/punishments?search=%00` and
+ * `/api/v1/store/products?search=%00` were two of them, and every endpoint
+ * that passes a search term or a filter through to a query was another. A
+ * null byte in a URL is not a search anyone typed; it is refused at the edge
+ * rather than sanitised at each of the places it can reach.
  */
 
 /** Highest C0 control, and DEL. */
@@ -29,10 +38,10 @@ const CONTROL_ESCAPE = /%(?:[01][0-9a-fA-F]|7[fF])/;
  * Compared by code point rather than matched by a character class, so nothing
  * in this file is a character a terminal or a diff would swallow.
  */
-export function hasControlCharacter(pathname: string): boolean {
-    for (let i = 0; i < pathname.length; i++) {
-        const code = pathname.charCodeAt(i);
+export function hasControlCharacter(value: string): boolean {
+    for (let i = 0; i < value.length; i++) {
+        const code = value.charCodeAt(i);
         if (code <= LAST_C0 || code === DEL) return true;
     }
-    return CONTROL_ESCAPE.test(pathname);
+    return CONTROL_ESCAPE.test(value);
 }
