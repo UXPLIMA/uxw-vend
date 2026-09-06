@@ -12,6 +12,7 @@ import { stripHtmlTags } from "@/core/sdk";
 import { useLocalDate } from "@/core/sdk/ui";
 import { toast } from "sonner";
 import { Loader2, ThumbsUp, Plus, X, MessageSquare } from "lucide-react";
+import { SUGGESTION_STATUSES, STATUS_BADGE_CLASS, canonicalStatus } from "../../lib/statuses";
 
 // Suggestion bodies are stored as rich-text HTML; the list view shows a
 // short preview, so strip tags rather than rendering them clamped.
@@ -30,21 +31,21 @@ interface Suggestion {
     _count: { votes: number };
 }
 
-const statusColors: Record<string, string> = {
-    open: "bg-primary/10 text-primary",
-    under_review: "bg-warning/10 text-warning",
-    accepted: "bg-success/10 text-success",
-    rejected: "bg-destructive/10 text-destructive",
-    completed: "bg-accent/10 text-accent",
-};
 
-const statusKeys: Record<string, string> = {
-    open: "open",
-    under_review: "underReview",
-    accepted: "planned",
-    rejected: "declined",
-    completed: "completed",
-};
+/**
+ * A status this board has no word for is printed as it stands. It used to
+ * fall back to the first word in the list, so a planned or declined
+ * suggestion was labelled "Open" to everyone reading the board.
+ */
+function statusLabel(t: { (key: string): string }, status: string): string {
+    const known = canonicalStatus(status);
+    return known ? t(known) : status;
+}
+
+function badgeClass(status: string): string {
+    const known = canonicalStatus(status);
+    return known ? STATUS_BADGE_CLASS[known] : "bg-muted text-muted-foreground";
+}
 
 export default function SuggestionsPage() {
     const { data: session } = useSession();
@@ -172,9 +173,9 @@ export default function SuggestionsPage() {
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {["", "open", "under_review", "accepted", "completed", "rejected"].map((s) => (
+                    {["", ...SUGGESTION_STATUSES].map((s) => (
                         <Button key={s} variant={filter === s ? "default" : "outline"} size="sm" onClick={() => setFilter(s)}>
-                            {s === "" ? t("status") : t(statusKeys[s] || "open")}
+                            {s === "" ? t("status") : t(s)}
                         </Button>
                     ))}
                     <div className="ml-auto">
@@ -212,8 +213,8 @@ export default function SuggestionsPage() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h2 className="font-medium text-foreground">{s.title}</h2>
-                                                <span className={`text-xs px-2 py-0.5 rounded ${statusColors[s.status] || "bg-muted text-muted-foreground"}`}>
-                                                    {t(statusKeys[s.status] || "open")}
+                                                <span className={`text-xs px-2 py-0.5 rounded ${badgeClass(s.status)}`}>
+                                                    {statusLabel(t, s.status)}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-muted-foreground line-clamp-2">{plainText(s.content)}</p>

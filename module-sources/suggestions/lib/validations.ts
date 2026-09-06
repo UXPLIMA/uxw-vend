@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SUGGESTION_STATUSES } from "./statuses";
 
 /**
  * Editing one suggestion. The route splits these by role - an admin moves
@@ -6,8 +7,11 @@ import { z } from "zod";
  * and the route still decides who may set which. `status` used to reach the
  * row untyped, which could leave a suggestion in a state the board filters
  * do not offer and nothing renders.
+ *
+ * The statuses come from the board's own vocabulary rather than a second copy
+ * of it: this list was two short of the dropdown an admin was offered, so two
+ * of the six choices answered 400.
  */
-export const SUGGESTION_STATUSES = ["open", "planned", "completed", "declined"] as const;
 
 export const suggestionUpdateSchema = z.object({
     status: z.enum(SUGGESTION_STATUSES).optional(),

@@ -6,6 +6,7 @@ import { Button, Card, CardContent, useConfirm, NativeSelect } from "@/core/sdk/
 import { Loader2, Trash2, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
+import { SUGGESTION_STATUSES, STATUS_BADGE_CLASS, canonicalStatus } from "../../lib/statuses";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Suggestion {
@@ -18,25 +19,10 @@ interface Suggestion {
     author?: { username: string | null } | null;
 }
 
-const STATUS_OPTIONS = ["open", "underReview", "planned", "inProgress", "completed", "declined"];
-const FILTERS: { key: "all" | "open" | "planned" | "completed" | "declined"; statusMatch?: string }[] = [
-    { key: "all" },
-    { key: "open", statusMatch: "open" },
-    { key: "planned", statusMatch: "planned" },
-    { key: "completed", statusMatch: "completed" },
-    { key: "declined", statusMatch: "declined" },
-];
-
-const statusBadgeClass = (status: string) => {
-    switch (status) {
-        case "completed": return "bg-success/10 text-success";
-        case "planned":
-        case "inProgress": return "bg-primary/10 text-primary";
-        case "declined": return "bg-destructive/10 text-destructive";
-        case "underReview": return "bg-warning/10 text-warning";
-        default: return "bg-muted text-muted-foreground";
-    }
-};
+// "All" and then one filter per status the board can actually be in. The
+// list used to name four of the six, so two statuses an admin could set had
+// no way to be filtered for afterwards.
+const FILTERS = ["all", ...SUGGESTION_STATUSES] as const;
 
 export default function AdminSuggestionsPage() {
     const t = useTranslations("suggestions");
@@ -45,7 +31,7 @@ export default function AdminSuggestionsPage() {
     const { confirm } = useConfirm();
     const [items, setItems] = useState<Suggestion[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<"all" | "open" | "planned" | "completed" | "declined">("all");
+    const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -94,11 +80,20 @@ export default function AdminSuggestionsPage() {
         }
     };
 
-    const filtered = items.filter(s => {
-        const match = FILTERS.find(f => f.key === filter);
-        if (!match || !match.statusMatch) return true;
-        return s.status === match.statusMatch;
-    });
+    // Compared through the fold, so a row written under an older spelling of
+    // the same status is not hidden by the filter for it.
+    // A status this board has no word for is printed as it stands rather than
+    // as a message key nothing declared.
+    const statusLabel = (status: string) => {
+        const known = canonicalStatus(status);
+        return known ? t(known) : status;
+    };
+    const badgeClass = (status: string) => {
+        const known = canonicalStatus(status);
+        return known ? STATUS_BADGE_CLASS[known] : "bg-muted text-muted-foreground";
+    };
+
+    const filtered = items.filter(s => filter === "all" || canonicalStatus(s.status) === filter);
 
     return (
         <div className="space-y-6">
@@ -110,12 +105,12 @@ export default function AdminSuggestionsPage() {
             <div className="flex flex-wrap gap-2">
                 {FILTERS.map(f => (
                     <Button
-                        key={f.key}
-                        variant={filter === f.key ? "default" : "outline"}
+                        key={f}
+                        variant={filter === f ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setFilter(f.key)}
+                        onClick={() => setFilter(f)}
                     >
-                        {t(`adm_filter${f.key.charAt(0).toUpperCase() + f.key.slice(1)}`)}
+                        {f === "all" ? t("adm_filterAll") : t(f)}
                     </Button>
                 ))}
             </div>
@@ -143,8 +138,8 @@ export default function AdminSuggestionsPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start gap-2 mb-1">
                                         <h2 className="font-semibold flex-1">{s.title}</h2>
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBadgeClass(s.status)}`}>
-                                            {STATUS_OPTIONS.includes(s.status) ? t(s.status) : s.status}
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeClass(s.status)}`}>
+                                            {statusLabel(s.status)}
                                         </span>
                                     </div>
                                     <p className="text-sm text-muted-foreground line-clamp-3 mb-2">{s.content}</p>
@@ -158,7 +153,7 @@ export default function AdminSuggestionsPage() {
                                         onChange={e => changeStatus(s.id, e.target.value)}
                                         aria-label={t("adm_setStatus")}
                                     >
-                                        {STATUS_OPTIONS.map(o => (
+                                        {SUGGESTION_STATUSES.map(o => (
                                             <option key={o} value={o}>{t(o)}</option>
                                         ))}
                                     </NativeSelect>

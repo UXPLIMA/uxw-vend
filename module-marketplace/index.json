@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T05:33:38Z",
+  "updatedAt": "2026-09-06T05:46:59Z",
   "modules": [
     {
       "id": "announcements",
@@ -2535,13 +2535,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.0.20",
+      "version": "1.0.21",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T05:46:59Z",
       "screenshots": [],
       "tags": [
         "community"

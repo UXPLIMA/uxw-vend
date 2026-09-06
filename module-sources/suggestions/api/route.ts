@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
+import { canonicalStatus, spellingsOf } from "../lib/statuses";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -26,7 +27,12 @@ export async function GET(request: NextRequest) {
 
     const isUserAdmin = session?.user?.id ? await isAdmin(session.user.id) : false;
     const where: Record<string, unknown> = {};
-    if (status) where.status = status;
+    // A status filter is a filter on the state, not on the spelling the row
+    // happened to be written with.
+    if (status) {
+        const canonical = canonicalStatus(status);
+        where.status = canonical ? { in: spellingsOf(canonical) } : status;
+    }
     if (!isUserAdmin) {
         where.visibility = "public";
         where.moderationState = "APPROVED";
