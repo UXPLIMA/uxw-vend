@@ -26,10 +26,10 @@
 import { test, expect } from '@playwright/test';
 
 /** Long enough that the rest of the page has finished moving first. */
-const HOLD_MS = 3000;
+const HOLD_MS = 4000;
 
-/** When the rest of the page is done and the skeleton is still up. */
-const MARK_MS = 2000;
+/** Room for the rest of the page to stop moving, once the skeleton is up. */
+const SETTLE_MS = 1000;
 
 /** One article in the shape `/api/v1/blog/articles` returns. */
 const article = (n: number) => ({
@@ -62,15 +62,17 @@ async function pageMovementWhenNewsArrives(
     });
 
     await page.goto('/tr', { waitUntil: 'load' });
-    await page.waitForTimeout(MARK_MS);
 
-    // Proves the ordering the measurement depends on. Without it a section
-    // that never drew a skeleton would pass by having nothing to say.
-    const drawn = await page.locator('.animate-pulse').count();
-    expect(drawn, 'the skeleton should still be up when the first height is read').toBeGreaterThan(0);
-
+    // Waiting for the skeleton rather than for a stopwatch. A fixed delay
+    // reads the page before the skeleton is up on a slow machine, and a
+    // section that never drew one would pass by having nothing to say.
+    const skeleton = page.locator('.animate-pulse').first();
+    await skeleton.waitFor({ state: 'visible', timeout: 20_000 });
+    await page.waitForTimeout(SETTLE_MS);
     const before = await page.evaluate(() => document.body.scrollHeight);
-    await page.waitForTimeout(HOLD_MS + 1500);
+
+    await skeleton.waitFor({ state: 'detached', timeout: 20_000 });
+    await page.waitForTimeout(SETTLE_MS);
     const after = await page.evaluate(() => document.body.scrollHeight);
     return { before, after };
 }
