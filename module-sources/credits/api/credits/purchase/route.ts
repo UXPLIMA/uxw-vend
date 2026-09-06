@@ -17,15 +17,20 @@ export async function POST(request: NextRequest) {
     }
     const { userId, amount } = parsed.data;
 
-    const user = await prisma.user.update({
-        where: { id: userId },
-        data: { creditBalance: { increment: amount } },
-        select: { creditBalance: true },
-    });
-
-    await prisma.creditTransaction.create({
-        data: { userId, amount, type: "admin_grant", description: `Admin granted ${amount} credits` },
-    });
+    // The balance and the row that explains it are written together. They
+    // used to be two calls, so a ledger write that failed left an operator
+    // looking at a balance nothing accounts for - the one thing a credit
+    // history exists to prevent.
+    const [user] = await prisma.$transaction([
+        prisma.user.update({
+            where: { id: userId },
+            data: { creditBalance: { increment: amount } },
+            select: { creditBalance: true },
+        }),
+        prisma.creditTransaction.create({
+            data: { userId, amount, type: "admin_grant", description: `Admin granted ${amount} credits` },
+        }),
+    ]);
 
     // Fire hook + activity feed entry
     const { doActionAsync } = await import("@/core/sdk");

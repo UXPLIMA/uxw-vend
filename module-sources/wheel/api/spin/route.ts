@@ -67,69 +67,89 @@ export async function POST() {
         }
     }
 
-    // Deduct credits for paid spin, conditional on the balance still covering
-    // it. The check above is a snapshot: two spins submitted together both saw
-    // enough credits, both spun, and the balance went negative. The condition
-    // is what makes the second deduction find nothing to update.
-    if (paidSpin) {
-        const debited = await prisma.user.updateMany({
-            where: { id: session.user.id, creditBalance: { gte: spinCost } },
-            data: { creditBalance: { decrement: spinCost } },
-        });
-        if (debited.count === 0) {
-            return NextResponse.json(
-                { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
-                { status: 429 },
-            );
+    // A one-time coupon, minted here rather than inside the transaction so the
+    // winner can be told the code even though the row is written below. The
+    // suffix is random because two spins in the same millisecond used to
+    // produce the same code, and `code` is unique: the second winner got a
+    // 500 instead of a prize.
+    const wonCoupon = selectedPrize.type === "coupon" && selectedPrize.value > 0;
+    const couponCode = wonCoupon
+        ? `WHEEL-${Date.now().toString(36).toUpperCase()}-${randomInt(0, 1679616).toString(36).toUpperCase().padStart(4, "0")}`
+        : null;
+
+    // One spin is one event, so it is one transaction.
+    //
+    // Every step of it used to be its own call. A paid spin decremented the
+    // balance and then wrote the ledger row separately, so a failure in
+    // between took a person's credits and left nothing saying where they went;
+    // a credits prize did the same in the other direction, and a spin could be
+    // paid for without being recorded at all. Either half failing now undoes
+    // the other.
+    const spun = await prisma.$transaction(async (tx) => {
+        if (paidSpin) {
+            // The balance read above is a snapshot: two spins submitted
+            // together both saw enough credits, both spun, and the balance
+            // went negative. The condition is what makes the second deduction
+            // find nothing to update.
+            const debited = await tx.user.updateMany({
+                where: { id: session.user.id, creditBalance: { gte: spinCost } },
+                data: { creditBalance: { decrement: spinCost } },
+            });
+            if (debited.count === 0) return false;
+
+            await tx.creditTransaction.create({
+                data: {
+                    userId: session.user.id,
+                    amount: -spinCost,
+                    type: "wheel_spin",
+                    description: `Wheel of Fortune: Paid spin (${spinCost} credits)`,
+                },
+            });
         }
-        await prisma.creditTransaction.create({
+
+        await tx.wheelSpin.create({
             data: {
                 userId: session.user.id,
-                amount: -spinCost,
-                type: "wheel_spin",
-                description: `Wheel of Fortune: Paid spin (${spinCost} credits)`,
+                prizeId: selectedPrize.id,
+                prizeName: selectedPrize.name,
+                prizeValue: selectedPrize.value,
             },
         });
-    }
 
-    // Record spin
-    await prisma.wheelSpin.create({
-        data: {
-            userId: session.user.id,
-            prizeId: selectedPrize.id,
-            prizeName: selectedPrize.name,
-            prizeValue: selectedPrize.value,
-        },
+        if (selectedPrize.type === "credits" && selectedPrize.value > 0) {
+            await tx.user.update({
+                where: { id: session.user.id },
+                data: { creditBalance: { increment: selectedPrize.value } },
+            });
+            await tx.creditTransaction.create({
+                data: {
+                    userId: session.user.id,
+                    amount: selectedPrize.value,
+                    type: "wheel_prize",
+                    description: `Wheel of Fortune: ${selectedPrize.name}`,
+                },
+            });
+        } else if (couponCode) {
+            await tx.coupon.create({
+                data: {
+                    code: couponCode,
+                    description: `Wheel of Fortune prize: ${selectedPrize.name}`,
+                    type: "FIXED",
+                    value: selectedPrize.value,
+                    usageLimit: 1,
+                    isActive: true,
+                },
+            });
+        }
+
+        return true;
     });
 
-    // Award prize
-    if (selectedPrize.type === "credits" && selectedPrize.value > 0) {
-        await prisma.user.update({
-            where: { id: session.user.id },
-            data: { creditBalance: { increment: selectedPrize.value } },
-        });
-
-        await prisma.creditTransaction.create({
-            data: {
-                userId: session.user.id,
-                amount: selectedPrize.value,
-                type: "wheel_prize",
-                description: `Wheel of Fortune: ${selectedPrize.name}`,
-            },
-        });
-    } else if (selectedPrize.type === "coupon" && selectedPrize.value > 0) {
-        // Create a personal one-time coupon
-        const code = `WHEEL-${Date.now().toString(36).toUpperCase()}`;
-        await prisma.coupon.create({
-            data: {
-                code,
-                description: `Wheel of Fortune prize: ${selectedPrize.name}`,
-                type: "FIXED",
-                value: selectedPrize.value,
-                usageLimit: 1,
-                isActive: true,
-            },
-        });
+    if (!spun) {
+        return NextResponse.json(
+            { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
+            { status: 429 },
+        );
     }
 
     // Find index for frontend animation
@@ -173,6 +193,9 @@ export async function POST() {
             value: selectedPrize.value,
             color: selectedPrize.color,
             index: prizeIndex,
+            // Without this a coupon prize was uncollectable: the row was
+            // written and the code existed only in the database.
+            code: couponCode,
         },
         cost: spinCost,
     });

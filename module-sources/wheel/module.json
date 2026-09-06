@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -99,7 +99,8 @@
         "valueCredits": "{value} credits",
         "errorAlreadySpun": "You already spun today. Come back tomorrow!",
         "errorNotEnoughCredits": "Not enough credits. You need {cost} credits for another spin.",
-        "errorGeneric": "Spin failed. Try again."
+        "errorGeneric": "Spin failed. Try again.",
+        "couponCode": "Your coupon code: {code}"
       },
       "admin": {
         "menu_wheel": "Wheel",
@@ -148,7 +149,8 @@
         "valueCredits": "{value} kredi",
         "errorAlreadySpun": "Bugün çarkı zaten çevirdin. Yarın tekrar gel!",
         "errorNotEnoughCredits": "Yetersiz kredi. Tekrar çevirmek için {cost} kredi lazım.",
-        "errorGeneric": "Çark çevrilemedi. Tekrar dene."
+        "errorGeneric": "Çark çevrilemedi. Tekrar dene.",
+        "couponCode": "Kupon kodun: {code}"
       },
       "admin": {
         "menu_wheel": "Çark Ödülleri",

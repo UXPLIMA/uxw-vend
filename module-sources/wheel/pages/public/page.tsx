@@ -27,7 +27,7 @@ export default function WheelPage() {
     const [loading, setLoading] = useState(true);
     const [spinning, setSpinning] = useState(false);
     const [rotation, setRotation] = useState(0);
-    const [result, setResult] = useState<{ name: string; type: string; value: number } | null>(null);
+    const [result, setResult] = useState<{ name: string; type: string; value: number; code?: string | null } | null>(null);
     const [freeSpinUsed, setFreeSpinUsed] = useState(false);
     const [spinCost, setSpinCost] = useState(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -201,6 +201,12 @@ export default function WheelPage() {
                                             {result.value > 0 && (
                                                 <p className="text-sm text-muted-foreground mt-1">
                                                     {result.type === "credits" ? t('creditsAdded', { value: result.value }) : t('couponCreated', { value: result.value })}
+                                                </p>
+                                            )}
+                                            {/* A coupon nobody is told the code of is not a prize. */}
+                                            {result.code && (
+                                                <p className="mt-3 font-mono text-base font-bold tracking-wider text-foreground">
+                                                    {t('couponCode', { code: result.code })}
                                                 </p>
                                             )}
                                         </div>

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T03:59:21Z",
+  "updatedAt": "2026-09-06T04:07:41Z",
   "modules": [
     {
       "id": "announcements",
@@ -398,13 +398,13 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.0.12",
+      "version": "1.0.13",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T03:59:21Z",
+      "updatedAt": "2026-09-06T04:07:41Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2871,13 +2871,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.0.18",
+      "version": "1.0.19",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T03:59:21Z",
+      "updatedAt": "2026-09-06T04:07:41Z",
       "screenshots": [],
       "tags": [
         "commerce"
