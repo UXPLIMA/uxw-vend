@@ -3,7 +3,7 @@
 import { useState, useEffect, useId } from "react";
 import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { useSession } from "next-auth/react";
-import { useRouter } from "@/core/lib/i18n/navigation";
+import { useRouter, usePathname } from "@/core/lib/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import { Navbar, Footer } from "@/core/components/layout";
@@ -42,6 +42,7 @@ interface UserProfile {
 export default function ProfilePage() {
     const { status: authStatus } = useSession();
     const router = useRouter();
+    const pathname = usePathname();
     const modules = useAllModules();
     const t = useTranslations("profile");
     const dateTag = dateLocaleTag(useLocale());
@@ -144,7 +145,10 @@ export default function ProfilePage() {
     useEffect(() => {
         let cancelled = false;
         if (authStatus === "unauthenticated") {
-            router.push("/auth/login");
+            // Keep the tab they were on: a session that expires while someone
+            // reads their own notification settings should not cost them the
+            // trip back to that screen.
+            router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/profile")}`);
             return;
         }
         if (authStatus !== "authenticated") return;
@@ -165,7 +169,7 @@ export default function ProfilePage() {
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [authStatus, router]);
+    }, [authStatus, router, pathname]);
 
     const saveProfile = async (e: React.FormEvent) => {
         e.preventDefault();

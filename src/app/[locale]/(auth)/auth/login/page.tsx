@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Home, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { PasswordInput } from "@/core/components/ui/password-input";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleOauthButtons } from "@/core/generated/module-registry";
 import { isEnabledIn } from "@/core/lib/module-enabled";
@@ -16,6 +17,7 @@ import { AuthChallenge, useAuthChallenge } from "@/core/components/auth/AuthChal
 import { CHALLENGE_FIELD } from "@/core/lib/auth-challenge-shared";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
 import { Checkbox } from "@/core/components/ui/checkbox";
+import { safeInternalPath } from "@/core/lib/safe-redirect";
 
 const DEMO_EMAIL = "admin@example.com";
 const DEMO_PASSWORD = "password123";
@@ -23,6 +25,14 @@ const DEMO_PASSWORD = "password123";
 export default function LoginPage() {
     const router = useRouter();
     const t = useTranslations('auth');
+    const locale = useLocale();
+    const searchParams = useSearchParams();
+
+    // Where this person was headed before they were asked to sign in. It comes
+    // from the URL, so it comes from whoever wrote the link: `safeInternalPath`
+    // is what stands between that and an open redirect, and a rejected one
+    // falls back to the homepage rather than to a guess.
+    const destination = safeInternalPath(searchParams.get("callbackUrl")) ?? "/";
     const challenge = useAuthChallenge();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -107,7 +117,7 @@ export default function LoginPage() {
                         // silent - not critical
                     }
                 }
-                router.push("/");
+                router.push(destination);
                 router.refresh();
             }
         } catch {
@@ -267,11 +277,11 @@ export default function LoginPage() {
                                                 // is the second look, because getting it wrong points the
                                                 // sign-in button at somebody else's login form.
                                                 onClick={() => {
-                                                    const href = btn.href ?? "";
-                                                    if (href.startsWith("/") && !href.startsWith("//")) {
+                                                    const href = safeInternalPath(btn.href ?? "");
+                                                    if (href) {
                                                         window.location.href = href;
                                                     } else {
-                                                        signIn(btn.provider, { callbackUrl: "/" });
+                                                        signIn(btn.provider, { callbackUrl: `/${locale}${destination === "/" ? "" : destination}` });
                                                     }
                                                 }}
                                                 className="border-border text-foreground hover:bg-muted">

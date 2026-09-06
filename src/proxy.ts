@@ -16,6 +16,7 @@ import { providerCallbackRoutes } from '@/core/generated/module-routes';
 import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
 import { isStaticAsset } from '@/core/lib/proxy-paths';
+import { safeInternalPath } from '@/core/lib/safe-redirect';
 
 const intlMiddleware = createIntlMiddleware({
     locales: locales,
@@ -137,18 +138,28 @@ function resolveIpScope(pathname: string): IpBlockScope {
 }
 
 /**
+ * Is there a session cookie at all?
+ *
+ * Not "is this visitor signed in" - a cookie can be expired, forged or
+ * revoked, and only `auth()` knows. It answers the cheaper question, without
+ * touching the database, and every caller here treats a false as certain and a
+ * true as merely possible.
+ */
+function hasSessionCookie(request: NextRequest): boolean {
+    const cookieHeader = request.headers.get('cookie') || '';
+    return (
+        cookieHeader.includes('authjs.session-token') ||
+        cookieHeader.includes('next-auth.session-token')
+    );
+}
+
+/**
  * Best-effort session-role extraction for middleware gating.
  * Returns "guest" when there is no session or when the lookup fails so
  * the caller can safely treat them as an unprivileged visitor.
  */
 async function getSessionRole(request: NextRequest): Promise<string> {
-    const cookieHeader = request.headers.get('cookie') || '';
-    if (
-        !cookieHeader.includes('authjs.session-token') &&
-        !cookieHeader.includes('next-auth.session-token')
-    ) {
-        return 'guest';
-    }
+    if (!hasSessionCookie(request)) return 'guest';
 
     try {
         const session = await auth();
@@ -353,6 +364,35 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
             }
         } catch {
             // Fail-open: a loader error must not block visitors.
+        }
+    }
+
+    // ===== A signed-out deep link keeps its destination =====
+    // An admin who opens a bookmarked /admin/media is sent to the login form
+    // by the admin layout's guard, and that guard cannot say where they were
+    // going: a layout is not given the pathname, by design, because it does
+    // not re-render on navigation. So the redirect dropped the destination and
+    // the admin, having signed in, landed on the homepage instead.
+    //
+    // Deciding this here is a routing choice, not an authorization one. The
+    // layout still makes that call, against a real session, and still makes it
+    // for every request; all that is settled here is which URL a visitor
+    // carrying no session cookie at all is sent to. Nothing downstream trusts
+    // this beyond a query string, and the login form validates it again before
+    // following it.
+    if (!isStaticAsset(pathname) && !pathname.startsWith('/api/')) {
+        const locale = extractLocale(pathname);
+        const adminPrefix = `/${locale}/admin`;
+        const isAdminPage =
+            pathname === adminPrefix || pathname.startsWith(`${adminPrefix}/`);
+
+        if (isAdminPage && !hasSessionCookie(request)) {
+            const url = new URL(`/${locale}/auth/login`, request.url);
+            const destination = safeInternalPath(
+                pathname.slice(`/${locale}`.length) + request.nextUrl.search,
+            );
+            if (destination) url.searchParams.set('callbackUrl', destination);
+            return NextResponse.redirect(url);
         }
     }
 
