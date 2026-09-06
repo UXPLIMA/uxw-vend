@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.36",
+  "version": "2.2.37",
   "coreVersion": "^1.21.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -240,7 +240,7 @@
     {
       "path": "/store/orders",
       "handler": "api/orders/route.ts",
-      "description": "List orders and create a new order (admin creates manual orders)."
+      "description": "List orders. Orders are created at /store/checkout."
     },
     {
       "path": "/store/orders/[id]",

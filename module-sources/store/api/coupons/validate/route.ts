@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { couponValidateSchema } from "../../../lib/validations";
+import { computeCouponDiscount } from "../../../lib/pricing";
 
 // POST /api/v1/store/coupons/validate - Check coupon validity
 export async function POST(request: NextRequest) {
@@ -33,31 +34,29 @@ export async function POST(request: NextRequest) {
     const coupon = await prisma.coupon.findUnique({
         where: { code: code.toUpperCase() },
     });
-
-    if (!coupon || !coupon.isActive) {
+    if (!coupon) {
         return NextResponse.json({ valid: false, error: "Invalid or expired coupon code" });
     }
 
-    const now = new Date();
-    if (coupon.startsAt && coupon.startsAt > now) {
-        return NextResponse.json({ valid: false, error: "Invalid or expired coupon code" });
-    }
-    if (coupon.expiresAt && coupon.expiresAt < now) {
-        return NextResponse.json({ valid: false, error: "Invalid or expired coupon code" });
-    }
-    if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
-        return NextResponse.json({ valid: false, error: "Invalid or expired coupon code" });
-    }
-    if (coupon.minPurchase && subtotal && Number(subtotal) < Number(coupon.minPurchase)) {
-        return NextResponse.json({ valid: false, error: `Minimum purchase: $${Number(coupon.minPurchase).toFixed(2)}` });
-    }
+    // The same function the checkout charges by.
+    //
+    // This route used to repeat the rules, and had drifted on one of them: a
+    // fixed-value coupon was previewed at its full face value while the
+    // checkout caps it at the subtotal, so a 50 coupon on a 10 cart promised
+    // a shopper 50 off and then took 10. A preview that disagrees with the
+    // till is worse than no preview.
+    const cartSubtotal = Number(subtotal) || 0;
+    const priced = computeCouponDiscount(coupon, cartSubtotal);
 
-    let discount = 0;
-    if (coupon.type === "PERCENTAGE") {
-        discount = (subtotal || 0) * (Number(coupon.value) / 100);
-        if (coupon.maxDiscount) discount = Math.min(discount, Number(coupon.maxDiscount));
-    } else {
-        discount = Number(coupon.value);
+    if (priced.error) {
+        // Why a coupon failed is deliberately not spelled out: one that never
+        // existed and one that has run out answer the same, so the response
+        // cannot be used to go looking for codes. The minimum purchase is the
+        // exception, because it is the one a shopper can act on.
+        if (coupon.minPurchase && cartSubtotal < Number(coupon.minPurchase)) {
+            return NextResponse.json({ valid: false, error: `Minimum purchase: $${Number(coupon.minPurchase).toFixed(2)}` });
+        }
+        return NextResponse.json({ valid: false, error: "Invalid or expired coupon code" });
     }
 
     return NextResponse.json({
@@ -66,7 +65,7 @@ export async function POST(request: NextRequest) {
             code: coupon.code,
             type: coupon.type,
             value: Number(coupon.value),
-            discount: Math.round(discount * 100) / 100,
+            discount: priced.discount,
         },
     });
 }
