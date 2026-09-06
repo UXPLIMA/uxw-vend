@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import * as LucideIcons from "lucide-react";
@@ -58,6 +58,7 @@ export default function CartPage() {
     const router = useRouter();
     const { format: formatPrice } = useSiteCurrency();
     const t = useTranslations('store');
+    const { confirm } = useConfirm();
     const commonT = useTranslations('common');
     const [cart, setCart] = useState<CartData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -136,6 +137,15 @@ export default function CartPage() {
     };
 
     const clearCart = async () => {
+        // One click emptied it, with nothing between the pointer and an hour
+        // of picking things out.
+        const ok = await confirm({
+            title: t("clearCart"),
+            message: t("clearCartConfirm"),
+            confirmText: t("clear"),
+            variant: "danger",
+        });
+        if (!ok) return;
         try {
             const res = await fetch("/api/v1/store/cart", { method: "DELETE" });
             const failed = await writeError(res, t("cartUpdateFailed"), t);

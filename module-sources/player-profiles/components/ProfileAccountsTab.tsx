@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Loader2 } from "lucide-react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useConfirm } from "@/core/sdk/ui";
 
 interface LinkedAccount {
     id: string;
@@ -27,6 +27,7 @@ const GAME_PROVIDER = "minecraft";
  */
 export function ProfileAccountsTab() {
     const t = useTranslations("playerProfiles");
+    const { confirm } = useConfirm();
     const gameUsernameId = useId();
 
     const [accounts, setAccounts] = useState<LinkedAccount[]>([]);
@@ -52,6 +53,13 @@ export function ProfileAccountsTab() {
     }, [load]);
 
     const unlink = async (account: LinkedAccount) => {
+        const ok = await confirm({
+            title: t("unlink"),
+            message: t("unlinkConfirm"),
+            confirmText: t("unlink"),
+            variant: "danger",
+        });
+        if (!ok) return;
         setBusy(true);
         try {
             const res = await fetch("/api/v1/linked-accounts", {

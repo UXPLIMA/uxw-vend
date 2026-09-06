@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Player Profiles",
   "description": "Public player profile pages",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -69,7 +69,8 @@
         "gameUsername": "Game username",
         "link": "Link",
         "linkError": "Could not link that account.",
-        "oauthAutoLink": "Accounts you sign in with are linked automatically."
+        "oauthAutoLink": "Accounts you sign in with are linked automatically.",
+        "unlinkConfirm": "This account will be disconnected. You will have to link it again to use it."
       },
       "pageTitles": {
         "player": "Player Profile"
@@ -106,7 +107,8 @@
         "gameUsername": "Oyun kullanıcı adı",
         "link": "Bağla",
         "linkError": "Hesap bağlanamadı.",
-        "oauthAutoLink": "Giriş yaptığınız hesaplar otomatik olarak bağlanır."
+        "oauthAutoLink": "Giriş yaptığınız hesaplar otomatik olarak bağlanır.",
+        "unlinkConfirm": "Bu hesabın bağlantısı kesilecek. Tekrar kullanmak için yeniden bağlamanız gerekir."
       },
       "pageTitles": {
         "player": "Oyuncu Profili"
