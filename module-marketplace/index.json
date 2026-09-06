@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T01:53:29Z",
+  "updatedAt": "2026-09-06T02:01:45Z",
   "modules": [
     {
       "id": "announcements",
@@ -2714,13 +2714,13 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.0.15",
+      "version": "1.0.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T02:01:45Z",
       "screenshots": [],
       "tags": [
         "management"
