@@ -11,6 +11,7 @@ import { NativeSelect } from "@/core/components/ui/native-select";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 /** Blocking an address, on its own route rather than folded above the list. */
 export default function NewIpBlockPage() {
@@ -48,7 +49,7 @@ export default function NewIpBlockPage() {
                 router.refresh();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("ipBlocks_createFailed"));
+                toast.error(errorMessage(data, t("ipBlocks_createFailed"), t));
             }
         } finally {
             setSaving(false);

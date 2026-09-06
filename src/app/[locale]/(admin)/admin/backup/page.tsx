@@ -12,6 +12,7 @@ import { downloadFromUrl } from "@/core/lib/download";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { Badge } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 import {
     Database,
     Download,
@@ -127,7 +128,7 @@ export default function BackupAdminPage() {
                 toast.success(t("backup_createdToast", { size: data.backup?.sizeHuman ?? "" }));
                 await fetchBackups();
             } else {
-                toast.error(data.error || t("backup_backupFailed"));
+                toast.error(errorMessage(data, t("backup_backupFailed"), t));
             }
         } catch {
             toast.error(t("backup_backupFailed"));
@@ -152,7 +153,7 @@ export default function BackupAdminPage() {
                 await fetchBackups();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("backup_deleteFailed"));
+                toast.error(errorMessage(data, t("backup_deleteFailed"), t));
             }
         } catch {
             toast.error(t("backup_deleteFailed"));
@@ -196,7 +197,7 @@ export default function BackupAdminPage() {
             if (res.ok && data.success) {
                 toast.success(t("backup_restored"));
             } else {
-                toast.error(data.error || t("backup_restoreFailed"));
+                toast.error(errorMessage(data, t("backup_restoreFailed"), t));
             }
         } catch {
             toast.error(t("backup_restoreFailed"));

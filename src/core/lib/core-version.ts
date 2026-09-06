@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.25.0 - `errorMessage` joins `@/core/sdk`, beside `writeError`. A handler
+ * that needs the body on success cannot hand the response to `writeError`
+ * afterwards, so thirty-three screens had settled on `data.error ||
+ * t("saveFailed")` instead: a shape that reads as a translated fallback and
+ * is the reverse of one, since `error` is the English the route wrote and is
+ * almost never absent. `errorMessage` answers the same question for a body
+ * the caller already read. Addition.
+ *
  * 1.24.0 - `pageParams` joins `@/core/sdk/server`, with `MAX_PAGE`,
  * `MAX_PAGE_SIZE` and `DEFAULT_PAGE_SIZE` beside it. Sixteen list endpoints
  * had hand-rolled the same page and limit parse in six wordings, and all of
@@ -162,4 +170,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.24.0";
+export const CORE_API_VERSION = "1.25.0";

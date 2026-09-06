@@ -16,6 +16,7 @@ import { SiteTypeStep } from "./_steps/SiteTypeStep";
 import { ThemeStep } from "./_steps/ThemeStep";
 import { ModulesStep } from "./_steps/ModulesStep";
 import { DoneStep } from "./_steps/DoneStep";
+import { errorMessage } from "@/core/lib/write-result";
 
 /**
  * Known categories in display order. Anything a module declares that isn't
@@ -204,7 +205,7 @@ export default function SetupWizardPage() {
             const data = (await res.json()) as SetupResult & { error?: string };
 
             if (!res.ok || !data.success) {
-                toast.error(data.error || t("failed"));
+                toast.error(errorMessage(data, t("failed"), t));
                 setSubmitting(false);
                 return;
             }

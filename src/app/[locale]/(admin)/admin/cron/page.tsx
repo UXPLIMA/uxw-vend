@@ -10,6 +10,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 interface CronJobRow {
     key: string;
@@ -84,7 +85,7 @@ export default function CronAdminPage() {
                 void fetchJobs();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("cron_runFailed"));
+                toast.error(errorMessage(data, t("cron_runFailed"), t));
             }
         } catch {
             toast.error(t("cron_runFailed"));

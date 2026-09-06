@@ -6,6 +6,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Checkbo
 import { Shield, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface TurnstileConfig {
     siteKey: string;
@@ -56,7 +57,7 @@ export default function CloudflareTurnstileAdminPage() {
             });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("saveError"));
+                toast.error(errorMessage(data, t("saveError"), t));
                 return;
             }
             toast.success(t("saved"));

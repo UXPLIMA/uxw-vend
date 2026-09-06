@@ -6,6 +6,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Checkbo
 import { Cloud, Loader2, Save, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface R2Config {
     accountId: string;
@@ -57,7 +58,7 @@ export default function CloudflareR2AdminPage() {
             });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("saveError"));
+                toast.error(errorMessage(data, t("saveError"), t));
                 return;
             }
             toast.success(t("saved"));

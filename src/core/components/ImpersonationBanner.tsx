@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { UserCog, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { errorMessage } from "@/core/lib/write-result";
 
 /**
  * Fixed top-of-viewport banner shown whenever the current session is an
@@ -30,7 +31,7 @@ export function ImpersonationBanner() {
             });
             if (!res.ok) {
                 const body = (await res.json().catch(() => ({}))) as { error?: string };
-                toast.error(body.error || t("impersonationStopFailed"));
+                toast.error(errorMessage(body, t("impersonationStopFailed"), t));
                 return;
             }
             await update({ stopImpersonating: true });

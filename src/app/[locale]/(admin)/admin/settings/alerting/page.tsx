@@ -12,6 +12,7 @@ import { CheckboxField } from "@/core/components/ui/checkbox";
 import { RadioField } from "@/core/components/ui/radio";
 import { Badge } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 type HealthStatus = "ok" | "degraded" | "down";
 
@@ -93,7 +94,7 @@ export default function AlertingSettingsPage() {
                 toast.success(t("alerting_saved"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("alerting_saveFailed"));
+                toast.error(errorMessage(data, t("alerting_saveFailed"), t));
             }
         } finally {
             setSaving(false);
@@ -112,7 +113,7 @@ export default function AlertingSettingsPage() {
                 toast.success(t("alerting_testSent"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("alerting_testFailed"));
+                toast.error(errorMessage(data, t("alerting_testFailed"), t));
             }
         } finally {
             setTesting(false);

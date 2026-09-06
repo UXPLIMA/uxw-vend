@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm } from "@/core/sdk/ui";
 import { Loader2, ShieldCheck, ShieldOff, KeyRound, RefreshCw } from "lucide-react";
 import { copyText } from "@/core/sdk";
+import { errorMessage } from "@/core/sdk";
 
 type Step = "idle" | "setup" | "verify" | "backup" | "regenerated";
 
@@ -69,7 +70,7 @@ export function ProfileSecurityTab() {
                 setTwoFASecret(data.secret);
                 setTwoFAStep("setup");
             } else {
-                setTwoFAError(data.error || t("setupError"));
+                setTwoFAError(errorMessage(data, t("setupError"), t));
             }
         } catch {
             setTwoFAError(t("setupError"));
@@ -96,7 +97,7 @@ export function ProfileSecurityTab() {
                 setTwoFAStep("backup");
                 toast.success(t("setupSuccess"));
             } else {
-                setTwoFAError(data.error || t("verificationFailed"));
+                setTwoFAError(errorMessage(data, t("verificationFailed"), t));
             }
         } catch {
             setTwoFAError(t("verificationFailed"));
@@ -134,7 +135,7 @@ export function ProfileSecurityTab() {
                 resetCredentials();
                 toast.success(t("regenerateSuccess"));
             } else {
-                setTwoFAError(data.error || t("setupError"));
+                setTwoFAError(errorMessage(data, t("setupError"), t));
             }
         } catch {
             setTwoFAError(t("setupError"));
@@ -173,7 +174,7 @@ export function ProfileSecurityTab() {
                 resetCredentials();
                 toast.success(t("disableSuccess"));
             } else {
-                setTwoFAError(data.error || t("verificationFailed"));
+                setTwoFAError(errorMessage(data, t("verificationFailed"), t));
             }
         } catch {
             setTwoFAError(t("verificationFailed"));
@@ -207,7 +208,7 @@ export function ProfileSecurityTab() {
             });
             const data = await res.json();
             if (!res.ok) {
-                setPasswordError(data.error || t("setupError"));
+                setPasswordError(errorMessage(data, t("setupError"), t));
                 return;
             }
             setPasswordSaved(true);

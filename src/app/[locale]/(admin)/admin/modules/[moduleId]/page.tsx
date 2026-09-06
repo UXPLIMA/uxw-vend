@@ -13,6 +13,7 @@ import { moduleDescription, moduleName } from "../module-name";
 import type { Module, ModuleSettingValues } from "../types";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { errorMessage } from "@/core/lib/write-result";
 
 /**
  * One module's settings, on its own screen.
@@ -74,7 +75,7 @@ export default function ModuleSettingsPage({
             });
             const data = await res.json();
             if (!res.ok) {
-                toast.error(data.error || t("modules_settingsFailed"));
+                toast.error(errorMessage(data, t("modules_settingsFailed"), t));
                 return false;
             }
             setMod((current) => (current ? { ...current, config } : current));

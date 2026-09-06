@@ -8,7 +8,7 @@ import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, us
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { writeError } from "@/core/sdk";
+import { writeError, errorMessage } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Category {
@@ -108,7 +108,7 @@ export default function AdminStoreCategoriesPage() {
                 toast.success(t("cat_deletedToast"));
             } else {
                 const data = await res.json();
-                toast.error(data.error || (t("cat_deleteError")));
+                toast.error(errorMessage(data, t("cat_deleteError"), t));
             }
         } catch {
             toast.error(t("cat_deleteError"));

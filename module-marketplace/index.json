@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T07:56:46Z",
+  "updatedAt": "2026-09-06T08:05:31Z",
   "modules": [
     {
       "id": "announcements",
@@ -122,13 +122,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.1.27",
-      "coreVersion": "^1.24.0",
+      "version": "1.2.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -205,13 +205,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.0.10",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:42:06Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -240,13 +240,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.1.6",
-      "coreVersion": "^1.0.0",
+      "version": "1.2.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:42:06Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -474,13 +474,13 @@
           "description": "Otomatik dönüşümle çoklu para birimi desteği"
         }
       },
-      "version": "1.1.5",
-      "coreVersion": "^1.0.0",
+      "version": "1.2.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2118,13 +2118,13 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.0.23",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T02:32:55Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2229,13 +2229,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.0.20",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2371,13 +2371,13 @@
           "description": "Ekip üyesi listesi ve başvurular"
         }
       },
-      "version": "1.0.18",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2441,13 +2441,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.40",
-      "coreVersion": "^1.24.0",
+      "version": "2.3.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2654,13 +2654,13 @@
           "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
         }
       },
-      "version": "1.0.21",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2726,13 +2726,13 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.0.16",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T02:01:45Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2873,13 +2873,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.0.20",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T04:58:16Z",
+      "updatedAt": "2026-09-06T08:05:31Z",
       "screenshots": [],
       "tags": [
         "commerce"

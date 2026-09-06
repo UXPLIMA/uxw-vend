@@ -11,6 +11,7 @@ import { Badge } from "@/core/components/ui/badge";
 import { Loader2, Check, Infinity as InfinityIcon } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 interface RoleRow {
     id: string;
@@ -71,7 +72,7 @@ export default function RateLimitsSettingsPage() {
             });
             if (!res.ok) {
                 const j = await res.json().catch(() => ({}));
-                toast.error(j.error || (t("rateLimits_saveError")));
+                toast.error(errorMessage(j, t("rateLimits_saveError"), t));
                 return;
             }
             toast.success(t("rateLimits_saved"));

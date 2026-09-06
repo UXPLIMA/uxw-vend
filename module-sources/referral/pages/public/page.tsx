@@ -10,6 +10,7 @@ import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-reac
 import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { copyText } from "@/core/sdk";
+import { errorMessage } from "@/core/sdk";
 
 interface ReferralData {
     referralCode: string;
@@ -89,7 +90,7 @@ export default function ReferralPage() {
                 toast.success(result.message || t("codeApplied"));
                 setReferralCodeInput("");
             } else {
-                toast.error(result.error || t("codeError"));
+                toast.error(errorMessage(result, t("codeError"), t));
             }
         } catch {
             toast.error(t("somethingWrong"));

@@ -46,6 +46,19 @@ export async function writeError(res: Response, fallback: string, t?: Translator
         // No body, or not JSON. The status alone is what we have.
     }
 
+    return errorMessage(body, fallback, t);
+}
+
+/**
+ * The same answer for a body the caller has already read.
+ *
+ * A handler that needs the body on success cannot hand the response to
+ * `writeError` afterwards - it has been consumed. Those handlers had all
+ * settled on `data.error || t("saveFailed")`, which reads like a translated
+ * fallback and is the opposite of one: `error` is the endpoint's English, so
+ * the key is reached only when the endpoint says nothing.
+ */
+export function errorMessage(body: WriteErrorBody | null | undefined, fallback: string, t?: Translator): string {
     const code = typeof body?.code === "string" ? body.code : null;
     if (t && code) {
         const key = `err.${code}`;

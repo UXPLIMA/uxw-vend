@@ -7,7 +7,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConf
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import { writeError } from "@/core/sdk";
+import { writeError, errorMessage } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface Category {
@@ -107,7 +107,7 @@ export default function AdminBlogCategoriesPage() {
                 fetchCategories();
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t("adm_deleteCatError")));
+                toast.error(errorMessage(data, t("adm_deleteCatError"), t));
             }
         } catch {
             toast.error(t("adm_deleteCatError"));

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { writeError } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface Coupon {
     id: string;
@@ -161,7 +162,7 @@ export default function AdminCouponsPage() {
             const res = await fetch(`/api/v1/store/coupons/${id}`, { method: "DELETE" });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t("cou_deleteError")));
+                toast.error(errorMessage(data, t("cou_deleteError"), t));
                 return;
             }
             toast.success(t("cou_deletedToast"));

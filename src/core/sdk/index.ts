@@ -65,7 +65,7 @@ export {
  */
 export { copyText } from "@/core/lib/copy-text";
 
-export { writeError } from "@/core/lib/write-result";
+export { writeError, errorMessage } from "@/core/lib/write-result";
 export type { WriteErrorBody } from "@/core/lib/write-result";
 export type { Translator } from "@/core/lib/auth-error-message";
 

@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface AdminTrophy {
     id: string;
@@ -168,7 +169,7 @@ export default function AdminTrophiesPage() {
             );
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("saveFailed"));
+                toast.error(errorMessage(data, t("saveFailed"), t));
                 return;
             }
             toast.success(editing ? t("updated") : t("created"));

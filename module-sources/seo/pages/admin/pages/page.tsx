@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Pencil, Trash2, Loader2, Search, Globe, EyeOff } from 
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface SeoPage {
     id: string;
@@ -160,7 +161,7 @@ export default function SeoPageOverridesPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                toast.error(data.error || t("adm_saveFailed"));
+                toast.error(errorMessage(data, t("adm_saveFailed"), t));
                 return;
             }
 

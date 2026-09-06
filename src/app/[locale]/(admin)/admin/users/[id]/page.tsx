@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useConfirm, usePrompt } from "@/core/components/ui/confirm-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { dateLocaleTag } from "@/core/lib/utils";
-import { writeError } from "@/core/lib/write-result";
+import { writeError, errorMessage } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
@@ -108,7 +108,7 @@ export default function AdminUserDetailPage() {
             });
             const data = (await res.json().catch(() => ({}))) as { error?: string };
             if (!res.ok) {
-                toast.error(data.error || t("users_impersonateFailed"));
+                toast.error(errorMessage(data, t("users_impersonateFailed"), t));
                 return;
             }
             await updateSession({ impersonate: userId });
@@ -133,7 +133,7 @@ export default function AdminUserDetailPage() {
             const res = await fetch(`/api/v1/users/${userId}/export`);
             if (!res.ok) {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || t("users_exportFailed"));
+                toast.error(errorMessage(body, t("users_exportFailed"), t));
                 return;
             }
             const blob = await res.blob();
@@ -169,7 +169,7 @@ export default function AdminUserDetailPage() {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setDeleteError(data.error || t("users_deleteFailed"));
+                setDeleteError(errorMessage(data, t("users_deleteFailed"), t));
                 return;
             }
             toast.success(t("users_deleted"));
@@ -236,7 +236,7 @@ export default function AdminUserDetailPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                setError(data.error || t("users_somethingWrong"));
+                setError(errorMessage(data, t("users_somethingWrong"), t));
                 return;
             }
 

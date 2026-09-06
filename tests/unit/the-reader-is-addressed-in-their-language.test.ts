@@ -146,6 +146,27 @@ describe("the reader is addressed in their language", () => {
         expect(offenders, "give the fallback a translation key").toEqual([]);
     });
 
+    it("a screen does not render the endpoint's own sentence", () => {
+        // `data.error || t("saveFailed")` was the whole family: every one of
+        // them reads as a translated fallback and is the reverse of one,
+        // because `error` is the English the route wrote and it is almost
+        // never absent. The check above catches only the ones whose fallback
+        // slot held an English literal too; this one catches the shape.
+        //
+        // Routes are exempt: `error` there is the wire format, and a route
+        // has no translator to reach for. `errorMessage` and `writeError`
+        // are what a screen uses to turn one into something a reader can be
+        // shown - the caller's key, or the `err.<code>` its catalogue knows.
+        const offenders: string[] = [];
+        for (const file of FILES.filter((f) => !f.includes("/api/"))) {
+            const src = code(file);
+            for (const m of src.matchAll(/\b\w+\??\.error\s*\|\|/g)) {
+                offenders.push(`${file}: ${m[0]}`);
+            }
+        }
+        expect(offenders, "use errorMessage(body, t(\"key\"), t) from @/core/sdk").toEqual([]);
+    });
+
     it("what a control suggests or asks is a translation key", () => {
         const offenders: string[] = [];
         // Components only. The same field names appear in API route bodies,
@@ -196,6 +217,7 @@ describe("the reader is addressed in their language", () => {
     });
 
     it("the SDK carries the replacements a module needs", () => {
+        expect(read("src/core/sdk/index.ts")).toContain("errorMessage");
         const sdk = read("src/core/sdk/ui.ts");
         for (const name of ["usePrompt", "useLocalDate", "useRelativeTime", "LoadFailed"]) {
             expect(sdk, `@/core/sdk/ui must export ${name}`).toContain(name);

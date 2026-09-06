@@ -11,6 +11,7 @@ import { badgeClassName } from "@/core/components/ui/badge";
 import { Checkbox } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { errorMessage } from "@/core/lib/write-result";
 
 type ModerationMode = "auto" | "manual";
 
@@ -95,7 +96,7 @@ export default function ModerationSettingsPage() {
             });
             if (!res.ok) {
                 const data = (await res.json().catch(() => null)) as { error?: string } | null;
-                toast.error(data?.error || t("moderationSettings_saveFailed"));
+                toast.error(errorMessage(data, t("moderationSettings_saveFailed"), t));
                 return;
             }
             toast.success(t("moderationSettings_saved"));

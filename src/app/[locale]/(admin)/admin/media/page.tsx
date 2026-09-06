@@ -14,6 +14,7 @@ import { NativeSelect } from "@/core/components/ui/native-select";
 import { copyText } from "@/core/lib/copy-text";
 import { cn } from "@/core/lib/utils";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 interface MediaItem {
     id: string;
@@ -92,7 +93,7 @@ export default function MediaLibraryPage() {
             const res = await fetch("/api/v1/upload", { method: "POST", body: fd });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("media_uploadFailed"));
+                toast.error(errorMessage(data, t("media_uploadFailed"), t));
                 return;
             }
             toast.success(t("media_uploaded"));

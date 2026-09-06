@@ -7,6 +7,7 @@ import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/s
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, PartyPopper } from "lucide-react";
+import { errorMessage } from "@/core/sdk";
 
 interface Prize {
     id: string;
@@ -103,7 +104,7 @@ export default function WheelPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                let errorMsg: string = data?.error || t("errorGeneric");
+                let errorMsg: string = errorMessage(data, t("errorGeneric"), t);
                 if (data?.code === "wheel_already_spun") {
                     errorMsg = t("errorAlreadySpun");
                 } else if (data?.code === "wheel_not_enough_credits") {

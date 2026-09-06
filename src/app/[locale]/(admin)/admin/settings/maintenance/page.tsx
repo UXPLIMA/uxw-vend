@@ -11,6 +11,7 @@ import { useTranslations } from "next-intl";
 import { CheckboxField } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { Textarea } from "@/core/components/ui/textarea";
+import { errorMessage } from "@/core/lib/write-result";
 
 interface MaintenanceConfig {
     enabled: boolean;
@@ -96,7 +97,7 @@ export default function MaintenanceSettingsPage() {
             });
             if (!res.ok) {
                 const data = (await res.json().catch(() => null)) as { error?: string } | null;
-                toast.error(data?.error || t("maintenance_saveFailed"));
+                toast.error(errorMessage(data, t("maintenance_saveFailed"), t));
                 return;
             }
             toast.success(t("maintenance_saved"));

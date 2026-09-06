@@ -6,6 +6,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label, 
 import { Loader2, Plus, Trash2, Save, Star } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface Currency {
     code: string;
@@ -107,7 +108,7 @@ export default function CurrencyAdminPage() {
             });
             const data = await res.json();
             if (!res.ok) {
-                toast.error(data.error || t("saveError"));
+                toast.error(errorMessage(data, t("saveError"), t));
                 return;
             }
             toast.success(t("saved"));

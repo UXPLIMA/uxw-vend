@@ -21,6 +21,7 @@ import { useConfirm } from "@/core/components/ui/confirm-dialog";
 import { compareVersions } from "./module-display";
 import type { Module, MarketplaceModule, SortKey } from "./types";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { errorMessage } from "@/core/lib/write-result";
 
 export function useAdminModules() {
     const t = useTranslations("admin");
@@ -109,7 +110,7 @@ export function useAdminModules() {
                 setModules(modules.map(m => m.id === moduleId ? { ...m, enabled } : m));
                 toast.success(`${moduleId} ${enabled ? t("modules_enable") : t("modules_disable")}`);
             } else {
-                toast.error(data.error || t("modules_toggleFailed"));
+                toast.error(errorMessage(data, t("modules_toggleFailed"), t));
             }
         } catch { toast.error(t("modules_networkError")); }
         finally { setUpdating(null); }
@@ -126,7 +127,7 @@ export function useAdminModules() {
             const res = await fetch("/api/v1/modules/upload", { method: "POST", body: formData });
             const data = await res.json();
             if (res.ok) { toast.success(t("modules_uploadedToast", { name: data.module?.name ?? "" })); fetchModules(); }
-            else toast.error(data.error || t("modules_uploadFailed"));
+            else toast.error(errorMessage(data, t("modules_uploadFailed"), t));
         } catch { toast.error(t("modules_uploadFailed")); }
         finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
     };
@@ -140,7 +141,7 @@ export function useAdminModules() {
             const res = await fetch(`/api/v1/modules/${moduleId}`, { method: "DELETE" });
             const data = await res.json();
             if (res.ok) { toast.success(t("modules_deletedToast", { name: moduleName })); fetchModules(); }
-            else toast.error(data.error || t("modules_deleteFailed"));
+            else toast.error(errorMessage(data, t("modules_deleteFailed"), t));
         } catch { toast.error(t("modules_deleteFailed")); }
         finally { setDeleting(null); }
     };
@@ -161,7 +162,7 @@ export function useAdminModules() {
                 toast.success(t("modules_updatedToast", { name: mod.name, version: data.module?.version ?? mpMod.version }));
                 fetchModules();
             } else {
-                toast.error(data.error || t("modules_updateFailed"));
+                toast.error(errorMessage(data, t("modules_updateFailed"), t));
             }
         } catch { toast.error(t("modules_updateFailed")); }
         finally { setUpdatingModule(null); }
@@ -190,7 +191,7 @@ export function useAdminModules() {
                 fetchModules();
                 fetchMarketplace();
             } else {
-                toast.error(data.error || t("modules_installFailed"));
+                toast.error(errorMessage(data, t("modules_installFailed"), t));
             }
         } catch { toast.error(t("modules_installFailed")); }
         finally {
@@ -247,7 +248,7 @@ export function useAdminModules() {
                     toast.error(t("modules_bulkFailedList", { names: failedNames }));
                 }
             } else {
-                toast.error(data.error || t("modules_bulkFailed"));
+                toast.error(errorMessage(data, t("modules_bulkFailed"), t));
             }
         } catch {
             toast.error(t("modules_bulkFailed"));

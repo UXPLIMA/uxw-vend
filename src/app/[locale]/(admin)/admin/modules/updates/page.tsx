@@ -12,6 +12,7 @@ import { dateLocaleTag } from "@/core/lib/utils";
 import { moduleDescription, moduleName } from "../module-name";
 import { Badge } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 interface UpdateInfo {
     moduleId: string;
@@ -40,7 +41,7 @@ export default function ModuleUpdatesPage() {
             const res = await fetch("/api/v1/modules/updates");
             const data = await res.json();
             if (!res.ok) {
-                setError(data.error || (t("moduleUpdates_checkFailed")));
+                setError(errorMessage(data, t("moduleUpdates_checkFailed"), t));
                 return;
             }
             setUpdates(data.updates || []);
@@ -69,7 +70,7 @@ export default function ModuleUpdatesPage() {
                 setUpdated((s) => new Set(s).add(moduleId));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || (t("moduleUpdates_updateFailed")));
+                toast.error(errorMessage(data, t("moduleUpdates_updateFailed"), t));
             }
         } catch {
             toast.error(t("moduleUpdates_networkError"));

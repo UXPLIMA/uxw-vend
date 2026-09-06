@@ -9,6 +9,7 @@ import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
+import { errorMessage } from "@/core/sdk";
 
 interface StaffMember {
     id: string;
@@ -49,7 +50,7 @@ export default function StaffPage() {
             });
             const data = await res.json();
             if (!res.ok) {
-                toast.error(data.error || t("applicationError"));
+                toast.error(errorMessage(data, t("applicationError"), t));
             } else {
                 toast.success(t("applicationSent"));
                 setPosition("");

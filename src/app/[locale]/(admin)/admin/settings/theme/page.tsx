@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 import { themeRegistry } from "@/core/generated/theme-registry";
 import { useTheme } from "@/core/providers/theme-provider";
 import { SuggestedModulesBanner } from "@/core/components/admin/theme/SuggestedModulesBanner";
-import { writeError } from "@/core/lib/write-result";
+import { writeError, errorMessage } from "@/core/lib/write-result";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import { readJson } from "@/core/lib/read-json";
@@ -73,7 +73,7 @@ export default function ThemeSettingsPage() {
             const res = await fetch(`/api/v1/themes/${themeId}`, { method: "DELETE" });
             const data = await res.json();
             if (!res.ok) {
-                toast.error(data.error || t("theme_deleteFailed"));
+                toast.error(errorMessage(data, t("theme_deleteFailed"), t));
             } else {
                 setUploadMessage({ type: "success", text: data.message });
             }
@@ -194,7 +194,7 @@ export default function ThemeSettingsPage() {
             if (res.ok) {
                 toast.success(t("theme_installedRestart", { name: theme.name }));
             } else {
-                toast.error(data.error || t("theme_installFailed"));
+                toast.error(errorMessage(data, t("theme_installFailed"), t));
             }
         } catch { toast.error(t("theme_installFailed")); }
         finally { setInstalling(null); }

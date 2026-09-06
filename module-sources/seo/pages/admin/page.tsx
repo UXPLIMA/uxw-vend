@@ -8,6 +8,7 @@ import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
 
 interface SeoSettings {
     seo_default_title: string;
@@ -66,7 +67,7 @@ export default function SeoSettingsPage() {
 
             if (!res.ok) {
                 const data = await res.json();
-                toast.error(data.error || t("adm_settingsSaveFailed"));
+                toast.error(errorMessage(data, t("adm_settingsSaveFailed"), t));
                 return;
             }
 

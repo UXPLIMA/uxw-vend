@@ -11,6 +11,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { ArrowLeft, Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { errorMessage } from "@/core/sdk";
 
 interface Product {
     id: string;
@@ -124,7 +125,7 @@ export default function ProductDetailPage() {
                 requireLogin();
             } else {
                 const body = await res.json().catch(() => ({}));
-                toast.error(body.error || t("addToCartError"));
+                toast.error(errorMessage(body, t("addToCartError"), t));
             }
         } catch (err) {
             console.error("Failed to add to cart:", err);

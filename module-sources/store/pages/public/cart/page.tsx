@@ -10,7 +10,7 @@ import * as LucideIcons from "lucide-react";
 import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { writeError } from "@/core/sdk";
+import { writeError, errorMessage } from "@/core/sdk";
 
 interface CartItem {
     id: string;
@@ -173,7 +173,7 @@ export default function CartPage() {
                 setCouponApplied(data.coupon.code);
                 setCouponDiscount(data.coupon.discount);
             } else {
-                setCouponError(data.error || (t("err_invalidCoupon")));
+                setCouponError(errorMessage(data, t("err_invalidCoupon"), t));
             }
         } catch {
             setCouponError(t("err_validateCoupon"));
@@ -237,7 +237,7 @@ export default function CartPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setCheckoutError(data.error || (t("err_checkoutFailed")));
+                setCheckoutError(errorMessage(data, t("err_checkoutFailed"), t));
                 return;
             }
 

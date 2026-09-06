@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/core/components/ui/button";
 import { Label } from "@/core/components/ui/label";
 import { useTranslations } from "next-intl";
+import { errorMessage } from "@/core/lib/write-result";
 
 export interface FileUploadProps {
     value: string | null;
@@ -57,7 +58,7 @@ export function FileUpload({ value, onChange, accept, label, id }: FileUploadPro
 
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("uploadFailed"));
+                toast.error(errorMessage(data, t("uploadFailed"), t));
                 return;
             }
 

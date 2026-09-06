@@ -11,6 +11,7 @@ import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { toast } from "sonner";
 import { copyText } from "@/core/lib/copy-text";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { errorMessage } from "@/core/lib/write-result";
 
 /**
  * Creating an API key, on its own route.
@@ -45,7 +46,7 @@ export default function NewApiKeyPage() {
                 toast.success(t("apiKeys_created"));
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || t("apiKeys_createError"));
+                toast.error(errorMessage(data, t("apiKeys_createError"), t));
             }
         } finally {
             setSaving(false);
