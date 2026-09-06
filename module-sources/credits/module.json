@@ -2,7 +2,7 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -30,6 +30,9 @@
       "handler": "api/credits/purchase/route.ts",
       "description": "Purchase credits via the configured payment gateway."
     }
+  ],
+  "dependencies": [
+    "store"
   ],
   "hooksEmitted": [
     {

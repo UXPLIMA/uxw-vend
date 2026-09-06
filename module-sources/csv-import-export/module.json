@@ -2,7 +2,7 @@
   "id": "csv-import-export",
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "coreVersion": "^1.0.0",
   "category": "integration",
   "author": "uxwVend",
@@ -35,6 +35,9 @@
       "handler": "api/import/route.ts",
       "description": "Import tabular data from a CSV upload (admin)."
     }
+  ],
+  "dependencies": [
+    "store"
   ],
   "translations": {
     "en": {

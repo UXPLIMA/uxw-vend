@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T02:32:55Z",
+  "updatedAt": "2026-09-06T03:59:21Z",
   "modules": [
     {
       "id": "announcements",
@@ -398,19 +398,21 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.0.11",
+      "version": "1.0.12",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T02:32:55Z",
+      "updatedAt": "2026-09-06T03:59:21Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "credits.zip",
-      "dependencies": [],
+      "dependencies": [
+        "store"
+      ],
       "conflicts": [],
       "hooks": {
         "emits": [
@@ -435,19 +437,21 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.0.8",
+      "version": "1.0.9",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T03:59:21Z",
       "screenshots": [],
       "tags": [
         "integration"
       ],
       "zip": "csv-import-export.zip",
-      "dependencies": [],
+      "dependencies": [
+        "store"
+      ],
       "conflicts": [],
       "hooks": {
         "emits": [],
@@ -2867,20 +2871,21 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.0.17",
+      "version": "1.0.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T02:32:55Z",
+      "updatedAt": "2026-09-06T03:59:21Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "wheel.zip",
       "dependencies": [
-        "credits"
+        "credits",
+        "store"
       ],
       "conflicts": [],
       "hooks": {
