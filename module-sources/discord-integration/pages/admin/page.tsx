@@ -16,7 +16,19 @@ const webhookEvents = [
     { key: "discord_webhook_ticket_created", labelKey: "adm_evt_ticketCreated", descKey: "adm_evt_ticketCreated_desc" },
     { key: "discord_webhook_user_registered", labelKey: "adm_evt_userRegistered", descKey: "adm_evt_userRegistered_desc" },
     { key: "discord_webhook_forum_topic_created", labelKey: "adm_evt_forumTopic", descKey: "adm_evt_forumTopic_desc" },
+    { key: "discord_webhook_blog_article_created", labelKey: "adm_evt_blogArticle", descKey: "adm_evt_blogArticle_desc" },
 ];
+
+/*
+ * These keys are not decoration: `sendDiscordWebhook(event)` looks up
+ * `discord_webhook_${event}` and falls back to the general one, so an event
+ * with no row here is an event an operator cannot route anywhere. A blog
+ * article was such an event - the listener posted it, and every site that had
+ * set a general webhook got articles in whichever channel it pointed at, with
+ * no way to send them somewhere else.
+ *
+ * `a-discord-event-can-be-routed.test.ts` holds the two lists together.
+ */
 
 export default function DiscordSettingsPage() {
     const t = useTranslations("discordIntegration");

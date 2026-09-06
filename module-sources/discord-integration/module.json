@@ -2,7 +2,7 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "coreVersion": "^1.20.0",
   "category": "integration",
   "author": "uxwVend",
@@ -112,7 +112,9 @@
         "adm_evt_userRegistered_desc": "When a new user signs up",
         "adm_evt_forumTopic": "Forum Topic",
         "adm_evt_forumTopic_desc": "When a new forum topic is created",
-        "testBlocked": "Your browser blocked the test call. The server sends the real notifications, so this does not mean the webhook is broken."
+        "testBlocked": "Your browser blocked the test call. The server sends the real notifications, so this does not mean the webhook is broken.",
+        "adm_evt_blogArticle": "Blog Article",
+        "adm_evt_blogArticle_desc": "When a new blog article is published"
       },
       "admin": {
         "menu_discord-integration": "Discord Integration",
@@ -160,7 +162,9 @@
         "adm_evt_userRegistered_desc": "Yeni bir kullanıcı kaydolduğunda",
         "adm_evt_forumTopic": "Forum Konusu",
         "adm_evt_forumTopic_desc": "Yeni bir forum konusu oluşturulduğunda",
-        "testBlocked": "Tarayıcı test çağrısını engelledi. Gerçek bildirimleri sunucu gönderir, bu yüzden webhook bozuk demek değil."
+        "testBlocked": "Tarayıcı test çağrısını engelledi. Gerçek bildirimleri sunucu gönderir, bu yüzden webhook bozuk demek değil.",
+        "adm_evt_blogArticle": "Blog Yazısı",
+        "adm_evt_blogArticle_desc": "Yeni bir blog yazısı yayınlandığında"
       },
       "admin": {
         "menu_discord-integration": "Discord Entegrasyonu",

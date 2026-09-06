@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T04:18:38Z",
+  "updatedAt": "2026-09-06T04:46:28Z",
   "modules": [
     {
       "id": "announcements",
@@ -619,13 +619,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.0.13",
+      "version": "1.0.14",
       "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T02:11:02Z",
+      "updatedAt": "2026-09-06T04:46:28Z",
       "screenshots": [],
       "tags": [
         "integration"
