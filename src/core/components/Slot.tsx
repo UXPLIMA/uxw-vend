@@ -15,7 +15,7 @@ import { isEnabledIn } from "@/core/lib/module-enabled";
  *   <article>
  *     <h1>{article.title}</h1>
  *     <Slot name="blog.article.aboveContent" context={{ articleId: article.id }} />
- *     <div dangerouslySetInnerHTML={{ __html: article.content }} />
+ *     <RichContent html={article.content} />
  *     <Slot name="blog.article.belowContent" context={{ articleId: article.id }} />
  *   </article>
  *

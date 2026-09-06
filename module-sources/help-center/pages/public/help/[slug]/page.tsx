@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { RichContent } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
-import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Footer, Navbar } from "@/core/sdk/layout";
@@ -121,9 +121,9 @@ export default function HelpArticlePage({ params }: PageProps) {
                             </div>
 
                             {/* Article Content */}
-                            <div
-                                className="prose prose-blue max-w-none mb-8"
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
+                            <RichContent
+                                className="mb-8"
+                                html={article.content}
                             />
 
                             {/* Feedback */}

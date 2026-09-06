@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
+import { Button, NativeSelect, RichContent, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useParams, usePathname } from "next/navigation";
@@ -306,9 +305,9 @@ export default function ProductDetailPage() {
                         <div className="bg-card rounded-lg border border-border p-6">
                             <h1 className="text-2xl font-bold text-foreground mb-2">{product.name}</h1>
                             {product.description && (
-                                <div
-                                    className="prose prose-sm max-w-none text-muted-foreground leading-relaxed"
-                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }}
+                                <RichContent
+                                    className="text-sm text-muted-foreground"
+                                    html={product.description}
                                 />
                             )}
                         </div>

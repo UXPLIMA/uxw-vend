@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, LoadFailed } from "@/core/sdk/ui";
+import { Card, CardContent, LoadFailed, RichContent } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useLocalDate } from "@/core/sdk/ui";
@@ -78,9 +77,9 @@ export default function ChangelogPage() {
                                                     </span>
                                                 </div>
                                                 <h2 className="font-bold text-foreground mb-2">{entry.title}</h2>
-                                                <div
-                                                    className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
-                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(entry.content) }}
+                                                <RichContent
+                                                    className="text-sm text-muted-foreground"
+                                                    html={entry.content}
                                                 />
                                             </CardContent>
                                         </Card>

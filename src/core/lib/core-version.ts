@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.21.0 - `RichContent` joins `@/core/sdk/ui`. Author-written HTML was
+ * rendered by seven module screens, each importing its own DOMPurify and each
+ * styling the result with `prose dark:prose-invert` - class names that match
+ * nothing here, since the typography plugin was never installed. One
+ * component now sanitises and styles it, in the theme's colours, and works on
+ * the server as well as in the browser.
+ *
  * 1.20.0 - `useSettingsLoad` and `readJson` join `@/core/sdk/admin`. A module
  * settings screen that read `/api/v1/settings` with a bare `.then((r) =>
  * r.json())` could not tell a 500 from an empty answer, so it rendered its
@@ -134,4 +141,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.20.0";
+export const CORE_API_VERSION = "1.21.0";

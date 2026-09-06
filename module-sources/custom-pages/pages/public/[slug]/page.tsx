@@ -2,10 +2,9 @@
 
 import { useState, useEffect, use } from "react";
 import { useTranslations } from "next-intl";
-import DOMPurify from "dompurify";
 import { Render, type Data } from "@measured/puck";
 import "@measured/puck/puck.css";
-import { Card, CardContent } from "@/core/sdk/ui";
+import { Card, CardContent, RichContent } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useMergedBlockConfig } from "@/core/sdk/blocks";
@@ -109,9 +108,8 @@ function PageContent({ page }: { page: CustomPage }) {
             <h1 className="text-3xl font-bold text-foreground mb-6">{page.title}</h1>
             <Card>
                 <CardContent className="p-8">
-                    <div
-                        className="prose prose-blue max-w-none"
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(page.content) }}
+                    <RichContent
+                        html={page.content}
                     />
                 </CardContent>
             </Card>

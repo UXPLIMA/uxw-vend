@@ -1,11 +1,11 @@
 import { formatDate } from "@/core/sdk";
+import { RichContent } from "@/core/sdk/ui";
 import { buildArticleJsonLd, moduleSettings, prisma, resolveAppUrl } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar, Slot, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
 import { getTranslations, getLocale } from "next-intl/server";
 import { CommentSection } from "../../components/CommentSection";
 import { dateLocaleTag } from "@/core/sdk";
@@ -250,9 +250,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                         <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />
 
                                         {/* Content - RichTextEditor stores HTML, sanitize before render */}
-                                        <div
-                                            className="prose prose-lg dark:prose-invert max-w-none"
-                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content) }}
+                                        <RichContent
+                                            className="text-lg"
+                                            html={article.content}
                                         />
 
 

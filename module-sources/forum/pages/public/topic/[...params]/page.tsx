@@ -5,10 +5,9 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useRouter } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
-import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, RichContent, Textarea } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { ArrowLeft, ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
@@ -221,9 +220,8 @@ export default function TopicDetailPage() {
                                         <p className="text-xs text-muted-foreground">{relativeTime(new Date(topic.createdAt))}</p>
                                     </div>
                                 </div>
-                                <div
-                                    className="prose dark:prose-invert max-w-none text-foreground"
-                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(topic.content) }}
+                                <RichContent
+                                    html={topic.content}
                                 />
                             </CardContent>
                         </Card>
@@ -326,9 +324,9 @@ function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { u
                         <p className="text-xs text-muted-foreground">{relativeTime(new Date(post.createdAt))}</p>
                     </div>
                 </div>
-                <div
-                    className="prose prose-sm dark:prose-invert max-w-none text-foreground mb-3"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+                <RichContent
+                    className="text-sm mb-3"
+                    html={post.content}
                 />
                 <button
                     onClick={togglePostLike}

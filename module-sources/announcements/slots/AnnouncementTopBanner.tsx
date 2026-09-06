@@ -50,11 +50,15 @@ export default function AnnouncementTopBanner() {
         setAnnouncement(null);
     };
 
+    // The theme's own colours. These were fixed palette values with a
+    // `dark:` counterpart, and this site switches modes on
+    // [data-mode="dark"], not on Tailwind's variant: the dark half never
+    // fired, so a dark banner kept its dark blue text on a dark background.
     const typeClasses: Record<string, string> = {
-        info: "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20",
-        warning: "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
-        success: "bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20",
-        error: "bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/20",
+        info: "bg-primary/10 text-primary border-primary/20",
+        warning: "bg-warning/10 text-warning border-warning/20",
+        success: "bg-success/10 text-success border-success/20",
+        error: "bg-destructive/10 text-destructive border-destructive/20",
     };
 
     const variant = typeClasses[announcement.type || "info"] || typeClasses.info;
@@ -79,7 +83,7 @@ export default function AnnouncementTopBanner() {
                 <button
                     type="button"
                     onClick={dismiss}
-                    className="flex-shrink-0 p-1 rounded hover:bg-black/10 dark:hover:bg-white/10"
+                    className="flex-shrink-0 p-1 rounded hover:bg-foreground/10"
                     aria-label={t("dismiss")}
                 >
                     <X className="w-3.5 h-3.5" />

@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
 import { Link } from "@/core/sdk/navigation";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
-import { LoadFailed, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
+import { LoadFailed, NativeSelect, RichContent, useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
     id: string;
     name: string;
@@ -274,9 +273,9 @@ export default function StorePage() {
                                         <div className="p-4">
                                             <h3 className="font-semibold text-foreground">{mode.name}</h3>
                                             {mode.description && (
-                                                <div
-                                                    className="text-sm text-muted-foreground mt-1 prose prose-sm max-w-none"
-                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(mode.description) }}
+                                                <RichContent
+                                                    className="text-sm text-muted-foreground mt-1"
+                                                    html={mode.description}
                                                 />
                                             )}
                                         </div>

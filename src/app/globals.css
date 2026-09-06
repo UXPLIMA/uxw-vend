@@ -101,6 +101,133 @@ body {
 ::selection { background: var(--color-primary); color: white; }
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 
+/**
+ * Author-written HTML: a blog article, a forum post, a product description.
+ *
+ * Seven module screens rendered sanitised HTML through `prose prose-lg
+ * dark:prose-invert`, and this project has never had the typography plugin
+ * installed. None of those class names matched anything. With preflight in
+ * front of them, that meant every heading rendered at body size, every list
+ * lost its markers and every link lost its colour, on the blog, the forum,
+ * the help centre, the changelog, custom pages and product descriptions -
+ * which is most of the writing on a site.
+ *
+ * The colours are the theme's, so an article recolours with everything else.
+ */
+.uxw-content {
+  /* No colour of its own: a changelog entry is muted and an article is not,
+     and the caller says which with the utility it already had. */
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+.uxw-content > :first-child { margin-top: 0; }
+.uxw-content > :last-child { margin-bottom: 0; }
+
+.uxw-content h1,
+.uxw-content h2,
+.uxw-content h3,
+.uxw-content h4 {
+  color: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.6em 0 0.6em;
+}
+
+.uxw-content h1 { font-size: 1.75em; }
+.uxw-content h2 { font-size: 1.4em; }
+.uxw-content h3 { font-size: 1.2em; }
+.uxw-content h4 { font-size: 1.05em; }
+
+.uxw-content p { margin: 0 0 1em; }
+
+.uxw-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.uxw-content a:hover { opacity: 0.8; }
+
+.uxw-content strong { font-weight: 600; }
+.uxw-content em { font-style: italic; }
+
+.uxw-content ul,
+.uxw-content ol {
+  margin: 0 0 1em;
+  padding-left: 1.5rem;
+}
+
+.uxw-content ul { list-style: disc; }
+.uxw-content ol { list-style: decimal; }
+.uxw-content li { margin: 0.35em 0; }
+.uxw-content li::marker { color: var(--color-muted-foreground); }
+
+.uxw-content blockquote {
+  margin: 1.2em 0;
+  padding: 0.2em 0 0.2em 1rem;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-muted-foreground);
+  font-style: italic;
+}
+
+.uxw-content code {
+  background: var(--color-muted);
+  border-radius: 0.3rem;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.uxw-content pre {
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  padding: 1rem;
+  margin: 0 0 1em;
+  overflow-x: auto;
+}
+
+.uxw-content pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.875em;
+}
+
+.uxw-content img,
+.uxw-content video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.6rem;
+  margin: 1em 0;
+}
+
+.uxw-content hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: 2em 0;
+}
+
+.uxw-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1em;
+  display: block;
+  overflow-x: auto;
+}
+
+.uxw-content th,
+.uxw-content td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.uxw-content th {
+  background: var(--color-muted);
+  font-weight: 600;
+}
+
 .text-gradient {
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;

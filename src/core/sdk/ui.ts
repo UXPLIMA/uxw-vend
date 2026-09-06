@@ -28,6 +28,7 @@ export {
 export { NativeSelect } from "@/core/components/ui/native-select";
 export { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 export { Radio, RadioField } from "@/core/components/ui/radio";
+export { RichContent } from "@/core/components/ui/rich-content";
 export type { RadioProps, RadioFieldProps } from "@/core/components/ui/radio";
 export type { NativeSelectProps } from "@/core/components/ui/native-select";
 export type { PaginationProps } from "@/core/components/ui/pagination";
