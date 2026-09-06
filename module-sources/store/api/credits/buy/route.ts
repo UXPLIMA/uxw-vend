@@ -51,7 +51,10 @@ export async function POST(request: NextRequest) {
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
         const currency = ((currSetting?.value as string) || "USD").toUpperCase();
 
-        const totalAmount = amount * pricePerCredit;
+        // A per-credit price is a fraction by nature (0.013 a credit), so the
+        // product of it is almost never a whole cent. Rounded here, because
+        // what the gateway charges is rounded whether we do it or not.
+        const totalAmount = Math.round(amount * pricePerCredit * 100) / 100;
         if (Math.round(totalAmount * 100) < 50) {
             return NextResponse.json({ error: "Minimum purchase amount is $0.50" }, { status: 400 });
         }

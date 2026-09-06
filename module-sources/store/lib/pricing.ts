@@ -7,6 +7,23 @@
 // imports computeOrderPricing/computeCouponDiscount/computeTotals instead of
 // inlining the arithmetic.
 
+/**
+ * Money, to the cent.
+ *
+ * Every number here is a currency amount, and a currency amount that is not a
+ * whole number of cents cannot be charged. A percentage discount produces one
+ * immediately (33% off 9.99 is 6.6933), and nothing downstream used to round
+ * it: the order was stored at 6.6933, the receipt showed 6.69, and each
+ * gateway rounded on its own terms - Stripe per line, iyzico with toFixed(2),
+ * PayTR on the total. So the amount charged, the amount recorded and the
+ * amount shown could all differ, and the gap grew with the quantity.
+ *
+ * Rounding once, here, at the moment each amount is computed, makes those
+ * three agree by construction: everything downstream already receives whole
+ * cents, so a gateway's own rounding becomes a no-op.
+ */
+const cents = (amount: number): number => Math.round(amount * 100) / 100;
+
 export interface PricingProduct {
     id: string;
     name: string;
@@ -85,8 +102,10 @@ export function computeOrderPricing(params: {
             price = price * (1 - matchingBulk.discountPercent / 100);
         }
 
-        const itemTotal = price * item.quantity;
-        subtotal += itemTotal;
+        // Rounded before the quantity multiplies it: a third of a cent on
+        // one seat is a cent on the fourth, and the gateway bills per line.
+        price = cents(price);
+        subtotal += price * item.quantity;
 
         return {
             productId: product.id,
@@ -101,7 +120,7 @@ export function computeOrderPricing(params: {
         };
     });
 
-    return { subtotal, orderItems };
+    return { subtotal: cents(subtotal), orderItems };
 }
 
 // Prisma money columns arrive as Decimal objects, not primitives. Every
@@ -159,7 +178,7 @@ export function computeCouponDiscount(
     } else {
         discount = Math.min(Number(coupon.value), subtotal);
     }
-    return { error: null, discount };
+    return { error: null, discount: cents(discount) };
 }
 
 /**
@@ -172,7 +191,7 @@ export function computeCreatorDiscount(
     discountPercent: number
 ): number {
     const afterCoupon = subtotal - couponDiscount;
-    return afterCoupon * (discountPercent / 100);
+    return cents(afterCoupon * (discountPercent / 100));
 }
 
 /**
@@ -187,9 +206,9 @@ export function computeTotals(params: {
     taxRate: number;
 }): { totalDiscount: number; taxableAmount: number; tax: number; total: number } {
     const { subtotal, couponDiscount, creatorDiscount, taxRate } = params;
-    const totalDiscount = couponDiscount + creatorDiscount;
-    const taxableAmount = Math.max(0, subtotal - totalDiscount);
+    const totalDiscount = cents(couponDiscount + creatorDiscount);
+    const taxableAmount = cents(Math.max(0, subtotal - totalDiscount));
     const tax = taxRate > 0 ? Math.round(taxableAmount * taxRate) / 100 : 0;
-    const total = Math.max(0, taxableAmount + tax);
+    const total = cents(Math.max(0, taxableAmount + tax));
     return { totalDiscount, taxableAmount, tax, total };
 }
