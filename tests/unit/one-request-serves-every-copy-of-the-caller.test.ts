@@ -99,6 +99,23 @@ describe("a shared request", () => {
         expect(peekShared("/api/peek")).toEqual({ value: 4 });
     });
 
+    it("does not keep an entry it can no longer serve", async () => {
+        // The store is keyed by URL, and a URL carries a query string, so
+        // `?page=1`, `?page=2` and so on are each an entry. Marking one stale
+        // and leaving it there means a long session grows a map it never
+        // reads from again.
+        const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ v: 1 }) });
+        vi.stubGlobal("fetch", fetchMock);
+
+        // A window of zero is expired the moment it is written.
+        await sharedJson("/api/gone?page=1", 0);
+        await sharedJson("/api/gone?page=2", 0);
+        await sharedJson("/api/gone?page=3", 0);
+
+        const store = (globalThis as unknown as Record<symbol, Map<string, unknown>>)[SHARED_STATE_KEY];
+        expect(store.size, "expired entries should not accumulate").toBeLessThan(3);
+    });
+
     it("shares through globalThis, not a module variable", () => {
         // This is the whole point: a second copy of this file, which a bundler
         // is free to create, has to find the same store.

@@ -44,6 +44,21 @@ function store(): Store {
 const DEFAULT_TTL_MS = 60_000;
 
 /**
+ * Drop entries that can no longer be served.
+ *
+ * The store is keyed by URL and a URL carries its query string, so `?page=1`
+ * and `?page=2` are separate entries. Leaving an expired one in place costs
+ * nothing to read and everything to keep: a long session accumulates a map it
+ * never reads from again. An in-flight entry is never dropped, because a
+ * caller is holding its promise.
+ */
+function sweep(s: Store, now: number): void {
+    for (const [key, entry] of s) {
+        if (!entry.promise && entry.expires <= now) s.delete(key);
+    }
+}
+
+/**
  * How long an answer stays fresh: a fixed number of milliseconds, or a
  * function of the payload for an endpoint that declares its own window.
  * `/api/v1/public-settings` does exactly that, and an operator sets it.
@@ -59,8 +74,9 @@ type Freshness<T> = number | ((value: T) => number);
  */
 export function sharedJson<T = unknown>(url: string, ttl: Freshness<T> = DEFAULT_TTL_MS): Promise<T> {
     const s = store();
-    const hit = s.get(url);
     const now = Date.now();
+    sweep(s, now);
+    const hit = s.get(url);
 
     if (hit) {
         if (hit.promise) return hit.promise as Promise<T>;
