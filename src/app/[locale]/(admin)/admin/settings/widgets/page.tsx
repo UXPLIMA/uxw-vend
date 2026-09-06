@@ -128,15 +128,20 @@ export default function WidgetSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        const res = await fetch("/api/v1/settings", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ widget_visibility: widgetConfig, widget_order: widgetOrder }),
-        });
-        const failed = await writeError(res, t("common_writeFailed"), t);
-        setSaving(false);
-        if (failed) { toast.error(failed); return; }
-        toast.success(t("widgets_saved"));
+        try {
+            const res = await fetch("/api/v1/settings", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ widget_visibility: widgetConfig, widget_order: widgetOrder }),
+            });
+            const failed = await writeError(res, t("common_writeFailed"), t);
+            if (failed) { toast.error(failed); return; }
+            toast.success(t("widgets_saved"));
+        } catch {
+            toast.error(t("common_writeFailed"));
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

@@ -94,19 +94,24 @@ export default function FormsPage() {
         setSaving(true);
         const url = editingSlug ? `/api/v1/forms/${editingSlug}` : "/api/v1/forms";
         const method = editingSlug ? "PATCH" : "POST";
-        const res = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title, description, fields }),
-        });
-        if (res.ok) {
-            toast.success(editingSlug ? t("adm_formSaved") : t("adm_formCreated"));
-            await fetchForms();
-            closeForm();
-        } else {
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, description, fields }),
+            });
+            if (res.ok) {
+                toast.success(editingSlug ? t("adm_formSaved") : t("adm_formCreated"));
+                await fetchForms();
+                closeForm();
+            } else {
+                toast.error(t("adm_writeFailed"));
+            }
+        } catch {
             toast.error(t("adm_writeFailed"));
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const deleteForm = async (slug: string) => {

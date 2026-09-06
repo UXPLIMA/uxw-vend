@@ -58,19 +58,24 @@ export default function FormPage({ params }: PageProps) {
         if (!form) return;
         setSubmitting(true);
 
-        const res = await fetch(`/api/v1/forms/${slug}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ data: values }),
-        });
+        try {
+            const res = await fetch(`/api/v1/forms/${slug}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data: values }),
+            });
 
-        if (res.ok) {
-            setSubmitted(true);
-            toast.success(t("submitSuccess"));
-        } else {
+            if (res.ok) {
+                setSubmitted(true);
+                toast.success(t("submitSuccess"));
+            } else {
+                toast.error(t("submitError"));
+            }
+        } catch {
             toast.error(t("submitError"));
+        } finally {
+            setSubmitting(false);
         }
-        setSubmitting(false);
     };
 
     const renderField = (field: FormField) => {

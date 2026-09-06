@@ -25,15 +25,20 @@ export default function CssSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        const res = await fetch("/api/v1/settings", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ custom_css: css }),
-        });
-        const writeFailed = await writeError(res, t("common_writeFailed"), t);
-        setSaving(false);
-        if (writeFailed) { toast.error(writeFailed); return; }
-        toast.success(t("css_saved"));
+        try {
+            const res = await fetch("/api/v1/settings", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ custom_css: css }),
+            });
+            const writeFailed = await writeError(res, t("common_writeFailed"), t);
+            if (writeFailed) { toast.error(writeFailed); return; }
+            toast.success(t("css_saved"));
+        } catch {
+            toast.error(t("common_writeFailed"));
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

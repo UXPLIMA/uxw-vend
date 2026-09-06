@@ -19,14 +19,24 @@ import fs from "node:fs";
 import path from "node:path";
 
 const ROOTS = ["src", "module-sources"];
-const RAISES = /set(?:Is)?Loading\(true\)/g;
-const CLEARS = /set(?:Is)?Loading\(false\)/;
+
+/**
+ * The flags a screen raises while it waits. `loading` puts a spinner on the
+ * page; the rest disable the button that was just pressed, which strands the
+ * admin just as thoroughly - a Save that never re-enables needs a reload
+ * before it can be pressed again.
+ */
+const FLAGS = ["Loading", "IsLoading", "Saving", "Submitting", "Busy", "Sending", "Deleting", "Uploading", "Processing"];
 
 function walk(dir: string, out: string[] = []): string[] {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) {
+            // src/modules is an rsync of module-sources; walking both would
+            // report every module screen twice and make the result depend on
+            // which modules this checkout happens to have installed.
             if (entry.name === "node_modules" || entry.name === "generated") continue;
+            if (full === path.join("src", "modules")) continue;
             walk(full, out);
         } else if (entry.name.endsWith(".tsx")) {
             out.push(full);
@@ -60,16 +70,17 @@ function enclosingBlock(source: string, index: number): string | null {
  * async-await; `.finally(`/`.catch(` cover the promise chains that predate it
  * and are still the right shape for a `Promise.all` of two fetches.
  */
-function clearsOnFailure(body: string): boolean {
+function clearsOnFailure(body: string, flag: string): boolean {
+    const clears = new RegExp(`set${flag}\\(false\\)`);
     for (const keyword of ["finally", "catch"]) {
         const block = new RegExp(`\\b${keyword}\\b[^{]*\\{`, "g");
         for (const opened of body.matchAll(block)) {
             const inner = enclosingBlock(body, opened.index + opened[0].length - 1);
-            if (inner && CLEARS.test(inner)) return true;
+            if (inner && clears.test(inner)) return true;
         }
         const chained = new RegExp(`\\.${keyword}\\(([\\s\\S]{0,300}?)\\)\\s*[;.]`, "g");
         for (const call of body.matchAll(chained)) {
-            if (CLEARS.test(call[1])) return true;
+            if (clears.test(call[1])) return true;
         }
     }
     return false;
@@ -79,18 +90,20 @@ describe("a spinner that goes up comes back down", () => {
     const files = ROOTS.flatMap((root) => walk(root));
 
     it("has screens to check", () => {
-        expect(files.length).toBeGreaterThan(400);
+        expect(files.length).toBeGreaterThan(350);
     });
 
     it("clears the flag on the failing path everywhere it sets it", () => {
+        const raises = new RegExp(`set(${FLAGS.join("|")})\\(true\\)`, "g");
         const stuck: string[] = [];
         for (const file of files) {
             const source = fs.readFileSync(file, "utf8");
-            for (const raised of source.matchAll(RAISES)) {
+            for (const raised of source.matchAll(raises)) {
                 const body = enclosingBlock(source, raised.index);
                 if (!body) continue;
-                if (!clearsOnFailure(body)) {
-                    stuck.push(`${file}:${source.slice(0, raised.index).split("\n").length}`);
+                if (!clearsOnFailure(body, raised[1])) {
+                    const line = source.slice(0, raised.index).split("\n").length;
+                    stuck.push(`${file}:${line} set${raised[1]}`);
                 }
             }
         }

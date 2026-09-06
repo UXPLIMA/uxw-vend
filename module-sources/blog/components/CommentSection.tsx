@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Button, LoadFailed } from "@/core/sdk/ui";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 
@@ -24,6 +25,7 @@ interface Comment {
 export function CommentSection({ postId, articleId }: { postId?: string; articleId?: string }) {
     const id = postId || articleId || "";
     const t = useTranslations("blog");
+    const commonT = useTranslations("common");
     const locale = useLocale();
     const [comments, setComments] = useState<Comment[]>([]);
     const [content, setContent] = useState("");
@@ -71,8 +73,13 @@ export function CommentSection({ postId, articleId }: { postId?: string; article
                 else setComments(prev => [comment, ...prev]);
                 setContent("");
             }
-        } catch { /* ignore */ }
-        setSubmitting(false);
+        } catch {
+            // Silent before: the button re-enabled, the box kept the text, and
+            // nothing said the comment had not gone anywhere.
+            toast.error(commonT("somethingWentWrong"));
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;

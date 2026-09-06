@@ -135,21 +135,28 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         const url = editingId ? `${apiPath}/${editingId}` : apiPath;
         const method = editingId ? "PATCH" : "POST";
 
-        const res = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
+        // A rejected fetch used to skip the clear below and leave Save
+        // disabled for good, on every screen built out of this shell.
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
 
-        const failed = await writeError(res, commonT("somethingWentWrong"), ct);
-        if (failed) {
-            toast.error(failed);
-        } else {
-            toast.success(ct(editingId ? "crud_updated" : "crud_created"));
-            await fetchItems();
-            closeForm();
+            const failed = await writeError(res, commonT("somethingWentWrong"), ct);
+            if (failed) {
+                toast.error(failed);
+            } else {
+                toast.success(ct(editingId ? "crud_updated" : "crud_created"));
+                await fetchItems();
+                closeForm();
+            }
+        } catch {
+            toast.error(commonT("somethingWentWrong"));
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const toggleSelect = (id: string) => {

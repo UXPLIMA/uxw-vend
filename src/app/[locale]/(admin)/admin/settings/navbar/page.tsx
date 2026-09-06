@@ -108,18 +108,23 @@ export default function NavbarSettingsPage() {
 
     const save = async () => {
         setSaving(true);
-        const res = await fetch("/api/v1/settings", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ navbar_links: links }),
-        });
-        if (res.ok) {
-            invalidateSettingsCache();
-            toast.success(t("navbar_saved"));
-        } else {
+        try {
+            const res = await fetch("/api/v1/settings", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ navbar_links: links }),
+            });
+            if (res.ok) {
+                invalidateSettingsCache();
+                toast.success(t("navbar_saved"));
+            } else {
+                toast.error(t("navbar_saveFailed"));
+            }
+        } catch {
             toast.error(t("navbar_saveFailed"));
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;

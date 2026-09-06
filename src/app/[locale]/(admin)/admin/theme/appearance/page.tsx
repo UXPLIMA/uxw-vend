@@ -74,14 +74,19 @@ export default function ActiveThemeAppearancePage() {
         if (!themeId) return;
         setSaving(true);
         const nonEmpty = Object.fromEntries(Object.entries(colorOverrides).filter(([, v]) => v !== undefined));
-        const res = await fetch(`/api/v1/themes/${themeId}/customization`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ mode: currentMode, overrides: { tokens: { colors: nonEmpty } } }),
-        });
-        setSaving(false);
-        if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
-        toast.success(t("theme_colorsSaved"));
+        try {
+            const res = await fetch(`/api/v1/themes/${themeId}/customization`, {
+                method: "PUT",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ mode: currentMode, overrides: { tokens: { colors: nonEmpty } } }),
+            });
+            if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
+            toast.success(t("theme_colorsSaved"));
+        } catch {
+            toast.error(t("theme_saveFailed"));
+        } finally {
+            setSaving(false);
+        }
     };
 
     const resetColors = async () => {

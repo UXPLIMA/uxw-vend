@@ -26,14 +26,19 @@ export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
 
     const onSubmit = async () => {
         setSaving(true);
-        const res = await fetch(`/api/v1/themes/${themeId}/settings/${group}`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ values }),
-        });
-        setSaving(false);
-        if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
-        toast.success(t("theme_saved"));
+        try {
+            const res = await fetch(`/api/v1/themes/${themeId}/settings/${group}`, {
+                method: "PUT",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ values }),
+            });
+            if (!res.ok) { toast.error(t("theme_saveFailed")); return; }
+            toast.success(t("theme_saved"));
+        } catch {
+            toast.error(t("theme_saveFailed"));
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (

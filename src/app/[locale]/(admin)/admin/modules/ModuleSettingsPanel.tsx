@@ -46,8 +46,14 @@ export function ModuleSettingsPanel({
 
     const save = async () => {
         setSaving(true);
-        await onSave(mod.id, values);
-        setSaving(false);
+        try {
+            // Whatever onSave does with a failure is its own business; what
+            // this owns is the button, and a rejection used to leave it
+            // disabled with no way back but a reload.
+            await onSave(mod.id, values);
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (

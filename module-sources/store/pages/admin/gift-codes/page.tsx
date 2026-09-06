@@ -56,23 +56,28 @@ export default function GiftCodesPage() {
     const generate = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const res = await fetch("/api/v1/gift-codes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                value: parseFloat(value),
-                count: parseInt(count),
-                expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
-            }),
-        });
-        if (res.ok) {
-            const data = await res.json();
-            toast.success(t("adm_giftCodesGenerated", { count: data.count }));
-            setPage(1);
-            await fetchCodes(1);
-            closeForm();
-        } else toast.error(t("adm_giftCodeFailed"));
-        setSaving(false);
+        try {
+            const res = await fetch("/api/v1/gift-codes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    value: parseFloat(value),
+                    count: parseInt(count),
+                    expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
+                }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                toast.success(t("adm_giftCodesGenerated", { count: data.count }));
+                setPage(1);
+                await fetchCodes(1);
+                closeForm();
+            } else toast.error(t("adm_giftCodeFailed"));
+        } catch {
+            toast.error(t("adm_giftCodeFailed"));
+        } finally {
+            setSaving(false);
+        }
     };
 
     const deleteCode = async (id: string) => {

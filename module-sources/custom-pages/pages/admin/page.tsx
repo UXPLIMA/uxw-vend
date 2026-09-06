@@ -78,34 +78,39 @@ export default function CustomPagesAdminPage() {
         e.preventDefault();
         setSaving(true);
 
-        if (editingId) {
-            const res = await fetch(`/api/v1/custom-pages/${editingId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, content, isActive, order }),
-            });
-            if (res.ok) {
-                toast.success(t("adm_pageUpdated"));
-                await fetchPages();
-                closeForm();
+        try {
+            if (editingId) {
+                const res = await fetch(`/api/v1/custom-pages/${editingId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, content, isActive, order }),
+                });
+                if (res.ok) {
+                    toast.success(t("adm_pageUpdated"));
+                    await fetchPages();
+                    closeForm();
+                } else {
+                    toast.error(t("adm_updateFailed"));
+                }
             } else {
-                toast.error(t("adm_updateFailed"));
+                const res = await fetch("/api/v1/custom-pages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, slug: slug || undefined, content, isActive, order }),
+                });
+                if (res.ok) {
+                    toast.success(t("adm_pageCreated"));
+                    await fetchPages();
+                    closeForm();
+                } else {
+                    toast.error(t("adm_createFailed"));
+                }
             }
-        } else {
-            const res = await fetch("/api/v1/custom-pages", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, slug: slug || undefined, content, isActive, order }),
-            });
-            if (res.ok) {
-                toast.success(t("adm_pageCreated"));
-                await fetchPages();
-                closeForm();
-            } else {
-                toast.error(t("adm_createFailed"));
-            }
+        } catch {
+            toast.error(editingId ? t("adm_updateFailed") : t("adm_createFailed"));
+        } finally {
+            setSaving(false);
         }
-        setSaving(false);
     };
 
     const deletePage = async (page: CustomPage) => {
