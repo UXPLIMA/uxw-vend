@@ -97,7 +97,7 @@ export function UserPicker({
                                 setQuery(user.username);
                                 setHits([]);
                             }}
-                            className="w-full text-left px-3 py-2 hover:bg-accent text-sm"
+                            className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
                         >
                             {user.username}
                         </button>

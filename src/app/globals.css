@@ -163,6 +163,18 @@ body {
 .uxw-content li { margin: 0.35em 0; }
 .uxw-content li::marker { color: var(--color-muted-foreground); }
 
+/**
+ * A tick box is 16px square, and the site-wide radius is tuned for cards and
+ * inputs. At the default 0.5rem the two meet at exactly half the box, so
+ * every checkbox in the panel was drawn as a perfect circle - indistinguishable
+ * from the radio buttons beside it, which is the one shape a checkbox must
+ * never have. Capped at a quarter of the box, and still zero for a theme that
+ * asked for square corners.
+ */
+.uxw-control-radius {
+  border-radius: min(var(--uxw-radius), 0.25rem);
+}
+
 .uxw-content blockquote {
   margin: 1.2em 0;
   padding: 0.2em 0 0.2em 1rem;

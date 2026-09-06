@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, CheckboxField } from "@/core/sdk/ui";
-import { Shield, Loader2, Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
 import { errorMessage } from "@/core/sdk";
@@ -79,10 +79,7 @@ export default function CloudflareTurnstileAdminPage() {
     return (
         <div className="max-w-2xl">
             <AdminPageHeader
-                title={<>
-                    <Shield className="w-7 h-7 text-warning" />
-                    {t("title")}
-                </>}
+                title={t("title")}
                 description={t("subtitle")}
             />
 

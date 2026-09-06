@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Palette, Check, ChevronRight, RotateCcw } from "lucide-react";
+import { Check, ChevronRight, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/core/components/ui/card";
 import { Button } from "@/core/components/ui/button";
@@ -137,10 +137,7 @@ export default function ActiveThemeAppearancePage() {
                 and the cap left the right half of every wide screen empty
                 while the colour pickers sat two to a row. */}
             <AdminPageHeader
-                title={<>
-                    <Palette className="w-5 h-5" />
-                    {activeTheme.name} - {t("theme_appearanceTitle")}
-                </>}
+                title={`${activeTheme.name} - ${t("theme_appearanceTitle")}`}
                 description={t("theme_appearanceSubtitle")}
                 actions={Object.keys(colorTokens).length > 0 ? (
                     <>
@@ -161,6 +158,10 @@ export default function ActiveThemeAppearancePage() {
                 suggestions={activeTheme.suggestedModules ?? []}
             />
 
+            {/* `items-stretch` is the grid default, so both columns are as
+                tall as the taller one; the right column lays its cards out
+                in a flex column and lets the last one take the slack, which
+                is what stops it ending a few pixels short of the swatches. */}
             <div className="grid gap-6 mt-6 xl:grid-cols-3">
                 <div className="xl:col-span-2 space-y-6">
                     {Object.keys(colorTokens).length > 0 && (
@@ -194,7 +195,7 @@ export default function ActiveThemeAppearancePage() {
                     )}
                 </div>
 
-                <div className="space-y-6">
+                <div className="flex flex-col gap-6">
                     {modes.length > 1 && (
                         <Card>
                             <CardHeader>
@@ -220,17 +221,17 @@ export default function ActiveThemeAppearancePage() {
                     )}
 
                     {groups.length > 0 && (
-                        <Card>
+                        <Card className="flex flex-col flex-1">
                             <CardHeader>
                                 <CardTitle className="text-base">{t("theme_groups")}</CardTitle>
                                 <CardDescription>{t("theme_groupsDesc")}</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-1">
+                            <CardContent className="flex-1 space-y-1">
                                 {groups.map(([key, group]) => (
                                     <Link
                                         key={key}
                                         href={`/admin/theme/${key}`}
-                                        className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-sm hover:bg-accent transition-colors"
+                                        className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-sm hover:bg-muted transition-colors"
                                     >
                                         {group.icon && <NavIcon name={group.icon} className="w-4 h-4 text-muted-foreground" />}
                                         <span className="flex-1 font-medium">{group.label}</span>

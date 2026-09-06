@@ -405,6 +405,13 @@ export function buildNavGroups({
     // One named section per multi-item module; the single-item ones share a
     // tail section per group, because a wall of one-item headers reads worse
     // than a single "Extensions" list.
+    //
+    // "Tail" is the point of it and it was not being kept: sections are
+    // appended as the modules are walked, in lexical id order, so Commerce
+    // put `currency` in the pooled section before it ever reached `store`
+    // and the panel read "EXTENSIONS - Currency" above "STORE - Products,
+    // Orders, ...". The pooled section is moved to the end of its group
+    // below, once every module has had its turn.
     const namedSections = new Map<string, NavSection>();
     const pooledSections = new Map<string, NavSection>();
 
@@ -435,7 +442,11 @@ export function buildNavGroups({
             } else {
                 let section = pooledSections.get(group.id);
                 if (!section) {
-                    section = { header: translate("sidebar_extensions", "Extensions"), items: [] };
+                    section = {
+                        header: translate("sidebar_extensions", "Extensions"),
+                        headerKey: "sidebar_extensions",
+                        items: [],
+                    };
                     pooledSections.set(group.id, section);
                     group.sections.push(section);
                 }
@@ -444,8 +455,23 @@ export function buildNavGroups({
         }
     }
 
+    const pooled = new Set(pooledSections.values());
+
     return groups
-        .map((group) => ({ ...group, sections: group.sections.filter((s) => s.items.length > 0) }))
+        .map((group) => {
+            const kept = group.sections.filter((s) => s.items.length > 0);
+            // The pooled section is the group's tail, whatever order the
+            // modules that filled it happened to be walked in.
+            const sections = [...kept.filter((s) => !pooled.has(s)), ...kept.filter((s) => pooled.has(s))];
+            // A header over the only section in a group names the group a
+            // second time and distinguishes it from nothing. Gaming is four
+            // one-page modules, so its whole contents sat under a lone
+            // "EXTENSIONS" heading that carried no information at all.
+            if (sections.length === 1 && pooled.has(sections[0])) {
+                sections[0] = { ...sections[0], header: undefined, headerKey: undefined };
+            }
+            return { ...group, sections };
+        })
         .filter((group) => group.sections.length > 0)
         .sort((a, b) => (sortOrder.get(a.id) ?? 0) - (sortOrder.get(b.id) ?? 0) || a.id.localeCompare(b.id));
 }

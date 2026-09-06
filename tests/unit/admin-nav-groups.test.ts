@@ -99,6 +99,43 @@ describe("buildNavGroups", () => {
         expect(fallback.sections[0].items).toHaveLength(2);
     });
 
+    it("puts the pooled section after the named ones, whatever the module ids", () => {
+        // The modules are walked in lexical id order, so `currency` filled
+        // the pooled section before `store` ever created its own. Commerce
+        // read "EXTENSIONS - Currency" above "STORE - Products, Orders",
+        // which is why the grouping looked arbitrary to anyone using it.
+        const groups = buildNavGroups({
+            modules: [
+                { id: "currency", menu: [menuItem("/currency", "Currency")] },
+                {
+                    id: "store",
+                    menu: [menuItem("/store/products", "Products"), menuItem("/store/orders", "Orders")],
+                },
+            ],
+        });
+        const fallback = groups.find((g) => g.id === FALLBACK_NAV_GROUP_ID)!;
+        expect(fallback.sections).toHaveLength(2);
+        expect(fallback.sections[0].items).toHaveLength(2);
+        expect(fallback.sections[1].headerKey).toBe("sidebar_extensions");
+    });
+
+    it("leaves a lone pooled section unheaded", () => {
+        // Gaming is four modules with one page each, so the pooled section is
+        // everything the group contains. A header over all of it repeats the
+        // group's own name and separates it from nothing.
+        const groups = buildNavGroups({
+            modules: [
+                { id: "punishments", menu: [menuItem("/punishments", "Punishments")] },
+                { id: "servers", menu: [menuItem("/servers", "Servers")] },
+            ],
+        });
+        const fallback = groups.find((g) => g.id === FALLBACK_NAV_GROUP_ID)!;
+        expect(fallback.sections).toHaveLength(1);
+        expect(fallback.sections[0].header).toBeUndefined();
+        expect(fallback.sections[0].headerKey).toBeUndefined();
+        expect(fallback.sections[0].items).toHaveLength(2);
+    });
+
     it("drops a module's contributions once it is no longer enabled", () => {
         // The caller passes only enabled modules, so a disabled module simply
         // stops appearing - and its group must go with it.

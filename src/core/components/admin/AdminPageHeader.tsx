@@ -21,10 +21,13 @@ import { cn } from "@/core/lib/utils";
  * One component, one set of choices:
  *
  *   - the title is `text-2xl font-bold`, once, everywhere;
- *   - the actions sit on the right of the title, aligned to its top, and wrap
- *     underneath on a narrow screen rather than squeezing the title;
- *   - a way back, when there is one, is a quiet link ABOVE the title, so it
- *     never competes with the screen's primary action for the same corner.
+ *   - the actions sit on the right of the title, centred against the title
+ *     and its description, and wrap underneath on a narrow screen rather
+ *     than squeezing the title;
+ *   - a way back, when there is one, is the first thing in that same right
+ *     hand cluster: a quiet ghost control, so it reads as secondary to the
+ *     screen's primary action without taking a line of its own above the
+ *     title, where it pushed the whole heading down the page.
  *
  * Actions are buttons the caller passes in. `Button` already spaces its own
  * icon, so an action is written `<Button><Plus className="w-4 h-4" />{label}
@@ -66,31 +69,38 @@ export function AdminPageHeader({
     actions,
     className,
 }: AdminPageHeaderProps) {
-    // Pulled left by its own padding so the words line up with the title
-    // underneath rather than sitting indented from it.
-    const backClass = cn(buttonClassName("ghost", "sm"), "-ml-3 mb-1");
+    const backClass = buttonClassName("ghost", "sm");
+    const back = backHref ? (
+        <Link href={backHref} className={backClass}>
+            <ArrowLeft className="w-4 h-4" />
+            {backLabel}
+        </Link>
+    ) : onBack ? (
+        <button type="button" onClick={onBack} className={backClass}>
+            <ArrowLeft className="w-4 h-4" />
+            {backLabel}
+        </button>
+    ) : null;
+
     return (
         <div className={cn("mb-6", className)}>
-            {backHref && (
-                <Link href={backHref} className={backClass}>
-                    <ArrowLeft className="w-4 h-4" />
-                    {backLabel}
-                </Link>
-            )}
-            {onBack && (
-                <button type="button" onClick={onBack} className={backClass}>
-                    <ArrowLeft className="w-4 h-4" />
-                    {backLabel}
-                </button>
-            )}
-            <div className="flex flex-wrap items-start justify-between gap-4">
+            {/* `items-center` rather than `items-start`: the cluster on the
+                right is one control tall and the block on the left is two
+                lines, so aligning to the top left the button sitting against
+                the title with the description hanging below it. */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="min-w-0">
                     <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
                     {description && (
                         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
                     )}
                 </div>
-                {actions && <div className="flex flex-wrap items-center gap-2 shrink-0">{actions}</div>}
+                {(back || actions) && (
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {back}
+                        {actions}
+                    </div>
+                )}
             </div>
         </div>
     );

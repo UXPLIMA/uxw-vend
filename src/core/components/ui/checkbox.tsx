@@ -40,7 +40,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         }, [indeterminate]);
 
         return (
-            <span className={cn("relative inline-flex h-4 w-4 shrink-0 align-middle", className)}>
+            // The fade for a disabled box belongs on the wrapper, not on the
+            // input: the tick is drawn as a sibling, so dimming only the input
+            // left a full-strength tick floating on a washed-out box.
+            <span className={cn("relative inline-flex h-4 w-4 shrink-0 align-middle has-[:disabled]:opacity-50", className)}>
                 <input
                     type="checkbox"
                     ref={(node) => {
@@ -49,13 +52,16 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                         else if (ref) ref.current = node;
                     }}
                     className={cn(
-                        "peer h-4 w-4 cursor-pointer appearance-none rounded border border-border bg-background",
+                        // `uxw-control-radius`, not `rounded`: the site-wide
+                        // radius is half of this box, which drew every
+                        // checkbox as a circle - the radio button's shape.
+                        "peer h-4 w-4 cursor-pointer appearance-none uxw-control-radius border border-border bg-background",
                         "transition-colors duration-150",
                         "hover:border-primary/60",
                         "checked:border-primary checked:bg-primary",
                         "indeterminate:border-primary indeterminate:bg-primary",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                        "disabled:cursor-not-allowed disabled:opacity-50",
+                        "disabled:cursor-not-allowed",
                     )}
                     {...props}
                 />
@@ -101,7 +107,7 @@ const CheckboxField = React.forwardRef<HTMLInputElement, CheckboxFieldProps>(
         <label
             className={cn(
                 "flex items-start gap-2.5 text-sm",
-                disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+                disabled ? "cursor-not-allowed text-muted-foreground" : "cursor-pointer",
                 rowClassName,
             )}
         >

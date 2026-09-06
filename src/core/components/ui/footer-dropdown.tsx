@@ -59,7 +59,7 @@ export function FooterDropdown({ options, value, onChange, formatLabel }: Footer
                                     setIsOpen(false);
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm transition-colors ${
-                                    value === option ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
+                                    value === option ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
                                 }`}
                             >
                                 {formatLabel ? formatLabel(option) : option}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { execFileSync } from "node:child_process";
+import fs from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -40,6 +41,35 @@ describe("one checkbox for the whole panel", () => {
             // land in the source, and the copy follows on the next rsync.
             .filter((line) => !line.startsWith("src/modules/"));
         expect(offenders).toEqual([]);
+    });
+
+    it("is a box, not the radio button's circle", () => {
+        // `rounded` resolves to the site-wide radius, which is 0.5rem by
+        // default - exactly half of this 16px control, so every checkbox in
+        // the panel was drawn as a perfect circle and could not be told apart
+        // from the radio button beside it. `uxw-control-radius` caps it at a
+        // quarter of the box and still collapses to 0 for a square theme.
+        const checkbox = fs.readFileSync(join(ROOT, "src/core/components/ui/checkbox.tsx"), "utf8");
+        expect(checkbox).toContain("uxw-control-radius");
+        // The comments here explain the old class, so only the code counts.
+        const code = checkbox.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+        expect(code).not.toMatch(/\brounded\b(?!-)/);
+        expect(fs.readFileSync(join(ROOT, "src/app/globals.css"), "utf8"))
+            .toContain(".uxw-control-radius");
+        // And the radio still is a circle, or the two have swapped problems.
+        expect(fs.readFileSync(join(ROOT, "src/core/components/ui/radio.tsx"), "utf8"))
+            .toContain("rounded-full");
+    });
+
+    it("fades a disabled box together with its tick", () => {
+        // The tick is drawn as a sibling of the input, so `disabled:opacity-50`
+        // on the input alone left a full-strength tick floating on a washed
+        // out box - and `CheckboxField` faded the row on top of that, so the
+        // box came out at 0.3 and the tick at 0.6.
+        const checkbox = fs.readFileSync(join(ROOT, "src/core/components/ui/checkbox.tsx"), "utf8");
+        expect(checkbox).toContain("has-[:disabled]:opacity-50");
+        expect(checkbox).not.toContain("disabled:opacity-50\"");
+        expect(checkbox).not.toContain('"cursor-not-allowed opacity-60"');
     });
 
     it("is actually used, in core and in the modules alike", () => {

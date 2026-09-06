@@ -136,7 +136,7 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                                                     className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
                                                         isAuto
                                                             ? "border-primary/40 bg-primary/5 cursor-default"
-                                                            : "border-border hover:bg-accent/30 cursor-pointer"
+                                                            : "border-border hover:bg-muted cursor-pointer"
                                                     }`}
                                                 >
                                                     <Checkbox

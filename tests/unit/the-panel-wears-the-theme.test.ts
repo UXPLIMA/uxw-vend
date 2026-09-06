@@ -115,6 +115,20 @@ describe("core's own screens", () => {
         expect(offenders).toEqual([]);
     });
 
+    it("hovers on a surface colour, never on the brand accent", () => {
+        // `hover:bg-accent` is a shadcn habit, where `accent` is a faint grey
+        // and comes with `accent-foreground`. Here `accent` is a brand colour
+        // a theme picks - Flat's is a saturated orange - so five controls
+        // turned bright orange under the cursor while their text stayed the
+        // colour it was. Every button in the panel hovers on `muted`.
+        const offenders: string[] = [];
+        for (const file of files) {
+            const hits = classAttributes(readFileSync(file, "utf-8")).match(/hover:bg-accent(\/\d+)?\b/g);
+            if (hits) offenders.push(`${file.slice(ROOT.length + 1)}: ${[...new Set(hits)].join(", ")}`);
+        }
+        expect(offenders, "use hover:bg-muted").toEqual([]);
+    });
+
     it("does not reach for the `dark:` variant, which never fires here", () => {
         const offenders: string[] = [];
         for (const file of files) {
