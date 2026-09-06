@@ -231,13 +231,17 @@ function generateRegistry() {
         label: string,
         exportName: string,
         items: Array<{ id: string; component: string; module: string }>,
-        loadingExpr = 'null',
     ): string {
         let out = `// ${label}\nexport const ${exportName}: Record<string, ComponentType<any>> = {\n`;
         for (const item of items) {
             const importPath = buildImportPath(item.component, item.module);
             const baseName = toComponentName(path.basename(importPath));
-            out += `  '${item.id}': dynamic(() => import('${importPath}').then((mod: Record<string, unknown>) => (mod.${baseName} ?? mod['${item.id}'] ?? mod.default ?? mod) as ComponentType<any>), { loading: () => ${loadingExpr} }),\n`;
+            // No `loading` fallback on purpose. One that renders nothing
+            // replaces what the server already drew while the chunk arrives,
+            // so the page shortens and everything below it jumps; the news
+            // section alone cost 0.22 of layout shift that way. Without a
+            // fallback the server's markup stays until the component is ready.
+            out += `  '${item.id}': dynamic(() => import('${importPath}').then((mod: Record<string, unknown>) => (mod.${baseName} ?? mod['${item.id}'] ?? mod.default ?? mod) as ComponentType<any>)),\n`;
         }
         out += '};\n\n';
         return out;
