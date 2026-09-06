@@ -3,6 +3,7 @@ import { generateOrderNumber } from "@/core/sdk";
 import { logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
+import { resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import {
@@ -229,7 +230,7 @@ export async function POST(request: NextRequest) {
         const taxSetting = await prisma.setting.findUnique({ where: { key: "tax_rate" } });
         const taxRate = Number(taxSetting?.value) || 0;
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
-        const currency = ((currSetting?.value as string) || "usd").toLowerCase();
+        const currency = resolveCurrency(currSetting?.value as string).toLowerCase();
 
         const { totalDiscount, tax, total } = computeTotals({
             subtotal,

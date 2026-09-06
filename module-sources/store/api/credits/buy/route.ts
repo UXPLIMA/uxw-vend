@@ -11,6 +11,7 @@ import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/s
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
+import { resolveCurrency } from "../../../lib/currency";
 
 const buyCreditsSchema = z.object({
     amount: z.number().int().min(1, "Minimum 1 credit").max(100000, "Maximum 100,000 credits"),
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
         const pricePerCredit = creditsPricePerUnit;
 
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
-        const currency = ((currSetting?.value as string) || "USD").toUpperCase();
+        const currency = resolveCurrency(currSetting?.value as string);
 
         // A per-credit price is a fraction by nature (0.013 a credit), so the
         // product of it is almost never a whole cent. Rounded here, because
