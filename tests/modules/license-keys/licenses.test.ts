@@ -88,6 +88,20 @@ const prismaMock = {
             Object.assign(row, data);
             return row;
         }),
+        // The seat settlement reads the oldest rows back and rolls its own
+        // one away if it did not make the cut. Without these two the race the
+        // module fixed could not be exercised at all.
+        findMany: vi.fn(async ({ where, take }: { where: { licenseKeyId: string }; take?: number }) => {
+            const rows = db.activations
+                .filter((a) => a.licenseKeyId === where.licenseKeyId)
+                .sort((a, b) => a.activatedAt.getTime() - b.activatedAt.getTime() || a.id.localeCompare(b.id));
+            return (take === undefined ? rows : rows.slice(0, take)).map((a) => ({ id: a.id }));
+        }),
+        delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+            const index = db.activations.findIndex((a) => a.id === where.id);
+            if (index === -1) throw new Error("Record to delete does not exist.");
+            return db.activations.splice(index, 1)[0];
+        }),
         deleteMany: vi.fn(async ({ where }: { where: { licenseKeyId: string; machineHash: string } }) => {
             const before = db.activations.length;
             db.activations = db.activations.filter(

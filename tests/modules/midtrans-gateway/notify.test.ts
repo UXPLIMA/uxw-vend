@@ -24,6 +24,11 @@ vi.mock("@/core/sdk/server", () => ({
         },
     },
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
+    // The route reads its body through the SDK's bounded reader, which
+    // answers a malformed or oversized body with a response of its own. What
+    // is under test here is what happens to a body that parsed, so the mock
+    // is the parse and nothing else.
+    readJsonBody: async (request: Request) => request.json(),
 }));
 
 const applyFiltersAsync = vi.fn(async () => ({ handled: true, duplicate: false, error: null }));

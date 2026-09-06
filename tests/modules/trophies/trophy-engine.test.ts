@@ -6,7 +6,12 @@ const trophyFindUnique = vi.fn();
 const activityFeedItemCount = vi.fn();
 const userTrophyUpsert = vi.fn();
 
-vi.mock("@/core/lib/db", () => ({
+// The engine reads its rows through `@/core/sdk/server`, so that is what has
+// to be replaced: mocking `@/core/lib/db` underneath it left the real SDK
+// entry point to load, and it pulls in next-intl's client navigation, which
+// cannot resolve `next/navigation` outside the Next bundler.
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: {
         trophy: {
             findMany: (...args: unknown[]) => trophyFindMany(...args),

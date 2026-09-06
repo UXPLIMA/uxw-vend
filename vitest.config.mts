@@ -8,24 +8,44 @@ import path from 'path';
 const rootDir = import.meta.dirname;
 
 /**
- * Tests for a module live in `tests/modules/<moduleId>/` and are included only
- * when that module is actually installed.
+ * Tests for a module live in `tests/modules/<moduleId>/` and import the module
+ * as `@/modules/<id>/...`, which is where an *installed* module lives.
  *
- * The platform ships with zero modules, so `src/modules/` is normally empty. A
- * test that imports `@/modules/<id>/...` cannot even be transformed in that
- * state - it fails at collection, not as an assertion. Gating the glob on what
- * is installed keeps `npm test` green on a clean checkout while still running
- * these tests on a machine where the module is present.
+ * The platform ships with zero modules, so `src/modules/` is normally empty,
+ * and a test importing a module that is not installed cannot even be
+ * transformed - it fails at collection, not as an assertion. This used to be
+ * handled by only including the tests of installed modules, which kept a
+ * clean checkout green and quietly created a hole: CI copies every module
+ * into `src/modules` before it runs, so it ran a hundred tests that no
+ * developer machine did. Three of them were red for weeks - a mock missing an
+ * export the route had gained, a mock missing a method, a test still mocking
+ * the path its module had stopped importing - and every one of them was
+ * invisible to `npm test` here.
+ *
+ * So the tests all run, everywhere, and a module that is not installed
+ * resolves to the sources the marketplace ZIPs are built from. `src/modules`
+ * still wins when it has the module, because that is the copy the running app
+ * would load.
  */
 const modulesDir = path.resolve(rootDir, 'src/modules');
-const installedModules = fs.existsSync(modulesDir)
-    ? fs.readdirSync(modulesDir, { withFileTypes: true })
-          .filter((e) => e.isDirectory() && fs.existsSync(path.join(modulesDir, e.name, 'module.json')))
-          .map((e) => e.name)
-    : [];
-const installedModuleTestGlobs = installedModules.map(
-    (id) => `tests/modules/${id}/**/*.test.{ts,tsx}`,
-);
+const sourcesDir = path.resolve(rootDir, 'module-sources');
+
+function moduleIdsIn(dir: string): string[] {
+    if (!fs.existsSync(dir)) return [];
+    return fs
+        .readdirSync(dir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'module.json')))
+        .map((e) => e.name);
+}
+
+const installedModules = new Set(moduleIdsIn(modulesDir));
+// `(?=/|$)` so `@/modules/store` cannot swallow `@/modules/store-front`.
+const moduleSourceAliases = moduleIdsIn(sourcesDir)
+    .filter((id) => !installedModules.has(id))
+    .map((id) => ({
+        find: new RegExp(`^@/modules/${id}(?=/|$)`),
+        replacement: path.resolve(sourcesDir, id),
+    }));
 
 export default defineConfig({
     test: {
@@ -34,7 +54,7 @@ export default defineConfig({
         include: [
             'tests/unit/**/*.test.{ts,tsx}',
             'tests/integration/**/*.test.{ts,tsx}',
-            ...installedModuleTestGlobs,
+            'tests/modules/**/*.test.{ts,tsx}',
         ],
         coverage: {
             provider: 'v8',
@@ -239,16 +259,17 @@ export default defineConfig({
         },
     },
     resolve: {
-        alias: {
-            // Order matters: Vite tries alias entries in sequence and '@'
-            // matches as a prefix, so the specific entry has to come first.
-            //
+        // An array, not an object, because the module fallbacks are computed.
+        // Order matters either way: Vite tries the entries in sequence and
+        // '@' matches as a prefix, so every specific entry comes first.
+        alias: [
             // Everything that reaches `@/core/lib/auth` - including any test
             // that touches `@/core/sdk/server`, whose `activity-log` re-export
             // imports it - gets a stub instead. See tests/stubs/core-auth.ts
             // for why the real module cannot be imported outside Next.
-            '@/core/lib/auth': path.resolve(rootDir, 'tests/stubs/core-auth.ts'),
-            '@': path.resolve(rootDir, 'src'),
-        },
+            { find: '@/core/lib/auth', replacement: path.resolve(rootDir, 'tests/stubs/core-auth.ts') },
+            ...moduleSourceAliases,
+            { find: '@', replacement: path.resolve(rootDir, 'src') },
+        ],
     },
 });
