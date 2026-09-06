@@ -71,3 +71,32 @@ describe("a rendered page", () => {
         ).toEqual([]);
     });
 });
+
+/**
+ * The same shape, one layer down.
+ *
+ * `getActiveTheme` is three queries: the active theme row, its customization
+ * and its settings. Its own comment called it "cacheable upstream", and no
+ * caller cached it, so an admin page asked again inside the layout that had
+ * already asked. Six queries for one theme.
+ */
+describe("the active theme", () => {
+    it("is resolved once per render", () => {
+        const src = read(path.join(ROOT, "src/core/lib/theme-state.ts"));
+        expect(src, "getActiveTheme must be wrapped in React cache")
+            .toMatch(/export const getActiveTheme = cache\(/);
+        expect(src).toMatch(/import \{ cache \} from "react"/);
+    });
+
+    it("is not re-exported uncached somewhere else", () => {
+        // A second uncached path to the same three queries would put the
+        // duplicate back without touching this file.
+        const libDir = path.join(ROOT, "src/core/lib");
+        const others = fs
+            .readdirSync(libDir)
+            .filter((n) => n.endsWith(".ts") && n !== "theme-state.ts")
+            .map((n) => path.join(libDir, n));
+        const leaks = others.filter((f) => /prisma\.themeState\.find/.test(read(f))).map(rel);
+        expect(leaks, `These read the theme state directly:\n${leaks.join("\n")}`).toEqual([]);
+    });
+});

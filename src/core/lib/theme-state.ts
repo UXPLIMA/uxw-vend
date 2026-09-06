@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "./db";
 import { themeRegistry, defaultThemeId } from "@/core/generated/theme-registry";
 import type { ThemeManifest } from "./theme-manifest-schema";
@@ -12,9 +13,14 @@ export interface ActiveTheme {
 
 /**
  * Resolve the active theme + mode from DB, merged with any customization
- * overrides and theme-owned settings. Three queries; cacheable upstream.
+ * overrides and theme-owned settings.
+ *
+ * Three queries, and the layout is not the only caller: an admin page asks
+ * again inside the layout that already asked, which made it six. `cache`
+ * deduplicates for one render, which is the window where the answer cannot
+ * change; a theme switch is a mutation, so the next request reads it fresh.
  */
-export async function getActiveTheme(): Promise<ActiveTheme> {
+export const getActiveTheme = cache(async function getActiveTheme(): Promise<ActiveTheme> {
     const state = await prisma.themeState.findFirst().catch(() => null);
     const themeId = state?.themeId && themeRegistry[state.themeId] ? state.themeId : defaultThemeId;
     const manifest = themeRegistry[themeId] ?? themeRegistry[defaultThemeId];
@@ -51,7 +57,7 @@ export async function getActiveTheme(): Promise<ActiveTheme> {
         : {});
 
     return { themeId, mode, manifest, tokenOverrides, settings };
-}
+});
 
 export async function setActiveTheme(themeId: string, mode: string): Promise<void> {
     await prisma.themeState.upsert({
