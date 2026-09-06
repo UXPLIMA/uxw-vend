@@ -30,7 +30,6 @@ function DefaultNavbar() {
      
     useEffect(() => { setMounted(true); }, []);
 
-
     // Build nav links: admin-configured links take priority, fallback to module-registered links
     // pathToModule maps top-level path prefixes to module IDs using both navLinks and routes
     const pathToModule: Record<string, string> = {};
@@ -112,58 +111,6 @@ function DefaultNavbar() {
         })
         .filter(Boolean) as typeof rawNavLinks;
 
-    // How many entries fit on one line. Ten of them do not fit a 1500 pixel
-    // window, and the row used to wrap into a bar with a fixed height, which
-    // put the overflow outside the bar. Each installed module may add one, so
-    // this gets worse rather than better. Whatever does not fit goes behind a
-    // single trailing menu, and the row keeps its shape.
-    //
-    // Widths are measured once, while every entry is on screen, and reused
-    // afterwards: an entry moved into the menu cannot be measured where it no
-    // longer is.
-    const navRef = useRef<HTMLElement | null>(null);
-    const itemWidths = useRef<number[]>([]);
-    const [visibleCount, setVisibleCount] = useState<number | null>(null);
-
-    useEffect(() => {
-        const nav = navRef.current;
-        if (!nav) return;
-
-        const measure = () => {
-            if (itemWidths.current.length !== navLinks.length) {
-                const rendered = nav.querySelectorAll<HTMLElement>("[data-nav-item]");
-                if (rendered.length !== navLinks.length) return;
-                itemWidths.current = [...rendered].map((el) => el.getBoundingClientRect().width);
-            }
-
-            const gap = 4;
-            // Room the trailing menu needs when there is anything to put in it.
-            const triggerWidth = 116;
-            const available = nav.getBoundingClientRect().width;
-
-            let used = 0;
-            let fits = 0;
-            for (const width of itemWidths.current) {
-                if (used + width + gap > available) break;
-                used += width + gap;
-                fits += 1;
-            }
-
-            // Making room for the trigger can push one more entry into it.
-            while (fits > 0 && fits < navLinks.length && used + triggerWidth > available) {
-                fits -= 1;
-                used -= itemWidths.current[fits] + gap;
-            }
-
-            setVisibleCount(fits >= navLinks.length ? null : fits);
-        };
-
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(nav);
-        return () => observer.disconnect();
-    }, [navLinks.length]);
-
     const menuRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -194,13 +141,13 @@ function DefaultNavbar() {
                         <Home className="w-4 h-4" />
                         <span className="truncate">{t('home')}</span>
                     </Link>
-                    <nav ref={navRef} className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-nowrap overflow-hidden" aria-label={t('primary')}>
+                    <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-wrap" aria-label={t('primary')}>
                         <Slot name="navbar.start" />
-                        {(visibleCount === null ? navLinks : navLinks.slice(0, visibleCount)).map((link) => {
+                        {navLinks.map((link) => {
                             // Dropdown menu
                             if (link.children && link.children.length > 0) {
                                 return (
-                                    <div key={link.label} data-nav-item className="relative shrink-0"
+                                    <div key={link.label} className="relative"
                                         onMouseEnter={() => setNavDropdown(link.label)}
                                         onMouseLeave={() => setNavDropdown(null)}
                                     >
@@ -234,46 +181,13 @@ function DefaultNavbar() {
 
                             // Normal link
                             return (
-                                <Link key={link.href} href={link.href} data-nav-item
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap shrink-0 transition-colors ${isActive(link.href) ? "text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
+                                <Link key={link.href} href={link.href}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? "text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
                                     <NavIcon name={link.icon} className="w-4 h-4" />
                                     {link.label}
                                 </Link>
                             );
                         })}
-
-                        {/* Everything the row could not hold, behind one entry
-                            rather than on a second line. */}
-                        {visibleCount !== null && visibleCount < navLinks.length && (
-                            <div className="relative shrink-0"
-                                onMouseEnter={() => setNavDropdown(OVERFLOW_MENU)}
-                                onMouseLeave={() => setNavDropdown(null)}
-                            >
-                                <button
-                                    type="button"
-                                    aria-haspopup="menu"
-                                    aria-expanded={navDropdown === OVERFLOW_MENU}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${navDropdown === OVERFLOW_MENU ? "text-primary bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
-                                >
-                                    {t('more')}
-                                    <ChevronDown className={`w-3 h-3 transition-transform ${navDropdown === OVERFLOW_MENU ? "rotate-180" : ""}`} />
-                                </button>
-                                {navDropdown === OVERFLOW_MENU && (
-                                    <div className="absolute top-full right-0 pt-1 z-50">
-                                        <div className="w-56 bg-card border border-[var(--color-border)] rounded-lg shadow-lg py-1 animate-fade-in max-h-[70vh] overflow-y-auto">
-                                            {navLinks.slice(visibleCount).map((link) => (
-                                                <Link key={link.href ?? link.label} href={link.href ?? "#"}
-                                                    onClick={() => setNavDropdown(null)}
-                                                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                                                    <NavIcon name={link.icon} className="w-4 h-4 text-muted-foreground" />
-                                                    {link.label}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </nav>
 
                     <div className="flex items-center gap-2">
@@ -362,9 +276,6 @@ function DefaultNavbar() {
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { STAFF_ROLE_PRIORITY } from "@/core/lib/constants";
-
-/** Dropdown key for the trailing menu, kept out of the space of link labels. */
-const OVERFLOW_MENU = "__overflow__";
 
 export function Navbar() {
     return <ThemeComponentSlot name="Navbar" fallback={DefaultNavbar} />;

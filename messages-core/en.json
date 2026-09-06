@@ -102,10 +102,10 @@
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "tickets": "Support",
-    "trophies": "Trophies",
-    "more": "More"
+    "trophies": "Trophies"
   },
-  "hero": {},
+  "hero": {
+  },
   "admin": {
     "activityLog_action": "Action",
     "activityLog_date": "Date",

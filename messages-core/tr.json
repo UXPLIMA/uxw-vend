@@ -102,10 +102,10 @@
     "switchToDark": "Karanlık moda geç",
     "switchToLight": "Açık moda geç",
     "tickets": "Destek",
-    "trophies": "Kupalar",
-    "more": "Daha fazla"
+    "trophies": "Kupalar"
   },
-  "hero": {},
+  "hero": {
+  },
   "admin": {
     "activityLog_action": "İşlem",
     "activityLog_date": "Tarih",
