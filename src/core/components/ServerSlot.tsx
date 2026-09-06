@@ -38,7 +38,7 @@ export function ServerSlot({ name, moduleStates, context, fallback = null }: Ser
             {contributions.map((sc) => {
                 const Component = registry[sc.id];
                 return (
-                    <ModuleErrorBoundary key={sc.id} fallbackLabel={`Failed: ${sc.id}`}>
+                    <ModuleErrorBoundary key={sc.id} componentId={sc.id}>
                         <Component {...(context || {})} />
                     </ModuleErrorBoundary>
                 );

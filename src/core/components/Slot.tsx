@@ -60,7 +60,7 @@ export function Slot({ name, context, fallback = null }: SlotProps) {
             {contributions.map((sc) => {
                 const Component = (SlotContentRegistry as Record<string, React.ComponentType<Record<string, unknown>>>)[sc.id];
                 return (
-                    <ModuleErrorBoundary key={sc.id} fallbackLabel={`Failed: ${sc.id}`}>
+                    <ModuleErrorBoundary key={sc.id} componentId={sc.id}>
                         <Component {...(context || {})} />
                     </ModuleErrorBoundary>
                 );

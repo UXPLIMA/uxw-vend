@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 import { notFound, redirect } from "next/navigation";
 import { ErrorBoundary } from "@/core/components/ErrorBoundary";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
@@ -19,6 +20,24 @@ function Throws({ how }: { how: "notFound" | "redirect" | "real" }): React.React
     throw new Error("a real failure");
 }
 
+/**
+ * Both boundaries show a translated notice, which they can only do inside a
+ * provider - the same one the locale layout wraps them in. Rendering them bare
+ * here would be testing a tree the application never builds, so the test puts
+ * the real English catalogue behind them and asserts on what it says.
+ */
+const MESSAGES = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "messages-core/en.json"), "utf8"),
+);
+
+function inLocale(children: React.ReactNode) {
+    return (
+        <NextIntlClientProvider locale="en" messages={MESSAGES}>
+            {children}
+        </NextIntlClientProvider>
+    );
+}
+
 beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(new Response("{}"))));
@@ -31,27 +50,38 @@ afterEach(() => {
 
 describe("ErrorBoundary", () => {
     it("lets a notFound() signal through", () => {
-        expect(() => render(<ErrorBoundary><Throws how="notFound" /></ErrorBoundary>)).toThrow();
+        expect(() => render(inLocale(<ErrorBoundary><Throws how="notFound" /></ErrorBoundary>))).toThrow();
     });
 
     it("lets a redirect() signal through", () => {
-        expect(() => render(<ErrorBoundary><Throws how="redirect" /></ErrorBoundary>)).toThrow();
+        expect(() => render(inLocale(<ErrorBoundary><Throws how="redirect" /></ErrorBoundary>))).toThrow();
     });
 
     it("still catches a real render failure", () => {
-        render(<ErrorBoundary><Throws how="real" /></ErrorBoundary>);
-        expect(screen.getByText("Something went wrong")).toBeTruthy();
+        render(inLocale(<ErrorBoundary><Throws how="real" /></ErrorBoundary>));
+        expect(screen.getByText(MESSAGES.common.error_title)).toBeTruthy();
+        expect(screen.getByText(MESSAGES.common.reloadPage)).toBeTruthy();
     });
 });
 
 describe("ModuleErrorBoundary", () => {
     it("lets a notFound() signal through", () => {
-        expect(() => render(<ModuleErrorBoundary><Throws how="notFound" /></ModuleErrorBoundary>)).toThrow();
+        expect(() => render(inLocale(<ModuleErrorBoundary><Throws how="notFound" /></ModuleErrorBoundary>))).toThrow();
     });
 
     it("still catches a real render failure from a module component", () => {
-        render(<ModuleErrorBoundary fallbackLabel="Widget failed"><Throws how="real" /></ModuleErrorBoundary>);
-        expect(screen.getByText("Widget failed")).toBeTruthy();
+        render(inLocale(<ModuleErrorBoundary componentId="store.widget"><Throws how="real" /></ModuleErrorBoundary>));
+        expect(screen.getByText(MESSAGES.common.componentFailed)).toBeTruthy();
+    });
+
+    it("names the failing component to the console, not to the reader", () => {
+        render(inLocale(<ModuleErrorBoundary componentId="store.widget"><Throws how="real" /></ModuleErrorBoundary>));
+        expect(screen.queryByText(/store\.widget/)).toBeNull();
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining("store.widget"),
+            expect.anything(),
+            expect.anything(),
+        );
     });
 });
 

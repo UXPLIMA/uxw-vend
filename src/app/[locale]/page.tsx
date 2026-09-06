@@ -67,7 +67,7 @@ export default function HomePage() {
               {enabledSections.map((section) => {
                 const SectionComponent = HomepageSectionRegistry[section.id];
                 return (
-                    <ModuleErrorBoundary key={section.id} fallbackLabel={`Failed to load ${section.id}`}>
+                    <ModuleErrorBoundary key={section.id} componentId={section.id}>
                         <SectionComponent />
                     </ModuleErrorBoundary>
                 );
@@ -117,7 +117,7 @@ export default function HomePage() {
               {enabledWidgets.map((w) => {
                 const WidgetComponent = WidgetComponentRegistry[w.id];
                 return (
-                    <ModuleErrorBoundary key={w.id} fallbackLabel={`Failed to load ${w.id}`}>
+                    <ModuleErrorBoundary key={w.id} componentId={w.id}>
                         <WidgetComponent />
                     </ModuleErrorBoundary>
                 );

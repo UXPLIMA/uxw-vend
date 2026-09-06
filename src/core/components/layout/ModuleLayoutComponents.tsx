@@ -43,7 +43,7 @@ export function ModuleLayoutComponents() {
             {enabled.map(lc => {
                 const Component = LayoutComponentRegistry[lc.id];
                 return (
-                    <ModuleErrorBoundary key={lc.id} fallbackLabel={`Failed to load ${lc.id}`}>
+                    <ModuleErrorBoundary key={lc.id} componentId={lc.id}>
                         <Component />
                     </ModuleErrorBoundary>
                 );

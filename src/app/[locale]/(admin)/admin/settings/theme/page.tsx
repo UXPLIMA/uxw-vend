@@ -192,7 +192,7 @@ export default function ThemeSettingsPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                toast.success(`"${theme.name}" installed. Restart server to activate.`);
+                toast.success(t("theme_installedRestart", { name: theme.name }));
             } else {
                 toast.error(data.error || t("theme_installFailed"));
             }

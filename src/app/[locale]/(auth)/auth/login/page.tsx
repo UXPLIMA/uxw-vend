@@ -107,10 +107,11 @@ export default function LoginPage() {
                         if (statusRes.ok) {
                             const status = await statusRes.json();
                             const remaining = Number(status?.remainingBackupCodes) || 0;
+                            const said = t('backupCodesRemaining', { count: remaining });
                             if (remaining <= 3) {
-                                toast.warning(`${remaining} backup codes remaining - regenerate at /profile if low`);
+                                toast.warning(said);
                             } else {
-                                toast.info(`${remaining} backup codes remaining - regenerate at /profile if low`);
+                                toast.info(said);
                             }
                         }
                     } catch {

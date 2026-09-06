@@ -4,6 +4,7 @@ import React from "react";
 import { unstable_rethrow } from "next/navigation";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface ErrorBoundaryState {
     hasError: boolean;
@@ -13,6 +14,32 @@ interface ErrorBoundaryState {
 interface ErrorBoundaryProps {
     children: React.ReactNode;
     fallback?: React.ReactNode;
+}
+
+/**
+ * The fallback is its own function component so that it can be translated.
+ *
+ * A class component cannot call a hook, which is why this screen stayed in
+ * English while the rest of the site followed the reader's locale. It does not
+ * have to: the boundary sits inside `NextIntlClientProvider` in the locale
+ * layout, so anything it renders can ask for the catalogue itself.
+ */
+function ErrorFallback({ onReload }: { onReload: () => void }) {
+    const t = useTranslations("common");
+
+    return (
+        <div className="min-h-[400px] flex items-center justify-center p-8">
+            <div className="text-center max-w-md">
+                <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
+                <h2 className="text-xl font-bold mb-2">{t("error_title")}</h2>
+                <p className="text-muted-foreground mb-6">{t("error_reported")}</p>
+                <Button onClick={onReload}>
+                    <RefreshCw className="w-4 h-4" />
+                    {t("reloadPage")}
+                </Button>
+            </div>
+        </div>
+    );
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -52,24 +79,12 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             if (this.props.fallback) return this.props.fallback;
 
             return (
-                <div className="min-h-[400px] flex items-center justify-center p-8">
-                    <div className="text-center max-w-md">
-                        <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
-                        <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
-                        <p className="text-muted-foreground mb-6">
-                            An unexpected error occurred. The error has been reported automatically.
-                        </p>
-                        <Button
-                            onClick={() => {
-                                this.setState({ hasError: false, error: null });
-                                window.location.reload();
-                            }}
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                            Reload Page
-                        </Button>
-                    </div>
-                </div>
+                <ErrorFallback
+                    onReload={() => {
+                        this.setState({ hasError: false, error: null });
+                        window.location.reload();
+                    }}
+                />
             );
         }
 

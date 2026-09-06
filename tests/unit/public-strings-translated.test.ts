@@ -13,9 +13,14 @@ import path from "path";
  * tell one nav apart from another. A Turkish visitor got those in English.
  *
  * The rule holds for the public tree only. `app/error.tsx`,
- * `app/not-found.tsx` and the two error boundaries stay in English on
- * purpose: they render either outside the locale layout or from a class
- * component, in both cases with no provider to ask.
+ * `app/not-found.tsx` and `app/global-error.tsx` stay in English on purpose:
+ * they render outside the locale layout, so there is no provider to ask.
+ *
+ * The two error boundaries used to be listed here on the same grounds, that a
+ * class component cannot call a hook. That was the wrong conclusion from a
+ * true fact: both render inside the locale layout's provider, and what a class
+ * cannot do, a function component it renders can. They are translated now, and
+ * `an-error-notice-is-in-the-readers-language.test.ts` keeps them that way.
  */
 
 const root = path.resolve(import.meta.dirname, "../..");

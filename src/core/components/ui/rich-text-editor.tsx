@@ -20,14 +20,24 @@ interface RichTextEditorProps {
     labelledBy?: string;
 }
 
+/**
+ * The placeholder Quill sits behind while its chunk downloads. It is a
+ * component rather than inline JSX so that it can ask for the catalogue: the
+ * `dynamic()` call is module scope, where a hook cannot go.
+ */
+function EditorLoading() {
+    const t = useTranslations("common");
+    return (
+        <div className="min-h-[300px] bg-muted rounded-md border border-border flex items-center justify-center">
+            <span className="text-muted-foreground">{t("loadingEditor")}</span>
+        </div>
+    );
+}
+
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill-new"), {
     ssr: false,
-    loading: () => (
-        <div className="min-h-[300px] bg-muted rounded-md border border-border flex items-center justify-center">
-            <span className="text-muted-foreground">Loading editor...</span>
-        </div>
-    ),
+    loading: () => <EditorLoading />,
 });
 
 export function RichTextEditor({

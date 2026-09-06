@@ -204,7 +204,7 @@ function DefaultNavbar() {
                                 {enabledNavbarComponents.map(nc => {
                                     const NavComp = NavbarComponentRegistry[nc.id];
                                     return (
-                                        <ModuleErrorBoundary key={nc.id} fallbackLabel={`Failed to load ${nc.id}`}>
+                                        <ModuleErrorBoundary key={nc.id} componentId={nc.id}>
                                             <NavComp />
                                         </ModuleErrorBoundary>
                                     );
