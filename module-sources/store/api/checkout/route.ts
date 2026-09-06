@@ -9,9 +9,44 @@ import {
     computeOrderPricing,
     computeCouponDiscount,
     computeCreatorDiscount,
+    computeCreatorCommission,
     computeTotals,
 } from "../../lib/pricing";
 import { z } from "zod";
+
+/**
+ * Bank a creator's cut and record it.
+ *
+ * The two checkout branches - paid in credits and paid at a gateway - both
+ * settle a code the same way, and both had written this transaction out in
+ * full. Keeping one copy is what stops the balance and the ledger row from
+ * ever being credited different amounts.
+ */
+async function payCreatorCommission(
+    code: { id: string; code: string; creatorId: string; commissionPercent: number },
+    total: number,
+    orderNumber: string,
+) {
+    const commission = computeCreatorCommission(total, code.commissionPercent);
+    await prisma.$transaction([
+        prisma.creatorCode.update({
+            where: { id: code.id },
+            data: { usageCount: { increment: 1 }, totalRevenue: { increment: total } },
+        }),
+        prisma.user.update({
+            where: { id: code.creatorId },
+            data: { creditBalance: { increment: commission } },
+        }),
+        prisma.creditTransaction.create({
+            data: {
+                userId: code.creatorId,
+                amount: commission,
+                type: "creator_commission",
+                description: `Commission for order ${orderNumber} via code ${code.code}`,
+            },
+        }),
+    ]);
+}
 
 const checkoutSchema = z.object({
     items: z.array(z.object({
@@ -317,24 +352,7 @@ export async function POST(request: NextRequest) {
 
             // ── Update creator code stats ──
             if (creatorCodeRecord) {
-                await prisma.$transaction([
-                    prisma.creatorCode.update({
-                        where: { id: creatorCodeRecord.id },
-                        data: { usageCount: { increment: 1 }, totalRevenue: { increment: total } },
-                    }),
-                    prisma.user.update({
-                        where: { id: creatorCodeRecord.creatorId },
-                        data: { creditBalance: { increment: total * creatorCodeRecord.commissionPercent / 100 } },
-                    }),
-                    prisma.creditTransaction.create({
-                        data: {
-                            userId: creatorCodeRecord.creatorId,
-                            amount: total * creatorCodeRecord.commissionPercent / 100,
-                            type: "creator_commission",
-                            description: `Commission for order ${order.orderNumber} via code ${creatorCodeRecord.code}`,
-                        },
-                    }),
-                ]);
+                await payCreatorCommission(creatorCodeRecord, total, order.orderNumber);
             }
 
             // ── Clear cart ──
@@ -374,24 +392,7 @@ export async function POST(request: NextRequest) {
 
         // ── Update creator code stats ──
         if (creatorCodeRecord) {
-            await prisma.$transaction([
-                prisma.creatorCode.update({
-                    where: { id: creatorCodeRecord.id },
-                    data: { usageCount: { increment: 1 }, totalRevenue: { increment: total } },
-                }),
-                prisma.user.update({
-                    where: { id: creatorCodeRecord.creatorId },
-                    data: { creditBalance: { increment: total * creatorCodeRecord.commissionPercent / 100 } },
-                }),
-                prisma.creditTransaction.create({
-                    data: {
-                        userId: creatorCodeRecord.creatorId,
-                        amount: total * creatorCodeRecord.commissionPercent / 100,
-                        type: "creator_commission",
-                        description: `Commission for order ${order.orderNumber} via code ${creatorCodeRecord.code}`,
-                    },
-                }),
-            ]);
+            await payCreatorCommission(creatorCodeRecord, total, order.orderNumber);
         }
 
         // ── Clear cart ──

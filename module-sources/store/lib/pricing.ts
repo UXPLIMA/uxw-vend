@@ -195,6 +195,17 @@ export function computeCreatorDiscount(
 }
 
 /**
+ * A creator's cut of an order.
+ *
+ * Paid into a credit balance and written to the ledger, so it is money in the
+ * same sense the order total is: a commission of 7.5% on 17.51 is 1.313825,
+ * and a balance cannot hold that.
+ */
+export function computeCreatorCommission(total: number, commissionPercent: number): number {
+    return cents(total * (commissionPercent / 100));
+}
+
+/**
  * Final tax + total roll-up, clamped so a discount that exceeds the subtotal
  * can never produce a negative charge. `taxRate` is a percentage (e.g. 8 for
  * 8%); the rounding (round to cents) matches the route's Math.round(.. )/100.

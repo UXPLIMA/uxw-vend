@@ -19,6 +19,7 @@ import {
     computeOrderPricing,
     computeCouponDiscount,
     computeCreatorDiscount,
+    computeCreatorCommission,
     computeTotals,
 } from "../../module-sources/store/lib/pricing";
 
@@ -106,6 +107,17 @@ describe("every amount the store computes is a whole number of cents", () => {
             );
             expect(whole(discount)).toBe(true);
         }
+    });
+
+    it("holds for a creator's commission, which is paid into a balance and ledgered", () => {
+        const bad: string[] = [];
+        for (const total of [0.01, 17.51, 20.07, 149.99, 1234.56]) {
+            for (const percent of [1, 2.5, 7.5, 15, 33, 100]) {
+                const commission = computeCreatorCommission(total, percent);
+                if (!whole(commission)) bad.push(`${total} at ${percent}% = ${commission}`);
+            }
+        }
+        expect(bad).toEqual([]);
     });
 
     it("charges what it records: gateway rounding is a no-op on these amounts", () => {

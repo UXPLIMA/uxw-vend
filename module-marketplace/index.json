@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T01:15:30Z",
+  "updatedAt": "2026-09-06T01:22:25Z",
   "modules": [
     {
       "id": "announcements",
@@ -2429,13 +2429,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.30",
+      "version": "2.2.31",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T01:15:30Z",
+      "updatedAt": "2026-09-06T01:22:25Z",
       "screenshots": [],
       "tags": [
         "commerce"
