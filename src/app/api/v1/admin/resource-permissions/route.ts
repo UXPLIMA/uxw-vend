@@ -5,6 +5,7 @@ import { isAdmin, setResourcePermission, removeResourcePermission, listGrantsFor
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { pageParams } from "@/core/lib/page-params";
 
 /** GET
  *  - ?roleId=xxx → list all grants for a single role
@@ -33,8 +34,8 @@ export async function GET(request: NextRequest) {
     if (searchParams.get("list") === "1") {
         const resource = searchParams.get("resource") || undefined;
         const principalType = searchParams.get("principalType") || undefined;
-        const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
         const perPage = 50;
+        const { page, skip, take } = pageParams(searchParams, { fixedLimit: perPage });
 
         const where = {
             ...(resource ? { resource } : {}),
@@ -47,8 +48,8 @@ export async function GET(request: NextRequest) {
             prisma.resourcePermission.findMany({
                 where,
                 orderBy: { createdAt: "desc" },
-                skip: (page - 1) * perPage,
-                take: perPage,
+                skip,
+                take,
             }),
             prisma.resourcePermission.count({ where }),
             prisma.role.findMany({

@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.24.0 - `pageParams` joins `@/core/sdk/server`, with `MAX_PAGE`,
+ * `MAX_PAGE_SIZE` and `DEFAULT_PAGE_SIZE` beside it. Sixteen list endpoints
+ * had hand-rolled the same page and limit parse in six wordings, and all of
+ * them clamped the page from below only: a large enough `?page=` reached an
+ * OFFSET past what a 32-bit integer holds, and the driver threw where the
+ * handler had nothing to say - a 500 for a number in a query string. A module
+ * that pages a list needs the fix as much as core does. Addition.
+ *
  * 1.23.0 - A `number` module setting may declare `step`. A number input's
  * default step is 1, so a manifest could declare a setting whose real values
  * are fractional - a price of 0.013 a credit - and the browser marked every
@@ -154,4 +162,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.23.0";
+export const CORE_API_VERSION = "1.24.0";

@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { PASSWORD_POLICY } from "@/core/lib/password-policy";
+import { pageParams } from "@/core/lib/page-params";
 
 /**
  * An admin creating an account by hand. The password is checked against the
@@ -38,8 +39,7 @@ export async function GET(request: NextRequest) {
         }
 
         const searchParams = request.nextUrl.searchParams;
-        const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || String(PER_PAGE_USERS)) || 20));
+        const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: PER_PAGE_USERS });
         const search = searchParams.get("search") || "";
 
         const where = search
@@ -69,8 +69,8 @@ export async function GET(request: NextRequest) {
                         },
                     },
                 },
-                skip: (page - 1) * limit,
-                take: limit,
+                skip,
+                take,
                 orderBy: { createdAt: "desc" },
             }),
             prisma.user.count({ where }),

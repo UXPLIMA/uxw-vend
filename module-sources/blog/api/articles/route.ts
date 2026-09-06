@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { enumParam, isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { pageParams, enumParam, isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { ARTICLE_STATUSES, blogArticleSchema } from "../../lib/validations";
 
 // GET /api/v1/blog/articles - List all articles (public)
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10") || 10));
+    const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: 10 });
     // BlogArticle.status is a Prisma enum: an unrecognised value is a thrown
     // validation error rather than an empty result, so it is answered here.
     const rawStatus = searchParams.get("status");
@@ -16,7 +15,6 @@ export async function GET(request: NextRequest) {
     if (status instanceof NextResponse) return status;
     const categoryId = searchParams.get("categoryId");
 
-    const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
 
@@ -42,7 +40,7 @@ export async function GET(request: NextRequest) {
         prisma.blogArticle.findMany({
             where,
             skip,
-            take: limit,
+            take,
             orderBy: { publishedAt: "desc" },
             include: {
                 author: { select: { id: true, username: true, avatar: true } },

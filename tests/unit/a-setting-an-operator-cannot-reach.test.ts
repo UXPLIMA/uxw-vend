@@ -124,8 +124,13 @@ describe("the store's prices can be set", () => {
         expect(price.min).toBeLessThan(0.01);
     });
 
-    it("requires the core that renders a step", () => {
-        expect(manifest.coreVersion).toBe("^1.23.0");
+    it("requires a core that renders a step", () => {
+        // At least the version that accepted `step`, not exactly it: the
+        // module widens its floor whenever it starts using something newer,
+        // and pinning the spelling made an unrelated bump fail here.
+        const [, major, minor] = /\^(\d+)\.(\d+)\./.exec(manifest.coreVersion ?? "") ?? [];
+        expect(Number(major)).toBe(1);
+        expect(Number(minor)).toBeGreaterThanOrEqual(23);
     });
 });
 

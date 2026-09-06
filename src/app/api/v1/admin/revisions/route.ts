@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { pageParams } from "@/core/lib/page-params";
 
 /**
  * GET /api/v1/admin/revisions
@@ -20,8 +21,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const resource = searchParams.get("resource") || undefined;
     const resourceId = searchParams.get("resourceId") || undefined;
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     const perPage = 50;
+    const { page, skip, take } = pageParams(searchParams, { fixedLimit: perPage });
 
     const where = {
         ...(resource ? { resource } : {}),
@@ -32,8 +33,8 @@ export async function GET(request: NextRequest) {
         prisma.revision.findMany({
             where,
             orderBy: { createdAt: "desc" },
-            skip: (page - 1) * perPage,
-            take: perPage,
+            skip,
+            take,
             include: {
                 author: { select: { id: true, username: true } },
             },

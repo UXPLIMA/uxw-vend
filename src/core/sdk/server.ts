@@ -61,6 +61,13 @@ export { rateLimit as rateLimitStrict } from "@/core/lib/rate-limit";
 // because the only reader lived where no module could reach it.
 export { shouldNotify } from "@/core/lib/notif-prefs";
 
+// Where a page starts and how big it is. Sixteen list endpoints had written
+// the same two lines and every one of them clamped the page from below only,
+// so a large enough ?page= reached an OFFSET no 32-bit integer holds and the
+// driver threw where the handler had nothing to say.
+export { pageParams, MAX_PAGE, MAX_PAGE_SIZE, DEFAULT_PAGE_SIZE } from "@/core/lib/page-params";
+export type { PageParams, PageParamsOptions } from "@/core/lib/page-params";
+
 // --- Caching (Redis with in-memory fallback) ---
 export { cached, invalidate } from "@/core/lib/cache";
 

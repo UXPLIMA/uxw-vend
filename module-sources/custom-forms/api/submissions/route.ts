@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { pageParams, isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { canAccessForm } from "../../lib/can-access-form";
 
@@ -13,8 +13,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const formId = request.nextUrl.searchParams.get("formId");
-    const page = Math.max(1, parseInt(request.nextUrl.searchParams.get("page") || "1") || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(request.nextUrl.searchParams.get("limit") || "50") || 50));
+    const { page, limit, skip, take } = pageParams(request.nextUrl.searchParams, { defaultLimit: 50 });
 
     const adminCheck = await isAdmin(session.user.id);
     if (!adminCheck) {
@@ -38,8 +37,8 @@ export async function GET(request: NextRequest) {
                 form: { select: { id: true, title: true, slug: true } },
             },
             orderBy: { createdAt: "desc" },
-            skip: (page - 1) * limit,
-            take: limit,
+            skip,
+            take,
         }),
         prisma.customFormSubmission.count({ where }),
     ]);

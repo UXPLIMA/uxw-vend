@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { pageParams, isAdmin, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { canonicalStatus, spellingsOf } from "../lib/statuses";
@@ -22,8 +22,7 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     const status = request.nextUrl.searchParams.get("status");
     const sort = request.nextUrl.searchParams.get("sort") || "newest";
-    const page = Math.max(1, parseInt(request.nextUrl.searchParams.get("page") || "1") || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(request.nextUrl.searchParams.get("limit") || "20") || 20));
+    const { page, limit, skip, take } = pageParams(request.nextUrl.searchParams);
 
     const isUserAdmin = session?.user?.id ? await isAdmin(session.user.id) : false;
     const where: Record<string, unknown> = {};
@@ -49,8 +48,8 @@ export async function GET(request: NextRequest) {
                 _count: { select: { votes: true } },
             },
             orderBy,
-            skip: (page - 1) * limit,
-            take: limit,
+            skip,
+            take,
         }),
         prisma.suggestion.count({ where }),
     ]);

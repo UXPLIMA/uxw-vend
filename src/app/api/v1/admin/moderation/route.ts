@@ -6,6 +6,7 @@ import { logActivity } from "@/core/lib/activity-log";
 import { ModuleModerationProviders } from "@/core/generated/module-moderation";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { readJsonBody } from "@/core/lib/api-body";
+import { pageParams } from "@/core/lib/page-params";
 
 async function loadActiveProviders() {
     const states = await getModuleStates();
@@ -29,8 +30,8 @@ export async function GET(request: NextRequest) {
     const providers = await loadActiveProviders();
     const { searchParams } = new URL(request.url);
     const typeParam = searchParams.get("type");
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     const perPage = 20;
+    const { page, skip, take } = pageParams(searchParams, { fixedLimit: perPage });
 
     if (!typeParam) {
         const counts: Record<string, number> = {};
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     try {
         const mod = await provider.loader();
-        const { items, total } = await mod.default.list((page - 1) * perPage, perPage);
+        const { items, total } = await mod.default.list(skip, take);
         return NextResponse.json({
             items: items.map((i) => ({ ...i, type: provider.id })),
             total,

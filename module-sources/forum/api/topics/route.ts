@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSlug } from "@/core/sdk";
-import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { pageParams, isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumTopicSchema } from "../../lib/validations";
 import { denyGuestView } from "../../lib/guest-view";
@@ -24,14 +24,10 @@ export async function GET(request: NextRequest) {
     if (denied) return denied;
 
     const searchParams = request.nextUrl.searchParams;
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     // The page size is the admin's `topicsPerPage`, not a constant. An explicit
     // ?limit= still wins for API callers, capped as before.
     const { topicsPerPage } = await moduleSettings<{ topicsPerPage: number }>("forum");
-    const requestedLimit = parseInt(searchParams.get("limit") || "");
-    const limit = Number.isFinite(requestedLimit) && requestedLimit > 0
-        ? Math.min(100, requestedLimit)
-        : topicsPerPage;
+    const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: topicsPerPage });
     const categoryId = searchParams.get("category");
     const search = searchParams.get("search") || "";
 
@@ -51,8 +47,8 @@ export async function GET(request: NextRequest) {
                 category: { select: { id: true, name: true, slug: true, color: true } },
                 _count: { select: { posts: true, likes: true } },
             },
-            skip: (page - 1) * limit,
-            take: limit,
+            skip,
+            take,
             orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
         }),
         prisma.forumTopic.count({ where }),

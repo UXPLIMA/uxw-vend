@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { pageParams } from "@/core/lib/page-params";
 
 /**
  * GET /api/v1/admin/warnings
@@ -23,8 +24,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId") || undefined;
     const activeParam = searchParams.get("active");
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
     const perPage = 50;
+    const { page, skip, take } = pageParams(searchParams, { fixedLimit: perPage });
 
     const where = {
         ...(userId ? { userId } : {}),
@@ -36,8 +37,8 @@ export async function GET(request: NextRequest) {
         prisma.userWarning.findMany({
             where,
             orderBy: { createdAt: "desc" },
-            skip: (page - 1) * perPage,
-            take: perPage,
+            skip,
+            take,
             include: {
                 user: { select: { id: true, username: true } },
                 issuedBy: { select: { id: true, username: true } },

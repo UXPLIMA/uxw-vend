@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T05:55:23Z",
+  "updatedAt": "2026-09-06T06:44:39Z",
   "modules": [
     {
       "id": "announcements",
@@ -122,13 +122,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.1.26",
-      "coreVersion": "^1.21.0",
+      "version": "1.1.27",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T05:55:23Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -509,13 +509,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.33",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.34",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T01:46:15Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -875,13 +875,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.1.23",
-      "coreVersion": "^1.21.0",
+      "version": "1.1.24",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T05:55:23Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2001,13 +2001,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.0.22",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.23",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-06T05:33:38Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2441,13 +2441,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.39",
-      "coreVersion": "^1.23.0",
+      "version": "2.2.40",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T05:55:23Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2537,13 +2537,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.0.21",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.22",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T05:46:59Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2579,13 +2579,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.0.38",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.39",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T05:55:23Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2838,13 +2838,13 @@
           "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
         }
       },
-      "version": "1.0.10",
-      "coreVersion": "^1.0.0",
+      "version": "1.0.11",
+      "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T06:44:39Z",
       "screenshots": [],
       "tags": [
         "integration"

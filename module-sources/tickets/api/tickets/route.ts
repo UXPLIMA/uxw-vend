@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { enumParam, isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { pageParams, enumParam, isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { TICKET_STATUSES, ticketSchema } from "../../lib/validations";
 
@@ -17,9 +17,7 @@ export async function GET(request: NextRequest) {
     const status = enumParam(searchParams, "status", TICKET_STATUSES);
     if (status instanceof NextResponse) return status;
     const departmentId = searchParams.get("departmentId");
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10") || 10));
-    const skip = (page - 1) * limit;
+    const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: 10 });
 
     const adminCheck = await isAdmin(session.user.id);
 
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
         prisma.ticket.findMany({
             where,
             skip,
-            take: limit,
+            take,
             orderBy: { updatedAt: "desc" },
             include: {
                 department: { select: { id: true, name: true, color: true } },

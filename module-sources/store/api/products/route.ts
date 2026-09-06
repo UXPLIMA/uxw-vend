@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/core/sdk";
-import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { pageParams, isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
 
@@ -8,8 +8,7 @@ import { productSchema } from "../../lib/validations";
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "12") || 12));
+        const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: 12 });
         const category = searchParams.get("category");
         const featured = searchParams.get("featured") === "true";
         const search = searchParams.get("search") || "";
@@ -37,8 +36,8 @@ export async function GET(request: NextRequest) {
                         select: { id: true, name: true, slug: true },
                     },
                 },
-                skip: (page - 1) * limit,
-                take: limit,
+                skip,
+                take,
                 orderBy: sort === "price_asc" ? { price: "asc" }
                     : sort === "price_desc" ? { price: "desc" }
                     : sort === "popular" ? { orderItems: { _count: "desc" } }

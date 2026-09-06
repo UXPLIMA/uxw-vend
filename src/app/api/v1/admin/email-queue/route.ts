@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
+import { pageParams } from "@/core/lib/page-params";
 
 const VALID_STATUSES = ["pending", "sending", "sent", "failed"] as const;
 type EmailStatus = (typeof VALID_STATUSES)[number];
@@ -21,8 +22,7 @@ export async function GET(request: NextRequest) {
             ? (statusParam as EmailStatus)
             : null;
 
-    const pageRaw = parseInt(url.searchParams.get("page") || "1", 10);
-    const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+    const { page, skip, take } = pageParams(url.searchParams, { fixedLimit: PAGE_SIZE });
 
     const where = status ? { status } : {};
 
@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
         prisma.emailJob.findMany({
             where,
             orderBy: { createdAt: "desc" },
-            skip: (page - 1) * PAGE_SIZE,
-            take: PAGE_SIZE,
+            skip,
+            take,
             select: {
                 id: true,
                 to: true,

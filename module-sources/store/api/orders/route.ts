@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma } from "@/core/sdk/server";
+import { pageParams, isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /**
@@ -27,8 +27,7 @@ export async function GET(request: NextRequest) {
         }
 
         const searchParams = request.nextUrl.searchParams;
-        const page = Math.max(1, parseInt(searchParams.get("page") || "1") || 1);
-        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10") || 10));
+        const { page, limit, skip, take } = pageParams(searchParams, { defaultLimit: 10 });
 
         const adminCheck = await isAdmin(session.user.id);
 
@@ -50,8 +49,8 @@ export async function GET(request: NextRequest) {
                         },
                     },
                 },
-                skip: (page - 1) * limit,
-                take: limit,
+                skip,
+                take,
                 orderBy: { createdAt: "desc" },
             }),
             prisma.order.count({ where }),
