@@ -22,10 +22,11 @@ interface BlogPost {
 }
 
 /**
- * Room the news section holds from its first paint: two rows of cards, which
- * is what the skeleton draws and what a full page renders.
+ * Room the news section holds from its first paint: a heading over two rows
+ * of cards, measured at 720px. Every state below renders that same shape, so
+ * the number is what the section already is rather than a guess about it.
  */
-const NEWS_SECTION_HEIGHT = "min-h-[532px]";
+const NEWS_SECTION_HEIGHT = "min-h-[720px]";
 
 export function BlogNewsSection() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,12 +49,18 @@ export function BlogNewsSection() {
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
-  // The skeleton stands in for two rows of cards, so a shorter answer after
-  // it shortens the page and pulls the footer up. That was 0.154 of layout
-  // shift against a 0.1 budget, and all of it landed after the reader had
-  // started looking. Every state reserves the same room now, so the section
-  // keeps the height it asked for whatever arrives.
-  if (isLoading) return <div className={NEWS_SECTION_HEIGHT}><SkeletonNewsGrid count={4} /></div>;
+  // The skeleton stands in for what settles here, heading included. Drawing
+  // the grid alone left it 52px short of the article state and 48px over the
+  // empty one, so whichever answer came back moved the footer and everything
+  // under it. The heading needs no data, so it is drawn from the first paint.
+  if (isLoading) {
+    return (
+      <div className={NEWS_SECTION_HEIGHT}>
+        <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
+        <SkeletonNewsGrid count={4} />
+      </div>
+    );
+  }
   // Don't return null when empty - render a visible empty state so the
   // homepage doesn't appear blank when blog is the only enabled section
   // and there's no published content yet.
@@ -85,8 +92,11 @@ export function BlogNewsSection() {
               <p className="text-xs text-muted-foreground mb-1">
                 {formatLocalDate(post.publishedAt || post.createdAt)}
               </p>
-              <h3 className="font-semibold text-foreground mb-1 line-clamp-2">{post.title}</h3>
-              {post.excerpt && <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>}
+              {/* Both blocks are clamped at two lines and hold two lines of
+                  room whether or not they fill it, so a short headline in one
+                  card cannot make its row shorter than the row above. */}
+              <h3 className="font-semibold text-foreground mb-1 line-clamp-2 min-h-[3rem]">{post.title}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">{post.excerpt}</p>
             </div>
           </Link>
         ))}
