@@ -96,6 +96,8 @@ const CONSTRUCTED: { match: RegExp; built: string; resolves: (suffix: string) =>
     // The alerting screen, over a health status.
     { match: /^health_(.+)$/, built: "`health_${status}`", resolves: (s) => BLOB.includes(s) },
     { match: /^alerting_(.+)Hint$/, built: "`alerting_${status}Hint`", resolves: (s) => BLOB.includes(s) },
+    // The block merger, over the category a module's page block declares.
+    { match: /^blocks_cat_(.+)$/, built: "`blocks_cat_${cat}`", resolves: (s) => BLOB.includes(s) },
 ];
 
 function catalogue(locale: string): [string, string][] {

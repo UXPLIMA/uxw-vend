@@ -3,6 +3,7 @@
 import React from "react";
 import type { Config } from "@measured/puck";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { NavIcon } from "@/core/components/ui/NavIcon";
 
 /** Editor-only: keeps the picker (and lucide's whole name table) off public pages. */
@@ -21,23 +22,32 @@ const LazyIconPicker = dynamic(
  *
  * Modules can extend this library by exporting their own block definitions
  * and registering them via getBlockConfig() - see ModuleBlocks below.
+ *
+ * Every `label` and category `title` here is a key in the `admin` catalogue,
+ * not a sentence. Puck renders them verbatim, so a Turkish operator opening
+ * the builder read an inspector that was English top to bottom on a panel
+ * that was Turkish everywhere else. `localizeBlockConfig` swaps a label the
+ * catalogue knows for its translation and leaves anything else alone, which
+ * is also how a module's own block opts in: put the key in the module's
+ * `admin` namespace and use it as the label.
  */
 
 // ──────────────────── Hero Block ────────────────────
 const HeroBlock = {
+    label: "blocks_hero",
     fields: {
-        title: { type: "text" as const, label: "Title" },
-        subtitle: { type: "textarea" as const, label: "Subtitle" },
-        backgroundImage: { type: "text" as const, label: "Background image URL" },
-        ctaText: { type: "text" as const, label: "Button text" },
-        ctaUrl: { type: "text" as const, label: "Button URL" },
+        title: { type: "text" as const, label: "blocks_field_title" },
+        subtitle: { type: "textarea" as const, label: "blocks_field_subtitle" },
+        backgroundImage: { type: "text" as const, label: "blocks_field_backgroundImage" },
+        ctaText: { type: "text" as const, label: "blocks_field_buttonText" },
+        ctaUrl: { type: "text" as const, label: "blocks_field_buttonUrl" },
         height: {
             type: "select" as const,
-            label: "Height",
+            label: "blocks_field_height",
             options: [
-                { label: "Small", value: "300px" },
-                { label: "Medium", value: "450px" },
-                { label: "Large", value: "600px" },
+                { label: "blocks_opt_small", value: "300px" },
+                { label: "blocks_opt_medium", value: "450px" },
+                { label: "blocks_opt_large", value: "600px" },
             ],
         },
     },
@@ -82,11 +92,12 @@ const HeroBlock = {
 
 // ──────────────────── Heading Block ────────────────────
 const HeadingBlock = {
+    label: "blocks_heading",
     fields: {
-        text: { type: "text" as const, label: "Text" },
+        text: { type: "text" as const, label: "blocks_field_text" },
         level: {
             type: "select" as const,
-            label: "Level",
+            label: "blocks_field_level",
             options: [
                 { label: "H1", value: "h1" },
                 { label: "H2", value: "h2" },
@@ -96,11 +107,11 @@ const HeadingBlock = {
         },
         align: {
             type: "select" as const,
-            label: "Alignment",
+            label: "blocks_field_alignment",
             options: [
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
+                { label: "blocks_opt_left", value: "left" },
+                { label: "blocks_opt_center", value: "center" },
+                { label: "blocks_opt_right", value: "right" },
             ],
         },
     },
@@ -125,15 +136,16 @@ const HeadingBlock = {
 
 // ──────────────────── Text Block ────────────────────
 const TextBlock = {
+    label: "blocks_text",
     fields: {
-        content: { type: "textarea" as const, label: "Content" },
+        content: { type: "textarea" as const, label: "blocks_field_content" },
         align: {
             type: "select" as const,
-            label: "Alignment",
+            label: "blocks_field_alignment",
             options: [
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
+                { label: "blocks_opt_left", value: "left" },
+                { label: "blocks_opt_center", value: "center" },
+                { label: "blocks_opt_right", value: "right" },
             ],
         },
     },
@@ -148,11 +160,26 @@ const TextBlock = {
 };
 
 // ──────────────────── Image Block ────────────────────
+/**
+ * What an Image block shows before anyone has given it a source. It is drawn
+ * on the public page as well as in the builder, so its wording comes from
+ * `common` rather than from the operator-only catalogue.
+ */
+function EmptyImage() {
+    const t = useTranslations("common");
+    return (
+        <div className="bg-muted h-48 w-full rounded-lg flex items-center justify-center text-muted-foreground">
+            {t("noImage")}
+        </div>
+    );
+}
+
 const ImageBlock = {
+    label: "blocks_image",
     fields: {
-        src: { type: "text" as const, label: "Image URL" },
-        alt: { type: "text" as const, label: "Alt text" },
-        maxWidth: { type: "text" as const, label: "Max width (e.g. 600px)" },
+        src: { type: "text" as const, label: "blocks_field_imageUrl" },
+        alt: { type: "text" as const, label: "blocks_field_altText" },
+        maxWidth: { type: "text" as const, label: "blocks_field_maxWidth" },
     },
     defaultProps: { src: "", alt: "", maxWidth: "100%" },
     render: ({ src, alt, maxWidth }: { src: string; alt: string; maxWidth: string }) => (
@@ -161,9 +188,7 @@ const ImageBlock = {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img src={src} alt={alt} style={{ maxWidth }} className="rounded-lg" />
             ) : (
-                <div className="bg-muted h-48 w-full rounded-lg flex items-center justify-center text-muted-foreground">
-                    No image
-                </div>
+                <EmptyImage />
             )}
         </div>
     ),
@@ -171,25 +196,26 @@ const ImageBlock = {
 
 // ──────────────────── Button Block ────────────────────
 const ButtonBlock = {
+    label: "blocks_button",
     fields: {
-        text: { type: "text" as const, label: "Button text" },
-        url: { type: "text" as const, label: "URL" },
+        text: { type: "text" as const, label: "blocks_field_buttonText" },
+        url: { type: "text" as const, label: "blocks_field_url" },
         variant: {
             type: "select" as const,
-            label: "Style",
+            label: "blocks_field_style",
             options: [
-                { label: "Primary", value: "primary" },
-                { label: "Outline", value: "outline" },
-                { label: "Ghost", value: "ghost" },
+                { label: "blocks_opt_primary", value: "primary" },
+                { label: "blocks_opt_outline", value: "outline" },
+                { label: "blocks_opt_ghost", value: "ghost" },
             ],
         },
         align: {
             type: "select" as const,
-            label: "Alignment",
+            label: "blocks_field_alignment",
             options: [
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
+                { label: "blocks_opt_left", value: "left" },
+                { label: "blocks_opt_center", value: "center" },
+                { label: "blocks_opt_right", value: "right" },
             ],
         },
     },
@@ -212,14 +238,15 @@ const ButtonBlock = {
 
 // ──────────────────── Spacer Block ────────────────────
 const SpacerBlock = {
+    label: "blocks_spacer",
     fields: {
         height: {
             type: "select" as const,
-            label: "Height",
+            label: "blocks_field_height",
             options: [
-                { label: "Small", value: "20px" },
-                { label: "Medium", value: "40px" },
-                { label: "Large", value: "80px" },
+                { label: "blocks_opt_small", value: "20px" },
+                { label: "blocks_opt_medium", value: "40px" },
+                { label: "blocks_opt_large", value: "80px" },
             ],
         },
     },
@@ -229,15 +256,16 @@ const SpacerBlock = {
 
 // ──────────────────── Card Block ────────────────────
 const CardBlock = {
+    label: "blocks_card",
     fields: {
-        title: { type: "text" as const, label: "Title" },
-        description: { type: "textarea" as const, label: "Description" },
+        title: { type: "text" as const, label: "blocks_field_title" },
+        description: { type: "textarea" as const, label: "blocks_field_description" },
         // A Puck "custom" field so the inspector shows the same icon picker the
         // rest of the admin uses. The picker is loaded on demand: this module
         // is also on the public render path, where the inspector never mounts.
         icon: {
             type: "custom" as const,
-            label: "Icon",
+            label: "blocks_field_icon",
             render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
                 <LazyIconPicker value={value} onChange={onChange} />
             ),
@@ -281,11 +309,11 @@ export const coreBlockConfig: Config<CoreBlockProps> = {
     },
     categories: {
         layout: {
-            title: "Layout",
+            title: "blocks_cat_layout",
             components: ["Hero", "Spacer"],
         },
         content: {
-            title: "Content",
+            title: "blocks_cat_content",
             components: ["Heading", "Text", "Image", "Button", "Card"],
         },
     },

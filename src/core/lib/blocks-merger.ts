@@ -65,8 +65,13 @@ export async function buildMergedBlockConfig(options: BlockConfigOptions): Promi
             const cat = entry.category || "modules";
             if (!merged.categories) merged.categories = {};
             if (!merged.categories[cat]) {
+                // A key rather than a word, for the same reason the core
+                // block library writes keys: the builder's palette headings
+                // were the operator's only English left on the screen.
+                // `localizeBlockConfig` falls back to the category's own name
+                // for a key no catalogue carries.
                 merged.categories[cat] = {
-                    title: cat.charAt(0).toUpperCase() + cat.slice(1),
+                    title: `blocks_cat_${cat}`,
                     components: [],
                 };
             }
