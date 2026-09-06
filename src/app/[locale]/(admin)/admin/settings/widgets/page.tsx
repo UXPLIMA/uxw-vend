@@ -173,6 +173,15 @@ export default function WidgetSettingsPage() {
                 </div>
             )}
 
+            {/* "It is on and it still is not there" is the question this
+                screen could not answer: a widget decides for itself whether
+                it has anything to render, and on a fresh install most of them
+                do not. Saying so here is cheaper than every admin finding out
+                by staring at an empty homepage. */}
+            {!loadFailed && sortedWidgets.length > 0 && (
+                <p className="mb-6 text-sm text-muted-foreground">{t("widgets_needsContent")}</p>
+            )}
+
             {loadFailed ? (
                 <Card className="mb-6">
                     <CardContent>

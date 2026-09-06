@@ -150,17 +150,21 @@ describe("every admin screen wears the same header", () => {
         // title. On every other screen the title is words, so the two with a
         // glyph read as a different kind of page for no reason - and the
         // theme screen's palette icon sat at a size nothing else used.
+        // Every `title={...}`, whatever it is wrapped in. Written against
+        // `title={<>` alone this missed the one that used `title={<span>`,
+        // and a screen kept its icon for another two months.
         const offenders: string[] = [];
-        for (const line of grep("title={<>", ADMIN_TREES)) {
-            const [file] = line.split(":");
-            const src = fs.readFileSync(join(ROOT, file), "utf8");
-            const start = src.indexOf("title={<>");
-            const end = src.indexOf("</>}", start);
-            if (start === -1 || end === -1) continue;
-            const title = src.slice(start, end);
-            // A lucide icon is `<Name className="w-4 h-4" />`: an element
-            // whose name is capitalised and that sizes itself in w-/h-.
-            if (/<[A-Z]\w*\s[^>]*className="[^"]*\bw-\d/.test(title)) offenders.push(`${file}: ${title.split("\n")[1]?.trim()}`);
+        for (const file of tsxFilesIn(ADMIN_TREES)) {
+            if (NOT_A_PAGE.some((allowed) => file.startsWith(allowed))) continue;
+            const src = stripComments(fs.readFileSync(join(ROOT, file), "utf8"));
+            for (const [start, end] of braceRanges(src, /\btitle=\{/g)) {
+                const title = src.slice(start, end);
+                // A lucide icon is `<Name className="w-4 h-4" />`: an element
+                // whose name is capitalised and that sizes itself in w-/h-.
+                if (/<[A-Z]\w*\s[^>]*className="[^"]*\bw-\d/.test(title)) {
+                    offenders.push(`${file}:${src.slice(0, start).split("\n").length}`);
+                }
+            }
         }
         expect(offenders, "a title is words; put the icon in the sidebar entry").toEqual([]);
     });
@@ -206,6 +210,44 @@ describe("every admin screen wears the same header", () => {
             }
         }
         expect(offenders, "a create action is a header action, at the size every screen gives it").toEqual([]);
+    });
+
+    it("gives the save one place too", () => {
+        // The theme's Hero screen put its save alone in a right-aligned row
+        // between the header and the card, with the header's own right hand
+        // side left empty - one click from the Appearance screen, which puts
+        // the same button in the header. Across the panel the same control
+        // was in the header on five screens, under the last card on seven,
+        // full width at the bottom of a card on two, and floating on three.
+        //
+        // A save is a page action when the page is one form: it goes in the
+        // header. It stays inside a <Card> only when it saves that card
+        // rather than the screen - a settings block on a page that also shows
+        // something else, or a create form among a list. Loose between the
+        // two is what this forbids.
+        const offenders: string[] = [];
+        for (const file of tsxFilesIn(ADMIN_TREES)) {
+            if (NOT_A_PAGE.some((allowed) => file.startsWith(allowed))) continue;
+            const src = stripComments(fs.readFileSync(join(ROOT, file), "utf8"));
+            if (!src.includes("<AdminPageHeader")) continue;
+            const slots = braceRanges(src, /actions=\{/g);
+            for (const button of openTags(src, "<Button")) {
+                const body = src.slice(button.end).split("</Button>")[0];
+                // The label, not the handler: `saveDraft` and `saveSettings`
+                // are both saves, `saved` is the state after one.
+                if (!/\bt\("[a-zA-Z_]*[Ss]av(e|ing)[a-zA-Z_]*"/.test(body)) continue;
+                const before = src.slice(0, button.start);
+                if (slots.some(([a, b]) => a < button.start && button.start < b)) continue;
+                // `<Card` as plain text also matches `<CardContent`, which
+                // would let a loose button pass on any screen that had ever
+                // opened one. Count the element, not the prefix.
+                const opened = before.match(/<Card\b/g)?.length ?? 0;
+                const closed = before.match(/<\/Card>/g)?.length ?? 0;
+                if (opened > closed) continue;
+                offenders.push(`${file}:${before.split("\n").length}`);
+            }
+        }
+        expect(offenders, "a save belongs in the header, or inside the card it saves").toEqual([]);
     });
 
     it("is mounted widely enough for that to mean something", () => {

@@ -39,9 +39,20 @@ export default function DiscordWidgetAdminPage() {
 
     return (
         <div className="space-y-6">
+            {/* The save is a header action. Nothing to save while the stored
+                value could not be read, so it is not offered then. */}
             <AdminPageHeader
                 title={t("adm_title")}
                 description={t("adm_subtitle")}
+                actions={loading || failed ? undefined : (
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
+                        ) : (
+                            <><Save className="w-4 h-4" /> {t("adm_save")}</>
+                        )}
+                    </Button>
+                )}
             />
 
             <Card>
@@ -67,15 +78,6 @@ export default function DiscordWidgetAdminPage() {
                                     inputMode="numeric"
                                 />
                                 <p className="text-xs text-muted-foreground mt-1">{t("adm_serverIdHelp")}</p>
-                            </div>
-                            <div className="flex justify-end">
-                                <Button onClick={save} disabled={saving}>
-                                    {saving ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
-                                    ) : (
-                                        <><Save className="w-4 h-4" /> {t("adm_save")}</>
-                                    )}
-                                </Button>
                             </div>
                         </>
                     )}

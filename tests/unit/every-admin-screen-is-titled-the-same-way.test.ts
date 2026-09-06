@@ -66,12 +66,23 @@ function adminPages(): string[] {
     return found;
 }
 
-/** A page that only renders another component of its own is titled by that one. */
+/**
+ * A page that only renders another component of its own is titled by that one.
+ *
+ * Both spellings of "another component of its own" count: a relative import,
+ * and an `@/` one. Reading only the relative form meant a page that handed
+ * its whole body to a core component - `@/core/components/...` - looked
+ * untitled even though that component drew the header.
+ */
 function ownComponents(file: string): string[] {
     const source = fs.readFileSync(file, "utf8");
-    return [...source.matchAll(/from\s+"(\.[^"]+)"/g)].map((m) =>
+    const relative = [...source.matchAll(/from\s+"(\.[^"]+)"/g)].map((m) =>
         path.resolve(path.dirname(file), m[1]),
     );
+    const aliased = [...source.matchAll(/from\s+"@\/([^"]+)"/g)].map((m) =>
+        path.join(ROOT, "src", m[1]),
+    );
+    return [...relative, ...aliased];
 }
 
 function titled(file: string, seen = new Set<string>()): boolean {

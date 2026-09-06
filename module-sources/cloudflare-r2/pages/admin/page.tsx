@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, CheckboxField, Badge } from "@/core/sdk/ui";
-import { Cloud, Loader2, Save, Check } from "lucide-react";
+import { Loader2, Save, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
 import { errorMessage } from "@/core/sdk";
@@ -80,12 +80,26 @@ export default function CloudflareR2AdminPage() {
 
     return (
         <div className="max-w-2xl">
+            {/* A title is words: the icon this one drew belongs to the
+                sidebar entry, and no other admin screen puts one here. The
+                save is a header action too, rather than a full-width button
+                at the bottom of the card - a third shape for the same
+                control, on a screen one click from two that use the other
+                two. */}
             <AdminPageHeader
-                title={<span className="inline-flex items-center gap-2"><Cloud className="w-6 h-6 text-warning" />{t("title")}</span>}
+                title={t("title")}
                 description={t("subtitle")}
-                actions={isActive ? (
-                    <Badge tone="success"><Check className="w-3.5 h-3.5" />{t("currentlyActive")}</Badge>
-                ) : undefined}
+                actions={
+                    <>
+                        {isActive && (
+                            <Badge tone="success"><Check className="w-3.5 h-3.5" />{t("currentlyActive")}</Badge>
+                        )}
+                        <Button onClick={save} disabled={saving}>
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            {saving ? t("saving") : t("save")}
+                        </Button>
+                    </>
+                }
             />
 
             <Card>
@@ -145,10 +159,6 @@ export default function CloudflareR2AdminPage() {
                         onChange={(e) => setSetActive(e.target.checked)}
                         label={t("active")}
                     />
-                    <Button onClick={save} disabled={saving} className="w-full">
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        {saving ? t("saving") : t("save")}
-                    </Button>
                 </CardContent>
             </Card>
         </div>

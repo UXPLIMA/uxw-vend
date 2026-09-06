@@ -4,7 +4,6 @@ import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
 import { SchemaForm } from "@/core/components/admin/theme-settings/SchemaForm";
-import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 
 export default async function ThemeSettingsPage({ params }: { params: Promise<{ group: string }> }) {
     const session = await auth();
@@ -23,13 +22,19 @@ export default async function ThemeSettingsPage({ params }: { params: Promise<{ 
             {/* No `p-6` here: the admin layout already pads its own content,
                 and a second one made every theme group start further in than
                 every other screen. */}
-            <AdminPageHeader
+            {/* The header is SchemaForm's, because the save button in it has
+                to know whether a save is in flight, and that state is the
+                form's. */}
+            <SchemaForm
+                themeId={themeId}
+                group={group}
+                fields={groupDef.fields}
+                initialValues={initialValues}
                 title={groupDef.label}
                 description={manifest.name}
                 backHref="/admin/theme/appearance"
                 backLabel={manifest.name}
             />
-            <SchemaForm themeId={themeId} group={group} fields={groupDef.fields} initialValues={initialValues} />
         </>
     );
 }

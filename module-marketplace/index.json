@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T09:47:46Z",
+  "updatedAt": "2026-09-06T10:37:06Z",
   "modules": [
     {
       "id": "announcements",
@@ -205,13 +205,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T08:05:31Z",
+      "updatedAt": "2026-09-06T10:37:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -240,13 +240,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.3.0",
+      "version": "1.4.0",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T09:26:17Z",
+      "updatedAt": "2026-09-06T10:37:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -619,13 +619,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.0.14",
+      "version": "1.1.0",
       "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T04:46:28Z",
+      "updatedAt": "2026-09-06T10:37:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -661,13 +661,13 @@
           "description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
         }
       },
-      "version": "1.0.9",
+      "version": "1.1.0",
       "coreVersion": "^1.20.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T10:37:06Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2229,13 +2229,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T08:05:31Z",
+      "updatedAt": "2026-09-06T10:37:06Z",
       "screenshots": [],
       "tags": [
         "content"

@@ -140,9 +140,17 @@ export default function NavbarSettingsPage() {
 
     return (
         <>
+            {/* The page is one form, so its save is a page action: it sits in
+                the header rather than between the last card and the help
+                text, which is where the eye looks for neither. */}
             <AdminPageHeader
                 title={t("navbar_title")}
                 description={t("navbar_subtitle")}
+                actions={
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}</> : <><Check className="w-4 h-4" /> {t("navbar_save")}</>}
+                    </Button>
+                }
             />
 
             <Card className="mb-6">
@@ -222,22 +230,17 @@ export default function NavbarSettingsPage() {
                 </CardContent>
             </Card>
 
-            <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}</> : <><Check className="w-4 h-4" /> {t("navbar_save")}</>}
-            </Button>
-
             <div className="mt-4 p-4 bg-muted rounded-lg text-sm text-muted-foreground space-y-1">
                 <p>
                     <strong>{t("navbar_icons")}</strong>{" "}
-                    Click the icon field to pick one from the full Lucide set, or search it by name.
-                    The same icons are previewed at{" "}
+                    {t("navbar_iconsHint")}{" "}
                     <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
                         lucide.dev/icons <ExternalLink className="w-3 h-3" />
                     </a>
-                    {" "}- clear the field for no icon.
+                    {" "}- {t("navbar_iconsHintClear")}
                 </p>
                 <p>
-                    <strong>{t("navbar_dropdown")}</strong> Click the &quot;Dropdown&quot; button to add a menu with sub-items. Set href to &quot;#&quot; for dropdown-only items.
+                    <strong>{t("navbar_dropdown")}</strong> {t("navbar_dropdownHint")}
                 </p>
             </div>
         </>

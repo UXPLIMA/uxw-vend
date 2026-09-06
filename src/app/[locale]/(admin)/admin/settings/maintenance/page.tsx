@@ -118,12 +118,26 @@ export default function MaintenanceSettingsPage() {
 
     return (
         <div className="space-y-6">
+            {/* The page is one form, so its save is a page action: it sits in
+                the header rather than in a right-aligned row after the last
+                card, where its position depended on how many roles the
+                allowlist happened to hold. */}
             <AdminPageHeader
                 title={t("sidebar_maintenance")}
-                description={<>
-                    Temporarily take your site offline for visitors while allowing administrators to
-                    continue browsing.
-                </>}
+                description={t("maintenance_subtitle")}
+                actions={
+                    <Button onClick={onSave} disabled={saving}>
+                        {saving ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
+                            </>
+                        )}
+                    </Button>
+                }
             />
 
             <Card>
@@ -201,23 +215,6 @@ export default function MaintenanceSettingsPage() {
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end">
-                <Button
-                    onClick={onSave}
-                    disabled={saving}
-                    
-                >
-                    {saving ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" /> {t("common_saving")}
-                        </>
-                    ) : (
-                        <>
-                            <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
-                        </>
-                    )}
-                </Button>
-            </div>
         </div>
     );
 }

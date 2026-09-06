@@ -2,7 +2,7 @@
   "id": "seo",
   "name": "SEO Manager",
   "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "coreVersion": "^1.25.0",
   "category": "content",
   "author": "uxwVend",

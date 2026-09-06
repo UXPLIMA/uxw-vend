@@ -34,6 +34,9 @@ interface SettingsFormProps {
     children?: React.ReactNode;
 }
 
+/** The header's submit button points at the form by id; they are the same form. */
+const FORM_ID = "settings-form";
+
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
     const t = useTranslations("admin");
     const [saving, setSaving] = useState(false);
@@ -89,11 +92,27 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
 
     return (
         <>
-            <AdminPageHeader title={title} description={subtitle} />
+            {/* The save lives in the header rather than under the card. On a
+                settings screen the page *is* the form, so its save is a
+                page-level action and belongs with the rest of them; left at
+                the bottom it sat in a different place on every screen,
+                depending only on how many fields that screen happened to
+                have. `form` is what lets a submit button stand outside the
+                form it submits. */}
+            <AdminPageHeader
+                title={title}
+                description={subtitle}
+                actions={
+                    <Button type="submit" form={FORM_ID} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("settingsForm_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("settingsForm_saved")}</> : t("settingsForm_saveSettings")}
+                    </Button>
+                }
+            />
 
             {error && <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>}
 
-            <form onSubmit={handleSave}>
+            <form id={FORM_ID} onSubmit={handleSave}>
                 <Card>
                     <CardContent className="p-6 space-y-4">
                         {fields.map((field) => (
@@ -149,13 +168,6 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                 </Card>
 
                 {children}
-
-                <div className="mt-6">
-                    <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("settingsForm_saving")}</> :
-                         saved ? <><Check className="w-4 h-4" /> {t("settingsForm_saved")}</> : t("settingsForm_saveSettings")}
-                    </Button>
-                </div>
             </form>
         </>
     );

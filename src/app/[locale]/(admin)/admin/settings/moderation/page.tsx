@@ -131,9 +131,25 @@ export default function ModerationSettingsPage() {
 
     return (
         <div className="space-y-6">
+            {/* The page is one form, so its save is a page action: it sits in
+                the header rather than at the far end of the row that carries
+                the link to the queue. */}
             <AdminPageHeader
                 title={t("moderationSettings_title")}
                 description={t("moderationSettings_subtitle")}
+                actions={
+                    <Button onClick={onSave} disabled={saving}>
+                        {saving ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> {t("moderationSettings_saving")}
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
+                            </>
+                        )}
+                    </Button>
+                }
             />
 
             <Card>
@@ -175,24 +191,13 @@ export default function ModerationSettingsPage() {
                 </CardContent>
             </Card>
 
-            <div className="flex items-center justify-between">
+            <div>
                 <Link
                     href="/admin/moderation"
                     className="text-sm text-primary hover:underline"
                 >
                     {t("moderationSettings_openQueue")}
                 </Link>
-                <Button onClick={onSave} disabled={saving}>
-                    {saving ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" /> {t("moderationSettings_saving")}
-                        </>
-                    ) : (
-                        <>
-                            <Save className="w-4 h-4" /> {t("moderationSettings_saveChanges")}
-                        </>
-                    )}
-                </Button>
             </div>
         </div>
     );

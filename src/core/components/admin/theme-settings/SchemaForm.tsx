@@ -7,6 +7,7 @@ import * as Fields from "@/core/components/admin/theme-customizer/fields";
 import type { ThemeFieldDef } from "@/core/lib/theme-manifest-schema";
 import { Button } from "@/core/components/ui/button";
 import { Card, CardContent } from "@/core/components/ui/card";
+import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { Check, Loader2 } from "lucide-react";
 
 interface Props {
@@ -14,9 +15,18 @@ interface Props {
     group: string;
     fields: Record<string, ThemeFieldDef>;
     initialValues: Record<string, unknown>;
+    /**
+     * The page's own title row. It is rendered here rather than by the page
+     * because the save button belongs in it, and only this component knows
+     * whether a save is in flight.
+     */
+    title: string;
+    description: string;
+    backHref: string;
+    backLabel: string;
 }
 
-export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
+export function SchemaForm({ themeId, group, fields, initialValues, title, description, backHref, backLabel }: Props) {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
     const [values, setValues] = useState<Record<string, unknown>>(() => ({ ...initialValues }));
@@ -43,16 +53,23 @@ export function SchemaForm({ themeId, group, fields, initialValues }: Props) {
 
     return (
         <>
-            {/* A theme group is a form, and a form on a wide panel is not a
-                narrow column with a button under it. The fields sit two or
-                three across, and the save button sits where every other
-                screen's does. */}
-            <div className="mb-6 flex justify-end">
-                <Button onClick={onSubmit} disabled={saving}>
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                    {saving ? t("theme_saving") : commonT("save")}
-                </Button>
-            </div>
+            {/* The save is a header action, next to the way back, like the
+                appearance screen one click away. It used to sit alone in a
+                right-aligned row between the header and the card, which left
+                the header's own right hand side empty and put the same button
+                in a different place on two screens of the same section. */}
+            <AdminPageHeader
+                title={title}
+                description={description}
+                backHref={backHref}
+                backLabel={backLabel}
+                actions={
+                    <Button onClick={onSubmit} disabled={saving}>
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                        {saving ? t("theme_saving") : commonT("save")}
+                    </Button>
+                }
+            />
 
             <Card>
                 <CardContent className="grid gap-6 p-6 md:grid-cols-2 xl:grid-cols-3">

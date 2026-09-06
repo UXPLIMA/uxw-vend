@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea } from "@/core/sdk/ui";
-import { Search, Loader2, Check, FileText, ArrowRight } from "lucide-react";
+import { Loader2, Check, FileText, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -27,6 +27,9 @@ const DEFAULT_SETTINGS: SeoSettings = {
     seo_google_verification: "",
     seo_bing_verification: "",
 };
+
+/** The header's submit button points at the form by id; they are the same form. */
+const FORM_ID = "seo-settings-form";
 
 export default function SeoSettingsPage() {
     const t = useTranslations("seo");
@@ -95,17 +98,25 @@ export default function SeoSettingsPage() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-8">
-                <AdminPageHeader
-                    title={t("adm_seoManager")}
-                    description={t("adm_seoManagerSubtitle")}
-                    actions={<>
-                        <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                            <Search className="w-5 h-5 text-success" />
-                        </div>
-                    </>}
-                />
-            </div>
+            {/* No wrapper: the header lays out its own row, and the extra
+                flex box around it only added a second set of margins. The
+                action slot holds the screen's save, not a decorative tile -
+                an icon in a header is something to press everywhere else. */}
+            <AdminPageHeader
+                title={t("adm_seoManager")}
+                description={t("adm_seoManagerSubtitle")}
+                actions={
+                    <Button type="submit" form={FORM_ID} disabled={saving}>
+                        {saving ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
+                        ) : saved ? (
+                            <><Check className="w-4 h-4" /> {t("adm_saved")}</>
+                        ) : (
+                            t("adm_saveSettings")
+                        )}
+                    </Button>
+                }
+            />
 
             {/* Page SEO Overrides Link */}
             <Link href="/admin/seo/pages">
@@ -124,7 +135,7 @@ export default function SeoSettingsPage() {
             </Link>
 
             {/* Global SEO Settings */}
-            <form onSubmit={handleSave}>
+            <form id={FORM_ID} onSubmit={handleSave}>
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-foreground">{t("adm_globalSeoSettings")}</CardTitle>
@@ -202,17 +213,6 @@ export default function SeoSettingsPage() {
                     </CardContent>
                 </Card>
 
-                <div className="mt-6">
-                    <Button type="submit" disabled={saving}>
-                        {saving ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</>
-                        ) : saved ? (
-                            <><Check className="w-4 h-4" /> {t("adm_saved")}</>
-                        ) : (
-                            t("adm_saveSettings")
-                        )}
-                    </Button>
-                </div>
             </form>
         </>
     );

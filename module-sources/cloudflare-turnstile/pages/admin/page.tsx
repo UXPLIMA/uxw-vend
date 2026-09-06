@@ -78,9 +78,18 @@ export default function CloudflareTurnstileAdminPage() {
 
     return (
         <div className="max-w-2xl">
+            {/* The save is a header action, the same control in the same
+                place as every other settings screen, rather than a full-width
+                button pinned to the bottom of the card. */}
             <AdminPageHeader
                 title={t("title")}
                 description={t("subtitle")}
+                actions={
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {t("save")}
+                    </Button>
+                }
             />
 
             <Card>
@@ -121,10 +130,6 @@ export default function CloudflareTurnstileAdminPage() {
                             description={t("enableOnRegisterDesc")}
                         />
                     </div>
-                    <Button onClick={save} disabled={saving} className="w-full">
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        {t("save")}
-                    </Button>
                 </CardContent>
             </Card>
         </div>

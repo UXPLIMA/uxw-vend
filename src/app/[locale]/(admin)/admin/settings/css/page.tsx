@@ -45,9 +45,18 @@ export default function CssSettingsPage() {
 
     return (
         <>
+            {/* The page is one editor, so its save is a page action: it sits
+                in the header rather than loose under the card, where its
+                position moved with the height of the textarea. Nothing to
+                save while the settings could not be read. */}
             <AdminPageHeader
                 title={t("css_title")}
                 description={t("css_subtitle")}
+                actions={failed ? undefined : (
+                    <Button onClick={save} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("css_saving")}</> : <><Check className="w-4 h-4" /> {t("css_saveCss")}</>}
+                    </Button>
+                )}
             />
 
             {failed ? (
@@ -72,9 +81,6 @@ export default function CssSettingsPage() {
                 </CardContent>
             </Card>
 
-            <Button onClick={save} disabled={saving}>
-                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("css_saving")}</> : <><Check className="w-4 h-4" /> {t("css_saveCss")}</>}
-            </Button>
             </>
             )}
         </>

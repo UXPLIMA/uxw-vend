@@ -45,6 +45,9 @@ const sections: SectionDef[] = [
 
 const allFields = sections.flatMap((s) => s.fields);
 
+/** The header's submit button points at the form by id; they are the same form. */
+const FORM_ID = "general-settings-form";
+
 export default function GeneralSettingsPage() {
     const t = useTranslations("admin");
     const [saving, setSaving] = useState(false);
@@ -109,12 +112,24 @@ export default function GeneralSettingsPage() {
 
     return (
         <>
+            {/* The page is one form, so its save is a page action: it sits in
+                the header with everything else a screen offers, not under
+                whichever card happens to be last. */}
             <AdminPageHeader
                 title={t("generalSettings_title")}
                 description={t("generalSettings_subtitle")}
+                actions={
+                    <Button type="submit" form={FORM_ID} disabled={saving}>
+                        {saving ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("generalSettings_saving")}</>
+                        ) : (
+                            <><Check className="w-4 h-4" /> {t("generalSettings_saveSettings")}</>
+                        )}
+                    </Button>
+                }
             />
 
-            <form onSubmit={handleSave}>
+            <form id={FORM_ID} onSubmit={handleSave}>
                 <div className="grid lg:grid-cols-2 gap-6">
                     {sections.map((section) => (
                         <Card key={section.titleKey}>
@@ -143,15 +158,6 @@ export default function GeneralSettingsPage() {
                     ))}
                 </div>
 
-                <div className="mt-6">
-                    <Button type="submit" disabled={saving}>
-                        {saving ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("generalSettings_saving")}</>
-                        ) : (
-                            <><Check className="w-4 h-4" /> {t("generalSettings_saveSettings")}</>
-                        )}
-                    </Button>
-                </div>
             </form>
         </>
     );

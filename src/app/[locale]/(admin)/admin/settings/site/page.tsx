@@ -13,6 +13,9 @@ import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 
+/** The header's submit button points at the form by id; they are the same form. */
+const FORM_ID = "site-settings-form";
+
 export default function SiteSettingsPage() {
     const t = useTranslations("admin");
     const [saving, setSaving] = useState(false);
@@ -93,16 +96,25 @@ export default function SiteSettingsPage() {
 
     return (
         <>
+            {/* The page is one form, so its save is a page action: it sits in
+                the header with everything else a screen offers, not under
+                whichever card happens to be last. */}
             <AdminPageHeader
                 title={t("siteSettings_title")}
                 description={t("siteSettings_subtitle")}
+                actions={
+                    <Button type="submit" form={FORM_ID} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("siteSettings_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("siteSettings_saved")}</> : t("siteSettings_saveSettings")}
+                    </Button>
+                }
             />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
             )}
 
-            <form onSubmit={handleSave}>
+            <form id={FORM_ID} onSubmit={handleSave}>
                 <div className="grid lg:grid-cols-2 gap-8">
                     <Card>
                         <CardHeader>
@@ -202,12 +214,6 @@ export default function SiteSettingsPage() {
                     </Card>
                 </div>
 
-                <div className="mt-6">
-                    <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("siteSettings_saving")}</> :
-                         saved ? <><Check className="w-4 h-4" /> {t("siteSettings_saved")}</> : t("siteSettings_saveSettings")}
-                    </Button>
-                </div>
             </form>
         </>
     );

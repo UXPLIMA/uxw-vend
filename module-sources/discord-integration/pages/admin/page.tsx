@@ -30,6 +30,9 @@ const webhookEvents = [
  * `a-discord-event-can-be-routed.test.ts` holds the two lists together.
  */
 
+/** The header's submit button points at the form by id; they are the same form. */
+const FORM_ID = "discord-webhooks-form";
+
 export default function DiscordSettingsPage() {
     const t = useTranslations("discordIntegration");
     const commonT = useTranslations("common");
@@ -133,18 +136,26 @@ export default function DiscordSettingsPage() {
 
     return (
         <>
+            {/* The save is a header action, beside the way back, rather than
+                between the last webhook card and the help box. */}
             <AdminPageHeader
                 title={t("adm_discordWebhooks")}
                 description={t("adm_webhooksSubtitle")}
                 backHref="/admin/settings/general"
                 backLabel={commonT("back")}
+                actions={
+                    <Button type="submit" form={FORM_ID} disabled={saving}>
+                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</> :
+                         saved ? <><Check className="w-4 h-4" /> {t("adm_saved")}</> : t("adm_saveWebhooks")}
+                    </Button>
+                }
             />
 
             {error && (
                 <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg">{error}</div>
             )}
 
-            <form onSubmit={handleSave}>
+            <form id={FORM_ID} onSubmit={handleSave}>
                 <div className="space-y-4">
                     {webhookEvents.map((event) => (
                         <Card key={event.key}>
@@ -179,12 +190,6 @@ export default function DiscordSettingsPage() {
                     ))}
                 </div>
 
-                <div className="mt-6">
-                    <Button type="submit" disabled={saving}>
-                        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</> :
-                         saved ? <><Check className="w-4 h-4" /> {t("adm_saved")}</> : t("adm_saveWebhooks")}
-                    </Button>
-                </div>
             </form>
 
             <div className="mt-6 p-4 bg-muted rounded-lg">
