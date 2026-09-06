@@ -93,6 +93,9 @@ AGENTS.md
 # Test artifacts
 *.png
 !public/**/*.png
+# Next reads app icons out of the file tree, so these are source, not output.
+!src/app/apple-icon.png
+!src/app/icon.png
 .playwright-mcp/
 test-results/
 playwright-report/
