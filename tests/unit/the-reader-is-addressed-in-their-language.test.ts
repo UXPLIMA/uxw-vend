@@ -83,6 +83,22 @@ function code(file: string): string {
         .replace(/^\s*\/\/.*$/gm, "");
 }
 
+/**
+ * The string literals inside a JSX expression attribute, starting just after
+ * its opening brace and stopping at the brace that closes it.
+ */
+function literalsIn(src: string, start: number): string[] {
+    let depth = 1;
+    let i = start;
+    while (i < src.length && depth > 0) {
+        if (src[i] === "{") depth++;
+        else if (src[i] === "}") depth--;
+        i++;
+    }
+    const expression = src.slice(start, i - 1);
+    return [...expression.matchAll(/(["'])((?:[^"'\\]|\\.){3,})\1/g)].map((m) => m[2]);
+}
+
 describe("the reader is addressed in their language", () => {
     it("no screen asks a question through a browser dialog", () => {
         const offenders: string[] = [];
@@ -144,6 +160,28 @@ describe("the reader is addressed in their language", () => {
             }
         }
         expect(offenders).toEqual([]);
+    });
+
+    it("an expression in a reader-facing attribute is keyed too", () => {
+        // The check above reads `aria-label="..."`. A ternary is the shape
+        // that got past it: `aria-label={voted ? "Remove vote" : "Upvote"}`
+        // is three English sentences the screen reader says out loud, and
+        // none of them is a quoted attribute value.
+        //
+        // `title` is not in this list on purpose - it is also the name of a
+        // node prop (`<AdminPageHeader title={<>...</>}>`), whose expression
+        // is full of class names rather than anything a reader hears.
+        const offenders: string[] = [];
+        for (const file of FILES.filter((f) => f.endsWith(".tsx"))) {
+            if (STAYS_IN_ENGLISH[file]) continue;
+            const src = code(file);
+            for (const m of src.matchAll(/\b(aria-label|placeholder|alt)=\{/g)) {
+                for (const text of literalsIn(src, m.index + m[0].length)) {
+                    if (looksLikeProse(text)) offenders.push(`${file}: [${m[1]}] ${text}`);
+                }
+            }
+        }
+        expect(offenders, "give the expression's branches translation keys").toEqual([]);
     });
 
     it("every allowlisted file exists and carries a reason", () => {

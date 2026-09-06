@@ -202,7 +202,7 @@ export default function SuggestionsPage() {
                                     <div className="flex gap-4">
                                         <button
                                             onClick={() => toggleVote(s.id)}
-                                            aria-label={session?.user ? (votedIds.has(s.id) ? "Remove vote" : "Upvote") : "Log in to vote"}
+                                            aria-label={!session?.user ? t("loginToVote") : votedIds.has(s.id) ? t("removeVote") : t("upvote")}
                                             className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-colors min-w-[60px] cursor-pointer ${
                                                 votedIds.has(s.id) ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                                             }`}

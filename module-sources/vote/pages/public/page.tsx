@@ -58,10 +58,23 @@ export default function VotePage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ voteSiteId: site.id }),
             });
-            if (res.ok) toast.success(t("voteRecorded"));
-            else toast.error((await res.json()).error || t("alreadyVoted"));
+            if (res.ok) {
+                toast.success(t("voteRecorded"));
+            } else {
+                // The endpoint answers in English; what it carries for the
+                // reader is the `code`. The cooldown one comes with the hours
+                // left so the sentence can be built in their own language.
+                const data = await res.json().catch(() => null);
+                if (data?.code === "vote_cooldown") {
+                    toast.error(t("cooldownHours", { hours: Number(data?.hours ?? 24) }));
+                } else if (data?.code === "vote_in_flight") {
+                    toast.error(t("voteInFlight"));
+                } else {
+                    toast.error(t("voteFailed"));
+                }
+            }
         } catch {
-            toast.error(t("alreadyVoted"));
+            toast.error(t("voteFailed"));
         } finally {
             setVoting(null);
         }
