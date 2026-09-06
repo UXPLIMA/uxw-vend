@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.1.25",
+  "version": "1.1.26",
   "coreVersion": "^1.21.0",
   "category": "community",
   "author": "uxwVend",
@@ -265,9 +265,7 @@
       "pageTitles": {
         "blog": "Blog"
       },
-      "profile": {
-        "notificationType_blog_article_created": "New blog post"
-      }
+      "profile": {}
     },
     "tr": {
       "nav": {
@@ -390,9 +388,7 @@
       "pageTitles": {
         "blog": "Blog"
       },
-      "profile": {
-        "notificationType_blog_article_created": "Yeni blog yazısı"
-      }
+      "profile": {}
     }
   },
   "pageBlocks": [
@@ -422,16 +418,6 @@
             "content"
           ]
         }
-      ]
-    }
-  ],
-  "notificationTypes": [
-    {
-      "eventType": "blog.article.created",
-      "label": "New blog post",
-      "channels": [
-        "email",
-        "inapp"
       ]
     }
   ],

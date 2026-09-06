@@ -2,7 +2,7 @@
   "id": "in-app-notifications",
   "name": "In-App Notifications",
   "description": "In-app notification system with bell icon",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "coreVersion": "^1.22.0",
   "category": "community",
   "author": "uxwVend",
@@ -58,7 +58,11 @@
         "notif_prizeWonMessage": "You won {prize} on the wheel.",
         "notif_referralUsedTitle": "Your referral code was used",
         "notif_referralUsedMessage": "Somebody joined with your referral code.",
-        "notif_referralUsedReward": "Somebody joined with your code. You earned {reward} credits."
+        "notif_referralUsedReward": "Somebody joined with your code. You earned {reward} credits.",
+        "notif_ticketRepliedTitle": "New reply on your ticket",
+        "notif_ticketRepliedMessage": "Support replied to \"{subject}\".",
+        "notif_forumReplyTitle": "New reply on your topic",
+        "notif_forumReplyMessage": "Someone replied to \"{title}\"."
       },
       "pageTitles": {
         "notifications": "Notifications"
@@ -97,7 +101,11 @@
         "notif_prizeWonMessage": "Çarkta {prize} kazandınız.",
         "notif_referralUsedTitle": "Davet kodunuz kullanıldı",
         "notif_referralUsedMessage": "Biri davet kodunuzla katıldı.",
-        "notif_referralUsedReward": "Biri kodunuzla katıldı. {reward} kredi kazandınız."
+        "notif_referralUsedReward": "Biri kodunuzla katıldı. {reward} kredi kazandınız.",
+        "notif_ticketRepliedTitle": "Destek talebine yanıt geldi",
+        "notif_ticketRepliedMessage": "Destek ekibi \"{subject}\" talebine yanıt verdi.",
+        "notif_forumReplyTitle": "Konuna yanıt geldi",
+        "notif_forumReplyMessage": "Birisi \"{title}\" konusuna yanıt verdi."
       },
       "pageTitles": {
         "notifications": "Bildirimler"
@@ -141,6 +149,16 @@
       "hook": "referral.referral.used",
       "type": "action",
       "handler": "listeners/referral-used.ts"
+    },
+    {
+      "hook": "tickets.ticket.replied",
+      "type": "action",
+      "handler": "listeners/ticket-replied.ts"
+    },
+    {
+      "hook": "forum.post.created",
+      "type": "action",
+      "handler": "listeners/forum-post-created.ts"
     }
   ]
 }

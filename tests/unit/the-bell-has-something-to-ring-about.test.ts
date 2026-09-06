@@ -46,14 +46,34 @@ describe("the bell has something to ring about", () => {
     });
 
     it("addresses a person the payload names, and gives up when it names none", () => {
+        // Who the row is filed for: `userId: <expression>` in the
+        // createNotification call. It may be read straight off the payload or
+        // bound to a name first, which is what a nested or a conditional
+        // recipient needs.
+        const RECIPIENT = /userId:\s*([A-Za-z_$][\w$]*(?:\??\.[\w$]+)*)/;
         for (const listener of listeners) {
             const source = fs.readFileSync(path.join(MODULE, listener.handler), "utf8");
-            // The recipient is read off the payload, never chosen by the module.
-            const addressed = /userId:\s*payload\.\w+/.test(source);
-            expect(addressed, `${listener.hook} must address payload's own user`).toBe(true);
-            // And a payload with nobody in it writes nothing.
-            expect(/if\s*\(!payload\??\.\w+\)\s*return;|if\s*\(!payload\?\.\w+\s*\|\|/.test(source),
-                `${listener.hook} must return when the payload names nobody`).toBe(true);
+            // From the call onwards, so the `userId: string` in the payload's
+            // own type declaration is not mistaken for the recipient.
+            const call = source.slice(source.indexOf("createNotification("));
+            const match = RECIPIENT.exec(call);
+            expect(match, `${listener.hook} files a notification for nobody`).not.toBeNull();
+            const expression = match![1];
+            const root = expression.split(/[?.]/)[0];
+            const named = expression.split(/[?.]/).filter(Boolean).pop()!;
+
+            // The recipient comes from the payload, never chosen by the module.
+            const derived =
+                root === "payload" || new RegExp(`const\\s+${root}\\s*=\\s*payload`).test(source);
+            expect(derived, `${listener.hook} must address payload's own user`).toBe(true);
+
+            // And a payload with nobody in it writes nothing: somewhere above,
+            // a falsy check on that same name returns without writing.
+            const names = new RegExp(`\\b${named}\\b`);
+            const guarded = source
+                .split("\n")
+                .some((line) => /if\s*\(!/.test(line) && names.test(line) && /return/.test(line));
+            expect(guarded, `${listener.hook} must return when the payload names nobody`).toBe(true);
         }
     });
 

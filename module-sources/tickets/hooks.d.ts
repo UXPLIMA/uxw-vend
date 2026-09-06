@@ -20,6 +20,10 @@ declare global {
 interface TicketHookPayload {
     id: string;
     subject: string;
+    // Who opened it. Nullable, and not by accident: `user` is
+    // `onDelete: SetNull`, so a ticket outlives the account that opened it and
+    // a listener with news for its owner may have nobody to tell.
+    userId: string | null;
     priority: string;
     user?: { username: string } | null;
     department?: { name: string } | null;

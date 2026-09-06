@@ -140,7 +140,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Fire hook for cross-module reactions
     const { doActionAsync } = await import("@/core/sdk");
-    await doActionAsync("forum.post.created", post);
+    // The topic travels with the reply: a listener that wants to tell the
+    // topic's author about it should not have to read the forum's tables.
+    await doActionAsync("forum.post.created", {
+        ...post,
+        topicAuthorId: topic.authorId,
+        topicTitle: topic.title,
+        topicSlug: topic.slug,
+    });
 
     // Public activity feed entry
     await prisma.activityFeedItem.create({

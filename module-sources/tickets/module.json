@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -425,7 +425,6 @@
       "eventType": "tickets.ticket.replied",
       "label": "Reply to your support ticket",
       "channels": [
-        "email",
         "inapp"
       ]
     }

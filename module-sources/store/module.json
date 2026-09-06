@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.38",
+  "version": "2.2.39",
   "coreVersion": "^1.23.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1630,7 +1630,6 @@
       "eventType": "store.order.completed",
       "label": "Order complete",
       "channels": [
-        "email",
         "inapp"
       ]
     }
