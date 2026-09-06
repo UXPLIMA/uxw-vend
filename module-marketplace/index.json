@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T09:26:17Z",
+  "updatedAt": "2026-09-06T09:47:46Z",
   "modules": [
     {
       "id": "announcements",
@@ -1022,13 +1022,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.1.17",
+      "version": "1.2.0",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T09:47:46Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2001,13 +2001,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.0.23",
+      "version": "1.1.0",
       "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-06T09:47:46Z",
       "screenshots": [],
       "tags": [
         "gaming"

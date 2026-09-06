@@ -214,20 +214,25 @@ export default function AdminPunishmentsPage() {
             <AdminPageHeader
                 title={t("adm_title")}
                 description={t("adm_subtitle")}
+                actions={
+                    <Link href={formHref()} className="inline-flex">
+                        <Button>
+                            <Plus className="w-4 h-4" /> {t("adm_newPunishment")}
+                        </Button>
+                    </Link>
+                }
             />
 
+            {/* Filters only. The screen's primary action is the header's, at
+                the size every other admin screen gives it; sitting it here in
+                `sm` next to the filters made the same control look like a
+                different, lesser one from one screen to the next. */}
             <div className="flex flex-wrap items-center gap-2">
                 {STATUS_FILTERS.map(f => (
                     <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => selectFilter(f)}>
                         {t(FILTER_LABEL[f])}
                     </Button>
                 ))}
-                <div className="flex-1" />
-                <Link href={formHref()} className="inline-flex">
-                    <Button size="sm">
-                        <Plus className="w-4 h-4" /> {t("adm_newPunishment")}
-                    </Button>
-                </Link>
             </div>
 
             {loading ? (

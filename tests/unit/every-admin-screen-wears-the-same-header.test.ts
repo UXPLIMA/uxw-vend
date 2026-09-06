@@ -66,6 +66,77 @@ const NOT_A_PAGE = [
     "src/app/[locale]/(admin)/error.tsx",
 ];
 
+/** Every .tsx under the given trees, repo-relative. */
+function tsxFilesIn(trees: string[]): string[] {
+    const out: string[] = [];
+    const walk = (dir: string) => {
+        let entries: fs.Dirent[];
+        try {
+            entries = fs.readdirSync(join(ROOT, dir), { withFileTypes: true });
+        } catch {
+            return;
+        }
+        for (const entry of entries) {
+            const path = `${dir}/${entry.name}`;
+            if (entry.isDirectory()) walk(path);
+            else if (entry.name.endsWith(".tsx")) out.push(path);
+        }
+    };
+    for (const tree of trees) walk(tree);
+    return out.sort();
+}
+
+/**
+ * Comments are prose about the code, not the code. The header component's own
+ * doc comment spells out what an action looks like, and a gate that reads it
+ * as a real button would fail on the documentation of the rule it enforces.
+ */
+function stripComments(src: string): string {
+    return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
+/** Character ranges of each `pattern`'s balanced `{...}` value. */
+function braceRanges(src: string, pattern: RegExp): Array<[number, number]> {
+    const out: Array<[number, number]> = [];
+    for (const match of src.matchAll(pattern)) {
+        let depth = 0;
+        for (let i = match.index! + match[0].length - 1; i < src.length; i++) {
+            if (src[i] === "{") depth++;
+            else if (src[i] === "}" && --depth === 0) {
+                out.push([match.index!, i]);
+                break;
+            }
+        }
+    }
+    return out;
+}
+
+/** Each `<Tag ...>` opening tag, as the span of the tag itself. */
+function openTags(src: string, tag: string): Array<{ start: number; end: number }> {
+    const out: Array<{ start: number; end: number }> = [];
+    for (const match of src.matchAll(new RegExp(`${tag}\\b`, "g"))) {
+        let depth = 0;
+        let quote = "";
+        let i = match.index! + match[0].length;
+        for (; i < src.length; i++) {
+            const c = src[i];
+            if (quote) {
+                if (c === quote) quote = "";
+            } else if (c === '"' || c === "'") quote = c;
+            else if (c === "{") depth++;
+            else if (c === "}") depth--;
+            else if (c === ">" && depth === 0) break;
+        }
+        out.push({ start: match.index!, end: i + 1 });
+    }
+    return out;
+}
+
+/** Is there an opening `tag` before here that has not been closed yet? */
+function unclosed(before: string, open: string, close: string): boolean {
+    return before.split(open).length > before.split(close).length;
+}
+
 describe("every admin screen wears the same header", () => {
     it("leaves the page title to AdminPageHeader", () => {
         const offenders = grep("<h1", ADMIN_TREES).filter(
@@ -104,6 +175,37 @@ describe("every admin screen wears the same header", () => {
         const heading = row.indexOf("<h1");
         expect(cluster, "back belongs in the right hand cluster").toBeGreaterThan(heading);
         expect(row).toContain("items-center");
+    });
+
+    it("gives the primary action one size and one place", () => {
+        // "Yeni Ceza" was `size="sm"` in a filter row; "Yeni Ceza" on the
+        // servers screen next door was a full-size button in the header. Same
+        // control, two sizes, two places, depending on which screen you had
+        // open. A create action is a link to a create screen, so that is what
+        // this looks for: a <Link> wrapping a <Button> with a Plus in it.
+        //
+        // Two placements are right. The header's action slot is the normal
+        // one. An empty state may repeat the same button inside its card,
+        // because there is no list to point at yet. Anything else is a screen
+        // inventing its own spot, and `size` on any of them is a screen
+        // inventing its own proportions.
+        const offenders: string[] = [];
+        for (const file of tsxFilesIn(ADMIN_TREES)) {
+            if (NOT_A_PAGE.some((allowed) => file.startsWith(allowed))) continue;
+            const src = stripComments(fs.readFileSync(join(ROOT, file), "utf8"));
+            const slots = braceRanges(src, /actions=\{/g);
+            for (const button of openTags(src, "<Button")) {
+                const body = src.slice(button.end).split("</Button>")[0];
+                if (!body.includes("<Plus")) continue;
+                if (!/<Link\s[^>]*href=[^>]*>\s*$/.test(src.slice(0, button.start))) continue;
+                const inHeader = slots.some(([a, b]) => a < button.start && button.start < b);
+                const inCard = unclosed(src.slice(0, button.start), "<CardContent", "</CardContent>");
+                const where = `${file}:${src.slice(0, button.start).split("\n").length}`;
+                if (!inHeader && !inCard) offenders.push(`${where} is not in the header or an empty state`);
+                else if (/\ssize=/.test(src.slice(button.start, button.end))) offenders.push(`${where} sets its own size`);
+            }
+        }
+        expect(offenders, "a create action is a header action, at the size every screen gives it").toEqual([]);
     });
 
     it("is mounted widely enough for that to mean something", () => {

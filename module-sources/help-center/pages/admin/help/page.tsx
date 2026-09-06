@@ -292,6 +292,22 @@ export default function AdminHelpCenterPage() {
             <AdminPageHeader
                 title={t("adm_helpCenter")}
                 description={t("adm_manageKnowledgeBase")}
+                actions={
+                    /* The primary action follows the open tab, and it lives
+                       where every other admin screen keeps it: the header. It
+                       used to sit in a right-aligned row of its own under the
+                       tabs, so the same "new X" control was in a different
+                       place here than anywhere else in the panel. */
+                    activeTab === "articles" ? (
+                        <Link href={formHref("article")} className="inline-flex">
+                            <Button><Plus className="w-4 h-4" /> {t("adm_newArticle")}</Button>
+                        </Link>
+                    ) : (
+                        <Link href={formHref("category")} className="inline-flex">
+                            <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
+                        </Link>
+                    )
+                }
             />
 
             {error && (
@@ -317,12 +333,6 @@ export default function AdminHelpCenterPage() {
             {/* Articles Tab */}
             {activeTab === "articles" && (
                 <>
-                    <div className="flex justify-end mb-4">
-                        <Link href={formHref("article")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4" /> {t("adm_newArticle")}</Button>
-                        </Link>
-                    </div>
-
                     <Card>
                         <CardContent className="p-0">
                             {articles.length === 0 ? (
@@ -376,12 +386,6 @@ export default function AdminHelpCenterPage() {
             {/* Categories Tab */}
             {activeTab === "categories" && (
                 <>
-                    <div className="flex justify-end mb-4">
-                        <Link href={formHref("category")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
-                        </Link>
-                    </div>
-
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {categories.length === 0 ? (
                             <Card className="col-span-full">
