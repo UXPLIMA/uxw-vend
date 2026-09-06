@@ -906,6 +906,7 @@
     "spotlight_noResults": "No results",
     "spotlight_open": "Open",
     "spotlight_placeholder": "Search admin pages, users, settings…",
+    "spotlight_searching": "Searching...",
     "spotlight_startTyping": "Start typing to search",
     "system_cpuCores": "CPU Cores",
     "system_databaseSize": "Database Size",

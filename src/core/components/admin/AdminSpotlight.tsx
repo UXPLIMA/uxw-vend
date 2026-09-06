@@ -149,7 +149,7 @@ export function AdminSpotlight() {
 
                 <div className="max-h-96 overflow-y-auto">
                     {loading && results.length === 0 ? (
-                        <div className="p-4 text-center text-sm text-muted-foreground">Searching…</div>
+                        <div className="p-4 text-center text-sm text-muted-foreground">{at("spotlight_searching")}</div>
                     ) : query.length < 2 ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">{at("spotlight_startTyping")}</div>
                     ) : results.length === 0 ? (
