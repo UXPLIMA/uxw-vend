@@ -191,12 +191,18 @@ function DefaultNavbar() {
                     </nav>
 
                     <div className="flex items-center gap-2">
-                        {mounted && (
-                            <button onClick={toggleDarkMode} aria-label={isDark ? t('switchToLight') : t('switchToDark')}
-                                className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                            </button>
-                        )}
+                        {/* The button holds its place before the theme is
+                            known. Rendering nothing until `mounted` left a
+                            gap that filled after paint and pushed this whole
+                            row sideways, which is a layout shift for the sake
+                            of one icon. Only the icon waits now. */}
+                        <button onClick={toggleDarkMode} disabled={!mounted}
+                            aria-label={isDark ? t('switchToLight') : t('switchToDark')}
+                            className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                            {mounted
+                                ? (isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />)
+                                : <span className="block w-4 h-4" aria-hidden="true" />}
+                        </button>
 
                         {session?.user ? (
                             <>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { sharedJson } from "@/core/sdk";
 import { useRelativeTime } from "@/core/sdk/ui";
 
 interface RecentPurchase {
@@ -17,8 +18,8 @@ export function RecentPurchasesWidget() {
     const [purchases, setPurchases] = useState<RecentPurchase[]>([]);
 
     useEffect(() => {
-        fetch("/api/v1/widget-stats")
-            .then((res) => res.json())
+        // Four widgets read the same payload; one request serves them all.
+        sharedJson<{ recentPurchases?: RecentPurchase[] }>("/api/v1/widget-stats")
             .then((data) => setPurchases(data.recentPurchases || []))
             .catch(() => {});
     }, []);

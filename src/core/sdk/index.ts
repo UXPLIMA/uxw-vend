@@ -63,6 +63,8 @@ export {
  * `copyText` uses the real API where there is one and an offscreen textarea
  * where there is not, and returns whether the text actually landed.
  */
+export { sharedJson, peekShared, invalidateShared } from "@/core/lib/shared-request";
+
 export { copyText } from "@/core/lib/copy-text";
 
 export { writeError, errorMessage } from "@/core/lib/write-result";

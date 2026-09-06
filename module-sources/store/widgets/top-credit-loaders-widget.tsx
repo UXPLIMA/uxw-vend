@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { sharedJson } from "@/core/sdk";
 import { useSiteCurrency } from "@/core/sdk/ui";
 
 interface TopLoader {
@@ -16,8 +17,8 @@ export function TopCreditLoadersWidget() {
     const [loaders, setLoaders] = useState<TopLoader[]>([]);
 
     useEffect(() => {
-        fetch("/api/v1/widget-stats")
-            .then((res) => res.json())
+        // Four widgets read the same payload; one request serves them all.
+        sharedJson<{ topCreditLoaders?: TopLoader[] }>("/api/v1/widget-stats")
             .then((data) => setLoaders(data.topCreditLoaders || []))
             .catch(() => {});
     }, []);

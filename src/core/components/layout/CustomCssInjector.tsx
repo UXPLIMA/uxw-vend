@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { sanitizeCustomCss } from "@/core/lib/css-sanitizer";
+import { sharedJson } from "@/core/lib/shared-request";
 
 export function CustomCssInjector() {
     const [css, setCss] = useState("");
 
     useEffect(() => {
-        fetch("/api/v1/public-settings")
-            .then((r) => r.json())
+        // Shared with the navbar, the footer and the currency selector, which
+        // all want the same payload: one request serves every one of them.
+        sharedJson<{ settings?: Record<string, unknown> }>("/api/v1/public-settings")
             .then((data) => {
                 const s = data.settings || {};
 

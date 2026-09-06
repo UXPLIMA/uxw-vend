@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.26.0 - `sharedJson`, `peekShared` and `invalidateShared` join
+ * `@/core/sdk`. A widget that fetches in an effect gets its own request, and
+ * four store widgets wanting the same totals made fifteen of them on one
+ * homepage. Deduplicating in a module-level variable does not survive code
+ * splitting, which had already put two copies of the settings hook on the
+ * same page; the shared store lives on `globalThis` instead. Addition.
+ *
  * 1.25.0 - `errorMessage` joins `@/core/sdk`, beside `writeError`. A handler
  * that needs the body on success cannot hand the response to `writeError`
  * afterwards, so thirty-three screens had settled on `data.error ||
@@ -170,4 +177,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.25.0";
+export const CORE_API_VERSION = "1.26.0";

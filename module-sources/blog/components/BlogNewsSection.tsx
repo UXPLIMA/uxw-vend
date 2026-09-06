@@ -21,6 +21,12 @@ interface BlogPost {
   category: { name: string; slug: string } | null;
 }
 
+/**
+ * Room the news section holds from its first paint: two rows of cards, which
+ * is what the skeleton draws and what a full page renders.
+ */
+const NEWS_SECTION_HEIGHT = "min-h-[532px]";
+
 export function BlogNewsSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,13 +48,18 @@ export function BlogNewsSection() {
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
-  if (isLoading) return <SkeletonNewsGrid count={4} />;
+  // The skeleton stands in for two rows of cards, so a shorter answer after
+  // it shortens the page and pulls the footer up. That was 0.154 of layout
+  // shift against a 0.1 budget, and all of it landed after the reader had
+  // started looking. Every state reserves the same room now, so the section
+  // keeps the height it asked for whatever arrives.
+  if (isLoading) return <div className={NEWS_SECTION_HEIGHT}><SkeletonNewsGrid count={4} /></div>;
   // Don't return null when empty - render a visible empty state so the
   // homepage doesn't appear blank when blog is the only enabled section
   // and there's no published content yet.
   if (blogPosts.length === 0) {
     return (
-      <div className="bg-card border border-dashed border-border rounded-lg py-10 px-6 text-center">
+      <div className={`${NEWS_SECTION_HEIGHT} flex flex-col items-center justify-center bg-card border border-dashed border-border rounded-lg py-10 px-6 text-center`}>
         <Newspaper className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
         <h2 className="font-medium text-foreground">{t('title')}</h2>
         <p className="text-sm text-muted-foreground mt-1">{t('empty')}</p>
@@ -57,7 +68,7 @@ export function BlogNewsSection() {
   }
 
   return (
-    <div>
+    <div className={NEWS_SECTION_HEIGHT}>
       <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
       <div className="grid md:grid-cols-2 gap-6">
         {paginatedNews.map((post) => (

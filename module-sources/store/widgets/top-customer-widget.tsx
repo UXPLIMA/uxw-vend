@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { sharedJson } from "@/core/sdk";
 import { useSiteCurrency } from "@/core/sdk/ui";
 
 export function TopCustomerWidget() {
@@ -10,8 +11,8 @@ export function TopCustomerWidget() {
     const [topCustomer, setTopCustomer] = useState<{ username: string; avatar: string | null; total: number } | null>(null);
 
     useEffect(() => {
-        fetch("/api/v1/widget-stats")
-            .then((res) => res.json())
+        // Four widgets read the same payload; one request serves them all.
+        sharedJson<{ topCustomer?: { username: string; avatar: string | null; total: number } }>("/api/v1/widget-stats")
             .then((data) => {
                 if (data.topCustomer) setTopCustomer(data.topCustomer);
             })
