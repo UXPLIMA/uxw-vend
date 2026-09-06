@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T01:22:25Z",
+  "updatedAt": "2026-09-06T01:34:07Z",
   "modules": [
     {
       "id": "announcements",
@@ -505,13 +505,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.31",
+      "version": "1.0.32",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-06T01:34:07Z",
       "screenshots": [],
       "tags": [
         "content"

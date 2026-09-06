@@ -131,61 +131,68 @@ export default function AnalyticsPage() {
         setLoading(true);
         const collected: ChartSeries[] = [];
         const collectedRankings: RankingSeries[] = [];
-
-        // Core users chart
         try {
-            const res = await fetch(`/api/v1/stats?period=${period}d`);
-            if (res.ok) {
-                const d: CoreStatsResponse = await res.json();
-                if (d.labels?.length && d.users?.length) {
-                    collected.push({
-                        id: "core-users",
-                        label: "New users per day",
-                        labelKey: "analytics_newUsersPerDay",
-                        labels: d.labels,
-                        data: d.users,
-                        color: "#6366f1",
-                        source: "core",
-                    });
+
+            // Core users chart
+            try {
+                const res = await fetch(`/api/v1/stats?period=${period}d`);
+                if (res.ok) {
+                    const d: CoreStatsResponse = await res.json();
+                    if (d.labels?.length && d.users?.length) {
+                        collected.push({
+                            id: "core-users",
+                            label: "New users per day",
+                            labelKey: "analytics_newUsersPerDay",
+                            labels: d.labels,
+                            data: d.users,
+                            color: "#6366f1",
+                            source: "core",
+                        });
+                    }
                 }
-            }
-        } catch { /* skip */ }
+            } catch { /* skip */ }
 
-        // Module charts
-        try {
-            const res = await fetch("/api/v1/modules");
-            if (res.ok) {
-                const data = await res.json();
-                const enabledModules = ((data.modules || []) as ModuleManifest[])
-                    .filter((m) => isEnabledIn(moduleStates, m.id) && !!m.statsApi);
+            // Module charts
+            try {
+                const res = await fetch("/api/v1/modules");
+                if (res.ok) {
+                    const data = await res.json();
+                    const enabledModules = ((data.modules || []) as ModuleManifest[])
+                        .filter((m) => isEnabledIn(moduleStates, m.id) && !!m.statsApi);
 
-                const fetches = enabledModules.map(async (m) => {
-                    try {
-                        const url = `/api/v1${m.statsApi}?period=${period}`;
-                        const r = await fetch(url);
-                        if (!r.ok) return;
-                        const body = await r.json();
-                        if (Array.isArray(body.charts)) {
-                            for (const c of body.charts) {
-                                collected.push({ ...c, source: m.id });
-                            }
-                        }
-                        if (Array.isArray(body.rankings)) {
-                            for (const r of body.rankings) {
-                                if (Array.isArray(r?.items)) {
-                                    collectedRankings.push({ ...r, source: m.id });
+                    const fetches = enabledModules.map(async (m) => {
+                        try {
+                            const url = `/api/v1${m.statsApi}?period=${period}`;
+                            const r = await fetch(url);
+                            if (!r.ok) return;
+                            const body = await r.json();
+                            if (Array.isArray(body.charts)) {
+                                for (const c of body.charts) {
+                                    collected.push({ ...c, source: m.id });
                                 }
                             }
-                        }
-                    } catch { /* skip */ }
-                });
-                await Promise.all(fetches);
-            }
-        } catch { /* skip */ }
+                            if (Array.isArray(body.rankings)) {
+                                for (const r of body.rankings) {
+                                    if (Array.isArray(r?.items)) {
+                                        collectedRankings.push({ ...r, source: m.id });
+                                    }
+                                }
+                            }
+                        } catch { /* skip */ }
+                    });
+                    await Promise.all(fetches);
+                }
+            } catch { /* skip */ }
 
-        setCharts(collected);
-        setRankings(collectedRankings);
-        setLoading(false);
+            setCharts(collected);
+            setRankings(collectedRankings);
+            // In a `finally` rather than trailing the body: it reads as
+            // unconditional only if you have checked that every `try` above it
+            // still has a `catch`, and a spinner that never stops is not a thing
+            // to leave resting on that.
+        } finally {
+            setLoading(false);
+        }
     }, [period, moduleStates]);
 
     useEffect(() => {

@@ -2,6 +2,7 @@
 
 
 import { useTranslations, useLocale } from "next-intl";
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, NativeSelect } from "@/core/sdk/ui";
 import { Loader2, ChevronDown, ChevronUp, FileText } from "lucide-react";
@@ -28,6 +29,7 @@ export default function SubmissionsPage() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("customForms");
+    const commonT = useTranslations("common");
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [forms, setForms] = useState<Form[]>([]);
     const [loading, setLoading] = useState(true);
@@ -38,10 +40,15 @@ export default function SubmissionsPage() {
     const [totalPages, setTotalPages] = useState(1);
 
     const fetchForms = async () => {
-        const res = await fetch("/api/v1/forms");
-        if (res.ok) {
+        try {
+            const res = await fetch("/api/v1/forms");
+            if (!res.ok) throw new Error(String(res.status));
             const data = await res.json();
             setForms(data.forms || []);
+        } catch {
+            // The filter is a convenience, not the page. Losing it is worth
+            // saying once, but not worth blocking the submissions below it.
+            toast.error(commonT("loadFailed"));
         }
     };
 
@@ -50,14 +57,22 @@ export default function SubmissionsPage() {
         const params = new URLSearchParams({ page: String(page), limit: "50" });
         if (filterForm) params.set("formId", filterForm);
 
-        const res = await fetch(`/api/v1/forms/submissions?${params}`);
-        if (res.ok) {
+        // A rejected fetch used to skip the setLoading(false) below it, so a
+        // dropped connection left the spinner turning for good; a non-ok
+        // response cleared it but left the list empty, which reads as "nobody
+        // has filled this form in" rather than "this did not load".
+        try {
+            const res = await fetch(`/api/v1/forms/submissions?${params}`);
+            if (!res.ok) throw new Error(String(res.status));
             const data = await res.json();
             setSubmissions(data.submissions || []);
             setTotal(data.total || 0);
             setTotalPages(data.pages || 1);
+        } catch {
+            toast.error(commonT("loadFailed"));
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => { fetchForms(); }, []);
