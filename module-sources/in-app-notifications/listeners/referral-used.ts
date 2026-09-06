@@ -1,3 +1,4 @@
+import { shouldNotify } from "@/core/sdk/server";
 import { createNotification } from "../lib/notifications";
 
 /**
@@ -12,6 +13,9 @@ export default async function onReferralUsed(payload: {
 }): Promise<void> {
     if (!payload?.referrerId) return;
     const reward = Number(payload.rewardAmount);
+    // The reader can mute this row in their profile. Nothing used to read
+    // that back, so muting it did nothing.
+    if (!(await shouldNotify(payload.referrerId, "referral.referral.used", "inapp"))) return;
     await createNotification({
         userId: payload.referrerId,
         title: "Your referral code was used",

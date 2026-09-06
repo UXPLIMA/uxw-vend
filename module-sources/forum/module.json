@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.21",
+  "version": "1.1.22",
   "coreVersion": "^1.21.0",
   "category": "community",
   "author": "uxwVend Team",
@@ -297,6 +297,9 @@
         "forum": "Forum",
         "topic": "Topic",
         "newTopic": "New Topic"
+      },
+      "profile": {
+        "notificationType_forum_post_created": "Reply on your forum topic"
       }
     },
     "tr": {
@@ -427,6 +430,9 @@
         "forum": "Forum",
         "topic": "Konu",
         "newTopic": "Yeni Konu"
+      },
+      "profile": {
+        "notificationType_forum_post_created": "Forum konunuza yanıt"
       }
     }
   },
@@ -449,11 +455,11 @@
   ],
   "notificationTypes": [
     {
-      "eventType": "forum.topic.replied",
+      "eventType": "forum.post.created",
       "label": "Reply on your forum topic",
       "channels": [
         "email",
-        "site"
+        "inapp"
       ]
     }
   ],

@@ -22,6 +22,14 @@ interface Pref {
 
 const DEFAULT_CHANNELS = ["email", "inapp"];
 
+/**
+ * `blog.article.created` becomes `notificationType_blog_article_created`, so a
+ * module translates its rows without core knowing any of their names.
+ */
+export function notificationTypeKey(eventType: string): string {
+    return `notificationType_${eventType.replace(/[.\-]/g, "_")}`;
+}
+
 export function NotificationPrefsTab() {
     const t = useTranslations("profile");
     const [types, setTypes] = useState<NotifType[]>([]);
@@ -40,6 +48,11 @@ export function NotificationPrefsTab() {
     }, []);
 
     // A pref is "enabled" by default unless an explicit row says otherwise
+    const labelFor = (type: { eventType: string; label: string }): string => {
+        const key = notificationTypeKey(type.eventType);
+        return t.has(key) ? t(key) : type.label;
+    };
+
     const isEnabled = (eventType: string, channel: string): boolean => {
         const p = prefs.find((x) => x.eventType === eventType && x.channel === channel);
         return p ? p.enabled : true;
@@ -116,7 +129,11 @@ export function NotificationPrefsTab() {
                                     return (
                                         <tr key={type.eventType} className="border-b border-border last:border-0">
                                             <td className="py-3 pr-4">
-                                                <div className="font-medium text-foreground">{type.label}</div>
+                                                {/* The manifest's label is English, written by whoever
+                                                    packaged the module. The reader gets their own
+                                                    language when the module ships the key, the same way
+                                                    the channel headings above already work. */}
+                                                <div className="font-medium text-foreground">{labelFor(type)}</div>
                                                 {type.description && (
                                                     <div className="text-xs text-muted-foreground">{type.description}</div>
                                                 )}

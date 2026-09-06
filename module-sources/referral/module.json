@@ -2,7 +2,7 @@
   "id": "referral",
   "name": "Referral System",
   "description": "Earn credits by referring new users",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "coreVersion": "^1.0.0",
   "category": "community",
   "author": "uxwVend",
@@ -140,6 +140,9 @@
       },
       "pageTitles": {
         "referral": "Referrals"
+      },
+      "profile": {
+        "notificationType_referral_referral_used": "Somebody used your referral code"
       }
     },
     "tr": {
@@ -221,6 +224,9 @@
       },
       "pageTitles": {
         "referral": "Davetler"
+      },
+      "profile": {
+        "notificationType_referral_referral_used": "Biri davet kodunuzu kullandı"
       }
     }
   },
@@ -237,6 +243,15 @@
       "type": "referral.referral.used",
       "prefix": "Joined via referral from ",
       "key": "referralUsed"
+    }
+  ],
+  "notificationTypes": [
+    {
+      "eventType": "referral.referral.used",
+      "label": "Somebody used your referral code",
+      "channels": [
+        "inapp"
+      ]
     }
   ]
 }

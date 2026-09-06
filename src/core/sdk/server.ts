@@ -56,6 +56,11 @@ export {
  */
 export { rateLimit as rateLimitStrict } from "@/core/lib/rate-limit";
 
+// A user who muted an event has to be able to mute it. The preferences
+// grid in /profile has always written rows; nothing has ever read one back,
+// because the only reader lived where no module could reach it.
+export { shouldNotify } from "@/core/lib/notif-prefs";
+
 // --- Caching (Redis with in-memory fallback) ---
 export { cached, invalidate } from "@/core/lib/cache";
 

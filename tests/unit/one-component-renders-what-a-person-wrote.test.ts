@@ -48,6 +48,17 @@ const rel = (file: string) => path.relative(ROOT, file);
 /** Structured data is markup for a crawler, not writing for a reader. */
 const JSON_LD = /Jsonld|JsonLd|jsonLd|JSON_LD/;
 
+/** The core version that first exported RichContent. */
+const INTRODUCED_IN = [1, 21, 0] as const;
+
+/** `a >= b`, comparing major, minor and patch in order. */
+function atLeast(a: number[], b: readonly number[]): boolean {
+    for (let i = 0; i < 3; i++) {
+        if (a[i] !== b[i]) return a[i] > b[i];
+    }
+    return true;
+}
+
 describe("HTML a person wrote", () => {
     it("has module files to read", () => {
         expect(MODULE_FILES.length).toBeGreaterThan(200);
@@ -108,9 +119,18 @@ describe("HTML a person wrote", () => {
     });
 
     it("is required by every module that renders it", () => {
-        // A module using an SDK symbol from 1.21.0 must ask for it.
+        // A module using an SDK symbol from 1.21.0 must ask for at least it.
+        //
+        // Asking for the floor rather than the exact string: this was written
+        // as `toBe("^1.21.0")` against both core's own constant and every
+        // module's range, which made the next unrelated addition to the SDK
+        // fail this test. A module that later needs 1.22.0 still gets
+        // RichContent, and pinning would have forced it to lie about that.
         const version = fs.readFileSync(path.join(ROOT, "src/core/lib/core-version.ts"), "utf8");
-        expect(version).toContain('CORE_API_VERSION = "1.21.0"');
+        const core = version.match(/CORE_API_VERSION = "(\d+)\.(\d+)\.(\d+)"/);
+        expect(core, "core-version.ts must declare CORE_API_VERSION").toBeTruthy();
+        expect(atLeast(core!.slice(1, 4).map(Number), INTRODUCED_IN)).toBe(true);
+
         const users = MODULE_FILES.filter((f) => /\bRichContent\b/.test(fs.readFileSync(f, "utf8")));
         expect(users.length).toBeGreaterThan(5);
         for (const file of users) {
@@ -118,7 +138,11 @@ describe("HTML a person wrote", () => {
             const manifest = JSON.parse(
                 fs.readFileSync(path.join(ROOT, "module-sources", id, "module.json"), "utf8"),
             ) as { coreVersion: string };
-            expect(manifest.coreVersion, id).toBe("^1.21.0");
+            const asked = manifest.coreVersion.match(/\^(\d+)\.(\d+)\.(\d+)/);
+            expect(asked, `${id} declares ${manifest.coreVersion}`).toBeTruthy();
+            expect(atLeast(asked!.slice(1, 4).map(Number), INTRODUCED_IN), id).toBe(true);
+            // Same major, or the caret range would not admit it at all.
+            expect(asked![1], id).toBe(String(INTRODUCED_IN[0]));
         }
     });
 });

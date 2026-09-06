@@ -2,7 +2,7 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -60,6 +60,9 @@
       "admin": {
         "module_credits_name": "Credit System",
         "module_credits_description": "Virtual currency wallet for users"
+      },
+      "profile": {
+        "notificationType_credits_credit_added": "Credits added to your balance"
       }
     },
     "tr": {
@@ -84,7 +87,19 @@
       "admin": {
         "module_credits_name": "Kredi Sistemi",
         "module_credits_description": "Kullanıcılar için sanal para cüzdanı"
+      },
+      "profile": {
+        "notificationType_credits_credit_added": "Bakiyenize kredi eklendi"
       }
     }
-  }
+  },
+  "notificationTypes": [
+    {
+      "eventType": "credits.credit.added",
+      "label": "Credits added to your balance",
+      "channels": [
+        "inapp"
+      ]
+    }
+  ]
 }

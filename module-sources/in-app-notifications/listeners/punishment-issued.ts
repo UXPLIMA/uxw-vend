@@ -1,3 +1,4 @@
+import { shouldNotify } from "@/core/sdk/server";
 import { createNotification } from "../lib/notifications";
 
 /**
@@ -12,6 +13,9 @@ export default async function onPunishmentIssued(payload: {
     reason?: string | null;
 }): Promise<void> {
     if (!payload?.targetUserId) return;
+    // The reader can mute this row in their profile. Nothing used to read
+    // that back, so muting it did nothing.
+    if (!(await shouldNotify(payload.targetUserId, "punishments.punishment.issued", "inapp"))) return;
     await createNotification({
         userId: payload.targetUserId,
         title: "A punishment was issued",

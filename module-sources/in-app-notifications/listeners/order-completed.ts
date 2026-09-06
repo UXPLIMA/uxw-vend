@@ -1,3 +1,4 @@
+import { shouldNotify } from "@/core/sdk/server";
 import { createNotification } from "../lib/notifications";
 
 /**
@@ -11,6 +12,9 @@ export default async function onOrderCompleted(payload: {
     orderNumber: string;
 }): Promise<void> {
     if (!payload?.userId) return;
+    // The reader can mute this row in their profile. Nothing used to read
+    // that back, so muting it did nothing.
+    if (!(await shouldNotify(payload.userId, "store.order.completed", "inapp"))) return;
     await createNotification({
         userId: payload.userId,
         title: "Order complete",

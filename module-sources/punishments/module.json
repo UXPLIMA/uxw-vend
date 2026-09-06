@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "coreVersion": "^1.0.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -126,6 +126,9 @@
       },
       "pageTitles": {
         "punishments": "Punishments"
+      },
+      "profile": {
+        "notificationType_punishments_punishment_issued": "A punishment on your account"
       }
     },
     "tr": {
@@ -191,7 +194,19 @@
       },
       "pageTitles": {
         "punishments": "Cezalar"
+      },
+      "profile": {
+        "notificationType_punishments_punishment_issued": "Hesabınıza verilen ceza"
       }
     }
-  }
+  },
+  "notificationTypes": [
+    {
+      "eventType": "punishments.punishment.issued",
+      "label": "A punishment on your account",
+      "channels": [
+        "inapp"
+      ]
+    }
+  ]
 }

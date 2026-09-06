@@ -2,7 +2,7 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "coreVersion": "^1.0.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -270,6 +270,9 @@
         "support": "Support",
         "newTicket": "New Ticket",
         "ticket": "Ticket"
+      },
+      "profile": {
+        "notificationType_tickets_ticket_replied": "Reply to your support ticket"
       }
     },
     "tr": {
@@ -411,6 +414,9 @@
         "support": "Destek",
         "newTicket": "Yeni Talep",
         "ticket": "Talep"
+      },
+      "profile": {
+        "notificationType_tickets_ticket_replied": "Destek talebinize yanıt"
       }
     }
   },
@@ -420,7 +426,7 @@
       "label": "Reply to your support ticket",
       "channels": [
         "email",
-        "site"
+        "inapp"
       ]
     }
   ],

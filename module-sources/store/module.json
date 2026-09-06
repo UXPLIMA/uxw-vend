@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.2.34",
+  "version": "2.2.36",
   "coreVersion": "^1.21.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1037,6 +1037,9 @@
         "product": "Product",
         "orderSuccess": "Order Complete",
         "vip": "VIP"
+      },
+      "profile": {
+        "notificationType_store_order_completed": "Order complete"
       }
     },
     "tr": {
@@ -1570,6 +1573,9 @@
         "product": "Ürün",
         "orderSuccess": "Sipariş Tamamlandı",
         "vip": "VIP"
+      },
+      "profile": {
+        "notificationType_store_order_completed": "Sipariş tamamlandı"
       }
     }
   },
@@ -1593,11 +1599,11 @@
   ],
   "notificationTypes": [
     {
-      "eventType": "store.order.status.changed",
-      "label": "Order status update",
+      "eventType": "store.order.completed",
+      "label": "Order complete",
       "channels": [
         "email",
-        "site"
+        "inapp"
       ]
     }
   ],

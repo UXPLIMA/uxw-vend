@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.22.0 - `shouldNotify` joins `@/core/sdk/server`. The notification
+ * preferences grid in /profile wrote a row for every toggle and nothing ever
+ * read one: the check that consults it sat in core, unexported, and its own
+ * doc comment described a caller that did not exist. A module that sends
+ * something to a person is the caller, so it has to be able to ask.
+ * Addition.
+ *
  * 1.21.0 - `RichContent` joins `@/core/sdk/ui`. Author-written HTML was
  * rendered by seven module screens, each importing its own DOMPurify and each
  * styling the result with `prose dark:prose-invert` - class names that match
@@ -141,4 +148,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.21.0";
+export const CORE_API_VERSION = "1.22.0";
