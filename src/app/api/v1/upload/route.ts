@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
-import { uploadFile } from "@/core/lib/storage";
+import { uploadFile, UPLOAD_ALLOWED_MIME, UPLOAD_MAX_SIZE } from "@/core/lib/storage";
 import { prisma } from "@/core/lib/db";
 
 /**
@@ -43,6 +43,21 @@ export async function POST(request: NextRequest) {
     }
 
     const blob = file as File;
+
+    // Before the body is read, not after. `uploadFile` refuses anything too
+    // large or of the wrong type, but it is handed a Buffer, and building
+    // that Buffer is what costs the memory: every other upload route on this
+    // site - modules, themes, module updates - checks the size it was told
+    // before it reads the bytes, and this one did not. The checks below are
+    // the same limits, applied a step earlier; storage.ts still verifies the
+    // type against the file's own magic bytes, which a header cannot fake.
+    if (blob.size > UPLOAD_MAX_SIZE) {
+        return NextResponse.json({ error: "File too large" }, { status: 413 });
+    }
+    if (!UPLOAD_ALLOWED_MIME.has(blob.type)) {
+        return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+    }
+
     const buffer = Buffer.from(await blob.arrayBuffer());
 
     try {

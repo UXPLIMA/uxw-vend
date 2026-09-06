@@ -173,6 +173,16 @@ export async function POST(request: NextRequest) {
             const res = await fetch(`${moduleMarketplaceBase()}/${zip}`);
             if (!res.ok) { results.push({ id, name: name || id, status: "failed", error: `Download failed: ${res.status}` }); continue; }
 
+            // What the server says it is sending, before the body is read.
+            // The single-module install route has always checked this; here a
+            // list of fifty ids meant fifty full downloads buffered in turn,
+            // each measured only after it was already in memory.
+            const declared = res.headers.get("content-length");
+            if (declared && parseInt(declared, 10) > MAX_MODULE_SIZE) {
+                results.push({ id, name: name || id, status: "failed", error: "Too large" });
+                continue;
+            }
+
             const buffer = Buffer.from(await res.arrayBuffer());
             if (buffer.length > MAX_MODULE_SIZE) { results.push({ id, name: name || id, status: "failed", error: "Too large" }); continue; }
             if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4B) { results.push({ id, name: name || id, status: "failed", error: "Invalid ZIP" }); continue; }
