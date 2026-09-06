@@ -129,7 +129,7 @@ export default function ForumPage() {
                                 <div className="space-y-1">
                                     <button
                                         onClick={() => { setSelectedCategory(null); setPage(1); }}
-                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedCategory ? "bg-blue-50 text-blue-600 font-medium" : "text-muted-foreground hover:bg-muted"}`}
+                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedCategory ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
                                     >
                                         {t('allTopics')}
                                     </button>
@@ -137,7 +137,7 @@ export default function ForumPage() {
                                         <button
                                             key={cat.id}
                                             onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${selectedCategory === cat.id ? "bg-blue-50 text-blue-600 font-medium" : "text-muted-foreground hover:bg-muted"}`}
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${selectedCategory === cat.id ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
                                         >
                                             <span className="flex items-center gap-2">
                                                 {cat.icon && <span>{cat.icon}</span>}
@@ -160,9 +160,9 @@ export default function ForumPage() {
                         ) : restricted ? (
                             <Card>
                                 <CardContent className="py-12 text-center space-y-3">
-                                    <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                                    <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                                     <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
-                                    <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                                    <Link href="/auth/login" className="text-primary hover:underline text-sm">{t('signIn')}</Link>
                                 </CardContent>
                             </Card>
                         ) : failed ? (
@@ -170,7 +170,7 @@ export default function ForumPage() {
                         ) : topics.length === 0 ? (
                             <Card>
                                 <CardContent className="py-12 text-center">
-                                    <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                                    <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                                     <p className="text-muted-foreground mb-4">{t('noTopics')}</p>
                                     <Link href="/forum/new">
                                         <Button>{t('createTopic')}</Button>
@@ -193,7 +193,7 @@ export default function ForumPage() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            {topic.isPinned && <Pin className="w-3 h-3 text-blue-500" />}
+                                                            {topic.isPinned && <Pin className="w-3 h-3 text-primary" />}
                                                             {topic.isLocked && <Lock className="w-3 h-3 text-muted-foreground" />}
                                                             <h2 className="font-medium text-foreground truncate">{topic.title}</h2>
                                                         </div>

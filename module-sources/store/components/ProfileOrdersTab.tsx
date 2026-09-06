@@ -29,10 +29,10 @@ interface Order {
 
 const statusColor = (status: string) => {
     switch (status) {
-        case "COMPLETED": return "bg-green-100 text-green-700";
-        case "PENDING": return "bg-yellow-100 text-yellow-700";
-        case "PROCESSING": return "bg-blue-100 text-blue-700";
-        case "CANCELLED": return "bg-red-100 text-red-700";
+        case "COMPLETED": return "bg-success/10 text-success";
+        case "PENDING": return "bg-warning/10 text-warning";
+        case "PROCESSING": return "bg-primary/10 text-primary";
+        case "CANCELLED": return "bg-destructive/10 text-destructive";
         default: return "bg-muted text-foreground";
     }
 };
@@ -79,7 +79,7 @@ export function ProfileOrdersTab() {
                     <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : orders.length === 0 ? (
                     <div className="text-center py-8">
-                        <ShoppingCart className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                        <ShoppingCart className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                         <p className="text-muted-foreground">{t("tab_orders_empty")}</p>
                         <Link href="/store">
                             <Button variant="outline" className="mt-3">{t("tab_orders_browse")}</Button>
@@ -135,7 +135,7 @@ export function ProfileOrdersTab() {
                                             ))}
                                         </div>
                                         {Number(order.discount) > 0 && (
-                                            <div className="flex justify-between mt-3 pt-3 border-t text-sm text-green-600">
+                                            <div className="flex justify-between mt-3 pt-3 border-t text-sm text-success">
                                                 <span>{t("tab_orders_discount")}</span>
                                                 <span>-{money(Number(order.discount))}</span>
                                             </div>

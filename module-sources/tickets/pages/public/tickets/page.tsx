@@ -22,18 +22,18 @@ interface Ticket {
 }
 
 const statusColors: Record<string, string> = {
-    OPEN: "bg-blue-100 text-blue-700",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-700",
-    WAITING_REPLY: "bg-purple-100 text-purple-700",
-    RESOLVED: "bg-green-100 text-green-700",
+    OPEN: "bg-primary/10 text-primary",
+    IN_PROGRESS: "bg-warning/10 text-warning",
+    WAITING_REPLY: "bg-accent/10 text-accent",
+    RESOLVED: "bg-success/10 text-success",
     CLOSED: "bg-muted text-muted-foreground",
 };
 
 const priorityColors: Record<string, string> = {
     LOW: "text-muted-foreground",
-    MEDIUM: "text-blue-500",
-    HIGH: "text-orange-500",
-    URGENT: "text-red-500",
+    MEDIUM: "text-primary",
+    HIGH: "text-warning",
+    URGENT: "text-destructive",
 };
 
 export default function SupportPage() {
@@ -79,7 +79,7 @@ export default function SupportPage() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{t('title')}</span>
                 </div>
@@ -130,7 +130,7 @@ export default function SupportPage() {
                                 {tickets.map((ticket) => (
                                     <tr key={ticket.id} className="hover:bg-muted">
                                         <td className="px-4 py-4">
-                                            <Link href={`/support/${ticket.id}`} className="text-blue-600 hover:underline font-medium">
+                                            <Link href={`/support/${ticket.id}`} className="text-primary hover:underline font-medium">
                                                 {ticket.subject}
                                             </Link>
                                         </td>

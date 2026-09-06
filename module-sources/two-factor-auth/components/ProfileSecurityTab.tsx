@@ -226,7 +226,7 @@ export function ProfileSecurityTab() {
         return (
             <Card>
                 <CardContent className="p-8 text-center">
-                    <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto" />
+                    <div className="w-6 h-6 border-2 border-border border-t-gray-600 rounded-full animate-spin mx-auto" />
                 </CardContent>
             </Card>
         );
@@ -242,7 +242,7 @@ export function ProfileSecurityTab() {
                     <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
                             {twoFAEnabled ? (
-                                <ShieldCheck className="w-5 h-5 text-green-600" />
+                                <ShieldCheck className="w-5 h-5 text-success" />
                             ) : (
                                 <ShieldOff className="w-5 h-5 text-muted-foreground" />
                             )}
@@ -251,7 +251,7 @@ export function ProfileSecurityTab() {
                         <span
                             className={`text-xs px-2 py-1 rounded ${
                                 twoFAEnabled
-                                    ? "bg-green-100 text-green-700"
+                                    ? "bg-success/10 text-success"
                                     : "bg-muted text-muted-foreground"
                             }`}
                         >
@@ -261,7 +261,7 @@ export function ProfileSecurityTab() {
                 </CardHeader>
                 <CardContent>
                     {twoFAError && (
-                        <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg mb-4">
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg mb-4">
                             {twoFAError}
                         </div>
                     )}
@@ -325,11 +325,11 @@ export function ProfileSecurityTab() {
                     {/* Backup codes shown after setup or regenerate */}
                     {(twoFAStep === "backup" || twoFAStep === "regenerated") && (
                         <div className="space-y-4">
-                            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <p className="text-sm font-medium text-yellow-800 mb-2">
+                            <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                                <p className="text-sm font-medium text-warning mb-2">
                                     {t("backupCodes")}
                                 </p>
-                                <p className="text-xs text-yellow-700 mb-3">
+                                <p className="text-xs text-warning mb-3">
                                     {t("backupCodesDescription")}
                                 </p>
                                 <div className="grid grid-cols-2 gap-2">
@@ -364,7 +364,7 @@ export function ProfileSecurityTab() {
                             <div
                                 className={`flex items-center gap-3 p-3 rounded-lg border ${
                                     lowBackupCodes
-                                        ? "bg-amber-50 border-amber-200 text-amber-800"
+                                        ? "bg-warning/10 border-warning/20 text-warning"
                                         : "bg-muted/50 border-border text-foreground"
                                 }`}
                             >
@@ -442,12 +442,12 @@ export function ProfileSecurityTab() {
                 <CardContent>
                     <form onSubmit={changePassword} className="space-y-4 max-w-md">
                         {passwordError && (
-                            <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                            <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                 {passwordError}
                             </div>
                         )}
                         {passwordSaved && (
-                            <div className="p-3 bg-green-50 border border-green-100 text-green-600 text-sm rounded-lg">
+                            <div className="p-3 bg-success/10 border border-success/20 text-success text-sm rounded-lg">
                                 {t("passwordChanged")}
                             </div>
                         )}

@@ -147,9 +147,9 @@ export default function StorePage() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
-                    <button onClick={resetView} className="hover:text-blue-600">{commonT('home')}</button>
+                    <button onClick={resetView} className="hover:text-primary">{commonT('home')}</button>
                     <ChevronRight className="w-4 h-4" />
-                    <button onClick={resetView} className="hover:text-blue-600">{t('title')}</button>
+                    <button onClick={resetView} className="hover:text-primary">{t('title')}</button>
 
                     {activeMode && (
                         <>
@@ -158,7 +158,7 @@ export default function StorePage() {
                                 <button
                                     type="button"
                                     onClick={() => setActiveCategory(null)}
-                                    className="text-foreground capitalize hover:text-blue-600"
+                                    className="text-foreground capitalize hover:text-primary"
                                 >
                                     {activeRootCategory?.name || activeMode}
                                 </button>
@@ -192,7 +192,7 @@ export default function StorePage() {
                             placeholder={t('searchProducts')}
                             aria-label={t('searchProducts')}
                             style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
-                            className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary"
                         />
                         {searchQuery && (
                             <button type="button" onClick={clearSearch} aria-label={commonT('close')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -209,7 +209,7 @@ export default function StorePage() {
                             <h2 className="text-xl font-bold text-foreground">
                                 {searching ? t('searching') : t('searchResultsFor', { query: searchQuery, count: searchResults.length })}
                             </h2>
-                            <button onClick={clearSearch} className="text-sm text-blue-600 hover:underline">{t('clear')}</button>
+                            <button onClick={clearSearch} className="text-sm text-primary hover:underline">{t('clear')}</button>
                         </div>
                         {!searching && searchResults.length === 0 ? (
                             <div className="bg-card rounded-xl p-8 text-center border border-border">
@@ -228,12 +228,12 @@ export default function StorePage() {
                                                 <>{/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
                                             ) : (
-                                                <Box className="w-16 h-16 text-gray-300" />
+                                                <Box className="w-16 h-16 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div className="p-4">
                                             <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
-                                            <div className="text-blue-600 font-bold">{formatPrice(product.price)}</div>
+                                            <div className="text-primary font-bold">{formatPrice(product.price)}</div>
                                         </div>
                                     </Link>
                                 ))}
@@ -267,7 +267,7 @@ export default function StorePage() {
                                                 <>{/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img src={mode.image} alt={mode.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
                                             ) : (
-                                                <Box className="w-12 h-12 text-gray-300" />
+                                                <Box className="w-12 h-12 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div className="p-4">
@@ -306,7 +306,7 @@ export default function StorePage() {
                                                 <>{/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
                                             ) : (
-                                                <Coins className="w-12 h-12 text-gray-300" />
+                                                <Coins className="w-12 h-12 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div className="p-4">
@@ -360,7 +360,7 @@ export default function StorePage() {
                                     >
                                         <div className={`h-44 bg-muted flex items-center justify-center overflow-hidden relative`}>
                                             {product.isFeatured && (
-                                                <span className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full z-10">
+                                                <span className="absolute top-2 right-2 bg-warning text-warning text-xs font-bold px-2 py-1 rounded-full z-10">
                                                     {t('featured')}
                                                 </span>
                                             )}
@@ -374,7 +374,7 @@ export default function StorePage() {
                                                 />
                                                 </>
                                             ) : (
-                                                <Box className="w-16 h-16 text-gray-300" />
+                                                <Box className="w-16 h-16 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div className="p-4">
@@ -383,9 +383,9 @@ export default function StorePage() {
                                                 {product.comparePrice && (
                                                     <span className="line-through text-muted-foreground text-xs">{formatPrice(product.comparePrice)}</span>
                                                 )}
-                                                <div className="text-blue-600 font-bold">{formatPrice(product.price)}</div>
+                                                <div className="text-primary font-bold">{formatPrice(product.price)}</div>
                                             </div>
-                                            <div className="text-sm text-muted-foreground group-hover:text-blue-600 transition-colors">
+                                            <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
                                                 {t('viewDetails')} →
                                             </div>
                                         </div>

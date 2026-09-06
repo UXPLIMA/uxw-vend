@@ -70,8 +70,8 @@ export default function DownloadsPage() {
                         {downloads.map((dl) => (
                             <Card key={dl.id} className="hover:shadow-md transition-shadow">
                                 <CardContent className="p-4 flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FileText className="w-6 h-6 text-blue-600" />
+                                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <FileText className="w-6 h-6 text-primary" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h2 className="font-medium text-foreground">{dl.title}</h2>

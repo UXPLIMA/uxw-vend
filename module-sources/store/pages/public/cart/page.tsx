@@ -367,10 +367,10 @@ export default function CartPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{t('couponCode')}</label>
                                         {couponApplied ? (
-                                            <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-md px-3 py-2">
+                                            <div className="flex items-center justify-between bg-success/10 border border-success/20 rounded-md px-3 py-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Check className="w-4 h-4 text-green-600" />
-                                                    <span className="text-sm font-medium text-green-700">{couponApplied}</span>
+                                                    <Check className="w-4 h-4 text-success" />
+                                                    <span className="text-sm font-medium text-success">{couponApplied}</span>
                                                 </div>
                                                 <button onClick={removeCoupon} aria-label={commonT('remove')}>
                                                     <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
@@ -398,10 +398,10 @@ export default function CartPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{t('creatorCode')}</label>
                                         {creatorApplied ? (
-                                            <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md px-3 py-2">
+                                            <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Check className="w-4 h-4 text-blue-600" />
-                                                    <span className="text-sm font-medium text-blue-700">{creatorApplied.code} ({creatorApplied.discountPercent}% off)</span>
+                                                    <Check className="w-4 h-4 text-primary" />
+                                                    <span className="text-sm font-medium text-primary">{creatorApplied.code} ({creatorApplied.discountPercent}% off)</span>
                                                 </div>
                                                 <button onClick={removeCreatorCode} aria-label={commonT('remove')}>
                                                     <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
@@ -435,14 +435,14 @@ export default function CartPage() {
                                     </div>
 
                                     {couponDiscount > 0 && (
-                                        <div className="flex justify-between text-green-600">
+                                        <div className="flex justify-between text-success">
                                             <span>{t('couponDiscount')}</span>
                                             <span>-{formatPrice(couponDiscount)}</span>
                                         </div>
                                     )}
 
                                     {creatorApplied && (
-                                        <div className="flex justify-between text-blue-600">
+                                        <div className="flex justify-between text-primary">
                                             <span>{t('creatorDiscount', { percent: creatorApplied.discountPercent })}</span>
                                             <span>-{formatPrice((cart.total - couponDiscount) * creatorApplied.discountPercent / 100)}</span>
                                         </div>

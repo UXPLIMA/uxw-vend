@@ -114,7 +114,7 @@ export default function FormPage({ params }: PageProps) {
                 ) : submitted ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                            <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
                             <h1 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h1>
                             <p className="text-muted-foreground">{t("thankYouBody")}</p>
                         </CardContent>
@@ -129,7 +129,7 @@ export default function FormPage({ params }: PageProps) {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {form.fields.map((field) => (
                                     <div key={field.name}>
-                                        <Label>{field.label} {field.required && <span className="text-red-500">*</span>}</Label>
+                                        <Label>{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
                                         {renderField(field)}
                                     </div>
                                 ))}

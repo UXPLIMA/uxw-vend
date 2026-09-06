@@ -82,15 +82,15 @@ export default function HelpCenterPage() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{t('title')}</span>
                 </div>
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
+                <div className="bg-gradient-to-r from-primary to-accent rounded-2xl p-8 text-white mb-8">
                     <h1 className="text-3xl font-bold mb-2">{t('heading')}</h1>
-                    <p className="text-blue-100 mb-6">{t('subtitle')}</p>
+                    <p className="text-primary mb-6">{t('subtitle')}</p>
 
                     {/* Search */}
                     <div className="flex gap-2 max-w-xl">
@@ -118,7 +118,7 @@ export default function HelpCenterPage() {
                         <ul className="space-y-2">
                             {searchResults.map((article) => (
                                 <li key={article.id}>
-                                    <Link href={`/help/${article.slug}`} className="text-blue-600 hover:underline">
+                                    <Link href={`/help/${article.slug}`} className="text-primary hover:underline">
                                         {article.title}
                                     </Link>
                                     <span className="text-muted-foreground text-sm ml-2">{t('inCategory', { category: article.category.name })}</span>
@@ -141,7 +141,7 @@ export default function HelpCenterPage() {
                                             <ul className="space-y-3">
                                                 {popularArticles.map((article) => (
                                                     <li key={article.id}>
-                                                        <Link href={`/help/${article.slug}`} className="text-blue-600 hover:underline text-sm">
+                                                        <Link href={`/help/${article.slug}`} className="text-primary hover:underline text-sm">
                                                             {article.title}
                                                         </Link>
                                                         {article.views !== null && (
@@ -158,7 +158,7 @@ export default function HelpCenterPage() {
                                     <div className="bg-card rounded-xl border border-border p-6 mt-4">
                                         <h3 className="font-bold text-foreground mb-2">{t('needHelp')}</h3>
                                         <p className="text-sm text-muted-foreground mb-4">{t('cantFind')}</p>
-                                        <Link href="/support/new" className="text-blue-600 hover:underline text-sm font-medium">
+                                        <Link href="/support/new" className="text-primary hover:underline text-sm font-medium">
                                             {t('createTicket')} →
                                         </Link>
                                     </div>
@@ -174,7 +174,7 @@ export default function HelpCenterPage() {
                                                     <div className="flex items-start gap-4">
                                                         {(() => {
                                                             const Icon = iconMap[category.icon || ""] || BookOpen;
-                                                            return <Icon className="w-8 h-8 text-blue-600 flex-shrink-0 mt-0.5" />;
+                                                            return <Icon className="w-8 h-8 text-primary flex-shrink-0 mt-0.5" />;
                                                         })()}
                                                         <div>
                                                             <h3 className="font-bold text-foreground">{category.name}</h3>

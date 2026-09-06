@@ -17,7 +17,7 @@ interface LeaderEntry {
     count?: number;
 }
 
-const rankColors = ["text-yellow-500", "text-muted-foreground", "text-amber-600"];
+const rankColors = ["text-warning", "text-muted-foreground", "text-warning"];
 
 export default function LeaderboardPage() {
     const t = useTranslations("leaderboard");
@@ -95,7 +95,7 @@ export default function LeaderboardPage() {
                                         <div className={`w-8 text-center font-bold text-lg ${rankColors[i] || "text-muted-foreground"}`}>
                                             #{i + 1}
                                         </div>
-                                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm overflow-hidden">
+                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-sm overflow-hidden">
                                             <Image
                                                 src={entry.avatar || getMinecraftAvatar(entry.username, 40)}
                                                 alt={entry.username}

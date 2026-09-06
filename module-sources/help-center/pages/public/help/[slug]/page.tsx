@@ -78,13 +78,13 @@ export default function HelpArticlePage({ params }: PageProps) {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
+                    <Link href="/" className="hover:text-primary">{commonT("home")}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/help" className="hover:text-blue-600">{t("title")}</Link>
+                    <Link href="/help" className="hover:text-primary">{t("title")}</Link>
                     {article?.category && (
                         <>
                             <span className="mx-2">/</span>
-                            <Link href={`/help/category/${article.category.slug}`} className="hover:text-blue-600">
+                            <Link href={`/help/category/${article.category.slug}`} className="hover:text-primary">
                                 {article.category.name}
                             </Link>
                         </>
@@ -101,7 +101,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                     <div className="bg-card rounded-xl p-8 text-center">
                         <h1 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h1>
                         <p className="text-muted-foreground mb-4">{t("articleNotFoundBody")}</p>
-                        <Link href="/help" className="text-blue-600 hover:underline">
+                        <Link href="/help" className="text-primary hover:underline">
                             {t("backToHelp")}
                         </Link>
                     </div>
@@ -131,12 +131,12 @@ export default function HelpArticlePage({ params }: PageProps) {
                             <div className="border-t pt-6">
                                 <p className="font-medium text-foreground mb-3">{t("wasHelpful")}</p>
                                 {feedbackGiven ? (
-                                    <p className="text-green-600">{t("feedbackThanks")}</p>
+                                    <p className="text-success">{t("feedbackThanks")}</p>
                                 ) : (
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => submitFeedback(true)}
-                                            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors inline-flex items-center gap-2"
+                                            className="px-4 py-2 bg-success/10 text-success rounded-lg hover:bg-success/10 transition-colors inline-flex items-center gap-2"
                                         >
                                             <ThumbsUp className="w-4 h-4" /> {t("helpfulYes")}
                                         </button>
@@ -155,7 +155,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                         {/* Related */}
                         <div className="mt-6 text-center">
                             <p className="text-muted-foreground mb-2">{t("stillNeedHelp")}</p>
-                            <Link href="/support/new" className="text-blue-600 hover:underline font-medium">
+                            <Link href="/support/new" className="text-primary hover:underline font-medium">
                                 {t("createTicket")}
                             </Link>
                         </div>

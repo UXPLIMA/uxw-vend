@@ -92,9 +92,9 @@ export default function NewTicketPage() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/support" className="hover:text-blue-600">{t('title')}</Link>
+                    <Link href="/support" className="hover:text-primary">{t('title')}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{t('newTicket')}</span>
                 </div>
@@ -109,7 +109,7 @@ export default function NewTicketPage() {
                         </div>
                     ) : (<>
                     {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
                             {error}
                         </div>
                     )}
@@ -153,7 +153,7 @@ export default function NewTicketPage() {
                                 type="text"
                                 value={formData.subject}
                                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                 placeholder={t('briefDescription')}
                                 required
                             />

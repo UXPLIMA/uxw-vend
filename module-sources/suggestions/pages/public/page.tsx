@@ -31,11 +31,11 @@ interface Suggestion {
 }
 
 const statusColors: Record<string, string> = {
-    open: "bg-blue-100 text-blue-700",
-    under_review: "bg-yellow-100 text-yellow-700",
-    accepted: "bg-green-100 text-green-700",
-    rejected: "bg-red-100 text-red-700",
-    completed: "bg-purple-100 text-purple-700",
+    open: "bg-primary/10 text-primary",
+    under_review: "bg-warning/10 text-warning",
+    accepted: "bg-success/10 text-success",
+    rejected: "bg-destructive/10 text-destructive",
+    completed: "bg-accent/10 text-accent",
 };
 
 const statusKeys: Record<string, string> = {
@@ -190,7 +190,7 @@ export default function SuggestionsPage() {
                     <LoadFailed onRetry={fetchSuggestions} />
                 ) : suggestions.length === 0 ? (
                     <Card><CardContent className="py-12 text-center">
-                        <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                        <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                         <p className="text-muted-foreground">{t("noSuggestions")}</p>
                     </CardContent></Card>
                 ) : (
@@ -203,10 +203,10 @@ export default function SuggestionsPage() {
                                             onClick={() => toggleVote(s.id)}
                                             aria-label={session?.user ? (votedIds.has(s.id) ? "Remove vote" : "Upvote") : "Log in to vote"}
                                             className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-colors min-w-[60px] cursor-pointer ${
-                                                votedIds.has(s.id) ? "bg-blue-100 text-blue-600" : "bg-muted text-muted-foreground hover:bg-blue-50 hover:text-blue-600"
+                                                votedIds.has(s.id) ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                                             }`}
                                         >
-                                            <ThumbsUp className={`w-4 h-4 ${votedIds.has(s.id) ? "fill-blue-600" : ""}`} />
+                                            <ThumbsUp className={`w-4 h-4 ${votedIds.has(s.id) ? "fill-primary" : ""}`} />
                                             <span className="text-sm font-bold mt-0.5">{s.upvotes}</span>
                                         </button>
                                         <div className="flex-1 min-w-0">

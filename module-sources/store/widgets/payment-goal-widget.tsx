@@ -35,13 +35,13 @@ export function PaymentGoalWidget() {
     return (
         <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center gap-2 mb-4">
-                <Target className="w-4 h-4 text-blue-600" />
+                <Target className="w-4 h-4 text-primary" />
                 <h2 className="font-bold text-foreground">{goal.title || sidebarT('paymentGoal')}</h2>
             </div>
 
             <div className="h-4 bg-muted rounded-full overflow-hidden mb-2 relative">
                 <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500 rounded-full"
                     style={{ width: `${percent}%` }}
                 />
                 {percent > 10 && (
@@ -63,7 +63,7 @@ export function PaymentGoalWidget() {
             )}
 
             {percent >= 100 && (
-                <div className="mt-2 text-center text-xs font-bold text-green-600 bg-green-50 rounded py-1">
+                <div className="mt-2 text-center text-xs font-bold text-success bg-success/10 rounded py-1">
                     {sidebarT('goalReached')}
                 </div>
             )}

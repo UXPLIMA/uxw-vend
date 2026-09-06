@@ -77,9 +77,9 @@ export default function HelpCategoryPage({ params }: PageProps) {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
+                    <Link href="/" className="hover:text-primary">{commonT("home")}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/help" className="hover:text-blue-600">{t("title")}</Link>
+                    <Link href="/help" className="hover:text-primary">{t("title")}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{category?.name || ""}</span>
                 </div>
@@ -92,7 +92,7 @@ export default function HelpCategoryPage({ params }: PageProps) {
                     <div className="bg-card rounded-xl p-8 text-center">
                         <h1 className="text-xl font-bold text-foreground mb-2">{t("categoryNotFound")}</h1>
                         <p className="text-muted-foreground mb-4">{t("categoryNotFoundBody")}</p>
-                        <Link href="/help" className="text-blue-600 hover:underline">
+                        <Link href="/help" className="text-primary hover:underline">
                             {t("backToHelp")}
                         </Link>
                     </div>
@@ -116,7 +116,7 @@ export default function HelpCategoryPage({ params }: PageProps) {
                                         className="block p-4 hover:bg-muted transition-colors"
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="text-blue-600 hover:underline font-medium">
+                                            <span className="text-primary hover:underline font-medium">
                                                 {article.title}
                                             </span>
                                             <span className="text-xs text-muted-foreground">{t("views", { count: article.views })}</span>

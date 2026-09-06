@@ -48,7 +48,7 @@ export default function TrophiesTab() {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-amber-500" />
+                    <Award className="w-5 h-5 text-warning" />
                     {t("title")}
                     <span className="text-sm font-normal text-muted-foreground ml-2">
                         {t("earnedCount", { earned: earned.length, total })}

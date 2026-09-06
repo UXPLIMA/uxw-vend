@@ -71,7 +71,7 @@ export default function PublicTrophiesPage() {
             <main className="container mx-auto px-4 py-6 flex-1 max-w-5xl">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <Award className="w-7 h-7 text-amber-500" />
+                        <Award className="w-7 h-7 text-warning" />
                         {t("pageTitle")}
                     </h1>
                     <p className="text-muted-foreground">{t("pageDesc")}</p>
@@ -94,12 +94,12 @@ export default function PublicTrophiesPage() {
                             return (
                                 <div
                                     key={tr.id}
-                                    className={`relative rounded-lg border p-4 transition-colors ${earned ? "border-amber-500/40 bg-amber-500/5" : "border-border bg-card"
+                                    className={`relative rounded-lg border p-4 transition-colors ${earned ? "border-warning/40 bg-warning/5" : "border-border bg-card"
                                         }`}
                                 >
                                     {earned && (
                                         <span
-                                            className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-green-500/15 text-green-600 text-xs px-2 py-0.5"
+                                            className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-success/15 text-success text-xs px-2 py-0.5"
                                             title={t("earnedTitle")}
                                         >
                                             <Check className="w-3 h-3" /> {t("earned")}
@@ -120,7 +120,7 @@ export default function PublicTrophiesPage() {
                                                 </p>
                                             )}
                                             <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                                                <span className="inline-flex items-center gap-1 font-medium text-amber-600">
+                                                <span className="inline-flex items-center gap-1 font-medium text-warning">
                                                     {t("pointsShort", { points: tr.points })}
                                                 </span>
                                                 <span className="inline-flex items-center gap-1">

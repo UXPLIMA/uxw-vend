@@ -75,7 +75,7 @@ export default function NewTopicPage() {
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-600 mb-4">
+                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4">
                     <ArrowLeft className="w-4 h-4" /> {t('backToForum')}
                 </Link>
 
@@ -95,7 +95,7 @@ export default function NewTopicPage() {
                         ) : (
                             <>
                                 {error && (
-                                    <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+                                    <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
                                         {error}
                                     </div>
                                 )}

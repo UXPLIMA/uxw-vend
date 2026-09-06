@@ -87,7 +87,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                                     );
                                 }
                                 return (
-                                    <div className="w-20 h-20 rounded-xl shadow-sm bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                                    <div className="w-20 h-20 rounded-xl shadow-sm bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold">
                                         {player.username.charAt(0).toUpperCase()}
                                     </div>
                                 );

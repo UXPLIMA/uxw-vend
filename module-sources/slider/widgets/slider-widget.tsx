@@ -48,7 +48,7 @@ export function SliderWidget() {
 
     return (
         <div className="relative rounded-xl overflow-hidden mb-6">
-            <Wrapper {...wrapperProps} className="block relative aspect-[21/9] bg-gray-200">
+            <Wrapper {...wrapperProps} className="block relative aspect-[21/9] bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={slide.image} alt={slide.title || ""} className="w-full h-full object-cover" />
                 {(slide.title || slide.subtitle) && (

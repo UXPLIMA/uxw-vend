@@ -153,7 +153,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                                                 href={`/blog/${article.number}/${article.slug}`}
                                                 className="block group"
                                             >
-                                                <h3 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
+                                                <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
                                                     {article.title}
                                                 </h3>
                                                 <p className="text-xs text-muted-foreground mt-1">
@@ -169,11 +169,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                             <div className="lg:col-span-3">
                                 {/* Breadcrumb */}
                                 <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-blue-600">{commonT('home')}</Link>
+                                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
                                     <span className="mx-2">/</span>
                                     {activeName ? (
                                         <>
-                                            <Link href="/blog" className="hover:text-blue-600">{t('title')}</Link>
+                                            <Link href="/blog" className="hover:text-primary">{t('title')}</Link>
                                             <span className="mx-2">/</span>
                                             <span className="text-foreground">{activeName}</span>
                                         </>

@@ -33,10 +33,10 @@ interface Ticket {
 }
 
 const statusColors: Record<string, string> = {
-    OPEN: "bg-blue-100 text-blue-700",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-700",
-    WAITING_REPLY: "bg-purple-100 text-purple-700",
-    RESOLVED: "bg-green-100 text-green-700",
+    OPEN: "bg-primary/10 text-primary",
+    IN_PROGRESS: "bg-warning/10 text-warning",
+    WAITING_REPLY: "bg-accent/10 text-accent",
+    RESOLVED: "bg-success/10 text-success",
     CLOSED: "bg-muted text-muted-foreground",
 };
 
@@ -133,9 +133,9 @@ export default function TicketDetailPage({ params }: PageProps) {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-blue-600">{t("home")}</Link>
+                    <Link href="/" className="hover:text-primary">{t("home")}</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/support" className="hover:text-blue-600">{t("support")}</Link>
+                    <Link href="/support" className="hover:text-primary">{t("support")}</Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{t("ticket")}</span>
                 </div>
@@ -146,7 +146,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                     </div>
                 ) : error ? (
                     <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-red-500 mb-4">{error}</p>
+                        <p className="text-destructive mb-4">{error}</p>
                         <Link href="/support">
                             <Button variant="outline">{t("backToSupport")}</Button>
                         </Link>
@@ -203,7 +203,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                             <div
                                                 key={message.id}
                                                 className={`bg-card rounded-xl border p-4 ${message.isStaffReply
-                                                    ? "border-blue-200 bg-blue-50/50"
+                                                    ? "border-primary/20 bg-primary/50"
                                                     : "border-border"
                                                     }`}
                                             >
@@ -220,7 +220,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium text-foreground">{message.user.username}</span>
                                                             {message.isStaffReply && (
-                                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">{t("staff")}</span>
+                                                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded font-medium">{t("staff")}</span>
                                                             )}
                                                         </div>
                                                         <span className="text-xs text-muted-foreground">{relativeTime(message.createdAt)}</span>

@@ -41,7 +41,7 @@ export function CartIcon() {
         >
             <ShoppingCart className="w-4 h-4" />
             {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-white text-[10px] rounded-full flex items-center justify-center font-bold">
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-bold">
                     {count > 9 ? "9+" : count}
                 </span>
             )}

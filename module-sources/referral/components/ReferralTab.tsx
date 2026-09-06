@@ -95,21 +95,21 @@ export function ReferralTab() {
             <div className="grid grid-cols-3 gap-3">
                 <Card>
                     <CardContent className="p-3 text-center">
-                        <Users className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                        <Users className="w-5 h-5 text-primary mx-auto mb-1" />
                         <p className="text-lg font-bold">{data.stats.totalReferrals}</p>
                         <p className="text-xs text-muted-foreground">{t("referralCount")}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-3 text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                        <Check className="w-5 h-5 text-success mx-auto mb-1" />
                         <p className="text-lg font-bold">{data.stats.completedReferrals}</p>
                         <p className="text-xs text-muted-foreground">{t("completedReferrals")}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-3 text-center">
-                        <Coins className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                        <Coins className="w-5 h-5 text-success mx-auto mb-1" />
                         <p className="text-lg font-bold">{(Number(data.stats.creditsEarned) || 0).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">{t("creditsEarned")}</p>
                     </CardContent>
@@ -134,9 +134,9 @@ export function ReferralTab() {
                                     </div>
                                     <div className="text-right">
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                            ref.status === "rewarded" ? "bg-green-100 text-green-700" :
-                                            ref.status === "completed" ? "bg-blue-100 text-blue-700" :
-                                            "bg-yellow-100 text-yellow-700"
+                                            ref.status === "rewarded" ? "bg-success/10 text-success" :
+                                            ref.status === "completed" ? "bg-primary/10 text-primary" :
+                                            "bg-warning/10 text-warning"
                                         }`}>
                                             {t.has(ref.status) ? t(ref.status) : ref.status}
                                         </span>

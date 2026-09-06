@@ -159,7 +159,7 @@ export default function TopicDetailPage() {
             <Navbar />
 
             <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
-                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-600 mb-4">
+                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4">
                     <ArrowLeft className="w-4 h-4" /> {t('backToForum')}
                 </Link>
 
@@ -171,7 +171,7 @@ export default function TopicDetailPage() {
                     <Card>
                         <CardContent className="py-12 text-center space-y-3">
                             <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
-                            <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">{t('signIn')}</Link>
+                            <Link href="/auth/login" className="text-primary hover:underline text-sm">{t('signIn')}</Link>
                         </CardContent>
                     </Card>
                 ) : !topic ? (
@@ -185,7 +185,7 @@ export default function TopicDetailPage() {
                         {/* Topic Header */}
                         <div className="mb-6">
                             <div className="flex items-center gap-2 mb-2">
-                                {topic.isPinned && <Pin className="w-4 h-4 text-blue-500" />}
+                                {topic.isPinned && <Pin className="w-4 h-4 text-primary" />}
                                 {topic.isLocked && <Lock className="w-4 h-4 text-muted-foreground" />}
                                 <h1 className="text-2xl font-bold text-foreground">{topic.title}</h1>
                             </div>
@@ -202,9 +202,9 @@ export default function TopicDetailPage() {
                                 <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t('viewsCount', { count: topic.views })}</span>
                                 <button
                                     onClick={toggleLike}
-                                    className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${liked ? "bg-blue-100 text-blue-600" : "hover:bg-muted"}`}
+                                    className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${liked ? "bg-primary/10 text-primary" : "hover:bg-muted"}`}
                                 >
-                                    <ThumbsUp className={`w-3 h-3 ${liked ? "fill-blue-600" : ""}`} />
+                                    <ThumbsUp className={`w-3 h-3 ${liked ? "fill-primary" : ""}`} />
                                     {t('likesCount', { count: likeCount })}
                                 </button>
                             </div>
@@ -330,9 +330,9 @@ function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { u
                 />
                 <button
                     onClick={togglePostLike}
-                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${postLiked ? "bg-blue-100 text-blue-600" : "text-muted-foreground hover:bg-muted hover:text-muted-foreground"}`}
+                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${postLiked ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-muted-foreground"}`}
                 >
-                    <ThumbsUp className={`w-3 h-3 ${postLiked ? "fill-blue-600" : ""}`} />
+                    <ThumbsUp className={`w-3 h-3 ${postLiked ? "fill-primary" : ""}`} />
                     {postLikeCount}
                 </button>
             </CardContent>

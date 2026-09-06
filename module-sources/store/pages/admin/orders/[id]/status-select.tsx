@@ -11,7 +11,7 @@ const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
 
 /**
  * A tint per status, expressed as an alpha over the theme's own colour rather
- * than a light-mode swatch. `bg-yellow-50` is a near-white that a dark panel
+ * than a light-mode swatch. `bg-warning/10` is a near-white that a dark panel
  * turns into a glowing rectangle; a tint of the theme's own warning colour
  * reads correctly on both, and follows a theme that recolours the panel.
  */

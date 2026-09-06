@@ -92,7 +92,7 @@ export default function VipTablePage() {
                     <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : products.length === 0 ? (
                     <div className="text-center py-12 bg-card rounded-xl border border-border">
-                        <Crown className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <Crown className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                         <p className="text-muted-foreground">{t("vip_empty")}</p>
                     </div>
                 ) : allFeatures.length > 0 ? (
@@ -109,14 +109,14 @@ export default function VipTablePage() {
                                                     <>{/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover" /></>
                                                 ) : (
-                                                    <Crown className="w-8 h-8 text-yellow-500" />
+                                                    <Crown className="w-8 h-8 text-warning" />
                                                 )}
                                                 <span className="font-bold text-foreground">{product.name}</span>
                                                 <div>
                                                     {product.comparePrice && (
                                                         <span className="text-xs text-muted-foreground line-through mr-1">{formatPrice(product.comparePrice)}</span>
                                                     )}
-                                                    <span className="text-blue-600 font-bold">{formatPrice(product.price)}</span>
+                                                    <span className="text-primary font-bold">{formatPrice(product.price)}</span>
                                                 </div>
                                             </div>
                                         </th>
@@ -130,9 +130,9 @@ export default function VipTablePage() {
                                         {productFeatures.map(({ product, features }) => (
                                             <td key={product.id} className="text-center py-3 px-4">
                                                 {features.includes(feature) ? (
-                                                    <Check className="w-5 h-5 text-green-500 mx-auto" />
+                                                    <Check className="w-5 h-5 text-success mx-auto" />
                                                 ) : (
-                                                    <X className="w-5 h-5 text-gray-300 mx-auto" />
+                                                    <X className="w-5 h-5 text-muted-foreground mx-auto" />
                                                 )}
                                             </td>
                                         ))}
@@ -145,7 +145,7 @@ export default function VipTablePage() {
                                     {productFeatures.map(({ product }) => (
                                         <td key={product.id} className="text-center py-4 px-4">
                                             <Link href={`/store/product/${product.number}/${product.slug}`}>
-                                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                                                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                                                     {t("vip_buy")}
                                                 </Button>
                                             </Link>
@@ -161,10 +161,10 @@ export default function VipTablePage() {
                         {products.map((product, i) => (
                             <div
                                 key={product.id}
-                                className={`bg-card rounded-xl border p-6 text-center relative ${i === Math.floor(products.length / 2) ? "ring-2 ring-blue-500 scale-105" : ""}`}
+                                className={`bg-card rounded-xl border p-6 text-center relative ${i === Math.floor(products.length / 2) ? "ring-2 ring-primary scale-105" : ""}`}
                             >
                                 {i === Math.floor(products.length / 2) && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-bold">
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full font-bold">
                                         {t("vip_popular")}
                                     </div>
                                 )}
@@ -172,20 +172,20 @@ export default function VipTablePage() {
                                     <>{/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={product.image} alt="" className="w-16 h-16 rounded-lg object-cover mx-auto mb-3" /></>
                                 ) : (
-                                    <Crown className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+                                    <Crown className="w-12 h-12 text-warning mx-auto mb-3" />
                                 )}
                                 <h2 className="text-xl font-bold text-foreground mb-1">{product.name}</h2>
                                 <div className="mb-4">
                                     {product.comparePrice && (
                                         <span className="text-muted-foreground line-through text-sm mr-2">{formatPrice(product.comparePrice)}</span>
                                     )}
-                                    <span className="text-2xl font-bold text-blue-600">{formatPrice(product.price)}</span>
+                                    <span className="text-2xl font-bold text-primary">{formatPrice(product.price)}</span>
                                 </div>
                                 {product.description && (
                                     <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
                                 )}
                                 <Link href={`/store/product/${product.number}/${product.slug}`}>
-                                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                                         {t("vip_buy")}
                                     </Button>
                                 </Link>

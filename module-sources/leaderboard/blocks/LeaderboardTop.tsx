@@ -25,7 +25,7 @@ interface LeaderEntry {
     count?: number;
 }
 
-const rankColors = ["text-yellow-500", "text-muted-foreground", "text-amber-600"];
+const rankColors = ["text-warning", "text-muted-foreground", "text-warning"];
 
 function iconFor(type: LeaderboardTopProps["type"]) {
     if (type === "buyers") return Crown;

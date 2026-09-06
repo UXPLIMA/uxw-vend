@@ -100,9 +100,9 @@ export default function ReferralPage() {
 
     const statusBadge = (status: string) => {
         switch (status) {
-            case "rewarded": return "bg-green-100 text-green-700";
-            case "completed": return "bg-blue-100 text-blue-700";
-            default: return "bg-yellow-100 text-yellow-700";
+            case "rewarded": return "bg-success/10 text-success";
+            case "completed": return "bg-primary/10 text-primary";
+            default: return "bg-warning/10 text-warning";
         }
     };
 
@@ -199,28 +199,28 @@ export default function ReferralPage() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <Card>
                                 <CardContent className="p-4 text-center">
-                                    <Users className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                                    <Users className="w-6 h-6 text-primary mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.totalReferrals ?? 0}</p>
                                     <p className="text-xs text-muted-foreground">{t("totalReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
-                                    <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
+                                    <Check className="w-6 h-6 text-success mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.completedReferrals ?? 0}</p>
                                     <p className="text-xs text-muted-foreground">{t("completedReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
-                                    <Clock className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+                                    <Clock className="w-6 h-6 text-warning mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{data?.stats?.pendingReferrals ?? 0}</p>
                                     <p className="text-xs text-muted-foreground">{t("pendingReferrals")}</p>
                                 </CardContent>
                             </Card>
                             <Card>
                                 <CardContent className="p-4 text-center">
-                                    <Coins className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
+                                    <Coins className="w-6 h-6 text-success mx-auto mb-2" />
                                     <p className="text-2xl font-bold">{(data?.stats?.creditsEarned ?? 0).toFixed(2)}</p>
                                     <p className="text-xs text-muted-foreground">{t("creditsEarned")}</p>
                                 </CardContent>

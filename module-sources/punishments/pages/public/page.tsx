@@ -22,10 +22,10 @@ interface PunishmentItem {
 
 const typeIcons: Record<string, typeof Ban> = { ban: Ban, mute: VolumeX, kick: LogOut, warn: AlertTriangle };
 const typeColors: Record<string, string> = {
-    ban: "bg-red-100 text-red-700",
-    mute: "bg-orange-100 text-orange-700",
-    kick: "bg-yellow-100 text-yellow-700",
-    warn: "bg-blue-100 text-blue-700",
+    ban: "bg-destructive/10 text-destructive",
+    mute: "bg-warning/10 text-warning",
+    kick: "bg-warning/10 text-warning",
+    warn: "bg-primary/10 text-primary",
 };
 
 /**

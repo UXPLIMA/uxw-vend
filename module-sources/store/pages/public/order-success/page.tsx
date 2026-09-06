@@ -17,8 +17,8 @@ export default function OrderSuccessPage() {
             <main className="container mx-auto px-4 py-12 flex-1 flex items-center justify-center">
                 <Card className="max-w-md w-full">
                     <CardContent className="p-8 text-center">
-                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle className="w-8 h-8 text-green-600" />
+                        <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle className="w-8 h-8 text-success" />
                         </div>
 
                         <h1 className="text-2xl font-bold text-foreground mb-2">{t("orderSuccess_title")}</h1>

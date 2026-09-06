@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T00:02:20Z",
+  "updatedAt": "2026-09-06T00:13:47Z",
   "modules": [
     {
       "id": "announcements",
@@ -122,13 +122,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.1.22",
+      "version": "1.1.23",
       "coreVersion": "^1.21.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T00:02:20Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -363,13 +363,13 @@
           "description": "KVKK ve GDPR uyumlu çerez onay bandı"
         }
       },
-      "version": "1.0.3",
+      "version": "1.0.4",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -398,13 +398,13 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.0.9",
+      "version": "1.0.10",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -505,13 +505,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.30",
+      "version": "1.0.31",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -694,13 +694,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.0.13",
+      "version": "1.0.14",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -871,13 +871,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.1.20",
+      "version": "1.1.21",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T00:02:20Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1018,13 +1018,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.1.16",
+      "version": "1.1.17",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T00:02:20Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1055,13 +1055,13 @@
           "description": "Zil simgeli uygulama içi bildirim sistemi"
         }
       },
-      "version": "1.0.14",
+      "version": "1.0.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1237,13 +1237,13 @@
           "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
         }
       },
-      "version": "1.1.10",
+      "version": "1.1.11",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1919,13 +1919,13 @@
           "description": "Herkese açık oyuncu profil sayfaları"
         }
       },
-      "version": "1.1.15",
+      "version": "1.1.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1989,13 +1989,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.0.18",
+      "version": "1.0.19",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2106,13 +2106,13 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.0.21",
+      "version": "1.0.22",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2289,13 +2289,13 @@
           "description": "Ana sayfa görsel galerisi ve bantları"
         }
       },
-      "version": "1.0.13",
+      "version": "1.0.14",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2359,13 +2359,13 @@
           "description": "Ekip üyesi listesi ve başvurular"
         }
       },
-      "version": "1.0.17",
+      "version": "1.0.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2429,13 +2429,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.28",
+      "version": "2.2.29",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T00:02:20Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2525,13 +2525,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.0.19",
+      "version": "1.0.20",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2567,13 +2567,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.0.35",
+      "version": "1.0.36",
       "coreVersion": "^1.0.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2642,13 +2642,13 @@
           "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
         }
       },
-      "version": "1.0.20",
+      "version": "1.0.21",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-05T20:50:26Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2714,13 +2714,13 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.0.14",
+      "version": "1.0.15",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2861,13 +2861,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.0.15",
+      "version": "1.0.16",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T00:13:47Z",
       "screenshots": [],
       "tags": [
         "commerce"

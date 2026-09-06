@@ -88,7 +88,7 @@ export default function StaffPage() {
                             return (
                                 <Card key={member.id} className="text-center hover:shadow-md transition-shadow">
                                     <CardContent className="p-6">
-                                        <div className="w-20 h-20 rounded-full mx-auto mb-3 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                                        <div className="w-20 h-20 rounded-full mx-auto mb-3 bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
                                             {avatarUrl ? (
                                                 <Image src={avatarUrl} alt={member.name} width={80} height={80} className="w-full h-full object-cover" />
                                             ) : (
@@ -96,7 +96,7 @@ export default function StaffPage() {
                                             )}
                                         </div>
                                         <h2 className="font-bold text-foreground">{member.name}</h2>
-                                        <p className="text-sm text-blue-600 font-medium">{member.role}</p>
+                                        <p className="text-sm text-primary font-medium">{member.role}</p>
                                     </CardContent>
                                 </Card>
                             );

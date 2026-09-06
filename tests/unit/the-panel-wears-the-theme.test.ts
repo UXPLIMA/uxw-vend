@@ -19,10 +19,20 @@
  * error box, a sign-out in `text-red-600 hover:bg-red-50`, a breadcrumb
  * hovering blue on a site with no blue in it.
  *
- * A theme under src/themes IS a design and names whatever colours it likes,
- * and so does a module's own public page. Brand marks are the one exception
- * inside core: a Facebook button hovering Facebook blue is not drift, it is
- * the mark, so the footer's social links name their own colours below.
+ * A module is in scope too, on both of its surfaces. Its admin screens were
+ * always here; its public ones were left out on the reasoning that a module's
+ * own page is its own design. That was wrong, and the store showed why: the
+ * VIP page painted its buy buttons `bg-blue-600 hover:bg-blue-700 text-white`
+ * over the themed Button underneath, the support list gave every ticket
+ * status a `bg-blue-100 text-blue-700` chip that stayed light on a dark site,
+ * and prices and links were blue on a site with no blue in it. A site owner
+ * installs a theme to recolour the site, and the store is the page most of
+ * their visitors see.
+ *
+ * A theme under src/themes IS a design and names whatever colours it likes.
+ * Brand marks are the one exception inside core: a Facebook button hovering
+ * Facebook blue is not drift, it is the mark, so the footer's social links
+ * name their own colours below.
  */
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, existsSync, statSync } from "fs";
@@ -55,8 +65,12 @@ function coreRoots(): string[] {
     const sources = join(ROOT, "module-sources");
     if (existsSync(sources)) {
         for (const entry of readdirSync(sources)) {
-            const pages = join(sources, entry, "pages/admin");
-            if (existsSync(pages)) roots.push(pages);
+            // Everything a module draws: its admin screens, its public pages,
+            // and the components, slots and widgets it hangs in core's chrome.
+            for (const surface of ["pages", "components", "slots", "widgets"]) {
+                const dir = join(sources, entry, surface);
+                if (existsSync(dir)) roots.push(dir);
+            }
         }
     }
     return roots.filter((r) => existsSync(r));
@@ -89,7 +103,7 @@ describe("core's own screens", () => {
     const files = coreRoots().flatMap((r) => tsxFiles(r));
 
     it("has screens to check", () => {
-        expect(files.length).toBeGreaterThan(80);
+        expect(files.length).toBeGreaterThan(250);
     });
 
     it("names no fixed colour from Tailwind's palette", () => {

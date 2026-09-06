@@ -196,7 +196,7 @@ export default function ProductDetailPage() {
                     <div className="text-center">
                         <h1 className="text-2xl font-bold text-foreground mb-4">{t('productNotFound')}</h1>
                         <Link href="/store">
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
                                 {t('backToStore')}
                             </Button>
                         </Link>
@@ -219,7 +219,7 @@ export default function ProductDetailPage() {
             <main className="container mx-auto px-4 py-6 flex-1">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-                    <Link href="/store" className="hover:text-blue-600 flex items-center gap-1">
+                    <Link href="/store" className="hover:text-primary flex items-center gap-1">
                         <ArrowLeft className="w-4 h-4" />
                         {t('backToStore')}
                     </Link>
@@ -288,7 +288,7 @@ export default function ProductDetailPage() {
                                         key={index}
                                         onClick={() => setCurrentImageIndex(index)}
                                         aria-label={t("product_thumbnail", { n: index + 1 })}
-                                        className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${index === currentImageIndex ? 'border-blue-600' : 'border-border hover:border-border'}`}
+                                        className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors ${index === currentImageIndex ? 'border-primary/30' : 'border-border hover:border-border'}`}
                                     >
                                         <Image
                                             src={img}
@@ -325,7 +325,7 @@ export default function ProductDetailPage() {
                                     <span className="text-3xl font-bold text-foreground">{formatPrice(product.price)}</span>
                                 </div>
                                 {product.comparePrice && (
-                                    <div className="inline-block bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded mt-2">
+                                    <div className="inline-block bg-success/10 text-success text-xs font-medium px-2 py-1 rounded mt-2">
                                         {t('save', { amount: formatPrice(product.comparePrice - product.price) })}
                                     </div>
                                 )}
@@ -333,7 +333,7 @@ export default function ProductDetailPage() {
 
                             {/* Stock */}
                             <div className="flex items-center gap-2 text-sm mb-4">
-                                <div className={`w-2 h-2 rounded-full ${inStock ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                <div className={`w-2 h-2 rounded-full ${inStock ? 'bg-success' : 'bg-destructive'}`}></div>
                                 <span className="text-muted-foreground">{inStock ? t('inStock') : t('outOfStock')}</span>
                                 {product.stock !== null && inStock && (
                                     <span className="text-muted-foreground">({t('available', { count: product.stock })})</span>
@@ -370,7 +370,7 @@ export default function ProductDetailPage() {
                                     {variables.map((v) => (
                                         <div key={v.name}>
                                             <label className="text-sm font-medium text-foreground mb-1 block">
-                                                {v.label} {v.required && <span className="text-red-500">*</span>}
+                                                {v.label} {v.required && <span className="text-destructive">*</span>}
                                             </label>
                                             {v.type === "select" && v.options ? (
                                                 <NativeSelect
@@ -411,7 +411,7 @@ export default function ProductDetailPage() {
                             {/* Buttons */}
                             <div className="flex gap-3">
                                 <Button
-                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-sm"
+                                    className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm"
                                     onClick={buyNow}
                                     disabled={!inStock || addingToCart}
                                 >

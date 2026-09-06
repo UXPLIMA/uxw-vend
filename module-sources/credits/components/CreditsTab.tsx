@@ -16,11 +16,11 @@ interface Transaction {
 
 const typeIcon = (type: string) => {
     switch (type) {
-        case "purchase": return <ShoppingBag className="w-4 h-4 text-blue-500" />;
-        case "transfer": return <Send className="w-4 h-4 text-purple-500" />;
+        case "purchase": return <ShoppingBag className="w-4 h-4 text-primary" />;
+        case "transfer": return <Send className="w-4 h-4 text-accent" />;
         case "debit":
-        case "spend": return <ArrowUpRight className="w-4 h-4 text-red-500" />;
-        default: return <ArrowDownLeft className="w-4 h-4 text-emerald-500" />;
+        case "spend": return <ArrowUpRight className="w-4 h-4 text-destructive" />;
+        default: return <ArrowDownLeft className="w-4 h-4 text-success" />;
     }
 };
 
@@ -98,7 +98,7 @@ export default function CreditsTab() {
                                             )}
                                         </div>
                                         <div className="text-right">
-                                            <p className={`text-sm font-semibold ${isNegative ? "text-red-500" : "text-emerald-500"}`}>
+                                            <p className={`text-sm font-semibold ${isNegative ? "text-destructive" : "text-success"}`}>
                                                 {isNegative ? "" : "+"}{amount.toFixed(2)}
                                             </p>
                                             <p className="text-xs text-muted-foreground">

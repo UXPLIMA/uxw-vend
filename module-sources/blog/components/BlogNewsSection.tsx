@@ -67,7 +67,7 @@ export function BlogNewsSection() {
               {post.coverImage ? (
                 <Image src={post.coverImage} alt={post.title} width={0} height={0} sizes="100vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
               ) : (
-                <div className="text-gray-300 text-sm">{t('noImage')}</div>
+                <div className="text-muted-foreground text-sm">{t('noImage')}</div>
               )}
             </div>
             <div className="p-4">

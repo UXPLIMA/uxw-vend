@@ -188,15 +188,15 @@ export default function WheelPage() {
 
                         {/* Result */}
                         {result && (
-                            <Card className={`w-full max-w-sm ${result.type === "error" ? "border-red-200" : "border-green-200"}`}>
+                            <Card className={`w-full max-w-sm ${result.type === "error" ? "border-destructive/20" : "border-success/20"}`}>
                                 <CardContent className="p-6 text-center">
                                     {result.type === "error" ? (
-                                        <p className="text-red-600">{result.name}</p>
+                                        <p className="text-destructive">{result.name}</p>
                                     ) : result.type === "nothing" ? (
                                         <p className="text-muted-foreground">{t('betterLuckNextTime', { prize: result.name })}</p>
                                     ) : (
                                         <div>
-                                            <PartyPopper className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                                            <PartyPopper className="w-8 h-8 text-warning mx-auto mb-2" />
                                             <p className="font-bold text-foreground text-lg">{t('youWon', { prize: result.name })}</p>
                                             {result.value > 0 && (
                                                 <p className="text-sm text-muted-foreground mt-1">

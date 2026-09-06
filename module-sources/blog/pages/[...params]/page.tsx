@@ -136,7 +136,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                                             />
                                                         </div>
                                                     )}
-                                                    <h3 className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors line-clamp-2">
+                                                    <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
                                                         {related.title}
                                                     </h3>
                                                     <p className="text-xs text-muted-foreground mt-1">
@@ -156,7 +156,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             href={shareTwitter}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex-1 py-2 px-4 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors text-center"
+                                            className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
                                         >
                                             Twitter
                                         </a>
@@ -164,7 +164,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             href={shareFacebook}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex-1 py-2 px-4 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 transition-colors text-center"
+                                            className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
                                         >
                                             Facebook
                                         </a>
@@ -176,13 +176,13 @@ export default async function BlogArticlePage({ params }: PageProps) {
                             <div className="lg:col-span-3">
                                 {/* Breadcrumb */}
                                 <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-blue-600">{commonT("home")}</Link>
+                                    <Link href="/" className="hover:text-primary">{commonT("home")}</Link>
                                     <span className="mx-2">/</span>
-                                    <Link href="/blog" className="hover:text-blue-600">{t("breadcrumb")}</Link>
+                                    <Link href="/blog" className="hover:text-primary">{t("breadcrumb")}</Link>
                                     {article.category && (
                                         <>
                                             <span className="mx-2">/</span>
-                                            <Link href={`/blog?category=${encodeURIComponent(article.category.slug)}`} className="hover:text-blue-600">
+                                            <Link href={`/blog?category=${encodeURIComponent(article.category.slug)}`} className="hover:text-primary">
                                                 {article.category.name}
                                             </Link>
                                         </>
@@ -211,7 +211,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                             {article.category && (
                                                 <Link
                                                     href={`/blog?category=${encodeURIComponent(article.category.slug)}`}
-                                                    className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium hover:bg-blue-200 transition-colors"
+                                                    className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/10 transition-colors"
                                                 >
                                                     {article.category.name}
                                                 </Link>
