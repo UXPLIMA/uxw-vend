@@ -427,31 +427,28 @@ export async function rateLimitForRole(
 }
 
 /**
- * Boolean-returning rate limiter that probes Redis readiness per call so
- * long-running processes recover from transient Redis outages without a
- * restart. Use this when only the allow/deny bit matters.
+ * Boolean-returning rate limiter, for the callers that only need the
+ * allow/deny bit. Every rate-limited route on the site goes through here.
+ *
+ * It used to PING Redis before every hit and pick a backend from the answer,
+ * on the reasoning that a long-running process should recover from a
+ * transient outage without a restart. It does recover - but not because of
+ * the ping. `RedisBackend.hit` fetches the client and catches its own errors
+ * on every call, falling through to the memory backend and logging why, which
+ * is exactly what the probe was arranging by hand. `rateLimit` has always
+ * relied on that and behaves identically.
+ *
+ * What the probe did add was a second round trip to Redis on the busiest path
+ * in the application: a cart update, a forum like, an activity feed poll all
+ * paid a PING before their INCR. This is one round trip now, and one code
+ * path shared with the other two entry points instead of a second one free to
+ * drift from them.
  */
 export async function rateLimitForRoleAsync(
     identifier: string,
     baseConfig: RateLimitConfig,
     role?: string | null
 ): Promise<boolean> {
-    const multiplier = await resolveRoleMultiplier(role);
-    const effective = applyMultiplier(baseConfig, multiplier);
-    if (effective === null) return true;
-
-    // Probe Redis readiness per call when configured; without REDIS_URL we
-    // route through getActiveBackend so the production misconfig guard fires
-    // instead of silently using memory.
-    const backend: RateLimitBackend = isRedisConfigured()
-        ? ((await isRedisReady()) ? RedisBackend : MemoryBackend)
-        : getActiveBackend();
-
-    try {
-        const result = await backend.hit(identifier, effective);
-        return result.success;
-    } catch {
-        const result = await MemoryBackend.hit(identifier, effective);
-        return result.success;
-    }
+    const result = await rateLimitForRole(identifier, baseConfig, role);
+    return result.success;
 }
