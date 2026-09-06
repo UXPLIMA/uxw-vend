@@ -1,5 +1,5 @@
 import { redirect } from "@/core/lib/i18n/navigation";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { getLocale, getTranslations } from "next-intl/server";
 import {
@@ -48,7 +48,7 @@ const KPI_WIDGETS: [string, () => React.ReactNode][] = [
 ];
 
 export default async function AdminDashboard() {
-    const session = await auth();
+    const session = await getSession();
     const locale = await getLocale();
     if (!session?.user) redirect({ href: "/auth/login", locale });
     if (!(await isAdmin(session.user.id))) redirect({ href: "/", locale });

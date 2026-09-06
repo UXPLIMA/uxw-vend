@@ -1,7 +1,7 @@
 import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
 import { redirect } from "@/core/lib/i18n/navigation";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -43,7 +43,7 @@ interface PageProps {
 }
 
 export default async function AdminUsersPage({ searchParams }: PageProps) {
-    const session = await auth();
+    const session = await getSession();
     const locale = await getLocale();
     if (!session?.user) redirect({ href: "/auth/login", locale });
 

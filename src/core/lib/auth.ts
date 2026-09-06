@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { cache } from "react";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { identifierLookup } from "./login-identifier";
@@ -472,6 +473,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
     },
 });
+
+/**
+ * The session, fetched once per request however many components ask.
+ *
+ * `auth()` goes to the database every time it is called: the session row, the
+ * user's ban and role, and the role itself. A server-rendered page asks more
+ * than once without meaning to, because the layout, the page and a component
+ * inside it each need to know who is signed in. Rendering `/tr/admin` made
+ * that round trip three times over, nine queries for one answer.
+ *
+ * React's `cache` deduplicates for the length of a single render, which is
+ * exactly the window where the answer cannot change. `auth()` itself is left
+ * alone: it is also the middleware and route-handler entry point, where there
+ * is no render to scope a cache to.
+ */
+export const getSession = cache(async () => auth());
+
 
 // Type extensions for NextAuth
 declare module "next-auth" {

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/core/lib/i18n/navigation";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import fs from "fs/promises";
@@ -83,7 +83,7 @@ async function countAvailableUpdates(): Promise<number> {
  */
 export async function UpdateNotificationBanner() {
     const t = await getTranslations("admin");
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id) return null;
     if (!(await isAdmin(session.user.id, session.user.role))) return null;
 

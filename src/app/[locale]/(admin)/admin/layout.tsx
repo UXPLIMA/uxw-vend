@@ -2,7 +2,7 @@
 import { redirect } from "@/core/lib/i18n/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { AdminSidebar } from "@/core/components/admin/AdminSidebar";
 import { AdminSearch } from "@/core/components/admin/AdminSearch";
@@ -15,7 +15,7 @@ import { prisma } from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-    const session = await auth();
+    const session = await getSession();
     const locale = await getLocale();
 
     if (!session?.user) {

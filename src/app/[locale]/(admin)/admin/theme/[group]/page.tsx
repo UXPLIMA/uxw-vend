@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { getActiveTheme } from "@/core/lib/theme-state";
 import { SchemaForm } from "@/core/components/admin/theme-settings/SchemaForm";
 
 export default async function ThemeSettingsPage({ params }: { params: Promise<{ group: string }> }) {
-    const session = await auth();
+    const session = await getSession();
     if (!session?.user?.id || !(await isAdmin(session.user.id))) notFound();
 
     const { group } = await params;

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { redirect } from "@/core/lib/i18n/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
-import { auth } from "@/core/lib/auth";
+import { getSession } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { getLocale } from "next-intl/server";
 
@@ -18,7 +18,7 @@ interface PageProps {
 }
 
 export default async function DynamicAdminModulePage(props: PageProps) {
-    const session = await auth();
+    const session = await getSession();
     const locale = await getLocale();
     if (!session?.user) {
         redirect({ href: "/auth/login", locale });

@@ -1,0 +1,73 @@
+/**
+ * A page that asks who is signed in, three times, for one answer.
+ *
+ * `auth()` is a database round trip: the session row, the user's ban and
+ * role, and the role itself. Nothing about a server render makes that
+ * obvious, so a layout, the page inside it and a component inside that each
+ * called it without knowing about the others. Rendering `/tr/admin` issued
+ * thirty-one queries, nine of them the same three repeated three times.
+ *
+ * `getSession` is `auth()` wrapped in React's `cache`, which deduplicates for
+ * the length of one render, which is exactly the window in which the answer
+ * cannot change. The same page issues twenty-three queries now.
+ *
+ * `auth()` itself is deliberately untouched: it is also the entry point for
+ * middleware and route handlers, where there is no render to scope a cache
+ * to. That is why this gate is scoped to the trees that render.
+ */
+import { describe, it, expect } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+
+const ROOT = path.join(__dirname, "../..");
+
+function filesUnder(dir: string, out: string[] = []): string[] {
+    if (!fs.existsSync(dir)) return out;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) filesUnder(full, out);
+        else if (/\.tsx$/.test(entry.name)) out.push(full);
+    }
+    return out;
+}
+
+const rel = (f: string) => path.relative(ROOT, f);
+const read = (f: string) => fs.readFileSync(f, "utf8");
+
+describe("the session helper", () => {
+    it("is the cached one, not a second copy of the raw call", () => {
+        const src = read(path.join(ROOT, "src/core/lib/auth.ts"));
+        expect(src).toMatch(/export const getSession = cache\(/);
+        expect(src, "cache must come from react, not from a hand-rolled map")
+            .toMatch(/import \{ cache \} from "react"/);
+    });
+});
+
+describe("a rendered page", () => {
+    /** Server components: the layouts, pages and components a render walks. */
+    const rendered = [
+        ...filesUnder(path.join(ROOT, "src/app")),
+        ...filesUnder(path.join(ROOT, "src/core/components")),
+    ].filter((f) => {
+        const src = read(f);
+        // Client components never call auth() at all, and route handlers are
+        // not .tsx, so what is left is the server render tree.
+        return !/^\s*["']use client["']/m.test(src);
+    });
+
+    it("finds the server-rendered files to check", () => {
+        expect(rendered.length).toBeGreaterThan(50);
+    });
+
+    it("asks through the cached helper, so one render is one round trip", () => {
+        const raw = rendered
+            .filter((f) => /await auth\(\)/.test(read(f)))
+            .map(rel);
+
+        expect(
+            raw,
+            `These render server-side and call auth() directly; use getSession() so a\n` +
+            `layout, its page and a component inside it share one lookup:\n${raw.join("\n")}`,
+        ).toEqual([]);
+    });
+});
