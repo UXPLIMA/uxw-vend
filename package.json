@@ -131,5 +131,19 @@
     "eslint-config-next": "^16.3.4",
     "jsdom": "^30.0.1",
     "vitest": "^4.1.2"
+  },
+  "allowScripts": {
+    "prisma@7.10.0": true,
+    "@prisma/engines@7.10.0": true,
+    "@swc/core@1.16.1": true,
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true,
+    "unrs-resolver@1.12.2": true,
+    "core-js-pure@3.50.0": true,
+    "tree-sitter@0.21.1": true,
+    "tree-sitter@0.22.4": true,
+    "tree-sitter-json@0.24.8": true,
+    "@tree-sitter-grammars/tree-sitter-yaml@0.7.1": true,
+    "@scarf/scarf": false
   }
 }
