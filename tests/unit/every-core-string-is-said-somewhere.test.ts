@@ -98,6 +98,10 @@ const CONSTRUCTED: { match: RegExp; built: string; resolves: (suffix: string) =>
     { match: /^alerting_(.+)Hint$/, built: "`alerting_${status}Hint`", resolves: (s) => BLOB.includes(s) },
     // The block merger, over the category a module's page block declares.
     { match: /^blocks_cat_(.+)$/, built: "`blocks_cat_${cat}`", resolves: (s) => BLOB.includes(s) },
+    // write-result's errorMessage, over the `code` an endpoint answers with:
+    // the key is the code, so the code appearing in a handler is the proof
+    // that something can ask for this string.
+    { match: /^err\.(.+)$/, built: "`err.${code}`", resolves: (s) => BLOB.includes(`"${s}"`) || BLOB.includes(`'${s}'`) },
 ];
 
 function catalogue(locale: string): [string, string][] {

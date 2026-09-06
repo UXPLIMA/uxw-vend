@@ -238,8 +238,15 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
     // the seeded admin. Block the handful of admin actions that would brick
     // the demo for everyone else - see isBlockedInDemo() for the full list.
     if (process.env.DEMO_MODE === '1' && isBlockedInDemo(request.method, pathname)) {
+        // The `code` matters as much as the sentence: without it every
+        // screen turned a deliberate demo refusal into its own generic "could
+        // not save", so a blocked action was indistinguishable from a broken
+        // one - which is exactly how it was read.
         return NextResponse.json(
-            { error: 'This action is disabled in the demo. Spin up your own instance to try it.' },
+            {
+                error: 'This action is disabled in the demo. Spin up your own instance to try it.',
+                code: 'demo_disabled',
+            },
             { status: 403 },
         );
     }
