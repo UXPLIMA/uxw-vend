@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "coreVersion": "^1.0.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -50,6 +50,17 @@
         "maxRequests": 30,
         "windowMs": 60000
       }
+    }
+  ],
+  "settings": [
+    {
+      "key": "spinCost",
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 100000,
+      "label": "Cost of an extra spin, in credits",
+      "description": "A visitor gets one free spin a day. Above zero, they may buy further spins at this price; at zero there are no paid spins and the wheel is once a day."
     }
   ],
   "dependencies": [

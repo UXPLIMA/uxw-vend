@@ -651,6 +651,13 @@ const moduleSetting = z
         /** Required for `number`: an admin form and a clamp both need bounds. */
         min: z.number().optional(),
         max: z.number().optional(),
+        /**
+         * How finely a `number` may be set. A number input's default step is
+         * 1, so a price of 0.013 a credit was a value the browser marked
+         * invalid and an admin could not enter - the setting existed and
+         * could not be used. Omit it for a whole-number setting.
+         */
+        step: z.number().positive().optional(),
         /** Required for `string`, for the same reason. */
         maxLength: z.number().int().min(1).max(10_000).optional(),
     })
@@ -667,8 +674,8 @@ const moduleSetting = z
             } else if (typeof setting.default === "number" && (setting.default < setting.min || setting.default > setting.max)) {
                 ctx.addIssue({ code: "custom", message: `setting "${setting.key}": default is outside min..max` });
             }
-        } else if (setting.min !== undefined || setting.max !== undefined) {
-            ctx.addIssue({ code: "custom", message: `setting "${setting.key}": min/max only apply to a number setting` });
+        } else if (setting.min !== undefined || setting.max !== undefined || setting.step !== undefined) {
+            ctx.addIssue({ code: "custom", message: `setting "${setting.key}": min/max/step only apply to a number setting` });
         }
         if (setting.type === "string") {
             if (setting.maxLength === undefined) {

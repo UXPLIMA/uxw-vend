@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { moduleSettings, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { randomInt } from "crypto";
 
@@ -17,9 +17,17 @@ export async function POST() {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    // Read spin cost setting
-    const costSetting = await prisma.setting.findUnique({ where: { key: "wheel_spin_cost" } });
-    const spinCost = costSetting ? parseInt(costSetting.value as string, 10) || 0 : 0;
+    // What an extra spin costs.
+    //
+    // This used to be read from a `wheel_spin_cost` row in the settings table
+    // that no screen wrote and no manifest declared a default for, so it was
+    // always absent, so the cost was always zero, so `paidSpin` was never
+    // true. The whole paid-spin half of this route - the balance check, the
+    // debit, the "not enough credits" answer, and the "spin again for N
+    // credits" button on the page - could not be reached by any operator. It
+    // is a module setting now, which is the thing core already renders a
+    // panel for.
+    const { spinCost } = await moduleSettings<{ spinCost: number }>("wheel");
 
     // Check daily cooldown
     const today = new Date();

@@ -86,6 +86,7 @@ export function ModuleSettingsPanel({
                                     type={setting.type === "number" ? "number" : "text"}
                                     min={setting.min}
                                     max={setting.max}
+                                    step={setting.step}
                                     maxLength={setting.maxLength}
                                     value={String(value ?? "")}
                                     onChange={(e) =>

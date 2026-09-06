@@ -7,7 +7,7 @@
  * settled - never here.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
@@ -45,8 +45,12 @@ export async function POST(request: NextRequest) {
 
         const { amount } = validation.data;
 
-        const priceSetting = await prisma.setting.findUnique({ where: { key: "credits_price_per_unit" } });
-        const pricePerCredit = Number(priceSetting?.value) || 0.01;
+        // A module setting rather than a `credits_price_per_unit` row, which is
+        // what this read before. Nothing wrote that row - no screen, no API, no
+        // manifest default - so every site sold credits at exactly the fallback
+        // and no operator could change it.
+        const { creditsPricePerUnit } = await moduleSettings<{ creditsPricePerUnit: number }>("store");
+        const pricePerCredit = creditsPricePerUnit;
 
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
         const currency = ((currSetting?.value as string) || "USD").toUpperCase();

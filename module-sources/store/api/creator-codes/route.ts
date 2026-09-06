@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, moduleSettings, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { creatorCodeCreateSchema } from "../../lib/validations";
-const CREATOR_DEFAULT_DISCOUNT = 5;
-const CREATOR_DEFAULT_COMMISSION = 10;
-
-async function getSetting(key: string, defaultValue: string): Promise<string> {
-    const s = await prisma.setting.findUnique({ where: { key } });
-    return (s?.value as string) ?? defaultValue;
-}
 
 // GET /api/v1/creator-codes - List (admin: all, user: own)
 export async function GET() {
@@ -41,15 +34,18 @@ export async function POST(request: NextRequest) {
     const existing = await prisma.creatorCode.findUnique({ where: { code: code.toUpperCase() } });
     if (existing) return NextResponse.json({ error: "Code already exists" }, { status: 400 });
 
-    const defaultDiscount = Number(await getSetting("creator_default_discount", String(CREATOR_DEFAULT_DISCOUNT)));
-    const defaultCommission = Number(await getSetting("creator_default_commission", String(CREATOR_DEFAULT_COMMISSION)));
+    // Module settings rather than `creator_default_*` rows. Nothing wrote
+    // those rows, so the two constants that stood behind them were the only
+    // values a site ever had.
+    const { creatorDefaultDiscount, creatorDefaultCommission } =
+        await moduleSettings<{ creatorDefaultDiscount: number; creatorDefaultCommission: number }>("store");
 
     const creatorCode = await prisma.creatorCode.create({
         data: {
             code: code.toUpperCase(),
             creatorId,
-            discountPercent: discountPercent || defaultDiscount,
-            commissionPercent: commissionPercent || defaultCommission,
+            discountPercent: discountPercent || creatorDefaultDiscount,
+            commissionPercent: commissionPercent || creatorDefaultCommission,
         },
     });
     return NextResponse.json({ creatorCode }, { status: 201 });

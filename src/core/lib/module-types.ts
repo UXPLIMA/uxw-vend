@@ -9,6 +9,8 @@ export interface ModuleSetting {
     /** Present exactly when `type` is "number". */
     min?: number;
     max?: number;
+    /** How finely the value may be set. Absent means whole numbers. */
+    step?: number;
     /** Present exactly when `type` is "string". */
     maxLength?: number;
 }

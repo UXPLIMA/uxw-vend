@@ -13,6 +13,8 @@ export interface ModuleSettingDecl {
     description?: string;
     min?: number;
     max?: number;
+    /** How finely a number may be set. Absent means whole numbers. */
+    step?: number;
     maxLength?: number;
 }
 

@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.23.0 - A `number` module setting may declare `step`. A number input's
+ * default step is 1, so a manifest could declare a setting whose real values
+ * are fractional - a price of 0.013 a credit - and the browser marked every
+ * usable value invalid. The setting existed and could not be set. Optional
+ * addition to the manifest.
+ *
  * 1.22.0 - `shouldNotify` joins `@/core/sdk/server`. The notification
  * preferences grid in /profile wrote a row for every toggle and nothing ever
  * read one: the check that consults it sat in core, unexported, and its own
@@ -148,4 +154,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.22.0";
+export const CORE_API_VERSION = "1.23.0";
