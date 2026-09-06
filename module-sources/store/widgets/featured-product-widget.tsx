@@ -47,7 +47,7 @@ export function FeaturedProductWidget() {
                 <h3 className="font-semibold text-foreground mb-1">{product.name}</h3>
                 <p className="text-primary font-bold text-lg mb-3">{formatPrice(product.price)}</p>
                 <Link href={`/store/product/${product.number}/${product.slug}`}>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-none">
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                         {sidebarT('viewDetails')}
                     </Button>
                 </Link>

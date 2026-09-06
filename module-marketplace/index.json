@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T18:40:16Z",
+  "updatedAt": "2026-09-06T20:48:44Z",
   "modules": [
     {
       "id": "announcements",
@@ -474,13 +474,13 @@
           "description": "Otomatik dönüşümle çoklu para birimi desteği"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T08:05:31Z",
+      "updatedAt": "2026-09-06T20:48:44Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2441,13 +2441,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.4.0",
+      "version": "2.4.1",
       "coreVersion": "^1.26.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T18:40:16Z",
+      "updatedAt": "2026-09-06T20:48:44Z",
       "screenshots": [],
       "tags": [
         "commerce"

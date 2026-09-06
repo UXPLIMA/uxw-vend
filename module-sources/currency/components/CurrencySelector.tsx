@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DollarSign } from "lucide-react";
 import { FooterDropdown, useSiteCurrency } from "@/core/sdk/ui";
 
 interface ConfiguredCurrency {
@@ -64,14 +63,12 @@ export function CurrencySelector() {
         setDisplay({ code: target.code, rate: target.rate / baseRate });
     };
 
-    const label = (c: string) => {
-        const found = options.find((x) => x.code === c);
-        return found ? `${found.symbol} ${found.code}` : c;
-    };
+    // The code alone. A symbol beside it says the same thing twice, and the
+    // three-letter code is the part a reader is looking for.
+    const label = (c: string) => c;
 
     return (
         <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <FooterDropdown
                 options={options.map((c) => c.code)}
                 value={code}
