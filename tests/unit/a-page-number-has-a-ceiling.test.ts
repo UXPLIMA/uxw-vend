@@ -32,8 +32,12 @@ import {
 const ROOT = process.cwd();
 const SCANNED = ["src/app/api", "module-sources"];
 
-/** A route reading the page number out of the query for itself. */
-const HAND_ROLLED = /searchParams\.get\("page"\)/;
+/**
+ * A route reading a page number out of the query for itself. Any name ending
+ * in "page": the forum's topic view pages its posts with `postsPage`, and
+ * that one overflowed the same OFFSET.
+ */
+const HAND_ROLLED = /searchParams\.get\("\w*[Pp]age"\)/;
 
 function routeFiles(dir: string, out: string[] = []): string[] {
     if (!fs.statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return out;
@@ -100,6 +104,15 @@ describe("pageParams", () => {
     it("lets a screen fix a page size the caller cannot move", () => {
         expect(pageParams(of("limit=99"), { fixedLimit: 50 }).limit).toBe(50);
         expect(pageParams(of("page=2&limit=99"), { fixedLimit: 50 }).skip).toBe(50);
+    });
+
+    it("reads a second list's page from its own parameter", () => {
+        const query = of("page=4&postsPage=99999999999999999999");
+        const posts = pageParams(query, { pageParam: "postsPage", fixedLimit: 20 });
+        expect(posts.page).toBe(MAX_PAGE);
+        expect(posts.skip).toBeLessThan(2_147_483_647);
+        // And the other list on the same screen is unaffected.
+        expect(pageParams(query).page).toBe(4);
     });
 });
 

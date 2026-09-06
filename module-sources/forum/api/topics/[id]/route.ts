@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { pageParams, isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumPostSchema, forumTopicUpdateSchema } from "../../../lib/validations";
 import { denyGuestView } from "../../../lib/guest-view";
@@ -34,7 +34,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // anyone opened it. They are now a page of `postsPerPage`, the size the
     // admin sets.
     const { postsPerPage } = await moduleSettings<{ postsPerPage: number }>("forum");
-    const postsPage = Math.max(1, parseInt(request.nextUrl.searchParams.get("postsPage") || "1") || 1);
+    const { page: postsPage, skip: postsSkip, take: postsTake } = pageParams(
+        request.nextUrl.searchParams,
+        { pageParam: "postsPage", fixedLimit: postsPerPage },
+    );
     const postWhere = adminCheckGet ? undefined : { moderationState: "APPROVED" as const };
 
     const topic = await prisma.forumTopic.findFirst({
@@ -45,8 +48,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             posts: {
                 where: postWhere,
                 orderBy: { createdAt: "asc" },
-                skip: (postsPage - 1) * postsPerPage,
-                take: postsPerPage,
+                skip: postsSkip,
+                take: postsTake,
                 include: {
                     author: { select: { id: true, username: true, avatar: true } },
                     _count: { select: { likes: true } },

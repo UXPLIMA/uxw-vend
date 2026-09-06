@@ -39,6 +39,15 @@ export interface PageParams {
 }
 
 export interface PageParamsOptions {
+    /**
+     * The query parameter the page number is read from. A screen that pages
+     * two lists at once names its second one something else - the forum's
+     * topic view pages its posts with `postsPage` - and that one needs the
+     * ceiling as much as the first.
+     */
+    pageParam?: string;
+    /** The query parameter the page size is read from. */
+    limitParam?: string;
     /** Page size when the caller does not ask for one. */
     defaultLimit?: number;
     /** The largest page a caller may ask for. */
@@ -58,13 +67,13 @@ function positiveInteger(raw: string | null): number | null {
 }
 
 export function pageParams(params: URLSearchParams, options: PageParamsOptions = {}): PageParams {
-    const page = Math.min(MAX_PAGE, positiveInteger(params.get("page")) ?? 1);
+    const page = Math.min(MAX_PAGE, positiveInteger(params.get(options.pageParam ?? "page")) ?? 1);
 
     const limit =
         options.fixedLimit ??
         Math.min(
             options.maxLimit ?? MAX_PAGE_SIZE,
-            positiveInteger(params.get("limit")) ?? options.defaultLimit ?? DEFAULT_PAGE_SIZE,
+            positiveInteger(params.get(options.limitParam ?? "limit")) ?? options.defaultLimit ?? DEFAULT_PAGE_SIZE,
         );
 
     return { page, limit, skip: (page - 1) * limit, take: limit };
