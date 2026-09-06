@@ -4,6 +4,7 @@ import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { punishmentCreateSchema } from "../lib/validations";
 import { isPunishmentStatus, punishmentStatus, statusWhere } from "../lib/status";
+import { canonicalType, spellingsOf } from "../lib/punishment-types";
 
 /**
  * Constant-time API key comparison. Guards against undefined values and
@@ -29,7 +30,12 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     const where: Record<string, unknown> = {};
-    if (type) where.type = type;
+    // A type filter is a filter on the punishment, not on the spelling the
+    // row happened to be written with.
+    if (type) {
+        const canonical = canonicalType(type);
+        where.type = canonical ? { in: spellingsOf(canonical) } : type;
+    }
     if (search) where.playerName = { contains: search, mode: "insensitive" };
     // Under AND rather than merged in, so the status clause keeps its own `OR`
     // whatever else the caller filtered on.
@@ -73,12 +79,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "playerName and type required" }, { status: 400 });
     }
     const { playerName, playerUuid, type, reason, duration, punishedBy, expiresAt } = parsed.data;
+    // Stored in this module's own words when it recognises them, so the
+    // filters and the labels have one thing to match.
+    const storedType = canonicalType(type) ?? type;
 
     const punishment = await prisma.punishment.create({
         data: {
             playerName,
             playerUuid: playerUuid || null,
-            type,
+            type: storedType,
             reason: reason || null,
             duration: duration || null,
             punishedBy: punishedBy || null,
@@ -93,7 +102,7 @@ export async function POST(request: NextRequest) {
     }).catch(() => null);
 
     // For warning-type punishments, also record a UserWarning row
-    if (type === "warn" || type === "warning") {
+    if (storedType === "warning") {
         if (targetUser) {
             await prisma.userWarning.create({
                 data: {
@@ -111,7 +120,7 @@ export async function POST(request: NextRequest) {
     await doActionAsync("punishments.punishment.issued", {
         punishmentId: punishment.id,
         playerName,
-        type,
+        type: storedType,
         reason,
         issuerUserId,
         targetUserId: targetUser?.id ?? null,
@@ -121,7 +130,7 @@ export async function POST(request: NextRequest) {
             data: {
                 type: "punishments.punishment.issued",
                 actorId: issuerUserId,
-                title: `${type} issued to ${playerName}${reason ? `: ${reason}` : ""}`,
+                title: `${storedType} issued to ${playerName}${reason ? `: ${reason}` : ""}`,
                 icon: "AlertTriangle",
                 isPublic: false,
             },

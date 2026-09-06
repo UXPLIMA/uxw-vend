@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { dateLocaleTag } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
 import { punishmentStatus, type PunishmentStatus } from "../../lib/status";
+import { PUNISHMENT_TYPES, canonicalType } from "../../lib/punishment-types";
 
 interface Punishment {
     id: string;
@@ -41,8 +42,6 @@ const BADGE_CLASS: Record<PunishmentStatus, string> = {
 };
 
 const PAGE_SIZE = 20;
-
-const TYPE_OPTIONS = ["ban", "mute", "kick", "warning", "tempBan", "tempMute"];
 
 export default function AdminPunishmentsPage() {
     const t = useTranslations("punishments");
@@ -93,6 +92,13 @@ export default function AdminPunishmentsPage() {
     useEffect(() => { load(); }, [load]);
 
     const selectFilter = (next: StatusFilter) => { setFilter(next); setPage(1); };
+
+    // A plugin may post a type this module has no word for; that value is
+    // printed as it stands rather than as a missing message key.
+    const typeLabel = (type: string) => {
+        const key = canonicalType(type);
+        return key && t.has(key) ? t(key) : type;
+    };
 
     const create = async () => {
         if (!form.playerName.trim()) return;
@@ -173,7 +179,7 @@ export default function AdminPunishmentsPage() {
                                     value={form.type}
                                     onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
                                 >
-                                    {TYPE_OPTIONS.map(o => (
+                                    {PUNISHMENT_TYPES.map(o => (
                                         <option key={o} value={o}>{t(o)}</option>
                                     ))}
                                 </NativeSelect>
@@ -253,7 +259,7 @@ export default function AdminPunishmentsPage() {
                                 return (
                                 <tr key={p.id} className="border-t">
                                     <td className="px-4 py-2 font-medium">{p.playerName}</td>
-                                    <td className="px-4 py-2">{TYPE_OPTIONS.includes(p.type) ? t(p.type) : p.type}</td>
+                                    <td className="px-4 py-2">{typeLabel(p.type)}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{p.reason || "-"}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{new Date(p.createdAt).toLocaleString(__dateTag)}</td>
                                     <td className="px-4 py-2">

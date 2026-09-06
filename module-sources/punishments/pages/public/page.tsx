@@ -8,6 +8,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { punishmentStatus, type PunishmentStatus } from "../../lib/status";
+import { PUNISHMENT_TYPES, canonicalType, type PunishmentType } from "../../lib/punishment-types";
 
 interface PunishmentItem {
     id: string;
@@ -21,21 +22,22 @@ interface PunishmentItem {
     expiresAt: string | null;
 }
 
-const typeIcons: Record<string, typeof Ban> = { ban: Ban, mute: VolumeX, kick: LogOut, warn: AlertTriangle };
-const typeColors: Record<string, string> = {
-    ban: "bg-destructive/10 text-destructive",
-    mute: "bg-warning/10 text-warning",
-    kick: "bg-warning/10 text-warning",
-    warn: "bg-primary/10 text-primary",
+const typeIcons: Record<PunishmentType, typeof Ban> = {
+    ban: Ban,
+    tempBan: Ban,
+    mute: VolumeX,
+    tempMute: VolumeX,
+    kick: LogOut,
+    warning: AlertTriangle,
 };
-
-/**
- * The message key per punishment type. The filter dropdown above the table
- * already read from this map; the table cell beside it printed the raw column
- * instead, so a Turkish visitor read the filter as "Susturma" and every row
- * under it as "mute".
- */
-const typeKeys: Record<string, string> = { ban: "ban", mute: "mute", kick: "kick", warn: "warning" };
+const typeColors: Record<PunishmentType, string> = {
+    ban: "bg-destructive/10 text-destructive",
+    tempBan: "bg-destructive/10 text-destructive",
+    mute: "bg-warning/10 text-warning",
+    tempMute: "bg-warning/10 text-warning",
+    kick: "bg-warning/10 text-warning",
+    warning: "bg-primary/10 text-primary",
+};
 
 /**
  * A punishment's status was the one thing this table never said. It printed
@@ -50,7 +52,7 @@ const statusClass: Record<PunishmentStatus, string> = {
 
 /** The label for one type, falling back to the value when it is unmapped. */
 function typeLabel(t: { (key: string): string; has: (key: string) => boolean }, type: string): string {
-    const key = typeKeys[type];
+    const key = canonicalType(type);
     return key && t.has(key) ? t(key) : type;
 }
 
@@ -101,7 +103,7 @@ export default function PunishmentsPage() {
                         </div>
                     </form>
                     <div className="flex gap-2">
-                        {["", "ban", "mute", "kick", "warn"].map((tf) => (
+                        {["", ...PUNISHMENT_TYPES].map((tf) => (
                             <Button key={tf} variant={typeFilter === tf ? "default" : "outline"} size="sm"
                                 onClick={() => { setTypeFilter(tf); setPage(1); }}>
                                 {tf === "" ? t("type") : typeLabel(t, tf)}
@@ -133,13 +135,14 @@ export default function PunishmentsPage() {
                                 </thead>
                                 <tbody>
                                     {punishments.map((p) => {
-                                        const Icon = typeIcons[p.type] || Ban;
+                                        const known = canonicalType(p.type);
+                                        const Icon = known ? typeIcons[known] : Ban;
                                         const status = punishmentStatus(p);
                                         return (
                                             <tr key={p.id} className="border-b last:border-0 hover:bg-muted">
                                                 <td className="py-3 px-4 font-medium">{p.playerName}</td>
                                                 <td className="py-3 px-4">
-                                                    <span className={`text-xs px-2 py-1 rounded inline-flex items-center gap-1 ${typeColors[p.type] || ""}`}>
+                                                    <span className={`text-xs px-2 py-1 rounded inline-flex items-center gap-1 ${known ? typeColors[known] : ""}`}>
                                                         <Icon className="w-3 h-3" /> {typeLabel(t, p.type)}
                                                     </span>
                                                 </td>

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T05:18:18Z",
+  "updatedAt": "2026-09-06T05:33:38Z",
   "modules": [
     {
       "id": "announcements",
@@ -1999,13 +1999,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.0.21",
+      "version": "1.0.22",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-06T05:18:18Z",
+      "updatedAt": "2026-09-06T05:33:38Z",
       "screenshots": [],
       "tags": [
         "gaming"
