@@ -59,6 +59,16 @@ export const INVALID_JSON_BODY = { error: "Invalid JSON body", code: "invalid_js
 /** The one wording for a body that is too large to read. */
 export const BODY_TOO_LARGE = { error: "Request body too large", code: "body_too_large" } as const;
 
+/**
+ * The one wording for a body carrying a character no column can hold.
+ *
+ * Postgres text cannot contain a null byte. A body is well-formed JSON with
+ * one in it - `"\u0000"` is a legal JSON escape - so it parsed, passed a Zod
+ * `min(1)`, and threw inside the driver on the way to the row: a 500 for a
+ * body the caller sent, which is the same mistake this file exists to stop.
+ */
+export const NULL_BYTE_IN_BODY = { error: "Invalid text in body", code: "invalid_text" } as const;
+
 /** How much JSON a route accepts unless it asks for more. */
 export const MAX_JSON_BODY_BYTES = 1024 * 1024;
 
@@ -115,6 +125,30 @@ async function readBoundedText(request: Request, maxBytes: number): Promise<stri
 }
 
 /**
+ * Whether any string anywhere in a parsed body holds a null byte.
+ *
+ * Walked with an explicit stack rather than recursion, so a deeply nested
+ * body costs the heap rather than the call stack, and compared by code point
+ * so nothing in this file is a character a terminal or a diff would swallow.
+ */
+function hasNullByte(value: unknown): boolean {
+    const pending: unknown[] = [value];
+    while (pending.length > 0) {
+        const current = pending.pop();
+        if (typeof current === "string") {
+            for (let i = 0; i < current.length; i++) {
+                if (current.charCodeAt(i) === 0) return true;
+            }
+        } else if (Array.isArray(current)) {
+            pending.push(...current);
+        } else if (current !== null && typeof current === "object") {
+            pending.push(...Object.values(current));
+        }
+    }
+    return false;
+}
+
+/**
  * Parse a JSON request body, or the response to return instead.
  *
  * The return type is `unknown`, not the `Promise<any>` that `Request.json()`
@@ -139,10 +173,18 @@ async function readBoundedText(request: Request, maxBytes: number): Promise<stri
 export async function readJsonBody(request: Request, options: ReadJsonBodyOptions = {}): Promise<unknown> {
     const text = await readBoundedText(request, options.maxBytes ?? MAX_JSON_BODY_BYTES);
     if (text === null) return NextResponse.json(BODY_TOO_LARGE, { status: 413 });
+    let parsed: unknown;
     try {
-        return JSON.parse(text);
+        parsed = JSON.parse(text);
     } catch {
         if ("fallback" in options) return options.fallback;
         return NextResponse.json(INVALID_JSON_BODY, { status: 400 });
     }
+    // Not covered by `fallback`: this body is not absent and not malformed,
+    // it simply carries something no column can store, and answering it with
+    // an empty object would file the caller's text as nothing at all.
+    if (hasNullByte(parsed)) {
+        return NextResponse.json(NULL_BYTE_IN_BODY, { status: 400 });
+    }
+    return parsed;
 }

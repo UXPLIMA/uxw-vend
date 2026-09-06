@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
-import { readJsonBody, MAX_JSON_BODY_BYTES } from "../../src/core/lib/api-body";
+import { readJsonBody, MAX_JSON_BODY_BYTES, NULL_BYTE_IN_BODY } from "../../src/core/lib/api-body";
 
 /**
  * App Router route handlers have no request body limit. The 1 MB that Pages
@@ -123,6 +123,44 @@ describe("readJsonBody", () => {
         const body = JSON.stringify({ note: "ç".repeat(400) });
         expect((await readJsonBody(jsonRequest(body), { maxBytes: 200 }))?.constructor).toBe(NextResponse);
         expect(await readJsonBody(jsonRequest(body), { maxBytes: 4000 })).toEqual({ note: "ç".repeat(400) });
+    });
+
+    describe("text no column can hold", () => {
+        // Built rather than typed, so this file stays one a terminal can print.
+        const NUL = String.fromCharCode(0);
+
+        async function code(result: unknown): Promise<string | undefined> {
+            return (await (result as NextResponse).json()).code;
+        }
+
+        it("answers 400 rather than throwing inside the driver", async () => {
+            // Postgres text cannot hold a null byte, and `\u0000` is a legal
+            // JSON escape - so this body parsed, passed a Zod min(1), and
+            // threw on the way to the row.
+            const result = await readJsonBody(jsonRequest(JSON.stringify({ content: `a${NUL}b` })));
+            expect(result).toBeInstanceOf(NextResponse);
+            expect((result as NextResponse).status).toBe(400);
+            expect(await code(result)).toBe(NULL_BYTE_IN_BODY.code);
+        });
+
+        it("finds one however deep it is buried", async () => {
+            const nested = { items: [{ meta: { note: NUL } }] };
+            const result = await readJsonBody(jsonRequest(JSON.stringify(nested)));
+            expect((result as NextResponse).status).toBe(400);
+        });
+
+        it("does not fall back to an empty body for an optional one", async () => {
+            // The body is neither absent nor malformed; answering {} would
+            // file the caller's text as nothing at all.
+            const result = await readJsonBody(jsonRequest(JSON.stringify({ a: NUL })), { fallback: {} });
+            expect(result).toBeInstanceOf(NextResponse);
+            expect((result as NextResponse).status).toBe(400);
+        });
+
+        it("leaves the whitespace a textarea legitimately carries", async () => {
+            const text = ["first line", "second line"].join(String.fromCharCode(10));
+            expect(await readJsonBody(jsonRequest(JSON.stringify({ text })))).toEqual({ text });
+        });
     });
 
     describe("an optional body", () => {
