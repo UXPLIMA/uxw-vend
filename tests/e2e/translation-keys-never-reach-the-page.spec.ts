@@ -84,7 +84,10 @@ test.describe('translation keys never reach the page', () => {
                 if (MISSING_MESSAGE.test(msg.text())) missing.push(msg.text());
             });
 
-            await page.goto(`/${locale}`, { waitUntil: 'networkidle' });
+            // `networkidle` is not a safe wait here: a session refresh or a widget
+            // poll keeps the connection busy, so it times out on a healthy page.
+            await page.goto(`/${locale}`, { waitUntil: 'load' });
+            await page.waitForTimeout(1500);
 
             // Walk what the navigation actually offers, so a module that adds
             // a page is covered the day it adds one.
@@ -98,7 +101,8 @@ test.describe('translation keys never reach the page', () => {
             const offenders: string[] = [];
 
             for (const path of paths) {
-                await page.goto(path, { waitUntil: 'networkidle' });
+                await page.goto(path, { waitUntil: 'load' });
+                await page.waitForTimeout(1200);
                 const keys = await visibleKeys(page);
                 if (keys.length) offenders.push(`${path}: ${keys.join(', ')}`);
             }
