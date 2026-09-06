@@ -14,6 +14,14 @@
  * Modules register listeners declaratively via `module.json` hookListeners
  * (wired into the codegen registry as static imports) or imperatively via
  * addAction/addFilter. Listeners are removed on module disable/uninstall.
+ *
+ * This file is re-exported through the isomorphic SDK entry (`@/core/sdk`),
+ * so it stays free of imports and logs through `console` rather than
+ * `./logger`. A production bundler follows a barrel only along the names a
+ * client component asked for, but `next dev` does not shake per name: it
+ * compiles the whole barrel and everything it re-exports for the browser.
+ * Anything needing the database, the logger or `next/headers` belongs in
+ * `hooks-bootstrap.ts`.
  */
 
 export type ActionListener<T = unknown> = (payload: T) => void;
@@ -350,77 +358,16 @@ export function hasFilter(name: string): boolean {
 let bootstrapped = false;
 
 /**
- * Load and register all module hook listeners.
- * Called once per server process. Idempotent.
- *
- * Reads from the auto-generated module-hooks.ts registry and lazy-imports
- * each listener module. Modules whose status is "disabled" in module-cache
- * are skipped. Disabled modules' listeners are removed when status changes
- * (via removeModuleHooks).
+ * The bootstrap itself lives in `hooks-bootstrap.ts`, out of reach of a
+ * browser bundle; the flag stays here because `resetHooks` clears it in the
+ * same breath as the registries.
  */
-export async function bootstrapHooks(): Promise<void> {
-    if (bootstrapped) return;
+export function isBootstrapped(): boolean {
+    return bootstrapped;
+}
+
+export function markBootstrapped(): void {
     bootstrapped = true;
-
-    // Core listeners - activity feed, etc. (module-specific listeners live in their modules)
-    try {
-        const { registerActivityFeedListeners } = await import("./activity-feed");
-        registerActivityFeedListeners();
-    } catch (err) {
-        console.error("[hooks] Failed to register core listeners:", err);
-    }
-
-    try {
-        const { ModuleHookListeners } = await import("@/core/generated/module-hooks");
-        const { getModuleStates } = await import("@/core/lib/module-cache");
-        const states = await getModuleStates();
-
-        for (const entry of ModuleHookListeners) {
-            // Skip disabled modules
-            if (states[entry.module] === false) continue; // skip disabled
-
-            try {
-                const mod = await entry.loader();
-                const listener = mod.default;
-                if (typeof listener !== "function") {
-                    console.warn(`[hooks] ${entry.module}/${entry.hook}: handler did not export a default function`);
-                    continue;
-                }
-                if (entry.type === "action") {
-                    addAction(entry.hook, listener as ActionListener, {
-                        priority: entry.priority,
-                        moduleId: entry.module,
-                    });
-                } else {
-                    addFilter(entry.hook, listener as FilterListener, {
-                        priority: entry.priority,
-                        moduleId: entry.module,
-                    });
-                }
-            } catch (err) {
-                console.error(`[hooks] Failed to load ${entry.module}/${entry.hook}:`, err);
-            }
-        }
-
-        // console, not `log` from ./logger, on purpose: this file is exported
-        // through the isomorphic SDK entry (@/core/sdk) and deliberately has no
-        // imports at all. logger.ts pulls in next/headers, which would land in
-        // every client bundle that imports so much as formatDate.
-        console.log(`[hooks] Registered ${ModuleHookListeners.length} module hook listeners`);
-    } catch (err) {
-        // The generated registry may not exist on first build.
-        console.warn("[hooks] Could not load module-hooks registry:", (err as Error).message);
-    }
-
-    // Once every module's static listeners are wired, fire core.boot so modules
-    // that need DB-driven dynamic listener registration (e.g. an engine that
-    // reads rules from its own tables) can hook in without core having to know
-    // about them.
-    try {
-        await doActionAsync("core.boot", {});
-    } catch (err) {
-        console.warn("[hooks] core.boot listener failed:", (err as Error).message);
-    }
 }
 
 /** Force re-bootstrap (used when modules are enabled/disabled at runtime). */

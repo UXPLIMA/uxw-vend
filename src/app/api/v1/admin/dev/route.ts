@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
-import { listActions, listFilters, bootstrapHooks } from "@/core/lib/hooks";
+import { listActions, listFilters } from "@/core/lib/hooks";
+import { bootstrapHooks } from "@/core/lib/hooks-bootstrap";
 import {
     ModuleHookListeners,
 } from "@/core/generated/module-hooks";

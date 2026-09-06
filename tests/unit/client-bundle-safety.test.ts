@@ -212,10 +212,33 @@ describe("client bundle safety", () => {
         // The shared half is what the three auth forms import; the server
         // half is what reaches the hook bus. If they ever merge again the
         // build breaks, so assert both sides of the line directly.
+        //
+        // The server half used to be provably server-only through the bus,
+        // which reached the database and the logger. It no longer does: the
+        // bus had to become client-safe on its own so `next dev` could
+        // compile the SDK barrel. What still separates the two halves is the
+        // import itself, so that is what this asserts now.
         const shared = join(ROOT, "src/core/lib/auth-challenge-shared.ts");
         const server = join(ROOT, "src/core/lib/auth-challenge.ts");
         expect(serverOnlyReach(shared)).toEqual([]);
-        expect(serverOnlyReach(server).length).toBeGreaterThan(0);
+        expect(parse(shared).edges).not.toContain("./hooks");
+        expect(parse(server).edges).toContain("./hooks");
+    });
+
+    it("keeps the hook bus clean on its own", () => {
+        // The barrel model above is how a production bundler behaves, and
+        // `npm run build` proves it: a client component that asks for
+        // `formatDate` never pays for the hook bus. `next dev` does not
+        // shake per name, so it compiles the whole barrel and every file it
+        // re-exports, and the bus reached the activity feed through a
+        // dynamic import, which reaches the database, the logger and
+        // `async_hooks`. Nothing in build, typecheck, lint or this suite
+        // said so; the dev server just answered 500 on every page once a
+        // module put a client component in front of the barrel.
+        //
+        // The bus is isomorphic by contract, so it has to be clean without
+        // help from a bundler. The server half lives in `hooks-bootstrap.ts`.
+        expect(serverOnlyReach(join(ROOT, "src/core/lib/hooks.ts"))).toEqual([]);
     });
 
     it("keeps @/core/sdk a pure re-export barrel", () => {

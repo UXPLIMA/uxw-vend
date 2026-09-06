@@ -20,7 +20,7 @@ export async function register(): Promise<void> {
     if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
     // Imported inside the guard so the edge bundle never pulls Prisma in.
-    const { bootstrapHooks } = await import("@/core/lib/hooks");
+    const { bootstrapHooks } = await import("@/core/lib/hooks-bootstrap");
     const { bootstrapScheduler } = await import("@/core/lib/scheduler");
     const { installShutdownHandlers } = await import("@/core/lib/shutdown");
     const { warnIfProxyTrustUnconfigured } = await import("@/core/lib/rate-limit");
