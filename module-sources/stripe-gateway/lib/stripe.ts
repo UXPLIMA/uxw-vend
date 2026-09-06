@@ -75,16 +75,14 @@ export async function getStripeWebhookSecret(): Promise<string | null> {
     return webhookSecret;
 }
 
-export async function getStripePublicKey(): Promise<string | null> {
-    const { publishable } = await readCreds();
-    return publishable;
-}
-
 /**
  * True when Stripe has at least a secret key configured.
  * The runtime gateway requires a secret key to do anything useful;
- * the public key matters only for client-side Elements which we
- * don't currently use (we redirect to Stripe Checkout instead).
+ * the public key matters only for client-side Elements, which this module
+ * does not use - it redirects to Stripe Checkout instead. That is why there
+ * is no reader for the publishable key here: the one that existed was called
+ * by nothing, and a getter for a credential nobody needs is an invitation to
+ * start needing it.
  */
 export async function getStripeEnabled(): Promise<boolean> {
     const { secret } = await readCreds();

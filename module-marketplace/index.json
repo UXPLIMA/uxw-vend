@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-06",
-  "updatedAt": "2026-09-06T02:11:02Z",
+  "updatedAt": "2026-09-06T02:21:52Z",
   "modules": [
     {
       "id": "announcements",
@@ -1925,13 +1925,13 @@
           "description": "Herkese açık oyuncu profil sayfaları"
         }
       },
-      "version": "1.1.17",
+      "version": "1.1.18",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-06T01:53:29Z",
+      "updatedAt": "2026-09-06T02:21:52Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2435,13 +2435,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.2.33",
+      "version": "2.2.34",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T01:53:29Z",
+      "updatedAt": "2026-09-06T02:21:52Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2486,13 +2486,13 @@
           "description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
         }
       },
-      "version": "2.0.6",
+      "version": "2.0.7",
       "coreVersion": "^1.3.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-06T02:21:52Z",
       "screenshots": [],
       "tags": [
         "commerce"
