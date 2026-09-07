@@ -9,6 +9,7 @@ import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
+import { log } from "@/core/lib/logger";
 
 /**
  * The three fields a reset carries. `password` is bounded here only so an
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ message: "Password has been reset successfully" });
     } catch (error) {
-        console.error("Reset password error:", error);
+        log.error("Reset password error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json({ error: "Internal server error", code: "server_error" }, { status: 500 });
     }
 }

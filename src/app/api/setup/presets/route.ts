@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { isSetupComplete } from "@/core/lib/setup-state";
 import { parseSetupPresets, CUSTOM_PRESET } from "@/core/lib/setup-presets";
+import { log } from "@/core/lib/logger";
 
 /**
  * Site-type presets for the first-run wizard.
@@ -40,7 +41,7 @@ export async function GET() {
 
     const presets = parseSetupPresets(raw, {
         knownModuleIds,
-        onWarn: (m) => console.warn(m),
+        onWarn: (m) => log.warn(m),
     });
     return NextResponse.json({ presets });
 }

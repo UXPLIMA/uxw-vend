@@ -4,6 +4,7 @@ import { auth } from "@/core/lib/auth";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { exportUserData, buildExportReadme } from "@/core/lib/user-data-export";
 import { logActivity } from "@/core/lib/activity-log";
+import { log } from "@/core/lib/logger";
 
 // GET /api/v1/auth/profile/export
 // Returns a ZIP of the authenticated user's personal data.
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
             },
         });
     } catch (err) {
-        console.error("[profile-export] failed", err);
+        log.error("[profile-export] failed", { error: err instanceof Error ? err.message : String(err) });
         return NextResponse.json(
             { error: "Failed to build export", code: "export_failed" },
             { status: 500 }

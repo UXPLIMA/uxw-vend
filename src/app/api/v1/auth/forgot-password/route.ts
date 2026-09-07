@@ -9,6 +9,7 @@ import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import { resolveAppUrl } from "@/core/lib/app-url";
 import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
+import { log } from "@/core/lib/logger";
 
 const GENERIC_OK = { message: "If an account exists, a reset link has been sent." };
 
@@ -93,13 +94,13 @@ export async function POST(request: NextRequest) {
             const resetUrl = `${resolveAppUrl()}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
             await sendPasswordResetEmail(email, resetUrl, user.locale ?? undefined).catch((err) => {
-                console.error("[forgot-password] email send failed:", err);
+                log.error("[forgot-password] email send failed", { error: err instanceof Error ? err.message : String(err) });
             });
         }
 
         return NextResponse.json(GENERIC_OK);
     } catch (error) {
-        console.error("Forgot password error:", error);
+        log.error("Forgot password error", { error: error instanceof Error ? error.message : String(error) });
         // Return generic message on errors too so internal failures can't
         // be distinguished from "email not registered" by a timing probe.
         return NextResponse.json(GENERIC_OK);

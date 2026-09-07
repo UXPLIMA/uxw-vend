@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/core/sdk";
-import { pageParams, isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error) {
-        console.error("List products error:", error);
+        log.error("List products error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ product }, { status: 201 });
     } catch (error) {
-        console.error("Create product error:", error);
+        log.error("Create product error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

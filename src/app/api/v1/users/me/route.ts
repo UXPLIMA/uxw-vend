@@ -4,6 +4,7 @@ import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { prisma } from "@/core/lib/db";
 import { updateUserSchema } from "@/core/lib/validations";
 import { readJsonBody } from "@/core/lib/api-body";
+import { log } from "@/core/lib/logger";
 
 // GET /api/v1/users/me - Get current user
 export async function GET() {
@@ -43,7 +44,7 @@ export async function GET() {
 
         return NextResponse.json({ user });
     } catch (error) {
-        console.error("Get current user error:", error);
+        log.error("Get current user error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -115,7 +116,7 @@ export async function PATCH(request: NextRequest) {
 
         return NextResponse.json({ user });
     } catch (error) {
-        console.error("Update user error:", error);
+        log.error("Update user error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

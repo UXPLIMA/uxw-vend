@@ -19,6 +19,7 @@ import { manifestHash } from "@/core/lib/module-install-audit";
 import { syncModuleTranslations } from "@/core/lib/i18n/translation-service";
 import { readJsonBody } from "@/core/lib/api-body";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
+import { log } from "@/core/lib/logger";
 
 /**
  * First-run setup API.
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
                     installedModules.push(moduleId);
                     registryNeedsRegen = true;
                 } catch (err) {
-                    console.error(`[setup] Failed to install module "${moduleId}":`, err);
+                    log.error(`[setup] Failed to install module "${moduleId}"`, { error: err instanceof Error ? err.message : String(err) });
                     failedModules.push({
                         id: moduleId,
                         reason: err instanceof Error ? err.message : String(err),
@@ -291,7 +292,7 @@ export async function POST(request: NextRequest) {
                 // Non-fatal, but the operator needs to know: a failed merge
                 // means the step above did not run, and a failed apply means
                 // the modules below have no tables.
-                console.error("[setup] Schema merge/additions failed:", err);
+                log.error("[setup] Schema merge/additions failed", { error: err instanceof Error ? err.message : String(err) });
             }
             try {
                 execFileSync("npx", ["tsx", "scripts/generate-registry.ts"], {
@@ -314,7 +315,7 @@ export async function POST(request: NextRequest) {
                         stdio: "pipe",
                     });
                 } catch (err) {
-                    console.error(`[setup] Migrations failed for "${moduleId}":`, err);
+                    log.error(`[setup] Migrations failed for "${moduleId}"`, { error: err instanceof Error ? err.message : String(err) });
                     failedModules.push({ id: moduleId, reason: "migrations failed" });
                 }
             }
@@ -390,7 +391,7 @@ async function loadCatalog(): Promise<CatalogEntry[]> {
                 ...(m.coreVersion ? { coreVersion: m.coreVersion } : {}),
             }));
     } catch (err) {
-        console.error("[setup] Could not read the marketplace catalog:", err);
+        log.error("[setup] Could not read the marketplace catalog", { error: err instanceof Error ? err.message : String(err) });
         return [];
     }
 }

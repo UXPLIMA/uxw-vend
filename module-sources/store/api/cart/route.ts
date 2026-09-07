@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { moduleSettings, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { log, moduleSettings, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -46,7 +46,7 @@ export async function GET() {
             total,
         });
     } catch (error) {
-        console.error("Get cart error:", error);
+        log.error("Get cart error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ cartItem }, { status: 201 });
     } catch (error) {
-        console.error("Add to cart error:", error);
+        log.error("Add to cart error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -195,7 +195,7 @@ export async function DELETE() {
 
         return NextResponse.json({ message: "Cart cleared" });
     } catch (error) {
-        console.error("Clear cart error:", error);
+        log.error("Clear cart error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

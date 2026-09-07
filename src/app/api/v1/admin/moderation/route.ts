@@ -7,6 +7,7 @@ import { ModuleModerationProviders } from "@/core/generated/module-moderation";
 import { getModuleStates } from "@/core/lib/module-cache";
 import { readJsonBody } from "@/core/lib/api-body";
 import { pageParams } from "@/core/lib/page-params";
+import { log } from "@/core/lib/logger";
 
 async function loadActiveProviders() {
     const states = await getModuleStates();
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
             pages: Math.max(1, Math.ceil(total / perPage)),
         });
     } catch (err) {
-        console.error("[moderation] fetch failed:", err);
+        log.error("[moderation] fetch failed", { error: err instanceof Error ? err.message : String(err) });
         return NextResponse.json({ items: [], total: 0, page: 1, pages: 1 });
     }
 }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
         const mod = await provider.loader();
         affected = await mod.default.bulkUpdate(ids, newState);
     } catch (err) {
-        console.error("[moderation] action failed:", err);
+        log.error("[moderation] action failed", { error: err instanceof Error ? err.message : String(err) });
         return NextResponse.json({ error: "Operation failed" }, { status: 500 });
     }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, log, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../../lib/validations";
 
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ product });
     } catch (error) {
-        console.error("Get product error:", error);
+        log.error("Get product error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -83,7 +83,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ product });
     } catch (error) {
-        console.error("Update product error:", error);
+        log.error("Update product error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -117,7 +117,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ message: "Product archived" });
     } catch (error) {
-        console.error("Delete product error:", error);
+        log.error("Delete product error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

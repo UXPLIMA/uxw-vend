@@ -53,6 +53,11 @@ const ROUTES = walk(AUTH_API, /^route\.ts$/);
 function errorBodies(src: string): string[] {
     const bodies: string[] = [];
     for (let i = src.indexOf("{ error:"); i !== -1; i = src.indexOf("{ error:", i + 1)) {
+        // A log line names `error` too, and it is not a response. The
+        // contract this pins is what a caller reads, so anything handed to
+        // the logger is skipped.
+        const lineStart = src.lastIndexOf("\n", i) + 1;
+        if (/\blog\.(error|warn|info|debug)\(/.test(src.slice(lineStart, i))) continue;
         bodies.push(src.slice(i, src.indexOf("}", i) + 1));
     }
     // The multi-line form, where the message sits on its own line.

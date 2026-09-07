@@ -11,6 +11,7 @@ import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
 import { readJsonBody } from "@/core/lib/api-body";
+import { log } from "@/core/lib/logger";
 
 // Derive a locale code ("en"/"tr") from the request URL. Falls back to "en".
 // Used at signup so the welcome email goes out in the language the visitor
@@ -127,8 +128,8 @@ export async function POST(request: NextRequest) {
 
         // Non-blocking side effects. Anything module-specific reacts to the
         // `user.registered` hook fired below rather than being called here.
-        sendWelcomeEmail(email, username, userLocale).catch(console.error);
-        logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch(console.error);
+        sendWelcomeEmail(email, username, userLocale).catch((err: unknown) => log.error("[register] sending the welcome email failed", { error: err instanceof Error ? err.message : String(err) }));
+        logActivity({ userId: user.id, action: "user.register", entity: "user", entityId: user.id }).catch((err: unknown) => log.error("[register] recording the sign up in the activity log failed", { error: err instanceof Error ? err.message : String(err) }));
 
         // Fire user.registered hook action - modules can react (welcome coupons, etc.)
         import("@/core/lib/hooks")
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
             { status: 201 }
         );
     } catch (error: unknown) {
-        console.error("Registration error:", error);
+        log.error("Registration error", { error: error instanceof Error ? error.message : String(error) });
 
         // Handle Prisma unique constraint violations (P2002)
         if (
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
             typeof (error as { code: string }).code === "string" &&
             (error as { code: string }).code.startsWith("P")
         ) {
-            console.error("Prisma error code:", (error as { code: string }).code);
+            log.error("Prisma error code", { error: String((error as { code: string }).code) });
             return NextResponse.json(
                 { error: "Database error. Please try again later.", code: "db_error" },
                 { status: 500 }

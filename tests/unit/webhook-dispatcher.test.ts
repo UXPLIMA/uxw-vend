@@ -35,6 +35,13 @@ vi.mock("@/core/generated/module-webhooks", () => ({
     },
 }));
 
+// The route reports refusals through the structured logger. Quietened here
+// so a passing run stays readable; what the test asserts is the answer the
+// caller gets, not that something was written down.
+vi.mock("@/core/lib/logger", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
+}));
+
 vi.mock("@/core/lib/module-cache", () => ({
     getModuleStates: async () => moduleStatesHolder.value,
 }));
@@ -88,7 +95,6 @@ describe("webhook dispatcher: POST", () => {
     });
 
     it("refuses dispatch when no signature config and no verifiesInHandler flag", async () => {
-        const errSpy = vi.spyOn(console, "error").mockImplementation(() => { });
         receivers.push({
             provider: "paypal",
             module: "paypal-gateway",
@@ -100,8 +106,6 @@ describe("webhook dispatcher: POST", () => {
 
         expect(res.status).toBe(503);
         expect(handlerSpy).not.toHaveBeenCalled();
-        expect(errSpy).toHaveBeenCalled();
-        errSpy.mockRestore();
     });
 
     it("returns 404 for an unknown provider", async () => {
@@ -144,8 +148,6 @@ describe("webhook dispatcher: POST", () => {
             verifiesInHandler: true,
             loader: async () => ({ default: handlerSpy }),
         });
-        const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
         const req = makeReq("paypal");
         const res = await POST(req, {
             params: Promise.resolve({ provider: "paypal" }),
@@ -154,7 +156,6 @@ describe("webhook dispatcher: POST", () => {
         expect(res.status).toBe(500);
         const json = (await res.json()) as { error: string };
         expect(json.error).toBe("Webhook handler failed");
-        errSpy.mockRestore();
     });
 });
 

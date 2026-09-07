@@ -14,6 +14,7 @@ import { MODULES_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
 import { findDependents } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { invalidate } from "@/core/lib/cache";
+import { log } from "@/core/lib/logger";
 
 export async function DELETE(
     _request: NextRequest,
@@ -144,7 +145,10 @@ export async function DELETE(
             // imports, which would brick the next build. Log loudly and
             // surface the warning so the operator knows to rebuild manually.
             registryNeedsRebuild = true;
-            console.error("[module:uninstall] registry regeneration failed for", moduleId, err);
+            log.error("[module:uninstall] registry regeneration failed", {
+                moduleId,
+                error: err instanceof Error ? err.message : String(err),
+            });
         }
 
         // HookNames.MODULE_UNINSTALLED is part of the published contract, so it has to

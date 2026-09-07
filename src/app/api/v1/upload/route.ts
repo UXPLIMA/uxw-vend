@@ -4,6 +4,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { uploadFile, UPLOAD_ALLOWED_MIME, UPLOAD_MAX_SIZE } from "@/core/lib/storage";
 import { prisma } from "@/core/lib/db";
+import { log } from "@/core/lib/logger";
 
 /**
  * POST /api/v1/upload
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
                 },
             });
         } catch (err) {
-            console.error("[upload] Failed to record media library entry:", err);
+            log.error("[upload] Failed to record media library entry", { error: err instanceof Error ? err.message : String(err) });
         }
 
         return NextResponse.json(result);

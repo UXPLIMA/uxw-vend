@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
-import { logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
 import { resolveCurrency } from "../../lib/currency";
@@ -347,7 +347,7 @@ export async function POST(request: NextRequest) {
                         commands: commands.map((c) => ({ command: c.command, serverId: c.serverId })),
                         quantity: item.quantity,
                         variables: itemVars,
-                    }).catch(console.error);
+                    }).catch((err: unknown) => log.error("[store] a checkout side effect failed", { error: err instanceof Error ? err.message : String(err) }));
                 }
             }
 
@@ -366,7 +366,7 @@ export async function POST(request: NextRequest) {
                 entity: "order",
                 entityId: order.id,
                 metadata: { orderNumber: order.orderNumber, total, paymentMethod: "credits" },
-            }).catch(console.error);
+            }).catch((err: unknown) => log.error("[store] a checkout side effect failed", { error: err instanceof Error ? err.message : String(err) }));
 
             await announceOrderCreated(order.id);
             await announceOrderCompleted(order.id);
@@ -406,7 +406,7 @@ export async function POST(request: NextRequest) {
             entity: "order",
             entityId: order.id,
             metadata: { orderNumber: order.orderNumber, total },
-        }).catch(console.error);
+        }).catch((err: unknown) => log.error("[store] a checkout side effect failed", { error: err instanceof Error ? err.message : String(err) }));
 
         await announceOrderCreated(order.id);
 
@@ -531,7 +531,7 @@ export async function POST(request: NextRequest) {
                 { status: 400 },
             );
         }
-        console.error("Checkout error:", error);
+        log.error("Checkout error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

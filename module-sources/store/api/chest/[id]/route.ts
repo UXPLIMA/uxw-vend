@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { log, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../../lib/delivery";
 import { chestRedeemSchema } from "../../../lib/validations";
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             productName: item.productName,
             commands: commands.map((c) => ({ command: c.command, serverId: c.serverId })),
             quantity: item.quantity,
-        }).catch(console.error);
+        }).catch((err: unknown) => log.error("[store] delivering a chest reward failed", { error: err instanceof Error ? err.message : String(err) }));
     }
 
     return NextResponse.json({ message: "Item redeemed" });

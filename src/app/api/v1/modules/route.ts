@@ -16,6 +16,7 @@ import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
 import { readJsonBody } from "@/core/lib/api-body";
 import { resolveSettings, settingDeclarations, validateSettingsInput } from "@/core/lib/module-settings";
 import { z } from "zod";
+import { log } from "@/core/lib/logger";
 
 /**
  * Toggling or configuring one module. `config` stays `unknown` here on
@@ -268,7 +269,7 @@ export async function PATCH(request: NextRequest) {
                 !modulesDir.startsWith(modulesRoot + path.sep)
             ) {
                 hookError = `hook path escapes module directory: ${hookRelPath}`;
-                console.error(`[modules] ${moduleId} ${hookKey}: ${hookError}`);
+                log.error(`[modules] ${moduleId} ${hookKey}: ${hookError}`);
             } else {
                 const _require = typeof __webpack_require__ === "function"
                     ? __non_webpack_require__
@@ -280,7 +281,7 @@ export async function PATCH(request: NextRequest) {
             }
         } catch (err) {
             hookError = err instanceof Error ? err.message : String(err);
-            console.error(`[modules] ${moduleId} ${hookKey} hook failed:`, err);
+            log.error(`[modules] ${moduleId} ${hookKey} hook failed`, { error: err instanceof Error ? err.message : String(err) });
         }
     }
 

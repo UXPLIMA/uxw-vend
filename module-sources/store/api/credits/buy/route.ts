@@ -7,7 +7,7 @@
  * settled - never here.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { log, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ redirect: payment.redirectUrl }, { status: 200 });
     } catch (error) {
-        console.error("Credit purchase error:", error);
+        log.error("Credit purchase error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/core/sdk";
-import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, log, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { categorySchema } from "../../lib/validations";
 
@@ -23,7 +23,7 @@ export async function GET() {
 
         return NextResponse.json({ categories });
     } catch (error) {
-        console.error("List categories error:", error);
+        log.error("List categories error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ category }, { status: 201 });
     } catch (error) {
-        console.error("Create category error:", error);
+        log.error("Create category error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

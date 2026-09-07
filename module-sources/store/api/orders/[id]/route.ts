@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, log, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 
@@ -74,7 +74,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ order });
     } catch (error) {
-        console.error("Get order error:", error);
+        log.error("Get order error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -126,7 +126,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ order });
     } catch (error) {
-        console.error("Update order error:", error);
+        log.error("Update order error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

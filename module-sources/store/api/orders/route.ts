@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pageParams, isAdmin, prisma } from "@/core/sdk/server";
+import { isAdmin, log, pageParams, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
 /**
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
             pagination: { page, limit, total, pages: Math.ceil(total / limit) },
         });
     } catch (error) {
-        console.error("List orders error:", error);
+        log.error("List orders error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

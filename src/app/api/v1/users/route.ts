@@ -9,6 +9,7 @@ import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { PASSWORD_POLICY } from "@/core/lib/password-policy";
 import { pageParams } from "@/core/lib/page-params";
+import { log } from "@/core/lib/logger";
 
 /**
  * An admin creating an account by hand. The password is checked against the
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error) {
-        console.error("List users error:", error);
+        log.error("List users error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ user }, { status: 201 });
     } catch (error) {
-        console.error("Create user error:", error);
+        log.error("Create user error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

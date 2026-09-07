@@ -5,6 +5,7 @@ import { isAdmin } from "@/core/lib/permissions";
 import { exportUserData, buildExportReadme } from "@/core/lib/user-data-export";
 import { logActivity } from "@/core/lib/activity-log";
 import { getClientIP } from "@/core/lib/rate-limit";
+import { log } from "@/core/lib/logger";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             },
         });
     } catch (err) {
-        console.error("[admin-user-export] failed", err);
+        log.error("[admin-user-export] failed", { error: err instanceof Error ? err.message : String(err) });
         return NextResponse.json(
             { error: "Failed to build export" },
             { status: 500 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { isAdmin, log, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { communityGoalSchema } from "../../lib/validations";
 
@@ -39,7 +39,7 @@ export async function GET() {
 
         return NextResponse.json({ target, current, title, endDate });
     } catch (error) {
-        console.error("Community goal error:", error);
+        log.error("Community goal error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json({ target: 0, current: 0, title: "Monthly Goal", endDate: null });
     }
 }

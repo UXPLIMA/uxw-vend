@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { ModuleWebhookReceivers } from "@/core/generated/module-webhooks";
 import { getModuleStates } from "@/core/lib/module-cache";
+import { log } from "@/core/lib/logger";
 
 type RouteParams = { params: Promise<{ provider: string }> };
 
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // A manifest that sets neither would otherwise ship as an unauthenticated
     // public endpoint.
     if (!hasHmacConfig && !handlerVerifies) {
-        console.error(
+        log.error(
             `[webhook] ${provider}: refusing dispatch - manifest provides neither signatureHeader+secretEnv nor verifiesInHandler`,
         );
         return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (hasHmacConfig) {
         const secret = process.env[entry.secretEnv!];
         if (!secret) {
-            console.error(`[webhook] ${provider}: ${entry.secretEnv} not set`);
+            log.error(`[webhook] ${provider}: ${entry.secretEnv} not set`);
             return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
         }
         const sig = request.headers.get(entry.signatureHeader!);
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             const result = await mod.default(newRequest);
             return NextResponse.json(result.body || { ok: true }, { status: result.status || 200 });
         } catch (err) {
-            console.error(`[webhook] ${provider} handler failed:`, err);
+            log.error(`[webhook] ${provider} handler failed`, { error: err instanceof Error ? err.message : String(err) });
             return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
         }
     }
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const result = await mod.default(request);
         return NextResponse.json(result.body || { ok: true }, { status: result.status || 200 });
     } catch (err) {
-        console.error(`[webhook] ${provider} handler failed:`, err);
+        log.error(`[webhook] ${provider} handler failed`, { error: err instanceof Error ? err.message : String(err) });
         return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
     }
 }
