@@ -1,3 +1,4 @@
+import { radiusLength } from "../src/core/lib/theme-radius";
 import fs from "fs";
 import path from "path";
 import { themeManifestSchema, type ThemeManifest } from "../src/core/lib/theme-manifest-schema";
@@ -63,7 +64,17 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
             for (const [name, value] of fontDefaults) lines.push(`    --uxw-font-${name}: ${value};`);
 
             if (theme.tokens?.radius && "default" in theme.tokens.radius && theme.tokens.radius.default !== undefined) {
-                lines.push(`    --uxw-radius: ${theme.tokens.radius.default};`);
+                // The manifest stores the operator's *choice* - `md` - and a
+                // custom property will hold that word without complaining. It
+                // breaks at the first `min()` or `calc()` that reads it, which
+                // is every control clamping the theme radius, so the name is
+                // turned into a length here or no declaration is written.
+                const radius = radiusLength(theme.tokens.radius.default);
+                if (radius) {
+                    lines.push(`    --uxw-radius: ${radius};`);
+                } else {
+                    console.warn(`[themes] ${theme.id}: radius "${String(theme.tokens.radius.default)}" is not a length, leaving the default`);
+                }
             }
 
             blocks.push(`[data-theme="${id}"][data-mode="${modeName}"] {`);
