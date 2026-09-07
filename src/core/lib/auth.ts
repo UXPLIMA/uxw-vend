@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { cache } from "react";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { impersonationRefusal } from "./impersonation";
 import { identifierLookup } from "./login-identifier";
 import { REFUSAL_CODE } from "./login-refusal";
 import { SignInRefusal } from "./sign-in-refusal";
@@ -374,14 +375,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 typeof (updatePayload as { impersonate?: unknown }).impersonate === "string"
             ) {
                 const targetUserId = (updatePayload as { impersonate: string }).impersonate;
-                const currentRole = token.role as string | undefined;
-                if (currentRole !== "admin") return token;
-                if (token.originalUserId) return token;
                 const target = await prisma.user.findUnique({
                     where: { id: targetUserId },
                     include: { role: true },
                 });
-                if (!target) return token;
+                // The same rule the start endpoint applies. This is where the
+                // token is actually rewritten, so a client that skips that
+                // endpoint and calls update() directly meets it here too.
+                // `|| !target` narrows the type; the refusal already covers
+                // a missing row, so the two cannot disagree about it.
+                if (
+                    impersonationRefusal(
+                        {
+                            id: token.id as string,
+                            role: token.role as string | undefined,
+                            originalUserId: token.originalUserId as string | undefined,
+                        },
+                        target,
+                    ) ||
+                    !target
+                ) {
+                    return token;
+                }
                 token.originalUserId = token.id;
                 token.id = target.id;
                 token.role = target.role?.name || "member";

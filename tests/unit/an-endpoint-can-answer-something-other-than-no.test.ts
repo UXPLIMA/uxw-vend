@@ -38,6 +38,27 @@ function withoutComments(source: string): string {
     return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 }
 
+/** The argument list of every `NextResponse.json(...)` call, paren matched. */
+function jsonAnswers(source: string): string[] {
+    const calls: string[] = [];
+    const opener = /NextResponse\.json\(/g;
+    for (let m = opener.exec(source); m; m = opener.exec(source)) {
+        let depth = 0;
+        let i = m.index + m[0].length - 1;
+        const start = i;
+        for (; i < source.length; i++) {
+            const c = source[i];
+            if (c === "(" || c === "{" || c === "[") depth++;
+            else if (c === ")" || c === "}" || c === "]") {
+                depth--;
+                if (depth === 0) break;
+            }
+        }
+        calls.push(source.slice(start, i + 1));
+    }
+    return calls;
+}
+
 /** Ways a route hands back something that is not a refusal. */
 const SAYS_YES = /apiSuccess\(|apiPaginated\(|NextResponse\.redirect|NextResponse\.next|new NextResponse\(|new Response\(/;
 
@@ -56,11 +77,14 @@ describe("an endpoint", () => {
             const source = withoutComments(fs.readFileSync(file, "utf8"));
             if (SAYS_YES.test(source)) return false;
 
-            const jsonCalls = source.match(/NextResponse\.json\(/g)?.length ?? 0;
-            const statuses = [...source.matchAll(/status:\s*(\d{3})/g)].map((m) => Number(m[1]));
-            // A json response with no status of its own is a 200.
-            if (jsonCalls > statuses.length) return false;
-            return statuses.length > 0 && statuses.every((code) => code >= 400);
+            // Read each `NextResponse.json(...)` call's own arguments rather
+            // than counting `status:` across the file: a route that maps
+            // refusals through a lookup table has more of those words than it
+            // has answers, and counting them called it a route that can only
+            // fail.
+            const answers = jsonAnswers(source);
+            if (answers.length === 0) return false;
+            return answers.every((answer) => /status:\s*[45]\d\d/.test(answer));
         }).map((file) => path.relative(ROOT, file));
 
         expect(

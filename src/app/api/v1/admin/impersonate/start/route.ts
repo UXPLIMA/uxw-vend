@@ -4,6 +4,7 @@ import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
 import { logActivity } from "@/core/lib/activity-log";
 import { readJsonBody } from "@/core/lib/api-body";
+import { impersonationRefusal } from "@/core/lib/impersonation";
 import { z } from "zod";
 
 const startImpersonationSchema = z.object({
@@ -24,15 +25,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Hard security guard: only real admins may start impersonation, and
-    // a session already in impersonation mode cannot stack another one.
-    if (session.user.originalUserId) {
-        return NextResponse.json(
-            { error: "Already impersonating another user" },
-            { status: 400 }
-        );
-    }
-
+    // Only real admins may start impersonation. The rest of the rules live in
+    // `impersonationRefusal`, because the token is not written here: the
+    // client follows up with `update()` and the `jwt` callback does it, so
+    // both have to reach the same answer.
     const adminCheck = await isAdmin(session.user.id, session.user.role);
     if (!adminCheck) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -47,13 +43,6 @@ export async function POST(request: NextRequest) {
     }
     const targetId = parsed.data.userId;
 
-    if (targetId === session.user.id) {
-        return NextResponse.json(
-            { error: "Cannot impersonate yourself" },
-            { status: 400 }
-        );
-    }
-
     const target = await prisma.user.findUnique({
         where: { id: targetId },
         select: {
@@ -64,20 +53,27 @@ export async function POST(request: NextRequest) {
             role: { select: { name: true } },
         },
     });
-    if (!target) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    if (target.isBanned) {
-        return NextResponse.json(
-            { error: "Cannot impersonate a banned user" },
-            { status: 400 }
-        );
-    }
-    if (target.role?.name === "admin") {
-        return NextResponse.json(
-            { error: "Cannot impersonate another admin" },
-            { status: 400 }
-        );
+    const refusal = impersonationRefusal(
+        {
+            id: session.user.id,
+            role: "admin",
+            originalUserId: session.user.originalUserId ?? undefined,
+        },
+        target,
+    );
+    // `|| !target` is what narrows the type: the refusal already covers a
+    // missing row, and saying so here keeps the two from disagreeing.
+    if (refusal || !target) {
+        const said: Record<string, { error: string; status: 400 | 403 | 404 }> = {
+            not_admin: { error: "Forbidden", status: 403 },
+            already: { error: "Already impersonating another user", status: 400 },
+            self: { error: "Cannot impersonate yourself", status: 400 },
+            not_found: { error: "User not found", status: 404 },
+            banned: { error: "Cannot impersonate a banned user", status: 400 },
+            admin_target: { error: "Cannot impersonate another admin", status: 400 },
+        };
+        const answer = said[refusal ?? "not_found"];
+        return NextResponse.json({ error: answer.error }, { status: answer.status });
     }
 
     await logActivity({
