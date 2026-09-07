@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { blogCommentSchema } from "../../lib/validations";
+import { publishedArticle } from "../../lib/visible-article";
 
 type ModerationSettingValue = {
     blog_comments?: "auto" | "manual";
@@ -49,6 +50,20 @@ export async function GET(request: NextRequest) {
 
     const session = await auth();
     const adminCheck = session?.user?.id ? await isAdmin(session.user.id) : false;
+
+    // The comments of an article nobody may read are not public either. An
+    // administrator is exempt for the same reason they see PENDING comments:
+    // the moderation screen reads this endpoint. Asked before the comments,
+    // since a list that cannot be shown is a query worth not running.
+    if (!adminCheck) {
+        const visible = await prisma.blogArticle.findFirst({
+            where: { id: articleId, ...publishedArticle() },
+            select: { id: true },
+        });
+        if (!visible) {
+            return NextResponse.json({ error: "Article not found" }, { status: 404 });
+        }
+    }
 
     const comments = await prisma.blogComment.findMany({
         where: {
@@ -103,9 +118,12 @@ export async function POST(request: NextRequest) {
 
     const { content, articleId } = validation.data;
 
-    // Check if article exists
-    const article = await prisma.blogArticle.findUnique({
-        where: { id: articleId },
+    // The article has to be one a visitor could have read, not merely a row
+    // that exists: an article pulled back to a draft keeps the id it had while
+    // it was public, and every reading door in this module already refuses it.
+    const article = await prisma.blogArticle.findFirst({
+        where: { id: articleId, ...publishedArticle() },
+        select: { id: true },
     });
 
     if (!article) {

@@ -1,4 +1,5 @@
 import { prisma } from "@/core/sdk/server";
+import { publishedArticle } from "./visible-article";
 
 /**
  * Does `/blog/<number-or-slug>/<anything>` name an article a visitor can read?
@@ -24,8 +25,7 @@ export default async function blogArticleExists(params: Record<string, string | 
     const article = await prisma.blogArticle.findFirst({
         where: {
             ...(isNaN(num) ? { slug: lookup } : { number: num }),
-            status: "PUBLISHED",
-            publishedAt: { lte: new Date() },
+            ...publishedArticle(),
         },
         select: { id: true },
     });

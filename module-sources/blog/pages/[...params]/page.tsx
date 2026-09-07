@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { CommentSection } from "../../components/CommentSection";
 import { dateLocaleTag } from "@/core/sdk";
+import { publishedArticle } from "../../lib/visible-article";
 
 interface PageProps {
     params: Promise<Record<string, unknown>>;
@@ -27,8 +28,7 @@ async function getArticle(lookup: string) {
     const article = await prisma.blogArticle.findFirst({
         where: {
             ...(isNaN(num) ? { slug: lookup } : { number: num }),
-            status: "PUBLISHED",
-            publishedAt: { lte: new Date() },
+            ...publishedArticle(),
         },
         include: {
             author: { select: { username: true, avatar: true } },
@@ -52,8 +52,7 @@ async function getRelatedArticles(articleId: string, categoryId: string | null) 
     return prisma.blogArticle.findMany({
         where: {
             id: { not: articleId },
-            status: "PUBLISHED",
-            publishedAt: { lte: new Date() },
+            ...publishedArticle(),
             ...(categoryId ? { categoryId } : {}),
         },
         take: 3,

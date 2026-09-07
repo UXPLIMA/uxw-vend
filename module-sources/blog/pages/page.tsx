@@ -6,6 +6,7 @@ import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { NewsGrid } from "../components/news-grid";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
+import { publishedArticle } from "../lib/visible-article";
 
 export const revalidate = 60;
 
@@ -37,8 +38,7 @@ interface Filter {
  */
 async function getBlogArticles(page: number, filter: Filter) {
     const where = {
-        status: "PUBLISHED",
-        publishedAt: { lte: new Date() },
+        ...publishedArticle(),
         ...(filter.category ? { category: { slug: filter.category } } : {}),
         ...(filter.tag ? { tags: { some: { slug: filter.tag } } } : {}),
     } as const;
@@ -63,7 +63,7 @@ async function getBlogArticles(page: number, filter: Filter) {
         // The sidebar wants the five newest on every page, not the five that
         // happen to be at the top of the page being viewed.
         prisma.blogArticle.findMany({
-            where: { status: "PUBLISHED", publishedAt: { lte: new Date() } },
+            where: publishedArticle(),
             orderBy: { publishedAt: "desc" },
             take: 5,
             select: { id: true, number: true, slug: true, title: true, publishedAt: true, createdAt: true },

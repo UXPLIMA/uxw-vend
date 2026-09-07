@@ -8,18 +8,13 @@
 
 import { prisma } from "@/core/sdk/server";
 import type { SitemapEntry } from "@/core/generated/module-seo";
+import { publishedArticle } from "../lib/visible-article";
 
 export default async function blogSitemap(): Promise<SitemapEntry[]> {
     try {
         const articles = await prisma.blogArticle.findMany({
             where: {
-                status: "PUBLISHED",
-                publishedAt: { lte: new Date() },
-                // A `publishAt` left over from a schedule outlives a status
-                // change that does not mention it, so PUBLISHED plus a passed
-                // `publishedAt` is not yet the whole test the article's own
-                // page applies.
-                OR: [{ publishAt: null }, { publishAt: { lte: new Date() } }],
+                ...publishedArticle(),
             },
             select: {
                 slug: true,
