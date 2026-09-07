@@ -234,7 +234,7 @@ model GiftCode {
   createdAt   DateTime  @default(now())
 
   redeemedById String?
-  redeemedBy   User?   @relation("RedeemedGifts", fields: [redeemedById], references: [id])
+  redeemedBy   User?   @relation("RedeemedGifts", fields: [redeemedById], references: [id], onDelete: SetNull)
   createdById  String?
 
   @@index([redeemedById])
@@ -266,7 +266,7 @@ model ProductCommand {
 model ChestItem {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation("ChestItems", fields: [userId], references: [id])
+  user        User     @relation("ChestItems", fields: [userId], references: [id], onDelete: Cascade)
   productId   String
   productName String
   quantity    Int      @default(1)
