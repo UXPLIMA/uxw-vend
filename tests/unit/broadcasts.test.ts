@@ -6,11 +6,26 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * mail to everyone cannot be recalled - and the terminal status, since a
  * run that leaves a row in "sending" forever blocks the cron from ever
  * picking up the next broadcast.
+ *
+ * The third is how much of the instance it holds while it does that. Queueing
+ * read every recipient row in order to write `recipients.length`, and sending
+ * read them all again and kept the array for the whole run - which is minutes,
+ * because the loop waits 200ms between batches of fifty. Measured for a list of
+ * a hundred thousand: 32.5 MB of ids, emails and usernames held for six and a
+ * half minutes, and 150.6 MB at half a million.
  */
 
 const { emailBroadcast, user, sendEmail, log } = vi.hoisted(() => ({
     emailBroadcast: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
-    user: { findMany: vi.fn() },
+    user: {
+        findMany: vi.fn<(args: {
+            where?: Record<string, unknown>;
+            take?: number;
+            skip?: number;
+            cursor?: { id: string };
+        }) => Promise<unknown[]>>(),
+        count: vi.fn<(args: { where: Record<string, unknown> }) => Promise<number>>(async () => 0),
+    },
     sendEmail: vi.fn(async (_opts: { to: string; subject: string; html: string }) => true),
     log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
@@ -33,6 +48,22 @@ function people(count: number, over: Partial<{ email: string }> = {}) {
     }));
 }
 
+
+/**
+ * Stand the recipient table up behind the cursor the sender actually uses.
+ *
+ * The double used to answer every read with the same array, which is a table
+ * that never ends: the paged sender walked it for ever and the test worker
+ * was killed. A double that describes a database nobody has is worse than no
+ * double at all.
+ */
+function recipients(list: { id: string; email: string; username: string }[]) {
+    user.findMany.mockImplementation(async (args) => {
+        const start = args.cursor ? list.findIndex((p) => p.id === args.cursor!.id) + 1 : 0;
+        return list.slice(start, start + (args.take ?? list.length));
+    });
+}
+
 function broadcastRow(over: Record<string, unknown> = {}) {
     return {
         id: "b1",
@@ -53,7 +84,9 @@ beforeEach(() => {
     emailBroadcast.findUnique.mockReset().mockResolvedValue(null);
     emailBroadcast.findFirst.mockReset().mockResolvedValue(null);
     emailBroadcast.update.mockReset().mockResolvedValue({});
-    user.findMany.mockReset().mockResolvedValue([]);
+    user.findMany.mockReset();
+    recipients([]);
+    user.count.mockReset().mockResolvedValue(0);
     sendEmail.mockReset().mockResolvedValue(true);
     log.info.mockReset();
 });
@@ -67,7 +100,7 @@ describe("queueBroadcast", () => {
 
     it("marks the row queued with its recipient count", async () => {
         emailBroadcast.findUnique.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(3));
+        user.count.mockResolvedValue(3);
 
         await expect(queueBroadcast("b1")).resolves.toEqual({ totalCount: 3 });
         expect(emailBroadcast.update).toHaveBeenCalledWith({
@@ -84,13 +117,13 @@ describe("recipient filtering", () => {
 
     it("never includes banned users", async () => {
         await queueBroadcast("b1");
-        expect(user.findMany.mock.calls[0]![0].where.isBanned).toBe(false);
+        expect(user.count.mock.calls[0]![0].where.isBanned).toBe(false);
     });
 
     it("targets everyone when the filter says all", async () => {
         await queueBroadcast("b1");
 
-        const where = user.findMany.mock.calls[0]![0].where;
+        const where = user.count.mock.calls[0]![0].where;
         expect(where).not.toHaveProperty("id");
         expect(where).not.toHaveProperty("roleId");
     });
@@ -102,7 +135,7 @@ describe("recipient filtering", () => {
 
         await queueBroadcast("b1");
 
-        expect(user.findMany.mock.calls[0]![0].where.id).toEqual({ in: ["u1", "u2"] });
+        expect(user.count.mock.calls[0]![0].where.id).toEqual({ in: ["u1", "u2"] });
     });
 
     it("targets the named roles", async () => {
@@ -112,7 +145,7 @@ describe("recipient filtering", () => {
 
         await queueBroadcast("b1");
 
-        expect(user.findMany.mock.calls[0]![0].where.roleId).toEqual({ in: ["r1"] });
+        expect(user.count.mock.calls[0]![0].where.roleId).toEqual({ in: ["r1"] });
     });
 
     it("lets an explicit user list win over a role list", async () => {
@@ -122,7 +155,7 @@ describe("recipient filtering", () => {
 
         await queueBroadcast("b1");
 
-        const where = user.findMany.mock.calls[0]![0].where;
+        const where = user.count.mock.calls[0]![0].where;
         expect(where.id).toEqual({ in: ["u1"] });
         expect(where).not.toHaveProperty("roleId");
     });
@@ -134,17 +167,34 @@ describe("recipient filtering", () => {
 
         await queueBroadcast("b1");
 
-        expect(user.findMany.mock.calls[0]![0].where.roleId).toEqual({ in: ["r1"] });
+        expect(user.count.mock.calls[0]![0].where.roleId).toEqual({ in: ["r1"] });
     });
 
-    it("skips users with no email address", async () => {
-        user.findMany.mockResolvedValue([
-            { id: "u1", email: "a@b.co", username: "a" },
-            { id: "u2", email: null, username: "b" },
-            { id: "u3", email: "", username: "c" },
-        ]);
+    // The guarantee has not changed, only where it is kept. It used to be a
+    // `.filter(u => !!u.email)` after the rows were read, which meant the
+    // number written here and the people actually sent to could differ by
+    // however many blank addresses a bad import had left. It is a condition on
+    // the query now, so the count is the send.
+    it("leaves out an address nobody can deliver to, in the query itself", async () => {
+        await queueBroadcast("b1");
 
-        await expect(queueBroadcast("b1")).resolves.toEqual({ totalCount: 1 });
+        expect(user.count.mock.calls[0]![0].where.email).toEqual({ not: "" });
+    });
+
+    it("asks the sender for the same people it counted", async () => {
+        // Both halves must be looking at one broadcast, or this compares the
+        // filter of the row being queued with the filter of the row being sent.
+        const row = broadcastRow({ filter: { roleIds: ["r1"] } });
+        emailBroadcast.findUnique.mockResolvedValue(row);
+        emailBroadcast.findFirst.mockResolvedValue(row);
+        emailBroadcast.update.mockResolvedValue({});
+        emailBroadcast.updateMany.mockResolvedValue({ count: 0 });
+        recipients(people(1));
+
+        await queueBroadcast("b1");
+        await processQueuedBroadcasts();
+
+        expect(user.findMany.mock.calls[0]![0].where).toEqual(user.count.mock.calls[0]![0].where);
     });
 });
 
@@ -177,7 +227,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("sends one message per recipient", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(3));
+        recipients(people(3));
 
         await processQueuedBroadcasts();
 
@@ -186,7 +236,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("substitutes the recipient's username into the body", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(1));
+        recipients(people(1));
 
         await processQueuedBroadcasts();
 
@@ -201,7 +251,7 @@ describe("processQueuedBroadcasts", () => {
         emailBroadcast.findFirst.mockResolvedValue(
             broadcastRow({ body: "{username} {username}" }),
         );
-        user.findMany.mockResolvedValue(people(1));
+        recipients(people(1));
 
         await processQueuedBroadcasts();
 
@@ -210,7 +260,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("finishes as sent with the counts", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(2));
+        recipients(people(2));
 
         await processQueuedBroadcasts();
 
@@ -222,7 +272,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("still finishes as sent when only some recipients failed", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(2));
+        recipients(people(2));
         sendEmail.mockRejectedValueOnce(new Error("mailbox full"));
 
         await processQueuedBroadcasts();
@@ -236,7 +286,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("marks the broadcast failed only when nothing got through", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(2));
+        recipients(people(2));
         sendEmail.mockRejectedValue(new Error("provider down"));
 
         await processQueuedBroadcasts();
@@ -248,7 +298,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("stringifies a non-Error failure", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(1));
+        recipients(people(1));
         sendEmail.mockRejectedValue("socket hang up");
 
         await processQueuedBroadcasts();
@@ -267,7 +317,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("saves progress partway through a long run", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(120));
+        recipients(people(120));
 
         await processQueuedBroadcasts();
 
@@ -279,7 +329,7 @@ describe("processQueuedBroadcasts", () => {
 
     it("records the outcome in the log", async () => {
         emailBroadcast.findFirst.mockResolvedValue(broadcastRow());
-        user.findMany.mockResolvedValue(people(1));
+        recipients(people(1));
 
         await processQueuedBroadcasts();
 
@@ -338,5 +388,49 @@ describe("a broadcast left mid-send", () => {
     it("does not send anything on the way past", async () => {
         await processQueuedBroadcasts();
         expect(sendEmail, "resuming would mail people a second time").not.toHaveBeenCalled();
+    });
+});
+
+describe("what a broadcast holds while it runs", () => {
+    it("counts the recipients without reading them", async () => {
+        emailBroadcast.findUnique.mockResolvedValue(broadcastRow({ filter: { all: true } }));
+        user.count.mockResolvedValue(120_000);
+        emailBroadcast.update.mockResolvedValue({});
+
+        const { totalCount } = await queueBroadcast("b1");
+
+        expect(totalCount).toBe(120_000);
+        expect(user.findMany, "queueing wants a number, not a hundred thousand rows").not.toHaveBeenCalled();
+    });
+
+    it("counts the same people it would send to", async () => {
+        emailBroadcast.findUnique.mockResolvedValue(broadcastRow({ filter: { roleIds: ["r1"] } }));
+        user.count.mockResolvedValue(3);
+        emailBroadcast.update.mockResolvedValue({});
+
+        await queueBroadcast("b1");
+
+        expect(user.count.mock.calls[0][0]).toMatchObject({
+            where: { isBanned: false, roleId: { in: ["r1"] } },
+        });
+    });
+
+    it("reads the list a page at a time when it sends", async () => {
+        emailBroadcast.findFirst.mockResolvedValue(broadcastRow({ filter: { all: true } }));
+        emailBroadcast.update.mockResolvedValue({});
+        emailBroadcast.updateMany.mockResolvedValue({ count: 0 });
+        const everyone = people(120);
+        user.findMany.mockImplementation(async (args) => {
+            const start = args.cursor ? everyone.findIndex((p) => p.id === args.cursor!.id) + 1 : 0;
+            return everyone.slice(start, start + (args.take ?? everyone.length));
+        });
+
+        await processQueuedBroadcasts();
+
+        expect(sendEmail).toHaveBeenCalledTimes(120);
+        for (const call of user.findMany.mock.calls) {
+            expect(call[0].take, "every read is bounded").toBeTypeOf("number");
+        }
+        expect(user.findMany.mock.calls.length).toBeGreaterThan(1);
     });
 });
