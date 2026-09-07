@@ -20,7 +20,25 @@
  * OFFSET holds.
  */
 
-/** The furthest into a table paging will go. */
+/**
+ * The furthest into a table paging will go.
+ *
+ * The note above justifies it by what an OFFSET can hold, which is about the
+ * type. What it costs is a separate question and was measured in Postgres on
+ * a 500k-row table, indexed on both the filter and the sort:
+ *
+ *     offset          0     1.2 ms
+ *     offset     12,000     3.4 ms
+ *     offset    499,988   141.2 ms   (the whole table)
+ *     offset  9,999,900   117.9 ms   (this ceiling; the table ran out first)
+ *
+ * A deep page costs a walk of the table rather than of its own number,
+ * because a database cannot skip rows that are not there. So this bounds the
+ * damage only while the table is smaller than it, and the number that decides
+ * the worst case is this one times `MAX_PAGE_SIZE`, which nobody declares.
+ * `how-deep-a-page-may-go-is-a-number-somebody-chose.test.ts` holds the
+ * product, so raising either constant has to be argued rather than assumed.
+ */
 export const MAX_PAGE = 100_000;
 
 /** How many rows a list gives back when the caller does not say. */
