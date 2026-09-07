@@ -18,6 +18,15 @@
  * does not. So the page's own visible text is the evidence: anything shaped
  * like `<namespace>.<key>`, where the namespace is one core or a module
  * actually declares, is a key that escaped onto the screen.
+ *
+ * The budget is derived rather than inherited. This walks up to sixteen
+ * screens and has to let each settle, so Playwright's default thirty seconds
+ * was never a number chosen for it: the mandated waiting alone came to 19.5s
+ * of that. Measured in CI against a production build it ran in 20.5s, two
+ * thirds of a budget nobody picked, and against a development server it
+ * exceeded it outright. `BUDGET_MS` is worked out from the same constants the
+ * walk uses, so raising the settle time or the page cap raises the budget with
+ * it rather than turning into a timeout nobody can read.
  */
 import { test, expect } from '@playwright/test';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -77,8 +86,41 @@ test.describe('translation keys never reach the page', () => {
         expect(NAMESPACES).toContain('common');
     });
 
-    for (const locale of ['tr', 'en']) {
+/** Screens walked, at most. A small install's nav offers fewer. */
+const MAX_PATHS = 15;
+/** How long a screen is given to finish drawing before it is read. */
+const SETTLE_MS = 1200;
+/** The first load warms the app as well, so it gets a little longer. */
+const FIRST_LOAD_SETTLE_MS = 1500;
+/**
+ * The wait stays a fixed one, and that is a decision rather than an oversight.
+ *
+ * Waiting for `.animate-spin` to clear was tried and measured: it took the two
+ * walks from failing on this box to passing in 38.9s. It was reverted because
+ * the served homepage contains no spinner at all, so the condition is already
+ * true before a client component has begun to fetch - the wait would return at
+ * the floor and the screen would be read before the copy it is being checked
+ * for had a chance to render. A gate that is quick because it looks earlier is
+ * not quicker.
+ *
+ * What was wrong was never the waiting. It was the budget: thirty seconds,
+ * inherited from Playwright's default, for a walk whose mandated waiting is
+ * 19.5s of it.
+ */
+
+/**
+ * What the walk may cost: the waiting it mandates, a second for each
+ * navigation, and a margin. The default gave it 30s for 20.7s of waiting it
+ * has no choice about, and CI measured the whole test at 20.5s against a
+ * production build - two thirds of a budget nobody chose for it.
+ */
+const BUDGET_MS = FIRST_LOAD_SETTLE_MS + (MAX_PATHS + 1) * (SETTLE_MS + 1000) + 10_000;
+
+
+for (const locale of ['tr', 'en']) {
         test(`no screen in ${locale} renders a key`, async ({ page }) => {
+            test.setTimeout(BUDGET_MS);
+
             const missing: string[] = [];
             page.on('console', (msg) => {
                 if (MISSING_MESSAGE.test(msg.text())) missing.push(msg.text());
@@ -87,7 +129,7 @@ test.describe('translation keys never reach the page', () => {
             // `networkidle` is not a safe wait here: a session refresh or a widget
             // poll keeps the connection busy, so it times out on a healthy page.
             await page.goto(`/${locale}`, { waitUntil: 'load' });
-            await page.waitForTimeout(1500);
+            await page.waitForTimeout(FIRST_LOAD_SETTLE_MS);
 
             // Walk what the navigation actually offers, so a module that adds
             // a page is covered the day it adds one.
@@ -97,12 +139,12 @@ test.describe('translation keys never reach the page', () => {
                     [...new Set(links.map((l) => (l as HTMLAnchorElement).getAttribute('href') ?? ''))],
                 );
 
-            const paths = [`/${locale}`, ...hrefs.filter(Boolean)].slice(0, 15);
+            const paths = [`/${locale}`, ...hrefs.filter(Boolean)].slice(0, MAX_PATHS);
             const offenders: string[] = [];
 
             for (const path of paths) {
                 await page.goto(path, { waitUntil: 'load' });
-                await page.waitForTimeout(1200);
+                await page.waitForTimeout(SETTLE_MS);
                 const keys = await visibleKeys(page);
                 if (keys.length) offenders.push(`${path}: ${keys.join(', ')}`);
             }
