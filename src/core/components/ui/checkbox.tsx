@@ -43,7 +43,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             // The fade for a disabled box belongs on the wrapper, not on the
             // input: the tick is drawn as a sibling, so dimming only the input
             // left a full-strength tick floating on a washed-out box.
-            <span className={cn("relative inline-flex h-4 w-4 shrink-0 align-middle has-[:disabled]:opacity-50", className)}>
+            <span className={cn("relative inline-flex h-[18px] w-[18px] shrink-0 align-middle has-[:disabled]:opacity-50", className)}>
                 <input
                     type="checkbox"
                     ref={(node) => {
@@ -52,30 +52,47 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                         else if (ref) ref.current = node;
                     }}
                     className={cn(
-                        // `uxw-control-radius`, not `rounded`: the site-wide
-                        // radius is half of this box, which drew every
-                        // checkbox as a circle - the radio button's shape.
-                        "peer h-4 w-4 cursor-pointer appearance-none uxw-control-radius border border-border bg-background",
+                        // 18px rather than 16: the label beside it is 14px, and
+                        // a box smaller than the text it belongs to reads as an
+                        // afterthought. `uxw-checkbox-radius`, not `rounded`,
+                        // because the site-wide radius is written for buttons
+                        // and drew this one as a circle - the radio's shape.
+                        "peer h-[18px] w-[18px] cursor-pointer appearance-none uxw-checkbox-radius",
+                        "border border-border bg-background",
                         "transition-colors duration-150",
-                        "hover:border-primary/60",
+                        "hover:border-primary/70",
                         "checked:border-primary checked:bg-primary",
                         "indeterminate:border-primary indeterminate:bg-primary",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                        // Offset so the ring sits around the box rather than on
+                        // its edge, where it looked like a second border.
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         "disabled:cursor-not-allowed",
                     )}
                     {...props}
                 />
+                {/*
+                  * The mark is 12px inside an 18px box, which leaves it room to
+                  * be a tick rather than a glyph wedged corner to corner - the
+                  * shape that made a checked box read as a solid block with
+                  * something wrong in it. Stroke 2.5 for the same reason.
+                  */}
                 {indeterminate ? (
                     <Minus
                         aria-hidden="true"
-                        strokeWidth={3}
+                        strokeWidth={2.5}
                         className="pointer-events-none absolute inset-0 m-auto h-3 w-3 text-primary-foreground"
                     />
                 ) : (
                     <Check
                         aria-hidden="true"
-                        strokeWidth={3}
-                        className="pointer-events-none absolute inset-0 m-auto h-3 w-3 text-primary-foreground opacity-0 peer-checked:opacity-100"
+                        strokeWidth={2.5}
+                        className={cn(
+                            "pointer-events-none absolute inset-0 m-auto h-3 w-3 text-primary-foreground",
+                            // Grows into place instead of appearing: the same
+                            // 150ms the box takes to fill.
+                            "scale-75 opacity-0 transition duration-150",
+                            "peer-checked:scale-100 peer-checked:opacity-100",
+                        )}
                     />
                 )}
             </span>

@@ -45,17 +45,23 @@ describe("one checkbox for the whole panel", () => {
 
     it("is a box, not the radio button's circle", () => {
         // `rounded` resolves to the site-wide radius, which is 0.5rem by
-        // default - exactly half of this 16px control, so every checkbox in
-        // the panel was drawn as a perfect circle and could not be told apart
-        // from the radio button beside it. `uxw-control-radius` caps it at a
-        // quarter of the box and still collapses to 0 for a square theme.
+        // default - half of this control, so every checkbox in the panel was
+        // drawn as a perfect circle and could not be told apart from the radio
+        // button beside it. The box uses its own clamp, which caps the theme's
+        // radius at a third of the box and still collapses to 0 for a square
+        // theme; the name changed when the box grew to 18px and the old
+        // quarter-of-16 cap started reading as a hard corner beside the
+        // buttons around it.
         const checkbox = fs.readFileSync(join(ROOT, "src/core/components/ui/checkbox.tsx"), "utf8");
-        expect(checkbox).toContain("uxw-control-radius");
+        expect(checkbox).toContain("uxw-checkbox-radius");
         // The comments here explain the old class, so only the code counts.
         const code = checkbox.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
         expect(code).not.toMatch(/\brounded\b(?!-)/);
-        expect(fs.readFileSync(join(ROOT, "src/app/globals.css"), "utf8"))
-            .toContain(".uxw-control-radius");
+        const css = fs.readFileSync(join(ROOT, "src/app/globals.css"), "utf8");
+        expect(css).toContain(".uxw-checkbox-radius");
+        // The clamp is the whole point: a theme radius written for buttons
+        // must not reach this control unbounded.
+        expect(css).toMatch(/\.uxw-checkbox-radius\s*\{[^}]*min\(var\(--uxw-radius\)/);
         // And the radio still is a circle, or the two have swapped problems.
         expect(fs.readFileSync(join(ROOT, "src/core/components/ui/radio.tsx"), "utf8"))
             .toContain("rounded-full");
