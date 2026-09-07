@@ -22,7 +22,7 @@ const presetSchema = z.object({
     modules: z.array(z.string().regex(SAFE_ID)).max(50).default([]),
 });
 
-export const presetFileSchema = z.object({
+const presetFileSchema = z.object({
     version: z.string().max(32).optional(),
     presets: z.array(presetSchema).max(20),
 });

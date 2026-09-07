@@ -120,7 +120,7 @@ export function verifyBackupCode(code: string, hashedCodes: string[]): { valid: 
     return { valid: true, remaining };
 }
 
-export function parseBackupCodes(value: unknown): string[] {
+function parseBackupCodes(value: unknown): string[] {
     if (!value) return [];
     if (Array.isArray(value)) return value as string[];
     if (typeof value === "string") {

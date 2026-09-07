@@ -62,10 +62,3 @@ export function isCanonicalSlot(name: string): name is CanonicalSlot {
     return CANONICAL_SLOT_SET.has(name);
 }
 
-/**
- * Generic slot-name sanity check: shape only, no membership.
- * Used to validate user/module-defined slot names that core doesn't own.
- */
-export function isValidSlotName(name: string): boolean {
-    return /^[a-zA-Z0-9.-]+$/.test(name) && name.length > 0 && name.length <= 128;
-}

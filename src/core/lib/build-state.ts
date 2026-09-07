@@ -83,7 +83,7 @@ const IMAGE_BUILD_ID_FILE = ".uxwvend-image-build-id";
 /** What `computeModuleFingerprint` returns when nothing is installed. */
 const EMPTY_FINGERPRINT = createHash("sha256").digest("hex");
 
-export function nextDir(root: string = process.cwd()): string {
+function nextDir(root: string = process.cwd()): string {
     return path.join(root, ".next");
 }
 
@@ -118,7 +118,7 @@ export function computeModuleFingerprint(root: string = process.cwd()): string {
 }
 
 /** The image's own build id, or null outside a container image. */
-export function readImageBuildId(root: string = process.cwd()): string | null {
+function readImageBuildId(root: string = process.cwd()): string | null {
     const file = path.join(root, IMAGE_BUILD_ID_FILE);
     try {
         return fs.readFileSync(file, "utf8").trim() || null;

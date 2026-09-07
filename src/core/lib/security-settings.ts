@@ -14,7 +14,7 @@
 import { prisma } from "./db";
 import { PASSWORD_POLICY, checkPasswordPolicy, type PasswordCheck } from "./password-policy";
 
-export const SETTING_KEYS = {
+const SETTING_KEYS = {
     passwordMinLength: "password_min_length",
     passwordResetExpiryMinutes: "password_reset_expiry_minutes",
     emailVerifyExpiryHours: "email_verify_expiry_hours",
@@ -94,7 +94,7 @@ function toNumber(raw: unknown): number | null {
     return null;
 }
 
-export function clampBounded(raw: unknown, setting: BoundedSetting): number {
+function clampBounded(raw: unknown, setting: BoundedSetting): number {
     const n = toNumber(raw);
     if (n === null) return setting.defaultValue;
     return Math.min(setting.max, Math.max(setting.min, Math.floor(n)));
@@ -120,7 +120,7 @@ async function readSetting(key: string): Promise<unknown> {
     }
 }
 
-export async function getPasswordMinLength(): Promise<number> {
+async function getPasswordMinLength(): Promise<number> {
     return clampMinPasswordLength(await readSetting(SETTING_KEYS.passwordMinLength));
 }
 

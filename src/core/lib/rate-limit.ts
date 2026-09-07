@@ -68,7 +68,7 @@ function memoryHitSync(identifier: string, config: RateLimitConfig): RateLimitRe
     return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
 }
 
-export const MemoryBackend: RateLimitBackend = {
+const MemoryBackend: RateLimitBackend = {
     name: "memory",
     async hit(identifier, config) {
         return memoryHitSync(identifier, config);

@@ -1,11 +1,12 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 /**
  * Lightweight same-origin CSRF guard for custom API mutation routes.
  *
- * NextAuth already protects its own endpoints (/api/auth/*). This helper is
- * for the dozens of custom state-changing endpoints we own - profile delete,
- * admin CRUD, API keys, module install/enable, etc.
+ * NextAuth already protects its own endpoints (/api/auth/*). Every other
+ * state-changing endpoint we own is covered in one place: `src/proxy.ts`
+ * calls `checkCsrf` before a mutating request reaches a route, so a handler
+ * does not check for itself and there is nowhere for one to forget.
  *
  * Strategy: verify the request's Origin (or Referer as fallback) matches one
  * of the configured allowed origins. This blocks the common CSRF vector of a
@@ -99,23 +100,3 @@ export function checkCsrf(request: NextRequest): CsrfResult {
     return { ok: true };
 }
 
-/**
- * Convenience wrapper that returns a NextResponse 403 ready to return from
- * a route handler, or `null` when the request passes the CSRF check.
- *
- * Usage:
- *   const bad = requireCsrfOrRespond(request);
- *   if (bad) return bad;
- */
-export function requireCsrfOrRespond(request: NextRequest) {
-    const result = checkCsrf(request);
-    if (result.ok) return null;
-
-    const message = result.reason === "origin_missing"
-        ? "Origin header is required"
-        : "Origin not allowed";
-    return NextResponse.json(
-        { ok: false, error: message, code: "csrf_rejected" },
-        { status: 403 },
-    );
-}
