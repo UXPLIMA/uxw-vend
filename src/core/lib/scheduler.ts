@@ -239,15 +239,12 @@ export async function bootstrapScheduler(): Promise<void> {
         handler: async () => {
             const { pruneOldRecords } = await import("./retention");
             const r = await pruneOldRecords();
-            const total = r.activityFeed + r.revision + r.userSession + r.verificationToken;
+            // Read off the result rather than listed by hand. The list was
+            // one name short of the result for as long as there were five
+            // counts, so the table added last was swept in silence.
+            const total = Object.values(r).reduce((sum, n) => sum + n, 0);
             if (total > 0) {
-                log.info("cron: retention sweep complete", {
-                    job: "retention",
-                    activityFeed: r.activityFeed,
-                    revision: r.revision,
-                    userSession: r.userSession,
-                    verificationToken: r.verificationToken,
-                });
+                log.info("cron: retention sweep complete", { job: "retention", ...r });
             }
         },
     });

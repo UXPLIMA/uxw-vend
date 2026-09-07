@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+const activityLogDeleteMany = vi.fn();
 const activityFeedItemDeleteMany = vi.fn();
 const cronRunDeleteMany = vi.fn();
 const revisionDeleteMany = vi.fn();
@@ -9,6 +10,7 @@ const webhookLogDeleteMany = vi.fn();
 
 vi.mock("@/core/lib/db", () => ({
     prisma: {
+        activityLog: { deleteMany: (...a: unknown[]) => activityLogDeleteMany(...a) },
         activityFeedItem: { deleteMany: (...a: unknown[]) => activityFeedItemDeleteMany(...a) },
         cronRun: { deleteMany: (...a: unknown[]) => cronRunDeleteMany(...a) },
         revision: { deleteMany: (...a: unknown[]) => revisionDeleteMany(...a) },
@@ -29,6 +31,7 @@ const count = (n: number) => ({ count: n });
 beforeEach(async () => {
     vi.resetModules();
     for (const fn of [
+        activityLogDeleteMany,
         activityFeedItemDeleteMany,
         cronRunDeleteMany,
         revisionDeleteMany,
@@ -49,6 +52,7 @@ describe("retention: pruneOldRecords", () => {
         verificationTokenDeleteMany.mockResolvedValue(count(4));
 
         expect(await mod.pruneOldRecords()).toEqual({
+            activityLog: 0,
             activityFeed: 5,
             revision: 3,
             userSession: 0,
@@ -174,5 +178,54 @@ describe("the cron state table", () => {
     it("is not counted as something the sweep removed", async () => {
         const result = await mod.pruneOldRecords();
         expect(result).not.toHaveProperty("cronRun");
+    });
+});
+
+/**
+ * The admin audit trail is the table this file was written for and the one it
+ * did not name. `logActivity` writes to it from sixty-two places - every admin
+ * mutation the product makes - and nothing has ever deleted a row. Measured in
+ * Postgres with its four indexes and the metadata blobs the call sites really
+ * write: 451 bytes a row, so a site taking five hundred admin actions a day
+ * keeps about 82 MB a year and never gives any of it back.
+ *
+ * The window is the one `Revision` already has, and for the reason already
+ * written down there: this is audit data, so it is kept longer than a feed.
+ */
+describe("retention: the admin audit trail", () => {
+    it("drops entries older than the audit window", async () => {
+        activityLogDeleteMany.mockResolvedValue(count(9));
+        const before = Date.now();
+
+        const result = await mod.pruneOldRecords();
+
+        expect(result.activityLog).toBe(9);
+        const where = activityLogDeleteMany.mock.calls[0][0].where as {
+            createdAt: { lt: Date };
+        };
+        const windowDays = (before - where.createdAt.lt.getTime()) / DAY_MS;
+        expect(windowDays).toBeGreaterThan(364);
+        expect(windowDays).toBeLessThan(366);
+    });
+
+    it("keeps the same window as the other audit table, so neither drifts", async () => {
+        await mod.pruneOldRecords();
+
+        const audit = (activityLogDeleteMany.mock.calls[0][0] as { where: { createdAt: { lt: Date } } })
+            .where.createdAt.lt.getTime();
+        const revision = (revisionDeleteMany.mock.calls[0][0] as { where: { createdAt: { lt: Date } } })
+            .where.createdAt.lt.getTime();
+
+        expect(Math.abs(audit - revision)).toBeLessThan(1000);
+    });
+
+    it("does not take the whole run down when its delete fails", async () => {
+        activityLogDeleteMany.mockRejectedValue(new Error("deadlock detected"));
+        revisionDeleteMany.mockResolvedValue(count(2));
+
+        const result = await mod.pruneOldRecords();
+
+        expect(result.activityLog).toBe(0);
+        expect(result.revision).toBe(2);
     });
 });

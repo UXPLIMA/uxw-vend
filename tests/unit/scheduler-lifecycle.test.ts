@@ -61,9 +61,15 @@ vi.mock("@/core/lib/logger", () => ({
 vi.mock("@/core/lib/revisions", () => ({ pruneOldRevisions: async () => 0 }));
 vi.mock("@/core/lib/broadcasts", () => ({ processQueuedBroadcasts: async () => undefined }));
 vi.mock("@/core/lib/email", () => ({ processEmailQueue: async () => ({ sent: 0, failed: 0 }) }));
-vi.mock("@/core/lib/retention", () => ({
-    pruneOldRecords: async () => ({ activityFeed: 0, webhookLog: 0, cronRun: 0, revision: 0, userSession: 0 }),
-}));
+/**
+ * The shape here is the shape `pruneOldRecords` really returns. It used to
+ * name `webhookLog` and `cronRun`, which that function stopped touching two
+ * changes ago, so this stub described a contract nothing had.
+ */
+let pruned = {
+    activityLog: 0, activityFeed: 0, revision: 0, userSession: 0, verificationToken: 0,
+};
+vi.mock("@/core/lib/retention", () => ({ pruneOldRecords: async () => pruned }));
 vi.mock("@/core/lib/health-alerting", () => ({ checkAndAlert: async () => ({ notified: false }) }));
 vi.mock("@/core/lib/ip-blocks", () => ({ invalidateIpBlockCache: () => { } }));
 vi.mock("@/core/lib/backup", () => ({ createBackup: async () => ({ filename: "f", sizeBytes: 1 }) }));
@@ -401,5 +407,25 @@ describe("tick and claimJob", () => {
         await drain();
 
         expect(good).toHaveBeenCalledOnce();
+    });
+});
+
+describe("what the retention sweep reports", () => {
+    // The sweep summed four of its five counts by hand and listed the same
+    // four in its log line, so the count added last was invisible: a night
+    // that pruned nothing but the admin audit trail said nothing at all.
+    it("counts and names every table the sweep touched", async () => {
+        vi.useFakeTimers();
+        pruned = { activityLog: 7, activityFeed: 0, revision: 0, userSession: 0, verificationToken: 0 };
+        const { log } = await import("@/core/lib/logger");
+        const { bootstrapScheduler, runJobNow } = await load();
+        await bootstrapScheduler();
+
+        await runJobNow("core:retention-prune");
+
+        const sweep = (log.info as unknown as { mock: { calls: unknown[][] } }).mock.calls
+            .find((call) => String(call[0]).includes("retention sweep"));
+        expect(sweep, "a sweep that deleted something says so").toBeTruthy();
+        expect(sweep![1]).toMatchObject({ activityLog: 7 });
     });
 });

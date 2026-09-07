@@ -69,7 +69,13 @@ describe("the scheduler", () => {
     });
 
     it("registers the retention sweep that now owns the token prune", () => {
+        // Where the token prune lives is a fact about retention.ts, not about
+        // a line of the scheduler's log call. This used to assert the log
+        // named `verificationToken`, which stopped being true the day the log
+        // started reading its counts off the result instead of listing them -
+        // while the guarantee the test is named for stayed exactly as true.
         expect(scheduler).toContain('key: "core:retention-prune"');
-        expect(scheduler).toContain("verificationToken: r.verificationToken");
+        expect(code(read("src/core/lib/retention.ts")))
+            .toContain("prisma.verificationToken.deleteMany");
     });
 });
