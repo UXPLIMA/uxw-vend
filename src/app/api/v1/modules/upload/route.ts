@@ -14,6 +14,7 @@ import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
+import { findApiPathConflicts } from "@/core/lib/module-api-conflicts";
 import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom } from "@/core/lib/module-dependencies";
 import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT } from "@/core/lib/runtime-paths";
@@ -144,6 +145,28 @@ export async function POST(request: NextRequest) {
                     activeConflicts: depCheck.activeConflicts,
                     versionMismatches: depCheck.versionMismatches,
                     coreIncompatible: depCheck.coreIncompatible,
+                },
+                { status: 409 },
+            );
+        }
+
+        // Which module answers an address is decided by enumeration order:
+        // `matchApiRoute` takes the first declaration whose path equals the
+        // URL. An uploaded manifest is the least trusted input there is, so
+        // without this check a ZIP could claim a path that has been answering
+        // for months and make it unreachable with nothing said.
+        const addressClash = findApiPathConflicts(
+            { module: manifest.id, paths: (manifest.api ?? []).map((entry) => entry.path) },
+            moduleSystem.getDefinitions().map((installed) => ({
+                module: installed.id,
+                paths: (installed.api ?? []).map((entry) => entry.path),
+            })),
+        );
+        if (addressClash.length > 0) {
+            return NextResponse.json(
+                {
+                    error: `Module ${manifest.id} claims API paths another module already answers`,
+                    conflictingPaths: addressClash,
                 },
                 { status: 409 },
             );

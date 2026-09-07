@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
+import { findApiPathConflicts } from "@/core/lib/module-api-conflicts";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { logActivity } from "@/core/lib/activity-log";
@@ -197,6 +198,31 @@ export async function POST(request: NextRequest) {
                     activeConflicts: depCheck.activeConflicts,
                     versionMismatches: depCheck.versionMismatches,
                     coreIncompatible: depCheck.coreIncompatible,
+                },
+                { status: 409 },
+            );
+        }
+
+
+        // Which module answers an address is decided by enumeration order:
+        // `matchApiRoute` takes the first declaration whose path equals the
+        // URL. A manifest arrives from outside, so without this check a new
+        // module could claim a path that has been answering for months and
+        // make it unreachable with nothing said. Runs before the registry
+        // regen, like the dependency check above.
+        const addressClash = findApiPathConflicts(
+            { module: manifestData.id, paths: (manifestData.api ?? []).map((entry) => entry.path) },
+            moduleSystem.getDefinitions().map((installed) => ({
+                module: installed.id,
+                paths: (installed.api ?? []).map((entry) => entry.path),
+            })),
+        );
+        if (addressClash.length > 0) {
+            await fs.rm(targetDir, { recursive: true, force: true });
+            return NextResponse.json(
+                {
+                    error: `Module ${manifestData.id} claims API paths another module already answers`,
+                    conflictingPaths: addressClash,
                 },
                 { status: 409 },
             );
