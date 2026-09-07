@@ -28,6 +28,16 @@ import { log, errorText } from "./logger";
  */
 export const MAX_LISTED_DEVICES = 50;
 
+/**
+ * How stale "last active" may get.
+ *
+ * The screen renders it as a date and a time and nobody reads it to the
+ * minute, so refreshing it on every recheck bought nothing and cost a write
+ * per session per minute per worker. Fifteen minutes is invisible on the
+ * screen and fifteen times cheaper.
+ */
+export const SESSION_TOUCH_INTERVAL_MS = 15 * 60_000;
+
 export interface SignInRecord {
     /** The `tokenId` claim in the JWT; the key every revocation check uses. */
     tokenId: string;
@@ -63,16 +73,19 @@ export async function recordSignIn(record: SignInRecord): Promise<void> {
 }
 
 /**
- * Move a session's `lastActiveAt` to now.
+ * Move a session's `lastActiveAt` forward, if it has fallen far enough behind.
  *
  * `updateMany` rather than `update` because a token minted before this file
  * existed has no row, and that is not a failure: it must not throw and it must
  * not be logged on every request for the life of that cookie.
+ *
+ * The `lastActiveAt` condition is what keeps several workers from each writing
+ * the same row: only one of them finds it stale, and the rest write nothing.
  */
 export async function touchSession(tokenId: string, at: Date = new Date()): Promise<void> {
     try {
         await prisma.userSession.updateMany({
-            where: { tokenId },
+            where: { tokenId, lastActiveAt: { lt: new Date(at.getTime() - SESSION_TOUCH_INTERVAL_MS) } },
             data: { lastActiveAt: at },
         });
     } catch (err) {

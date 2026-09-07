@@ -13,7 +13,9 @@ import {
     sessionExpiresAt,
 } from "./session-lifetime";
 import { shouldRecheckSession } from "./session-recheck";
-import { recordSignIn, touchSession } from "./session-registry";
+import { SESSION_RECHECK_INTERVAL_SECONDS } from "./session-recheck";
+import { forgetChecked, markChecked, wasCheckedWithin } from "./session-check-memo";
+import { recordSignIn, touchSession, SESSION_TOUCH_INTERVAL_MS } from "./session-registry";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { coreAuthAdapter } from "./auth-adapter";
 import bcrypt from "bcryptjs";
@@ -423,8 +425,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.role = target.role?.name || "member";
                 token.rolePriority = target.role?.priority ?? 0;
                 // The token now speaks for somebody else, so the stamp from
-                // the admin's own check does not vouch for it.
+                // the admin's own check does not vouch for it. The process
+                // keeps its own copy of that stamp, and it has to go too or
+                // the next request reads the admin's answer for somebody
+                // else's account.
                 token.checkedAt = undefined;
+                if (typeof token.tokenId === "string") forgetChecked(token.tokenId);
                 return token;
             }
 
@@ -449,6 +455,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.rolePriority = admin.role?.priority ?? 0;
                 token.originalUserId = undefined;
                 token.checkedAt = undefined;
+                if (typeof token.tokenId === "string") forgetChecked(token.tokenId);
                 return token;
             }
 
@@ -463,7 +470,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // immediately, not at the next manual update(). When not
             // impersonating, this also refreshes the admin's own role so a
             // demotion takes effect on the next request.
-            if (shouldRecheckSession(token, trigger)) {
+            // `token.checkedAt` is written onto the token and the token is
+            // written back to the browser by Auth.js's own handlers only, and
+            // this app reads the session by calling `auth()` from routes and
+            // from the proxy. So the cookie kept the stamp it was minted with
+            // and this block ran on every request past the first minute:
+            // measured at three UserSession updates, three selects and six
+            // User selects per request. The process remembers what the cookie
+            // could not; see session-check-memo.ts.
+            const tokenId = typeof token.tokenId === "string" ? token.tokenId : null;
+            const alreadyCheckedHere =
+                trigger !== "update" &&
+                tokenId !== null &&
+                wasCheckedWithin(tokenId, SESSION_RECHECK_INTERVAL_SECONDS * 1000);
+
+            if (shouldRecheckSession(token, trigger) && !alreadyCheckedHere) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
                     select: {
@@ -491,13 +512,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.role = dbUser.role?.name || "member";
                 token.rolePriority = dbUser.role?.priority ?? 0;
                 token.checkedAt = Date.now();
+                if (tokenId) markChecked(tokenId);
 
-                // Bounded by the recheck interval rather than by the request
-                // rate, so an active session costs one extra update a minute
-                // and the sessions screen stops calling the sign-in time
-                // "last active".
-                if (token.tokenId) {
-                    await touchSession(token.tokenId as string);
+                // Bounded by its own interval rather than by the recheck
+                // rate: "last active" is rendered as a date and a time, so a
+                // write a minute per session bought nothing a reader could
+                // see. The row's own condition catches the other workers.
+                if (tokenId && !wasCheckedWithin(`activity:${tokenId}`, SESSION_TOUCH_INTERVAL_MS)) {
+                    await touchSession(tokenId);
+                    markChecked(`activity:${tokenId}`);
                 }
 
                 // Double-check the original admin identity during impersonation

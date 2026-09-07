@@ -138,12 +138,19 @@ describe("the jwt callback", () => {
     it("drops the stamp when the token changes whose it is", () => {
         // Impersonation rewrites id and role in place. A stamp vouching for
         // the admin must not vouch for the account they stepped into.
+        //
+        // There are two stamps now. The token's own is written back to the
+        // browser by nothing, so the process keeps its own copy, and a swap
+        // that cleared only the first would leave the second answering for
+        // the wrong account until the interval ran out.
         const start = AUTH.indexOf("token.originalUserId = token.id;");
         const stop = AUTH.indexOf("token.originalUserId = undefined;");
         expect(start).toBeGreaterThan(-1);
         expect(stop).toBeGreaterThan(-1);
-        expect(AUTH.slice(start, start + 400)).toContain("token.checkedAt = undefined;");
-        expect(AUTH.slice(stop, stop + 200)).toContain("token.checkedAt = undefined;");
+        for (const swap of [AUTH.slice(start, start + 700), AUTH.slice(stop, stop + 300)]) {
+            expect(swap).toContain("token.checkedAt = undefined;");
+            expect(swap).toContain("forgetChecked(");
+        }
     });
 
     it("does not claim updateAge refreshes anything", () => {
