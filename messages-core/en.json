@@ -12,6 +12,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "err.demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it.",
+    "err.out_of_stock": "Sorry, one of these has just sold out.",
     "error_description": "An unexpected error occurred. Please try again.",
     "error_id": "Error ID",
     "error_reported": "An unexpected error occurred. It has been reported automatically.",

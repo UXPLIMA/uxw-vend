@@ -11,6 +11,7 @@ import { prisma, log } from "@/core/sdk/server";
 import { sendOrderConfirmationEmail } from "./order-email";
 import { deliverProduct } from "./delivery";
 import { announceOrderCompleted } from "./order-events";
+import { claimStock, releaseStock, stockClaims } from "./stock";
 
 const OK: PaymentOutcome = { handled: true, duplicate: false, error: null };
 const ALREADY: PaymentOutcome = { handled: true, duplicate: true, error: null };
@@ -75,7 +76,12 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
                 paymentId: settlement.providerRef,
             },
         });
-        if (claimed.count === 0) return false;
+        if (claimed.count === 0) return { settled: false, short: [] as string[] };
+
+        // Stock comes off the shelf here rather than at checkout: an order
+        // nobody pays for must not hold anything. Inside the same claim as the
+        // status, so a retried webhook cannot take it twice.
+        const short = await claimStock(tx, stockClaims(order.items));
 
         if (buyerId && granted.length > 0) {
             await tx.chestItem.createMany({
@@ -106,11 +112,22 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
                 ...(settlement.metadata ? { metadata: settlement.metadata } : {}),
             },
         });
-        return true;
+        return { settled: true, short };
     });
 
     // Another delivery of the same payment got there first.
-    if (!settled) return ALREADY;
+    if (!settled.settled) return ALREADY;
+
+    // The money moved before this ran, so a shelf that could not cover the
+    // order is not something to refuse: the buyer paid and is granted what
+    // they bought. It is an error because a shop that oversold will otherwise
+    // hear it from a customer first.
+    if (settled.short.length > 0) {
+        log.error("[store] an order took more than the shelf had", {
+            orderId: order.id,
+            products: settled.short,
+        });
+    }
 
     if (!buyerId || !buyer) {
         log.warn("[store] order paid for by an account that no longer exists", { orderId: order.id });
@@ -238,11 +255,25 @@ export async function refundPayment(provider: string, providerRef: string): Prom
     if (!payment) return failed("unknown payment");
     if (payment.status === "REFUNDED") return ALREADY;
 
-    await prisma.$transaction([
-        prisma.payment.update({ where: { id: payment.id }, data: { status: "REFUNDED" } }),
-        prisma.order.update({ where: { id: payment.orderId }, data: { status: "REFUNDED" } }),
-    ]);
-    return OK;
+    const refundedOrder = await prisma.order.findUnique({
+        where: { id: payment.orderId },
+        include: { items: true },
+    });
+
+    // The status precondition is what makes two refund notifications safe: the
+    // read above is a snapshot, and without it both would put the same stock
+    // back and the shelf would grow.
+    const refunded = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.payment.updateMany({
+            where: { id: payment.id, status: { not: "REFUNDED" } },
+            data: { status: "REFUNDED" },
+        });
+        if (claimed.count === 0) return false;
+        await tx.order.update({ where: { id: payment.orderId }, data: { status: "REFUNDED" } });
+        if (refundedOrder) await releaseStock(tx, stockClaims(refundedOrder.items));
+        return true;
+    });
+    return refunded ? OK : ALREADY;
 }
 
 /**

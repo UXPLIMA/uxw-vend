@@ -41,8 +41,18 @@ const db = {
         createMany: vi.fn(async () => ({ count: 1 })),
         deleteMany: vi.fn(async () => ({})),
     },
-    payment: { create: vi.fn(async () => ({})), findFirst: vi.fn(), update: vi.fn(async () => ({})) },
+    payment: {
+        create: vi.fn(async () => ({})),
+        findFirst: vi.fn(),
+        update: vi.fn(async () => ({})),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+    },
     productCommand: { findMany: vi.fn(async () => []) },
+    // Settlement takes stock off the shelf now. These fixtures sell products
+    // the shop does not count - `stock: null` - so the read finds nothing to
+    // take and no product is written to. `a-limited-product-runs-out.test.ts`
+    // is where the counting itself is tested.
+    product: { findMany: vi.fn(async () => []), updateMany: vi.fn(async () => ({ count: 1 })) },
     user: { update: vi.fn(async () => ({})) },
     creditTransaction: { findUnique: vi.fn(async () => null), create: vi.fn(async () => ({})) },
     subscription: {
@@ -232,6 +242,9 @@ describe("settleOrder", () => {
 
         expect(calls.filter((c) => c.viaTx).map((c) => c.op)).toEqual([
             "order.updateMany",
+            // Which products the shop counts, asked inside the transaction so
+            // the take is decided against the same snapshot as the claim.
+            "product.findMany",
             "chestItem.createMany",
             "ownedProduct.createMany",
             "payment.create",
@@ -415,8 +428,14 @@ describe("refundPayment", () => {
         const outcome = await refundPayment("stripe", "pi_123");
 
         expect(outcome.handled).toBe(true);
-        expect(db.payment.update).toHaveBeenCalledWith(
-            expect.objectContaining({ where: { id: "pay-1" }, data: { status: "REFUNDED" } }),
+        // Conditional, like every other claim here: two refund notifications
+        // arriving together both read COMPLETED, and only the `where` stops
+        // the second one putting the stock back a second time.
+        expect(db.payment.updateMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { id: "pay-1", status: { not: "REFUNDED" } },
+                data: { status: "REFUNDED" },
+            }),
         );
         expect(db.order.update).toHaveBeenCalledWith(
             expect.objectContaining({ where: { id: "order-1" }, data: { status: "REFUNDED" } }),
@@ -427,7 +446,7 @@ describe("refundPayment", () => {
         db.payment.findFirst.mockResolvedValueOnce({ id: "pay-1", orderId: "order-1", status: "REFUNDED" });
 
         expect(await refundPayment("stripe", "pi_123")).toEqual({ handled: true, duplicate: true, error: null });
-        expect(db.payment.update).not.toHaveBeenCalled();
+        expect(db.payment.updateMany).not.toHaveBeenCalled();
     });
 
     // Two gateways can hold the same provider reference only by accident, but a

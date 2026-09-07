@@ -3,6 +3,7 @@ import { generateOrderNumber } from "@/core/sdk";
 import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
+import { claimStock, shortOfStock, stockClaims } from "../../lib/stock";
 import { resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
@@ -269,6 +270,15 @@ export async function POST(request: NextRequest) {
                     throw new Error("INSUFFICIENT_CREDITS");
                 }
 
+                // The shelf and the money move together or neither does. A
+                // failure here rolls the debit back, which is why this is the
+                // one path that can refuse: nothing has left the buyer's
+                // account until this transaction commits.
+                const short = await claimStock(tx, stockClaims(orderItems));
+                if (short.length > 0) {
+                    throw new Error("OUT_OF_STOCK");
+                }
+
                 // Create credit transaction
                 await tx.creditTransaction.create({
                     data: {
@@ -371,6 +381,18 @@ export async function POST(request: NextRequest) {
             await announceOrderCreated(order.id);
             await announceOrderCompleted(order.id);
             return NextResponse.json({ order, redirect: null, message: "Order completed with credits" }, { status: 201 });
+        }
+
+        // Nothing is held for a PENDING order, so this cannot promise the
+        // shelf will still cover it when the money lands - the conditional
+        // take at settlement decides that. It is here so a shopper hears "we
+        // are out of that" before a payment page rather than after.
+        const unavailable = await shortOfStock(prisma, stockClaims(orderItems));
+        if (unavailable.length > 0) {
+            return NextResponse.json(
+                { error: "One of these is no longer in stock.", code: "out_of_stock" },
+                { status: 409 },
+            );
         }
 
         // ── Create order (PENDING -- NO ownership granted yet) ──
@@ -525,6 +547,12 @@ export async function POST(request: NextRequest) {
         // The conditional debit lost the race: another checkout spent the
         // balance between the read and the write. Same answer the read gave
         // when it saw too little, not a 500.
+        if (error instanceof Error && error.message === "OUT_OF_STOCK") {
+            return NextResponse.json(
+                { error: "One of these is no longer in stock.", code: "out_of_stock" },
+                { status: 409 },
+            );
+        }
         if (error instanceof Error && error.message === "INSUFFICIENT_CREDITS") {
             return NextResponse.json(
                 { error: "Insufficient credit balance." },

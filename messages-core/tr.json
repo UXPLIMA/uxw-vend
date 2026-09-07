@@ -12,6 +12,7 @@
     "delete": "Sil",
     "edit": "Düzenle",
     "err.demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır.",
+    "err.out_of_stock": "Üzgünüz, bunlardan biri az önce tükendi.",
     "error_description": "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
     "error_id": "Hata kimliği",
     "error_reported": "Beklenmedik bir hata oluştu. Hata otomatik olarak bildirildi.",
