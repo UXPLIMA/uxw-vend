@@ -199,6 +199,20 @@ describe("the footer currency picker", () => {
     it("hides itself rather than offering one option", () => {
         expect(source).toContain("options.length < 2");
     });
+
+    it("keeps an icon beside it, the way the language picker above it has one", () => {
+        // The footer's settings column is a row per setting: icon, then
+        // dropdown. Taking the dollar sign out of the label once took the icon
+        // with it, and left this row shorter than the one above it.
+        expect(source).toMatch(/<Coins[^>]*className="w-4 h-4 text-muted-foreground"/);
+    });
+
+    it("does not put a currency glyph on a control that offers several", () => {
+        // Why the icon is not a dollar sign: it stayed a dollar while the
+        // label read EUR or TRY.
+        expect(source).not.toContain("DollarSign");
+        expect(source).not.toMatch(/[$€₺]/);
+    });
 });
 
 describe("every module that shows a price", () => {

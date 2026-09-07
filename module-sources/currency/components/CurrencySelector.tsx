@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Coins } from "lucide-react";
 import { FooterDropdown, useSiteCurrency } from "@/core/sdk/ui";
 
 interface ConfiguredCurrency {
@@ -67,8 +68,15 @@ export function CurrencySelector() {
     // three-letter code is the part a reader is looking for.
     const label = (c: string) => c;
 
+    // The icon is `Coins` and not a currency glyph on purpose. This control
+    // offers several currencies, so a dollar sign beside it was wrong for two
+    // of the three the demo ships - it stayed a dollar while the label read
+    // EUR. Something that means "money" is right whatever is selected, and it
+    // keeps this row looking like the language row above it, which is what the
+    // footer's settings column is: a label, an icon, a dropdown.
     return (
         <div className="flex items-center gap-2">
+            <Coins className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <FooterDropdown
                 options={options.map((c) => c.code)}
                 value={code}
