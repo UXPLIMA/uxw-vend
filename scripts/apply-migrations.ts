@@ -63,6 +63,49 @@ function listMigrationFiles(dir: string): string[] {
         .sort();
 }
 
+/** Resolve a module's own schema file the same way its migrations are resolved. */
+function getSchemaPath(moduleName: string): string | null {
+    const installed = path.join(INSTALLED_MODULES_DIR, moduleName, "schema.prisma");
+    if (fs.existsSync(installed)) return installed;
+    const source = path.join(MODULE_SOURCES_DIR, moduleName, "schema.prisma");
+    if (fs.existsSync(source)) return source;
+    return null;
+}
+
+/** The models a module's own schema declares, in the order it declares them. */
+export function declaredModels(schema: string): string[] {
+    const withoutComments = schema.replace(/^\s*\/\/.*$/gm, "");
+    return [...withoutComments.matchAll(/^\s*model\s+(\w+)\s*\{/gm)].map((m) => m[1]);
+}
+
+/**
+ * Whether the database has caught up with the module's schema.
+ *
+ * Install merges the schema and reconciles the database on the build that
+ * follows, and the migration runner goes before that. A module whose every
+ * table is still missing has not been reconciled yet, and a migration that
+ * names one of them would fail with 42P01 rather than do nothing.
+ *
+ * One table present is enough to say yes: a module that gained a model since
+ * its last release has some and not others, and its migrations are exactly
+ * what brings the rest forward. A module that declares no tables of its own
+ * has nothing to wait for and may still migrate a core one.
+ */
+export function hasBeenReconciled(models: string[], present: Set<string>): boolean {
+    if (models.length === 0) return true;
+    return models.some((model) => present.has(model));
+}
+
+async function tablesPresent(models: string[]): Promise<Set<string>> {
+    if (models.length === 0) return new Set();
+    const rows = await prisma.$queryRawUnsafe<{ table_name: string }[]>(
+        `SELECT table_name FROM information_schema.tables
+         WHERE table_schema = current_schema() AND table_name = ANY($1::text[])`,
+        models,
+    );
+    return new Set(rows.map((r) => r.table_name));
+}
+
 function sha256(content: string): string {
     return crypto.createHash("sha256").update(content).digest("hex");
 }
@@ -85,6 +128,18 @@ async function applyModuleMigrations(
 
     const files = listMigrationFiles(migrationsDir);
     if (files.length === 0) return result;
+
+    // A migration brings an older database forward. On an install into a fresh
+    // one there is nothing to bring: the merged schema declares the final shape
+    // and the reconcile creates it. Running first means every table the
+    // migration names is still missing, which is an error rather than a no-op,
+    // and the installer reads that as a failed install.
+    const schemaPath = getSchemaPath(moduleId);
+    const models = schemaPath ? declaredModels(fs.readFileSync(schemaPath, "utf-8")) : [];
+    if (!hasBeenReconciled(models, await tablesPresent(models))) {
+        console.log(`  waiting for the schema reconcile, ${files.length} migration(s) deferred`);
+        return result;
+    }
 
     const existingRecords = await prisma.moduleMigration.findMany({
         where: { moduleId },
