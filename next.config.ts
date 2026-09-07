@@ -169,19 +169,24 @@ const nextConfig: NextConfig = {
       { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
     ];
 
+    // Order decides this, not specificity. Next applies every rule whose
+    // source matches and a later one wins on a key it repeats, so the
+    // exception has to come after the rule it excepts. Listed the other way
+    // round, `/en/admin/api-docs` and `/en` answered with byte-identical
+    // policies and the one page that needs eval was the one page without it.
     return [
-      {
-        source: '/:locale/admin/api-docs/:path*',
-        headers: [
-          ...commonHeaders,
-          { key: 'Content-Security-Policy', value: swaggerCsp },
-        ],
-      },
       {
         source: '/(.*)',
         headers: [
           ...commonHeaders,
           { key: 'Content-Security-Policy', value: baseCsp },
+        ],
+      },
+      {
+        source: '/:locale/admin/api-docs/:path*',
+        headers: [
+          ...commonHeaders,
+          { key: 'Content-Security-Policy', value: swaggerCsp },
         ],
       },
     ];
