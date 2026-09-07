@@ -49,12 +49,22 @@ function stringsFor(locale: string | null | undefined): OrderEmailStrings {
     return STRINGS[(locale ?? "en").slice(0, 2)] ?? STRINGS.en;
 }
 
+/**
+ * The same five characters core's mail sender escapes.
+ *
+ * The apostrophe was missing here. Nothing in this file puts a value inside a
+ * single quoted attribute, so nothing was getting through, but two functions
+ * with one name that behave differently are indistinguishable at the call
+ * site, and the difference only shows the day somebody writes
+ * `href='${escapeHtml(url)}'` in whichever file has the shorter one.
+ */
 function escapeHtml(value: string): string {
     return value
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 export async function sendOrderConfirmationEmail(input: {
