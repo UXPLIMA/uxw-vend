@@ -3,6 +3,16 @@ import { isAdmin, prisma, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk
 import { auth } from "@/core/sdk/auth";
 import { staffApplicationSchema } from "../../lib/validations";
 
+/**
+ * Most rows this list will hand back at once.
+ *
+ * The table fills up while the site is used, so reading all of it gets slower
+ * every week and says nothing until the screen stops answering. One more than
+ * the ceiling is fetched so the answer can admit it was cut rather than look
+ * complete.
+ */
+const MAX_ROWS = 500;
+
 // GET - Admin: all applications, User: own applications
 export async function GET() {
     const session = await auth();
@@ -11,12 +21,16 @@ export async function GET() {
     const adminCheck = await isAdmin(session.user.id);
     const where = adminCheck ? {} : { userId: session.user.id };
 
-    const applications = await prisma.staffApplication.findMany({
+    const rows = await prisma.staffApplication.findMany({
         where,
         include: { user: { select: { id: true, username: true, avatar: true, email: true } } },
         orderBy: { createdAt: "desc" },
+        take: MAX_ROWS + 1,
     });
-    return NextResponse.json({ applications });
+    return NextResponse.json({
+        applications: rows.slice(0, MAX_ROWS),
+        truncated: rows.length > MAX_ROWS,
+    });
 }
 
 // POST - Submit application

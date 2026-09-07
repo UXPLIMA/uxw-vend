@@ -3,6 +3,16 @@ import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { couponSchema } from "../../lib/validations";
 
+/**
+ * Most rows this list will hand back at once.
+ *
+ * The table fills up while the site is used, so reading all of it gets slower
+ * every week and says nothing until the screen stops answering. One more than
+ * the ceiling is fetched so the answer can admit it was cut rather than look
+ * complete.
+ */
+const MAX_ROWS = 500;
+
 // GET /api/v1/store/coupons
 export async function GET() {
     const session = await auth();
@@ -15,11 +25,15 @@ export async function GET() {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const coupons = await prisma.coupon.findMany({
+    const rows = await prisma.coupon.findMany({
         orderBy: { createdAt: "desc" },
+        take: MAX_ROWS + 1,
     });
 
-    return NextResponse.json({ coupons });
+    return NextResponse.json({
+        coupons: rows.slice(0, MAX_ROWS),
+        truncated: rows.length > MAX_ROWS,
+    });
 }
 
 // POST /api/v1/store/coupons

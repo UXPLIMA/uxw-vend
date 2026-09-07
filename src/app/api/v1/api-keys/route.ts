@@ -10,6 +10,16 @@ import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 
 /**
+ * Most rows this list will hand back at once.
+ *
+ * The table fills up while the site is used, so reading all of it gets slower
+ * every week and says nothing until the screen stops answering. One more than
+ * the ceiling is fetched so the answer can admit it was cut rather than look
+ * complete.
+ */
+const MAX_ROWS = 500;
+
+/**
  * A new API key. `expiresAt` used to reach `new Date(...)` untyped, and an
  * unparseable value there is an Invalid Date that Prisma rejects with a 500
  * rather than a 400.
@@ -25,7 +35,7 @@ export async function GET() {
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const keys = await prisma.apiKey.findMany({
+    const rows = await prisma.apiKey.findMany({
         select: {
             id: true,
             name: true,
@@ -38,8 +48,12 @@ export async function GET() {
             user: { select: { username: true } },
         },
         orderBy: { createdAt: "desc" },
+        take: MAX_ROWS + 1,
     });
-    return NextResponse.json({ keys: keys.map((k) => ({ ...k, key: k.keyPrefix + "..." })) });
+    return NextResponse.json({
+        keys: rows.slice(0, MAX_ROWS).map((k) => ({ ...k, key: k.keyPrefix + "..." })),
+        truncated: rows.length > MAX_ROWS,
+    });
 }
 
 export async function POST(request: NextRequest) {
