@@ -1,8 +1,8 @@
 /**
  * Run what CI's check job runs, in one command.
  *
- * CLAUDE.md lists seven gates. The check job runs eleven, and the difference
- * has cost real commits: `check-marketplace-sync` and `npm audit` are in
+ * The list a contributor is likely to run from memory is shorter than the one
+ * CI runs, and the difference has cost real commits: `check-marketplace-sync` and `npm audit` are in
  * nobody's habit, and `test:coverage` enforces per-file thresholds that plain
  * `npm test` leaves as decoration. A push is a slow way to find that out.
  *

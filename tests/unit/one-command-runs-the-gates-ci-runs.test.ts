@@ -6,8 +6,8 @@ import { GATES, OUTSIDE_VERIFY } from "../../scripts/verify";
 /**
  * There is one command that runs what CI's check job runs.
  *
- * CLAUDE.md lists seven gates. CI's check job runs eleven, and the difference
- * is not academic: `check-marketplace-sync` and `npm audit` appear in neither
+ * The list a contributor runs from memory is shorter than CI's check job, and
+ * the difference is not academic: `check-marketplace-sync` and `npm audit` appear in neither
  * the documented list nor anybody's habit, and `test:coverage` enforces
  * per-file thresholds that plain `npm test` does not. Commits have gone red on
  * exactly that gap - five consecutive ones on the Docker job, and three in one
