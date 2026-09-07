@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { ModuleRoutes } from "@/core/generated/module-registry";
 import { ModuleRouteResolvers } from "@/core/generated/module-route-resolvers";
-import { matchModuleRoute } from "@/core/lib/route-matcher";
+import { matchModuleRouteOnce } from "@/core/lib/route-matcher";
 import { buildPageMeta } from "@/core/lib/seo";
 import { resolveRouteTitle } from "@/core/lib/route-title";
 import { getMessages } from "@/core/lib/i18n/translation-service";
@@ -55,7 +55,7 @@ interface PageProps {
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug, locale } = await params;
-    const match = matchModuleRoute(slug);
+    const match = matchModuleRouteOnce(slug.join("/"));
     const route = match ? ModuleRoutes.find((r) => r.key === match.key) : undefined;
 
     // Only for a route that declared a name; the fallback needs no catalogue.
@@ -104,7 +104,7 @@ export default async function DynamicModulePage(props: PageProps) {
     const { params } = props;
     const { slug } = await params;
 
-    const match = matchModuleRoute(slug);
+    const match = matchModuleRouteOnce(slug.join("/"));
 
     if (!match) {
         notFound();
