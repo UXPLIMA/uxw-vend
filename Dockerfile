@@ -63,6 +63,13 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# pg_dump and psql. The backup feature spawns both, and without them the
+# scheduled job records `spawn pg_dump ENOENT` once a day and the admin backup
+# screen cannot take or restore anything - the image shipped that way.
+# The client major must be at least the server's: pg_dump refuses a server
+# newer than itself, while an 18 client dumps 16 and 17 servers fine. 3.3MB.
+RUN apk add --no-cache postgresql18-client
+
 # Non-root user so an RCE via a module hook cannot write outside /app.
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 --ingroup nodejs nextjs

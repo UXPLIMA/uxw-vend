@@ -90,6 +90,24 @@ function resolveBackupPath(id: string): string | null {
     return full;
 }
 
+/**
+ * A spawn failure an operator can act on.
+ *
+ * Node reports a missing binary as `spawn pg_dump ENOENT`, which names a
+ * syscall rather than a problem. The server's own CronRun row for
+ * `core:automated-backup` carried exactly that string, and the answer - that
+ * the runtime image has no PostgreSQL client tools in it - was nowhere in the
+ * message. Every other spawn failure keeps its own words.
+ */
+function describeSpawnFailure(tool: string, err: unknown): Error {
+    if ((err as NodeJS.ErrnoException)?.code === "ENOENT") {
+        return new Error(
+            `${tool} was not found on the server. Install the PostgreSQL client tools to take or restore a backup.`,
+        );
+    }
+    return err instanceof Error ? err : new Error(String(err));
+}
+
 async function readNotes(filename: string): Promise<string | undefined> {
     const notePath = path.join(BACKUP_DIR, `${filename}.note`);
     try {
@@ -146,7 +164,7 @@ export async function createBackup(
             pipeline(pgDump.stdout, gzip, writeStream),
             // wait for pg_dump to exit
             new Promise<void>((resolve, reject) => {
-                pgDump.on("error", (err) => reject(err));
+                pgDump.on("error", (err) => reject(describeSpawnFailure("pg_dump", err)));
                 pgDump.on("exit", (code) => {
                     if (code === 0) resolve();
                     else reject(new Error(`pg_dump exited with code ${code}${pgStderr ? `: ${pgStderr.trim()}` : ""}`));
@@ -266,7 +284,7 @@ export async function restoreBackup(id: string): Promise<{ success: boolean; err
         let psqlStderr = "";
         psql.stderr.on("data", (chunk: Buffer) => { psqlStderr += chunk.toString(); });
         psql.on("error", (err) => {
-            resolve({ success: false, error: err.message });
+            resolve({ success: false, error: describeSpawnFailure("psql", err).message });
         });
         psql.on("exit", (code) => {
             if (code === 0) {

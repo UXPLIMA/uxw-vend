@@ -245,6 +245,42 @@ describe("createBackup", () => {
         expect(unlinked).toHaveLength(1);
     });
 
+    // The server's own CronRun row for `core:automated-backup` read
+    // "spawn pg_dump ENOENT" for a day. That names a syscall, not a problem an
+    // operator can act on, and the runtime image shipped without the
+    // PostgreSQL client tools at all - so this is the message a real
+    // deployment sees first.
+    it("says which tool is missing when pg_dump is not installed", async () => {
+        nextChild = (child) => {
+            child.stdout = Readable.from([""]);
+            setImmediate(() => {
+                const err: NodeJS.ErrnoException = new Error("spawn pg_dump ENOENT");
+                err.code = "ENOENT";
+                child.emit("error", err);
+            });
+        };
+        const { createBackup } = await load();
+
+        await expect(createBackup("manual")).rejects.toThrow(
+            /pg_dump.*PostgreSQL client tools/,
+        );
+    });
+
+    it("still removes the half-written archive when the tool is missing", async () => {
+        nextChild = (child) => {
+            child.stdout = Readable.from([""]);
+            setImmediate(() => {
+                const err: NodeJS.ErrnoException = new Error("spawn pg_dump ENOENT");
+                err.code = "ENOENT";
+                child.emit("error", err);
+            });
+        };
+        const { createBackup } = await load();
+
+        await expect(createBackup("manual")).rejects.toThrow();
+        expect(unlinked).toHaveLength(1);
+    });
+
     it("stores a trimmed note beside the archive", async () => {
         const { createBackup } = await load();
         const meta = await createBackup("manual", "  pre-install:blog  ");
@@ -333,6 +369,21 @@ describe("restoreBackup", () => {
 
         expect(spawnCalls[0].options.env!.DATABASE_URL).toBeUndefined();
         expect(spawnCalls[0].options.env!.PGPASSWORD).toBe("s3cr3t");
+    });
+
+    it("says which tool is missing when psql is not installed", async () => {
+        nextChild = (child) => {
+            setImmediate(() => {
+                const err: NodeJS.ErrnoException = new Error("spawn psql ENOENT");
+                err.code = "ENOENT";
+                child.emit("error", err);
+            });
+        };
+        const { restoreBackup } = await load();
+
+        const result = await restoreBackup(VALID_ID);
+        expect(result.success).toBe(false);
+        expect(result.error).toMatch(/psql.*PostgreSQL client tools/);
     });
 
     it.each([
