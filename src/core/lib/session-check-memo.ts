@@ -7,9 +7,11 @@
  * back to the browser by Auth.js's own handlers, and this app reads the
  * session by calling `auth()` from route handlers and from the proxy. So the
  * cookie kept the stamp it was minted with and the recheck fired on every
- * request for the life of that cookie: measured against the running server,
- * three `UserSession` updates, three selects and six `User` selects per
- * request past the first minute, and no `Set-Cookie` on any of them.
+ * request for the life of that cookie. Measured against the running server by
+ * printing every statement of one signed-in `GET /api/v1/users/me` past the
+ * interval: nine statements, of which four are the recheck - the user row, its
+ * role, the session row's revocation flag and the last-active write - and no
+ * `Set-Cookie` on the response to carry a fresh stamp back.
  *
  * A process-local stamp survives where the token's does not, and it allows
  * exactly the staleness that was already agreed: each worker re-reads a given

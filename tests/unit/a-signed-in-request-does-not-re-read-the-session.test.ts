@@ -6,19 +6,22 @@
  * only means something if the token is written back to the browser, and it is
  * not: this app calls `auth()` directly from route handlers and from the
  * proxy, and Auth.js re-issues the session cookie from its own handlers only.
- * Measured against the running server, one signed-in request to
- * `/api/v1/users/me`, with the client holding its cookie the way a browser
- * does:
  *
- *     t+3s   0 UserSession updates, 0 selects, 3 User selects, no Set-Cookie
- *     t+63s  3 UserSession updates, 3 selects, 6 User selects, no Set-Cookie
- *     t+70s  3 updates again
- *     t+77s  3 updates again
+ * Measured against the running server, one signed-in `GET /api/v1/users/me`,
+ * the client holding its cookie the way a browser does. Inside the interval
+ * the request costs four statements, all of them the route's own work. The
+ * first request past it costs nine, and the four extra are the recheck:
  *
- * So the interval bounded nothing. Past the first minute every request paid
- * the full recheck, three times over, for the life of the cookie. That is the
- * same shape as the `updateAge` bug this project already fixed once: a
- * mechanism that reads correctly and is never actually consulted.
+ *     SELECT User    isBanned, isDeleted, roleId
+ *     SELECT Role    name, priority
+ *     SELECT UserSession   isRevoked
+ *     UPDATE UserSession   lastActiveAt
+ *
+ * and no `Set-Cookie` on the response, so the stamp the callback just wrote
+ * never leaves the process. Every following request paid those four again,
+ * for the life of the cookie. So the interval bounded nothing: the same shape
+ * as the `updateAge` bug this project already fixed once, a mechanism that
+ * reads correctly and is never actually consulted.
  *
  * A stamp the process keeps is a stamp that survives, and the staleness it
  * allows is the one already agreed: each worker re-reads a token at most once
