@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
-import path from "path";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { prisma } from "@/core/lib/db";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { prismaErrorOrThrow } from "@/core/lib/prisma-errors";
+import { resolveUploadPath } from "@/core/lib/uploads-path";
 
 /** The two fields a media item's record may be renamed by. */
 const updateMediaSchema = z.object({
@@ -61,10 +61,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const item = await prisma.mediaItem.findUnique({ where: { id } });
     if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Best-effort delete from local filesystem (S3 deletes left for V2)
-    if (item.url.startsWith("/uploads/")) {
+    // Best-effort delete from the local filesystem. `resolveUploadPath`
+    // answers only for a url that resolves inside `public/uploads`, so a
+    // stored value that climbs out is a file this route does not touch.
+    //
+    // A remote object is not deleted, because `StorageProvider` only declares
+    // `upload`. Giving it a `delete` is a change to the interface modules are
+    // written against, so an object in a bucket outlives the record that named
+    // it and an operator has to remove it themselves.
+    const localPath = resolveUploadPath(item.url);
+    if (localPath) {
         try {
-            const localPath = path.join(process.cwd(), "public", item.url);
             await fs.unlink(localPath);
         } catch {
             // File may already be gone - non-fatal
