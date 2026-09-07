@@ -29,6 +29,12 @@ import { log } from "@/core/lib/logger";
  * configuration, the selected theme, and any initial modules the installer
  * would like to enable. Every call re-verifies that `prisma.user.count() === 0`
  * so the endpoint cannot be replayed to create a second privileged account.
+ *
+ * @public-mutation: there is nobody to authenticate yet, which is what this
+ * endpoint exists to fix. It closes itself instead: the first user row makes
+ * every later call answer 409 before the body is read, and the account is
+ * created inside an advisory-locked transaction so two racing installers
+ * cannot both win.
  */
 
 const setupSchema = z.object({
