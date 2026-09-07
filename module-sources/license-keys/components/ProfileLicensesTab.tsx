@@ -37,24 +37,38 @@ export function ProfileLicensesTab() {
     const formatLocalDate = useLocalDate();
     const [licenses, setLicenses] = useState<License[]>([]);
     const [loading, setLoading] = useState(true);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [shown, setShown] = useState<Set<string>>(new Set());
     const [copiedId, setCopiedId] = useState<string | null>(null);
 
-    const load = useCallback(async () => {
+    // The server answers a page at a time, because it decrypts every key it
+    // returns. `cursor` is the id of the last key already on screen.
+    const load = useCallback(async (cursor?: string) => {
         try {
-            const res = await fetch("/api/v1/licenses");
+            const res = await fetch(
+                cursor ? `/api/v1/licenses?cursor=${encodeURIComponent(cursor)}` : "/api/v1/licenses",
+            );
             if (res.ok) {
                 const data = await res.json();
-                setLicenses(data.licenses || []);
+                setLicenses((prev) => (cursor ? [...prev, ...(data.licenses || [])] : data.licenses || []));
+                setNextCursor(data.nextCursor ?? null);
             }
         } finally {
             setLoading(false);
+            setLoadingMore(false);
         }
     }, []);
 
     useEffect(() => {
         load();
     }, [load]);
+
+    const loadMore = () => {
+        if (!nextCursor) return;
+        setLoadingMore(true);
+        load(nextCursor);
+    };
 
     const toggle = (id: string) => {
         setShown((prev) => {
@@ -160,6 +174,13 @@ export function ProfileLicensesTab() {
                     </Card>
                 );
             })}
+
+            {nextCursor && (
+                <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="w-full">
+                    {loadingMore && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {t("showMore")}
+                </Button>
+            )}
         </div>
     );
 }

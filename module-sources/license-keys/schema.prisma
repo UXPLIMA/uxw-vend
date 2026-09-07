@@ -34,7 +34,7 @@ model LicenseKey {
 
   activations LicenseActivation[]
 
-  @@index([userId])
+  @@index([userId, createdAt])
   @@index([orderId])
   @@index([productId])
 }

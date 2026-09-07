@@ -15,7 +15,8 @@ import path from "node:path";
  * `Message` has `(conversationId, createdAt)`, `Notification` has
  * `(userId, createdAt)`. The three below did not, and they are the ones that
  * grow without an end: a credit ledger, the comments under a popular
- * article, and every form a visitor has ever submitted.
+ * article, every form a visitor has ever submitted, and the keys a long-lived
+ * account has been issued.
  *
  * The other thirty models that order by `createdAt` without an index are left
  * alone on purpose. Coupons, announcements, changelog entries and downloads
@@ -39,6 +40,12 @@ const READ_NEWEST_FIRST = [
         model: "BlogComment",
         reads: "the comments under one article, newest first",
         index: ["articleId", "createdAt"],
+    },
+    {
+        schema: "module-sources/license-keys/schema.prisma",
+        model: "LicenseKey",
+        reads: "one customer's keys, newest page first",
+        index: ["userId", "createdAt"],
     },
     {
         schema: "module-sources/custom-forms/schema.prisma",
