@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import * as LucideIcons from "lucide-react";
@@ -268,9 +268,19 @@ export default function CartPage() {
                 <h1 className="text-3xl font-bold mb-8">{t('shoppingCart')}</h1>
 
                 {loading ? (
-                    <div className="text-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
-                    </div>
+                    // Drawn to the measurements of the card below, which is
+                    // what a visitor with nothing in their cart gets: a mark,
+                    // a heading, a line of explanation and a button. A bare
+                    // spinner stood 128px tall against that card's 300px, so
+                    // the answer arriving pushed the footer down by 174px.
+                    <Card>
+                        <CardContent className="py-12 text-center" aria-busy="true">
+                            <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
+                            <Skeleton className="h-7 w-48 mx-auto mb-2" />
+                            <Skeleton className="h-6 w-72 mx-auto mb-6" />
+                            <Skeleton className="h-10 w-36 mx-auto" />
+                        </CardContent>
+                    </Card>
                 ) : !cart || cart.items.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">

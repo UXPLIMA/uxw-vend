@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, Skeleton } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
@@ -154,9 +154,20 @@ export default function ForumPage() {
                     {/* Topics List */}
                     <div className="lg:col-span-4 min-w-0 space-y-3">
                         {loading ? (
-                            <div className="text-center py-12">
-                                <p className="text-muted-foreground">{t('loadingTopics')}</p>
-                            </div>
+                            // Drawn to the measurements of the card that
+                            // replaces it. A line of text stood 120px tall
+                            // against the 236px card that answers, so the
+                            // topics arriving pushed the footer down by 118px.
+                            // The sentence stays for a reader who is listening
+                            // rather than looking.
+                            <Card>
+                                <CardContent className="py-12 text-center" aria-busy="true">
+                                    <span className="sr-only">{t('loadingTopics')}</span>
+                                    <Skeleton className="w-12 h-12 rounded-full mx-auto mb-3" />
+                                    <Skeleton className="h-6 w-56 mx-auto mb-4" />
+                                    <Skeleton className="h-10 w-40 mx-auto" />
+                                </CardContent>
+                            </Card>
                         ) : restricted ? (
                             <Card>
                                 <CardContent className="py-12 text-center space-y-3">
