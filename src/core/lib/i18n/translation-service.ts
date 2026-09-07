@@ -11,9 +11,43 @@
  * This replaces the build-time `clean-translations.ts` merge.
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import { prisma } from "@/core/lib/db";
 import { cacheGet, cacheSet, cacheDel } from "@/core/lib/redis";
 import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
+
+/**
+ * The catalogue this version ships, read once per process and per locale.
+ *
+ * The table is the source of truth for anything an operator edited and for
+ * every module, and a seeder copies these files into it on each boot. Between
+ * a release and that seeder is a window where a string exists in the code and
+ * not in the table, and every screen using one renders the key: the update
+ * screen shipped reading `admin.updates_title` to anybody who opened it.
+ *
+ * Starting from the file closes that window. Rows are laid over the top, so a
+ * customised string is still the customised string and a module's strings
+ * still come only from the table.
+ */
+const shipped = new Map<string, Record<string, Record<string, unknown>>>();
+
+function shippedMessages(locale: string): Record<string, Record<string, unknown>> {
+    const cached = shipped.get(locale);
+    if (cached) return cached;
+
+    let parsed: Record<string, Record<string, unknown>> = {};
+    try {
+        const file = path.join(process.cwd(), "messages-core", `${locale}.json`);
+        parsed = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, Record<string, unknown>>;
+    } catch {
+        // A locale core ships no catalogue for is a module's business, and an
+        // unreadable file is not a reason to serve no strings at all.
+        parsed = {};
+    }
+    shipped.set(locale, parsed);
+    return parsed;
+}
 
 const CACHE_PREFIX = "uxw:translations:";
 const CACHE_TTL_SECONDS = 120;
@@ -67,7 +101,17 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
         return a.module.localeCompare(b.module);
     });
 
+    // What this version ships, then what the database says. A row wins
+    // wherever there is one; a string nobody has seeded yet is still a string.
     const messages: Record<string, Record<string, unknown>> = {};
+    for (const [namespace, values] of Object.entries(shippedMessages(locale))) {
+        if (isUnsafeKey(namespace) || !values || typeof values !== "object") continue;
+        // Copied key by key rather than assigned wholesale: the file is
+        // committed rather than uploaded, but it reaches the same accumulator
+        // a database row does, and the rule for that accumulator is that
+        // nothing gets in without passing this.
+        messages[namespace] = safeCopy(values as Record<string, unknown>);
+    }
 
     for (const row of rows) {
         if (!messages[row.namespace]) messages[row.namespace] = emptyRecord();
@@ -169,6 +213,25 @@ export async function invalidateTranslationCache(): Promise<void> {
 // ---------------------------------------------------------------------------
 // Internals
 // ---------------------------------------------------------------------------
+
+/**
+ * A catalogue branch with every unsafe key dropped, at every level.
+ *
+ * The shipped file is already nested - `auth.login.title` is an object inside
+ * an object - so this copies the shape rather than walking a dotted path the
+ * way a database row needs.
+ */
+function safeCopy(source: Record<string, unknown>): Record<string, unknown> {
+    const out = emptyRecord();
+    for (const [key, value] of Object.entries(source)) {
+        if (isUnsafeKey(key)) continue;
+        out[key] =
+            value && typeof value === "object" && !Array.isArray(value)
+                ? safeCopy(value as Record<string, unknown>)
+                : value;
+    }
+    return out;
+}
 
 async function getEnabledModuleIds(): Promise<string[]> {
     const modules = await prisma.moduleConfig.findMany({
