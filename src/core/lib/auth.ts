@@ -13,6 +13,7 @@ import {
     sessionExpiresAt,
 } from "./session-lifetime";
 import { shouldRecheckSession } from "./session-recheck";
+import { recordSignIn, touchSession } from "./session-registry";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { coreAuthAdapter } from "./auth-adapter";
 import bcrypt from "bcryptjs";
@@ -287,6 +288,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     role: user.role?.name || "member",
                     rolePriority: user.role?.priority ?? 0,
                     remember: parseRemember(credentials.remember),
+                    // The jwt callback never sees the request, and it is the
+                    // only place that knows the token id a device row is keyed
+                    // by. So the two facts about the caller ride out on the
+                    // user object, the way `remember` already does.
+                    signInIp: ip ?? null,
+                    signInUserAgent: reqHeaders?.get("user-agent") ?? null,
                 };
             },
         }),
@@ -354,6 +361,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // authorize() just read this user out of the database, so the
                 // first request after signing in has nothing to re-check.
                 token.checkedAt = Date.now();
+
+                // This branch runs once per sign-in, and it is the only moment
+                // that holds both the new token id and the user it belongs to.
+                // Without a row here the sessions screen has nothing to list
+                // and `isRevoked` below can never be true. An OAuth sign-in
+                // reaches this without an address or a user agent, which costs
+                // the row two columns and none of its purpose.
+                await recordSignIn({
+                    tokenId: token.tokenId as string,
+                    userId: user.id as string,
+                    expiresAt: new Date(token.absoluteExpiry as number),
+                    ipAddress: (user as { signInIp?: string | null }).signInIp ?? null,
+                    userAgent: (user as { signInUserAgent?: string | null }).signInUserAgent ?? null,
+                });
             }
 
             // Enforced on every request, not only on refresh: the cookie now
@@ -470,6 +491,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.role = dbUser.role?.name || "member";
                 token.rolePriority = dbUser.role?.priority ?? 0;
                 token.checkedAt = Date.now();
+
+                // Bounded by the recheck interval rather than by the request
+                // rate, so an active session costs one extra update a minute
+                // and the sessions screen stops calling the sign-in time
+                // "last active".
+                if (token.tokenId) {
+                    await touchSession(token.tokenId as string);
+                }
 
                 // Double-check the original admin identity during impersonation
                 // - if the admin has been banned / demoted since starting the

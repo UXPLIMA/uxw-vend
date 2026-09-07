@@ -4,8 +4,12 @@ import { rateLimitForRoleAsync } from "@/core/lib/rate-limit";
 import { prisma } from "@/core/lib/db";
 
 /**
- * POST - revoke ALL sessions for the current user EXCEPT the current one.
- * Useful "sign out everywhere else" button.
+ * POST - revoke every session the current user has, this one included.
+ *
+ * The screen calls it "sign out everywhere" and says every device will need to
+ * log in again, so the caller's own device is not spared: the jwt callback
+ * reads `isRevoked` on its next scheduled check and ends the token there. The
+ * client sends the browser to the login page rather than waiting for that.
  */
 export async function POST() {
     const session = await auth();
@@ -20,9 +24,6 @@ export async function POST() {
         return NextResponse.json({ error: "Too many requests", code: "rate_limited" }, { status: 429 });
     }
 
-    // The current JWT has tokenId in it, but session() callback doesn't expose
-    // it by default. For now, revoke ALL sessions - the user will be re-issued
-    // a new one on next request via the existing JWT, then a new UserSession row.
     const result = await prisma.userSession.updateMany({
         where: { userId: session.user.id, isRevoked: false },
         data: { isRevoked: true },
