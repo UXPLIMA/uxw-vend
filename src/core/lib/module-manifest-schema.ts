@@ -26,6 +26,7 @@
  * the case the rule names for keeping a file whole.
  */
 import { z } from "zod";
+import { CRON_SCHEDULES } from "./cron-schedules";
 import { isValidRange } from "./semver-range";
 
 const SAFE_ID = /^[a-z0-9][a-z0-9-]*$/;
@@ -465,7 +466,9 @@ const pageBlock = z.object({
 
 const cronJob = z.object({
     id: z.string().min(1).max(64).regex(SAFE_SLUG),
-    schedule: z.string().min(1).max(64),
+    // A name the scheduler cannot turn into an interval is a job that never
+    // runs, and it used to reach an install unremarked.
+    schedule: z.enum(CRON_SCHEDULES),
     handler: relativePath("handler"),
 });
 

@@ -1,5 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import { onShutdown, installShutdownHandlers, isShuttingDown } from "@/core/lib/shutdown";
+import { SCHEDULE_MS } from "./cron-schedules";
 import { errorText, log } from "./logger";
 
 /**
@@ -39,15 +40,6 @@ interface CronJob {
     handler: CronHandler;
 }
 
-const SCHEDULE_MS: Record<string, number> = {
-    "every-minute": 60_000,
-    "every-5-minutes": 5 * 60_000,
-    "every-15-minutes": 15 * 60_000,
-    "every-hour": 60 * 60_000,
-    "every-day": 24 * 60 * 60_000,
-    "every-week": 7 * 24 * 60 * 60_000,
-    "every-month": 30 * 24 * 60 * 60_000,
-};
 
 const registeredJobs = new Map<string, CronJob>();
 let tickerStarted = false;
