@@ -189,6 +189,20 @@ const nextConfig: NextConfig = {
           { key: 'Content-Security-Policy', value: swaggerCsp },
         ],
       },
+      // An uploaded SVG is a document served from this origin, and the site
+      // policy above allows inline script because the app's own pages need
+      // it. `images` already refuses to serve one that way through the
+      // optimizer; this says the same thing for the address the bytes have on
+      // disk. The route that reads them cannot: a file that exists under
+      // `public/uploads` is answered by the static handler and the route never
+      // runs, while a header rule applies whichever one serves it.
+      {
+        source: '/uploads/:path*.svg',
+        headers: [
+          ...commonHeaders,
+          { key: 'Content-Security-Policy', value: "default-src 'none'; script-src 'none'; sandbox;" },
+        ],
+      },
     ];
   },
 };
