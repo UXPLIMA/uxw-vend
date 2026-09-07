@@ -110,6 +110,57 @@ function sha256(content: string): string {
     return crypto.createHash("sha256").update(content).digest("hex");
 }
 
+/** The part of the client one migration needs, transaction client included. */
+export interface MigrationClient {
+    $executeRawUnsafe(sql: string): Promise<unknown>;
+    moduleMigration: {
+        create(args: {
+            data: { moduleId: string; migrationName: string; checksum: string; executionMs: number };
+        }): Promise<unknown>;
+    };
+}
+
+interface PendingMigration {
+    moduleId: string;
+    file: string;
+    content: string;
+    checksum: string;
+}
+
+/**
+ * Apply one migration and record that it ran, or do neither.
+ *
+ * These used to be two writes: the SQL inside a transaction, then the
+ * `ModuleMigration` row after it. A process that died in between - a deploy
+ * restarting the container, a dropped connection - left the schema changed and
+ * nothing saying so, and the next run applied the same file again. An additive
+ * migration written with IF NOT EXISTS survives that; an `ADD COLUMN` without
+ * it fails and aborts the module, and a data migration applies twice.
+ *
+ * Postgres runs DDL inside a transaction, so the record belongs in the one
+ * that is already open. Exported so a test can watch which client each write
+ * goes through: reaching for the module-level client inside the callback runs
+ * outside the transaction and looks identical in the source.
+ */
+export async function applyOneMigration(
+    client: { $transaction<T>(run: (tx: MigrationClient) => Promise<T>): Promise<T> },
+    migration: PendingMigration,
+): Promise<number> {
+    const start = Date.now();
+    await client.$transaction(async (tx) => {
+        await tx.$executeRawUnsafe(migration.content);
+        await tx.moduleMigration.create({
+            data: {
+                moduleId: migration.moduleId,
+                migrationName: migration.file,
+                checksum: migration.checksum,
+                executionMs: Date.now() - start,
+            },
+        });
+    });
+    return Date.now() - start;
+}
+
 interface ApplyResult {
     moduleId: string;
     applied: string[];
@@ -182,20 +233,12 @@ async function applyModuleMigrations(
             continue;
         }
 
-        // Apply the migration inside a transaction
-        const start = Date.now();
+        // The file is handed to Postgres whole: multi-statement files work
+        // because the driver sends them as one simple query, and a dollar
+        // quoted function body survives for the same reason. A procedure
+        // complex enough to need more than that belongs in its own file.
         try {
-            // Split on semicolons at end of lines to support multi-statement files,
-            // but respect dollar-quoted strings (functions). Simple split is fine
-            // for the 99% case; complex procedures should be one-statement files.
-            await prisma.$transaction(async (tx) => {
-                await tx.$executeRawUnsafe(content);
-            });
-            const executionMs = Date.now() - start;
-
-            await prisma.moduleMigration.create({
-                data: { moduleId, migrationName: file, checksum, executionMs },
-            });
+            const executionMs = await applyOneMigration(prisma, { moduleId, file, content, checksum });
             result.applied.push(file);
             console.log(`  applied ${moduleId}/${file} (${executionMs}ms)`);
         } catch (err) {
