@@ -289,10 +289,13 @@ export async function bootstrapScheduler(): Promise<void> {
         // it made a backup that never ran report `ok`. It never ran: pg_dump
         // is on neither the runtime image nor a plain Node dev box, and
         // `backups/` was empty while the dashboard was green.
+        //
+        // Whether it runs at all is the operator's answer, not this file's:
+        // an install that backs up from outside can switch it off instead of
+        // collecting one error a night.
         handler: async () => {
-            const { createBackup } = await import("./backup");
-            const meta = await createBackup("scheduled", "Daily automated backup");
-            log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
+            const { runScheduledBackup } = await import("./backup-schedule");
+            await runScheduledBackup();
         },
     });
 

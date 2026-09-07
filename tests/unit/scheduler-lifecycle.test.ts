@@ -73,6 +73,10 @@ vi.mock("@/core/lib/retention", () => ({ pruneOldRecords: async () => pruned }))
 vi.mock("@/core/lib/health-alerting", () => ({ checkAndAlert: async () => ({ notified: false }) }));
 vi.mock("@/core/lib/ip-blocks", () => ({ invalidateIpBlockCache: () => { } }));
 vi.mock("@/core/lib/backup", () => ({ createBackup: async () => ({ filename: "f", sizeBytes: 1 }) }));
+// The backup job asks whether it is switched on before it dumps anything, and
+// that read is a database call this file's prisma stub does not answer. Same
+// reason as the stubs above: a tick is a test of the loop.
+vi.mock("@/core/lib/backup-schedule", () => ({ runScheduledBackup: async () => undefined }));
 
 let moduleCrons: { module: string; id: string; schedule: string; loader: () => Promise<unknown> }[];
 let cronsImportThrows: boolean;

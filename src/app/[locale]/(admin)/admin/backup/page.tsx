@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
+import { CheckboxField } from "@/core/components/ui/checkbox";
 import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useConfirm } from "@/core/components/ui/confirm-dialog";
@@ -71,6 +72,8 @@ export default function BackupAdminPage() {
     const [creating, setCreating] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [restoringId, setRestoringId] = useState<string | null>(null);
+    const [automated, setAutomated] = useState(true);
+    const [savingSchedule, setSavingSchedule] = useState(false);
     const [nextScheduled, setNextScheduled] = useState<string | null>(null);
     const [lastScheduled, setLastScheduled] = useState<string | null>(null);
     const [restoreTarget, setRestoreTarget] = useState<BackupRow | null>(null);
@@ -86,6 +89,7 @@ export default function BackupAdminPage() {
             }
             const data = await res.json();
             setBackups(data.backups || []);
+            setAutomated(data.automated?.enabled !== false);
         } catch {
             toast.error(t("backup_loadFailed"));
         } finally {
@@ -114,6 +118,34 @@ export default function BackupAdminPage() {
     }, [fetchBackups, fetchCronInfo]);
 
     const lastBackupAt = backups.length > 0 ? backups[0].createdAt : null;
+
+    const toggleAutomated = async (next: boolean) => {
+        const previous = automated;
+        // Moved before the request so the box does not lag behind the click;
+        // put back on any answer that is not a yes.
+        setAutomated(next);
+        setSavingSchedule(true);
+        try {
+            const res = await fetch("/api/v1/admin/backup", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ automated: next }),
+            });
+            if (!res.ok) {
+                setAutomated(previous);
+                const data = await res.json().catch(() => null);
+                toast.error(errorMessage(data, t("backup_scheduleFailed"), t));
+                return;
+            }
+            toast.success(next ? t("backup_scheduleOn") : t("backup_scheduleOff"));
+            void fetchCronInfo();
+        } catch {
+            setAutomated(previous);
+            toast.error(t("backup_scheduleFailed"));
+        } finally {
+            setSavingSchedule(false);
+        }
+    };
 
     const handleCreate = async () => {
         setCreating(true);
@@ -252,9 +284,21 @@ export default function BackupAdminPage() {
                             <Clock className="w-3 h-3" /> {t("backup_nextScheduled")}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-4 pt-0">
-                        <div className="text-sm font-medium">{formatDate(nextScheduled, __dateTag)}</div>
-                        <div className="text-xs text-muted-foreground mt-1">{t("backup_runsDaily")}</div>
+                    <CardContent className="p-4 pt-0 space-y-3">
+                        <div>
+                            <div className="text-sm font-medium">
+                                {automated ? formatDate(nextScheduled, __dateTag) : t("backup_scheduleOffLabel")}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                                {automated ? t("backup_runsDaily") : t("backup_scheduleOffHint")}
+                            </div>
+                        </div>
+                        <CheckboxField
+                            checked={automated}
+                            disabled={savingSchedule}
+                            onChange={(e) => void toggleAutomated(e.target.checked)}
+                            label={<span className="text-xs">{t("backup_automatedLabel")}</span>}
+                        />
                     </CardContent>
                 </Card>
             </div>
