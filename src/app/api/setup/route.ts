@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
+import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import prisma from "@/core/lib/db";
 import { markSetupComplete } from "@/core/lib/setup-state";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
@@ -468,8 +469,18 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<Loca
         throw new Error("Invalid ZIP file");
     }
 
-    await fs.mkdir(targetDir, { recursive: true });
     const zip = new AdmZip(buffer);
+    // The same rules the marketplace installer applies, rather than a smaller
+    // set written out again here: entry count, uncompressed size, compression
+    // ratio, symlinks and file types, none of which the compressed size of
+    // the file above says anything about. The resolve below stays as well;
+    // traversal is worth refusing twice.
+    const shape = validateZipEntries(zip.getEntries());
+    if (!shape.ok) {
+        throw new Error(`Module archive rejected: ${shape.error}`);
+    }
+
+    await fs.mkdir(targetDir, { recursive: true });
     for (const entry of zip.getEntries()) {
         if (entry.isDirectory) continue;
         if (entry.entryName.includes("../")) continue;

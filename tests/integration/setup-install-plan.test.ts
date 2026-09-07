@@ -103,15 +103,20 @@ vi.mock("fs/promises", () => {
     return { ...api, default: api };
 });
 
-// The route only asks AdmZip for entries; one manifest entry is enough.
+// One manifest entry is enough, but it has to look like one: the route runs
+// the archive through `validateZipEntries` before writing anything, and that
+// reads an entry's attributes and its size header as well as its name.
 vi.mock("adm-zip", () => {
+    const data = Buffer.from('{"id":"x"}');
     class FakeZip {
         getEntries() {
             return [
                 {
                     isDirectory: false,
                     entryName: "module.json",
-                    getData: () => Buffer.from('{"id":"x"}'),
+                    attr: 0,
+                    header: { size: data.length, compressedSize: data.length },
+                    getData: () => data,
                 },
             ];
         }
