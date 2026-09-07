@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 /**
- * Eighteen payment credentials sit in the settings table as plain text.
+ * Twenty credentials sit in the settings table as plain text.
  *
  * The product ships `secret-storage.ts`: AES-256-GCM, versioned, with a
  * documented migration path where a value written without the `v1:` prefix is
@@ -22,9 +22,16 @@ import path from "node:path";
  * readers and migrating what is already stored, and it touches the payment
  * path, which is where this repository says to escalate rather than guess.
  *
+ * Two of them do not look like credentials from the key name alone.
+ * `cloudflare_r2_config` and `cloudflare_turnstile_config` are JSON blobs with
+ * `accessKey` and `secretKey` inside, and the first version of this gate
+ * matched on the key name, so it pinned the eighteen payment keys and walked
+ * past the storage and captcha secrets sitting one level down. A gate that
+ * only sees the shape it was written for is the thing it was written against.
+ *
  * What it does is stop the number growing while the decision is open. The
  * list may shrink freely, as each key moves behind `encryptSecret`. A
- * nineteenth arrives with the conversation, not without it.
+ * twenty-first arrives with the conversation, not without it.
  */
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
@@ -52,6 +59,9 @@ const PLAINTEXT_CREDENTIALS = new Set([
     "razorpay_webhook_secret",
     "stripe_secret_key",
     "stripe_webhook_secret",
+    // Not credential-shaped by name: the secret is a field inside the blob.
+    "cloudflare_r2_config",
+    "cloudflare_turnstile_config",
 ]);
 
 const LOOKS_LIKE_A_CREDENTIAL = /secret|password|token|api_key|apikey|private/i;
@@ -87,6 +97,26 @@ function settingKeysRead(): Map<string, string> {
     return found;
 }
 
+/** Credential field names that appear inside a settings blob. */
+const CREDENTIAL_FIELD = /\b(secretKey|accessKey|clientSecret|privateKey|apiKey)\b/;
+
+/**
+ * Setting keys ending `_config` whose reader pulls a credential field out of
+ * the parsed value. The key name says nothing; the reader does.
+ */
+function credentialBlobs(): Map<string, string> {
+    const found = new Map<string, string>();
+    for (const file of [...tsFiles(path.join(ROOT, "module-sources")), ...tsFiles(path.join(ROOT, "src"))]) {
+        const body = fs.readFileSync(file, "utf8");
+        if (!body.includes("prisma.setting")) continue;
+        if (!CREDENTIAL_FIELD.test(body)) continue;
+        for (const m of body.matchAll(/"([a-z0-9_]+_config)"/g)) {
+            if (!found.has(m[1])) found.set(m[1], path.relative(ROOT, file));
+        }
+    }
+    return found;
+}
+
 describe("a credential kept in the settings table", () => {
     const read = settingKeysRead();
 
@@ -109,8 +139,21 @@ describe("a credential kept in the settings table", () => {
         ).toEqual([]);
     });
 
+    it("is pinned even when the secret is a field inside a blob", () => {
+        const unpinned = [...credentialBlobs().entries()]
+            .filter(([key]) => !PLAINTEXT_CREDENTIALS.has(key))
+            .map(([key, file]) => `${key}  (${file})`);
+
+        expect(
+            unpinned,
+            `A settings blob carries a credential and is not on the list. The key\n` +
+            `name does not have to say so; the reader does:\n${unpinned.join("\n")}`,
+        ).toEqual([]);
+    });
+
     it("keeps the pinned list free of names nobody reads any more", () => {
-        const gone = [...PLAINTEXT_CREDENTIALS].filter((key) => !read.has(key));
+        const blobs = credentialBlobs();
+        const gone = [...PLAINTEXT_CREDENTIALS].filter((key) => !read.has(key) && !blobs.has(key));
         expect(
             gone,
             `These are pinned as plaintext credentials and nothing reads them.\n` +
