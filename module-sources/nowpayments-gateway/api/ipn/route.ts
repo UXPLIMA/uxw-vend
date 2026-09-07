@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { z } from "zod";
 import { applyFiltersAsync } from "@/core/sdk";
 import { log, readJsonBody } from "@/core/sdk/server";
 import { getNowPaymentsConfig, ipnSignature } from "../../lib/nowpayments";
@@ -24,13 +25,25 @@ function signatureMatches(expected: string, received: string): boolean {
     return crypto.timingSafeEqual(a, b);
 }
 
-interface IpnBody {
-    payment_id?: string | number;
-    payment_status?: string;
-    order_id?: string;
-    price_amount?: number | string;
-    price_currency?: string;
-}
+/**
+ * The fields this route reads, and only those.
+ *
+ * The body used to be cast to an interface, which the compiler believes and
+ * the runtime does not: a `price_amount` the provider sent as text went
+ * through `Number()` as `NaN` and into the settlement as the amount.
+ *
+ * Everything is optional and coerced, so a payload that works today still
+ * works. Unknown fields are dropped rather than refused, because a webhook
+ * that rejects an unfamiliar field is a webhook that loses payments the week
+ * the provider adds one.
+ */
+const IPN_BODY = z.object({
+    payment_id: z.union([z.string(), z.number()]).optional(),
+    payment_status: z.string().optional(),
+    order_id: z.string().optional(),
+    price_amount: z.coerce.number().finite().optional(),
+    price_currency: z.string().optional(),
+});
 
 export async function POST(request: NextRequest) {
     const config = await getNowPaymentsConfig();
@@ -39,19 +52,29 @@ export async function POST(request: NextRequest) {
     }
 
     const signature = request.headers.get("x-nowpayments-sig");
-    const body = (await readJsonBody(request)) as IpnBody;
+    const body = await readJsonBody(request);
     if (body instanceof NextResponse) return body;
 
+    // Signed over what arrived, before anything reshapes it.
     if (!signature || !signatureMatches(ipnSignature(config.ipnSecret, body), signature)) {
         log.error("[nowpayments-gateway] an IPN arrived with a bad signature");
         return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    const reference = body.order_id;
+    const parsed = IPN_BODY.safeParse(body);
+    if (!parsed.success) {
+        log.error("[nowpayments-gateway] an IPN arrived in a shape this build cannot read", {
+            issues: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.code}`).join(", "),
+        });
+        return NextResponse.json({ error: "Unreadable notification" }, { status: 400 });
+    }
+    const payload = parsed.data;
+
+    const reference = payload.order_id;
     if (!reference) return NextResponse.json({ received: true });
 
-    const status = (body.payment_status ?? "").toLowerCase();
-    const providerRef = String(body.payment_id ?? reference);
+    const status = (payload.payment_status ?? "").toLowerCase();
+    const providerRef = String(payload.payment_id ?? reference);
 
     if (status === "finished" || status === "confirmed") {
         const outcome = await applyFiltersAsync("payment.settled", UNHANDLED, {
@@ -59,8 +82,8 @@ export async function POST(request: NextRequest) {
             reference,
             provider: "nowpayments",
             providerRef,
-            amount: Number(body.price_amount ?? 0),
-            currency: (body.price_currency ?? "usd").toUpperCase(),
+            amount: Number(payload.price_amount ?? 0),
+            currency: (payload.price_currency ?? "usd").toUpperCase(),
         });
         if (!outcome.handled) {
             log.error("[nowpayments-gateway] nothing settled a finished payment", { reference, providerRef });
@@ -73,7 +96,7 @@ export async function POST(request: NextRequest) {
         const outcome = await applyFiltersAsync("payment.refunded", UNHANDLED, {
             provider: "nowpayments",
             providerRef,
-            amount: Number(body.price_amount ?? 0),
+            amount: Number(payload.price_amount ?? 0),
         });
         if (!outcome.handled) log.warn("[nowpayments-gateway] nothing recorded a refund", { providerRef });
         return NextResponse.json({ received: true });
