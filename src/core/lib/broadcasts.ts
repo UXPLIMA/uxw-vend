@@ -50,8 +50,39 @@ export async function queueBroadcast(broadcastId: string): Promise<{ totalCount:
     return { totalCount: recipients.length };
 }
 
+/**
+ * How long a send may be in flight before nobody is running it.
+ *
+ * A broadcast holds `sending` for as long as its recipient list takes, and
+ * the job that started it can go away mid-list: a deploy, a restart, the
+ * rebuild an install triggers. The processor only looks for `queued`, so a
+ * row left that way is never returned to and reads as sending for as long as
+ * the database lives.
+ *
+ * An hour is well past any real list at fifty an a fifth of a second, and
+ * short enough that an operator finds out the same day.
+ */
+const SEND_STALE_AFTER_MS = 60 * 60_000;
+
 /** Cron-driven processor: picks up queued broadcasts, sends in batches. */
 export async function processQueuedBroadcasts(): Promise<void> {
+    // Close off a send nobody is running. Not resumed on purpose: `sentCount`
+    // is written every five batches of fifty, so picking it up again would
+    // mail as many as two hundred and fifty people a second time, and a
+    // broadcast cannot be recalled. A failure an operator can see is the
+    // better of the two.
+    await prisma.emailBroadcast.updateMany({
+        where: {
+            status: "sending",
+            startedAt: { lt: new Date(Date.now() - SEND_STALE_AFTER_MS) },
+        },
+        data: {
+            status: "failed",
+            lastError: "Interrupted before the send finished; not resumed, because the recipients already reached cannot be told apart",
+            completedAt: new Date(),
+        },
+    });
+
     const broadcast = await prisma.emailBroadcast.findFirst({
         where: { status: "queued" },
         orderBy: { createdAt: "asc" },

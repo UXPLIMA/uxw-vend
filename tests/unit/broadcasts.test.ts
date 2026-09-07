@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  */
 
 const { emailBroadcast, user, sendEmail, log } = vi.hoisted(() => ({
-    emailBroadcast: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
+    emailBroadcast: { findUnique: vi.fn(), findFirst: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     user: { findMany: vi.fn() },
     sendEmail: vi.fn(async (_opts: { to: string; subject: string; html: string }) => true),
     log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -286,5 +286,57 @@ describe("processQueuedBroadcasts", () => {
         expect(log.info).toHaveBeenCalledWith("broadcast complete", {
             broadcastId: "b1", sent: 1, failed: 0,
         });
+    });
+});
+
+/**
+ * A broadcast the process died in the middle of.
+ *
+ * `processQueuedBroadcasts` flips the row to `sending` and then spends as
+ * long as the recipient list takes, saving progress every five batches. A
+ * deploy, a restart or the rebuild an install triggers lands in that window,
+ * and the row keeps `sending`: the processor only ever looks for `queued`, so
+ * nothing returns to it, and the broadcast screen shows it sending for as
+ * long as the database lives.
+ *
+ * It is not resumed, and that is deliberate. `sentCount` is written every
+ * five batches of fifty, so resuming would mail up to two hundred and fifty
+ * people a second time, and a broadcast cannot be recalled. A failure an
+ * operator can see is the better of the two.
+ */
+describe("a broadcast left mid-send", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        emailBroadcast.findFirst.mockResolvedValue(null);
+        emailBroadcast.updateMany.mockResolvedValue({ count: 0 });
+    });
+
+    it("is closed off before the next one is picked up", async () => {
+        await processQueuedBroadcasts();
+
+        const sweep = emailBroadcast.updateMany.mock.calls.find(
+            ([args]) => (args as { where: { status?: string } }).where.status === "sending",
+        );
+        expect(sweep, "nothing closes off a stranded send").toBeTruthy();
+        const [args] = sweep as [{ data: Record<string, unknown> }];
+        expect(args.data.status).toBe("failed");
+        expect(args.data.lastError, "an operator needs to be told why").toBeTruthy();
+    });
+
+    it("only touches a send that has gone stale", async () => {
+        await processQueuedBroadcasts();
+
+        const [args] = emailBroadcast.updateMany.mock.calls.find(
+            ([a]) => (a as { where: { status?: string } }).where.status === "sending",
+        ) as [{ where: { startedAt?: { lt?: Date } } }];
+
+        const cutoff = args.where.startedAt?.lt;
+        expect(cutoff, "without a cutoff this would kill a send in progress").toBeInstanceOf(Date);
+        expect(cutoff!.getTime()).toBeLessThan(Date.now());
+    });
+
+    it("does not send anything on the way past", async () => {
+        await processQueuedBroadcasts();
+        expect(sendEmail, "resuming would mail people a second time").not.toHaveBeenCalled();
     });
 });
