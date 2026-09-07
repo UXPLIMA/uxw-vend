@@ -17,6 +17,12 @@ import path from "node:path";
  * has a ceiling, and a table that does not is written down here as such. The
  * list below is the whole argument, and adding to it should feel like a
  * decision.
+ *
+ * There used to be a second list, for the one route that read a whole table
+ * on purpose: the CSV export. It does not any more. It reads a page, writes
+ * it, and reads the next, which took its peak heap on 100k users from 228.9 MB
+ * to 18.1 MB. With the exception gone the mechanism went too - a future export
+ * that wants one should have to fail this test and argue for it.
  */
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
@@ -33,15 +39,6 @@ const BOUNDED_BY_DESIGN = new Set([
     "blogCategory",   // curated by an editor
     "seoPage",        // one per page an editor described
     "licenseProduct", // one per product a licence can be issued for
-]);
-
-/**
- * Reading everything is the point of an export. It is listed here so the
- * exception is visible rather than silent; if it ever needs to stream instead
- * of collecting, that is a change to make deliberately.
- */
-const READS_EVERYTHING_ON_PURPOSE = new Set([
-    "module-sources/csv-import-export/api/export/route.ts",
 ]);
 
 function routeFiles(dir: string, out: string[] = []): string[] {
@@ -71,7 +68,6 @@ describe("an endpoint that reads a whole table", () => {
         for (const base of ["src/app", "module-sources"]) {
             for (const file of routeFiles(path.join(ROOT, base))) {
                 const relative = path.relative(ROOT, file);
-                if (READS_EVERYTHING_ON_PURPOSE.has(relative)) continue;
                 const source = fs.readFileSync(file, "utf8");
                 for (const match of source.matchAll(/(\w+)\s*\.\s*findMany\s*\(/g)) {
                     const body = callBody(source, match.index + match[0].length - 1);

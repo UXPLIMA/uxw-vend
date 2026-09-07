@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-07",
-  "updatedAt": "2026-09-07T10:56:46Z",
+  "updatedAt": "2026-09-07T11:04:42Z",
   "modules": [
     {
       "id": "announcements",
@@ -437,13 +437,13 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.0.9",
+      "version": "1.0.10",
       "coreVersion": "^1.0.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T03:59:21Z",
+      "updatedAt": "2026-09-07T11:04:42Z",
       "screenshots": [],
       "tags": [
         "integration"
