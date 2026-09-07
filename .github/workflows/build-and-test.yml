@@ -118,19 +118,12 @@ jobs:
     # build, and installed modules disappeared after `uxwvend update`.
     steps:
       - uses: actions/checkout@v7
-      - uses: docker/setup-buildx-action@v4
 
-      - name: Build image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: false
-          # Loaded into the local daemon so compose can run it.
-          load: true
-          tags: uxwvend:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+      # First, because the two steps that run when something goes wrong -
+      # the log dump and the teardown - both call `docker compose`, and compose
+      # will not start without this file. Written after the image build, a
+      # failure in buildx or in the build left both of them erroring on a
+      # missing POSTGRES_PASSWORD instead of saying what had happened.
       - name: Write .env for the stack
         run: |
           set -euo pipefail
@@ -145,6 +138,19 @@ jobs:
           APP_PORT=3001
           APP_BIND_ADDR=127.0.0.1
           ENVEOF
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          # Loaded into the local daemon so compose can run it.
+          load: true
+          tags: uxwvend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Start the stack
         run: docker compose up -d
