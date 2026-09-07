@@ -3,6 +3,14 @@ import { z } from "zod";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
+/**
+ * This answer is the same whoever asked, so a proxy in front of the site may
+ * hold it briefly. `s-maxage` speaks to shared caches and not to browsers, so
+ * no visitor's own cache is involved. Anything here that ever starts varying
+ * by who is asking has to lose this.
+ */
+const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+
 const SETTING_KEY = "currency_config";
 
 const currencySchema = z.object({
@@ -49,9 +57,9 @@ const DEFAULT_CONFIG = {
 export async function GET() {
     const setting = await prisma.setting.findUnique({ where: { key: SETTING_KEY } });
     if (!setting) {
-        return NextResponse.json(DEFAULT_CONFIG);
+        return NextResponse.json(DEFAULT_CONFIG, { headers: SHARED_CACHE });
     }
-    return NextResponse.json(setting.value);
+    return NextResponse.json(setting.value, { headers: SHARED_CACHE });
 }
 
 export async function POST(request: NextRequest) {

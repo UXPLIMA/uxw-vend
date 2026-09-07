@@ -3,6 +3,14 @@ import { isAdmin, log, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { communityGoalSchema } from "../../lib/validations";
 
+/**
+ * This answer is the same whoever asked, so a proxy in front of the site may
+ * hold it briefly. `s-maxage` speaks to shared caches and not to browsers, so
+ * no visitor's own cache is involved. Anything here that ever starts varying
+ * by who is asking has to lose this.
+ */
+const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+
 // GET /api/v1/community-goal - Public endpoint
 export async function GET() {
     try {
@@ -20,7 +28,7 @@ export async function GET() {
         const endDate = (settingsMap.community_goal_end_date as string) || null;
 
         if (target <= 0) {
-            return NextResponse.json({ target: 0, current: 0, title, endDate: null });
+            return NextResponse.json({ target: 0, current: 0, title, endDate: null }, { headers: SHARED_CACHE });
         }
 
         // Calculate current from completed orders this month (or since goal start)
@@ -37,10 +45,10 @@ export async function GET() {
 
         const current = Number(result._sum.total) || 0;
 
-        return NextResponse.json({ target, current, title, endDate });
+        return NextResponse.json({ target, current, title, endDate }, { headers: SHARED_CACHE });
     } catch (error) {
         log.error("Community goal error", { error: error instanceof Error ? error.message : String(error) });
-        return NextResponse.json({ target: 0, current: 0, title: "Monthly Goal", endDate: null });
+        return NextResponse.json({ target: 0, current: 0, title: "Monthly Goal", endDate: null }, { headers: SHARED_CACHE });
     }
 }
 

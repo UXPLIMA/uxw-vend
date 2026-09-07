@@ -3,6 +3,14 @@ import { isAdmin, logActivity, prisma, sanitizeHtml, readJsonBody } from "@/core
 import { auth } from "@/core/sdk/auth";
 import { announcementCreateSchema } from "../lib/validations";
 
+/**
+ * This answer is the same whoever asked, so a proxy in front of the site may
+ * hold it briefly. `s-maxage` speaks to shared caches and not to browsers, so
+ * no visitor's own cache is involved. Anything here that ever starts varying
+ * by who is asking has to lose this.
+ */
+const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+
 // GET /api/v1/announcements - Public: active announcements
 export async function GET() {
     const now = new Date();
@@ -26,7 +34,7 @@ export async function GET() {
         take: 100,
     });
 
-    return NextResponse.json({ announcements });
+    return NextResponse.json({ announcements }, { headers: SHARED_CACHE });
 }
 
 // POST /api/v1/announcements - Admin

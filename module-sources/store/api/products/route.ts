@@ -4,6 +4,14 @@ import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
 
+/**
+ * The listing is the same whoever asked: it filters on query parameters and
+ * reads no session. `s-maxage` speaks to shared caches and not to browsers,
+ * so no visitor's own cache is involved. If this ever starts varying by who
+ * is asking, it has to lose this.
+ */
+const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+
 // GET /api/v1/store/products - List products
 export async function GET(request: NextRequest) {
     try {
@@ -54,7 +62,7 @@ export async function GET(request: NextRequest) {
                 total,
                 pages: Math.ceil(total / limit),
             },
-        });
+        }, { headers: SHARED_CACHE });
     } catch (error) {
         log.error("List products error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
