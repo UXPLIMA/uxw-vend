@@ -3,6 +3,7 @@ import { slugify } from "@/core/sdk";
 import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
+import { PUBLIC_PRODUCT } from "../../lib/public-product";
 
 /**
  * The listing is the same whoever asked: it filters on query parameters and
@@ -43,11 +44,7 @@ export async function GET(request: NextRequest) {
         const [products, total] = await Promise.all([
             prisma.product.findMany({
                 where,
-                include: {
-                    category: {
-                        select: { id: true, name: true, slug: true },
-                    },
-                },
+            select: PUBLIC_PRODUCT,
                 skip,
                 take,
                 orderBy: sort === "price_asc" ? { price: "asc" }

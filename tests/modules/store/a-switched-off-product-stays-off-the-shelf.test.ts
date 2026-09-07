@@ -56,6 +56,21 @@ const { NextRequest } = await import("next/server");
 const SWITCHED_OFF = { id: "p9", slug: "withdrawn", number: 9, name: "Withdrawn", isActive: false };
 const ON_SALE = { id: "p1", slug: "vip", number: 1, name: "VIP", isActive: true };
 
+/**
+ * Stands the row in the database up behind the query the route actually
+ * writes. An earlier version of this file handed the row back whatever the
+ * `where` said, which describes a database that does not exist - and would
+ * have gone on passing if the filter were deleted.
+ */
+function rowInTheDatabase(row: { isActive: boolean } | null) {
+    findFirst.mockImplementation(async (args) => {
+        const where = (args as { where?: { isActive?: boolean } }).where ?? {};
+        if (!row) return null;
+        if (where.isActive === true && !row.isActive) return null;
+        return row;
+    });
+}
+
 /** The single-product route, asked for `id` by a caller who is or is not admin. */
 async function readOne(id: string) {
     const response = await GET_ONE(
@@ -98,43 +113,43 @@ describe("the public product listing", () => {
 
 describe("the public product page", () => {
     it("does not hand a switched-off product to a visitor who guesses its number", async () => {
-        findFirst.mockResolvedValue(SWITCHED_OFF);
+        rowInTheDatabase(SWITCHED_OFF);
 
         expect((await readOne("9")).status).toBe(404);
     });
 
     it("does not hand one over by slug either", async () => {
-        findFirst.mockResolvedValue(SWITCHED_OFF);
+        rowInTheDatabase(SWITCHED_OFF);
 
         expect((await readOne("withdrawn")).status).toBe(404);
     });
 
     it("says the same thing it says for a product that never existed", async () => {
-        findFirst.mockResolvedValue(SWITCHED_OFF);
+        rowInTheDatabase(SWITCHED_OFF);
         const hidden = await readOne("9");
-        findFirst.mockResolvedValue(null);
+        rowInTheDatabase(null);
         const absent = await readOne("does-not-exist");
 
         expect(hidden).toEqual(absent);
     });
 
     it("still answers for a product that is on sale", async () => {
-        findFirst.mockResolvedValue(ON_SALE);
+        rowInTheDatabase(ON_SALE);
 
         const { status, body } = await readOne("vip");
         expect(status).toBe(200);
         expect(body.product.slug).toBe("vip");
     });
 
-    // The admin edit screen loads a product from this very endpoint, and the
-    // product an operator most needs to open is the one they switched off.
-    it("hands a switched-off product to an administrator, who has to edit it", async () => {
+    // The admin edit screen used to load a product from this endpoint, which is
+    // why it had an administrator exception. It has its own door now, so this
+    // one answers the same thing to everybody - which is the property that lets
+    // a proxy hold it.
+    it("refuses a switched-off product even to an administrator", async () => {
         callerIsAdmin = true;
-        findFirst.mockResolvedValue(SWITCHED_OFF);
+        rowInTheDatabase(SWITCHED_OFF);
 
-        const { status, body } = await readOne("9");
-        expect(status).toBe(200);
-        expect(body.product.slug).toBe("withdrawn");
+        expect((await readOne("9")).status).toBe(404);
     });
 });
 

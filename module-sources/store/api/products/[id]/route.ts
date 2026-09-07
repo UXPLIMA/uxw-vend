@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, log, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../../lib/validations";
+import { PUBLIC_PRODUCT } from "../../../lib/public-product";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -10,41 +11,22 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
 
+        // Switched off is a filter, not a check after the fact: the row never
+        // leaves the database, so there is nothing to leak by mistake later.
         const product = await prisma.product.findFirst({
             where: {
+                isActive: true,
                 OR: [
                     { id },
                     { slug: id },
                     ...(isNaN(Number(id)) ? [] : [{ number: Number(id) }]),
                 ],
             },
-            include: {
-                category: {
-                    select: { id: true, name: true, slug: true },
-                },
-            },
+            select: PUBLIC_PRODUCT,
         });
 
-        const notFound = () =>
-            NextResponse.json({ error: "Product not found" }, { status: 404 });
-
-        if (!product) return notFound();
-
-        // A switched-off product is not on the shelf, and this route answers by
-        // `number` as well as by id and slug - a sequential integer, so walking
-        // 1, 2, 3 read every product the listing was careful to hide. It answers
-        // exactly as it does for a product that never existed, so the 404 says
-        // nothing about which of the two it is.
-        //
-        // The administrator exception is not a loophole: the edit screen loads a
-        // product from this endpoint, and the one an operator most needs to open
-        // is the one they just switched off. The check runs only when the
-        // product is off, so the page a visitor actually asks for does not pay
-        // for a session lookup it never needs.
-        if (!product.isActive) {
-            const session = await auth();
-            const viewerIsAdmin = session?.user?.id ? await isAdmin(session.user.id) : false;
-            if (!viewerIsAdmin) return notFound();
+        if (!product) {
+            return NextResponse.json({ error: "Product not found" }, { status: 404 });
         }
 
         return NextResponse.json({ product });

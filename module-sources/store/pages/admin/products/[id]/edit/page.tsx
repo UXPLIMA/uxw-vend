@@ -58,7 +58,10 @@ export default function EditProductPage(props: PageProps) {
     useEffect(() => {
         let cancelled = false;
         Promise.all([
-            fetch(`/api/v1/store/products/${productId}`).then((r) => {
+            // The operator's endpoint, not the public one: this form has a
+            // field for every column, and the product worth opening is often
+            // the one that was just switched off, which the public read hides.
+            fetch(`/api/v1/store/admin/products/${productId}`).then((r) => {
                 if (!r.ok) throw new Error("load failed");
                 return r.json();
             }),
