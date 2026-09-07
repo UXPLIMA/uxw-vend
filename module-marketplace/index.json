@@ -460,7 +460,7 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
-        "apiRoutes": 2,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },

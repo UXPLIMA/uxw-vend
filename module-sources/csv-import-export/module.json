@@ -29,11 +29,6 @@
       "path": "/admin/export",
       "handler": "api/export/route.ts",
       "description": "Export tabular data to CSV (admin)."
-    },
-    {
-      "path": "/admin/import",
-      "handler": "api/import/route.ts",
-      "description": "Import tabular data from a CSV upload (admin)."
     }
   ],
   "dependencies": [
@@ -43,9 +38,6 @@
     "en": {
       "admin": {
         "export": "Export",
-        "import": "Import",
-        "importProducts": "Import Products (CSV)",
-        "importing": "Importing...",
         "menu_csv-import-export": "Csv Import Export",
         "menu_csv-import-export_export/import": "Export/Import",
         "module_csv-import-export_name": "CSV Import/Export",
@@ -58,18 +50,11 @@
         "adm_exportOrders": "Export Orders",
         "adm_exportProducts": "Export Products",
         "adm_exportUsers": "Export Users",
-        "adm_import": "Import",
-        "adm_importProducts": "Import Products",
-        "adm_importing": "Importing...",
-        "adm_productColumns": "CSV with columns: name, slug, price, comparePrice, stock, isActive, isFeatured, type, description",
         "cancel": "Cancel",
         "confirm": "Confirm Import",
         "csv": "CSV",
         "export": "Export",
         "exportData": "Export Data",
-        "import": "Import",
-        "importDone": "Import complete.",
-        "importFailed": "The import did not finish.",
         "json": "JSON",
         "orders": "Orders",
         "overwrite": "Overwrite existing data",
@@ -85,9 +70,6 @@
     "tr": {
       "admin": {
         "export": "Dışa Aktar",
-        "import": "İçe Aktar",
-        "importProducts": "Ürünleri İçe Aktar (CSV)",
-        "importing": "İçe aktarılıyor...",
         "menu_csv-import-export": "Dışa/İçe Aktarma",
         "menu_csv-import-export_export/import": "Dışa/İçe Aktarma",
         "module_csv-import-export_name": "CSV İçe/Dışa Aktarma",
@@ -100,18 +82,11 @@
         "adm_exportOrders": "Siparişleri Dışa Aktar",
         "adm_exportProducts": "Ürünleri Dışa Aktar",
         "adm_exportUsers": "Kullanıcıları Dışa Aktar",
-        "adm_import": "İçe Aktar",
-        "adm_importProducts": "Ürünleri İçe Aktar",
-        "adm_importing": "İçe aktarılıyor...",
-        "adm_productColumns": "Şu sütunlarla CSV: name, slug, price, comparePrice, stock, isActive, isFeatured, type, description",
         "cancel": "İptal",
         "confirm": "İçerik Aktarımını Onayla",
         "csv": "CSV",
         "export": "Dışa Aktar",
         "exportData": "Verileri Dışa Aktar",
-        "import": "İçe Aktar",
-        "importDone": "İçe aktarma tamamlandı.",
-        "importFailed": "İçe aktarma tamamlanmadı.",
         "json": "JSON",
         "orders": "Siparişler",
         "overwrite": "Mevcut verilerin üzerine yaz",

@@ -1,39 +1,15 @@
 "use client";
 
-
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/core/sdk/ui";
-import { Download, Upload, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Download } from "lucide-react";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
 export default function ExportImportPage() {
     const t = useTranslations("csvImportExport");
-    const [importing, setImporting] = useState(false);
 
     const exportData = (type: string) => {
         window.open(`/api/v1/admin/export?type=${type}`, "_blank");
-    };
-
-    const importProducts = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setImporting(true);
-        const text = await file.text();
-
-        const res = await fetch("/api/v1/admin/import?type=products", {
-            method: "POST",
-            body: text,
-        });
-
-        const data = await res.json();
-        if (res.ok) toast.success(t("importDone"));
-        else toast.error(t("importFailed"));
-
-        setImporting(false);
-        e.target.value = "";
     };
 
     return (
@@ -43,7 +19,7 @@ export default function ExportImportPage() {
                 description={t("adm_exportImportSubtitle")}
             />
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="max-w-md">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base">
@@ -60,30 +36,6 @@ export default function ExportImportPage() {
                         <Button variant="outline" className="w-full justify-start" onClick={() => exportData("users")}>
                             <Download className="w-4 h-4" /> {t("adm_exportUsers")}
                         </Button>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Upload className="w-4 h-4" /> {t("adm_import")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div>
-                            <Label>{t("adm_importProducts")}</Label>
-                            <p className="text-xs text-muted-foreground mb-2">
-                                {t("adm_productColumns")}
-                            </p>
-                            <Input
-                                aria-label={t("adm_importProducts")}
-                                type="file"
-                                accept=".csv"
-                                onChange={importProducts}
-                                disabled={importing}
-                            />
-                            {importing && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> {t("adm_importing")}</p>}
-                        </div>
                     </CardContent>
                 </Card>
             </div>
