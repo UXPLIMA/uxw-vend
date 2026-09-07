@@ -26,7 +26,7 @@
  * behaviour as before this became registry-driven.
  */
 
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 /**
  * Deliberately not typed as Auth.js's `Provider`: importing that type pulls the
@@ -105,7 +105,7 @@ export function resolveAuthProviders(
         } catch (error) {
             onWarn(
                 `[auth] Module "${declared.module}" failed to build auth provider "${declared.id}": ` +
-                    `${error instanceof Error ? error.message : String(error)}`,
+                    `${errorText(error)}`,
             );
         }
     };

@@ -13,7 +13,7 @@
  * unwinds before early-init code (Prisma).
  */
 
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 type ShutdownCallback = () => Promise<void> | void;
 
@@ -57,7 +57,7 @@ async function runShutdown(signal: string): Promise<void> {
                 await result;
             }
         } catch (err) {
-            log.error(`[shutdown] ${entry.name} failed`, { error: err instanceof Error ? err.message : String(err) });
+            log.error(`[shutdown] ${entry.name} failed`, { error: errorText(err) });
         }
     }
     log.info("shutdown complete");

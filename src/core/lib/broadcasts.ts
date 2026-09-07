@@ -1,6 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import { sendEmail } from "@/core/lib/email";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 interface BroadcastFilter {
     all?: boolean;
@@ -82,7 +82,7 @@ export async function processQueuedBroadcasts(): Promise<void> {
                 sent++;
             } catch (err) {
                 failed++;
-                lastError = err instanceof Error ? err.message : String(err);
+                lastError = errorText(err);
             }
         }));
 

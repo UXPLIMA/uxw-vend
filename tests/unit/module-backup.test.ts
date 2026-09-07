@@ -12,7 +12,8 @@ const { createBackup } = vi.hoisted(() => ({ createBackup: vi.fn() }));
 vi.mock("@/core/lib/backup", () => ({ createBackup }));
 
 vi.mock("@/core/lib/logger", () => ({
-    log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 const META = { filename: "backup-2026-09-01.sql.gz", sizeBytes: 1234 };

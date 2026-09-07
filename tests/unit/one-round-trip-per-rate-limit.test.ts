@@ -27,7 +27,8 @@ vi.mock("@/core/lib/db", () => ({
     prisma: { setting: { findUnique: async () => null } },
 }));
 
-vi.mock("@/core/lib/logger", () => ({ log: { warn: vi.fn(), info: vi.fn(), error: vi.fn() } }));
+vi.mock("@/core/lib/logger", () => ({ 
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { warn: vi.fn(), info: vi.fn(), error: vi.fn() } }));
 
 describe("a rate-limited request", () => {
     beforeEach(() => {

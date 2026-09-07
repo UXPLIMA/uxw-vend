@@ -51,7 +51,8 @@ vi.mock("@/core/lib/shutdown", () => ({
 }));
 
 vi.mock("@/core/lib/logger", () => ({
-    log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 // The eight core jobs are registered by bootstrapScheduler and therefore run

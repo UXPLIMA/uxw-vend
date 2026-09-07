@@ -1,6 +1,6 @@
 import { LoadedModule, ModuleManifest } from "./module-types";
 import { moduleManifestSchema } from "./module-manifest-schema";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 class ModuleLoader {
     private modules: Map<string, LoadedModule> = new Map();
@@ -54,7 +54,7 @@ class ModuleLoader {
             try {
                 parsedJson = JSON.parse(manifestContent);
             } catch (err) {
-                log.warn(`[module-loader] ${dirName}: invalid JSON in module.json - skipping`, { error: err instanceof Error ? err.message : String(err) });
+                log.warn(`[module-loader] ${dirName}: invalid JSON in module.json - skipping`, { error: errorText(err) });
                 return;
             }
 
@@ -73,7 +73,7 @@ class ModuleLoader {
                 path: modulePath,
             });
         } catch (error) {
-            log.error(`Failed to load module ${dirName}`, { error: error instanceof Error ? error.message : String(error) });
+            log.error(`Failed to load module ${dirName}`, { error: errorText(error) });
         }
     }
 

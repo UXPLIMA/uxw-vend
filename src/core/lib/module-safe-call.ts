@@ -24,7 +24,7 @@
  *   );
  */
 
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 export async function safeCall<T>(
     moduleName: string,
     opName: string,
@@ -35,7 +35,7 @@ export async function safeCall<T>(
         return await fn();
     } catch (err) {
         log.error(`[module-safe-call] ${moduleName}:${opName} failed`, {
-            error: err instanceof Error ? err.message : String(err),
+            error: errorText(err),
         });
         try {
             const { prisma } = await import("@/core/lib/db");
@@ -48,7 +48,7 @@ export async function safeCall<T>(
                         entityId: moduleName,
                         metadata: {
                             operation: opName,
-                            error: err instanceof Error ? err.message : String(err),
+                            error: errorText(err),
                             stack:
                                 err instanceof Error
                                     ? err.stack?.split("\n").slice(0, 5).join("\n")

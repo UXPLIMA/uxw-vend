@@ -54,7 +54,8 @@ vi.mock("@/core/lib/shutdown", () => ({
 }));
 vi.mock("@/core/generated/module-crons", () => ({ ModuleCronJobs: [] }));
 vi.mock("@/core/lib/logger", () => ({
-    log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 type Scheduler = typeof import("@/core/lib/scheduler");

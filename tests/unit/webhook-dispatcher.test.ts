@@ -39,7 +39,8 @@ vi.mock("@/core/generated/module-webhooks", () => ({
 // so a passing run stays readable; what the test asserts is the answer the
 // caller gets, not that something was written down.
 vi.mock("@/core/lib/logger", () => ({
-    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
 vi.mock("@/core/lib/module-cache", () => ({

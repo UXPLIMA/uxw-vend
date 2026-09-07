@@ -1,6 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import { onShutdown, installShutdownHandlers, isShuttingDown } from "@/core/lib/shutdown";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 /**
  * Lightweight cron-style scheduler.
@@ -86,7 +86,7 @@ async function claimJob(key: string, schedule: string): Promise<boolean> {
         `;
         return affected === 1;
     } catch (err) {
-        log.error(`[scheduler] claim failed for ${key}`, { error: err instanceof Error ? err.message : String(err) });
+        log.error(`[scheduler] claim failed for ${key}`, { error: errorText(err) });
         return false;
     }
 }
@@ -99,8 +99,8 @@ async function runJob(job: CronJob): Promise<void> {
         await job.handler();
     } catch (err) {
         status = "error";
-        error = err instanceof Error ? err.message : String(err);
-        log.error(`[scheduler] Job ${job.key} failed`, { error: err instanceof Error ? err.message : String(err) });
+        error = errorText(err);
+        log.error(`[scheduler] Job ${job.key} failed`, { error: errorText(err) });
     }
     const lastRunMs = Date.now() - start;
     const lastRunAt = new Date();
@@ -113,7 +113,7 @@ async function runJob(job: CronJob): Promise<void> {
             data: { lastRunAt, lastStatus: status, lastError: error, lastRunMs, nextRunAt },
         });
     } catch (err) {
-        log.error(`[scheduler] Failed to record run for ${job.key}`, { error: err instanceof Error ? err.message : String(err) });
+        log.error(`[scheduler] Failed to record run for ${job.key}`, { error: errorText(err) });
     }
 }
 
@@ -151,7 +151,7 @@ async function tick(): Promise<string[]> {
     } catch (err) {
         // Fail soft, as getModuleStates itself does: an unreadable config
         // means no explicit state is known, and every job stays eligible.
-        log.error("[scheduler] Could not read module states", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[scheduler] Could not read module states", { error: errorText(err) });
     }
 
     for (const job of registeredJobs.values()) {
@@ -163,7 +163,7 @@ async function tick(): Promise<string[]> {
                 ran.push(job.key);
             }
         } catch (err) {
-            log.error(`[scheduler] Tick error for ${job.key}`, { error: err instanceof Error ? err.message : String(err) });
+            log.error(`[scheduler] Tick error for ${job.key}`, { error: errorText(err) });
         }
     }
     return ran;
@@ -302,7 +302,7 @@ export async function bootstrapScheduler(): Promise<void> {
                 const meta = await createBackup("scheduled", "Daily automated backup");
                 log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
             } catch (err) {
-                log.error("[cron] automated-backup failed", { error: err instanceof Error ? err.message : String(err) });
+                log.error("[cron] automated-backup failed", { error: errorText(err) });
             }
         },
     });
@@ -324,7 +324,7 @@ export async function bootstrapScheduler(): Promise<void> {
                     handler: handler as CronHandler,
                 });
             } catch (err) {
-                log.error(`[scheduler] Failed to load ${entry.module}/${entry.id}`, { error: err instanceof Error ? err.message : String(err) });
+                log.error(`[scheduler] Failed to load ${entry.module}/${entry.id}`, { error: errorText(err) });
             }
         }
     } catch {

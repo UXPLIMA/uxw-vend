@@ -31,7 +31,8 @@ const { execFileMock } = vi.hoisted(() => ({
 vi.mock("child_process", () => ({ execFile: execFileMock, default: { execFile: execFileMock } }));
 
 vi.mock("@/core/lib/logger", () => ({
-    log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
 const { writeBuildState, writeSchemaState } = vi.hoisted(() => ({

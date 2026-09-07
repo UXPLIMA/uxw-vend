@@ -20,7 +20,8 @@ vi.mock("@/core/lib/db", () => ({
     default: { emailBroadcast, user },
 }));
 vi.mock("@/core/lib/email", () => ({ sendEmail }));
-vi.mock("@/core/lib/logger", () => ({ log }));
+vi.mock("@/core/lib/logger", () => ({ 
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log }));
 
 import { queueBroadcast, processQueuedBroadcasts } from "@/core/lib/broadcasts";
 

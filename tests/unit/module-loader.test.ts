@@ -9,7 +9,8 @@ const { logWarn, logError } = vi.hoisted(() => ({ logWarn: vi.fn(), logError: vi
 // the real logger would land on a different instance than the one it picks
 // up. Mocking the module keeps one object on both sides.
 vi.mock("@/core/lib/logger", () => ({
-    log: { warn: logWarn, error: logError, info: vi.fn(), debug: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { warn: logWarn, error: logError, info: vi.fn(), debug: vi.fn() },
 }));
 
 

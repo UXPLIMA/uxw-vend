@@ -19,7 +19,7 @@ import {
     type ActionListener,
     type FilterListener,
 } from "./hooks";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 /**
  * Load and register all module hook listeners.
@@ -39,7 +39,7 @@ export async function bootstrapHooks(): Promise<void> {
         const { registerActivityFeedListeners } = await import("./activity-feed");
         registerActivityFeedListeners();
     } catch (err) {
-        log.error("[hooks] Failed to register core listeners", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[hooks] Failed to register core listeners", { error: errorText(err) });
     }
 
     try {
@@ -70,7 +70,7 @@ export async function bootstrapHooks(): Promise<void> {
                     });
                 }
             } catch (err) {
-                log.error(`[hooks] Failed to load ${entry.module}/${entry.hook}`, { error: err instanceof Error ? err.message : String(err) });
+                log.error(`[hooks] Failed to load ${entry.module}/${entry.hook}`, { error: errorText(err) });
             }
         }
 

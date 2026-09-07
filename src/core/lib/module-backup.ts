@@ -1,5 +1,5 @@
 import { createBackup, type BackupMeta } from "./backup";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 /**
  * Snapshot the database before a destructive module operation so ops can
@@ -26,7 +26,7 @@ export async function backupBeforeModuleChange(
         return meta;
     } catch (err) {
         log.error(`[module-backup] snapshot before ${action} of ${moduleId} failed, continuing`, {
-            error: err instanceof Error ? err.message : String(err),
+            error: errorText(err),
         });
         return null;
     }

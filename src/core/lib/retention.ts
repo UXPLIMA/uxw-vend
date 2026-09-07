@@ -1,5 +1,5 @@
 import { prisma } from "@/core/lib/db";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 
 /**
  * Audit-log retention.
@@ -47,7 +47,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.activityFeed = r.count;
     } catch (err) {
-        log.error("[retention] activityFeed prune failed", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[retention] activityFeed prune failed", { error: errorText(err) });
     }
 
     try {
@@ -56,7 +56,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.cronRun = r.count;
     } catch (err) {
-        log.error("[retention] cronRun prune failed", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[retention] cronRun prune failed", { error: errorText(err) });
     }
 
     try {
@@ -65,7 +65,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.revision = r.count;
     } catch (err) {
-        log.error("[retention] revision prune failed", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[retention] revision prune failed", { error: errorText(err) });
     }
 
     // UserSession: drop anything that's already expired, plus revoked rows
@@ -82,7 +82,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.userSession = r.count;
     } catch (err) {
-        log.error("[retention] userSession prune failed", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[retention] userSession prune failed", { error: errorText(err) });
     }
 
     // Email verification and password reset both live in VerificationToken,
@@ -97,7 +97,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.verificationToken = r.count;
     } catch (err) {
-        log.error("[retention] verificationToken prune failed", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[retention] verificationToken prune failed", { error: errorText(err) });
     }
 
     return result;

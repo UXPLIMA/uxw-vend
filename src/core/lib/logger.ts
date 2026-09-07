@@ -128,6 +128,18 @@ function logWithContext(level: LogLevel, message: string, extra?: Record<string,
     });
 }
 
+/**
+ * What to put in a log line's `error` field.
+ *
+ * Written out at every call site as
+ * `err instanceof Error ? err.message : String(err)`, which is a branch each
+ * time and a branch nobody's test takes twice. Here it is one branch, covered
+ * once, and a caller reads as what it means rather than how it is done.
+ */
+export function errorText(err: unknown): string {
+    return err instanceof Error ? err.message : String(err);
+}
+
 export const log = {
     debug: (msg: string, extra?: Record<string, unknown>) => logWithContext("debug", msg, extra),
     info: (msg: string, extra?: Record<string, unknown>) => logWithContext("info", msg, extra),

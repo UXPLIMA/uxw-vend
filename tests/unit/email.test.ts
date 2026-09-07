@@ -26,7 +26,8 @@ vi.mock("@/core/lib/db", () => ({ prisma: { emailJob } }));
 const logWarn = vi.fn();
 
 vi.mock("@/core/lib/logger", () => ({
-    log: { debug: vi.fn(), info: vi.fn(), warn: logWarn, error: vi.fn() },
+    
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),log: { debug: vi.fn(), info: vi.fn(), warn: logWarn, error: vi.fn() },
 }));
 
 // --- resend ----------------------------------------------------------------
@@ -394,6 +395,28 @@ describe("recipient validation", () => {
 
         await expect(sendEmail({ to: "a\r\nBcc: b@c.co", subject: "Hi", html: "x" }))
             .resolves.toBe(false);
+    });
+});
+
+describe("a listener that throws", () => {
+    it("does not stop the mail, and the caller's own words go out", async () => {
+        // The two filters run inside one try. A module that registers a
+        // broken `email.subject` or `email.body` listener is a module bug,
+        // and the file says the mail still goes: this is that promise.
+        vi.doMock("@/core/lib/hooks", () => ({
+            applyFiltersAsync: async () => { throw new Error("listener exploded"); },
+        }));
+        const { sendEmail } = await loadWithProvider();
+
+        await sendEmail({
+            to: "user@example.com",
+            subject: "Your receipt",
+            html: "<p>thanks</p>",
+        });
+
+        expect(lastSend().subject).toBe("Your receipt");
+        expect(String(lastSend().html)).toContain("thanks");
+        vi.doUnmock("@/core/lib/hooks");
     });
 });
 

@@ -22,7 +22,7 @@
 
 import { execFile } from "child_process";
 import { promisify } from "util";
-import { log } from "./logger";
+import { errorText, log } from "./logger";
 import { writeBuildState, writeSchemaState } from "./build-state";
 
 const execFileAsync = promisify(execFile);
@@ -132,7 +132,7 @@ export async function acquireInstallLock(): Promise<(() => void) | null> {
         // DB unreachable - fall back to in-process lock so single-worker
         // setups (no Postgres yet, e.g. during initial setup wizard)
         // still get some mutual exclusion.
-        log.error("[install-lock] advisory lock failed, falling back to in-process", { error: err instanceof Error ? err.message : String(err) });
+        log.error("[install-lock] advisory lock failed, falling back to in-process", { error: errorText(err) });
         installing = true;
         return () => { installing = false; };
     }
@@ -180,7 +180,7 @@ export function scheduleBuild(): void {
                 // Non-fatal: Prisma Client types may be stale until next merge.
                 log.error("install-lock: schema merge failed", {
                     step: "merge-schemas",
-                    error: err instanceof Error ? err.message : String(err),
+                    error: errorText(err),
                 });
             }
 
@@ -219,7 +219,7 @@ export function scheduleBuild(): void {
                 } catch (err) {
                     log.error("install-lock: schema additions failed", {
                         step: "schema-additions",
-                        error: err instanceof Error ? err.message : String(err),
+                        error: errorText(err),
                     });
                 }
             } else {
@@ -238,7 +238,7 @@ export function scheduleBuild(): void {
                 // Non-fatal: module tables may be missing until migrations re-run.
                 log.error("install-lock: migrations failed", {
                     step: "apply-migrations",
-                    error: err instanceof Error ? err.message : String(err),
+                    error: errorText(err),
                 });
             }
 
@@ -251,7 +251,7 @@ export function scheduleBuild(): void {
                 // Non-fatal: registry may not reflect newly installed modules.
                 log.error("install-lock: registry generation failed", {
                     step: "generate-registry",
-                    error: err instanceof Error ? err.message : String(err),
+                    error: errorText(err),
                 });
             }
 
@@ -288,7 +288,7 @@ export function scheduleBuild(): void {
             // Non-fatal: build failed - will need a manual rebuild.
             log.error("install-lock: build failed", {
                 step: "build",
-                error: err instanceof Error ? err.message : String(err),
+                error: errorText(err),
             });
         } finally {
             buildRunning = false;

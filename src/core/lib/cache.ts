@@ -18,6 +18,7 @@
  */
 
 import { getRedisClient, isRedisConfigured } from "./redis";
+import { errorText } from "./logger";
 
 export interface CacheBackend {
     readonly name: string;
@@ -93,7 +94,7 @@ let redisFallbackWarned = false;
 function warnRedisFallbackOnce(err: unknown): void {
     if (redisFallbackWarned) return;
     redisFallbackWarned = true;
-    const message = err instanceof Error ? err.message : String(err);
+    const message = errorText(err);
     console.warn(`[cache] Redis backend unavailable, falling back to memory: ${message}`);
 }
 
