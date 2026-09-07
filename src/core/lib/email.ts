@@ -30,6 +30,17 @@ import { log } from "./logger";
 const APP_NAME = resolveAppName();
 const MAX_ATTEMPTS = 3;
 
+/**
+ * How long a claim may sit before the queue assumes nobody is working on it.
+ *
+ * The job runs every five minutes and a send is a single HTTP call, so a row
+ * still `sending` after fifteen belongs to a process that went away: a
+ * deploy, a restart, the rebuild an install triggers. Nothing else recovers
+ * one - the claim only looks for `pending` and the admin endpoint is
+ * read-only - so a message claimed and interrupted was lost silently.
+ */
+const CLAIM_STALE_AFTER_MS = 15 * 60_000;
+
 // Inline localized strings for transactional emails. Each entry has en + tr.
 // Other locales fall back to en. Kept here so emails don't depend on the
 // next-intl request context (they're often sent from background jobs).
@@ -280,6 +291,24 @@ export async function processEmailQueue(batchSize = 10): Promise<{
     let failed = 0;
     let retried = 0;
 
+    // Take back anything a dead process was holding. `EmailJob` carries no
+    // `updatedAt` and does not need one: a `sending` row's `scheduledAt` has
+    // no other meaning, so the claim below stamps it and a row still sending
+    // long after its stamp is one nobody is working on. The attempt is
+    // counted, so a row that keeps being interrupted reaches MAX_ATTEMPTS and
+    // becomes visible as failed rather than cycling forever.
+    await prisma.emailJob.updateMany({
+        where: {
+            status: "sending",
+            scheduledAt: { lt: new Date(now.getTime() - CLAIM_STALE_AFTER_MS) },
+        },
+        data: {
+            status: "pending",
+            attempts: { increment: 1 },
+            lastError: "Interrupted before the send completed",
+        },
+    });
+
     // Claim a batch. We use updateMany → findMany to mark as "sending"
     // atomically-enough for our scale; for strict exactly-once a SELECT
     // FOR UPDATE / advisory-lock pattern would be stronger.
@@ -298,7 +327,7 @@ export async function processEmailQueue(batchSize = 10): Promise<{
             id: { in: pending.map((j) => j.id) },
             status: "pending",
         },
-        data: { status: "sending" },
+        data: { status: "sending", scheduledAt: now },
     });
 
     if (claimed.count === 0) {

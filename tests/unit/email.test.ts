@@ -169,13 +169,19 @@ describe("queueEmail", () => {
 // ===========================================================================
 
 describe("processEmailQueue claiming", () => {
-    it("does nothing when the queue is empty", async () => {
+    it("claims nothing when the queue is empty", async () => {
         const { processEmailQueue } = await load();
 
         await expect(processEmailQueue()).resolves.toEqual({
             processed: 0, sent: 0, failed: 0, retried: 0,
         });
-        expect(emailJob.updateMany).not.toHaveBeenCalled();
+        // One write still goes out: the sweep that takes back a claim a dead
+        // process was holding runs before the queue is read, because a
+        // stranded row is exactly what an empty-looking queue can be hiding.
+        const claims = emailJob.updateMany.mock.calls.filter(
+            ([a]) => (a as { data: { status?: string } }).data.status === "sending",
+        );
+        expect(claims).toEqual([]);
     });
 
     it("selects only due pending jobs, oldest first", async () => {
@@ -204,11 +210,17 @@ describe("processEmailQueue claiming", () => {
 
         await processEmailQueue();
 
-        const args = emailJob.updateMany.mock.calls[0]![0];
+        // The first call is the stale-claim sweep; the claim is the one that
+        // names the rows it just read.
+        const args = emailJob.updateMany.mock.calls.find(
+            ([a]) => (a as { data: { status?: string } }).data.status === "sending",
+        )![0];
         expect(args.where.id.in).toEqual(["a", "b"]);
         // The status guard is what stops a second worker re-claiming the row.
         expect(args.where.status).toBe("pending");
-        expect(args.data).toEqual({ status: "sending" });
+        expect(args.data.status).toBe("sending");
+        // Stamped, so the sweep above can tell a live claim from a dead one.
+        expect(args.data.scheduledAt).toBeInstanceOf(Date);
     });
 
     it("sends nothing when another worker won the claim", async () => {
@@ -766,5 +778,85 @@ describe("account lockout mail", () => {
         await sendAccountLockoutEmail({ to: "user@example.com", username: "ada", unlocksAt });
 
         expect(emailJob.create.mock.calls[0]![0].data.body).toContain(unlocksAt.toUTCString());
+    });
+});
+
+/**
+ * A message claimed and never finished.
+ *
+ * `processEmailQueue` marks a batch `sending` and then walks it, updating
+ * each row as it goes. Between those two writes the process can go away: a
+ * deploy, a container restart, the rebuild an install triggers. The rows it
+ * had claimed keep the `sending` status, and the claim only ever looks for
+ * `pending`, so nothing picks them up again. The admin screen shows them as
+ * sending for as long as the database lives, and its endpoint is read-only,
+ * so there is no way back through the product either.
+ *
+ * `deliverViaProvider` catches its own failures, so this is not the ordinary
+ * error path: it is the one where nothing gets to run.
+ *
+ * `EmailJob` carries no `updatedAt`, and it does not need one. A `sending`
+ * row's `scheduledAt` has no other meaning, so the claim stamps it and a row
+ * still sending long after its stamp is one nobody is working on.
+ */
+describe("a message left mid-send", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        emailJob.findMany.mockResolvedValue([]);
+        emailJob.updateMany.mockResolvedValue({ count: 0 });
+    });
+
+    it("is returned to the queue before the next batch is claimed", async () => {
+        const { processEmailQueue } = await import("@/core/lib/email");
+        await processEmailQueue();
+
+        const recovery = emailJob.updateMany.mock.calls.find(
+            ([args]) => (args as { where: { status?: string } }).where.status === "sending",
+        );
+        expect(recovery, "nothing sweeps a stranded claim").toBeTruthy();
+
+        const [args] = recovery as [{ where: Record<string, unknown>; data: Record<string, unknown> }];
+        expect(args.data.status).toBe("pending");
+    });
+
+    it("only takes back a claim that has gone stale", async () => {
+        const { processEmailQueue } = await import("@/core/lib/email");
+        await processEmailQueue();
+
+        const [args] = emailJob.updateMany.mock.calls.find(
+            ([a]) => (a as { where: { status?: string } }).where.status === "sending",
+        ) as [{ where: { scheduledAt?: { lt?: Date } } }];
+
+        const before = args.where.scheduledAt?.lt;
+        expect(before, "a sweep with no cutoff would steal a send in progress").toBeInstanceOf(Date);
+        expect(before!.getTime()).toBeLessThan(Date.now());
+    });
+
+    it("counts the interruption, so a row that keeps dying is not immortal", async () => {
+        const { processEmailQueue } = await import("@/core/lib/email");
+        await processEmailQueue();
+
+        const [args] = emailJob.updateMany.mock.calls.find(
+            ([a]) => (a as { where: { status?: string } }).where.status === "sending",
+        ) as [{ data: Record<string, unknown> }];
+
+        expect(args.data.attempts, "without this the recovery loop has no end").toBeTruthy();
+    });
+
+    it("stamps the claim, so the sweep can tell how old it is", async () => {
+        emailJob.findMany.mockResolvedValue([
+            { id: "j1", to: "a@b.c", subject: "s", body: "b", html: null, attempts: 0 },
+        ]);
+        emailJob.updateMany.mockResolvedValue({ count: 1 });
+
+        const { processEmailQueue } = await import("@/core/lib/email");
+        await processEmailQueue();
+
+        const claim = emailJob.updateMany.mock.calls.find(
+            ([a]) => (a as { data: { status?: string } }).data.status === "sending",
+        );
+        expect(claim, "no call claims a batch").toBeTruthy();
+        const [args] = claim as [{ data: { scheduledAt?: Date } }];
+        expect(args.data.scheduledAt, "an unstamped claim cannot be aged").toBeInstanceOf(Date);
     });
 });
