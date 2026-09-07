@@ -18,8 +18,10 @@ test.describe('Admin warnings', () => {
         const list = page.locator('.divide-y').first();
         await expect(empty.or(list)).toBeVisible();
 
-        // Open composer
-        const issueButton = page.getByRole('button', { name: /Issue Warning/i }).first();
+        // Open composer. It navigates to /admin/warnings/new, so it is a link:
+        // it used to be a <button> inside an <a>, which the HTML spec forbids
+        // and which gave a keyboard user two tab stops for one control.
+        const issueButton = page.getByRole('link', { name: /Issue Warning/i }).first();
         await expect(issueButton).toBeVisible();
         await issueButton.click();
 
@@ -37,8 +39,8 @@ test.describe('Admin warnings', () => {
         // Give debounce time
         await page.waitForTimeout(500);
 
-        // Close via Cancel
-        await page.getByRole('button', { name: /^Cancel$/i }).first().click();
+        // Cancel navigates back to the list, so it is a link too.
+        await page.getByRole('link', { name: /^Cancel$/i }).first().click();
         await expect(page.getByRole('heading', { name: /New Warning/i })).toHaveCount(0);
     });
 });

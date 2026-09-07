@@ -13,9 +13,11 @@ test.describe('Admin resource permissions', () => {
             .first();
         await expect(heading).toBeVisible();
 
-        // Open form
+        // Open form. It navigates to /admin/resource-permissions/new, so it is
+        // a link: it used to be a <button> inside an <a>, which the HTML spec
+        // forbids and which gave a keyboard user two tab stops for one control.
         const grantButton = page
-            .getByRole('button', { name: /Grant Permission/i })
+            .getByRole('link', { name: /Grant Permission/i })
             .first();
         await expect(grantButton).toBeVisible();
         await grantButton.click();
@@ -30,8 +32,8 @@ test.describe('Admin resource permissions', () => {
         await expect(resourceInput).toBeVisible();
         await resourceInput.fill('test.resource');
 
-        // Cancel closes form
-        const cancelButton = page.getByRole('button', { name: /^Cancel$/i }).first();
+        // Cancel navigates back to the list, so it is a link too.
+        const cancelButton = page.getByRole('link', { name: /^Cancel$/i }).first();
         await cancelButton.click();
         await expect(page.getByRole('heading', { name: /New Grant/i })).toHaveCount(0);
 
