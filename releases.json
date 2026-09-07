@@ -1,0 +1,15 @@
+{
+  "$comment": "The catalogue the admin update screen reads. Published beside module-marketplace/index.json on the same base, so a fork or an air-gapped mirror serves its own by pointing UXWVEND_MARKETPLACE_BASE somewhere else. Newest last is not required; the reader sorts.",
+  "updated": "2026-09-07",
+  "releases": [
+    {
+      "version": "0.2.1",
+      "tag": "0.2.1",
+      "publishedAt": "2026-09-07T00:00:00Z",
+      "notes": "The version this catalogue starts from.",
+      "security": false,
+      "channel": "stable",
+      "minVersion": null
+    }
+  ]
+}

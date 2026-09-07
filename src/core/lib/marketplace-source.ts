@@ -31,6 +31,11 @@ function resolveBase(): string {
     }
 }
 
+/** The root the catalogue is served from, for readers that are not a ZIP. */
+export function marketplaceBase(): string {
+    return resolveBase();
+}
+
 /** Base URL for module ZIPs, e.g. `${base}/blog.zip`. */
 export function moduleMarketplaceBase(): string {
     return `${resolveBase()}/module-marketplace`;

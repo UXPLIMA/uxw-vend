@@ -127,6 +127,10 @@ describe("install.sh", () => {
             "docker-compose.build.yml",
             "docker-compose.debug.yml",
             "Caddyfile",
+            // The updater's script. It reaches the host the same way the
+            // compose files do, and is mounted read-only into the one
+            // container that may talk to Docker.
+            "updater.sh",
         ]) {
             fs.copyFileSync(path.join(REPO, f), path.join(raw, f));
         }

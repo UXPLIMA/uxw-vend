@@ -67,6 +67,7 @@ import {
     Cog,
     SlidersHorizontal,
     Cpu,
+    ArrowUpCircle,
 } from "lucide-react";
 
 /** Lucide-compatible icon component used across the admin sidebar. */
@@ -232,7 +233,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Wrench,
         label: "Advanced",
         labelKey: "sidebar_advanced",
-        pathPrefix: ["/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/api-docs", "/admin/api-keys", "/admin/dev", "/admin/system", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
+        pathPrefix: ["/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/updates", "/admin/api-docs", "/admin/api-keys", "/admin/dev", "/admin/system", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
         sections: [
             {
                 header: "Operations",
@@ -242,6 +243,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                     { href: "/admin/email-queue", label: "Email Queue", labelKey: "sidebar_emailQueue", icon: Inbox },
                     { href: "/admin/backup", label: "Backup & Restore", labelKey: "sidebar_backup", icon: Database },
                     { href: "/admin/system", label: "System Health", labelKey: "sidebar_systemHealth", icon: Server },
+                    { href: "/admin/updates", label: "Updates", labelKey: "sidebar_updates", icon: ArrowUpCircle },
                 ],
             },
             {

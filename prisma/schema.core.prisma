@@ -518,3 +518,22 @@ model EmailJob {
   @@index([status, scheduledAt])
   @@index([createdAt])
 }
+
+// One attempt at moving the install to another version of uxwVend.
+//
+// The row is the audit trail: the intent file on the shared volume is what the
+// updater reads and it holds one run at a time, while this answers "what has
+// this install done, and did it work" months later.
+model CoreUpdate {
+  id          String    @id @default(cuid())
+  fromVersion String
+  toVersion   String
+  tag         String
+  requestedBy String?
+  status      String    @default("requested")
+  error       String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+
+  @@index([startedAt])
+}

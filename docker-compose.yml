@@ -119,6 +119,9 @@ services:
       # image-build-id stamp the volume cannot mask) and rebuilds once, which
       # is also what makes installed modules survive an update.
       - nextbuild:/app/.next
+      # The channel to the updater: the panel writes a requested tag here and
+      # reads the updater's progress back. No socket, by design.
+      - updatestate:/var/lib/uxwvend/update
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
       interval: 30s
@@ -127,6 +130,29 @@ services:
       # Long enough for a boot-time rebuild after an update. See the matching
       # note on HEALTHCHECK in the Dockerfile.
       start_period: 600s
+
+  # Applies an update asked for from the admin panel.
+  #
+  # The only service with the Docker socket, deliberately: updating means
+  # pulling an image and recreating a container, and the socket is root on the
+  # host. The app runs module code that arrives in a ZIP from a marketplace, so
+  # it never gets that - it writes a tag it took from the release feed into the
+  # shared volume below, and this reads it. `updater.sh` is mounted from the
+  # host, not from that volume, so a compromised app cannot rewrite what the
+  # socket holder runs.
+  #
+  # `uxwvend update` on the host does the same job by hand and is unaffected.
+  updater:
+    image: docker:28-cli
+    restart: unless-stopped
+    command: ["sh", "/updater.sh"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # The compose project: the files and the .env whose UXWVEND_VERSION is
+      # what pins the running version.
+      - ./:/project
+      - ./updater.sh:/updater.sh:ro
+      - updatestate:/state
 
   # TLS terminator. Enabled only with `--profile tls`, which the installer
   # passes when the operator supplied a domain. Caddy obtains and renews a
@@ -155,6 +181,7 @@ services:
       - caddyconfig:/config
 
 volumes:
+  updatestate:
   pgdata:
   redisdata:
   uploads:

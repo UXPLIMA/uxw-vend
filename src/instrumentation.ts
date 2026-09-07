@@ -46,6 +46,33 @@ export async function register(): Promise<void> {
         console.error("[instrumentation] scheduler bootstrap failed:", err instanceof Error ? err.message : String(err));
     }
 
+    // An update in flight is closed out by the boot that follows it, because
+    // the process saying "it arrived" is the version that arrived. See
+    // core-update.ts; this is the only place that knows both the database and
+    // what the site's maintenance setting was before the swap.
+    try {
+        const { reconcileUpdate } = await import("@/core/lib/core-update");
+        const { getMaintenanceConfig, setMaintenanceConfig } = await import("@/core/lib/maintenance");
+        const { prisma } = await import("@/core/lib/db");
+        const pkg = await import("../package.json");
+
+        const result = await reconcileUpdate(pkg.default.version, async (outcome, intent) => {
+            await prisma.coreUpdate.updateMany({
+                where: { toVersion: intent.toVersion, status: { in: ["requested", "running"] } },
+                data: { status: outcome, finishedAt: new Date() },
+            });
+        });
+        if (result.reopened) {
+            const config = await getMaintenanceConfig();
+            await setMaintenanceConfig({ ...config, enabled: false });
+        }
+        if (result.outcome) {
+            console.log(`[instrumentation] update ${result.outcome}`);
+        }
+    } catch (err) {
+        console.error("[instrumentation] update reconcile failed:", err instanceof Error ? err.message : String(err));
+    }
+
     // Fire-and-forget: index creation is a background optimisation and must
     // not hold the server back from accepting requests.
     void import("../scripts/ensure-search-indexes")

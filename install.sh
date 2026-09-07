@@ -29,7 +29,7 @@ REPO_SLUG="UXPLIMA/uxw-vend"
 # (`curl | bash`) path can be exercised against a local checkout in tests.
 RAW_BASE="${UXWVEND_RAW_BASE:-https://raw.githubusercontent.com/${REPO_SLUG}/main}"
 IMAGE_DEFAULT="ghcr.io/uxplima/uxw-vend"
-COMPOSE_FILES=(docker-compose.yml docker-compose.build.yml docker-compose.debug.yml Caddyfile)
+COMPOSE_FILES=(docker-compose.yml docker-compose.build.yml docker-compose.debug.yml Caddyfile updater.sh)
 
 INSTALL_DIR="/opt/uxwvend"
 DOMAIN=""
