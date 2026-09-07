@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDarkMode } from "@/core/hooks/useDarkMode";
@@ -47,6 +48,11 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
     const pathname = usePathname();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    // The drawer draws a scrim over the page and closes when it is clicked, so
+    // it owes a keyboard user the same exit every dialog here owes: Escape, a
+    // Tab that stays inside, and focus back on the button that opened it.
+    const drawerRef = useModalDialog<HTMLElement>(mobileOpen, () => setMobileOpen(false));
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
 
@@ -260,7 +266,13 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
 
             {/* Mobile sidebar: stacks icon rail above contextual items */}
             <aside
+                ref={drawerRef}
+                role="dialog"
+                aria-modal="true"
                 aria-label={t("sidebar_landmark")}
+                // Closed, it is still `display: flex` below `lg` and only moved
+                // out of view by a transform, which leaves it in the tab order.
+                inert={!mobileOpen}
                 className={`lg:hidden fixed top-0 left-0 bottom-0 flex z-50 transition-transform duration-200 bg-card border-r border-border ${
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}

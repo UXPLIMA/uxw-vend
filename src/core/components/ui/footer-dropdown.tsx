@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useModalDialog } from "@/core/hooks/useModalDialog";
 
 interface FooterDropdownProps {
     options: readonly string[] | string[];
@@ -17,26 +18,19 @@ interface FooterDropdownProps {
  */
 export function FooterDropdown({ options, value, onChange, formatLabel }: FooterDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const triggerRef = useRef<HTMLButtonElement>(null);
 
     // The only way to close this was clicking the invisible sheet over the
-    // page, which a keyboard user cannot do. Escape closes it and puts focus
-    // back where it came from.
-    useEffect(() => {
-        if (!isOpen) return;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key !== "Escape") return;
-            setIsOpen(false);
-            triggerRef.current?.focus();
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [isOpen]);
+    // page, which a keyboard user cannot do. Escape and focus restoration come
+    // from the shared hook rather than a second copy of them here; the trap is
+    // off because the page behind a footer dropdown stays usable.
+    const panelRef = useModalDialog<HTMLDivElement>(isOpen, () => setIsOpen(false), {
+        trapFocus: false,
+        autoFocus: false,
+    });
 
     return (
         <div className="relative">
             <button
-                ref={triggerRef}
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
@@ -49,7 +43,7 @@ export function FooterDropdown({ options, value, onChange, formatLabel }: Footer
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-card border border-border rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                    <div ref={panelRef} className="absolute bottom-full left-0 mb-1 w-full bg-card border border-border rounded shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
                         {options.map((option) => (
                             <button
                                 key={option}
