@@ -4,6 +4,7 @@ import { isKnownLocale } from "@/core/lib/i18n/resolve-locale";
 import { buildPageMeta, buildOrganizationJsonLd } from "@/core/lib/seo";
 import { serverConfig } from "@/core/config/server";
 import { Inter, Outfit, JetBrains_Mono } from "next/font/google";
+import { buildTokenOverrideCss } from "@/core/lib/theme-override-css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { publicMessages } from "@/core/lib/i18n/message-scopes";
@@ -105,19 +106,14 @@ export default async function RootLayout({
   // rewrites itself once the request lands.
   const session = await getSession();
 
-  // Build an override <style> block so admin-saved color customizations
-  // actually take effect. The generated theme-tokens.css sets
-  // [data-theme][data-mode] { --uxw-color-X: ... } with the manifest
-  // defaults; we append a same-specificity block with the admin's overrides
-  // so the later declaration wins the cascade. Values reach here only after
-  // HEX-only sanitization in the customization API - safe to interpolate.
-  const overrideColors = ((active.tokenOverrides as { tokens?: { colors?: Record<string, string> } })?.tokens?.colors) ?? {};
-  const overrideEntries = Object.entries(overrideColors).filter(
-    ([, v]) => typeof v === "string" && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v),
-  );
-  const overrideCss = overrideEntries.length > 0
-    ? `[data-theme="${active.themeId}"][data-mode="${active.mode}"] {\n${overrideEntries.map(([k, v]) => `  --uxw-color-${k}: ${v};`).join("\n")}\n}`
-    : "";
+  // An override <style> block so admin-saved colour customizations take
+  // effect: the generated theme-tokens.css sets the manifest defaults at
+  // [data-theme][data-mode], and this appends the operator's at the same
+  // specificity so the later declaration wins. Built by a function rather
+  // than here, because this string is rendered as HTML and a token name that
+  // is not a token name has no business reaching it.
+  const overrideColors = ((active.tokenOverrides as { tokens?: { colors?: Record<string, unknown> } })?.tokens?.colors) ?? {};
+  const overrideCss = buildTokenOverrideCss(active.themeId, active.mode, overrideColors);
 
   return (
     // The font variables belong on `html`, not on `body`: a custom property
