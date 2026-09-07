@@ -17,22 +17,26 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ members });
     }
 
-    // Filter to staff with an unexpired, non-revoked session → considered "online"
+    // Staff with an unexpired, non-revoked session count as online.
+    //
+    // Asked of the users rather than of the sessions: a row is written per
+    // sign-in and lives until its token expires, so reading every session of
+    // every staff member to keep their ids grows with logins. `some` is an
+    // existence check the database answers, and the result is one row per
+    // staff member however often they signed in.
     const linkedUserIds = members.map((m) => m.user?.id).filter((id): id is string => !!id);
     if (linkedUserIds.length === 0) {
         return NextResponse.json({ members: [] });
     }
     const now = new Date();
-    const activeSessions = await prisma.userSession.findMany({
+    const online = await prisma.user.findMany({
         where: {
-            userId: { in: linkedUserIds },
-            isRevoked: false,
-            expiresAt: { gt: now },
+            id: { in: linkedUserIds },
+            loginSessions: { some: { isRevoked: false, expiresAt: { gt: now } } },
         },
-        select: { userId: true },
-        distinct: ["userId"],
+        select: { id: true },
     });
-    const onlineUserIds = new Set(activeSessions.map((s) => s.userId));
+    const onlineUserIds = new Set(online.map((u) => u.id));
     const onlineMembers = members.filter((m) => m.user?.id && onlineUserIds.has(m.user.id));
     return NextResponse.json({ members: onlineMembers });
 }

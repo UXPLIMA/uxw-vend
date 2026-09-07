@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { MAX_LISTED_DEVICES } from "@/core/lib/session-registry";
 
 /**
  * GET - list current user's active sessions.
@@ -23,6 +24,9 @@ export async function GET() {
             expiresAt: { gt: new Date() },
         },
         orderBy: { lastActiveAt: "desc" },
+        // Narrowing to one user is not a ceiling here: a row is written per
+        // sign-in, not per device, and a live one lasts as long as its token.
+        take: MAX_LISTED_DEVICES,
         select: {
             id: true,
             deviceInfo: true,

@@ -18,6 +18,16 @@
 import { prisma } from "./db";
 import { log, errorText } from "./logger";
 
+/**
+ * How many devices the sessions screen lists.
+ *
+ * A row is written per sign-in and lives until its token expires, and nothing
+ * dedupes a browser that signs in twice, so the count follows logins rather
+ * than devices. Fifty is more than a person has and few enough that the
+ * response stays a screenful; the oldest-active fall off the end.
+ */
+export const MAX_LISTED_DEVICES = 50;
+
 export interface SignInRecord {
     /** The `tokenId` claim in the JWT; the key every revocation check uses. */
     tokenId: string;
