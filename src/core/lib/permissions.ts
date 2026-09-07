@@ -187,13 +187,31 @@ export async function hasResourcePermission(
 
     if (grants.length === 0) return false;
 
+    // Specificity runs along two axes, not one. The candidate list orders the
+    // principal axis (this user for this entity, then this user, then their
+    // role for this entity, then their role); the action axis is inside each
+    // level, because the unique key includes `action` and so "edit" and "*"
+    // are two rows on the same principal. Matching on principal alone let the
+    // database's row order decide between them, so an operator who granted a
+    // role everything and then took one action away had written a deny that
+    // held or did not hold depending on which row came back first.
+    type Grant = {
+        principalType: string;
+        principalId: string;
+        resourceId: string | null;
+        action: string;
+        allow: boolean;
+    };
     for (const c of candidates) {
-        const match = grants.find(
-            (g: { principalType: string; principalId: string; resourceId: string | null; allow: boolean }) =>
+        const atThisLevel = (grants as Grant[]).filter(
+            (g) =>
                 g.principalType === c.principalType &&
                 g.principalId === c.principalId &&
                 g.resourceId === c.resourceId
         );
+        const match =
+            atThisLevel.find((g) => g.action === action) ??
+            atThisLevel.find((g) => g.action === "*");
         if (match) {
             return match.allow;
         }

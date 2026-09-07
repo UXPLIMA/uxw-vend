@@ -182,7 +182,7 @@ describe("hasResourcePermission", () => {
     it("allows via a role-wide grant", async () => {
         mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
         mockResourceFindMany.mockResolvedValue([
-            { principalType: "role", principalId: "role-member", resourceId: null, allow: true },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "edit", allow: true },
         ]);
         expect(await hasResourcePermission("u1", "blog.article", "edit")).toBe(true);
     });
@@ -190,8 +190,8 @@ describe("hasResourcePermission", () => {
     it("most-specific-wins: user+resourceId allow beats a role-wide deny", async () => {
         mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
         mockResourceFindMany.mockResolvedValue([
-            { principalType: "role", principalId: "role-member", resourceId: null, allow: false },
-            { principalType: "user", principalId: "u1", resourceId: "art-7", allow: true },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "edit", allow: false },
+            { principalType: "user", principalId: "u1", resourceId: "art-7", action: "edit", allow: true },
         ]);
         expect(await hasResourcePermission("u1", "blog.article", "edit", "art-7")).toBe(true);
     });
@@ -199,8 +199,8 @@ describe("hasResourcePermission", () => {
     it("most-specific-wins: a user+resourceId deny short-circuits over a broader user allow", async () => {
         mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
         mockResourceFindMany.mockResolvedValue([
-            { principalType: "user", principalId: "u1", resourceId: null, allow: true },
-            { principalType: "user", principalId: "u1", resourceId: "art-7", allow: false },
+            { principalType: "user", principalId: "u1", resourceId: null, action: "edit", allow: true },
+            { principalType: "user", principalId: "u1", resourceId: "art-7", action: "edit", allow: false },
         ]);
         expect(await hasResourcePermission("u1", "blog.article", "edit", "art-7")).toBe(false);
     });
@@ -208,18 +208,60 @@ describe("hasResourcePermission", () => {
     it("falls back to role-wide when no user-level or resource-scoped grant matches", async () => {
         mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
         mockResourceFindMany.mockResolvedValue([
-            { principalType: "role", principalId: "role-member", resourceId: null, allow: true },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "view", allow: true },
         ]);
         // resourceId supplied but only a role-wide grant exists -> still allows.
         expect(await hasResourcePermission("u1", "blog.article", "view", "art-9")).toBe(true);
     });
 
+
+    /**
+     * An exact action and a wildcard can sit on the same principal at the same
+     * level: the unique key is (resource, resourceId, action, principalType,
+     * principalId), so "edit" and "*" are two rows, not one.
+     *
+     * The query asks for both and the resolution loop matched on principal and
+     * resourceId alone, so whichever row the database handed back first won.
+     * An operator who grants a role everything and then takes one action away
+     * had written a deny that held or did not hold depending on row order.
+     *
+     * Most specific wins, and an action names itself where "*" does not.
+     */
+    it("lets a deny on the action itself beat a wildcard allow beside it", async () => {
+        mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
+        mockResourceFindMany.mockResolvedValue([
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "*", allow: true },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "edit", allow: false },
+        ]);
+        expect(await hasResourcePermission("u1", "blog.article", "edit")).toBe(false);
+    });
+
+    it("answers the same whichever way round the two rows arrive", async () => {
+        mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
+        mockResourceFindMany.mockResolvedValue([
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "edit", allow: false },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "*", allow: true },
+        ]);
+        expect(await hasResourcePermission("u1", "blog.article", "edit")).toBe(false);
+    });
+
+    it("lets an allow on the action itself beat a wildcard deny beside it", async () => {
+        mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
+        mockResourceFindMany.mockResolvedValue([
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "*", allow: false },
+            { principalType: "role", principalId: "role-member", resourceId: null, action: "view", allow: true },
+        ]);
+        expect(await hasResourcePermission("u1", "blog.article", "view")).toBe(true);
+    });
+
     it("a wildcard-action grant (action '*') satisfies a specific action request", async () => {
         mockUserFindUnique.mockResolvedValue(memberWith([], { roleId: "role-member" }));
         // The route asks findMany for action in [action, "*"]; a "*" grant comes
-        // back and matches the candidate resolution.
+        // back and matches the candidate resolution. The row carried no action at
+        // all until the resolution started reading one, so this asserted the
+        // wildcard path without ever putting a wildcard in front of it.
         mockResourceFindMany.mockResolvedValue([
-            { principalType: "user", principalId: "u1", resourceId: null, allow: true },
+            { principalType: "user", principalId: "u1", resourceId: null, action: "*", allow: true },
         ]);
         expect(await hasResourcePermission("u1", "blog.article", "delete")).toBe(true);
         // Confirm the query asked for both the action and the wildcard.
