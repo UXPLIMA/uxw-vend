@@ -296,14 +296,15 @@ export async function bootstrapScheduler(): Promise<void> {
     registerCronJob({
         key: "core:automated-backup",
         schedule: "every-day",
+        // Nothing is caught here. `runJob` writes the failure into this job's
+        // CronRun row, which is what the observability screen reads; catching
+        // it made a backup that never ran report `ok`. It never ran: pg_dump
+        // is on neither the runtime image nor a plain Node dev box, and
+        // `backups/` was empty while the dashboard was green.
         handler: async () => {
             const { createBackup } = await import("./backup");
-            try {
-                const meta = await createBackup("scheduled", "Daily automated backup");
-                log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
-            } catch (err) {
-                log.error("[cron] automated-backup failed", { error: errorText(err) });
-            }
+            const meta = await createBackup("scheduled", "Daily automated backup");
+            log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
         },
     });
 
