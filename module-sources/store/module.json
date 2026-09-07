@@ -261,6 +261,11 @@
       "description": "List store products and create new ones (admin)."
     },
     {
+      "path": "/store/admin/products",
+      "handler": "api/admin/products/route.ts",
+      "description": "List every product, including the ones switched off (admin)."
+    },
+    {
       "path": "/store/products/[id]",
       "handler": "api/products/[id]/route.ts",
       "description": "Get, update, or delete a single store product."

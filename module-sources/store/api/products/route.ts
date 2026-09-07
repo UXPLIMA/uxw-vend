@@ -22,10 +22,14 @@ export async function GET(request: NextRequest) {
         const search = searchParams.get("search") || "";
         const sort = searchParams.get("sort") || "newest";
 
-        const showAll = searchParams.get("all") === "true";
-
+        // Always. A product an operator switched off is not on the shelf,
+        // and this answer is public: it used to drop the filter for anyone
+        // who wrote `?all=true`, and since it became something a proxy may
+        // hold, that answer would have been cached and served as well as
+        // computed. The screen that needs the full list asks
+        // /api/v1/store/admin/products, which checks who is asking.
         const where = {
-            ...(!showAll && { isActive: true }),
+            isActive: true,
             ...(category && { category: { slug: category } }),
             ...(featured && { isFeatured: true }),
             ...(search && {
