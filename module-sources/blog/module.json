@@ -43,7 +43,8 @@
     {
       "path": "/blog/[...params]",
       "component": "pages/[...params]/page.tsx",
-      "titleFromPath": true
+      "titleFromPath": true,
+      "resolver": "lib/article-exists.ts"
     }
   ],
   "menu": [

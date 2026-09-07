@@ -17,8 +17,16 @@ import { matchModuleRoute } from "@/core/lib/route-matcher";
  * large change for a small question, so the module answers the question
  * separately: a route may declare a `resolver`, a file default-exporting
  * `(params) => Promise<boolean>`, and core's catch-all asks it before
- * rendering and calls `notFound()` on false. A page that already resolves on
- * the server and calls `notFound()` itself - blog does - needs nothing.
+ * rendering and calls `notFound()` on false.
+ *
+ * This gate used to accept a second answer: a page that is a server component
+ * and calls `notFound()` itself. Blog was the only route relying on it, and
+ * measured against a production build it answered 200 anyway. A module page
+ * is rendered by the catch-all through the page registry, and by the time the
+ * component runs the status line is already gone. `/blog/999999/anything`
+ * returned 200 with a not-found body; `/help/no-such-article` and
+ * `/store/product/999999/x`, which both use a resolver, returned 404. So the
+ * resolver is the only answer this accepts now.
  *
  * This gate holds the rule for every module, installed or not, and pins the
  * two halves of the wiring that make it work.
@@ -38,14 +46,12 @@ function manifests(): Manifest[] {
         .map((p) => JSON.parse(fs.readFileSync(p, "utf8")) as Manifest);
 }
 
-/** How a route answers a URL that names nothing. */
-export function answers404(moduleDir: string, route: Route): "resolver" | "server" | "no" {
-    if (route.resolver) return "resolver";
-    const component = path.join(moduleDir, route.component);
-    if (!fs.existsSync(component)) return "no";
-    const body = fs.readFileSync(component, "utf8");
-    if (/^\s*["']use client["']/m.test(body)) return "no";
-    return /\bnotFound\s*\(\s*\)/.test(body) ? "server" : "no";
+/**
+ * How a route answers a URL that names nothing. A `notFound()` inside the
+ * page is not counted: the catch-all has already answered by then.
+ */
+export function answers404(moduleDir: string, route: Route): "resolver" | "no" {
+    return route.resolver ? "resolver" : "no";
 }
 
 describe("dynamic public routes", () => {
