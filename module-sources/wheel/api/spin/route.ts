@@ -64,6 +64,20 @@ export async function POST() {
 
     // Weighted random selection using cryptographically secure randomness
     const totalWeight = prizes.reduce((sum, p) => sum + p.probability, 0);
+
+    // Zero is a probability the screen accepts and the column stores, which is
+    // how an operator switches one prize off. Do it to all of them and the
+    // weights sum to zero, and `randomInt(0, 0)` does not return zero: it
+    // throws, so every spin answered 500. There is nothing to draw from, which
+    // is the same answer as having no prizes at all, said differently so an
+    // operator can tell the two apart.
+    if (totalWeight <= 0) {
+        return NextResponse.json(
+            { error: "Every prize has odds of zero, so there is nothing to draw.", code: "wheel_no_odds" },
+            { status: 400 },
+        );
+    }
+
     let random = randomInt(0, Math.ceil(totalWeight * 1000)) / 1000;
     let selectedPrize = prizes[0];
 
