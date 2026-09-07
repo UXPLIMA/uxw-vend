@@ -9,11 +9,17 @@ import type { Page } from '@playwright/test';
  * suite only ever passed against a developer's hand-made account, which is why
  * it could not run in CI. CI seeds with these same two variables.
  *
- * The fallbacks are the long-standing local dev values, so an existing
- * workstation keeps working without setting anything.
+ * The fallbacks are what `prisma/seed.ts` makes when it is told nothing, and
+ * `the-e2e-login-matches-the-account-the-seed-makes.test.ts` holds them to it.
+ * They drifted once: the helper looked for `admin@uxwvend.com` while the seed
+ * wrote `admin@example.com`, and a local run answered with twenty specs each
+ * waiting fifteen seconds for a navigation that could never come.
+ *
+ * No fallback password can be right, because the seed's is random unless it is
+ * told otherwise. What `login` can do is say so.
  */
-export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? 'admin@uxwvend.com';
-export const ADMIN_USERNAME = process.env.E2E_ADMIN_USERNAME ?? 'admin';
+export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? 'admin@example.com';
+export const ADMIN_USERNAME = process.env.E2E_ADMIN_USERNAME ?? 'uxwadmin';
 export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'admin123';
 
 /**
@@ -34,8 +40,21 @@ export async function login(
     await page.locator('input#email, input[type="email"]').first().fill(email);
     await page.locator('input#password, input[type="password"]').first().fill(password);
 
-    await Promise.all([
-        page.waitForURL((url) => !url.pathname.includes('/auth/login'), { timeout: 15_000 }),
-        page.locator('button[type="submit"]').first().click(),
-    ]);
+    try {
+        await Promise.all([
+            page.waitForURL((url) => !url.pathname.includes('/auth/login'), { timeout: 15_000 }),
+            page.locator('button[type="submit"]').first().click(),
+        ]);
+    } catch (err) {
+        // A bare waitForURL timeout says nothing about why, and every spec
+        // that logs in repeats it. Name the two variables instead: on a box
+        // seeded with a random password this is the whole answer.
+        throw new Error(
+            `Signing in as ${email} did not leave /auth/login within 15s.\n` +
+            `If that account is not the one this database was seeded with, set ` +
+            `E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD (the seed prints its ` +
+            `password once, or set SEED_ADMIN_PASSWORD before seeding).\n` +
+            `Original: ${err instanceof Error ? err.message : String(err)}`,
+        );
+    }
 }
