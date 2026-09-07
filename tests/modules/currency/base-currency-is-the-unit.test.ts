@@ -18,6 +18,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const upsert = vi.fn(async ({ create, update }: { create?: unknown; update?: unknown }) => update ?? create);
 
 vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: { setting: { findUnique: vi.fn(async () => null), upsert: (args: never) => upsert(args) } },
     isAdmin: vi.fn(async () => true),
     readJsonBody: vi.fn(async (request: Request) => request.json()),

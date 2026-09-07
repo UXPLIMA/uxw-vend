@@ -18,6 +18,6 @@ export default async function publishScheduled(): Promise<void> {
             log.info("cron: blog articles published", { job: "blog:publish-scheduled", published: result.count });
         }
     } catch (err) {
-        console.error("[blog] publish-scheduled failed:", err);
+        log.error("[blog] publish-scheduled failed", { error: err instanceof Error ? err.message : String(err) });
     }
 }

@@ -42,7 +42,8 @@ const prismaMock = {
     },
 };
 
-vi.mock("@/core/sdk/server", () => ({ prisma: prismaMock }));
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }, prisma: prismaMock }));
 
 const { getServerStatus, getAllServerStatuses, isQueryable } = await import(
     "@/modules/servers/lib/server-query"

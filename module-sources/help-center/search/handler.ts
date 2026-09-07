@@ -1,4 +1,4 @@
-import { moduleSettings, prisma } from "@/core/sdk/server";
+import { log, moduleSettings, prisma } from "@/core/sdk/server";
 
 interface SearchResult {
     type: string;
@@ -52,10 +52,9 @@ export default async function search(q: string): Promise<SearchResult[]> {
         }));
     } catch (err) {
         // Fallback to LIKE-based search if FTS index not ready
-        console.warn(
-            "[help-search] FTS failed, falling back to ILIKE:",
-            err instanceof Error ? err.message : String(err)
-        );
+        log.warn("[help-search] FTS failed, falling back to ILIKE", {
+            error: err instanceof Error ? err.message : String(err),
+        });
         const rows = await prisma.helpArticle.findMany({
             where: {
                 AND: [

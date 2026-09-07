@@ -40,6 +40,7 @@ function delegate(model: string) {
 }
 
 vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: {
         $queryRaw: vi.fn(async (strings: TemplateStringsArray) => {
             rawCalls.push(strings.join(" ? "));

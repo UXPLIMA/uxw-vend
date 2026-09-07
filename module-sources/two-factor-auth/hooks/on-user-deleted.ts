@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 /**
  * Declarative hook listener - wired by module.json hookListeners.
@@ -26,6 +26,6 @@ export default async function onUserDeleted(payload: { userId: string }) {
     } catch (err) {
         // The account is already anonymised; a failure here must not be
         // reported as a failed erasure.
-        console.error("[two-factor-auth] Failed to clear 2FA on erasure:", err);
+        log.error("[two-factor-auth] Failed to clear 2FA on erasure", { error: err instanceof Error ? err.message : String(err) });
     }
 }

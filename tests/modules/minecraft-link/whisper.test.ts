@@ -14,6 +14,7 @@ vi.mock("@/core/sdk", () => ({ applyFiltersAsync: (...args: unknown[]) => applyF
 
 const setting = { value: null as string | null };
 vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: { setting: { findUnique: async () => (setting.value === null ? null : { value: setting.value }) } },
 }));
 

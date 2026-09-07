@@ -111,7 +111,8 @@ const prismaMock = {
     },
 };
 
-vi.mock("@/core/sdk/server", () => ({ prisma: prismaMock }));
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }, prisma: prismaMock }));
 
 const { issueTicket, consumeTicket } = await import("@/modules/steam-auth/lib/steam-ticket");
 const { upsertSteamUser } = await import("@/modules/steam-auth/lib/steam-user");

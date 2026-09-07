@@ -12,6 +12,7 @@ import { describe, it, expect, vi } from "vitest";
 // The real ones need an app key in the environment; the properties under test
 // here are about which value goes through them, not how they encrypt.
 vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     encryptSecret: (value: string) => `enc:${Buffer.from(value).toString("base64")}`,
     decryptSecret: (value: string) => Buffer.from(value.slice(4), "base64").toString("utf8"),
     prisma: {},

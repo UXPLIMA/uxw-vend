@@ -21,14 +21,14 @@ export default async function refreshCurrencyRates(): Promise<void> {
         });
 
         if (!res.ok) {
-            console.error(`[cron] currency-rate-refresh: HTTP ${res.status}`);
+            log.error(`[cron] currency-rate-refresh: HTTP ${res.status}`);
             return;
         }
 
         const data = (await res.json()) as { base?: string; rates?: Record<string, number> };
         const rates = data.rates;
         if (!rates || typeof rates !== "object") {
-            console.error("[cron] currency-rate-refresh: malformed response, no rates");
+            log.error("[cron] currency-rate-refresh: malformed response, no rates");
             return;
         }
 
@@ -43,12 +43,14 @@ export default async function refreshCurrencyRates(): Promise<void> {
                 });
                 updated++;
             } catch (err) {
-                console.error(`[cron] currency-rate-refresh: failed to upsert ${currency}:`, err);
+                log.error(`[cron] currency-rate-refresh: failed to upsert ${currency}`, {
+                    error: err instanceof Error ? err.message : String(err),
+                });
             }
         }
 
         log.info("cron: currency rates refreshed", { job: "currency:refresh", updated });
     } catch (err) {
-        console.error("[cron] currency-rate-refresh failed:", err);
+        log.error("[cron] currency-rate-refresh failed", { error: err instanceof Error ? err.message : String(err) });
     }
 }

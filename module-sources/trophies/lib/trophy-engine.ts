@@ -67,7 +67,7 @@ export async function seedDefaultTrophies(): Promise<void> {
         await prisma.trophy.createMany({ data: DEFAULT_TROPHIES, skipDuplicates: true });
         log.info("default trophies seeded", { seeded: DEFAULT_TROPHIES.length });
     } catch (err) {
-        console.warn("[trophies] default seed skipped:", (err as Error).message);
+        log.warn("[trophies] default seed skipped", { error: String((err as Error).message) });
     }
 }
 
@@ -129,7 +129,7 @@ async function loadRules(): Promise<TrophyRule[]> {
         }
         return rules;
     } catch (err) {
-        console.warn("[trophy-engine] DB rule load failed; no trophy rules will be wired this boot:", (err as Error).message);
+        log.warn("[trophy-engine] DB rule load failed; no trophy rules will be wired this boot", { error: String((err as Error).message) });
         return [];
     }
 }

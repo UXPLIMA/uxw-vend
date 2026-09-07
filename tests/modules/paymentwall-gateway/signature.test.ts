@@ -7,7 +7,8 @@
 import { describe, it, expect, vi } from "vitest";
 import crypto from "crypto";
 
-vi.mock("@/core/sdk/server", () => ({ prisma: {} }));
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }, prisma: {} }));
 
 const { paymentwallSign, pingbackKind } = await import("@/modules/paymentwall-gateway/lib/paymentwall");
 

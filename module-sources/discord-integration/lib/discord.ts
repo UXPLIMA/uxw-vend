@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 
 interface DiscordEmbed {
     title?: string;
@@ -66,7 +66,7 @@ export async function sendDiscordWebhook(
         const host = urlObj.hostname.toLowerCase().replace(/\.$/, "");
         const onDiscord = ["discord.com", "discordapp.com"].some((d) => host === d || host.endsWith("." + d));
         if (!onDiscord) {
-            console.warn("[Discord] Invalid webhook domain:", urlObj.hostname);
+            log.warn("[Discord] Invalid webhook domain", { error: String(urlObj.hostname) });
             return;
         }
     } catch {
@@ -83,6 +83,6 @@ export async function sendDiscordWebhook(
             }),
         });
     } catch (err) {
-        console.error("[Discord Webhook] Failed to send:", err);
+        log.error("[Discord Webhook] Failed to send", { error: err instanceof Error ? err.message : String(err) });
     }
 }

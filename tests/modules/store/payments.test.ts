@@ -12,7 +12,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const applyFiltersAsync = vi.fn();
 vi.mock("@/core/sdk", () => ({ applyFiltersAsync: (...args: unknown[]) => applyFiltersAsync(...args) }));
-vi.mock("@/core/sdk/server", () => ({ resolveAppUrl: async () => "https://shop.example.com" }));
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }, resolveAppUrl: async () => "https://shop.example.com" }));
 
 const { listPaymentProviders, isPaymentProviderAvailable, startPaymentSession } = await import(
     "@/modules/store/lib/payments"

@@ -128,6 +128,31 @@ describe("an endpoint", () => {
         ).toEqual([]);
     });
 
+    it("writes them the same way inside a module, where the work is done", () => {
+        // A module's cron jobs, hooks, search handlers and libraries run on the
+        // server too, and a hook runs inside the request that triggered it, so
+        // its lines belong to that request as much as a route's do. A module
+        // file marked `"use client"` is skipped: it has no correlation id and
+        // cannot import the logger, which reaches next/headers.
+        const bare: string[] = [];
+        for (const file of serverFiles(path.join(ROOT, "module-sources"))) {
+            if (path.basename(file) === "route.ts") continue;
+            const source = fs.readFileSync(file, "utf8");
+            if (source.slice(0, 200).includes('"use client"')) continue;
+            source.split("\n").forEach((line, i) => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith("//") || trimmed.startsWith("*")) return;
+                if (CONSOLE.test(line)) {
+                    bare.push(`${path.relative(ROOT, file)}:${i + 1}  ${trimmed.slice(0, 80)}`);
+                }
+            });
+        }
+        expect(
+            bare,
+            `these write to the console from inside a module, so nothing joins them to the request that caused them:\n${bare.join("\n")}`,
+        ).toEqual([]);
+    });
+
     it("is looked for in the endpoints that exist", () => {
         const count = SCANNED.reduce((n, b) => n + routeFiles(path.join(ROOT, b)).length, 0);
         expect(count).toBeGreaterThan(100);

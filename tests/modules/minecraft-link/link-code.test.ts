@@ -63,7 +63,8 @@ const prismaMock = {
     },
 };
 
-vi.mock("@/core/sdk/server", () => ({ prisma: prismaMock }));
+vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }, prisma: prismaMock }));
 
 const { generateCode, issueCode, redeemCode, hashCode, MAX_ATTEMPTS } = await import(
     "@/modules/minecraft-link/lib/link-code"

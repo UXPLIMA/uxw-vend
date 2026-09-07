@@ -113,6 +113,7 @@ const prismaMock = {
 };
 
 vi.mock("@/core/sdk/server", () => ({
+    log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: prismaMock,
     encryptSecret: (value: string) => `enc:${Buffer.from(value).toString("base64")}`,
     decryptSecret: (value: string) => Buffer.from(value.slice(4), "base64").toString("utf8"),

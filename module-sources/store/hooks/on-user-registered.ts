@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { log, prisma } from "@/core/sdk/server";
 import { randomBytes } from "crypto";
 
 /**
@@ -31,6 +31,6 @@ export default async function onUserRegistered(payload: {
             },
         });
     } catch (err) {
-        console.error("[store] Failed to create welcome coupon:", err);
+        log.error("[store] Failed to create welcome coupon", { error: err instanceof Error ? err.message : String(err) });
     }
 }

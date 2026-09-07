@@ -15,6 +15,6 @@ export default async function cleanupWebhookLogs(): Promise<void> {
             log.info("cron: webhook logs pruned", { job: "webhook-logs:cleanup", deleted: result.count });
         }
     } catch (err) {
-        console.error("[cron] webhook-logs-cleanup failed:", err);
+        log.error("[cron] webhook-logs-cleanup failed", { error: err instanceof Error ? err.message : String(err) });
     }
 }
