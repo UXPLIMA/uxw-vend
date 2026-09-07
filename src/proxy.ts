@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { locales, defaultLocale } from './core/lib/i18n/config';
+import { carriesSessionCookie } from './core/lib/session-cookie';
 import { moduleRouteMap } from '@/core/generated/module-routes';
 import { randomUUID } from 'crypto';
 import { isSetupComplete } from '@/core/lib/setup-state';
@@ -137,20 +138,9 @@ function resolveIpScope(pathname: string): IpBlockScope {
     return 'all';
 }
 
-/**
- * Is there a session cookie at all?
- *
- * Not "is this visitor signed in" - a cookie can be expired, forged or
- * revoked, and only `auth()` knows. It answers the cheaper question, without
- * touching the database, and every caller here treats a false as certain and a
- * true as merely possible.
- */
+/** See `carriesSessionCookie`: a question about a cookie's name, not the header's text. */
 function hasSessionCookie(request: NextRequest): boolean {
-    const cookieHeader = request.headers.get('cookie') || '';
-    return (
-        cookieHeader.includes('authjs.session-token') ||
-        cookieHeader.includes('next-auth.session-token')
-    );
+    return carriesSessionCookie(request.headers.get('cookie'));
 }
 
 /**
