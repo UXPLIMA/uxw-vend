@@ -3,6 +3,7 @@ import { prisma } from "@/core/lib/db";
 import { isRedisReady, rateLimitForRoleAsync, getClientIP } from "@/core/lib/rate-limit";
 import { isRedisConfigured } from "@/core/lib/redis";
 import { getEmailConfig } from "@/core/lib/email-config";
+import { bootstrapScheduler, listRegisteredJobs } from "@/core/lib/scheduler";
 import pkg from "../../../../package.json";
 
 /**
@@ -88,13 +89,43 @@ async function checkEmailQueue(): Promise<{ ok: boolean; configured: boolean; pe
     }
 }
 
+/** How far past its due time a job may drift before it counts as behind. */
+const SCHEDULER_GRACE_MS = 2 * 60 * 1000;
+
+/**
+ * Is the scheduler keeping up?
+ *
+ * This used to count rows that were overdue **and** whose last run had
+ * errored, which made the one failure it exists to catch invisible: when the
+ * ticker stops, every job falls behind while `lastStatus` stays "ok". Measured
+ * against the development database - a job two hours overdue whose last run
+ * succeeded, and this endpoint answering `status: ok, staleJobs: 0`.
+ *
+ * The narrowing was not pointless and is kept, only on the right axis. A
+ * module an operator switched off leaves its CronRun row behind with an old
+ * `nextRunAt` for ever, so counting every overdue row would put the site in a
+ * permanent amber nothing can clear. What is supposed to run is what is
+ * registered, so that is what is asked about.
+ *
+ * A job that failed but is not yet due again is not stale, and is not lost
+ * either: it is what /api/v1/admin/observability/recent-errors reads.
+ *
+ * The registry is loaded first, the way both admin cron routes already do it
+ * and for the reason they give: a freshly booted process has registered
+ * nothing until it ticks, and reading an empty registry here would have turned
+ * this check into a permanent green. `bootstrapScheduler` is idempotent.
+ */
 async function checkScheduler(): Promise<{ ok: boolean; staleJobs: number; error?: string }> {
     try {
-        const cutoff = new Date(Date.now() - 2 * 60 * 1000);
+        await bootstrapScheduler();
+        const registered = listRegisteredJobs().map((job) => job.key);
+        // A build with no jobs at all has nothing to be behind on.
+        if (registered.length === 0) return { ok: true, staleJobs: 0 };
+
         const staleJobs = await prisma.cronRun.count({
             where: {
-                nextRunAt: { lt: cutoff },
-                lastStatus: "error",
+                jobKey: { in: registered },
+                nextRunAt: { lt: new Date(Date.now() - SCHEDULER_GRACE_MS) },
             },
         });
         return { ok: staleJobs === 0, staleJobs };
