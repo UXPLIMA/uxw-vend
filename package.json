@@ -23,6 +23,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "typecheck:modules": "npx tsx scripts/typecheck-modules.ts",
+    "verify": "npx tsx scripts/verify.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
