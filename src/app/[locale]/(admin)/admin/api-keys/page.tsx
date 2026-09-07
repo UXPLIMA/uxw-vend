@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Loader2, Plus, Trash2, Key } from "lucide-react";
 import { toast } from "sonner";
@@ -66,11 +66,9 @@ export default function ApiKeysPage() {
                 title={t("apiKeys_title")}
                 description={t("apiKeys_subtitle")}
                 actions={<>
-                    <Link href="/admin/api-keys/new" className="inline-flex">
-                        <Button>
+                    <Link href="/admin/api-keys/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("apiKeys_newKey")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

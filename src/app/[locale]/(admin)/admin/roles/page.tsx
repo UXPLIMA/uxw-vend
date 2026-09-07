@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Loader2, Plus, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -77,11 +77,9 @@ export default function AdminRolesPage() {
                 title={t("roles_title")}
                 description={t("roles_subtitle")}
                 actions={<>
-                    <Link href="/admin/roles/new" className="inline-flex">
-                        <Button>
+                    <Link href="/admin/roles/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("roles_newRole")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 
@@ -99,11 +97,9 @@ export default function AdminRolesPage() {
                                     <span>{role.displayName}</span>
                                 </div>
                                 <div className="flex gap-1">
-                                    <Link href={`/admin/roles/${role.id}/edit`} className="inline-flex">
-                                        <Button variant="ghost" size="sm">
+                                    <Link href={`/admin/roles/${role.id}/edit`} className={buttonClassName("ghost", "sm")}>
                                             {t("crud_edit")}
-                                        </Button>
-                                    </Link>
+                                        </Link>
                                     {role.name !== "admin" && role.name !== "member" && (
                                         <Button
                                             aria-label={commonT("delete")}

@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
+import { buttonClassName } from "@/core/components/ui/button";
 import { Card, CardContent } from "@/core/components/ui/card";
 import { Link } from "@/core/lib/i18n/navigation";
 import { ModuleIcon } from "../ModuleIcon";
@@ -108,12 +108,10 @@ export default function ModuleSettingsPage({
             <Card>
                 <CardContent className="py-12 text-center space-y-3">
                     <p className="text-muted-foreground">{t("modules_notInstalled")}</p>
-                    <Link href="/admin/modules" className="inline-flex">
-                        <Button variant="outline" size="sm">
+                    <Link href="/admin/modules" className={buttonClassName("outline", "sm")}>
                             <ArrowLeft className="w-4 h-4" />
                             {commonT("back")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </CardContent>
             </Card>
         );

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination } from "@/core/components/ui/pagination";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
@@ -91,11 +91,9 @@ export default function ResourcePermissionsPage() {
                 title={t("rp_title")}
                 description={t("rp_subtitle")}
                 actions={<>
-                    <Link href="/admin/resource-permissions/new" className="inline-flex">
-                        <Button>
+                    <Link href="/admin/resource-permissions/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("rp_grant")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

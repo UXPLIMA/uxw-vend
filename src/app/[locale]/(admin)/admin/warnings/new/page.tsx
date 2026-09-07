@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
@@ -13,6 +13,7 @@ import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { cn } from "@/core/lib/utils";
 
 /** Issuing a warning, on its own route rather than folded above the list. */
 export default function NewWarningPage() {
@@ -123,11 +124,9 @@ export default function NewWarningPage() {
                                     t("warnings_issue")
                                 )}
                             </Button>
-                            <Link href="/admin/warnings" className="inline-flex">
-                                <Button type="button" variant="outline" disabled={saving}>
+                            <Link href="/admin/warnings" className={cn(buttonClassName("outline", "default"), saving && "pointer-events-none opacity-50")} aria-disabled={saving} tabIndex={saving ? -1 : undefined}>
                                     {commonT("cancel")}
-                                </Button>
-                            </Link>
+                                </Link>
                         </div>
                     </form>
                 </CardContent>

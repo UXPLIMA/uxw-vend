@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Home, ArrowLeft, CheckCircle } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
@@ -76,11 +76,9 @@ export default function ForgotPasswordPage() {
                                 <p className="text-muted-foreground text-sm mb-4">
                                     {t('resetLinkSent', { email })}
                                 </p>
-                                <Link href="/auth/login">
-                                    <Button variant="outline">
+                                <Link href="/auth/login" className={buttonClassName("outline", "default")}>
                                         <ArrowLeft className="w-4 h-4" /> {t('backToLogin')}
-                                    </Button>
-                                </Link>
+                                    </Link>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">

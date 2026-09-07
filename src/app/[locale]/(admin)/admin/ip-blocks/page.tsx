@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -80,11 +80,9 @@ export default function IpBlocksPage() {
                 title={t("ipBlocks_title")}
                 description={t("ipBlocks_subtitle")}
                 actions={<>
-                    <Link href="/admin/ip-blocks/new" className="inline-flex">
-                        <Button>
+                    <Link href="/admin/ip-blocks/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("ipBlocks_add")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

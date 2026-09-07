@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
-import { Button } from "@/core/components/ui/button";
+import { buttonClassName } from "@/core/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
 export default function AuthErrorPage() {
@@ -30,12 +30,8 @@ export default function AuthErrorPage() {
                 <h1 className="text-2xl font-bold text-foreground mb-2">{t("errorTitle")}</h1>
                 <p className="text-muted-foreground mb-8">{message}</p>
                 <div className="flex gap-3 justify-center">
-                    <Link href="/auth/login">
-                        <Button>{t("errorTryAgain")}</Button>
-                    </Link>
-                    <Link href="/">
-                        <Button variant="outline">{t("errorGoHome")}</Button>
-                    </Link>
+                    <Link href="/auth/login" className={buttonClassName("default", "default")}>{t("errorTryAgain")}</Link>
+                    <Link href="/" className={buttonClassName("outline", "default")}>{t("errorGoHome")}</Link>
                 </div>
             </div>
         </div>

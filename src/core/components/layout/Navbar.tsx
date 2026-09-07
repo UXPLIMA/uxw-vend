@@ -3,7 +3,7 @@
 import { Link, usePathname } from "@/core/lib/i18n/navigation";
 import { Home, User, LogOut, Shield, Sun, Moon, ChevronDown } from "lucide-react";
 import { NavIcon } from "@/core/components/ui/NavIcon";
-import { Button } from "@/core/components/ui/button";
+import { buttonClassName } from "@/core/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
@@ -261,8 +261,8 @@ function DefaultNavbar() {
                             </>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <Link href="/auth/login"><Button variant="ghost" size="sm" className="text-muted-foreground">{commonT('login')}</Button></Link>
-                                <Link href="/auth/register"><Button size="sm">{commonT('register')}</Button></Link>
+                                <Link href="/auth/login" className={buttonClassName("ghost", "sm", "text-muted-foreground")}>{commonT('login')}</Link>
+                                <Link href="/auth/register" className={buttonClassName("default", "sm")}>{commonT('register')}</Link>
                             </div>
                         )}
                     </div>

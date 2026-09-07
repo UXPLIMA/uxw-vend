@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Home, CheckCircle } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { PasswordInput } from "@/core/components/ui/password-input";
 import { useTranslations } from "next-intl";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
@@ -65,9 +65,7 @@ export default function ResetPasswordPage() {
                 <div className="text-center">
                     <h1 className="text-xl font-bold text-foreground mb-2">{t('invalidResetLink')}</h1>
                     <p className="text-muted-foreground mb-4">{t('invalidResetLinkBody')}</p>
-                    <Link href="/auth/forgot-password">
-                        <Button>{t('sendResetLink')}</Button>
-                    </Link>
+                    <Link href="/auth/forgot-password" className={buttonClassName("default", "default")}>{t('sendResetLink')}</Link>
                 </div>
             </div>
         );
@@ -104,11 +102,9 @@ export default function ResetPasswordPage() {
                                 <p className="text-muted-foreground text-sm mb-4">
                                     {t('resetSuccessBody')}
                                 </p>
-                                <Link href="/auth/login">
-                                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                <Link href="/auth/login" className={buttonClassName("default", "default", "bg-blue-600 hover:bg-blue-700 text-white")}>
                                         {t('signIn')}
-                                    </Button>
-                                </Link>
+                                    </Link>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">

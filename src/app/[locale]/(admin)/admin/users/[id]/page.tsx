@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { Link } from "@/core/lib/i18n/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check, Ban, ShieldCheck, Download, Trash2, AlertTriangle, UserCog } from "lucide-react";
@@ -265,9 +265,7 @@ export default function AdminUserDetailPage() {
         return (
             <div className="text-center py-12">
                 <p className="text-muted-foreground">{t("users_notFound")}</p>
-                <Link href="/admin/users">
-                    <Button variant="outline" className="mt-4">{t("users_backToUsers")}</Button>
-                </Link>
+                <Link href="/admin/users" className={buttonClassName("outline", "default", "mt-4")}>{t("users_backToUsers")}</Link>
             </div>
         );
     }

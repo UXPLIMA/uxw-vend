@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { NativeSelect } from "@/core/components/ui/native-select";
@@ -13,6 +13,7 @@ import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { cn } from "@/core/lib/utils";
 
 const ACTIONS = ["view", "create", "edit", "delete", "*"];
 
@@ -189,11 +190,9 @@ export default function NewResourcePermissionPage() {
                                     t("rp_create")
                                 )}
                             </Button>
-                            <Link href="/admin/resource-permissions" className="inline-flex">
-                                <Button type="button" variant="outline" disabled={saving}>
+                            <Link href="/admin/resource-permissions" className={cn(buttonClassName("outline", "default"), saving && "pointer-events-none opacity-50")} aria-disabled={saving} tabIndex={saving ? -1 : undefined}>
                                     {commonT("cancel")}
-                                </Button>
-                            </Link>
+                                </Link>
                         </div>
                     </form>
                 </CardContent>

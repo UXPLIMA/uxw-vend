@@ -11,7 +11,7 @@ import { ModuleWidgets, WidgetComponentRegistry, ModuleHomepageSections, Homepag
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { buttonClassName } from "@/core/components/ui/button";
 import { Sparkles, Settings, Puzzle } from "lucide-react";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { visibleWidgets } from "@/core/lib/homepage-widgets";
@@ -87,18 +87,14 @@ export default function HomePage() {
                 </p>
                 {isStaff ? (
                   <div className="flex flex-wrap gap-3 justify-center">
-                    <Link href="/admin/modules">
-                      <Button>
+                    <Link href="/admin/modules" className={buttonClassName("default", "default")}>
                         <Puzzle className="w-4 h-4" />
                         {commonT('welcomeBrowseModules')}
-                      </Button>
-                    </Link>
-                    <Link href="/admin/settings/general">
-                      <Button variant="outline">
+                      </Link>
+                    <Link href="/admin/settings/general" className={buttonClassName("outline", "default")}>
                         <Settings className="w-4 h-4" />
                         {commonT('welcomeOpenSettings')}
-                      </Button>
-                    </Link>
+                      </Link>
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">

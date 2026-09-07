@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
@@ -13,6 +13,7 @@ import { writeError } from "@/core/lib/write-result";
 import { toast } from "sonner";
 import { CheckboxField } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { cn } from "@/core/lib/utils";
 
 /**
  * The role editor, on its own route.
@@ -229,11 +230,9 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
                                     t("roles_createRole")
                                 )}
                             </Button>
-                            <Link href="/admin/roles" className="inline-flex">
-                                <Button type="button" variant="outline" disabled={saving}>
+                            <Link href="/admin/roles" className={cn(buttonClassName("outline", "default"), saving && "pointer-events-none opacity-50")} aria-disabled={saving} tabIndex={saving ? -1 : undefined}>
                                     {commonT("cancel")}
-                                </Button>
-                            </Link>
+                                </Link>
                         </div>
                     </form>
                 </CardContent>

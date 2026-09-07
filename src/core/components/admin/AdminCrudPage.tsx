@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
@@ -289,11 +289,9 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                             <Trash2 className="w-4 h-4" /> {ct("crud_delete")} {selected.size}
                         </Button>
                     )}
-                    <Link href={formHref()} className="inline-flex">
-                        <Button>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {ct("crud_addNew")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

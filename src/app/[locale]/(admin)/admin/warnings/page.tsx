@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/core/components/ui/card";
-import { Button } from "@/core/components/ui/button";
+import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Pagination } from "@/core/components/ui/pagination";
 import { Plus, Loader2, ShieldOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -97,11 +97,9 @@ export default function WarningsPage() {
                 title={t("warnings_title")}
                 description={t("warnings_subtitle")}
                 actions={<>
-                    <Link href="/admin/warnings/new" className="inline-flex">
-                        <Button>
+                    <Link href="/admin/warnings/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("warnings_issueButton")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

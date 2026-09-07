@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/lib/i18n/navigation";
 import { Home, ArrowLeft, CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
+import { buttonClassName } from "@/core/components/ui/button";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
 
 type Status = "verifying" | "success" | "failed";
@@ -81,9 +81,7 @@ export default function VerifyEmailPage() {
                                 <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
                                 <h2 className="font-semibold text-foreground mb-2">{t("verifySuccess")}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">{t("verifySuccessBody")}</p>
-                                <Link href="/profile">
-                                    <Button>{t("backToLogin")}</Button>
-                                </Link>
+                                <Link href="/profile" className={buttonClassName("default", "default")}>{t("backToLogin")}</Link>
                             </>
                         )}
                         {status === "failed" && (
@@ -93,11 +91,9 @@ export default function VerifyEmailPage() {
                                 <p className="text-muted-foreground text-sm mb-4">
                                     {errorMessage || t("verifyFailedBody")}
                                 </p>
-                                <Link href="/auth/login">
-                                    <Button variant="outline">
+                                <Link href="/auth/login" className={buttonClassName("outline", "default")}>
                                         <ArrowLeft className="w-4 h-4" /> {t("backToLogin")}
-                                    </Button>
-                                </Link>
+                                    </Link>
                             </>
                         )}
                     </div>
