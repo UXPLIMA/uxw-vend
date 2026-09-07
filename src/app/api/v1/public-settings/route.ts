@@ -73,7 +73,7 @@ export async function GET() {
         isDemo: process.env.DEMO_MODE === "1",
     }, {
         headers: {
-            "Cache-Control": `public, s-maxage=${Math.floor(ttlMs / 2000)}, stale-while-revalidate=${Math.floor(ttlMs / 1000)}`,
+            "Cache-Control": `public, max-age=0, s-maxage=${Math.floor(ttlMs / 2000)}, stale-while-revalidate=${Math.floor(ttlMs / 1000)}`,
         },
     });
 }

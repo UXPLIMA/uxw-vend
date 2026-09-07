@@ -9,7 +9,7 @@ import { auth } from "@/core/sdk/auth";
  * no visitor's own cache is involved. Anything here that ever starts varying
  * by who is asking has to lose this.
  */
-const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" };
 
 const SETTING_KEY = "currency_config";
 

@@ -10,7 +10,7 @@ import { productSchema } from "../../lib/validations";
  * so no visitor's own cache is involved. If this ever starts varying by who
  * is asking, it has to lose this.
  */
-const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" };
 
 // GET /api/v1/store/products - List products
 export async function GET(request: NextRequest) {

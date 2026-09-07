@@ -75,7 +75,7 @@ export async function GET() {
             topBuyers,
             topCreditLoaders,
         }, {
-            headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+            headers: { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" },
         });
     } catch {
         return NextResponse.json({

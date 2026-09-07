@@ -7,7 +7,7 @@ import { prisma } from "@/core/sdk/server";
  * no visitor's own cache is involved. Anything here that ever starts varying
  * by who is asking has to lose this.
  */
-const SHARED_CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" };
+const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" };
 
 export async function GET(request: NextRequest) {
     const path = request.nextUrl.searchParams.get("path");
