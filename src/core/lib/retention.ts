@@ -1,4 +1,5 @@
 import { prisma } from "@/core/lib/db";
+import { log } from "./logger";
 
 /**
  * Audit-log retention.
@@ -46,7 +47,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.activityFeed = r.count;
     } catch (err) {
-        console.error("[retention] activityFeed prune failed:", err);
+        log.error("[retention] activityFeed prune failed", { error: err instanceof Error ? err.message : String(err) });
     }
 
     try {
@@ -55,7 +56,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.cronRun = r.count;
     } catch (err) {
-        console.error("[retention] cronRun prune failed:", err);
+        log.error("[retention] cronRun prune failed", { error: err instanceof Error ? err.message : String(err) });
     }
 
     try {
@@ -64,7 +65,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.revision = r.count;
     } catch (err) {
-        console.error("[retention] revision prune failed:", err);
+        log.error("[retention] revision prune failed", { error: err instanceof Error ? err.message : String(err) });
     }
 
     // UserSession: drop anything that's already expired, plus revoked rows
@@ -81,7 +82,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.userSession = r.count;
     } catch (err) {
-        console.error("[retention] userSession prune failed:", err);
+        log.error("[retention] userSession prune failed", { error: err instanceof Error ? err.message : String(err) });
     }
 
     // Email verification and password reset both live in VerificationToken,
@@ -96,7 +97,7 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         });
         result.verificationToken = r.count;
     } catch (err) {
-        console.error("[retention] verificationToken prune failed:", err);
+        log.error("[retention] verificationToken prune failed", { error: err instanceof Error ? err.message : String(err) });
     }
 
     return result;

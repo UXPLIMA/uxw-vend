@@ -4,6 +4,15 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
+const { logWarn, logError } = vi.hoisted(() => ({ logWarn: vi.fn(), logError: vi.fn() }));
+// The module under test is re-imported after `vi.resetModules()`, so a spy on
+// the real logger would land on a different instance than the one it picks
+// up. Mocking the module keeps one object on both sides.
+vi.mock("@/core/lib/logger", () => ({
+    log: { warn: logWarn, error: logError, info: vi.fn(), debug: vi.fn() },
+}));
+
+
 /**
  * The loader is the boundary between untrusted files on disk and the
  * module registry. A malformed manifest must remove exactly one module,
@@ -30,6 +39,10 @@ let root: string;
 let cwd: ReturnType<typeof vi.spyOn>;
 let consoleWarn: ReturnType<typeof vi.spyOn>;
 let consoleError: ReturnType<typeof vi.spyOn>;
+// The loader reports through the structured logger, which carries the
+// correlation id of whatever asked for the scan. What is pinned below is
+// still the sentence it writes, not that something was written.
+
 
 /** Write `src/modules/<dir>/module.json` under the fake project root. */
 function writeModule(dir: string, manifest: unknown): void {
@@ -48,9 +61,10 @@ function mkdir(...segments: string[]): void {
 beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-loader-"));
     cwd = vi.spyOn(process, "cwd").mockReturnValue(root);
-    consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => { });
-    consoleError = vi.spyOn(console, "error").mockImplementation(() => { });
-    vi.spyOn(console, "log").mockImplementation(() => { });
+    logWarn.mockClear();
+    logError.mockClear();
+    consoleWarn = logWarn as unknown as ReturnType<typeof vi.spyOn>;
+    consoleError = logError as unknown as ReturnType<typeof vi.spyOn>;
     vi.resetModules();
 });
 

@@ -26,6 +26,8 @@
  * behaviour as before this became registry-driven.
  */
 
+import { log } from "./logger";
+
 /**
  * Deliberately not typed as Auth.js's `Provider`: importing that type pulls the
  * `next-auth/providers` barrel into the middleware bundle, which re-exports
@@ -92,7 +94,7 @@ export function resolveAuthProviders(
         factories,
         moduleFactories = {},
         env = process.env,
-        onWarn = (message: string) => console.warn(message),
+        onWarn = (message: string) => log.warn(message),
     } = options;
 
     const providers: ResolvedProvider[] = [];

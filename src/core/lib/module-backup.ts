@@ -25,10 +25,9 @@ export async function backupBeforeModuleChange(
         log.info("module snapshot created", { action, moduleId, filename: meta.filename, sizeBytes: meta.sizeBytes });
         return meta;
     } catch (err) {
-        console.error(
-            `[module-backup] snapshot before ${action} of ${moduleId} failed (continuing):`,
-            err instanceof Error ? err.message : err,
-        );
+        log.error(`[module-backup] snapshot before ${action} of ${moduleId} failed, continuing`, {
+            error: err instanceof Error ? err.message : String(err),
+        });
         return null;
     }
 }

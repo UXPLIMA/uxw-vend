@@ -4,6 +4,8 @@
  * When Redis is unavailable, all operations silently fall back to in-memory.
  */
 
+import { log } from "./logger";
+
 type RedisClientType = {
     get(key: string): Promise<string | null>;
     set(key: string, value: string, options?: { PX?: number; EX?: number }): Promise<unknown>;
@@ -39,7 +41,7 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
         const c = createClient({ url: REDIS_URL }) as RedisClientType;
         c.on("error", (...args: unknown[]) => {
             const err = args[0] as Error | undefined;
-            console.error("[Redis] Connection failed, falling back to in-memory:", err?.message ?? "unknown error");
+            log.error("[Redis] Connection failed, falling back to in-memory", { error: err?.message ?? "unknown error" });
             client = null;
             failed = true;
             // Retry after 30 seconds
@@ -50,7 +52,7 @@ export async function getRedisClient(): Promise<RedisClientType | null> {
         connecting = false;
         return client;
     } catch (err) {
-        console.error("[Redis] Connection failed, falling back to in-memory:", (err as Error).message);
+        log.error("[Redis] Connection failed, falling back to in-memory", { error: (err as Error).message });
         connecting = false;
         failed = true;
         // Retry after 30 seconds

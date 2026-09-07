@@ -25,6 +25,40 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 const SCANNED = ["src/app", "module-sources"];
 
 /**
+ * Core's own server code, where a failure is furthest from the request that
+ * caused it and the correlation id is worth the most: the scheduler, the hook
+ * bus, the module loader.
+ */
+const CORE = "src/core/lib";
+
+/**
+ * Files under `src/core/lib` that a `"use client"` file imports, so the
+ * logger cannot go in them: it reaches `next/headers` and `async_hooks`, and
+ * `client-bundle-safety.test.ts` fails the moment either lands in a browser
+ * bundle. They keep the console, which is what a browser has anyway.
+ *
+ * `hooks.ts` is here for the same reason by a longer road: `@/core/sdk`
+ * re-exports it, and that entry is isomorphic, so anything it pulls in is
+ * compiled for the browser. `hooks-bootstrap.ts` exists precisely because the
+ * two halves once shared a file and `next dev` answered 500 on every page
+ * whose client graph touched the barrel.
+ *
+ * `logger.ts` is here for a different reason: it is what writes the line.
+ */
+const REACHED_FROM_A_BROWSER = new Set([
+    "src/core/lib/logger.ts",
+    "src/core/lib/hooks.ts",
+    "src/core/lib/blocks-merger.ts",
+    "src/core/lib/secret-storage.ts",
+    "src/core/lib/module-cache.ts",
+    "src/core/lib/cache.ts",
+    "src/core/lib/rate-limit.ts",
+    "src/core/lib/activity-log.ts",
+    "src/core/lib/email.ts",
+    "src/core/lib/revisions.ts",
+]);
+
+/**
  * Any mention of the console, called or handed on. `.catch(console.error)`
  * loses the request the same way a direct call does, and it was the shape
  * six of these took.
@@ -33,6 +67,17 @@ const CONSOLE = /\bconsole\.(log|error|warn|info|debug)\b/;
 
 /** A line that only talks about the console is not one that writes to it. */
 const COMMENT = /^\s*(\/\/|\*|\/\*)/;
+
+/** Every `.ts` under a directory, tests aside. */
+function serverFiles(dir: string, out: string[] = []): string[] {
+    if (!fs.existsSync(dir)) return out;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) serverFiles(full, out);
+        else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts")) out.push(full);
+    }
+    return out;
+}
 
 function routeFiles(dir: string, out: string[] = []): string[] {
     if (!fs.existsSync(dir)) return out;
@@ -61,6 +106,25 @@ describe("an endpoint", () => {
         expect(
             bare,
             `these write to the console, so an operator cannot join them to the request that caused them. Use log.error / log.warn:\n${bare.join("\n")}`,
+        ).toEqual([]);
+    });
+
+    it("writes them the same way inside core, where the request is furthest away", () => {
+        const bare: string[] = [];
+        for (const file of serverFiles(path.join(ROOT, CORE))) {
+            const relative = path.relative(ROOT, file);
+            if (REACHED_FROM_A_BROWSER.has(relative)) continue;
+            const source = fs.readFileSync(file, "utf8");
+            if (source.slice(0, 200).includes('"use client"')) continue;
+            source.split("\n").forEach((line, i) => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith("//") || trimmed.startsWith("*")) return;
+                if (CONSOLE.test(line)) bare.push(`${relative}:${i + 1}  ${trimmed.slice(0, 80)}`);
+            });
+        }
+        expect(
+            bare,
+            `these write to the console from inside core, so nothing joins them to the request that caused them:\n${bare.join("\n")}`,
         ).toEqual([]);
     });
 

@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { MAX_LOGIN_ATTEMPTS, getBounded } from "./security-settings";
+import { log } from "./logger";
 
 /**
  * Progressive account lockout after repeated failed logins.
@@ -110,11 +111,11 @@ export async function registerFailedLogin(
                     locale: existing.locale ?? undefined,
                 });
             } catch (err) {
-                console.error("[account-lockout] lockout notification failed:", err);
+                log.error("[account-lockout] lockout notification failed", { error: err instanceof Error ? err.message : String(err) });
             }
         }
     } catch (err) {
-        console.error("[account-lockout] registerFailedLogin failed:", err);
+        log.error("[account-lockout] registerFailedLogin failed", { error: err instanceof Error ? err.message : String(err) });
     }
 }
 
@@ -134,7 +135,7 @@ export async function resetFailedLogins(userId: string): Promise<void> {
             },
         });
     } catch (err) {
-        console.error("[account-lockout] resetFailedLogins failed:", err);
+        log.error("[account-lockout] resetFailedLogins failed", { error: err instanceof Error ? err.message : String(err) });
     }
 }
 

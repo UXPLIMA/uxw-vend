@@ -1,5 +1,6 @@
 import { LoadedModule, ModuleManifest } from "./module-types";
 import { moduleManifestSchema } from "./module-manifest-schema";
+import { log } from "./logger";
 
 class ModuleLoader {
     private modules: Map<string, LoadedModule> = new Map();
@@ -33,7 +34,7 @@ class ModuleLoader {
             // console rather than ./logger: this module is reachable from the
             // client (hence the `typeof window` guard above), and logger.ts
             // imports next/headers.
-            console.log(`Loaded ${this.modules.size} modules`);
+            log.info(`Loaded ${this.modules.size} modules`);
         } catch {
             // fs not available (client-side) - return empty
         }
@@ -53,7 +54,7 @@ class ModuleLoader {
             try {
                 parsedJson = JSON.parse(manifestContent);
             } catch (err) {
-                console.warn(`[module-loader] ${dirName}: invalid JSON in module.json - skipping`, err);
+                log.warn(`[module-loader] ${dirName}: invalid JSON in module.json - skipping`, { error: err instanceof Error ? err.message : String(err) });
                 return;
             }
 
@@ -61,7 +62,7 @@ class ModuleLoader {
             if (!result.success) {
                 const first = result.error.issues[0];
                 const where = first.path.join(".");
-                console.warn(
+                log.warn(
                     `[module-loader] ${dirName}: manifest schema invalid${where ? ` at ${where}` : ""} - ${first.message} - skipping`,
                 );
                 return;
@@ -72,7 +73,7 @@ class ModuleLoader {
                 path: modulePath,
             });
         } catch (error) {
-            console.error(`Failed to load module ${dirName}:`, error);
+            log.error(`Failed to load module ${dirName}`, { error: error instanceof Error ? error.message : String(error) });
         }
     }
 

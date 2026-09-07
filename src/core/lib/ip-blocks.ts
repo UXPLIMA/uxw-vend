@@ -1,5 +1,6 @@
 import { prisma } from "@/core/lib/db";
 import type { IpBlock } from "@prisma/client";
+import { log } from "./logger";
 
 /**
  * IP allowlist / blocklist.
@@ -65,7 +66,7 @@ async function loadBlocks(): Promise<CachedBlock[]> {
         cacheWarm = true;
         return cache;
     } catch (err) {
-        console.error("[ip-blocks] Failed to load block list (failing open):", err);
+        log.error("[ip-blocks] Failed to load block list (failing open)", { error: err instanceof Error ? err.message : String(err) });
         // Fail-open: return existing cache (possibly empty) so a DB
         // outage does not deny all traffic.
         return cache;

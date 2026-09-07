@@ -132,7 +132,7 @@ export async function acquireInstallLock(): Promise<(() => void) | null> {
         // DB unreachable - fall back to in-process lock so single-worker
         // setups (no Postgres yet, e.g. during initial setup wizard)
         // still get some mutual exclusion.
-        console.error("[install-lock] advisory lock failed, falling back to in-process:", err);
+        log.error("[install-lock] advisory lock failed, falling back to in-process", { error: err instanceof Error ? err.message : String(err) });
         installing = true;
         return () => { installing = false; };
     }

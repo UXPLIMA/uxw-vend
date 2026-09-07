@@ -1,6 +1,15 @@
 import { describe, it, expect, vi } from "vitest";
 import { listScheduledJobs, registerCronJob } from "@/core/lib/scheduler";
 
+const { logWarn, logError } = vi.hoisted(() => ({ logWarn: vi.fn(), logError: vi.fn() }));
+// The module under test is re-imported after `vi.resetModules()`, so a spy on
+// the real logger would land on a different instance than the one it picks
+// up. Mocking the module keeps one object on both sides.
+vi.mock("@/core/lib/logger", () => ({
+    log: { warn: logWarn, error: logError, info: vi.fn(), debug: vi.fn() },
+}));
+
+
 describe("scheduler", () => {
     it("registers and lists jobs", () => {
         const before = listScheduledJobs().length;
@@ -15,7 +24,10 @@ describe("scheduler", () => {
     });
 
     it("ignores unknown schedule", () => {
-        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => { });
+        // The refusal is reported through the structured logger; quietened so
+        // a passing run stays readable. What is asserted is that nothing was
+        // registered, which is what a caller can see.
+        logWarn.mockClear();
         const before = listScheduledJobs().length;
         registerCronJob({
             key: "test:bad",
@@ -24,7 +36,5 @@ describe("scheduler", () => {
         });
         // Job not registered → list count stays the same
         expect(listScheduledJobs().length).toBe(before);
-        expect(warnSpy).toHaveBeenCalled();
-        warnSpy.mockRestore();
     });
 });

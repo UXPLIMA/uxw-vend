@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+const { logWarn, logError } = vi.hoisted(() => ({ logWarn: vi.fn(), logError: vi.fn() }));
+// The module under test is re-imported after `vi.resetModules()`, so a spy on
+// the real logger would land on a different instance than the one it picks
+// up. Mocking the module keeps one object on both sides.
+vi.mock("@/core/lib/logger", () => ({
+    log: { warn: logWarn, error: logError, info: vi.fn(), debug: vi.fn() },
+}));
+
+
 /**
  * redis.ts sat at 9.8% while backing every cache read in the product. The
  * part that matters is not the happy path but the fallback: when Redis
@@ -103,7 +112,7 @@ beforeEach(() => {
         return c;
     };
 
-    vi.spyOn(console, "error").mockImplementation(() => { });
+    logError.mockClear();
     // The module arms a 60s cleanup interval at import; fake timers keep it
     // from outliving the test and make the expiry sweep observable.
     vi.useFakeTimers();
@@ -186,9 +195,9 @@ describe("getRedisClient", () => {
         const mod = await withRedis();
 
         expect(await mod.getRedisClient()).toBeNull();
-        expect(console.error).toHaveBeenCalledWith(
-            "[Redis] Connection failed, falling back to in-memory:",
-            "ECONNREFUSED 127.0.0.1:6379",
+        expect(logError).toHaveBeenCalledWith(
+            "[Redis] Connection failed, falling back to in-memory",
+            { error: "ECONNREFUSED 127.0.0.1:6379" },
         );
     });
 
@@ -222,9 +231,9 @@ describe("getRedisClient", () => {
         clients[0]!.emitError("read ECONNRESET");
 
         expect(await mod.getRedisClient()).toBeNull();
-        expect(console.error).toHaveBeenCalledWith(
-            "[Redis] Connection failed, falling back to in-memory:",
-            "read ECONNRESET",
+        expect(logError).toHaveBeenCalledWith(
+            "[Redis] Connection failed, falling back to in-memory",
+            { error: "read ECONNRESET" },
         );
     });
 
@@ -234,9 +243,9 @@ describe("getRedisClient", () => {
 
         clients[0]!.handlers.get("error")!();
 
-        expect(console.error).toHaveBeenCalledWith(
-            "[Redis] Connection failed, falling back to in-memory:",
-            "unknown error",
+        expect(logError).toHaveBeenCalledWith(
+            "[Redis] Connection failed, falling back to in-memory",
+            { error: "unknown error" },
         );
     });
 

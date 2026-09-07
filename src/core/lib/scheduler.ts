@@ -56,7 +56,7 @@ let tickTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
 export function registerCronJob(job: CronJob): void {
     if (!SCHEDULE_MS[job.schedule]) {
-        console.warn(`[scheduler] Unknown schedule "${job.schedule}" for ${job.key}`);
+        log.warn(`[scheduler] Unknown schedule "${job.schedule}" for ${job.key}`);
         return;
     }
     registeredJobs.set(job.key, job);
@@ -86,7 +86,7 @@ async function claimJob(key: string, schedule: string): Promise<boolean> {
         `;
         return affected === 1;
     } catch (err) {
-        console.error(`[scheduler] claim failed for ${key}:`, err);
+        log.error(`[scheduler] claim failed for ${key}`, { error: err instanceof Error ? err.message : String(err) });
         return false;
     }
 }
@@ -100,7 +100,7 @@ async function runJob(job: CronJob): Promise<void> {
     } catch (err) {
         status = "error";
         error = err instanceof Error ? err.message : String(err);
-        console.error(`[scheduler] Job ${job.key} failed:`, err);
+        log.error(`[scheduler] Job ${job.key} failed`, { error: err instanceof Error ? err.message : String(err) });
     }
     const lastRunMs = Date.now() - start;
     const lastRunAt = new Date();
@@ -113,7 +113,7 @@ async function runJob(job: CronJob): Promise<void> {
             data: { lastRunAt, lastStatus: status, lastError: error, lastRunMs, nextRunAt },
         });
     } catch (err) {
-        console.error(`[scheduler] Failed to record run for ${job.key}:`, err);
+        log.error(`[scheduler] Failed to record run for ${job.key}`, { error: err instanceof Error ? err.message : String(err) });
     }
 }
 
@@ -151,7 +151,7 @@ async function tick(): Promise<string[]> {
     } catch (err) {
         // Fail soft, as getModuleStates itself does: an unreadable config
         // means no explicit state is known, and every job stays eligible.
-        console.error("[scheduler] Could not read module states:", err);
+        log.error("[scheduler] Could not read module states", { error: err instanceof Error ? err.message : String(err) });
     }
 
     for (const job of registeredJobs.values()) {
@@ -163,7 +163,7 @@ async function tick(): Promise<string[]> {
                 ran.push(job.key);
             }
         } catch (err) {
-            console.error(`[scheduler] Tick error for ${job.key}:`, err);
+            log.error(`[scheduler] Tick error for ${job.key}`, { error: err instanceof Error ? err.message : String(err) });
         }
     }
     return ran;
@@ -302,7 +302,7 @@ export async function bootstrapScheduler(): Promise<void> {
                 const meta = await createBackup("scheduled", "Daily automated backup");
                 log.info("cron: automated backup created", { job: "automated-backup", filename: meta.filename, sizeBytes: meta.sizeBytes });
             } catch (err) {
-                console.error("[cron] automated-backup failed:", err);
+                log.error("[cron] automated-backup failed", { error: err instanceof Error ? err.message : String(err) });
             }
         },
     });
@@ -315,7 +315,7 @@ export async function bootstrapScheduler(): Promise<void> {
                 const mod = await entry.loader();
                 const handler = mod.default;
                 if (typeof handler !== "function") {
-                    console.warn(`[scheduler] ${entry.module}/${entry.id}: no default async function exported`);
+                    log.warn(`[scheduler] ${entry.module}/${entry.id}: no default async function exported`);
                     continue;
                 }
                 registerCronJob({
@@ -324,7 +324,7 @@ export async function bootstrapScheduler(): Promise<void> {
                     handler: handler as CronHandler,
                 });
             } catch (err) {
-                console.error(`[scheduler] Failed to load ${entry.module}/${entry.id}:`, err);
+                log.error(`[scheduler] Failed to load ${entry.module}/${entry.id}`, { error: err instanceof Error ? err.message : String(err) });
             }
         }
     } catch {

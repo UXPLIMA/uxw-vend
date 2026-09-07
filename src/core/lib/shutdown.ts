@@ -57,7 +57,7 @@ async function runShutdown(signal: string): Promise<void> {
                 await result;
             }
         } catch (err) {
-            console.error(`[shutdown] ${entry.name} failed:`, err);
+            log.error(`[shutdown] ${entry.name} failed`, { error: err instanceof Error ? err.message : String(err) });
         }
     }
     log.info("shutdown complete");
@@ -80,7 +80,7 @@ export function installShutdownHandlers(): void {
 
     const handle = (signal: NodeJS.Signals) => {
         const forceExit = setTimeout(() => {
-            console.error(`[shutdown] grace window of ${maxGraceMs}ms exceeded, forcing exit`);
+            log.error(`[shutdown] grace window of ${maxGraceMs}ms exceeded, forcing exit`);
             process.exit(1);
         }, maxGraceMs);
         forceExit.unref();

@@ -23,6 +23,8 @@
  *     [],
  *   );
  */
+
+import { log } from "./logger";
 export async function safeCall<T>(
     moduleName: string,
     opName: string,
@@ -32,7 +34,9 @@ export async function safeCall<T>(
     try {
         return await fn();
     } catch (err) {
-        console.error(`[module-safe-call] ${moduleName}:${opName} failed:`, err);
+        log.error(`[module-safe-call] ${moduleName}:${opName} failed`, {
+            error: err instanceof Error ? err.message : String(err),
+        });
         try {
             const { prisma } = await import("@/core/lib/db");
             await prisma.activityLog

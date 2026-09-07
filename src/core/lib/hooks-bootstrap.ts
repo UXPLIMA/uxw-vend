@@ -19,6 +19,7 @@ import {
     type ActionListener,
     type FilterListener,
 } from "./hooks";
+import { log } from "./logger";
 
 /**
  * Load and register all module hook listeners.
@@ -38,7 +39,7 @@ export async function bootstrapHooks(): Promise<void> {
         const { registerActivityFeedListeners } = await import("./activity-feed");
         registerActivityFeedListeners();
     } catch (err) {
-        console.error("[hooks] Failed to register core listeners:", err);
+        log.error("[hooks] Failed to register core listeners", { error: err instanceof Error ? err.message : String(err) });
     }
 
     try {
@@ -54,7 +55,7 @@ export async function bootstrapHooks(): Promise<void> {
                 const mod = await entry.loader();
                 const listener = mod.default;
                 if (typeof listener !== "function") {
-                    console.warn(`[hooks] ${entry.module}/${entry.hook}: handler did not export a default function`);
+                    log.warn(`[hooks] ${entry.module}/${entry.hook}: handler did not export a default function`);
                     continue;
                 }
                 if (entry.type === "action") {
@@ -69,14 +70,14 @@ export async function bootstrapHooks(): Promise<void> {
                     });
                 }
             } catch (err) {
-                console.error(`[hooks] Failed to load ${entry.module}/${entry.hook}:`, err);
+                log.error(`[hooks] Failed to load ${entry.module}/${entry.hook}`, { error: err instanceof Error ? err.message : String(err) });
             }
         }
 
-        console.log(`[hooks] Registered ${ModuleHookListeners.length} module hook listeners`);
+        log.info(`[hooks] Registered ${ModuleHookListeners.length} module hook listeners`);
     } catch (err) {
         // The generated registry may not exist on first build.
-        console.warn("[hooks] Could not load module-hooks registry:", (err as Error).message);
+        log.warn("[hooks] Could not load module-hooks registry", { error: String((err as Error).message) });
     }
 
     // Once every module's static listeners are wired, fire core.boot so modules
@@ -86,6 +87,6 @@ export async function bootstrapHooks(): Promise<void> {
     try {
         await doActionAsync("core.boot", {});
     } catch (err) {
-        console.warn("[hooks] core.boot listener failed:", (err as Error).message);
+        log.warn("[hooks] core.boot listener failed", { error: String((err as Error).message) });
     }
 }
