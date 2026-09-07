@@ -39,6 +39,8 @@ function delegate(model: string) {
     };
 }
 
+vi.mock("@/core/sdk/auth", () => ({ auth: async () => null }));
+
 vi.mock("@/core/sdk/server", () => ({
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     prisma: {
@@ -52,7 +54,11 @@ vi.mock("@/core/sdk/server", () => ({
         helpArticle: delegate("helpArticle"),
         product: delegate("product"),
     },
-    moduleSettings: vi.fn(async () => ({ enableSearch: true })),
+    // `allowGuestView` is the forum's other visibility rule, and its provider
+    // now consults it before it queries anything. Granting it here is what
+    // lets these tests reach the rule they are actually about - the one a
+    // moderator applies. The rule itself has its own tests.
+    moduleSettings: vi.fn(async () => ({ enableSearch: true, allowGuestView: true })),
 }));
 
 /**

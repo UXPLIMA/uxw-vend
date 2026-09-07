@@ -1,4 +1,5 @@
 import { log, prisma } from "@/core/sdk/server";
+import { mayViewForum } from "../lib/guest-view";
 
 interface SearchResult {
     type: string;
@@ -15,8 +16,10 @@ interface SearchResult {
  * lookups. Falls back to ILIKE-based contains() queries if the FTS index
  * is not yet present.
  *
- * Both paths repeat the visibility rule the public endpoints apply, because
- * a search result is a way into the content and not a lesser view of it.
+ * Both paths repeat the visibility rules the public endpoints apply, because
+ * a search result is a way into the content and not a lesser view of it:
+ * whether the forum is open to guests at all, and then whether the topic has
+ * been approved.
  * `/api/v1/forum/topics` hides anything but APPROVED from a non-admin, and
  * the single-topic endpoint answers 404 for one - a search that skipped the
  * same test handed an anonymous visitor the title and the first 140
@@ -25,6 +28,13 @@ interface SearchResult {
  */
 export default async function search(q: string): Promise<SearchResult[]> {
     if (!q || q.length < 2) return [];
+
+    // The other half of the visibility rule, and the half this file used to
+    // skip. A forum an operator has closed answers 403 at its own endpoints;
+    // a search that did not ask handed a stranger the title and the opening
+    // of every topic in it. Asked before the query, because a result that
+    // cannot be shown is a query worth not running.
+    if (!(await mayViewForum())) return [];
 
     try {
         // Full-text path
