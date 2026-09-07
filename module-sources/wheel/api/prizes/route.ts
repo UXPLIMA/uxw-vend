@@ -10,9 +10,17 @@ export async function GET() {
 
     const where = adminCheck ? {} : { isActive: true };
 
+    // A visitor is drawing a wheel, not auditing it: name, colour, payout and
+    // order are what a segment needs. `probability` is the number an operator
+    // tunes in the admin screen, the public page has never read it, and the
+    // wheel looks the same without it. An administrator gets the whole row,
+    // because editing those odds is what their screen is for.
     const prizes = await prisma.wheelPrize.findMany({
         where,
         orderBy: { order: "asc" },
+        ...(adminCheck ? {} : {
+            select: { id: true, name: true, type: true, value: true, color: true, order: true },
+        }),
     });
     return NextResponse.json({ prizes });
 }

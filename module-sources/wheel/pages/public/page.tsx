@@ -15,7 +15,6 @@ interface Prize {
     type: string;
     value: number;
     color: string;
-    probability: number;
 }
 
 export default function WheelPage() {
