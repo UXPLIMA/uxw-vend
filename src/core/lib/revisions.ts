@@ -14,7 +14,16 @@ import { prisma } from "@/core/lib/db";
  *   await recordRevision("blog.article", id, existing, "update", session.user.id);
  *   await prisma.blogArticle.update({ where: { id }, data: ... });
  *
- * Listing & restoring is done via /api/v1/revisions endpoints (separate file).
+ * Listing is done by the admin screen through /api/v1/admin/revisions, which
+ * pages across every resource. /api/v1/revisions answers for one entity and
+ * has no caller in this tree.
+ *
+ * Nothing restores. The line here used to say "listing & restoring", and
+ * `getRevision` sat below described as "for restore preview", read by its own
+ * test and nothing else: a preview of something the product does not do. Both
+ * are gone rather than left standing as a promise. A revision is a record of
+ * what an entity was, and putting it back is a feature somebody would have to
+ * decide on, not one to imply.
  */
 
 export async function recordRevision(
@@ -46,14 +55,6 @@ export async function listRevisions(resource: string, resourceId: string, limit 
         where: { resource, resourceId },
         orderBy: { createdAt: "desc" },
         take: limit,
-        include: { author: { select: { id: true, username: true } } },
-    });
-}
-
-/** Get a single revision (for restore preview). */
-export async function getRevision(id: string) {
-    return prisma.revision.findUnique({
-        where: { id },
         include: { author: { select: { id: true, username: true } } },
     });
 }

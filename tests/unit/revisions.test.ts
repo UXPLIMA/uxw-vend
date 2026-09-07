@@ -21,7 +21,6 @@ vi.mock("@/core/lib/db", () => ({ prisma: { revision }, default: { revision } })
 import {
     recordRevision,
     listRevisions,
-    getRevision,
     pruneOldRevisions,
 } from "@/core/lib/revisions";
 
@@ -102,19 +101,6 @@ describe("listRevisions", () => {
     it("honours an explicit limit", async () => {
         await listRevisions("blog.article", "a1", 5);
         expect(revision.findMany.mock.calls[0]![0].take).toBe(5);
-    });
-});
-
-describe("getRevision", () => {
-    it("fetches one revision with its author", async () => {
-        revision.findUnique.mockResolvedValue({ id: "r1" });
-
-        await expect(getRevision("r1")).resolves.toEqual({ id: "r1" });
-        expect(revision.findUnique.mock.calls[0]![0].where).toEqual({ id: "r1" });
-    });
-
-    it("returns null for an unknown id", async () => {
-        await expect(getRevision("nope")).resolves.toBeNull();
     });
 });
 
