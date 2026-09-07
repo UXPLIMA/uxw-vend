@@ -243,8 +243,10 @@ describe("settleOrder", () => {
         expect(calls.filter((c) => c.viaTx).map((c) => c.op)).toEqual([
             "order.updateMany",
             // Which products the shop counts, asked inside the transaction so
-            // the take is decided against the same snapshot as the claim.
+            // the take is decided against the same snapshot as the claim, and
+            // then the sale counted against the product row.
             "product.findMany",
+            "product.updateMany",
             "chestItem.createMany",
             "ownedProduct.createMany",
             "payment.create",

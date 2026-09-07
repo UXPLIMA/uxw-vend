@@ -4,8 +4,6 @@ import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
 import { PUBLIC_PRODUCT } from "../../lib/public-product";
-import { popularWindow } from "../../lib/popular-window";
-import type { Prisma } from "@prisma/client";
 
 /**
  * The listing is the same whoever asked: it filters on query parameters and
@@ -15,65 +13,6 @@ import type { Prisma } from "@prisma/client";
  */
 const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" };
 
-
-/**
- * Products ordered by how many of them people have actually bought.
- *
- * It used to be `orderBy: { orderItems: { _count: "desc" } }`, which counts an
- * order item whatever became of its order - and checkout writes the `Order`
- * with `status: "PENDING"` before the buyer pays. An abandoned checkout raised
- * a product's ranking for good, so anyone could put anything at the top of the
- * shop by starting checkouts and walking away. Measured on a seeded database:
- * a product with no paid orders and five thousand abandoned ones came back
- * first.
- *
- * Prisma cannot filter the relation it counts inside `orderBy` - both spellings
- * were tried and rejected - so the ranking is read from a `groupBy`, the same
- * way this module's admin statistics have always read it. The route's own
- * filter object goes in under `product`, so a category or a search narrows the
- * ranking exactly as it narrows the list, with no second copy of it in SQL.
- *
- * A product nobody has bought still belongs in the list, after the ones people
- * have, which is what `popularWindow` works out. The `notIn` there is bounded
- * by how many products have ever sold, and only a page reaching past them
- * pays for it.
- */
-async function mostSoldFirst(where: Prisma.ProductWhereInput, skip: number, take: number) {
-    const ranked = await prisma.orderItem.groupBy({
-        by: ["productId"],
-        where: { order: { status: "COMPLETED" }, productId: { not: null }, product: where },
-        _count: { productId: true },
-        orderBy: { _count: { productId: "desc" } },
-    });
-    const rankedIds = ranked
-        .map((row) => row.productId)
-        .filter((id): id is string => typeof id === "string");
-
-    const window = popularWindow(rankedIds, skip, take);
-
-    const [sold, neverSold] = await Promise.all([
-        window.ids.length
-            ? prisma.product.findMany({ where: { ...where, id: { in: window.ids } }, select: PUBLIC_PRODUCT })
-            : Promise.resolve([]),
-        window.tailTake
-            ? prisma.product.findMany({
-                  where: rankedIds.length ? { ...where, id: { notIn: rankedIds } } : where,
-                  select: PUBLIC_PRODUCT,
-                  orderBy: { createdAt: "desc" },
-                  skip: window.tailSkip,
-                  take: window.tailTake,
-              })
-            : Promise.resolve([]),
-    ]);
-
-    // `in` promises no order of its own, so the ranking is reapplied here.
-    const byId = new Map(sold.map((product) => [product.id, product]));
-    const inRankOrder = window.ids
-        .map((id) => byId.get(id))
-        .filter((product): product is (typeof sold)[number] => product !== undefined);
-
-    return [...inRankOrder, ...neverSold];
-}
 
 // GET /api/v1/store/products - List products
 export async function GET(request: NextRequest) {
@@ -104,17 +43,23 @@ export async function GET(request: NextRequest) {
         };
 
         const [products, total] = await Promise.all([
-            sort === "popular"
-                ? mostSoldFirst(where, skip, take)
-                : prisma.product.findMany({
-                      where,
-                      select: PUBLIC_PRODUCT,
-                      skip,
-                      take,
-                      orderBy: sort === "price_asc" ? { price: "asc" }
-                          : sort === "price_desc" ? { price: "desc" }
-                          : { createdAt: "desc" },
-                  }),
+            prisma.product.findMany({
+                where,
+                select: PUBLIC_PRODUCT,
+                skip,
+                take,
+                // Popularity is a column now. It used to be a `groupBy` over
+                // every paid order item, complete before a page of it could be
+                // cut, which measured 90 ms against a shop with 150,000 order
+                // items; `unitsSold` is maintained where the sale happens and
+                // reads in 1 ms behind (isActive, unitsSold). A product nobody
+                // has bought sits at zero and therefore after the ones people
+                // have, which is where the old two-list dance was going.
+                orderBy: sort === "popular" ? [{ unitsSold: "desc" as const }, { createdAt: "desc" as const }]
+                    : sort === "price_asc" ? { price: "asc" as const }
+                    : sort === "price_desc" ? { price: "desc" as const }
+                    : { createdAt: "desc" as const },
+            }),
             prisma.product.count({ where }),
         ]);
 

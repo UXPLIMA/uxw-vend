@@ -52,6 +52,9 @@ model Product {
   image         String?
   images        String[] @default([])
   stock         Int?
+  /// Units sold, maintained at settlement and refund. Denormalised because
+  /// ranking by an aggregate over every paid order item measured 90 ms.
+  unitsSold     Int      @default(0)
   isActive      Boolean  @default(true)
   isFeatured    Boolean  @default(false)
   type          ProductType @default(DIGITAL)
@@ -71,6 +74,7 @@ model Product {
 
   @@index([categoryId])
   @@index([isActive, isFeatured])
+  @@index([isActive, unitsSold])
 }
 
 enum ProductType {

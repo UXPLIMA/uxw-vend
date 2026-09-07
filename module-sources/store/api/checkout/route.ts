@@ -4,6 +4,7 @@ import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBod
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
 import { claimStock, shortOfStock, stockClaims } from "../../lib/stock";
+import { countSales } from "../../lib/popularity";
 import { resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
@@ -274,10 +275,14 @@ export async function POST(request: NextRequest) {
                 // failure here rolls the debit back, which is why this is the
                 // one path that can refuse: nothing has left the buyer's
                 // account until this transaction commits.
-                const short = await claimStock(tx, stockClaims(orderItems));
+                const claims = stockClaims(orderItems);
+                const short = await claimStock(tx, claims);
                 if (short.length > 0) {
                     throw new Error("OUT_OF_STOCK");
                 }
+                // This path completes the order here rather than at a
+                // gateway's word, so the sale is counted here too.
+                await countSales(tx, claims);
 
                 // Create credit transaction
                 await tx.creditTransaction.create({

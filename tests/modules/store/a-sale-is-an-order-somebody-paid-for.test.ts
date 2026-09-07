@@ -8,16 +8,22 @@
  * checkout raised a product's ranking for good, and anyone could put anything
  * at the top of the shop by starting checkouts and walking away.
  *
- * Proven against the development server before this was written: three
- * thousand products, twenty thousand completed orders, and one product with
- * zero paid orders and five thousand abandoned ones. It came back first.
+ * Proven against the development server at the time: three thousand products,
+ * twenty thousand completed orders, and one product with zero paid orders and
+ * five thousand abandoned ones. It came back first.
  *
- * The store already knew the right answer - its admin stats group order items
- * with `where: { order: { status: "COMPLETED" } }` - so this is the public
- * list catching up with the rest of the product rather than a new policy.
+ * The first fix read the ranking from a `groupBy` filtered on paid orders.
+ * That was correct and slow - complete before a page of it could be cut, 90 ms
+ * against a shop with 150,000 order items - so the count now lives on the
+ * product row as `unitsSold`, maintained at settlement and at refund. The
+ * guarantee is the same one, kept somewhere cheaper: the ranking cannot see an
+ * order nobody paid for, because nothing but a settlement writes to it.
+ *
+ * What this file defends is that the public list still asks the order table
+ * nothing at all, whatever it is sorted by. `what-sells-is-counted-when-it-
+ * sells.test.ts` covers the counter itself.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { popularWindow } from "@/modules/store/lib/popular-window";
 
 const groupBy = vi.fn(async () => [] as { productId: string | null }[]);
 const findMany = vi.fn(async () => [] as unknown[]);
@@ -39,43 +45,6 @@ vi.mock("@/core/sdk/auth", () => ({ auth: async () => null }));
 const { GET } = await import("@/modules/store/api/products/route");
 const { NextRequest } = await import("next/server");
 
-describe("a page of a popularity ranking", () => {
-    const ranked = ["a", "b", "c", "d", "e"];
-
-    it("is the ranked products, in order, while there are enough of them", () => {
-        expect(popularWindow(ranked, 0, 3)).toEqual({ ids: ["a", "b", "c"], tailSkip: 0, tailTake: 0 });
-    });
-
-    it("keeps its place on a later page", () => {
-        expect(popularWindow(ranked, 3, 2)).toEqual({ ids: ["d", "e"], tailSkip: 0, tailTake: 0 });
-    });
-
-    it("asks for what is left over once the ranked run out mid-page", () => {
-        expect(popularWindow(ranked, 3, 4)).toEqual({ ids: ["d", "e"], tailSkip: 0, tailTake: 2 });
-    });
-
-    it("asks only for the remainder once the page starts past them", () => {
-        expect(popularWindow(ranked, 7, 3)).toEqual({ ids: [], tailSkip: 2, tailTake: 3 });
-    });
-
-    it("asks for the remainder from the start when nothing has sold", () => {
-        expect(popularWindow([], 0, 12)).toEqual({ ids: [], tailSkip: 0, tailTake: 12 });
-    });
-
-    it("asks for nothing when the page is past everything", () => {
-        expect(popularWindow(ranked, 5, 0)).toEqual({ ids: [], tailSkip: 0, tailTake: 0 });
-    });
-
-    it("never asks for a negative slice, whatever the page number", () => {
-        for (const skip of [0, 1, 4, 5, 6, 50, 10_000]) {
-            const w = popularWindow(ranked, skip, 12);
-            expect(w.tailSkip, `skip ${skip}`).toBeGreaterThanOrEqual(0);
-            expect(w.tailTake, `skip ${skip}`).toBeGreaterThanOrEqual(0);
-            expect(w.ids.length + w.tailTake, `skip ${skip}`).toBeLessThanOrEqual(12);
-        }
-    });
-});
-
 describe("the public product list, ranked by popularity", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -88,30 +57,32 @@ describe("the public product list, ranked by popularity", () => {
         return GET(new NextRequest(`http://example.com/api/v1/store/products?${query}`));
     }
 
-    it("counts only orders somebody paid for", async () => {
-        await list("sort=popular");
-
-        expect(groupBy).toHaveBeenCalledTimes(1);
-        expect(groupBy.mock.calls[0][0]).toMatchObject({
-            where: { order: { status: "COMPLETED" } },
-        });
-    });
-
-    it("narrows the ranking by the same filter it narrows the list with", async () => {
-        await list("sort=popular&category=ranks");
-
-        const where = (groupBy.mock.calls[0][0] as { where: { product?: Record<string, unknown> } }).where;
-        expect(
-            where.product,
-            "a category should narrow what counts as popular, not just what is shown",
-        ).toMatchObject({ isActive: true, category: { slug: "ranks" } });
-    });
-
-    it("asks nothing of the order table for any other sort", async () => {
-        for (const sort of ["newest", "price_asc", "price_desc"]) {
+    it("asks the order table nothing, whatever the sort", async () => {
+        // The ranking cannot see an unpaid order because it does not read
+        // orders at all any more: only a settlement writes to the counter.
+        for (const sort of ["popular", "newest", "price_asc", "price_desc"]) {
             vi.clearAllMocks();
             await list(`sort=${sort}`);
             expect(groupBy, sort).not.toHaveBeenCalled();
         }
     });
+
+    it("puts what has sold most first, and what has never sold last", async () => {
+        await list("sort=popular");
+
+        expect(findMany).toHaveBeenCalledTimes(1);
+        const args = findMany.mock.calls[0][0] as { orderBy: unknown };
+        // Newest first among the products that have sold the same amount,
+        // which is where a product nobody has bought sits: zero, then newest.
+        expect(args.orderBy).toEqual([{ unitsSold: "desc" }, { createdAt: "desc" }]);
+    });
+
+    it("shows only what is on the shelf, and pages it", async () => {
+        await list("sort=popular&category=ranks");
+
+        const args = findMany.mock.calls[0][0] as { where: Record<string, unknown>; take: number };
+        expect(args.where).toMatchObject({ isActive: true, category: { slug: "ranks" } });
+        expect(args.take).toBe(12);
+    });
+
 });

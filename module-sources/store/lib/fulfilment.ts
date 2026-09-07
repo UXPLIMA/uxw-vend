@@ -12,6 +12,7 @@ import { sendOrderConfirmationEmail } from "./order-email";
 import { deliverProduct } from "./delivery";
 import { announceOrderCompleted } from "./order-events";
 import { claimStock, releaseStock, stockClaims } from "./stock";
+import { countSales, uncountSales } from "./popularity";
 
 const OK: PaymentOutcome = { handled: true, duplicate: false, error: null };
 const ALREADY: PaymentOutcome = { handled: true, duplicate: true, error: null };
@@ -81,7 +82,11 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
         // Stock comes off the shelf here rather than at checkout: an order
         // nobody pays for must not hold anything. Inside the same claim as the
         // status, so a retried webhook cannot take it twice.
-        const short = await claimStock(tx, stockClaims(order.items));
+        const claims = stockClaims(order.items);
+        const short = await claimStock(tx, claims);
+        // Counted even where the shelf came up short: the unit sold, and the
+        // ranking describes sales rather than what is left.
+        await countSales(tx, claims);
 
         if (buyerId && granted.length > 0) {
             await tx.chestItem.createMany({
@@ -270,7 +275,11 @@ export async function refundPayment(provider: string, providerRef: string): Prom
         });
         if (claimed.count === 0) return false;
         await tx.order.update({ where: { id: payment.orderId }, data: { status: "REFUNDED" } });
-        if (refundedOrder) await releaseStock(tx, stockClaims(refundedOrder.items));
+        if (refundedOrder) {
+            const claims = stockClaims(refundedOrder.items);
+            await releaseStock(tx, claims);
+            await uncountSales(tx, claims);
+        }
         return true;
     });
     return refunded ? OK : ALREADY;

@@ -45,7 +45,6 @@ const EXEMPT: Record<string, string> = {
     "ActivityLog.metadata": "a JSON path filter, which a plain btree index does not serve",
     "OrderItem.order": "a relation filter, which this scan cannot see through: the join uses OrderItem.orderId and the conditions are Order.status and Order.createdAt, all three indexed",
     "User.loginSessions": "a relation filter, which this scan cannot see through: the join uses UserSession.userId and the conditions are isRevoked and expiresAt, all indexed",
-    "OrderItem.product": "the sibling of the one above, on the popularity ranking: the join uses OrderItem.productId, which is indexed, and the conditions are the product list's own filter, which is applied to Product",
 };
 
 /** Models whose row count grows with what users do. */

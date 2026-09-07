@@ -63,13 +63,18 @@ const db = {
             [...products.values()].filter((p) => where.id.in.includes(p.id) && p.stock !== null),
         updateMany: async ({ where, data }: {
             where: { id: string; stock?: { gte: number } };
-            data: { stock: { decrement?: number; increment?: number } };
+            // Settlement also counts the sale, on the same table and in the
+            // same transaction, so this stands in for both writes.
+            data: { stock?: { decrement?: number; increment?: number }; unitsSold?: { increment?: number; decrement?: number } };
         }) => {
             const row = products.get(where.id);
-            if (!row || row.stock === null) return { count: 0 };
-            if (where.stock && row.stock < where.stock.gte) return { count: 0 };
-            if (data.stock.decrement !== undefined) row.stock -= data.stock.decrement;
-            if (data.stock.increment !== undefined) row.stock += data.stock.increment;
+            if (!row) return { count: 0 };
+            if (where.stock && (row.stock === null || row.stock < where.stock.gte)) return { count: 0 };
+            if (data.stock) {
+                if (row.stock === null) return { count: 0 };
+                row.stock -= data.stock.decrement ?? 0;
+                row.stock += data.stock.increment ?? 0;
+            }
             return { count: 1 };
         },
     },
