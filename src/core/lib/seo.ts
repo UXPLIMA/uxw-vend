@@ -10,6 +10,7 @@
  * fallbacks so the helpers work for fresh installs with no DB rows yet.
  */
 
+import { cache } from "react";
 import type { Metadata } from "next";
 import { prisma } from "./db";
 import { resolveAppUrl } from "./app-url";
@@ -54,8 +55,17 @@ interface SeoSiteInfo {
     siteUrl: string;
 }
 
-/** Reads site_name + site_description from Settings with env fallbacks. */
-async function getSeoSiteInfo(): Promise<SeoSiteInfo> {
+/**
+ * Reads site_name + site_description from Settings with env fallbacks.
+ *
+ * Cached for the length of one render, for the reason `getSession` and
+ * `getActiveTheme` are: every route that declares metadata calls
+ * `buildPageMeta`, so the root layout asks and the page inside it asks
+ * again. Measured against a production build, that was two of the twelve
+ * queries `/en/blog` issued for one request. A site cannot be renamed
+ * between a layout's metadata and its page's.
+ */
+const getSeoSiteInfo = cache(async function getSeoSiteInfo(): Promise<SeoSiteInfo> {
     // Runtime-resolved: see app-url.ts. Reading NEXT_PUBLIC_SITE_URL here
     // baked localhost into every canonical tag of every prebuilt-image install.
     const siteUrl = resolveAppUrl();
@@ -77,7 +87,7 @@ async function getSeoSiteInfo(): Promise<SeoSiteInfo> {
     }
 
     return { siteName, siteDescription, siteUrl };
-}
+});
 
 /** Synchronous version using only env/serverConfig - safe for non-async callers. */
 function getSeoSiteInfoSync(): SeoSiteInfo {

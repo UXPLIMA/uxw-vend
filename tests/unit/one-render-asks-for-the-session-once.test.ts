@@ -118,3 +118,37 @@ describe("the client session provider", () => {
             .toMatch(/getSession\(\)/);
     });
 });
+
+/**
+ * The same shape, one layer further out.
+ *
+ * `buildPageMeta` reads `site_name` and `site_description` from Settings, and
+ * every route that declares metadata calls it: the root layout does, and so
+ * does the page rendered inside it. Neither knows about the other.
+ *
+ * Measured against a production build with statement logging on, `/en/blog`
+ * issued twelve queries for one request and two of them were the identical
+ * two-key Settings lookup. A layout's metadata and its page's metadata belong
+ * to one request, which is exactly the window in which a site's own name
+ * cannot change, and exactly the window `cache` covers.
+ */
+describe("the site's name and description", () => {
+    it("are read once per render", () => {
+        const src = read(path.join(ROOT, "src/core/lib/seo.ts"));
+        expect(src, "getSeoSiteInfo must be wrapped in React cache")
+            .toMatch(/const getSeoSiteInfo = cache\(/);
+        expect(src).toMatch(/import \{ cache \} from "react"/);
+    });
+
+    it("are not reachable through a second uncached path", () => {
+        // A second reader of the same keys would put the duplicate back
+        // without this file changing.
+        const libDir = path.join(ROOT, "src/core/lib");
+        const others = fs
+            .readdirSync(libDir)
+            .filter((n) => n.endsWith(".ts") && n !== "seo.ts")
+            .map((n) => path.join(libDir, n));
+        const leaks = others.filter((f) => /"site_name"/.test(read(f))).map(rel);
+        expect(leaks, `These read the site name straight from Settings:\n${leaks.join("\n")}`).toEqual([]);
+    });
+});
