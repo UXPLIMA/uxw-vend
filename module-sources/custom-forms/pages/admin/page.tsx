@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, Input, Label, useConfirm, useFormRoute, NativeSelect, CheckboxField } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, useConfirm, useFormRoute, NativeSelect, CheckboxField, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, X, Trash2, FileText, Link as LinkIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
@@ -206,9 +206,7 @@ export default function FormsPage() {
                 title={t("adm_customForms")}
                 description={t("adm_customFormsSubtitle")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_newForm")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newForm")}</Link>
                 </>}
             />
 

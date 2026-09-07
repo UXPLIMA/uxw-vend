@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Label, Textarea, NativeSelect } from "@/core/sdk/ui";
+import { Button, Label, Textarea, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useSession } from "next-auth/react";
@@ -74,9 +74,7 @@ export default function NewTicketPage() {
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">{t('loginToCreate')}</p>
-                        <Link href="/auth/login">
-                            <Button>{t('login')}</Button>
-                        </Link>
+                        <Link href="/auth/login" className={buttonClassName("default", "default")}>{t('login')}</Link>
                     </div>
                 </main>
                 <Footer />
@@ -175,9 +173,7 @@ export default function NewTicketPage() {
                             <Button type="submit" disabled={loading}>
                                 {loading ? t('creating') : t('createTicket')}
                             </Button>
-                            <Link href="/support">
-                                <Button type="button" variant="outline">{t('cancel')}</Button>
-                            </Link>
+                            <Link href="/support" className={buttonClassName("outline", "default")}>{t('cancel')}</Link>
                         </div>
                     </form>
                     </>)}

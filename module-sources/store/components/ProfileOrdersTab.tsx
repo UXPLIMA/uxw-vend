@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { formatDate } from "@/core/sdk";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { ShoppingCart, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { ORDER_STATUS_KEYS, orderStatusLabel } from "../lib/order-status";
@@ -81,9 +81,7 @@ export function ProfileOrdersTab() {
                     <div className="text-center py-8">
                         <ShoppingCart className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                         <p className="text-muted-foreground">{t("tab_orders_empty")}</p>
-                        <Link href="/store">
-                            <Button variant="outline" className="mt-3">{t("tab_orders_browse")}</Button>
-                        </Link>
+                        <Link href="/store" className={buttonClassName("outline", "default", "mt-3")}>{t("tab_orders_browse")}</Link>
                     </div>
                 ) : (
                     <div className="space-y-3">

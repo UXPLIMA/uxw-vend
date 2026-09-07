@@ -9,7 +9,7 @@
  * heaviest, `RichTextEditor`, already loads its editor through `next/dynamic`,
  * so importing `Button` does not drag it in.
  */
-export { Button } from "@/core/components/ui/button";
+export { Button, buttonClassName } from "@/core/components/ui/button";
 export { Badge, badgeClassName } from "@/core/components/ui/badge";
 export type { BadgeTone } from "@/core/components/ui/badge";
 export { Card, CardHeader, CardTitle, CardContent } from "@/core/components/ui/card";

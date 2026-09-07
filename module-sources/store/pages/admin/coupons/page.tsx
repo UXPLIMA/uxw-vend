@@ -3,7 +3,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, useSiteCurrency, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, useSiteCurrency, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Tag } from "lucide-react";
 import { toast } from "sonner";
@@ -317,9 +317,7 @@ export default function AdminCouponsPage() {
                 title={t("adm_coupons")}
                 description={t("adm_manageDiscountCodes")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_newCoupon")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newCoupon")}</Link>
                 </>}
             />
 

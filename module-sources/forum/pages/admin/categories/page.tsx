@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, useFormRoute } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, useFormRoute, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
@@ -184,11 +184,9 @@ export default function AdminForumCategoriesPage() {
                 title={t("adm_forumCategories")}
                 description={t("adm_manageCategories")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("adm_newCategory")}
-                        </Button>
-                    </Link>
+                        </Link>
                 </>}
             />
 

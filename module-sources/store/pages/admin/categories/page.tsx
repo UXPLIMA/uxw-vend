@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, useConfirm, useFormRoute, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -214,9 +214,7 @@ export default function AdminStoreCategoriesPage() {
                 title={t("adm_storeCategories")}
                 description={t("adm_organizeProducts")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Link>
                 </>}
             />
 

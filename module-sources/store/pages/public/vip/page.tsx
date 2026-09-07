@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, LoadFailed, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { Check, X, Crown, Loader2 } from "lucide-react";
@@ -144,11 +144,9 @@ export default function VipTablePage() {
                                     <td className="py-4 px-6"></td>
                                     {productFeatures.map(({ product }) => (
                                         <td key={product.id} className="text-center py-4 px-4">
-                                            <Link href={`/store/product/${product.number}/${product.slug}`}>
-                                                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                                            <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "sm", "bg-primary hover:bg-primary/90 text-primary-foreground")}>
                                                     {t("vip_buy")}
-                                                </Button>
-                                            </Link>
+                                                </Link>
                                         </td>
                                     ))}
                                 </tr>
@@ -184,11 +182,9 @@ export default function VipTablePage() {
                                 {product.description && (
                                     <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
                                 )}
-                                <Link href={`/store/product/${product.number}/${product.slug}`}>
-                                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                                <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "default", "w-full bg-primary hover:bg-primary/90 text-primary-foreground")}>
                                         {t("vip_buy")}
-                                    </Button>
-                                </Link>
+                                    </Link>
                             </div>
                         ))}
                     </div>

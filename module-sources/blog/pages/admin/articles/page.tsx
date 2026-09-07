@@ -3,7 +3,7 @@ import { redirect } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, buttonClassName } from "@/core/sdk/ui";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -85,9 +85,7 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
                 title={t("adm_blogArticles")}
                 description={t("adm_manageBlogContent")}
                 actions={<>
-                    <Link href="/admin/blog/articles/new">
-                        <Button>{`+ ${t("adm_newArticle")}`}</Button>
-                    </Link>
+                    <Link href="/admin/blog/articles/new" className={buttonClassName("default", "default")}>{`+ ${t("adm_newArticle")}`}</Link>
                 </>}
             />
 

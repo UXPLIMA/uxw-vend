@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useFormRoute } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, useConfirm, useFormRoute, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
@@ -181,9 +181,7 @@ export default function AdminBlogCategoriesPage() {
                 title={t("adm_blogCategories")}
                 description={t("adm_organizeBlog")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Link>
                 </>}
             />
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
-import { Button, LoadFailed } from "@/core/sdk/ui";
+import { Button, LoadFailed, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -87,18 +87,14 @@ export default function SupportPage() {
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-bold text-foreground">{t('myTickets')}</h1>
                     {session?.user && (
-                        <Link href="/support/new">
-                            <Button>{t('newTicket')}</Button>
-                        </Link>
+                        <Link href="/support/new" className={buttonClassName("default", "default")}>{t('newTicket')}</Link>
                     )}
                 </div>
 
                 {!session?.user ? (
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">{t('loginRequired')}</p>
-                        <Link href="/auth/login">
-                            <Button>{t('login')}</Button>
-                        </Link>
+                        <Link href="/auth/login" className={buttonClassName("default", "default")}>{t('login')}</Link>
                     </div>
                 ) : loading ? (
                     <div className="bg-card rounded-xl p-8 text-center">
@@ -109,9 +105,7 @@ export default function SupportPage() {
                 ) : tickets.length === 0 ? (
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">{t('noTicketsYet')}</p>
-                        <Link href="/support/new">
-                            <Button>{t('createFirst')}</Button>
-                        </Link>
+                        <Link href="/support/new" className={buttonClassName("default", "default")}>{t('createFirst')}</Link>
                     </div>
                 ) : (
                     <div className="bg-card rounded-xl border border-border overflow-x-auto">

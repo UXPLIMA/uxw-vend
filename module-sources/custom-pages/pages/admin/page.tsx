@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, Label, RichTextEditor, useConfirm, useFormRoute, CheckboxField } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, RichTextEditor, useConfirm, useFormRoute, CheckboxField, buttonClassName } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Plus, Trash2, ExternalLink, Pencil, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -194,9 +194,7 @@ export default function CustomPagesAdminPage() {
                 title={t("adm_customPages")}
                 description={t("adm_customPagesSubtitle")}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_newPage")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newPage")}</Link>
                 </>}
             />
 
@@ -217,10 +215,13 @@ export default function CustomPagesAdminPage() {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Link href={`/admin/custom-pages/builder/${page.id}`}>
-                                        <Button variant="ghost" size="sm" title={t("adm_openInBuilder")}>
-                                            <LayoutDashboard className="w-3 h-3" />
-                                        </Button>
+                                    <Link
+                                        href={`/admin/custom-pages/builder/${page.id}`}
+                                        title={t("adm_openInBuilder")}
+                                        aria-label={t("adm_openInBuilder")}
+                                        className={buttonClassName("ghost", "sm")}
+                                    >
+                                        <LayoutDashboard className="w-3 h-3" />
                                     </Link>
                                     <Button variant="ghost" size="sm" onClick={() => openForm(page.id)} title={t("adm_htmlEditor")}><Pencil className="w-3 h-3" /></Button>
                                     <Button aria-label={commonT("delete")} variant="ghost" size="sm" className="text-destructive" onClick={() => deletePage(page)}><Trash2 className="w-3 h-3" /></Button>

@@ -19,16 +19,16 @@ import path from "node:path";
  * anchor". Pagination, the admin page header and the media uploader already
  * ask it for the classes and stay one element. These are the ones that did not.
  *
- * The modules are pinned rather than fixed: `buttonClassName` is not part of
- * `@/core/sdk/ui`, so a module cannot reach it without adding a symbol to the
- * SDK surface, which is a version bump and its own change. The number may fall
- * and may not rise.
+ * The modules were pinned at forty for a while, because `buttonClassName` was
+ * not part of `@/core/sdk/ui` and a module could not reach it. It is now, at
+ * CORE_API_VERSION 1.27.0, beside `Button` the way `badgeClassName` sits
+ * beside `Badge`, and the forty are gone. The number may fall and may not rise.
  */
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 
 /** How many module files still wrap a button in a link. Shrink only. */
-const MODULE_SITES_PINNED = 40;
+const MODULE_SITES_PINNED = 0;
 
 function tsxFiles(dir: string, into: string[] = []): string[] {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

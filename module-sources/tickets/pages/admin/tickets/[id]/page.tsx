@@ -4,7 +4,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, use } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Textarea, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Textarea, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
@@ -145,9 +145,7 @@ export default function AdminTicketDetailPage(props: PageProps) {
         return (
             <div className="text-center py-12">
                 <p className="text-muted-foreground">{t("adm_ticketNotFound")}</p>
-                <Link href="/admin/tickets">
-                    <Button variant="outline" className="mt-4">{t("adm_backToTickets")}</Button>
-                </Link>
+                <Link href="/admin/tickets" className={buttonClassName("outline", "default", "mt-4")}>{t("adm_backToTickets")}</Link>
             </div>
         );
     }

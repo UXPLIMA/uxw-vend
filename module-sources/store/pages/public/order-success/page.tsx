@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
@@ -27,16 +27,12 @@ export default function OrderSuccessPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                            <Link href="/profile">
-                                <Button variant="outline">
+                            <Link href="/profile" className={buttonClassName("outline", "default")}>
                                     <ShoppingBag className="w-4 h-4" /> {t("orderSuccess_myOrders")}
-                                </Button>
-                            </Link>
-                            <Link href="/store">
-                                <Button>
+                                </Link>
+                            <Link href="/store" className={buttonClassName("default", "default")}>
                                     {t("orderSuccess_continue")} <ArrowRight className="w-4 h-4" />
-                                </Button>
-                            </Link>
+                                </Link>
                         </div>
                     </CardContent>
                 </Card>

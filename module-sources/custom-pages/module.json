@@ -2,7 +2,7 @@
   "id": "custom-pages",
   "name": "Custom Pages",
   "description": "Admin-created HTML content pages",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "coreVersion": "^1.21.0",
   "category": "content",
   "author": "uxwVend",

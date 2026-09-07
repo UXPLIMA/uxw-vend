@@ -5,7 +5,7 @@ import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button, Textarea } from "@/core/sdk/ui";
+import { Button, Textarea, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -117,9 +117,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                 <main className="container mx-auto px-4 py-6 flex-1">
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-muted-foreground mb-4">{t("loginToView")}</p>
-                        <Link href="/auth/login">
-                            <Button>{t("login")}</Button>
-                        </Link>
+                        <Link href="/auth/login" className={buttonClassName("default", "default")}>{t("login")}</Link>
                     </div>
                 </main>
                 <Footer />
@@ -149,9 +147,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                 ) : error ? (
                     <div className="bg-card rounded-xl p-8 text-center">
                         <p className="text-destructive mb-4">{error}</p>
-                        <Link href="/support">
-                            <Button variant="outline">{t("backToSupport")}</Button>
-                        </Link>
+                        <Link href="/support" className={buttonClassName("outline", "default")}>{t("backToSupport")}</Link>
                     </div>
                 ) : ticket ? (
                     <StandardSidebarLayout sidebar={(

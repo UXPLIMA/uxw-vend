@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, NativeSelect, RichContent, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, NativeSelect, RichContent, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { useParams, usePathname } from "next/navigation";
@@ -196,11 +196,9 @@ export default function ProductDetailPage() {
                 <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold text-foreground mb-4">{t('productNotFound')}</h1>
-                        <Link href="/store">
-                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Link href="/store" className={buttonClassName("default", "default", "bg-primary hover:bg-primary/90 text-primary-foreground")}>
                                 {t('backToStore')}
-                            </Button>
-                        </Link>
+                            </Link>
                     </div>
                 </main>
                 <Footer />

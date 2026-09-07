@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import * as LucideIcons from "lucide-react";
@@ -289,9 +289,7 @@ export default function CartPage() {
                             <p className="text-muted-foreground mb-6">
                                 {t('cartEmptyDesc')}
                             </p>
-                            <Link href="/store">
-                                <Button>{t('browseStore')}</Button>
-                            </Link>
+                            <Link href="/store" className={buttonClassName("default", "default")}>{t('browseStore')}</Link>
                         </CardContent>
                     </Card>
                 ) : (

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-07",
-  "updatedAt": "2026-09-07T11:13:50Z",
+  "updatedAt": "2026-09-07T12:40:41Z",
   "modules": [
     {
       "id": "announcements",
@@ -122,13 +122,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T18:40:16Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -509,13 +509,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.34",
+      "version": "1.0.35",
       "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -549,13 +549,13 @@
           "description": "Yöneticinin oluşturduğu HTML içerik sayfaları"
         }
       },
-      "version": "1.0.24",
+      "version": "1.0.25",
       "coreVersion": "^1.21.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T01:46:15Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -875,13 +875,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.1.25",
+      "version": "1.1.26",
       "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T07:15:04Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1022,13 +1022,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^1.21.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T09:47:46Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1286,13 +1286,13 @@
           "description": "Dijital ürünler için lisans anahtarı üretin, teslim edin ve etkinleştirin; anahtar başına makine sınırı ile"
         }
       },
-      "version": "1.0.14",
+      "version": "1.0.15",
       "coreVersion": "^1.2.0",
       "author": "uxwVend",
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-07T10:16:42Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2001,13 +2001,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.1.0",
+      "version": "1.1.1",
       "coreVersion": "^1.24.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-06T09:47:46Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2229,13 +2229,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T10:37:06Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2441,13 +2441,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.4.4",
+      "version": "2.4.5",
       "coreVersion": "^1.26.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-07T11:13:50Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2579,13 +2579,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.0.39",
+      "version": "1.0.40",
       "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2654,13 +2654,13 @@
           "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
         }
       },
-      "version": "1.1.0",
+      "version": "1.1.1",
       "coreVersion": "^1.25.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-06T08:05:31Z",
+      "updatedAt": "2026-09-07T12:40:41Z",
       "screenshots": [],
       "tags": [
         "community"

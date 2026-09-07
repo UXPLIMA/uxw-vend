@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, CheckboxField, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Pagination, usePagedRows, useConfirm, useFormRoute, CheckboxField, Textarea, buttonClassName } from "@/core/sdk/ui";
 import { ArrowLeft, Plus, Pencil, Trash2, Loader2, Search, Globe, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
@@ -358,9 +358,7 @@ export default function SeoPageOverridesPage() {
                 backHref="/admin/seo"
                 backLabel={commonT("back")}
                 actions={
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_addPage")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_addPage")}</Link>
                 }
             />
 
@@ -371,9 +369,7 @@ export default function SeoPageOverridesPage() {
                         <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-lg font-medium text-foreground mb-1">{t("adm_noPageSeo")}</p>
                         <p className="text-sm text-muted-foreground mb-6">{t("adm_noPageSeoDesc")}</p>
-                        <Link href={formHref()} className="inline-flex">
-                            <Button><Plus className="w-4 h-4" /> {t("adm_addPage")}</Button>
-                        </Link>
+                        <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_addPage")}</Link>
                     </CardContent>
                 </Card>
             ) : (

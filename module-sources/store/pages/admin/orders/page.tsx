@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminOrderStatusKeys, orderStatusLabel } from "../../../lib/order-status";
@@ -156,9 +156,7 @@ export default function AdminOrdersPage() {
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4 text-right">
-                                                <Link href={`/admin/store/orders/${order.id}`}>
-                                                    <Button variant="ghost" size="sm">{t("adm_view")}</Button>
-                                                </Link>
+                                                <Link href={`/admin/store/orders/${order.id}`} className={buttonClassName("ghost", "sm")}>{t("adm_view")}</Link>
                                             </td>
                                         </tr>
                                     ))}

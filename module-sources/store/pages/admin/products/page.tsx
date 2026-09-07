@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Loader2, ChevronLeft, ChevronRight, Package, Plus } from "lucide-react";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
@@ -61,9 +61,7 @@ export default function AdminProductsPage() {
                 title={t("adm_products")}
                 description={t("adm_productsTotal", { count: total })}
                 actions={<>
-                    <Link href="/admin/store/products/new">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_addProduct")}</Button>
-                    </Link>
+                    <Link href="/admin/store/products/new" className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_addProduct")}</Link>
                 </>}
             />
 
@@ -80,9 +78,7 @@ export default function AdminProductsPage() {
                         <div className="text-center py-12">
                             <Package className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
                             <p className="text-muted-foreground">{t("adm_noProductsYet")}</p>
-                            <Link href="/admin/store/products/new">
-                                <Button className="mt-4">{t("adm_createFirstProduct")}</Button>
-                            </Link>
+                            <Link href="/admin/store/products/new" className={buttonClassName("default", "default", "mt-4")}>{t("adm_createFirstProduct")}</Link>
                         </div>
                     ) : (
                         <>
@@ -143,9 +139,7 @@ export default function AdminProductsPage() {
                                                     )}
                                                 </td>
                                                 <td className="py-3 px-4 text-right">
-                                                    <Link href={`/admin/store/products/${product.id}/edit`}>
-                                                        <Button variant="ghost" size="sm">{t("adm_edit")}</Button>
-                                                    </Link>
+                                                    <Link href={`/admin/store/products/${product.id}/edit`} className={buttonClassName("ghost", "sm")}>{t("adm_edit")}</Link>
                                                 </td>
                                             </tr>
                                         ))}

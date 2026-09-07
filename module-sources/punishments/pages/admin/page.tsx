@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, RotateCcw, Ban } from "lucide-react";
 import { toast } from "sonner";
@@ -215,11 +215,9 @@ export default function AdminPunishmentsPage() {
                 title={t("adm_title")}
                 description={t("adm_subtitle")}
                 actions={
-                    <Link href={formHref()} className="inline-flex">
-                        <Button>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t("adm_newPunishment")}
-                        </Button>
-                    </Link>
+                        </Link>
                 }
             />
 

@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed, buttonClassName } from "@/core/sdk/ui";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { adminKeys, labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -233,9 +233,7 @@ export default function AdminTicketsPage() {
                                         {relativeTime(ticket.updatedAt)}
                                     </td>
                                     <td className="px-4 py-4">
-                                        <Link href={`/admin/tickets/${ticket.id}`}>
-                                            <Button size="sm" variant="ghost">{t("adm_view")}</Button>
-                                        </Link>
+                                        <Link href={`/admin/tickets/${ticket.id}`} className={buttonClassName("ghost", "sm")}>{t("adm_view")}</Link>
                                     </td>
                                 </tr>
                             ))}

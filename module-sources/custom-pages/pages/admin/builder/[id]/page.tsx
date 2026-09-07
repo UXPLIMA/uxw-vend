@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button } from "@/core/sdk/ui";
+import { Button, buttonClassName } from "@/core/sdk/ui";
 import { useMergedBlockConfig } from "@/core/sdk/blocks";
 import { Puck, type Data } from "@measured/puck";
 import "@measured/puck/puck.css";
@@ -115,8 +115,12 @@ export default function PageBuilderPage(props: PageProps) {
         <div className="fixed inset-0 z-30 flex flex-col bg-background lg:left-64">
             {/* Top bar */}
             <div className="flex items-center gap-4 px-4 py-3 border-b border-border flex-shrink-0">
-                <Link href="/admin/custom-pages">
-                    <Button aria-label={commonT("back")} variant="ghost" size="icon"><ArrowLeft className="w-4 h-4" /></Button>
+                <Link
+                    href="/admin/custom-pages"
+                    aria-label={commonT("back")}
+                    className={buttonClassName("ghost", "icon")}
+                >
+                    <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <div className="flex-1 min-w-0">
                     <h1 className="font-bold truncate">{pageTitle}</h1>

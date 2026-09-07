@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed, Skeleton } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, Skeleton, buttonClassName } from "@/core/sdk/ui";
 import { Footer, Navbar } from "@/core/sdk/layout";
 import { ThemeComponentSlot } from "@/core/sdk/theme";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
@@ -102,11 +102,9 @@ export default function ForumPage() {
                         <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
                         <p className="text-muted-foreground text-sm">{t('communityDiscussions')}</p>
                     </div>
-                    <Link href="/forum/new">
-                        <Button>
+                    <Link href="/forum/new" className={buttonClassName("default", "default")}>
                             <Plus className="w-4 h-4" /> {t('newTopic')}
-                        </Button>
-                    </Link>
+                        </Link>
                 </div>
 
                 {/* Search */}
@@ -183,9 +181,7 @@ export default function ForumPage() {
                                 <CardContent className="py-12 text-center">
                                     <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                                     <p className="text-muted-foreground mb-4">{t('noTopics')}</p>
-                                    <Link href="/forum/new">
-                                        <Button>{t('createTopic')}</Button>
-                                    </Link>
+                                    <Link href="/forum/new" className={buttonClassName("default", "default")}>{t('createTopic')}</Link>
                                 </CardContent>
                             </Card>
                         ) : (

@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, Pagination, useConfirm, useFormRoute, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus, Trash2, Gift, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -158,9 +158,7 @@ export default function GiftCodesPage() {
                 title={t("adm_giftCodes")}
                 description={t("adm_codesTotal", { total: codes.length, available: codes.filter(c => !c.isRedeemed).length })}
                 actions={<>
-                    <Link href={formHref()} className="inline-flex">
-                        <Button><Plus className="w-4 h-4" /> {t("adm_generate")}</Button>
-                    </Link>
+                    <Link href={formHref()} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_generate")}</Link>
                 </>}
             />
 

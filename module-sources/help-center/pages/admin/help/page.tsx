@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect, useFormRoute } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect, useFormRoute, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
@@ -299,13 +299,9 @@ export default function AdminHelpCenterPage() {
                        tabs, so the same "new X" control was in a different
                        place here than anywhere else in the panel. */
                     activeTab === "articles" ? (
-                        <Link href={formHref("article")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4" /> {t("adm_newArticle")}</Button>
-                        </Link>
+                        <Link href={formHref("article")} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newArticle")}</Link>
                     ) : (
-                        <Link href={formHref("category")} className="inline-flex">
-                            <Button><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Button>
-                        </Link>
+                        <Link href={formHref("category")} className={buttonClassName("default", "default")}><Plus className="w-4 h-4" /> {t("adm_newCategory")}</Link>
                     )
                 }
             />

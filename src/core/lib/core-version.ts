@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.27.0 - `buttonClassName` joins `@/core/sdk/ui`, beside `Button` the way
+ * `badgeClassName` sits beside `Badge`. A control that navigates has to be an
+ * anchor, and forty module call sites were wrapping a `<Button>` in a `<Link>`
+ * instead, which renders `<a><button>`: forbidden by the HTML spec, two tab
+ * stops for one control, and the accessible name on the inner element where a
+ * screen reader announces the outer one. Core fixed its own with this function
+ * and a module could not reach it.
+ *
  * 1.26.0 - `sharedJson`, `peekShared` and `invalidateShared` join
  * `@/core/sdk`. A widget that fetches in an effect gets its own request, and
  * four store widgets wanting the same totals made fifteen of them on one
@@ -177,4 +185,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.26.0";
+export const CORE_API_VERSION = "1.27.0";

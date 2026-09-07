@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { Crown } from "lucide-react";
 
 interface Product {
@@ -46,11 +46,9 @@ export function FeaturedProductWidget() {
                 </div>
                 <h3 className="font-semibold text-foreground mb-1">{product.name}</h3>
                 <p className="text-primary font-bold text-lg mb-3">{formatPrice(product.price)}</p>
-                <Link href={`/store/product/${product.number}/${product.slug}`}>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "default", "w-full bg-primary hover:bg-primary/90 text-primary-foreground")}>
                         {sidebarT('viewDetails')}
-                    </Button>
-                </Link>
+                    </Link>
             </div>
         </div>
     );
