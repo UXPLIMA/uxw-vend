@@ -858,7 +858,8 @@
         "cart_decreaseQuantity": "Decrease quantity of {name}",
         "cart_increaseQuantity": "Increase quantity of {name}",
         "product_goToImage": "Go to image {n}",
-        "clearCartConfirm": "Everything in your cart will be removed. This cannot be undone."
+        "clearCartConfirm": "Everything in your cart will be removed. This cannot be undone.",
+        "adm_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1394,7 +1395,8 @@
         "cart_decreaseQuantity": "{name} adedini azalt",
         "cart_increaseQuantity": "{name} adedini artır",
         "product_goToImage": "{n}. görsele git",
-        "clearCartConfirm": "Sepetinizdeki her şey kaldırılacak. Bu işlem geri alınamaz."
+        "clearCartConfirm": "Sepetinizdeki her şey kaldırılacak. Bu işlem geri alınamaz.",
+        "adm_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
       },
       "cart": {
         "title": "Alışveriş Sepeti",

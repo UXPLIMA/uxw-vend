@@ -28,13 +28,21 @@ export default function ApiKeysPage() {
     const t = useTranslations("admin");
     const commonT = useTranslations("common");
     const [keys, setKeys] = useState<ApiKeyItem[]>([]);
+    // The endpoint stops at 500 rows and says when it did. Showing five
+    // hundred with nothing to mark the edge is the silence the ceiling was
+    // added to avoid.
+    const [truncated, setTruncated] = useState(false);
     const paged = usePagedRows(keys);
     const [loading, setLoading] = useState(true);
     const { confirm } = useConfirm();
 
     const fetchKeys = useCallback(async () => {
         const res = await fetch("/api/v1/api-keys");
-        if (res.ok) { const data = await res.json(); setKeys(data.keys || []); }
+        if (res.ok) {
+            const data = await res.json();
+            setKeys(data.keys || []);
+            setTruncated(Boolean(data.truncated));
+        }
         setLoading(false);
     }, []);
 
@@ -65,6 +73,12 @@ export default function ApiKeysPage() {
                     </Link>
                 </>}
             />
+
+            {truncated && (
+                <p role="status" className="mb-4 text-sm text-muted-foreground">
+                    {t("common_listTruncated")}
+                </p>
+            )}
 
             <Card>
                 <CardContent className="p-0">

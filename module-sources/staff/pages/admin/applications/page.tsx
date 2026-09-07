@@ -46,12 +46,18 @@ export default function StaffApplicationsPage() {
     const t = useTranslations("staff");
     const ask = usePrompt();
     const [apps, setApps] = useState<Application[]>([]);
+    // The endpoint stops at 500 rows and says when it did.
+    const [truncated, setTruncated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("");
 
     const fetchApps = async () => {
         const res = await fetch("/api/v1/staff-applications");
-        if (res.ok) { const data = await res.json(); setApps(data.applications || []); }
+        if (res.ok) {
+            const data = await res.json();
+            setApps(data.applications || []);
+            setTruncated(Boolean(data.truncated));
+        }
         setLoading(false);
     };
 
@@ -92,6 +98,12 @@ export default function StaffApplicationsPage() {
                 title={t("adm_staffApplications")}
                 description={t("adm_pendingReview", { count: apps.filter(a => a.status === "pending").length })}
             />
+
+            {truncated && (
+                <p role="status" className="mb-4 text-sm text-muted-foreground">
+                    {t("adm_listTruncated")}
+                </p>
+            )}
 
             <div className="flex gap-2 mb-6">
                 {[

@@ -35,6 +35,8 @@ export default function AdminCouponsPage() {
     const commonT = useTranslations("common");
     const { confirm } = useConfirm();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
+    // The endpoint stops at 500 rows and says when it did.
+    const [truncated, setTruncated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     // The editor is a screen at `?form=new` or `?form=<id>`, not a card above
@@ -62,6 +64,7 @@ export default function AdminCouponsPage() {
             if (res.ok) {
                 const data = await res.json();
                 setCoupons(data.coupons || []);
+                setTruncated(Boolean(data.truncated));
             }
         } catch (err) {
             console.error(err);
@@ -319,6 +322,12 @@ export default function AdminCouponsPage() {
                     </Link>
                 </>}
             />
+
+            {truncated && (
+                <p role="status" className="mb-4 text-sm text-muted-foreground">
+                    {t("adm_listTruncated")}
+                </p>
+            )}
 
             {/* Coupons List */}
             <Card>

@@ -138,7 +138,8 @@
         "adm_apps_accepted": "Accepted",
         "adm_apps_rejected": "Rejected",
         "subtitle": "The people behind the community",
-        "empty": "No staff members listed yet"
+        "empty": "No staff members listed yet",
+        "adm_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
       },
       "admin": {
         "menu_staff": "Staff",
@@ -222,7 +223,8 @@
         "adm_apps_accepted": "Kabul Edilen",
         "adm_apps_rejected": "Reddedilen",
         "subtitle": "Topluluğun arkasındaki ekip",
-        "empty": "Henüz ekip üyesi listelenmemiş"
+        "empty": "Henüz ekip üyesi listelenmemiş",
+        "adm_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
       },
       "admin": {
         "menu_staff": "Personel",

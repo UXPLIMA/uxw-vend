@@ -104,8 +104,7 @@
     "tickets": "Destek",
     "trophies": "Kupalar"
   },
-  "hero": {
-  },
+  "hero": {},
   "admin": {
     "activityLog_action": "İşlem",
     "activityLog_date": "Tarih",
@@ -1080,7 +1079,8 @@
     "widgets_saving": "Kaydediliyor...",
     "widgets_subtitle": "Ana sayfa kenar çubuğu bileşenlerinin görünürlüğünü ve sırasını ayarlayın",
     "widgets_title": "Kenar Çubuğu Bileşenleri",
-    "widgets_visible": "Görünür"
+    "widgets_visible": "Görünür",
+    "common_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

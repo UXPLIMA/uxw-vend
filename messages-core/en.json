@@ -104,8 +104,7 @@
     "tickets": "Support",
     "trophies": "Trophies"
   },
-  "hero": {
-  },
+  "hero": {},
   "admin": {
     "activityLog_action": "Action",
     "activityLog_date": "Date",
@@ -1080,7 +1079,8 @@
     "widgets_saving": "Saving...",
     "widgets_subtitle": "Toggle visibility and reorder homepage sidebar widgets",
     "widgets_title": "Sidebar Widgets",
-    "widgets_visible": "Visible"
+    "widgets_visible": "Visible",
+    "common_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
   },
   "footer": {
     "quickLinks": "Quick Links",
