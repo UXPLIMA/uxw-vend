@@ -4,7 +4,6 @@ import {
     formatCurrency,
     formatDate,
     formatRelativeTime,
-    generateId,
     slugify,
     generateSlug,
     truncate,
@@ -140,29 +139,6 @@ describe("formatRelativeTime", () => {
     it("localizes the relative phrase", () => {
         vi.setSystemTime(now);
         expect(formatRelativeTime(at(5 * 60_000), "tr")).toContain("dakika");
-    });
-});
-
-describe("generateId", () => {
-    it("defaults to 12 characters", () => {
-        expect(generateId()).toHaveLength(12);
-    });
-
-    it("honours an explicit length", () => {
-        expect(generateId(32)).toHaveLength(32);
-    });
-
-    it("returns an empty string for length zero", () => {
-        expect(generateId(0)).toBe("");
-    });
-
-    it("emits only alphanumerics", () => {
-        expect(generateId(200)).toMatch(/^[A-Za-z0-9]+$/);
-    });
-
-    it("does not repeat itself across calls", () => {
-        const seen = new Set(Array.from({ length: 50 }, () => generateId()));
-        expect(seen.size).toBe(50);
     });
 });
 

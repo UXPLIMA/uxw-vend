@@ -118,19 +118,6 @@ export function formatRelativeTime(date: Date | string, locale: string = "en"): 
 }
 
 /**
- * Generate a random string
- */
-export function generateId(length = 12): string {
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-}
-
-/**
  * Generate a slug from string
  */
 // Diacritic transliteration map. Turkish + common European diacritics go first
