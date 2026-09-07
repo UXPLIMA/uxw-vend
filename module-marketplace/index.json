@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-07",
-  "updatedAt": "2026-09-07T14:21:45Z",
+  "updatedAt": "2026-09-07T14:33:58Z",
   "modules": [
     {
       "id": "announcements",
@@ -875,13 +875,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.1.26",
+      "version": "1.1.27",
       "coreVersion": "^1.24.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-07T12:40:41Z",
+      "updatedAt": "2026-09-07T14:33:58Z",
       "screenshots": [],
       "tags": [
         "community"

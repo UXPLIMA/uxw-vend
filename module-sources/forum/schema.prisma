@@ -54,6 +54,12 @@ model ForumTopic {
   // carries the stats screen's date window.
   @@index([moderationState])
   @@index([createdAt])
+
+  // The front page reads pinned first, then newest, twenty at a time. A
+  // single-column index cannot serve a two-key sort, so `createdAt` alone left
+  // Postgres reading every topic and sorting them: 316 shared buffers against
+  // 4 on 4000 topics, and the whole table rather than the first twenty rows.
+  @@index([isPinned, createdAt])
 }
 
 model ForumPost {
