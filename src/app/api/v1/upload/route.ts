@@ -5,6 +5,8 @@ import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { uploadFile, UPLOAD_ALLOWED_MIME, UPLOAD_MAX_SIZE } from "@/core/lib/storage";
 import { prisma } from "@/core/lib/db";
 import { log } from "@/core/lib/logger";
+import { resolveUploadPath } from "@/core/lib/uploads-path";
+import fs from "node:fs/promises";
 
 /**
  * POST /api/v1/upload
@@ -64,7 +66,11 @@ export async function POST(request: NextRequest) {
     try {
         const result = await uploadFile(buffer, blob.name, blob.type);
 
-        // Record in the central media library
+        // The file and its library entry are one act. Recorded separately,
+        // a failure here used to be logged and the upload reported as a
+        // success, which left a file under public/uploads that the media
+        // screen cannot show and the delete endpoint cannot reach - served
+        // forever, by nothing's decision.
         try {
             await prisma.mediaItem.create({
                 data: {
@@ -77,7 +83,31 @@ export async function POST(request: NextRequest) {
                 },
             });
         } catch (err) {
-            log.error("[upload] Failed to record media library entry", { error: err instanceof Error ? err.message : String(err) });
+            const onDisk = resolveUploadPath(result.url);
+            if (!onDisk) {
+                // A bucket is not ours to delete from: StorageProvider
+                // declares `upload` and nothing else. Reporting failure would
+                // leave the object there and send the operator to upload a
+                // second copy of it, so the upload stands and the gap is named.
+                log.warn("[upload] Stored a file the media library has no entry for", {
+                    url: result.url,
+                    error: err instanceof Error ? err.message : String(err),
+                });
+                return NextResponse.json(result);
+            }
+
+            log.error("[upload] Failed to record media library entry, removing the file", {
+                error: err instanceof Error ? err.message : String(err),
+            });
+            await fs.unlink(onDisk).catch((unlinkErr: unknown) => {
+                log.error("[upload] Could not remove the file either", {
+                    error: unlinkErr instanceof Error ? unlinkErr.message : String(unlinkErr),
+                });
+            });
+            return NextResponse.json(
+                { error: "The upload could not be saved. Try again." },
+                { status: 500 },
+            );
         }
 
         return NextResponse.json(result);
