@@ -211,7 +211,18 @@ export async function sendHealthWebhook(
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
             signal: AbortSignal.timeout(5000),
+            // validateWebhookUrl only ever sees the URL an admin typed. Left to
+            // itself fetch follows up to twenty redirects, so a public host
+            // answering `302 Location: http://127.0.0.1:3101/` moves the
+            // request somewhere the check never looked - and a 302 turns the
+            // POST into a GET, which is the shape that reaches an internal
+            // service. No webhook receiver worth sending to redirects, so
+            // refusing costs nothing and closes the second hop.
+            redirect: "manual",
         });
+        if (res.status >= 300 && res.status < 400) {
+            return { ok: false, error: "Webhook URL redirected, which is not followed" };
+        }
         if (!res.ok) {
             return { ok: false, error: `HTTP ${res.status}` };
         }

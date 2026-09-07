@@ -249,6 +249,28 @@ describe("sendHealthWebhook", () => {
         expect(webhookCalls()).toHaveLength(0);
     });
 
+    // validateWebhookUrl only ever sees the URL an admin typed. A public host
+    // that answers 302 with `Location: http://127.0.0.1:3101/...` moves the
+    // request somewhere the validator never looked, and fetch follows up to
+    // twenty of those by default. Measured directly: a default fetch at a
+    // redirecting host reaches the internal service; with `redirect: "manual"`
+    // it stops at the 302.
+    it("does not let the platform follow a redirect the validator never saw", async () => {
+        await sendHealthWebhook(config, { a: 1 }, GENERIC_CHANNEL);
+
+        expect(webhookCalls()[0]!.init?.redirect).toBe("manual");
+    });
+
+    it("treats a redirect as a refusal rather than a delivery", async () => {
+        webhookStatus = 302;
+
+        await expect(sendHealthWebhook(config, {}, GENERIC_CHANNEL))
+            .resolves.toEqual({
+                ok: false,
+                error: "Webhook URL redirected, which is not followed",
+            });
+    });
+
     it("reports a non-2xx response as a failure", async () => {
         webhookStatus = 500;
         await expect(sendHealthWebhook(config, {}, GENERIC_CHANNEL))
