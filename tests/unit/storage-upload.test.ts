@@ -37,6 +37,13 @@ vi.mock("@/core/lib/db", () => ({
     },
 }));
 
+const { logWarn } = vi.hoisted(() => ({ logWarn: vi.fn() }));
+
+vi.mock("@/core/lib/logger", () => ({
+    errorText: (e: unknown) => (e instanceof Error ? e.message : String(e)),
+    log: { debug: vi.fn(), info: vi.fn(), warn: logWarn, error: vi.fn() },
+}));
+
 let registry: Record<string, () => Promise<unknown>>;
 let registryImportThrows = false;
 
@@ -373,5 +380,59 @@ describe("storage provider resolution", () => {
         settingRow = { value: 42 };
 
         expect(await uploadOnce()).toMatchObject({ path: expect.stringContaining("public/uploads/") });
+    });
+});
+
+/**
+ * The provider that was configured and is no longer there.
+ *
+ * `resolveActiveProvider` falls back to the local filesystem three ways: the
+ * setting cannot be read, the configured id is not in the registry, or the
+ * module fails to load. All three were silent, and the fallback itself is
+ * right - an upload must not fail because a module was switched off.
+ *
+ * What was missing is the sentence. An operator who set up R2 months ago and
+ * has since disabled the module keeps uploading, and the files land on local
+ * disk instead: half the media library in a bucket, half beside the app, and
+ * nothing anywhere saying when the split began. It is the shape of the backup
+ * job that reported ok while never once producing a backup.
+ */
+describe("falling back to local storage", () => {
+    async function uploadOnce() {
+        const { uploadFile } = await load();
+        return uploadFile(png(), "a.png", "image/png");
+    }
+
+    beforeEach(() => {
+        logWarn.mockClear();
+    });
+
+    it("says so when the configured provider is not registered", async () => {
+        registry = {};
+        settingRow = { value: "cloudflare-r2" };
+
+        await uploadOnce();
+
+        expect(logWarn).toHaveBeenCalled();
+        const [message, meta] = logWarn.mock.calls[0] as [string, Record<string, unknown>];
+        expect(`${message} ${JSON.stringify(meta ?? {})}`).toContain("cloudflare-r2");
+    });
+
+    it("says so when the module cannot be loaded at all", async () => {
+        registryImportThrows = true;
+        settingRow = { value: "cloudflare-r2" };
+
+        await uploadOnce();
+
+        expect(logWarn, "an uninstall that takes the registry with it is the loudest case").toHaveBeenCalled();
+    });
+
+    it("says nothing when local is what was asked for", async () => {
+        registry = {};
+        settingRow = null;
+
+        await uploadOnce();
+
+        expect(logWarn, "the default is not a fallback").not.toHaveBeenCalled();
     });
 });

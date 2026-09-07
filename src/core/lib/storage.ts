@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { errorText, log } from "./logger";
 import path from "path";
 import crypto from "crypto";
 import { prisma } from "@/core/lib/db";
@@ -108,8 +109,13 @@ async function resolveActiveProvider(): Promise<StorageProvider> {
         } else if (setting && setting.value && typeof setting.value === "object") {
             providerId = (setting.value as { id?: string }).id || null;
         }
-    } catch {
-        // ignore - fall through to env / local
+    } catch (err) {
+        // The setting is unreadable, which is a database problem rather than a
+        // configuration one, so the upload still goes to local disk - but an
+        // operator who has a bucket configured needs to know it was not used.
+        log.warn("storage provider setting could not be read, falling back", {
+            error: errorText(err),
+        });
     }
 
     if (!providerId) {
@@ -120,13 +126,31 @@ async function resolveActiveProvider(): Promise<StorageProvider> {
         return localStorageProvider;
     }
 
+    // Falling back is right: an upload must not fail because a module was
+    // switched off. Doing it silently is not. An operator who set up a bucket
+    // months ago and has since disabled the module keeps uploading, and the
+    // files land on local disk instead, so half the media library sits in one
+    // place and half in the other with nothing saying when the split began.
     try {
         const { StorageProviderRegistry } = await import("@/core/generated/module-storage");
         const loader = (StorageProviderRegistry as Record<string, () => Promise<StorageProvider>>)[providerId];
-        if (!loader) return localStorageProvider;
+        if (!loader) {
+            log.warn("storage provider is configured but not registered, using local disk", {
+                providerId,
+            });
+            return localStorageProvider;
+        }
         const provider = await loader();
-        return provider || localStorageProvider;
-    } catch {
+        if (!provider) {
+            log.warn("storage provider loaded as nothing, using local disk", { providerId });
+            return localStorageProvider;
+        }
+        return provider;
+    } catch (err) {
+        log.warn("storage provider could not be loaded, using local disk", {
+            providerId,
+            error: errorText(err),
+        });
         return localStorageProvider;
     }
 }
