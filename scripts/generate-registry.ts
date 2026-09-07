@@ -423,6 +423,15 @@ function generateRegistry() {
     }
 
     const AUTH_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-auth-providers.ts');
+    // The same declarations with none of the imports.
+    //
+    // `module-auth-providers.ts` has to import every provider it can build, so
+    // anything reading it drags next-auth's whole provider surface and each
+    // module's own provider file in with it - which is a cycle for a route that
+    // only wants to know which ids exist, and answered 500 with "Cannot access
+    // 'ModuleAuthProviders' before initialization". The data is data; this file
+    // is the half of it that imports nothing.
+    const AUTH_DECLARATIONS_FILE = path.join(path.dirname(OUTPUT_FILE), 'module-auth-declarations.ts');
     let authContent = '// Auto-generated Auth.js provider registry - server only\n';
     authContent += '// Core names no OAuth provider. Every entry here comes from an installed\n';
     authContent += "// module's `authProviders` manifest declaration, and only activates once\n";
@@ -430,6 +439,15 @@ function generateRegistry() {
     if (authProviderImports.length > 0) authContent += `${authProviderImports.join('\n')}\n`;
     authContent += '\n';
     authContent += `export const ModuleAuthProviders: { id: string; envIdVar?: string; envSecretVar?: string; factory?: string; standardCallback?: boolean; envVars?: string[]; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n\n`;
+    const declarationsContent =
+        '// AUTO-GENERATED. Do not edit.\n' +
+        '//\n' +
+        '// What each installed module declared about its auth provider, with no\n' +
+        '// imports: a reader that only needs the ids and the env vars they want\n' +
+        '// must not pull every provider next-auth ships in behind them.\n\n' +
+        `export const ModuleAuthDeclarations: { id: string; envIdVar?: string; envSecretVar?: string; factory?: string; standardCallback?: boolean; envVars?: string[]; module: string }[] = ${JSON.stringify(safeAuthProviders, null, 2)};\n`;
+    fs.writeFileSync(AUTH_DECLARATIONS_FILE, declarationsContent);
+
     authContent += '// Providers Auth.js ships. Each one takes a client id and secret and\n';
     authContent += '// nothing else.\n';
     authContent += 'export const ModuleAuthProviderFactories: Record<string, (config: {\n';

@@ -77,6 +77,41 @@ interface ModuleProviderConfig {
 export type ProviderFactory = (config: BuiltInProviderConfig) => unknown;
 export type ModuleProviderFactory = (config: ModuleProviderConfig) => unknown;
 
+/**
+ * Is this declaration backed by credentials on this install?
+ *
+ * Two shapes, because there are two kinds of provider: one the module builds
+ * itself out of the variables it names, one next-auth ships and which takes
+ * the usual id and secret pair. A declaration that names no variables at all
+ * cannot be told apart from an unconfigured one, so it counts as not ready -
+ * which is how the resolver has always read it.
+ */
+function isConfigured(declared: DeclaredAuthProvider, env: Record<string, string | undefined>): boolean {
+    if (declared.factory) {
+        const names = declared.envVars ?? [];
+        return names.length > 0 && names.every((name) => Boolean(env[name]));
+    }
+    const clientId = declared.envIdVar ? env[declared.envIdVar] : undefined;
+    const clientSecret = declared.envSecretVar ? env[declared.envSecretVar] : undefined;
+    return Boolean(clientId && clientSecret);
+}
+
+/**
+ * The ids a site can actually sign somebody in with, in declaration order.
+ *
+ * The login page renders a button per installed provider module, and until
+ * this existed it had no way to ask which of them would work: Auth.js builds
+ * its configuration at module load, so a provider with no credentials is never
+ * built and its button leads to an error page. One definition of "configured",
+ * used by the resolver below and by the endpoint the page asks.
+ */
+export function configuredProviderIds(
+    declarations: DeclaredAuthProvider[],
+    env: Record<string, string | undefined>,
+): string[] {
+    return declarations.filter((declared) => isConfigured(declared, env)).map((declared) => declared.id);
+}
+
 export interface ResolveAuthProvidersOptions {
     /** Statically imported Auth.js provider constructors, keyed by provider id. */
     factories: Record<string, ProviderFactory | undefined>;
@@ -111,22 +146,18 @@ export function resolveAuthProviders(
     };
 
     for (const declared of declarations) {
+        // Not configured on this install is the normal state for a module
+        // whose credentials the admin has not filled in, and it is silent.
+        // `configuredProviderIds` above answers the same question for the
+        // endpoint the login page reads, so the page cannot offer a button
+        // this loop skipped.
+        if (!isConfigured(declared, env)) continue;
+
         if (declared.factory) {
-            const names = declared.envVars ?? [];
             const values: Record<string, string> = {};
-            let configured = names.length > 0;
-            for (const name of names) {
-                const value = env[name];
-                // Not configured on this install: stay silent, this is the
-                // normal state for a module whose credentials the admin has
-                // not filled in.
-                if (!value) {
-                    configured = false;
-                    break;
-                }
-                values[name] = value;
+            for (const name of declared.envVars ?? []) {
+                values[name] = env[name] as string;
             }
-            if (!configured) continue;
 
             const factory = moduleFactories[declared.id];
             if (typeof factory !== "function") {
@@ -145,9 +176,8 @@ export function resolveAuthProviders(
             continue;
         }
 
-        const clientId = declared.envIdVar ? env[declared.envIdVar] : undefined;
-        const clientSecret = declared.envSecretVar ? env[declared.envSecretVar] : undefined;
-        if (!clientId || !clientSecret) continue;
+        const clientId = env[declared.envIdVar as string] as string;
+        const clientSecret = env[declared.envSecretVar as string] as string;
 
         const factory = factories[declared.id];
         if (typeof factory !== "function") {

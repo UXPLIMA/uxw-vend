@@ -43,8 +43,25 @@ export default function LoginPage() {
     const [remember, setRemember] = useState(false);
     const [isDemo, setIsDemo] = useState(false);
     const allModules = useAllModules();
-    const oauthButtons = ModuleOauthButtons.filter(b => isEnabledIn(allModules, b.module));
+    // Which providers this install can actually sign somebody in with. A
+    // module being installed puts a button here; having credentials is what
+    // makes the button work, and Auth.js decides that at module load, so the
+    // page has to ask. `null` means "not asked yet", which shows nothing -
+    // buttons that appear and then vanish are worse than buttons that arrive.
+    const [configuredProviders, setConfiguredProviders] = useState<string[] | null>(null);
+    const oauthButtons = ModuleOauthButtons.filter(
+        (b) => isEnabledIn(allModules, b.module) && (configuredProviders?.includes(b.provider) ?? false),
+    );
     const [twoFactorCode, setTwoFactorCode] = useState("");
+
+    useEffect(() => {
+        fetch("/api/v1/auth/providers")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d: { providers?: unknown } | null) => {
+                setConfiguredProviders(Array.isArray(d?.providers) ? (d.providers as string[]) : []);
+            })
+            .catch(() => setConfiguredProviders([]));
+    }, []);
 
     useEffect(() => {
         fetch("/api/v1/public-settings")
