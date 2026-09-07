@@ -234,6 +234,7 @@
       "component": "pages/admin/gift-codes/page.tsx"
     }
   ],
+  "seoRoutes": { "handler": "seo/sitemap.ts" },
   "api": [
     {
       "path": "/store/cart",

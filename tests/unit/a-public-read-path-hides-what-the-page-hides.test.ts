@@ -207,6 +207,15 @@ const SITEMAPS = [
         },
         reason: "an article taken down is not announced",
     },
+    {
+        module: "store",
+        model: "product",
+        load: load(sitemapBuilders, "store"),
+        expect: (json: string) => {
+            expect(json).toContain('"isActive":true');
+        },
+        reason: "a product taken off the shelf is not announced",
+    },
 ] as const;
 
 describe("a sitemap announces only what its public page would", () => {
