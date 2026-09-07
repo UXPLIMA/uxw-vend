@@ -37,7 +37,7 @@ export default async function search(q: string): Promise<SearchResult[]> {
             type: "product",
             title: r.name,
             excerpt: r.shortDesc ?? undefined,
-            href: `/store/${r.slug}`,
+            href: `/store/product/${r.slug}`,
             image: r.image ?? undefined,
         }));
     } catch (err) {
@@ -66,7 +66,7 @@ export default async function search(q: string): Promise<SearchResult[]> {
             type: "product",
             title: r.name,
             excerpt: r.shortDesc ?? undefined,
-            href: `/store/${r.slug}`,
+            href: `/store/product/${r.slug}`,
             image: r.image ?? undefined,
         }));
     }
