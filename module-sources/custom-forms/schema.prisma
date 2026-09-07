@@ -30,4 +30,7 @@ model CustomFormSubmission {
   // are valid). Stale userIds become harmless dangling pointers after the
   // user is deleted.
   @@index([formId])
+  // The admin list is every submission, newest first, a page at a time,
+  // with nothing narrowing it. Additive: formId is still its own lookup.
+  @@index([createdAt])
 }

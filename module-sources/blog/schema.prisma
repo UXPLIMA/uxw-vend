@@ -73,7 +73,9 @@ model BlogComment {
   authorId  String?
   author    User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
-  @@index([articleId])
+  // Read as "the comments under this article, newest first". The leading
+  // column still answers a plain articleId lookup.
+  @@index([articleId, createdAt])
   @@index([authorId])
 
   // The moderation queue counts and lists PENDING rows on every load of the

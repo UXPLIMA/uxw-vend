@@ -288,7 +288,10 @@ model CreditTransaction {
   description String?
   createdAt   DateTime @default(now())
 
-  @@index([userId])
+  // Read as "this member's ledger, newest first, twenty at a time". The
+  // leading column still answers a plain userId lookup, so this replaces the
+  // single column index rather than joining it.
+  @@index([userId, createdAt])
 }
 
 model CreatorCode {
