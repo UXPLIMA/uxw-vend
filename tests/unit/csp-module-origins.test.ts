@@ -81,7 +81,6 @@ describe("core's content security policy", () => {
             "https://static.cloudflareinsights.com",
             "https://fonts.googleapis.com",
             "https://fonts.gstatic.com",
-            "https://rsms.me",
         ]);
         const named = [...csp.matchAll(/https:\/\/[a-z0-9.-]+/g)].map((m) => m[0]);
         expect(named.filter((o) => !allowed.has(o))).toEqual([]);

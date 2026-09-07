@@ -122,12 +122,15 @@ const nextConfig: NextConfig = {
       // injects when Web Analytics is enabled for the zone; without it
       // the browser logs a CSP violation on every page load.
       directive('script-src', `'self'`, `'unsafe-inline'`, ...(unsafeEval ? [`'unsafe-eval'`] : []), 'https://static.cloudflareinsights.com'),
-      // @measured/puck's CSS pulls Inter from rsms.me (external @import in
-      // its bundled stylesheet). Whitelist that origin for both the sheet
-      // itself (style-src) and the @font-face URLs it references (font-src).
-      directive('style-src', `'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com', 'https://rsms.me'),
+      // No third party stylesheet is fetched at runtime any more.
+      // @measured/puck's CSS opens with an @import for Inter from rsms.me,
+      // which scripts/postcss-drop-remote-imports.mjs removes on the way
+      // through; this app self hosts Inter through next/font. The origin is
+      // no longer named here, so if that ever stops working the browser
+      // refuses the request rather than quietly making it.
+      directive('style-src', `'self'`, `'unsafe-inline'`, 'https://fonts.googleapis.com'),
       directive('img-src', `'self'`, 'data:', 'blob:', 'https:'),
-      directive('font-src', `'self'`, 'https://fonts.gstatic.com', 'https://rsms.me', 'data:'),
+      directive('font-src', `'self'`, 'https://fonts.gstatic.com', 'data:'),
       // The dev HMR socket is ws:// whenever the app is served over plain
       // HTTP, which wss: alone does not cover.
       directive('connect-src', `'self'`, 'https:', 'wss:', ...(isDev ? ['ws:'] : [])),
