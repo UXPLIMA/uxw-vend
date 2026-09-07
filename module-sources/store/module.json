@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "coreVersion": "^1.26.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -234,7 +234,9 @@
       "component": "pages/admin/gift-codes/page.tsx"
     }
   ],
-  "seoRoutes": { "handler": "seo/sitemap.ts" },
+  "seoRoutes": {
+    "handler": "seo/sitemap.ts"
+  },
   "api": [
     {
       "path": "/store/cart",

@@ -25,8 +25,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             },
         });
 
-        if (!product) {
-            return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        const notFound = () =>
+            NextResponse.json({ error: "Product not found" }, { status: 404 });
+
+        if (!product) return notFound();
+
+        // A switched-off product is not on the shelf, and this route answers by
+        // `number` as well as by id and slug - a sequential integer, so walking
+        // 1, 2, 3 read every product the listing was careful to hide. It answers
+        // exactly as it does for a product that never existed, so the 404 says
+        // nothing about which of the two it is.
+        //
+        // The administrator exception is not a loophole: the edit screen loads a
+        // product from this endpoint, and the one an operator most needs to open
+        // is the one they just switched off. The check runs only when the
+        // product is off, so the page a visitor actually asks for does not pay
+        // for a session lookup it never needs.
+        if (!product.isActive) {
+            const session = await auth();
+            const viewerIsAdmin = session?.user?.id ? await isAdmin(session.user.id) : false;
+            if (!viewerIsAdmin) return notFound();
         }
 
         return NextResponse.json({ product });
