@@ -1,3 +1,30 @@
+/**
+ * What a module is allowed to say about itself.
+ *
+ * A manifest arrives in a ZIP from outside, so this is a trust boundary
+ * rather than a convenience: every route it wants mounted, every API handler,
+ * every hook, block, widget and translation is described here first and
+ * checked before anything is written to disk or added to a registry. A field
+ * this file does not name does not exist as far as the platform is concerned.
+ *
+ * Use it as one call:
+ *
+ *     const parsed = moduleManifestSchema.safeParse(json);
+ *     if (!parsed.success) reject(parsed.error.issues);
+ *
+ * Everything above `moduleManifestSchema` is a piece of that one grammar and
+ * is deliberately not exported. Depends on `zod` and on `semver-range` for the
+ * compatibility ranges a module declares.
+ *
+ * ## Why this is one file
+ *
+ * It is past the 700 line mark the house rules ask about. The thirty odd
+ * schemas here are not thirty subjects: they are the clauses of a single
+ * declaration, they are read top to bottom the way the manifest is written,
+ * and every consumer imports the composed schema and nothing else. Adding a
+ * manifest field touches its clause and the composition together, which is
+ * the case the rule names for keeping a file whole.
+ */
 import { z } from "zod";
 import { isValidRange } from "./semver-range";
 
