@@ -120,7 +120,15 @@ export default async function RootLayout({
     : "";
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    // The font variables belong on `html`, not on `body`: a custom property
+    // is substituted on the element that declares it, and the theme tokens
+    // are declared on `[data-theme][data-mode]`, which is this element. On
+    // `body` a token could name `var(--font-inter)` and get nothing.
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
           try { if (localStorage.getItem('color-mode') === 'dark') document.documentElement.setAttribute('data-mode', 'dark'); } catch {}
@@ -132,9 +140,7 @@ export default async function RootLayout({
         {overrideCss && <style dangerouslySetInnerHTML={{ __html: overrideCss }} />}
         <ServerSlot name="head.extra" moduleStates={moduleStates} />
       </head>
-      <body
-        className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-background`}
-      >
+      <body className="antialiased bg-background">
         <SessionProvider session={session}>
           <NextIntlClientProvider messages={publicMessages(messages)}>
               <AppThemeProvider themeId={active.themeId} mode={active.mode} serverConfig={active.settings}>

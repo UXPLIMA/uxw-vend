@@ -23,9 +23,9 @@
   --uxw-color-successForeground: #ffffff;
   --uxw-color-warning: #b45309;
   --uxw-color-warningForeground: #ffffff;
-  --uxw-font-heading: Inter, system-ui, sans-serif;
-  --uxw-font-body: Inter, system-ui, sans-serif;
-  --uxw-font-mono: ui-monospace, SFMono-Regular, monospace;
+  --uxw-font-heading: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  --uxw-font-body: var(--font-inter), system-ui, sans-serif;
+  --uxw-font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
   --uxw-radius: 0.5rem;
 }
 

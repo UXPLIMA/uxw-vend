@@ -26,9 +26,9 @@
             "warning": "#ffb800"
           },
           "fonts": {
-            "heading": "\"Press Start 2P\", \"Outfit\", monospace",
-            "body": "\"Inter\", sans-serif",
-            "mono": "\"JetBrains Mono\", monospace"
+            "heading": "\"Press Start 2P\", var(--font-outfit), monospace",
+            "body": "var(--font-inter), sans-serif",
+            "mono": "var(--font-jetbrains), monospace"
           }
         }
       }
