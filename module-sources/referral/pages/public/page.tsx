@@ -87,7 +87,7 @@ export default function ReferralPage() {
             });
             const result = await res.json();
             if (res.ok) {
-                toast.success(result.message || t("codeApplied"));
+                toast.success(t("codeApplied"));
                 setReferralCodeInput("");
             } else {
                 toast.error(errorMessage(result, t("codeError"), t));

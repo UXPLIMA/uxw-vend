@@ -108,3 +108,58 @@ describe("an answer built from a failure", () => {
         expect(catches).toBeGreaterThan(50);
     });
 });
+
+/**
+ * The other half of the same rule, on the other side of the wire.
+ *
+ * A route that answers `{ error: "Ticket not found" }` has written a string in
+ * one language, and a screen that renders that string has published it in
+ * whatever language the reader is not using. The referral page did exactly
+ * that: `toast.success(result.message || t("codeApplied"))` preferred the
+ * server's English over the Turkish it already had, so applying a referral
+ * code on a Turkish site answered in English. The ticket page rendered
+ * `err.message` straight into the page, which is the browser's words when the
+ * request fails and the route's words when it does not.
+ *
+ * The reader's text comes from `t()`. A response is data: a status, a code, a
+ * count. Whether it also carries prose is the server's business.
+ */
+
+function componentFiles(dir: string, out: string[] = []): string[] {
+    if (!fs.existsSync(dir)) return out;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name === "node_modules") continue;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) componentFiles(full, out);
+        else if (entry.name.endsWith(".tsx")) out.push(full);
+    }
+    return out;
+}
+
+/**
+ * `setMessage` and `setStatus` are deliberately not here: the maintenance
+ * screen loads the banner an operator typed into a form field with
+ * `setMessage(cfg.message)`, which is the operator's own prose coming back,
+ * not the server's.
+ */
+const SHOWN_TO_A_READER = /(?:toast\.(?:error|success|warning|info)|setError)\(\s*[a-zA-Z_$][\w$]*\.(?:error|message)\b/;
+
+describe("what a screen shows a reader", () => {
+    const screens = SCANNED.flatMap((d) => componentFiles(path.join(ROOT, d)));
+
+    it("finds the screens to check", () => {
+        expect(screens.length).toBeGreaterThan(100);
+    });
+
+    it("is its own words, not the answer's", () => {
+        const echoed = screens
+            .filter((file) => SHOWN_TO_A_READER.test(fs.readFileSync(file, "utf8")))
+            .map((file) => path.relative(ROOT, file));
+
+        expect(
+            echoed,
+            `These render a string that arrived from the server. It is written in\n` +
+            `one language and read in another. Say it with t():\n${echoed.join("\n")}`,
+        ).toEqual([]);
+    });
+});

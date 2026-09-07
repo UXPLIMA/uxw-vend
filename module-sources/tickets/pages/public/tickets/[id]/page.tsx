@@ -60,7 +60,9 @@ export default function TicketDetailPage({ params }: PageProps) {
         if (session?.user) {
             fetch(`/api/v1/tickets/${id}`)
                 .then((res) => {
-                    if (!res.ok) throw new Error("Ticket not found");
+                    // The reason is not the reader's: a 404 and a dead
+                    // network both mean the ticket is not on screen.
+                    if (!res.ok) throw new Error("load-failed");
                     return res.json();
                 })
                 .then((data) => {
@@ -70,7 +72,7 @@ export default function TicketDetailPage({ params }: PageProps) {
                 })
                 .catch((err) => {
                     if (cancelled) return;
-                    setError(err.message);
+                    setError(t("ticketLoadFailed"));
                     setLoading(false);
                 });
         } else {

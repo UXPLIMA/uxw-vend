@@ -29,7 +29,7 @@ export default function ExportImportPage() {
         });
 
         const data = await res.json();
-        if (res.ok) toast.success(data.message);
+        if (res.ok) toast.success(t("importDone"));
         else toast.error(t("importFailed"));
 
         setImporting(false);
