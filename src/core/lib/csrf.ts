@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { secretsMatch } from "./constant-time";
 
 /**
  * Lightweight same-origin CSRF guard for custom API mutation routes.
@@ -80,7 +81,7 @@ export function checkCsrf(request: NextRequest): CsrfResult {
     if (SAFE_METHODS.has(request.method)) return { ok: true };
 
     const internalSecret = process.env.CSRF_INTERNAL_SECRET;
-    if (internalSecret && request.headers.get("x-internal-request") === internalSecret) {
+    if (internalSecret && secretsMatch(request.headers.get("x-internal-request"), internalSecret)) {
         return { ok: true };
     }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/core/lib/db";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
+import { secretsMatch } from "@/core/lib/constant-time";
 
 // GET /api/v1/modules/status - Get enabled/disabled status of all modules
 export async function GET(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
     const headerValue = request.headers.get("x-internal-request");
 
     const isInternalCall = internalSecret
-        ? headerValue === internalSecret
+        ? secretsMatch(headerValue, internalSecret)
         : headerValue === "1";
 
     if (!isInternalCall) {
