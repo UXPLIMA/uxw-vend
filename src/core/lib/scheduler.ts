@@ -239,12 +239,11 @@ export async function bootstrapScheduler(): Promise<void> {
         handler: async () => {
             const { pruneOldRecords } = await import("./retention");
             const r = await pruneOldRecords();
-            const total = r.activityFeed + r.cronRun + r.revision + r.userSession + r.verificationToken;
+            const total = r.activityFeed + r.revision + r.userSession + r.verificationToken;
             if (total > 0) {
                 log.info("cron: retention sweep complete", {
                     job: "retention",
                     activityFeed: r.activityFeed,
-                    cronRun: r.cronRun,
                     revision: r.revision,
                     userSession: r.userSession,
                     verificationToken: r.verificationToken,

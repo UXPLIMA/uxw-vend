@@ -4,9 +4,18 @@ import { errorText, log } from "./logger";
 /**
  * Audit-log retention.
  *
- * Tables like ActivityFeedItem, CronRun and Revision grow unbounded unless
- * pruned. `pruneOldRecords()` deletes rows older than the per-table retention
- * window. Called daily by the core scheduler.
+ * Tables like ActivityFeedItem and Revision grow unbounded unless pruned.
+ * `pruneOldRecords()` deletes rows older than the per-table retention window.
+ * Called daily by the core scheduler.
+ *
+ * `CronRun` used to be swept here on the same premise and does not belong:
+ * `jobKey` is its primary key and `claimJob` upserts on it, so it holds one
+ * row per registered job and cannot grow past the number of jobs. What the
+ * thirty day window actually reached was the row of a job that had not run in
+ * that time, which is one whose module is switched off or one that runs
+ * monthly, and deleting it took `lastStatus` and `lastError` with it. Those
+ * are what the observability screen reads, so a job that failed and then
+ * stopped running had its failure swept away by the daily tidy-up.
  *
  * Core's tables only. `WebhookLog` used to be pruned here too, guarded by an
  * `in prisma` check because it belongs to the `webhook-logs` module - and that
@@ -16,7 +25,6 @@ import { errorText, log } from "./logger";
  *
  * Retention windows (days):
  *   ActivityFeedItem   180
- *   CronRun             30
  *   Revision           365  (longer - it's a compliance/audit trail)
  *   UserSession         30  (past expiresAt OR revoked)
  *   VerificationToken   already expired
@@ -29,14 +37,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export interface PruneResult {
     activityFeed: number;
-    cronRun: number;
     revision: number;
     userSession: number;
     verificationToken: number;
 }
 
 export async function pruneOldRecords(): Promise<PruneResult> {
-    const result: PruneResult = { activityFeed: 0, cronRun: 0, revision: 0, userSession: 0, verificationToken: 0 };
+    const result: PruneResult = { activityFeed: 0, revision: 0, userSession: 0, verificationToken: 0 };
 
     const cutoff = (days: number) => new Date(Date.now() - days * DAY_MS);
     const now = new Date();
@@ -48,15 +55,6 @@ export async function pruneOldRecords(): Promise<PruneResult> {
         result.activityFeed = r.count;
     } catch (err) {
         log.error("[retention] activityFeed prune failed", { error: errorText(err) });
-    }
-
-    try {
-        const r = await prisma.cronRun.deleteMany({
-            where: { lastRunAt: { lt: cutoff(30) } },
-        });
-        result.cronRun = r.count;
-    } catch (err) {
-        log.error("[retention] cronRun prune failed", { error: errorText(err) });
     }
 
     try {
