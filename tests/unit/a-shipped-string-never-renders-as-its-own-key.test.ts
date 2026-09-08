@@ -18,6 +18,8 @@
  * has seeded yet is still a string.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
 let rows: { namespace: string; key: string; value: string; module: string; isCustom: boolean }[] = [];
 let enabledModules: string[] = [];
@@ -99,5 +101,33 @@ describe("the messages a page is given", () => {
         // business, not a crash.
         const messages = await getMessages("de");
         expect(messages).toBeTypeOf("object");
+    });
+});
+
+describe("the catalogue on disk", () => {
+    /**
+     * next-intl reads a dot as nesting and refuses a key that contains one.
+     * Four entries were written flat - "err.demo_disabled" sitting at the top
+     * of a namespace - and one of them sat directly beside an `err` object
+     * holding nineteen siblings, which is what the shape is meant to be. The
+     * runtime nests them on the way through, so the site was fine; anything
+     * that hands the file to next-intl directly was not, and every test that
+     * does printed INVALID_KEY on the way past.
+     */
+    it("spells a nested key as nesting, in every locale it ships", () => {
+        const dotted: string[] = [];
+        for (const locale of ["en", "tr"]) {
+            const file = path.join(process.cwd(), "messages-core", `${locale}.json`);
+            const catalogue = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
+            const walk = (node: unknown, trail: string) => {
+                if (!node || typeof node !== "object") return;
+                for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+                    if (key.includes(".")) dotted.push(`${locale}: ${trail}${key}`);
+                    walk(value, `${trail}${key}.`);
+                }
+            };
+            walk(catalogue, "");
+        }
+        expect(dotted).toEqual([]);
     });
 });

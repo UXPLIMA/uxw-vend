@@ -11,8 +11,6 @@
     "decreaseQuantity": "Adedi azalt",
     "delete": "Sil",
     "edit": "Düzenle",
-    "err.demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır.",
-    "err.out_of_stock": "Üzgünüz, bunlardan biri az önce tükendi.",
     "error_description": "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin.",
     "error_id": "Hata kimliği",
     "error_reported": "Beklenmedik bir hata oluştu. Hata otomatik olarak bildirildi.",
@@ -69,7 +67,11 @@
     "welcomeTitle": "Topluluğunuza hoş geldiniz",
     "welcomeVisitorHint": "Üst menüden topluluğu keşfedebilirsiniz.",
     "writeContentHere": "İçeriğinizi buraya yazın...",
-    "breadcrumb": "Sayfa yolu"
+    "breadcrumb": "Sayfa yolu",
+    "err": {
+      "demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır.",
+      "out_of_stock": "Üzgünüz, bunlardan biri az önce tükendi."
+    }
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
@@ -455,7 +457,6 @@
     "emailQueue_title": "E-posta Kuyruğu",
     "emailQueue_to": "Alıcı",
     "enabled": "Açık",
-    "err.demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır.",
     "error_id": "Hata kimliği:",
     "error_title": "Bir şeyler ters gitti",
     "footer_aboutText": "Hakkında Metni",
@@ -1110,7 +1111,10 @@
     "widgets_subtitle": "Ana sayfa kenar çubuğu bileşenlerinin görünürlüğünü ve sırasını ayarlayın",
     "widgets_title": "Kenar Çubuğu Bileşenleri",
     "widgets_visible": "Görünür",
-    "common_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
+    "common_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın.",
+    "err": {
+      "demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır."
+    }
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",
@@ -1225,9 +1229,9 @@
       "username_taken": "Bu kullanıcı adı zaten alınmış.",
       "oauth_account_delete": "Bu hesap harici bir sağlayıcı ile giriş yapıyor. Silmek için lütfen destek ile iletişime geç.",
       "delete_failed": "Hesap silinemedi. Lütfen tekrar dene.",
-      "export_failed": "Veri dışa aktarımın oluşturulamadı. Lütfen tekrar dene."
+      "export_failed": "Veri dışa aktarımın oluşturulamadı. Lütfen tekrar dene.",
+      "challenge_failed": "Doğrulama başarısız. Lütfen tekrar deneyin."
     },
-    "err.challenge_failed": "Doğrulama başarısız. Lütfen tekrar deneyin.",
     "errorAccessDenied": "Erişim reddedildi. Giriş yapma izniniz yok.",
     "errorConfiguration": "Sunucu yapılandırma hatası. Lütfen site yöneticisine başvurun.",
     "errorDefault": "Giriş başarısız. Lütfen tekrar dene.",

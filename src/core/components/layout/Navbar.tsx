@@ -195,8 +195,16 @@ function DefaultNavbar() {
                             known. Rendering nothing until `mounted` left a
                             gap that filled after paint and pushed this whole
                             row sideways, which is a layout shift for the sake
-                            of one icon. Only the icon waits now. */}
-                        <button onClick={toggleDarkMode} disabled={!mounted}
+                            of one icon. Only the icon waits now.
+
+                            It is not disabled while it waits. `disabled` is
+                            an attribute, so marking it made the served HTML
+                            differ from what the same component asks for once
+                            it has mounted, and React reported the pair as a
+                            hydration mismatch it would not patch up. It was
+                            buying nothing either way: a button that has not
+                            hydrated has no handler to run. */}
+                        <button onClick={toggleDarkMode}
                             aria-label={isDark ? t('switchToLight') : t('switchToDark')}
                             className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                             {mounted

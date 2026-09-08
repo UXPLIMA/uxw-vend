@@ -47,6 +47,14 @@ const LOCALES = readdirSync(join(ROOT, "messages-core"))
 const ROUTES = walk(AUTH_API, /^route\.ts$/);
 
 /**
+ * A code an endpoint can answer with. Two spellings reach a caller: the
+ * literal, and the fallback behind a `??` where the code comes from a shared
+ * refusal map and may be missing. `challenge_failed` is only ever the second
+ * kind, so a scan that reads the first alone calls its message an orphan.
+ */
+const CODE_LITERAL = /\bcode:\s*(?:[^,}\n]*\?\?\s*)?"([a-z_]+)"/g;
+
+/**
  * A response body literal that names `error`. The capture is the whole
  * object so the assertion can look for a sibling `code` inside it.
  */
@@ -91,7 +99,7 @@ describe("auth API error contract", () => {
     it("every code used has a message in every locale", () => {
         const used = new Set<string>();
         for (const route of ROUTES) {
-            for (const m of code(route).matchAll(/\bcode:\s*"([a-z_]+)"/g)) used.add(m[1]);
+            for (const m of code(route).matchAll(CODE_LITERAL)) used.add(m[1]);
         }
         expect(used.size).toBeGreaterThan(10);
         for (const locale of LOCALES) {
@@ -103,7 +111,7 @@ describe("auth API error contract", () => {
     it("no locale carries a message no endpoint can send", () => {
         const used = new Set<string>();
         for (const route of ROUTES) {
-            for (const m of code(route).matchAll(/\bcode:\s*"([a-z_]+)"/g)) used.add(m[1]);
+            for (const m of code(route).matchAll(CODE_LITERAL)) used.add(m[1]);
         }
         for (const locale of LOCALES) {
             const orphans = Object.keys(catalogue(locale)).filter((c) => !used.has(c));

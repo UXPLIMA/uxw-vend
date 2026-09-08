@@ -98,10 +98,6 @@ const CONSTRUCTED: { match: RegExp; built: string; resolves: (suffix: string) =>
     { match: /^alerting_(.+)Hint$/, built: "`alerting_${status}Hint`", resolves: (s) => BLOB.includes(s) },
     // The block merger, over the category a module's page block declares.
     { match: /^blocks_cat_(.+)$/, built: "`blocks_cat_${cat}`", resolves: (s) => BLOB.includes(s) },
-    // write-result's errorMessage, over the `code` an endpoint answers with:
-    // the key is the code, so the code appearing in a handler is the proof
-    // that something can ask for this string.
-    { match: /^err\.(.+)$/, built: "`err.${code}`", resolves: (s) => BLOB.includes(`"${s}"`) || BLOB.includes(`'${s}'`) },
 ];
 
 function catalogue(locale: string): [string, string][] {
@@ -146,6 +142,29 @@ describe("the core message catalogue", () => {
     it("claims a key is assembled only where one is assembled", () => {
         const unbuilt = CONSTRUCTED.filter((rule) => !BLOB.includes(rule.built)).map((rule) => rule.built);
         expect(unbuilt).toEqual([]);
+    });
+
+    it("says every error code it carries a message for", () => {
+        // These are not reached by name: `errorMessage` builds the key from
+        // the `code` an endpoint answered with, so the proof that a string is
+        // asked for is the code appearing in a handler. They live one level
+        // down, in an `err` object per namespace, which is why the walk above
+        // does not see them.
+        const json = JSON.parse(fs.readFileSync(path.join(ROOT, "messages-core/en.json"), "utf8"));
+        expect(BLOB).toContain("`err.${code}`");
+
+        const dead: string[] = [];
+        let checked = 0;
+        for (const [namespace, value] of Object.entries(json)) {
+            const codes = (value as Record<string, unknown>)?.err;
+            if (!codes || typeof codes !== "object") continue;
+            for (const code of Object.keys(codes as Record<string, unknown>)) {
+                checked += 1;
+                if (!BLOB.includes(`"${code}"`) && !BLOB.includes(`'${code}'`)) dead.push(`${namespace}.err.${code}`);
+            }
+        }
+        expect(checked).toBeGreaterThan(10);
+        expect(dead).toEqual([]);
     });
 
     it("keeps no rule for a shape the catalogue no longer has", () => {

@@ -11,8 +11,6 @@
     "decreaseQuantity": "Decrease quantity",
     "delete": "Delete",
     "edit": "Edit",
-    "err.demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it.",
-    "err.out_of_stock": "Sorry, one of these has just sold out.",
     "error_description": "An unexpected error occurred. Please try again.",
     "error_id": "Error ID",
     "error_reported": "An unexpected error occurred. It has been reported automatically.",
@@ -69,7 +67,11 @@
     "welcomeTitle": "Welcome to your community",
     "welcomeVisitorHint": "Use the navigation above to explore the community.",
     "writeContentHere": "Write your content here...",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "err": {
+      "demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it.",
+      "out_of_stock": "Sorry, one of these has just sold out."
+    }
   },
   "notFound": {
     "title": "Page not found",
@@ -455,7 +457,6 @@
     "emailQueue_title": "Email Queue",
     "emailQueue_to": "To",
     "enabled": "Enabled",
-    "err.demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it.",
     "error_id": "Error ID:",
     "error_title": "Something went wrong",
     "footer_aboutText": "About Text",
@@ -1110,7 +1111,10 @@
     "widgets_subtitle": "Toggle visibility and reorder homepage sidebar widgets",
     "widgets_title": "Sidebar Widgets",
     "widgets_visible": "Visible",
-    "common_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
+    "common_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest.",
+    "err": {
+      "demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it."
+    }
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -1225,9 +1229,9 @@
       "username_taken": "That username is already taken.",
       "oauth_account_delete": "This account signs in with an external provider. Please contact support to delete it.",
       "delete_failed": "We could not delete the account. Please try again.",
-      "export_failed": "We could not build your data export. Please try again."
+      "export_failed": "We could not build your data export. Please try again.",
+      "challenge_failed": "Verification failed. Please try again."
     },
-    "err.challenge_failed": "Verification failed. Please try again.",
     "errorAccessDenied": "Access denied. You don't have permission to sign in.",
     "errorConfiguration": "Server misconfiguration. Please contact the site administrator.",
     "errorDefault": "Sign-in failed. Please try again.",
