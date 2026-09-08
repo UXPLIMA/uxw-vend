@@ -106,11 +106,16 @@ export async function getMessages(locale: string): Promise<Record<string, unknow
     const messages: Record<string, Record<string, unknown>> = {};
     for (const [namespace, values] of Object.entries(shippedMessages(locale))) {
         if (isUnsafeKey(namespace) || !values || typeof values !== "object") continue;
-        // Copied key by key rather than assigned wholesale: the file is
-        // committed rather than uploaded, but it reaches the same accumulator
-        // a database row does, and the rule for that accumulator is that
-        // nothing gets in without passing this.
-        messages[namespace] = safeCopy(values as Record<string, unknown>);
+        // Flattened and then re-nested rather than copied across, so the file
+        // arrives by the same road a row does. A catalogue entry may be
+        // written either way - `{ "err": { "demo_disabled": ... } }` or the
+        // flat `"err.demo_disabled"` - and next-intl accepts only the first,
+        // so the dot has to be spent here whichever form it arrived in.
+        const target = emptyRecord();
+        flattenObject(values as Record<string, unknown>, "", (key, value) => {
+            setNestedValue(target, key, value);
+        });
+        messages[namespace] = target;
     }
 
     for (const row of rows) {
@@ -213,25 +218,6 @@ export async function invalidateTranslationCache(): Promise<void> {
 // ---------------------------------------------------------------------------
 // Internals
 // ---------------------------------------------------------------------------
-
-/**
- * A catalogue branch with every unsafe key dropped, at every level.
- *
- * The shipped file is already nested - `auth.login.title` is an object inside
- * an object - so this copies the shape rather than walking a dotted path the
- * way a database row needs.
- */
-function safeCopy(source: Record<string, unknown>): Record<string, unknown> {
-    const out = emptyRecord();
-    for (const [key, value] of Object.entries(source)) {
-        if (isUnsafeKey(key)) continue;
-        out[key] =
-            value && typeof value === "object" && !Array.isArray(value)
-                ? safeCopy(value as Record<string, unknown>)
-                : value;
-    }
-    return out;
-}
 
 async function getEnabledModuleIds(): Promise<string[]> {
     const modules = await prisma.moduleConfig.findMany({

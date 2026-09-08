@@ -68,6 +68,32 @@ describe("the messages a page is given", () => {
         expect(messages.admin.updates_upToDate).toBe("Bu en yeni sürüm.");
     });
 
+    it("nests a shipped key that carries a dot, because a dot means nesting", async () => {
+        // The catalogue is written by hand and some entries are flat paths:
+        // `"err.demo_disabled"` sits at the top of the `common` namespace. The
+        // database path has always split those on the dot; the file path did
+        // not, and next-intl refuses a key containing one - the layout threw
+        // INVALID_KEY on every page before this.
+        const messages = (await getMessages("en")) as Record<string, Record<string, Record<string, string>>>;
+        expect(messages.common.err.demo_disabled).toContain("demo");
+    });
+
+    it("hands back a tree with no dot in any key, whatever the file looked like", async () => {
+        // The property next-intl actually enforces, checked over everything
+        // this version ships rather than over the four keys that broke it.
+        const messages = await getMessages("en");
+        const dotted: string[] = [];
+        const walk = (node: unknown, path: string) => {
+            if (!node || typeof node !== "object") return;
+            for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+                if (key.includes(".")) dotted.push(`${path}${key}`);
+                walk(value, `${path}${key}.`);
+            }
+        };
+        walk(messages, "");
+        expect(dotted).toEqual([]);
+    });
+
     it("still answers when the file for a locale is not there", async () => {
         // A locale nobody ships a catalogue for is the module system's
         // business, not a crash.
